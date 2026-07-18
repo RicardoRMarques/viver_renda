@@ -1,138 +1,157 @@
+#!/usr/bin/env python3
 """
-Coletor de FIIs — API brapi.dev
-----------------------------------------------------------------------
-Substitui o scraping por uma API oficial em JSON.
+coletar_brapi_fiis.py
+----------------------
+Busca cotação + indicadores fundamentalistas de uma lista de FIIs na API da
+brapi.dev e salva o resultado em fiis_investidor10.json, na raiz do repositório.
 
-IMPORTANTE — dois níveis de acesso na brapi:
-  1) Cotação básica (preço, variação, volume) -> /api/quote/
-     Disponível em TODOS os planos, inclusive o gratuito. Sem custo.
-  2) Indicadores completos (P/VP, DY, vacância, patrimônio, cotistas,
-     dados do administrador) -> /api/v2/fii/indicators
-     Exclusivo do plano PRO (pago). No sandbox sem token, só funciona
-     para os tickers de teste MXRF11 e HGLG11.
+O token da API é lido de uma variável de ambiente (BRAPI_TOKEN), nunca fica
+escrito no código nem é exposto ao navegador do visitante do site. Este
+script roda apenas no GitHub Actions (servidor), então é seguro usar o token
+aqui.
 
-Este script tenta os indicadores completos primeiro; se não tiver
-token Pro (ou o ticker não for MXRF11/HGLG11), cai automaticamente
-para a cotação básica gratuita.
-
-Dependências:
-    pip install requests
-
-Uso:
-    # sem token — funciona com cotação básica para qualquer ticker
-    python coletar_brapi_fiis.py
-
-    # com token Pro — libera indicadores completos para todos os tickers
+Uso local (opcional, para testar):
     export BRAPI_TOKEN="seu_token_aqui"
     python coletar_brapi_fiis.py
-
-Gera: fiis_investidor10.json (mesmo nome usado pelo pesquisa-fiis.html,
-assim não precisa mudar nada no site)
 """
 
 import json
 import os
+import sys
 import time
+from datetime import datetime, timezone
+
 import requests
 
-BASE_URL = "https://brapi.dev/api"
-TICKERS = ["BTLG11", "IRIM11", "ALZR11", "TRXF11", "GARE11"]
+# ---------------------------------------------------------------------------
+# Configuração
+# ---------------------------------------------------------------------------
 
-TOKEN = os.getenv("BRAPI_TOKEN")  # opcional — necessário para indicadores completos
-HEADERS = {"Authorization": f"Bearer {TOKEN}"} if TOKEN else {}
+# Lista de FIIs acompanhados no boletim. Ajuste livremente.
+TICKERS_FII = [
+    "BTLG11",
+    "IRIM11",
+    "ALZR11",
+    "TRXF11",
+    "GARE11",
+    "MXRF11",
+    "HGLG11",
+    "KNRI11",
+    "VISC11",
+    "XPML11",
+]
 
-# Tickers liberados no sandbox gratuito para indicadores completos
-TICKERS_SANDBOX_LIVRE = {"MXRF11", "HGLG11"}
+BRAPI_BASE_URL = "https://brapi.dev/api/quote"
+OUTPUT_FILE = "fiis_investidor10.json"
+LOTE = 8  # brapi aceita vários tickers por chamada; dividimos em lotes por segurança
+TIMEOUT = 20
 
 
-def buscar_indicadores_completos(ticker: str) -> dict | None:
-    """
-    Tenta /api/v2/fii/indicators. Só funciona sem token para MXRF11/HGLG11.
-    Com BRAPI_TOKEN de plano Pro, funciona para qualquer ticker.
-    """
-    if not TOKEN and ticker not in TICKERS_SANDBOX_LIVRE:
-        return None  # nem tenta, pra não gastar request à toa
+def obter_token() -> str:
+    token = os.environ.get("BRAPI_TOKEN", "").strip()
+    if not token:
+        print("ERRO: variável de ambiente BRAPI_TOKEN não definida.", file=sys.stderr)
+        sys.exit(1)
+    return token
 
+
+def dividir_em_lotes(lista, tamanho):
+    for i in range(0, len(lista), tamanho):
+        yield lista[i:i + tamanho]
+
+
+def formatar_percentual(valor):
+    if valor is None:
+        return None
     try:
-        resp = requests.get(
-            f"{BASE_URL}/v2/fii/indicators",
-            params={"symbols": ticker},
-            headers=HEADERS,
-            timeout=15,
-        )
-        if resp.status_code != 200:
-            return None
-        dados = resp.json().get("fiis", [])
-        return dados[0] if dados else None
-    except Exception:
+        return f"{float(valor):.2f}%"
+    except (TypeError, ValueError):
         return None
 
 
-def buscar_cotacao_basica(ticker: str) -> dict | None:
-    """/api/quote/{ticker} — disponível em todos os planos, inclusive gratuito."""
+def formatar_moeda(valor):
+    if valor is None:
+        return None
     try:
-        resp = requests.get(f"{BASE_URL}/quote/{ticker}", headers=HEADERS, timeout=15)
-        if resp.status_code != 200:
-            return None
-        dados = resp.json().get("results", [])
-        return dados[0] if dados else None
-    except Exception:
+        return f"R$ {float(valor):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except (TypeError, ValueError):
         return None
 
 
-def montar_registro(ticker: str) -> dict:
-    completo = buscar_indicadores_completos(ticker)
+def formatar_numero(valor, casas=2):
+    if valor is None:
+        return None
+    try:
+        return f"{float(valor):.{casas}f}"
+    except (TypeError, ValueError):
+        return None
 
-    if completo:
-        return {
-            "ticker": ticker,
-            "fonte": "brapi.dev (indicadores completos)",
-            "cotacao": f"R$ {completo.get('price', '—')}",
-            "dy_12m": f"{round(completo.get('dividendYield12m', 0) * 100, 2)}%" if completo.get("dividendYield12m") else "—",
-            "p_vp": completo.get("priceToNav", "—"),
-            "segmento": completo.get("segmentoAtuacao", "—"),
-            "tipo_fundo": completo.get("segmentType", "—"),
-            "tipo_gestao": completo.get("tipoGestao", "—"),
-            "numero_cotistas": completo.get("totalInvestors", "—"),
-            "valor_patrimonial": completo.get("equity", "—"),
-            "razao_social": completo.get("name", ticker),
-        }
 
-    # fallback: cotação básica gratuita
-    basica = buscar_cotacao_basica(ticker)
-    if basica:
-        return {
-            "ticker": ticker,
-            "fonte": "brapi.dev (cotação básica — plano gratuito)",
-            "cotacao": f"R$ {basica.get('regularMarketPrice', '—')}",
-            "dy_12m": "— (requer plano Pro)",
-            "p_vp": "— (requer plano Pro)",
-            "segmento": "— (requer plano Pro)",
-            "tipo_fundo": "—",
-            "tipo_gestao": "—",
-            "numero_cotistas": "—",
-            "valor_patrimonial": "—",
-            "razao_social": basica.get("shortName", ticker),
-        }
+def buscar_lote(tickers, token):
+    url = f"{BRAPI_BASE_URL}/{','.join(tickers)}"
+    params = {"fundamental": "true", "dividends": "true"}
+    headers = {"Authorization": f"Bearer {token}"}
 
-    return {"ticker": ticker, "fonte": "brapi.dev", "erro": "não encontrado"}
+    resp = requests.get(url, params=params, headers=headers, timeout=TIMEOUT)
+    resp.raise_for_status()
+    data = resp.json()
+    return data.get("results", [])
+
+
+def montar_registro(ativo):
+    dy = (
+        ativo.get("dividendYield")
+        or (ativo.get("defaultKeyStatistics") or {}).get("dividendYield")
+    )
+    pvp = (ativo.get("defaultKeyStatistics") or {}).get("priceToBook")
+
+    return {
+        "ticker": ativo.get("symbol"),
+        "razao_social": ativo.get("longName") or ativo.get("shortName") or "",
+        "cotacao": formatar_moeda(ativo.get("regularMarketPrice")),
+        "variacao_dia": formatar_percentual(ativo.get("regularMarketChangePercent")),
+        "dy_12m": formatar_percentual(dy),
+        "p_vp": formatar_numero(pvp),
+        "segmento": (ativo.get("industry") or ativo.get("sector") or "—"),
+        "fonte": "brapi.dev",
+        "atualizado_em": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 def main():
-    if not TOKEN:
-        print("Aviso: sem BRAPI_TOKEN definido — usando apenas cotação básica gratuita.")
-        print("Indicadores completos (P/VP, DY, vacância) exigem plano Pro.\n")
+    token = obter_token()
+    resultados = []
+    erros = []
 
-    resultado = []
-    for ticker in TICKERS:
-        print(f"Coletando {ticker}...")
-        resultado.append(montar_registro(ticker))
-        time.sleep(0.5)
+    for lote in dividir_em_lotes(TICKERS_FII, LOTE):
+        try:
+            ativos = buscar_lote(lote, token)
+            for ativo in ativos:
+                resultados.append(montar_registro(ativo))
+        except requests.RequestException as exc:
+            print(f"AVISO: falha ao buscar lote {lote}: {exc}", file=sys.stderr)
+            erros.extend(lote)
+        time.sleep(1)  # respeita rate limit da API
 
-    with open("fiis_investidor10.json", "w", encoding="utf-8") as f:
-        json.dump(resultado, f, ensure_ascii=False, indent=2)
+    if not resultados:
+        print("ERRO: nenhum FII foi coletado com sucesso. Mantendo arquivo anterior.", file=sys.stderr)
+        sys.exit(1)
 
-    print(f"\nConcluído: {len(resultado)} fundos salvos em fiis_investidor10.json")
+    # Ordena pelo maior Dividend Yield (quando disponível) para destacar no boletim
+    def chave_ordenacao(item):
+        try:
+            return -float((item.get("dy_12m") or "0%").replace("%", ""))
+        except ValueError:
+            return 0
+
+    resultados.sort(key=chave_ordenacao)
+
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(resultados, f, ensure_ascii=False, indent=2)
+
+    print(f"OK: {len(resultados)} FIIs salvos em {OUTPUT_FILE}.")
+    if erros:
+        print(f"AVISO: falha ao coletar os tickers: {', '.join(erros)}", file=sys.stderr)
 
 
 if __name__ == "__main__":
