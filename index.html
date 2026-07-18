@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dividendos | Viver de Renda</title>
-  <meta name="description" content="Página de apresentação sobre investimentos, construção de patrimônio e viver de renda." />
+  <title>Dividendos | Viver de Renda & Consultas B3</title>
+  <meta name="description" content="Consulte cotações de Ações, FIIs, BDRs e ETFs em tempo real. Educação financeira para construir patrimônio." />
   <style>
     :root {
       --bg: #0b1220;
@@ -14,6 +14,8 @@
       --primary: #31c3ff;
       --primary-dark: #16a0d8;
       --accent: #7cff92;
+      --gold: #e0b84d;
+      --danger: #ff6b6b;
       --border: rgba(255,255,255,0.08);
       --shadow: 0 16px 40px rgba(0,0,0,0.28);
     }
@@ -27,10 +29,11 @@
     body {
       font-family: Arial, Helvetica, sans-serif;
       background:
-        radial-gradient(circle at top, rgba(49,195,255,0.18), transparent 30%),
+        radial-gradient(circle at top, rgba(49,195,255,0.15), transparent 40%),
         linear-gradient(180deg, #07101c 0%, #0b1220 100%);
       color: var(--text);
       line-height: 1.6;
+      min-height: 100vh;
     }
 
     a {
@@ -39,14 +42,35 @@
     }
 
     .container {
-      width: min(1100px, 92%);
+      width: min(1200px, 94%);
       margin: 0 auto;
     }
 
-    header {
-      padding: 24px 0 0;
+    /* Ticker de Índices */
+    .market-ticker {
+      background: #04101a;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0;
+      font-size: 0.85rem;
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
     }
+    .market-ticker::-webkit-scrollbar { display: none; }
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+    }
+    .ticker-item strong { color: var(--text); }
+    .val-up { color: var(--accent); font-weight: bold; }
+    .val-down { color: var(--danger); font-weight: bold; }
 
+    /* Header */
+    header { padding: 24px 0 0; }
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -54,300 +78,464 @@
       gap: 16px;
       padding-bottom: 18px;
     }
-
     .brand {
       font-weight: 700;
       letter-spacing: 0.4px;
       color: var(--primary);
-      font-size: 1.1rem;
+      font-size: 1.2rem;
     }
-
     .nav {
       display: flex;
-      gap: 18px;
+      gap: 24px;
       flex-wrap: wrap;
       color: var(--muted);
       font-size: 0.95rem;
+      font-weight: bold;
     }
+    .nav a:hover { color: var(--primary); }
 
-    .hero {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 32px;
-      align-items: center;
-      padding: 40px 0 28px;
+    .section-intro {
+      text-align: center;
+      padding: 50px 0 30px;
     }
-
-    .hero h1 {
-      font-size: clamp(2rem, 4vw, 3.6rem);
+    .section-intro h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
       line-height: 1.1;
-      margin-bottom: 16px;
-    }
-
-    .hero p {
-      color: var(--muted);
-      font-size: 1.05rem;
-      max-width: 60ch;
-      margin-bottom: 24px;
-    }
-
-    .badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .badge {
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      font-size: 0.9rem;
-    }
-
-    .cta-group {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 14px 20px;
-      border-radius: 12px;
-      font-weight: 700;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #04101a;
-      box-shadow: var(--shadow);
-    }
-
-    .btn-secondary {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-    }
-
-    .hero-card {
-      background: rgba(17,27,46,0.92);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-    }
-
-    .hero-card img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 18px;
-    }
-
-    .section {
-      padding: 24px 0;
-    }
-
-    .section h2 {
-      font-size: 1.8rem;
       margin-bottom: 14px;
     }
-
-    .section p, .section li {
+    .section-intro p {
       color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 640px;
+      margin: 0 auto;
     }
+
+    /* Layout dividido: Explorar mercado (esquerda) + Boletim (direita) */
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+      padding-bottom: 60px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .panel-title .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+    .panel-title.explorar .dot { background: var(--primary); }
+    .panel-title.boletim .dot { background: var(--gold); }
+
+    /* ---------- Coluna esquerda: Explorar o mercado ---------- */
+    .search-container {
+      background: rgba(17,27,46,0.7);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      height: 100%;
+    }
+
+    .asset-types {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .asset-type-btn {
+      padding: 8px 18px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .asset-type-btn.active, .asset-type-btn:hover {
+      background: rgba(49,195,255,0.15);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .search-input-group {
+      display: flex;
+      gap: 12px;
+      position: relative;
+    }
+    .search-input-group input {
+      flex: 1;
+      padding: 16px 20px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      background: #04101a;
+      color: var(--text);
+      font-size: 1.05rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input-group input:focus {
+      border-color: var(--primary);
+    }
+    .search-input-group input::placeholder {
+      color: #4a5a7a;
+    }
+    .btn-search {
+      padding: 0 26px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #04101a;
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s;
+    }
+    .btn-search:hover { transform: scale(1.02); }
+
+    .result-card {
+      margin-top: 20px;
+      background: #04101a;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .asset-info h2 {
+      font-size: 1.7rem;
+      color: var(--primary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .asset-company { color: var(--muted); font-size: 0.95rem; }
+
+    .asset-price-box { text-align: right; }
+    .asset-price { font-size: 1.9rem; font-weight: bold; }
+    .asset-var { font-size: 1rem; }
+
+    .indicators {
+      display: flex;
+      gap: 20px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      width: 100%;
+    }
+    .indicator-item span { display: block; font-size: 0.82rem; color: var(--muted); }
+    .indicator-item strong { font-size: 1.05rem; }
+
+    /* ---------- Coluna direita: Boletim Viver de Renda ---------- */
+    .boletim-panel {
+      background: rgba(17,27,46,0.7);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      height: 100%;
+    }
+    .boletim-status {
+      font-size: 0.8rem;
+      color: #6b7a99;
+      margin-bottom: 14px;
+    }
+    .boletim-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 560px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .boletim-item {
+      background: #04101a;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .boletim-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .boletim-ticker { font-weight: 700; color: var(--gold); font-size: 1.05rem; }
+    .boletim-preco { font-weight: 700; }
+    .boletim-nome { font-size: 0.82rem; color: var(--muted); margin-bottom: 10px; }
+    .boletim-metrics {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .boletim-metric { font-size: 0.82rem; color: var(--muted); }
+    .boletim-metric strong { color: var(--text); display: block; font-size: 0.95rem; }
+    .boletim-fonte {
+      margin-top: 10px;
+      font-size: 0.75rem;
+    }
+    .boletim-fonte a { color: var(--primary); }
+
+    /* Seção de Apresentação e Curso */
+    .presentation-section {
+      padding: 60px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+    }
+    .presentation-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .presentation-header h2 { font-size: 2rem; margin-bottom: 12px; }
+    .presentation-header p { color: var(--muted); max-width: 700px; margin: 0 auto; }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      margin-top: 20px;
+      gap: 20px;
     }
-
     .card {
-      background: rgba(17,27,46,0.95);
+      background: rgba(17,27,46,0.6);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 20px;
-      box-shadow: var(--shadow);
+      padding: 24px;
     }
-
-    .card h3 {
-      color: var(--text);
-      margin-bottom: 10px;
-      font-size: 1.1rem;
-    }
-
-    .list {
-      margin-top: 12px;
-      padding-left: 18px;
-    }
-
-    .highlight {
-      color: var(--accent);
-      font-weight: 700;
-    }
+    .card h3 { color: var(--primary); margin-bottom: 12px; font-size: 1.2rem; }
+    .card p { color: var(--muted); font-size: 0.95rem; }
 
     .offer {
-      margin: 28px 0 54px;
-      background: linear-gradient(135deg, rgba(49,195,255,0.16), rgba(124,255,146,0.12));
-      border: 1px solid rgba(255,255,255,0.12);
+      margin: 40px auto;
+      max-width: 800px;
+      background: linear-gradient(135deg, rgba(49,195,255,0.1), rgba(124,255,146,0.05));
+      border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 28px;
+      padding: 32px;
       text-align: center;
     }
-
-    .offer h2 {
-      margin-bottom: 10px;
+    .btn-buy {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: var(--accent);
+      color: #04101a;
+      box-shadow: 0 4px 15px rgba(124,255,146,0.2);
+      transition: transform 0.2s;
     }
-
-    .offer p {
-      max-width: 70ch;
-      margin: 0 auto 20px;
-      color: var(--muted);
-    }
+    .btn-buy:hover { transform: translateY(-3px); }
 
     footer {
+      text-align: center;
       border-top: 1px solid var(--border);
-      padding: 20px 0 28px;
+      padding: 24px 0;
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
-    @media (max-width: 860px) {
-      .hero {
-        grid-template-columns: 1fr;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+    @media (max-width: 900px) {
+      .split-layout { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+      .search-input-group { flex-direction: column; }
+      .btn-search { padding: 16px; }
+      .result-card { flex-direction: column; text-align: center; gap: 20px; }
+      .asset-price-box { text-align: center; }
+      .indicators { justify-content: center; flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
+
+  <!-- Ticker (Estático no HTML, pode ser dinâmico via JS futuramente) -->
+  <div class="market-ticker">
+    <div class="container" style="display: flex; gap: 24px;">
+      <div class="ticker-item">IBOVESPA <strong>128.500</strong> <span class="val-up">+0.45%</span></div>
+      <div class="ticker-item">IFIX <strong>3.380</strong> <span class="val-up">+0.12%</span></div>
+      <div class="ticker-item">SMLL <strong>2.150</strong> <span class="val-down">-0.30%</span></div>
+      <div class="ticker-item">DÓLAR <strong>R$ 5,05</strong> <span class="val-down">-0.25%</span></div>
+    </div>
+  </div>
+
   <header>
     <div class="container topbar">
       <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
       <nav class="nav">
-        <a href="#objetivo">Objetivo</a>
-        <a href="#conteudo">Conteúdo</a>
-        <a href="#publico">Público</a>
-        <a href="#compra">Comprar</a>
+        <a href="#consultas">Mercado</a>
+        <a href="#educacao">Educação</a>
+        <a href="#compra" style="color: var(--accent);">Comprar Material</a>
       </nav>
     </div>
   </header>
 
   <main class="container">
-    <section class="hero">
+
+    <section class="section-intro" id="consultas">
+      <h1>Explore o mercado. <br><span style="color: var(--primary);">Tome melhores decisões.</span></h1>
+      <p>Consulte fundamentos, preços e variações de Ações, Fundos Imobiliários, BDRs e ETFs listados na B3, além do boletim diário com os destaques de FIIs.</p>
+    </section>
+
+    <section class="split-layout">
+
+      <!-- ESQUERDA: Explorar o mercado -->
       <div>
-        <h1>Educação financeira para construir patrimônio e viver de renda</h1>
-        <p>
-          Esta apresentação foi criada para explicar, de forma didática, os principais produtos financeiros
-          e como eles podem se encaixar em uma estratégia de longo prazo voltada à geração de renda.
-        </p>
+        <div class="panel-title explorar"><span class="dot"></span> Explore o mercado</div>
+        <div class="search-container">
+          <div class="asset-types">
+            <button class="asset-type-btn active">Ações</button>
+            <button class="asset-type-btn">FIIs</button>
+            <button class="asset-type-btn">BDRs</button>
+            <button class="asset-type-btn">ETFs</button>
+          </div>
 
-        <div class="badges">
-          <span class="badge">Investimentos</span>
-          <span class="badge">Patrimônio</span>
-          <span class="badge">Renda Passiva</span>
-          <span class="badge">Diversificação</span>
-        </div>
+          <div class="search-input-group">
+            <input type="text" id="tickerInput" placeholder="Ex: ALOS3, MXRF11, IVVB11..." autocomplete="off" />
+            <button class="btn-search" id="btnBuscar">Analisar Ativo</button>
+          </div>
 
-        <div class="cta-group">
-          <a class="btn btn-primary" href="https://go.hotmart.com/T105616628U" target="_blank" rel="noopener noreferrer">
-            Comprar agora
-          </a>
-          <a class="btn btn-secondary" href="#conteudo">
-            Ver conteúdo
-          </a>
+          <div class="result-card" id="resultCard">
+            <div class="asset-info">
+              <h2 id="resTicker">ALOS3</h2>
+              <div class="asset-company" id="resName">Allos S.A.</div>
+
+              <div class="indicators">
+                <div class="indicator-item">
+                  <span>Div. Yield</span>
+                  <strong id="resDy">4.5%</strong>
+                </div>
+                <div class="indicator-item">
+                  <span>P/VP</span>
+                  <strong id="resPvp">0.85</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="asset-price-box">
+              <div class="asset-price" id="resPrice">R$ 24,50</div>
+              <div class="asset-var val-up" id="resVar">+1.25% Hoje</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="hero-card">
-  <img src="capa_viver_renda.png" 
-       alt="Capa da apresentação Dividendos: Viver de Renda" 
-       loading="lazy">
+      <!-- DIREITA: Boletim de Mercado Viver de Renda -->
+      <div>
+        <div class="panel-title boletim"><span class="dot"></span> Boletim de Mercado Viver de Renda</div>
+        <div class="boletim-panel">
+          <div class="boletim-status" id="boletimStatus">Carregando boletim...</div>
+          <div class="boletim-list" id="boletimList"></div>
+        </div>
       </div>
+
     </section>
 
-    <section class="section" id="objetivo">
-      <h2>Propósito da apresentação</h2>
-      <p>
-        O material tem como foco ensinar investimentos de maneira clara, organizando os conceitos por classes de ativos,
-        indexadores, tributação e características de cada produto. A ideia é ajudar o público a entender como montar uma
-        carteira coerente com o objetivo de acumular patrimônio e gerar renda ao longo do tempo.
-      </p>
-    </section>
+    <!-- ÁREA SECUNDÁRIA: EDUCAÇÃO E VENDA -->
+    <section class="presentation-section" id="educacao">
+      <div class="presentation-header">
+        <h2>Aprenda a investir e viva de renda</h2>
+        <p>A pesquisa de ativos é apenas o primeiro passo. Nossa apresentação didática organiza o conhecimento que você precisa para estruturar uma carteira vencedora no longo prazo.</p>
+      </div>
 
-    <section class="section" id="conteudo">
-      <h2>O que a página destaca</h2>
       <div class="grid">
         <div class="card">
-          <h3>Renda fixa</h3>
-          <p>
-            Explica produtos como Tesouro Direto, CDB, LCI, LCA, poupança, debêntures, CRI e CRA, com foco em risco,
-            garantia e tributação.
-          </p>
+          <h3>Renda Fixa</h3>
+          <p>Entenda o porto seguro da sua carteira: Tesouro Direto, CDBs, LCIs e proteção do FGC.</p>
         </div>
-
         <div class="card">
-          <h3>Renda variável</h3>
-          <p>
-            Apresenta ações, FIIs, fundos de infraestrutura, ETFs e outros instrumentos para quem busca crescimento e renda.
-          </p>
+          <h3>Renda Variável</h3>
+          <p>Como lucrar com Ações, receber aluguéis mensais com FIIs e dolarizar com ETFs/BDRs.</p>
         </div>
-
         <div class="card">
           <h3>Estratégia</h3>
-          <p>
-            Mostra como diversificar por perfil, prazo e objetivos, reforçando a construção de uma carteira para viver de renda.
-          </p>
+          <p>O segredo da diversificação e dos aportes constantes para gerar renda passiva vitalícia.</p>
         </div>
+      </div>
+
+      <div class="offer" id="compra">
+        <h2 style="margin-bottom: 10px;">Adquira o material completo</h2>
+        <p style="color: var(--muted); margin-bottom: 20px;">Aprenda como os diferentes produtos financeiros se conectam na prática.</p>
+        <a class="btn-buy" href="https://go.hotmart.com/T105616628U" target="_blank" rel="noopener noreferrer">
+          Comprar Apresentação Agora
+        </a>
       </div>
     </section>
 
-    <section class="section" id="publico">
-      <h2>Para quem esta página é indicada?</h2>
-      <ul class="list">
-       <li>Investidores iniciantes que querem entender os conceitos básicos de investimentos.</li>
-       <li>Pessoas que desejam organizar melhor sua carteira e aportes mensais.</li>
-       <li>Quem busca gerar renda passiva no longo prazo, visando viver de rendimentos.</li>
-       <li>Interessados em educação financeira prática e planejamento patrimonial eficiente.</li>
-     </ul>
-    </section>
-
-    <section class="offer" id="compra">
-      <h2>Pronto para conhecer a apresentação?</h2>
-      <p>
-        Acesse o material completo e veja como os diferentes produtos financeiros se conectam em uma estratégia prática
-        de formação de patrimônio e geração de renda.
-      </p>
-      <a class="btn btn-primary" href="https://go.hotmart.com/T105616628U" target="_blank" rel="noopener noreferrer">
-        Ir para a compra
-      </a>
-    </section>
   </main>
 
   <footer>
     <div class="container">
-      <p>
-        Página demonstrativa criada com base no propósito educacional da apresentação sobre investimentos e viver de renda.
-      </p>
+      <p>Desenvolvido para investidores. Dados fornecidos via integração com a B3.</p>
     </div>
   </footer>
+
+  <script>
+    /* ---------------------------------------------------------------
+       Boletim de Mercado Viver de Renda
+       Opção 3: lê um JSON estático (fiis_investidor10.json) gerado
+       periodicamente pelo GitHub Actions + script coletar_brapi_fiis.py.
+       O token da API NUNCA fica exposto aqui — só o robô usa o token,
+       e o site só lê o arquivo já pronto no repositório.
+    ----------------------------------------------------------------*/
+    async function carregarBoletim() {
+      const statusEl = document.getElementById('boletimStatus');
+      const listEl = document.getElementById('boletimList');
+
+      try {
+        const resp = await fetch('fiis_investidor10.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const dados = await resp.json();
+        if (!Array.isArray(dados) || dados.length === 0) throw new Error('vazio');
+
+        statusEl.textContent = `Atualizado automaticamente · ${dados.length} fundos`;
+        listEl.innerHTML = dados.map(f => `
+          <div class="boletim-item">
+            <div class="boletim-item-top">
+              <span class="boletim-ticker">${f.ticker}</span>
+              <span class="boletim-preco">${f.cotacao || '—'}</span>
+            </div>
+            <div class="boletim-nome">${f.razao_social || ''}</div>
+            <div class="boletim-metrics">
+              <div class="boletim-metric">DY 12M<strong>${f.dy_12m || '—'}</strong></div>
+              <div class="boletim-metric">P/VP<strong>${f.p_vp || '—'}</strong></div>
+              <div class="boletim-metric">Segmento<strong>${f.segmento || '—'}</strong></div>
+            </div>
+            ${f.fonte ? `<div class="boletim-fonte"><a href="#" onclick="return false;">${f.fonte}</a></div>` : ''}
+          </div>
+        `).join('');
+      } catch (e) {
+        statusEl.textContent = 'Boletim ainda não gerado — configure o GitHub Actions para publicar fiis_investidor10.json';
+        listEl.innerHTML = '<div class="boletim-item">Assim que o robô rodar pela primeira vez, os fundos aparecerão aqui automaticamente.</div>';
+      }
+    }
+
+    carregarBoletim();
+
+    // Placeholder do botão "Analisar Ativo" (busca de ações/FIIs individuais)
+    document.getElementById('btnBuscar').addEventListener('click', () => {
+      const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+      if (!ticker) return;
+      // Aqui entra a chamada futura à API (via proxy ou dado estático),
+      // preenchendo #resTicker, #resName, #resPrice, #resVar, #resDy, #resPvp
+      document.getElementById('resTicker').textContent = ticker;
+    });
+  </script>
+
 </body>
 </html>
