@@ -527,13 +527,82 @@
 
     carregarBoletim();
 
-    // Placeholder do botão "Analisar Ativo" (busca de ações/FIIs individuais)
-    document.getElementById('btnBuscar').addEventListener('click', () => {
-      const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+    // Busca real de ações/FIIs/BDRs/ETFs via brapi
+    const BRAPI_TOKEN = 'eJTYGhkHYGdQZy8kDmnHgy'; // TODO: mover para um proxy e remover daqui
+
+    function formatMoeda(valor) {
+      return typeof valor === 'number'
+        ? valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : '—';
+    }
+
+    async function buscarAtivo() {
+      const input = document.getElementById('tickerInput');
+      const btn = document.getElementById('btnBuscar');
+      const ticker = input.value.trim().toUpperCase().split(',')[0].trim();
       if (!ticker) return;
-      // Aqui entra a chamada futura à API (via proxy ou dado estático),
-      // preenchendo #resTicker, #resName, #resPrice, #resVar, #resDy, #resPvp
-      document.getElementById('resTicker').textContent = ticker;
+
+      const resTicker = document.getElementById('resTicker');
+      const resName = document.getElementById('resName');
+      const resPrice = document.getElementById('resPrice');
+      const resVar = document.getElementById('resVar');
+      const resDy = document.getElementById('resDy');
+      const resPvp = document.getElementById('resPvp');
+
+      const textoOriginal = btn.textContent;
+      btn.textContent = 'Buscando...';
+      btn.disabled = true;
+      resTicker.textContent = ticker;
+      resName.textContent = 'Consultando...';
+
+      try {
+        const url = `https://brapi.dev/api/quote/${ticker}?fundamental=true`;
+        const resp = await fetch(url, {
+          headers: { Authorization: `Bearer ${BRAPI_TOKEN}` }
+        });
+        const data = await resp.json();
+        const ativo = data && data.results && data.results[0];
+
+        if (!resp.ok || !ativo) {
+          const msg = (data && data.message) || 'Ticker não encontrado.';
+          resName.textContent = msg;
+          resPrice.textContent = '—';
+          resVar.textContent = '';
+          resDy.textContent = '—';
+          resPvp.textContent = '—';
+          return;
+        }
+
+        const variacao = typeof ativo.regularMarketChangePercent === 'number'
+          ? ativo.regularMarketChangePercent
+          : 0;
+        const emAlta = variacao >= 0;
+        const dy = ativo.dividendYield
+          || (ativo.defaultKeyStatistics && ativo.defaultKeyStatistics.dividendYield);
+        const pvp = ativo.defaultKeyStatistics && ativo.defaultKeyStatistics.priceToBook;
+
+        resTicker.textContent = ativo.symbol;
+        resName.textContent = ativo.longName || ativo.shortName || '';
+        resPrice.textContent = `R$ ${formatMoeda(ativo.regularMarketPrice)}`;
+        resVar.textContent = `${emAlta ? '▲' : '▼'} ${formatMoeda(Math.abs(variacao))}% Hoje`;
+        resVar.className = `asset-var ${emAlta ? 'val-up' : 'val-down'}`;
+        resDy.textContent = dy ? `${formatMoeda(dy)}%` : '—';
+        resPvp.textContent = pvp ? formatMoeda(pvp) : '—';
+      } catch (e) {
+        resName.textContent = 'Não foi possível consultar agora. Tente novamente.';
+        resPrice.textContent = '—';
+        resVar.textContent = '';
+        resDy.textContent = '—';
+        resPvp.textContent = '—';
+      } finally {
+        btn.textContent = textoOriginal;
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById('btnBuscar').addEventListener('click', buscarAtivo);
+    document.getElementById('tickerInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') buscarAtivo();
     });
   </script>
 
