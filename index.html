@@ -130,11 +130,24 @@
       padding-top: 26px;
       border-top: 1px solid var(--border);
     }
+    .ranking-section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
     .ranking-title {
       font-size: 1rem;
       font-weight: 700;
       color: var(--text);
       margin-bottom: 14px;
+    }
+    .ranking-title-sep {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border);
     }
     .ranking-list {
       display: flex;
@@ -362,9 +375,28 @@
         <div class="panel-title explorar"><span class="dot"></span> Explore o mercado</div>
         <div class="search-container">
           <div class="ranking-block">
-            <h3 class="ranking-title">🏆 6 melhores ações do momento</h3>
-            <div class="ranking-list" id="rankingAcoes">
+            <h3 class="ranking-section-title">🏅 Rankings de Ativos — Ações</h3>
+
+            <h4 class="ranking-title">💰 Maiores Dividend Yield</h4>
+            <div class="ranking-list" id="rankingDy">
               <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+            </div>
+
+            <h4 class="ranking-title ranking-title-sep">📈 Maiores Valor de Mercado</h4>
+            <div class="ranking-list" id="rankingValorMercado">
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+            </div>
+
+            <h4 class="ranking-title ranking-title-sep">🧾 Maiores Receita</h4>
+            <div class="ranking-list" id="rankingReceita">
               <div class="ranking-row skeleton"></div>
               <div class="ranking-row skeleton"></div>
               <div class="ranking-row skeleton"></div>
@@ -533,9 +565,9 @@
     carregarNoticias();
 
     /* ---------------------------------------------------------------
-       Ranking: 6 melhores ações e 6 melhores FIIs do momento.
-       Lê ranking.json, gerado pelo robô (coletar_brapi_fiis.py) via
-       brapi (/api/quote/list, ordenado por maior variação % do dia).
+       Rankings: Maiores Dividend Yield / Valor de Mercado / Receita
+       (5 ações cada) e 6 melhores FIIs do momento.
+       Lê ranking.json, gerado pelo robô (coletar_brapi_fiis.py) via brapi.
     ----------------------------------------------------------------*/
     function formatMoeda(valor) {
       return typeof valor === 'number'
@@ -543,6 +575,13 @@
         : '—';
     }
 
+    function formatCompacto(valor) {
+      return typeof valor === 'number'
+        ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
+        : '—';
+    }
+
+    // Ranking de FIIs (e o antigo formato "6 melhores do momento"): mostra preço + variação % do dia
     function renderizarRanking(elId, lista) {
       const listEl = document.getElementById(elId);
 
@@ -569,16 +608,50 @@
       }).join('');
     }
 
+    // Rankings de ações por métrica (Dividend Yield, Valor de Mercado, Receita):
+    // mostra preço + o valor da métrica em destaque (não é variação do dia).
+    function renderizarRankingMetrica(elId, lista, formato) {
+      const listEl = document.getElementById(elId);
+
+      if (!Array.isArray(lista) || lista.length === 0) {
+        listEl.innerHTML = '<div class="ranking-row"><span class="ranking-nome">Ranking ainda não gerado — aguarde o robô rodar.</span></div>';
+        return;
+      }
+
+      listEl.innerHTML = lista.map(item => {
+        const valorFormatado = formato === 'percentual'
+          ? `${formatMoeda(item.valor)}%`
+          : `R$ ${formatCompacto(item.valor)}`;
+
+        return `
+          <div class="ranking-row">
+            <div class="ranking-info">
+              <span class="ranking-ticker">${item.ticker || '—'}</span>
+              <span class="ranking-nome">${item.nome || ''}</span>
+            </div>
+            <div class="ranking-numbers">
+              <div class="ranking-preco">R$ ${formatMoeda(item.preco)}</div>
+              <div class="ranking-change val-up">${valorFormatado}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
     async function carregarRanking() {
       try {
         const resp = await fetch('ranking.json', { cache: 'no-store' });
         if (!resp.ok) throw new Error('arquivo não encontrado');
         const ranking = await resp.json();
+        const acoes = ranking.acoes || {};
 
-        renderizarRanking('rankingAcoes', ranking.acoes);
+        renderizarRankingMetrica('rankingDy', acoes.dividend_yield, 'percentual');
+        renderizarRankingMetrica('rankingValorMercado', acoes.valor_mercado, 'moeda');
+        renderizarRankingMetrica('rankingReceita', acoes.receita, 'moeda');
         renderizarRanking('rankingFiis', ranking.fiis);
       } catch (e) {
-        renderizarRanking('rankingAcoes', []);
+        renderizarRankingMetrica('rankingDy', [], 'percentual');
+        renderizarRankingMetrica('rankingValorMercado', [], 'moeda');
+        renderizarRankingMetrica('rankingReceita', [], 'moeda');
         renderizarRanking('rankingFiis', []);
       }
     }
