@@ -104,7 +104,7 @@
       height: 38px;
       border-radius: 50%;
       border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04);
+      background: transparent; /* Alterado para adaptar melhor ao fundo */
       cursor: pointer;
       font-size: 1.1rem;
       line-height: 1;
@@ -157,11 +157,10 @@
 
     /* ---------- Coluna esquerda: Ranking do mercado ---------- */
     .search-container {
-      background: rgba(17,27,46,0.7);
+      background: var(--card); /* CORREÇÃO: Usa variável do tema */
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 28px;
-      backdrop-filter: blur(10px);
       box-shadow: var(--shadow);
       height: 100%;
     }
@@ -231,11 +230,10 @@
 
     /* ---------- Coluna direita: Boletim Viver de Renda ---------- */
     .boletim-panel {
-      background: rgba(17,27,46,0.7);
+      background: var(--card); /* CORREÇÃO: Usa variável do tema */
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 28px;
-      backdrop-filter: blur(10px);
       box-shadow: var(--shadow);
       height: 100%;
     }
@@ -308,7 +306,7 @@
       height: 120px;
       object-fit: cover;
       display: block;
-      background: rgba(255,255,255,0.04);
+      background: rgba(15,30,60,0.05); /* Melhor adaptação clara/escura */
     }
     .noticia-body {
       padding: 12px 14px;
@@ -343,10 +341,11 @@
       gap: 20px;
     }
     .card {
-      background: rgba(17,27,46,0.6);
+      background: var(--card); /* CORREÇÃO: Fundo inteligente adaptável ao tema claro/escuro */
       border: 1px solid var(--border);
       border-radius: 18px;
       padding: 24px;
+      box-shadow: var(--shadow); /* Adicionado sombra para destacar */
     }
     .card h3 { color: var(--primary); margin-bottom: 12px; font-size: 1.2rem; }
     .card p { color: var(--muted); font-size: 0.95rem; }
@@ -359,6 +358,7 @@
       border-radius: 24px;
       padding: 32px;
       text-align: center;
+      box-shadow: var(--shadow);
     }
     .btn-buy {
       display: inline-block;
@@ -547,15 +547,6 @@
   </footer>
 
   <script>
-
-    /* ---------------------------------------------------------------
-       Índices atualizados: Ibovespa, Dólar, Euro, Bitcoin (USD),
-       IPCA e CPI (EUA).
-       Lê indices.json, gerado pelo robô (coletar_brapi_fiis.py), que busca
-       Ibovespa/Dólar/Euro/Bitcoin no Yahoo Finance e IPCA/CPI em fontes
-       oficiais (Banco Central e BLS). Isso roda no servidor porque o Yahoo
-       Finance não libera CORS para chamadas direto do navegador.
-    ----------------------------------------------------------------*/
     async function carregarIndices() {
       const rowsEl = document.getElementById('indicesRows');
 
@@ -566,7 +557,6 @@
         if (!Array.isArray(indices) || indices.length === 0) throw new Error('vazio');
 
         rowsEl.innerHTML = indices.map(item => {
-          // Índices de mercado (Ibovespa, Dólar, Euro, Bitcoin) têm "valor" + "variacao_pct"
           if (typeof item.valor === 'number') {
             const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
             const emAlta = variacao >= 0;
@@ -581,7 +571,6 @@
               </div>`;
           }
 
-          // IPCA e CPI têm só "valor_pct" (variação mensal)
           const variacao = typeof item.valor_pct === 'number' ? item.valor_pct : 0;
           const emAlta = variacao >= 0;
           return `
@@ -598,13 +587,6 @@
 
     carregarIndices();
 
-    /* ---------------------------------------------------------------
-       Últimas notícias do mercado financeiro
-       Lê noticias.json, gerado pelo mesmo robô (coletar_brapi_fiis.py),
-       que busca o feed RSS de mercado e extrai título, link e imagem.
-       O card inteiro é um <a> clicável — a URL nunca aparece como texto,
-       fica "oculta" atrás da imagem/título.
-    ----------------------------------------------------------------*/
     async function carregarNoticias() {
       const listEl = document.getElementById('noticiasList');
 
@@ -630,11 +612,6 @@
 
     carregarNoticias();
 
-    /* ---------------------------------------------------------------
-       Rankings: Maiores Dividend Yield / Valor de Mercado / Receita
-       (5 ações cada) e 6 melhores FIIs do momento.
-       Lê ranking.json, gerado pelo robô (coletar_brapi_fiis.py) via brapi.
-    ----------------------------------------------------------------*/
     function formatMoeda(valor) {
       return typeof valor === 'number'
         ? valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -647,7 +624,6 @@
         : '—';
     }
 
-    // Ranking de FIIs (e o antigo formato "6 melhores do momento"): mostra preço + variação % do dia
     function renderizarRanking(elId, lista) {
       const listEl = document.getElementById(elId);
 
@@ -674,8 +650,6 @@
       }).join('');
     }
 
-    // Rankings de ações por métrica (Dividend Yield, Valor de Mercado, Receita):
-    // mostra preço + o valor da métrica em destaque (não é variação do dia).
     function renderizarRankingMetrica(elId, lista, formato) {
       const listEl = document.getElementById(elId);
 
@@ -724,9 +698,6 @@
 
     carregarRanking();
 
-    /* ---------------------------------------------------------------
-       Alternar tema claro/escuro (botão ☀️/🌙 no topo)
-    ----------------------------------------------------------------*/
     (function () {
       const botao = document.getElementById('themeToggle');
       const html = document.documentElement;
