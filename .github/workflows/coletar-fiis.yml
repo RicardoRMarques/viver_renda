@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do repositório
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Configurar Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -31,14 +31,15 @@ jobs:
           BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
         run: python coletar_brapi_fiis.py
 
-      - name: Commitar e enviar fiis_investidor10.json
+      - name: Commitar e enviar fiis_investidor10.json e noticias.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- fiis_investidor10.json; then
+          git add fiis_investidor10.json
+          if [ -f noticias.json ]; then git add noticias.json; fi
+          if git diff --cached --quiet; then
             echo "Sem alterações no boletim, nada para commitar."
           else
-            git add fiis_investidor10.json
-            git commit -m "chore: atualizar boletim de FIIs [skip ci]"
+            git commit -m "chore: atualizar boletim de FIIs e notícias [skip ci]"
             git push
           fi
