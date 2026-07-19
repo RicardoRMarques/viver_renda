@@ -9,6 +9,9 @@
     :root {
       --bg: #0b1220;
       --card: #111b2e;
+      --deep: #04101a;
+      --grad-a: #07101c;
+      --grad-b: #0b1220;
       --text: #e8eefc;
       --muted: #a9b6d3;
       --primary: #31c3ff;
@@ -18,6 +21,23 @@
       --danger: #ff6b6b;
       --border: rgba(255,255,255,0.08);
       --shadow: 0 16px 40px rgba(0,0,0,0.28);
+    }
+
+    html[data-theme="light"] {
+      --bg: #eef2f9;
+      --card: #ffffff;
+      --deep: #f4f7fc;
+      --grad-a: #f7f9fd;
+      --grad-b: #eef2f9;
+      --text: #16223b;
+      --muted: #5b6b8c;
+      --primary: #0f8fce;
+      --primary-dark: #0c73a6;
+      --accent: #1f9e4a;
+      --gold: #a8781a;
+      --danger: #d1435a;
+      --border: rgba(15,30,60,0.1);
+      --shadow: 0 12px 30px rgba(20,40,80,0.12);
     }
 
     * {
@@ -30,7 +50,7 @@
       font-family: Arial, Helvetica, sans-serif;
       background:
         radial-gradient(circle at top, rgba(49,195,255,0.15), transparent 40%),
-        linear-gradient(180deg, #07101c 0%, #0b1220 100%);
+        linear-gradient(180deg, var(--grad-a) 0%, var(--grad-b) 100%);
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
@@ -73,6 +93,25 @@
       font-weight: bold;
     }
     .nav a:hover { color: var(--primary); }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .theme-toggle:hover {
+      transform: scale(1.08);
+      border-color: var(--primary);
+    }
 
     .section-intro {
       text-align: center;
@@ -161,7 +200,7 @@
       gap: 12px;
       padding: 12px 14px;
       border-radius: 12px;
-      background: #04101a;
+      background: var(--deep);
       border: 1px solid var(--border);
     }
     .ranking-row.skeleton {
@@ -211,7 +250,7 @@
       align-items: center;
       padding: 12px 14px;
       border-radius: 12px;
-      background: #04101a;
+      background: var(--deep);
       border: 1px solid var(--border);
     }
     .indice-row.skeleton {
@@ -250,7 +289,7 @@
     .noticia-card {
       display: block;
       position: relative;
-      background: #04101a;
+      background: var(--deep);
       border: 1px solid var(--border);
       border-radius: 14px;
       overflow: hidden;
@@ -352,6 +391,15 @@
   </style>
 </head>
 <body>
+  <script>
+    // Aplica o tema salvo antes de renderizar, pra evitar flash da cor errada
+    (function () {
+      var temaSalvo = localStorage.getItem('viverderenda_tema');
+      if (temaSalvo === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
 
   <header>
     <div class="container topbar">
@@ -360,6 +408,7 @@
         <a href="#consultas">Mercado</a>
         <a href="#educacao">Educação</a>
         <a href="#compra" style="color: var(--accent);">Comprar Material</a>
+        <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
       </nav>
     </div>
   </header>
@@ -660,6 +709,34 @@
     }
 
     carregarRanking();
+
+    /* ---------------------------------------------------------------
+       Alternar tema claro/escuro (botão ☀️/🌙 no topo)
+    ----------------------------------------------------------------*/
+    (function () {
+      const botao = document.getElementById('themeToggle');
+      const html = document.documentElement;
+
+      function atualizarIcone() {
+        const claro = html.getAttribute('data-theme') === 'light';
+        botao.textContent = claro ? '🌙' : '☀️';
+        botao.title = claro ? 'Escurecer a página' : 'Clarear a página';
+      }
+
+      botao.addEventListener('click', () => {
+        const claroAgora = html.getAttribute('data-theme') === 'light';
+        if (claroAgora) {
+          html.removeAttribute('data-theme');
+          localStorage.setItem('viverderenda_tema', 'dark');
+        } else {
+          html.setAttribute('data-theme', 'light');
+          localStorage.setItem('viverderenda_tema', 'light');
+        }
+        atualizarIcone();
+      });
+
+      atualizarIcone();
+    })();
   </script>
 
 </body>
