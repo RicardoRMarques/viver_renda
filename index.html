@@ -104,7 +104,7 @@
       height: 38px;
       border-radius: 50%;
       border: 1px solid var(--border);
-      background: transparent; /* Alterado para adaptar melhor ao fundo */
+      background: transparent;
       cursor: pointer;
       font-size: 1.1rem;
       line-height: 1;
@@ -157,7 +157,7 @@
 
     /* ---------- Coluna esquerda: Ranking do mercado ---------- */
     .search-container {
-      background: var(--card); /* CORREÇÃO: Usa variável do tema */
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 28px;
@@ -230,7 +230,7 @@
 
     /* ---------- Coluna direita: Boletim Viver de Renda ---------- */
     .boletim-panel {
-      background: var(--card); /* CORREÇÃO: Usa variável do tema */
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: 24px;
       padding: 28px;
@@ -238,7 +238,6 @@
       height: 100%;
     }
 
-    /* Índices atualizados */
     .indices-rows {
       display: flex;
       flex-direction: column;
@@ -285,7 +284,6 @@
       padding-top: 18px;
     }
 
-    /* Notícias do mercado dentro do boletim */
     .noticia-card {
       display: block;
       position: relative;
@@ -306,7 +304,7 @@
       height: 120px;
       object-fit: cover;
       display: block;
-      background: rgba(15,30,60,0.05); /* Melhor adaptação clara/escura */
+      background: rgba(15,30,60,0.05);
     }
     .noticia-body {
       padding: 12px 14px;
@@ -341,11 +339,11 @@
       gap: 20px;
     }
     .card {
-      background: var(--card); /* CORREÇÃO: Fundo inteligente adaptável ao tema claro/escuro */
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: 18px;
       padding: 24px;
-      box-shadow: var(--shadow); /* Adicionado sombra para destacar */
+      box-shadow: var(--shadow);
     }
     .card h3 { color: var(--primary); margin-bottom: 12px; font-size: 1.2rem; }
     .card p { color: var(--muted); font-size: 0.95rem; }
@@ -393,15 +391,12 @@
       .split-layout { grid-template-columns: 1fr; }
       .grid { grid-template-columns: 1fr; }
       .ranking-nome { max-width: 120px; }
-
-      /* No celular/tablet, o Boletim de mercado aparece primeiro */
       .coluna-boletim { order: -1; }
     }
   </style>
 </head>
 <body>
   <script>
-    // Aplica o tema salvo antes de renderizar, pra evitar flash da cor errada
     (function () {
       var temaSalvo = localStorage.getItem('viverderenda_tema');
       if (temaSalvo === 'light') {
@@ -425,7 +420,7 @@
 
     <section class="section-intro" id="consultas">
       <h1>Explore o mercado. <br><span style="color: var(--primary);">Tome melhores decisões.</span></h1>
-      <p>Acompanhe os destaques do dia: as ações e os Fundos Imobiliários com melhor desempenho no ranking da B3, além do boletim diário com índices e notícias do mercado.</p>
+      <p>Acompanhe os destaques do dia: os maiores Fundos Imobiliários e ações com melhor desempenho no ranking da B3, além do boletim diário com índices e notícias do mercado.</p>
     </section>
 
     <section class="split-layout">
@@ -465,8 +460,9 @@
             </div>
           </div>
 
+          <!-- ALTERAÇÃO AQUI: Novo título do bloco de FIIs -->
           <div class="ranking-block">
-            <h3 class="ranking-title">🏢 6 melhores FIIs do momento</h3>
+            <h3 class="ranking-title">🏢 6 maiores FIIs que estão em alta</h3>
             <div class="ranking-list" id="rankingFiis">
               <div class="ranking-row skeleton"></div>
               <div class="ranking-row skeleton"></div>
@@ -549,7 +545,6 @@
   <script>
     async function carregarIndices() {
       const rowsEl = document.getElementById('indicesRows');
-
       try {
         const resp = await fetch('indices.json', { cache: 'no-store' });
         if (!resp.ok) throw new Error('arquivo não encontrado');
@@ -570,7 +565,6 @@
                 <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
               </div>`;
           }
-
           const variacao = typeof item.valor_pct === 'number' ? item.valor_pct : 0;
           const emAlta = variacao >= 0;
           return `
@@ -584,12 +578,10 @@
         rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Índices ainda não gerados — aguarde o robô rodar.</span></div>';
       }
     }
-
     carregarIndices();
 
     async function carregarNoticias() {
       const listEl = document.getElementById('noticiasList');
-
       try {
         const resp = await fetch('noticias.json', { cache: 'no-store' });
         if (!resp.ok) throw new Error('arquivo não encontrado');
@@ -609,7 +601,6 @@
         listEl.innerHTML = '<div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Notícias ainda não geradas — aguarde o robô rodar.</div></div></div>';
       }
     }
-
     carregarNoticias();
 
     function formatMoeda(valor) {
@@ -626,7 +617,6 @@
 
     function renderizarRanking(elId, lista) {
       const listEl = document.getElementById(elId);
-
       if (!Array.isArray(lista) || lista.length === 0) {
         listEl.innerHTML = '<div class="ranking-row"><span class="ranking-nome">Ranking ainda não gerado — aguarde o robô rodar.</span></div>';
         return;
@@ -652,7 +642,6 @@
 
     function renderizarRankingMetrica(elId, lista, formato) {
       const listEl = document.getElementById(elId);
-
       if (!Array.isArray(lista) || lista.length === 0) {
         listEl.innerHTML = '<div class="ranking-row"><span class="ranking-nome">Ranking ainda não gerado — aguarde o robô rodar.</span></div>';
         return;
@@ -687,6 +676,8 @@
         renderizarRankingMetrica('rankingDy', acoes.dividend_yield, 'percentual');
         renderizarRankingMetrica('rankingValorMercado', acoes.valor_mercado, 'moeda');
         renderizarRankingMetrica('rankingReceita', acoes.receita, 'moeda');
+        
+        // Aqui o JavaScript continua consumindo a chave "fiis" do seu ranking.json
         renderizarRanking('rankingFiis', ranking.fiis);
       } catch (e) {
         renderizarRankingMetrica('rankingDy', [], 'percentual');
@@ -695,7 +686,6 @@
         renderizarRanking('rankingFiis', []);
       }
     }
-
     carregarRanking();
 
     (function () {
@@ -719,10 +709,8 @@
         }
         atualizarIcone();
       });
-
       atualizarIcone();
     })();
   </script>
-
 </body>
 </html>
