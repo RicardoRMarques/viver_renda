@@ -29,9 +29,27 @@ import requests
 # ---------------------------------------------------------------------------
 
 NOTICIAS_OUTPUT_FILE = "noticias.json"
-NOTICIAS_FEED_URL = "https://www.infomoney.com.br/mercados/feed/"
+
+# Tenta cada feed nesta ordem até conseguir pelo menos 1 notícia.
+# Alguns provedores (ex: InfoMoney) às vezes bloqueiam requisições vindas
+# de servidores/datacenters (como o do GitHub Actions), então mantemos
+# alternativas para não deixar o boletim sem notícias.
+NOTICIAS_FEEDS = [
+    ("InfoMoney", "https://www.infomoney.com.br/mercados/feed/"),
+    ("G1 Economia", "https://g1.globo.com/dynamo/economia/rss2.xml"),
+    ("Money Times", "https://www.moneytimes.com.br/feed/"),
+]
 NOTICIAS_QTD = 3
 TIMEOUT = 20
+
+HEADERS_NAVEGADOR = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+    ),
+    "Accept": "application/rss+xml, application/xml, text/xml, */*;q=0.9",
+    "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+}
 
 
 def _extrair_imagem_do_item(item):
@@ -59,20 +77,14 @@ def _extrair_imagem_do_item(item):
     return None
 
 
-def coletar_noticias(quantidade=NOTICIAS_QTD):
-    """Busca as últimas notícias do feed RSS de mercado financeiro configurado
-    e retorna uma lista de dicts prontos para exibição no boletim."""
-    try:
-        resp = requests.get(NOTICIAS_FEED_URL, timeout=TIMEOUT, headers={
-            "User-Agent": "Mozilla/5.0 (compatible; ViverDeRendaBot/1.0)"
-        })
-        resp.raise_for_status()
-        raiz = ET.fromstring(resp.content)
-    except (requests.RequestException, ET.ParseError) as exc:
-        print(f"AVISO: falha ao buscar notícias: {exc}", file=sys.stderr)
-        return []
+def _buscar_feed(nome_fonte, url):
+    """Busca e faz parse de um feed RSS específico. Retorna lista de notícias
+    (pode ser vazia) ou lança exceção em caso de falha de rede/parse."""
+    resp = requests.get(url, timeout=TIMEOUT, headers=HEADERS_NAVEGADOR)
+    resp.raise_for_status()
+    raiz = ET.fromstring(resp.content)
 
-    itens = raiz.findall("./channel/item")[:quantidade]
+    itens = raiz.findall("./channel/item")[:NOTICIAS_QTD]
     noticias = []
 
     for item in itens:
@@ -88,18 +100,34 @@ def coletar_noticias(quantidade=NOTICIAS_QTD):
             "titulo": titulo,
             "link": link,
             "imagem": imagem,
-            "fonte": "InfoMoney",
+            "fonte": nome_fonte,
             "publicado_em": data_pub,
         })
 
     return noticias
 
 
+def coletar_noticias():
+    """Tenta cada feed configurado em NOTICIAS_FEEDS, na ordem, até conseguir
+    pelo menos uma notícia. Retorna lista de dicts prontos para o boletim."""
+    for nome_fonte, url in NOTICIAS_FEEDS:
+        try:
+            noticias = _buscar_feed(nome_fonte, url)
+            if noticias:
+                print(f"OK: {len(noticias)} notícias obtidas de {nome_fonte}.")
+                return noticias
+            print(f"AVISO: feed de {nome_fonte} respondeu, mas sem itens úteis.", file=sys.stderr)
+        except (requests.RequestException, ET.ParseError) as exc:
+            print(f"AVISO: falha ao buscar notícias de {nome_fonte} ({url}): {exc}", file=sys.stderr)
+
+    return []
+
+
 def main():
     noticias = coletar_noticias()
 
     if not noticias:
-        print("ERRO: nenhuma notícia coletada. Mantendo arquivo anterior, se existir.", file=sys.stderr)
+        print("ERRO: nenhum dos feeds configurados retornou notícias. Mantendo arquivo anterior, se existir.", file=sys.stderr)
         sys.exit(1)
 
     with open(NOTICIAS_OUTPUT_FILE, "w", encoding="utf-8") as f:
