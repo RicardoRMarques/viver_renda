@@ -86,27 +86,20 @@ BLS_CPI_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/CUUR0000SA0"
 
 # Rankings de ativos, via brapi:
 # - Ações: Maiores Dividend Yield, Maiores Valor de Mercado, Maiores Receita (5 cada)
-# - FIIs: melhores do momento, com curadoria por segmento (4 Logística + 2 Papel)
+# - FIIs: 6 mais buscados/negociados do momento (maior volume do dia)
 # O endpoint /api/quote/list só ordena por close/change/volume/market_cap_basic —
-# não tem "ordenar por Dividend Yield" nem "por Receita" prontos. Por isso
-# buscamos um pool das ações mais líquidas e calculamos os rankings de DY e
-# Receita aqui, buscando os fundamentos de cada uma individualmente. Já os
-# FIIs não vêm de um ranking automático da brapi: usamos uma lista curada por
-# segmento (Logística e Papel) e escolhemos os de maior variação % do dia
-# dentro de cada uma.
+# não tem "ordenar por Dividend Yield" nem "por Receita" prontos, nem um
+# indicador oficial de "mais buscados". Por isso: (1) para ações, buscamos um
+# pool das mais líquidas e calculamos DY/Receita aqui, ticker por ticker; (2)
+# para FIIs, usamos o volume negociado do dia como proxy de "mais buscados",
+# que é o dado mais próximo disso disponível na API pública.
 BRAPI_LIST_URL = "https://brapi.dev/api/quote/list"
 BRAPI_QUOTE_URL = "https://brapi.dev/api/quote"
 RANKING_ACOES_QTD = 5
 POOL_ACOES_TAMANHO = 25  # quantas ações líquidas usamos como base p/ DY e Receita
+RANKING_FIIS_QTD = 6
 
-FIIS_LOGISTICA = ["BTLG11", "HGLG11", "XPLG11", "VILG11", "LVBI11",
-                  "BRCO11", "GGRC11", "RBRL11", "ALZR11", "PATL11"]
-# IRDM11 removido: não está mais listado. Incluídos KNHY11 e KNSC11 (Kinea),
-# além de KNCR11 e KNIP11 (também Kinea), que já estavam na lista.
-FIIS_PAPEL = ["MXRF11", "KNCR11", "KNIP11", "CPTS11", "KNHY11",
-              "KNSC11", "VGIR11", "HGCR11", "RECR11", "MCCI11", "CVBI11"]
-FIIS_LOGISTICA_QTD = 4
-FIIS_PAPEL_QTD = 2
+
 
 
 def _extrair_imagem_do_item(item):
@@ -346,59 +339,31 @@ def obter_token_brapi():
     return os.environ.get("BRAPI_TOKEN", "").strip()
 
 
-def _buscar_cotacao_simples(ticker, token):
-    """Busca preço e variação % do dia de UM ticker via /api/quote (respeita
-    o limite de 1 ticker por requisição do plano gratuito da brapi)."""
-    url = f"{BRAPI_QUOTE_URL}/{ticker}"
-    resp = requests.get(url, params={"token": token}, timeout=TIMEOUT)
+def coletar_ranking_fiis(token, quantidade=RANKING_FIIS_QTD):
+    """Busca os FIIs mais negociados (maior volume do dia) via /api/quote/list,
+    usado como proxy de 'mais buscados' — a brapi não tem esse dado pronto."""
+    params = {
+        "type": "fund",
+        "sortBy": "volume",
+        "sortOrder": "desc",
+        "limit": quantidade,
+        "page": 1,
+        "token": token,
+    }
+    resp = requests.get(BRAPI_LIST_URL, params=params, timeout=TIMEOUT)
     resp.raise_for_status()
     data = resp.json()
-    ativo = (data.get("results") or [None])[0]
-    if not ativo:
-        return None
+    ativos = data.get("stocks") or []
 
-    return {
-        "ticker": ativo.get("symbol"),
-        "nome": ativo.get("shortName") or ativo.get("longName") or ativo.get("symbol"),
-        "preco": ativo.get("regularMarketPrice"),
-        "variacao_pct": ativo.get("regularMarketChangePercent"),
-    }
-
-
-def _buscar_cotacoes_uma_a_uma(tickers, token):
-    """Busca cotações de vários tickers, um de cada vez (plano gratuito da
-    brapi só aceita 1 ticker por requisição em /api/quote)."""
-    resultados = []
-    for ticker in tickers:
-        try:
-            cotacao = _buscar_cotacao_simples(ticker, token)
-            if cotacao:
-                resultados.append(cotacao)
-        except (requests.RequestException, ValueError, KeyError) as exc:
-            print(f"AVISO: falha ao buscar cotação de {ticker}: {exc}", file=sys.stderr)
-    return resultados
-
-
-def coletar_ranking_fiis(token):
-    """Monta o ranking de FIIs com curadoria por segmento: os
-    FIIS_LOGISTICA_QTD melhores de Logística + FIIS_PAPEL_QTD melhores de
-    Papel, por maior variação % do dia dentro de cada segmento."""
-    print("Buscando cotações de FIIs de Logística...")
-    dados_logistica = _buscar_cotacoes_uma_a_uma(FIIS_LOGISTICA, token)
-
-    print("Buscando cotações de FIIs de Papel...")
-    dados_papel = _buscar_cotacoes_uma_a_uma(FIIS_PAPEL, token)
-
-    def _variacao(item):
-        return item.get("variacao_pct") if isinstance(item.get("variacao_pct"), (int, float)) else float("-inf")
-
-    dados_logistica.sort(key=_variacao, reverse=True)
-    dados_papel.sort(key=_variacao, reverse=True)
-
-    melhores = dados_logistica[:FIIS_LOGISTICA_QTD] + dados_papel[:FIIS_PAPEL_QTD]
-    melhores.sort(key=_variacao, reverse=True)
-
-    return melhores
+    ranking = []
+    for ativo in ativos[:quantidade]:
+        ranking.append({
+            "ticker": ativo.get("stock"),
+            "nome": ativo.get("name") or "",
+            "preco": ativo.get("close"),
+            "variacao_pct": ativo.get("change"),
+        })
+    return ranking
 
 
 def _obter_pool_acoes_liquidas(token, tamanho=POOL_ACOES_TAMANHO):
@@ -476,8 +441,8 @@ def coletar_rankings_acoes(token, tamanho_pool=POOL_ACOES_TAMANHO, qtd=RANKING_A
 
 def coletar_ranking():
     """Monta o ranking completo do boletim: 3 rankings de ações (DY, valor de
-    mercado, receita — 5 cada) e o ranking de FIIs (4 de Logística + 2 de
-    Papel, os de maior variação % do dia em cada segmento).
+    mercado, receita — 5 cada) e o ranking dos 6 FIIs mais buscados/negociados
+    do momento (maior volume do dia).
     Retorna vazio se o token não estiver configurado ou a API falhar — nesse
     caso o front-end mantém o ranking anterior."""
     token = obter_token_brapi()
