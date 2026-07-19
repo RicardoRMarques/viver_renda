@@ -58,6 +58,7 @@ HEADERS_NAVEGADOR = {
 # buscamos aqui no robô (servidor) e publicamos em indices.json.
 YAHOO_TICKERS = [
     ("Ibovespa", "^BVSP", "pontos"),
+    ("IFIX", "IFIX.SA", "pontos"),
     ("Dólar", "BRL=X", "R$ "),
     ("Euro", "EURBRL=X", "R$ "),
     ("Bitcoin (USD)", "BTC-USD", "US$ "),
