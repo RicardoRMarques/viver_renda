@@ -74,6 +74,9 @@ YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
 # IPCA: variação mensal, via API pública do Banco Central (série SGS 433)
 BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
 
+# Selic: meta definida pelo Copom (% a.a.), via API pública do Banco Central (série SGS 432)
+BCB_SELIC_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json"
+
 # IPCA acumulado no ano: não existe uma série pronta pra isso no BCB, então
 # compomos os valores mensais (série 433) desde janeiro do ano corrente.
 BCB_IPCA_ANO_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados"
@@ -205,6 +208,22 @@ def coletar_indices_mercado():
     return indices
 
 
+def coletar_selic():
+    """Taxa Selic (meta definida pelo Copom), via API pública do Banco Central (série SGS 432)."""
+    try:
+        resp = requests.get(BCB_SELIC_URL, timeout=TIMEOUT)
+        resp.raise_for_status()
+        dados = resp.json()
+        if not dados:
+            return None
+        item = dados[-1]
+        valor = float(item["valor"].replace(",", "."))
+        return {"label": "Selic (meta)", "valor_pct": valor, "referencia": item.get("data")}
+    except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
+        print(f"AVISO: falha ao buscar Selic no Banco Central: {exc}", file=sys.stderr)
+        return None
+
+
 def coletar_ipca():
     """Variação mensal do IPCA, via API pública do Banco Central (série SGS 433)."""
     try:
@@ -279,8 +298,21 @@ def coletar_cpi_eua():
 
 
 def coletar_indices():
-    """Monta a lista completa de índices do boletim: mercado (Yahoo) + macro (BCB/BLS)."""
+    """Monta a lista completa de índices do boletim: mercado (Yahoo) + macro (BCB/BLS).
+    A Selic é inserida logo após o Ibovespa, na posição solicitada."""
     indices = coletar_indices_mercado()
+
+    selic = coletar_selic()
+    if selic:
+        # Insere logo depois do Ibovespa (posição 0), se ele existir na lista;
+        # caso contrário, adiciona no início.
+        posicao_ibovespa = next(
+            (i for i, item in enumerate(indices) if item.get("label") == "Ibovespa"), None
+        )
+        if posicao_ibovespa is not None:
+            indices.insert(posicao_ibovespa + 1, selic)
+        else:
+            indices.insert(0, selic)
 
     ipca = coletar_ipca()
     if ipca:
