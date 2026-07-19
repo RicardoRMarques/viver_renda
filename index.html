@@ -460,9 +460,9 @@
             </div>
           </div>
 
-          <!-- ALTERAÇÃO AQUI: Novo título do bloco de FIIs -->
+          <!-- ALTERAÇÃO AQUI: Novo título refletindo 4 FIIs de Logística e 2 de Papel -->
           <div class="ranking-block">
-            <h3 class="ranking-title">🏢 6 maiores FIIs que estão em alta</h3>
+            <h3 class="ranking-title">🏢 Melhores FIIs: 4 de Logística e 2 de Papel</h3>
             <div class="ranking-list" id="rankingFiis">
               <div class="ranking-row skeleton"></div>
               <div class="ranking-row skeleton"></div>
@@ -677,7 +677,6 @@
         renderizarRankingMetrica('rankingValorMercado', acoes.valor_mercado, 'moeda');
         renderizarRankingMetrica('rankingReceita', acoes.receita, 'moeda');
         
-        // Aqui o JavaScript continua consumindo a chave "fiis" do seu ranking.json
         renderizarRanking('rankingFiis', ranking.fiis);
       } catch (e) {
         renderizarRankingMetrica('rankingDy', [], 'percentual');
