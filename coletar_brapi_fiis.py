@@ -68,6 +68,10 @@ YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
 # IPCA: variação mensal, via API pública do Banco Central (série SGS 433)
 BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
 
+# IPCA acumulado no ano: não existe uma série pronta pra isso no BCB, então
+# compomos os valores mensais (série 433) desde janeiro do ano corrente.
+BCB_IPCA_ANO_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados"
+
 # CPI (EUA): índice de preços ao consumidor, via API pública do BLS
 BLS_CPI_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/CUUR0000SA0"
 
@@ -198,6 +202,40 @@ def coletar_ipca():
         return None
 
 
+def coletar_ipca_acumulado_ano():
+    """IPCA acumulado no ano corrente, compondo os valores mensais (série SGS 433)
+    de janeiro até o mês mais recente disponível. Não existe uma série pronta
+    para o acumulado do ano no BCB, então o cálculo é feito aqui."""
+    try:
+        hoje = date.today()
+        params = {
+            "formato": "json",
+            "dataInicial": f"01/01/{hoje.year}",
+            "dataFinal": hoje.strftime("%d/%m/%Y"),
+        }
+        resp = requests.get(BCB_IPCA_ANO_URL, params=params, timeout=TIMEOUT)
+        resp.raise_for_status()
+        dados = resp.json()
+        if not dados:
+            return None
+
+        fator_acumulado = 1.0
+        for item in dados:
+            valor_mes = float(item["valor"].replace(",", ".")) / 100
+            fator_acumulado *= (1 + valor_mes)
+
+        acumulado_pct = (fator_acumulado - 1) * 100
+        ultimo_mes = dados[-1].get("data")
+        return {
+            "label": "IPCA (acum. ano)",
+            "valor_pct": acumulado_pct,
+            "referencia": ultimo_mes,
+        }
+    except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
+        print(f"AVISO: falha ao calcular IPCA acumulado no ano: {exc}", file=sys.stderr)
+        return None
+
+
 def coletar_cpi_eua():
     """Variação mensal do CPI (EUA), via API pública do BLS (Bureau of Labor Statistics)."""
     try:
@@ -228,6 +266,10 @@ def coletar_indices():
     ipca = coletar_ipca()
     if ipca:
         indices.append(ipca)
+
+    ipca_ano = coletar_ipca_acumulado_ano()
+    if ipca_ano:
+        indices.append(ipca_ano)
 
     cpi = coletar_cpi_eua()
     if cpi:
