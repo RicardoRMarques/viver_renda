@@ -48,7 +48,7 @@ OUTPUT_FILE = "fiis_investidor10.json"
 NOTICIAS_OUTPUT_FILE = "noticias.json"
 NOTICIAS_FEED_URL = "https://www.infomoney.com.br/mercados/feed/"
 NOTICIAS_QTD = 3
-LOTE = 8  # brapi aceita vários tickers por chamada; dividimos em lotes por segurança
+LOTE = 1  # plano gratuito da brapi permite só 1 ticker por requisição (Startup: 10, Pro: 20)
 TIMEOUT = 20
 
 
