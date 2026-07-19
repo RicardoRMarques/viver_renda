@@ -44,7 +44,7 @@ RANKING_OUTPUT_FILE = "ranking.json"
 # alternativas para não deixar o boletim sem notícias.
 NOTICIAS_FEEDS = [
     ("InfoMoney", "https://www.infomoney.com.br/mercados/feed/"),
-    ("G1 Economia", "https://g1.globo.com/dynamo/economia/rss2.xml"),
+    ("InfoMoney (geral)", "https://www.infomoney.com.br/feed/"),
     ("Money Times", "https://www.moneytimes.com.br/feed/"),
 ]
 NOTICIAS_QTD = 3
