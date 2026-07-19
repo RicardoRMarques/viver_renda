@@ -1,4 +1,4 @@
-name: Atualizar Notícias (Boletim Viver de Renda)
+name: Atualizar Boletim (Notícias, Índices e Ranking)
 
 on:
   # Roda em dias úteis, a cada hora, entre 12h e 22h UTC
@@ -26,18 +26,21 @@ jobs:
       - name: Instalar dependências
         run: pip install requests
 
-      - name: Rodar coleta de notícias e índices
+      - name: Rodar coleta de notícias, índices e ranking
+        env:
+          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
         run: python coletar_brapi_fiis.py
 
-      - name: Commitar e enviar noticias.json e indices.json
+      - name: Commitar e enviar noticias.json, indices.json e ranking.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add noticias.json
           if [ -f indices.json ]; then git add indices.json; fi
+          if [ -f ranking.json ]; then git add ranking.json; fi
           if git diff --cached --quiet; then
             echo "Sem alterações no boletim, nada para commitar."
           else
-            git commit -m "chore: atualizar notícias e índices do boletim [skip ci]"
+            git commit -m "chore: atualizar boletim (notícias, índices, ranking) [skip ci]"
             git push
           fi
