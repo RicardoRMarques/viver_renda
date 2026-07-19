@@ -79,5 +79,42 @@
       }
     ]
   },
-  "fiis": []
+  "fiis": [
+    {
+      "ticker": "IRDM11",
+      "nome": "FII IRIDIUM CI  ER",
+      "preco": 58.5,
+      "variacao_pct": 2.18
+    },
+    {
+      "ticker": "HGCR11",
+      "nome": "HGCR11",
+      "preco": 93.94,
+      "variacao_pct": 1.21
+    },
+    {
+      "ticker": "GGRC11",
+      "nome": "GGRC11",
+      "preco": 9.92,
+      "variacao_pct": 1.02
+    },
+    {
+      "ticker": "BRCO11",
+      "nome": "BRCO11",
+      "preco": 114.24,
+      "variacao_pct": 0.21
+    },
+    {
+      "ticker": "VILG11",
+      "nome": "VILG11",
+      "preco": 94.24,
+      "variacao_pct": 0.2
+    },
+    {
+      "ticker": "RBRL11",
+      "nome": "RBRL11",
+      "preco": 72.05,
+      "variacao_pct": 0.08
+    }
+  ]
 }
