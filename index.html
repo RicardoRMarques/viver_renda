@@ -46,26 +46,6 @@
       margin: 0 auto;
     }
 
-    /* Ticker de Índices */
-    .market-ticker {
-      background: #04101a;
-      border-bottom: 1px solid var(--border);
-      padding: 10px 0;
-      font-size: 0.85rem;
-      display: flex;
-      gap: 24px;
-      overflow-x: auto;
-      white-space: nowrap;
-      scrollbar-width: none;
-    }
-    .market-ticker::-webkit-scrollbar { display: none; }
-    .ticker-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-    }
-    .ticker-item strong { color: var(--text); }
     .val-up { color: var(--accent); font-weight: bold; }
     .val-down { color: var(--danger); font-weight: bold; }
 
@@ -260,59 +240,8 @@
       box-shadow: var(--shadow);
       height: 100%;
     }
-    .boletim-status {
-      font-size: 0.8rem;
-      color: #6b7a99;
-      margin-bottom: 14px;
-    }
-    .boletim-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-height: 560px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-    .boletim-item {
-      background: #04101a;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-    }
-    .boletim-item-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .boletim-ticker { font-weight: 700; color: var(--gold); font-size: 1.05rem; }
-    .boletim-preco { font-weight: 700; }
-    .boletim-nome { font-size: 0.82rem; color: var(--muted); margin-bottom: 10px; }
-    .boletim-metrics {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .boletim-metric { font-size: 0.82rem; color: var(--muted); }
-    .boletim-metric strong { color: var(--text); display: block; font-size: 0.95rem; }
-    .boletim-fonte {
-      margin-top: 10px;
-      font-size: 0.75rem;
-    }
-    .boletim-fonte a { color: var(--primary); }
 
     /* Notícias do mercado dentro do boletim */
-    .boletim-noticias-title {
-      margin-top: 20px;
-      margin-bottom: 12px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
-      border-top: 1px solid var(--border);
-      padding-top: 18px;
-    }
     .noticia-card {
       display: block;
       position: relative;
@@ -420,16 +349,6 @@
 </head>
 <body>
 
-  <!-- Ticker (Estático no HTML, pode ser dinâmico via JS futuramente) -->
-  <div class="market-ticker">
-    <div class="container" style="display: flex; gap: 24px;">
-      <div class="ticker-item">IBOVESPA <strong>128.500</strong> <span class="val-up">+0.45%</span></div>
-      <div class="ticker-item">IFIX <strong>3.380</strong> <span class="val-up">+0.12%</span></div>
-      <div class="ticker-item">SMLL <strong>2.150</strong> <span class="val-down">-0.30%</span></div>
-      <div class="ticker-item">DÓLAR <strong>R$ 5,05</strong> <span class="val-down">-0.25%</span></div>
-    </div>
-  </div>
-
   <header>
     <div class="container topbar">
       <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
@@ -498,10 +417,6 @@
       <div>
         <div class="panel-title boletim"><span class="dot"></span> Boletim de Mercado Viver de Renda</div>
         <div class="boletim-panel">
-          <div class="boletim-status" id="boletimStatus">Carregando boletim...</div>
-          <div class="boletim-list" id="boletimList"></div>
-
-          <div class="boletim-noticias-title">Últimas notícias do mercado</div>
           <div id="noticiasList">
             <div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Carregando notícias...</div></div></div>
           </div>
@@ -550,47 +465,6 @@
   </footer>
 
   <script>
-    /* ---------------------------------------------------------------
-       Boletim de Mercado Viver de Renda
-       Opção 3: lê um JSON estático (fiis_investidor10.json) gerado
-       periodicamente pelo GitHub Actions + script coletar_brapi_fiis.py.
-       O token da API NUNCA fica exposto aqui — só o robô usa o token,
-       e o site só lê o arquivo já pronto no repositório.
-    ----------------------------------------------------------------*/
-    async function carregarBoletim() {
-      const statusEl = document.getElementById('boletimStatus');
-      const listEl = document.getElementById('boletimList');
-
-      try {
-        const resp = await fetch('fiis_investidor10.json', { cache: 'no-store' });
-        if (!resp.ok) throw new Error('arquivo não encontrado');
-        const dados = await resp.json();
-        if (!Array.isArray(dados) || dados.length === 0) throw new Error('vazio');
-
-        statusEl.textContent = `Atualizado automaticamente · ${dados.length} fundos`;
-        listEl.innerHTML = dados.map(f => `
-          <div class="boletim-item">
-            <div class="boletim-item-top">
-              <span class="boletim-ticker">${f.ticker}</span>
-              <span class="boletim-preco">${f.cotacao || '—'}</span>
-            </div>
-            <div class="boletim-nome">${f.razao_social || ''}</div>
-            <div class="boletim-metrics">
-              <div class="boletim-metric">DY 12M<strong>${f.dy_12m || '—'}</strong></div>
-              <div class="boletim-metric">P/VP<strong>${f.p_vp || '—'}</strong></div>
-              <div class="boletim-metric">Segmento<strong>${f.segmento || '—'}</strong></div>
-            </div>
-            ${f.fonte ? `<div class="boletim-fonte"><a href="#" onclick="return false;">${f.fonte}</a></div>` : ''}
-          </div>
-        `).join('');
-      } catch (e) {
-        statusEl.textContent = 'Boletim ainda não gerado — configure o GitHub Actions para publicar fiis_investidor10.json';
-        listEl.innerHTML = '<div class="boletim-item">Assim que o robô rodar pela primeira vez, os fundos aparecerão aqui automaticamente.</div>';
-      }
-    }
-
-    carregarBoletim();
-
     /* ---------------------------------------------------------------
        Últimas notícias do mercado financeiro
        Lê noticias.json, gerado pelo mesmo robô (coletar_brapi_fiis.py),

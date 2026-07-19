@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consulta de Ativos | Dividendos Viver de Renda</title>
+  <meta name="description" content="Consulte fundamentos, preços e variações de Ações, Índices, Fundos Imobiliários, BDRs e ETFs em tempo real." />
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #111b2e;
+      --text: #e8eefc;
+      --muted: #a9b6d3;
+      --primary: #31c3ff;
+      --primary-dark: #16a0d8;
+      --accent: #7cff92;
+      --danger: #ff7c7c;
+      --border: rgba(255,255,255,0.08);
+      --shadow: 0 16px 40px rgba(0,0,0,0.28);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(49,195,255,0.18), transparent 30%),
+        linear-gradient(180deg, #07101c 0%, #0b1220 100%);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container { width: min(1100px, 92%); margin: 0 auto; }
+
+    header { padding: 24px 0 0; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .brand { font-weight: 700; letter-spacing: 0.4px; color: var(--primary); font-size: 1.1rem; }
+
+    .nav { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: 0.95rem; }
+    .nav a:hover { color: var(--text); }
+
+    .hero { padding: 32px 0 8px; text-align: center; }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 62ch;
+      margin: 0 auto 8px;
+      font-size: 1.05rem;
+    }
+
+    .type-badges {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 22px 0 6px;
+    }
+
+    .type-badge {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .search-panel {
+      margin: 26px 0 8px;
+      background: rgba(17,27,46,0.95);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .search-row input[type="text"] {
+      flex: 1 1 260px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .search-row input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    .search-row input[type="text"]::placeholder { color: #6d7ba0; }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      font-size: 1rem;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #04101a;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .chip {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .chip:hover { color: var(--text); border-color: var(--primary); }
+
+    .token-toggle {
+      margin-top: 18px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .token-toggle summary { cursor: pointer; color: var(--primary); }
+
+    .token-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .token-row input {
+      flex: 1 1 220px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .btn-small {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .status-msg {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      min-height: 1.2em;
+    }
+
+    .status-msg.error { color: var(--danger); }
+
+    .results {
+      margin: 26px 0 60px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .result-card {
+      background: rgba(17,27,46,0.95);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .result-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .result-ticker { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+    .result-name { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+
+    .result-type-tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: var(--primary);
+      border: 1px solid rgba(49,195,255,0.35);
+      border-radius: 999px;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+
+    .result-price {
+      font-family: "Courier New", monospace;
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin: 8px 0 2px;
+    }
+
+    .result-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .up { color: var(--accent); }
+    .down { color: var(--danger); }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 14px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .result-grid div { font-size: 0.85rem; color: var(--muted); }
+    .result-grid strong { display: block; color: var(--text); font-size: 0.95rem; }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 20px;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      margin: 26px 0 60px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 0 28px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 860px) {
+      .topbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container topbar">
+      <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
+      <nav class="nav">
+        <a href="index.html">Início</a>
+        <a href="index.html#conteudo">Conteúdo</a>
+        <a href="index.html#compra">Comprar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Consulte fundamentos, preços e variações</h1>
+      <p>
+        Ações, Índices, Fundos Imobiliários (FIIs), BDRs e ETFs da B3, com dados em tempo real
+        via <strong>brapi.dev</strong>.
+      </p>
+      <div class="type-badges">
+        <span class="type-badge">📈 Ações</span>
+        <span class="type-badge">📊 Índices</span>
+        <span class="type-badge">🏢 FIIs</span>
+        <span class="type-badge">🌎 BDRs</span>
+        <span class="type-badge">🧺 ETFs</span>
+      </div>
+    </section>
+
+    <section class="search-panel">
+      <form id="search-form" class="search-row">
+        <input
+          type="text"
+          id="ticker-input"
+          placeholder="Digite um ou mais tickers, ex: PETR4, HGLG11, VALE3"
+          autocomplete="off"
+        />
+        <button type="submit" class="btn btn-primary">Consultar</button>
+      </form>
+
+      <div class="chips" id="quick-chips">
+        <span class="chip" data-ticker="PETR4">PETR4</span>
+        <span class="chip" data-ticker="VALE3">VALE3</span>
+        <span class="chip" data-ticker="ITUB4">ITUB4</span>
+        <span class="chip" data-ticker="BOVA11">BOVA11 (índice)</span>
+        <span class="chip" data-ticker="HGLG11">HGLG11 (FII)</span>
+        <span class="chip" data-ticker="BTLG11">BTLG11 (FII)</span>
+        <span class="chip" data-ticker="AAPL34">AAPL34 (BDR)</span>
+        <span class="chip" data-ticker="IVVB11">IVVB11 (ETF)</span>
+      </div>
+
+      <details class="token-toggle">
+        <summary>Usar um token brapi diferente (opcional)</summary>
+        <p style="margin-top:10px;">
+          Esta página já usa um token da brapi configurado no site, então a maioria dos tickers já funciona.
+          Se quiser usar seu próprio token em vez do padrão, cole abaixo — ele fica salvo só neste navegador
+          e substitui o token embutido.
+        </p>
+        <div class="token-row">
+          <input type="text" id="token-input" placeholder="Cole seu token brapi aqui" />
+          <button type="button" class="btn-small" id="save-token">Salvar token</button>
+          <button type="button" class="btn-small" id="clear-token">Remover token</button>
+        </div>
+      </details>
+
+      <div class="status-msg" id="status-msg"></div>
+    </section>
+
+    <div id="results-container"></div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>
+        Dados fornecidos pela <a href="https://brapi.dev" target="_blank" rel="noopener noreferrer" style="color:var(--primary)">brapi.dev</a>,
+        com cotações da B3. Consulte sempre fontes oficiais antes de tomar decisões de investimento.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var form = document.getElementById('search-form');
+      var input = document.getElementById('ticker-input');
+      var statusMsg = document.getElementById('status-msg');
+      var resultsContainer = document.getElementById('results-container');
+      var tokenInput = document.getElementById('token-input');
+      var saveTokenBtn = document.getElementById('save-token');
+      var clearTokenBtn = document.getElementById('clear-token');
+      var chips = document.getElementById('quick-chips');
+
+      var TOKEN_KEY = 'brapi_token';
+      var EMBEDDED_TOKEN = 'eJTYGhkHYGdQZy8kDmnHgy'; // TODO: mover para um proxy (Cloudflare Worker) e remover daqui
+
+      function getToken() {
+        return localStorage.getItem(TOKEN_KEY) || EMBEDDED_TOKEN;
+      }
+
+      tokenInput.value = getToken();
+
+      saveTokenBtn.addEventListener('click', function () {
+        localStorage.setItem(TOKEN_KEY, tokenInput.value.trim());
+        statusMsg.className = 'status-msg';
+        statusMsg.textContent = 'Token salvo neste navegador.';
+      });
+
+      clearTokenBtn.addEventListener('click', function () {
+        localStorage.removeItem(TOKEN_KEY);
+        tokenInput.value = '';
+        statusMsg.className = 'status-msg';
+        statusMsg.textContent = 'Token removido.';
+      });
+
+      chips.addEventListener('click', function (e) {
+        var target = e.target.closest('.chip');
+        if (!target) return;
+        input.value = target.getAttribute('data-ticker');
+        runSearch();
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        runSearch();
+      });
+
+      function formatNumber(n, decimals) {
+        if (typeof n !== 'number' || isNaN(n)) return '—';
+        return n.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+      }
+
+      function formatCompact(n) {
+        if (typeof n !== 'number' || isNaN(n)) return '—';
+        return n.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 });
+      }
+
+      function typeLabel(item) {
+        // brapi doesn't always return an explicit "type" field on /quote,
+        // so we infer from ticker shape as a friendly fallback.
+        if (item.type) return item.type;
+        var symbol = item.symbol || '';
+        if (/^\^/.test(symbol) || /^IBOV|IFIX|SMLL/.test(symbol)) return 'Índice';
+        if (/3[04]$/.test(symbol)) return 'BDR';
+        if (/11$/.test(symbol)) return 'FII / ETF';
+        return 'Ação';
+      }
+
+      function runSearch() {
+        var raw = input.value.trim();
+        if (!raw) {
+          statusMsg.className = 'status-msg error';
+          statusMsg.textContent = 'Digite ao menos um ticker.';
+          return;
+        }
+
+        var tickers = raw
+          .split(',')
+          .map(function (t) { return t.trim().toUpperCase(); })
+          .filter(Boolean);
+
+        statusMsg.className = 'status-msg';
+        statusMsg.textContent = 'Consultando ' + tickers.join(', ') + '...';
+        resultsContainer.innerHTML = '';
+
+        var token = getToken();
+        var url = 'https://brapi.dev/api/quote/' + tickers.join(',') + '?fundamental=true';
+
+        var headers = {};
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        fetch(url, { headers: headers })
+          .then(function (r) { return r.json().then(function (data) { return { ok: r.ok, data: data }; }); })
+          .then(function (res) {
+            if (!res.ok || !res.data || !res.data.results || !res.data.results.length) {
+              var apiMsg = (res.data && res.data.message) ? res.data.message : 'Nenhum resultado encontrado.';
+              statusMsg.className = 'status-msg error';
+              statusMsg.textContent = apiMsg + ' Dica: sem token, apenas PETR4, VALE3, MGLU3 e ITUB4 funcionam.';
+              renderEmptyState();
+              return;
+            }
+
+            statusMsg.className = 'status-msg';
+            statusMsg.textContent = 'Atualizado agora · ' + res.data.results.length + ' ativo(s).';
+            renderResults(res.data.results);
+          })
+          .catch(function () {
+            statusMsg.className = 'status-msg error';
+            statusMsg.textContent = 'Não foi possível consultar agora. Tente novamente em instantes.';
+            renderEmptyState();
+          });
+      }
+
+      function renderEmptyState() {
+        resultsContainer.innerHTML =
+          '<div class="empty-state">Nenhum dado para mostrar ainda. Consulte um ticker acima, ex: <strong>PETR4</strong>.</div>';
+      }
+
+      function renderResults(results) {
+        resultsContainer.innerHTML = '<div class="results">' +
+          results.map(function (item) {
+            var change = typeof item.regularMarketChangePercent === 'number' ? item.regularMarketChangePercent : 0;
+            var isUp = change >= 0;
+            var price = formatNumber(item.regularMarketPrice, 2);
+            var dy = item.dividendYield || (item.defaultKeyStatistics && item.defaultKeyStatistics.dividendYield);
+
+            return '' +
+              '<div class="result-card">' +
+                '<div class="result-head">' +
+                  '<div>' +
+                    '<div class="result-ticker">' + item.symbol + '</div>' +
+                    '<div class="result-name">' + (item.longName || item.shortName || '') + '</div>' +
+                  '</div>' +
+                  '<span class="result-type-tag">' + typeLabel(item) + '</span>' +
+                '</div>' +
+                '<div class="result-price">R$ ' + price + '</div>' +
+                '<div class="result-change ' + (isUp ? 'up' : 'down') + '">' +
+                  (isUp ? '▲' : '▼') + ' ' + formatNumber(Math.abs(change), 2) + '%' +
+                '</div>' +
+                '<div class="result-grid">' +
+                  '<div>Abertura<strong>R$ ' + formatNumber(item.regularMarketOpen, 2) + '</strong></div>' +
+                  '<div>Fechamento ant.<strong>R$ ' + formatNumber(item.regularMarketPreviousClose, 2) + '</strong></div>' +
+                  '<div>Máxima<strong>R$ ' + formatNumber(item.regularMarketDayHigh, 2) + '</strong></div>' +
+                  '<div>Mínima<strong>R$ ' + formatNumber(item.regularMarketDayLow, 2) + '</strong></div>' +
+                  '<div>Volume<strong>' + formatCompact(item.regularMarketVolume) + '</strong></div>' +
+                  '<div>Market cap<strong>' + formatCompact(item.marketCap) + '</strong></div>' +
+                  (dy ? '<div>Dividend Yield<strong>' + formatNumber(dy, 2) + '%</strong></div>' : '') +
+                '</div>' +
+              '</div>';
+          }).join('') +
+        '</div>';
+      }
+
+      // Load a friendly default view on first visit
+      input.value = 'PETR4, VALE3, ITUB4';
+      runSearch();
+    })();
+  </script>
+</body>
+</html>
