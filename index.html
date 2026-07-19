@@ -164,30 +164,6 @@
     }
     .hg-chip:hover { color: var(--primary); border-color: var(--primary); }
 
-    .hg-chave { margin-top: 16px; font-size: 0.82rem; color: var(--muted); }
-    .hg-chave summary { cursor: pointer; color: var(--primary); }
-    .hg-chave p { margin: 10px 0; }
-    .hg-chave a { color: var(--primary); }
-    .hg-linha-chave { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-    .hg-linha-chave input {
-      flex: 1 1 220px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #04101a;
-      color: var(--text);
-      font-size: 0.9rem;
-    }
-    .hg-btn-small {
-      padding: 10px 16px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-
     .hg-status { text-align: left; color: var(--muted); font-size: 0.88rem; margin: 14px 0; min-height: 1.2em; }
     .hg-status.erro { color: var(--danger); }
 
@@ -545,18 +521,6 @@
           <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
         </div>
 
-        <details class="hg-chave">
-          <summary>Configurar chave da HG Brasil</summary>
-          <p>
-            Cole sua chave da <a href="https://console.hgbrasil.com" target="_blank" rel="noopener noreferrer">HG Brasil</a>
-            abaixo — ela fica salva só neste navegador, nunca no código do site.
-          </p>
-          <div class="hg-linha-chave">
-            <input type="text" id="hgChaveInput" placeholder="Cole sua chave HG Brasil aqui" />
-            <button class="hg-btn-small" id="hgSalvarChave">Salvar</button>
-          </div>
-        </details>
-
         <div class="hg-status" id="hgStatus"></div>
         <div id="hgResultado"></div>
       </div>
@@ -689,27 +653,16 @@
     /* ---------------------------------------------------------------
        Consulta rápida: Ações e FIIs via HG Brasil
        API com CORS liberado — chamada direto do navegador, sem robô.
-       A chave fica salva só no localStorage do visitante, nunca no HTML.
     ----------------------------------------------------------------*/
     (function () {
-      const CHAVE_KEY = 'hgbrasil_chave';
-      const CHAVE_PADRAO = 'b4cda510'; // TODO: mover para um proxy e remover daqui
+      const CHAVE_HG = 'b4cda510'; // TODO: mover para um proxy e remover daqui
       const inputTicker = document.getElementById('hgTickerInput');
-      const inputChave = document.getElementById('hgChaveInput');
       const statusEl = document.getElementById('hgStatus');
       const resultadoEl = document.getElementById('hgResultado');
       const btnBuscar = document.getElementById('hgBtnBuscar');
       const chips = document.querySelectorAll('.hg-chip');
 
       if (!inputTicker) return; // seção não presente nesta página
-
-      inputChave.value = localStorage.getItem(CHAVE_KEY) || CHAVE_PADRAO;
-
-      document.getElementById('hgSalvarChave').addEventListener('click', () => {
-        localStorage.setItem(CHAVE_KEY, inputChave.value.trim());
-        statusEl.className = 'hg-status';
-        statusEl.textContent = 'Chave salva neste navegador.';
-      });
 
       chips.forEach(chip => {
         chip.addEventListener('click', () => {
@@ -740,42 +693,56 @@
         const digitado = inputTicker.value.trim().toUpperCase();
         if (!digitado) return;
         const ticker = digitado.startsWith('B3:') ? digitado : `B3:${digitado}`;
-        const chave = localStorage.getItem(CHAVE_KEY) || inputChave.value.trim() || CHAVE_PADRAO;
-
-        if (!chave) {
-          statusEl.className = 'hg-status erro';
-          statusEl.textContent = 'Configure sua chave da HG Brasil primeiro (veja acima).';
-          return;
-        }
 
         statusEl.className = 'hg-status';
         statusEl.textContent = `Consultando ${digitado}...`;
         resultadoEl.innerHTML = '';
 
+        let resp, data;
         try {
-          const url = `https://api.hgbrasil.com/v2/finance/quotes?tickers=${encodeURIComponent(ticker)}&key=${encodeURIComponent(chave)}`;
-          const resp = await fetch(url);
-          const data = await resp.json();
-
-          if (data?.metadata?.key_status !== 'valid') {
-            statusEl.className = 'hg-status erro';
-            statusEl.textContent = 'Chave inválida ou expirada. Confira em console.hgbrasil.com.';
-            return;
-          }
-
-          const ativo = data?.results?.[0];
-          if (!ativo) {
-            statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Ticker "${digitado}" não encontrado.`;
-            return;
-          }
-
-          statusEl.textContent = '';
-          hgRenderizarAtivo(ativo);
-        } catch (e) {
+          const url = `https://api.hgbrasil.com/v2/finance/quotes?tickers=${encodeURIComponent(ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
+          resp = await fetch(url);
+        } catch (erroRede) {
+          // Falha de rede/CORS antes mesmo de chegar resposta do servidor
           statusEl.className = 'hg-status erro';
-          statusEl.textContent = 'Não foi possível consultar agora. Tente novamente.';
+          statusEl.textContent = 'Falha de conexão ao consultar a HG Brasil (verifique sua internet ou bloqueadores de anúncio/CORS).';
+          console.error('Erro de rede na consulta HG Brasil:', erroRede);
+          return;
         }
+
+        try {
+          data = await resp.json();
+        } catch (erroJson) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `A HG Brasil respondeu algo inesperado (HTTP ${resp.status}). Tente novamente em instantes.`;
+          console.error('Erro ao interpretar resposta da HG Brasil:', erroJson);
+          return;
+        }
+
+        const statusChave = data?.metadata?.key_status;
+        if (statusChave && statusChave !== 'valid') {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Chave da HG Brasil recusada (status: ${statusChave}). Confira o domínio autorizado e o plano em console.hgbrasil.com.`;
+          console.error('key_status retornado pela HG Brasil:', statusChave, data);
+          return;
+        }
+
+        if (!resp.ok) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Erro ${resp.status} ao consultar a HG Brasil. Tente novamente em instantes.`;
+          console.error('Resposta HTTP não-OK da HG Brasil:', resp.status, data);
+          return;
+        }
+
+        const ativo = data?.results?.[0];
+        if (!ativo) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Ticker "${digitado}" não encontrado.`;
+          return;
+        }
+
+        statusEl.textContent = '';
+        hgRenderizarAtivo(ativo);
       }
 
       function hgRenderizarAtivo(a) {
@@ -829,7 +796,7 @@
       btnBuscar.addEventListener('click', hgBuscarAtivo);
       inputTicker.addEventListener('keydown', (e) => { if (e.key === 'Enter') hgBuscarAtivo(); });
 
-      // Já existe uma chave padrão embutida, então carrega o ticker inicial direto
+      // Carrega o ticker inicial automaticamente (chave já embutida)
       hgBuscarAtivo();
     })();
 
