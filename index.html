@@ -241,6 +241,53 @@
       height: 100%;
     }
 
+    /* Índices atualizados */
+    .indices-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .indice-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #04101a;
+      border: 1px solid var(--border);
+    }
+    .indice-row.skeleton {
+      height: 44px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .indice-label { font-weight: 700; color: var(--text); font-size: 0.92rem; }
+    .indice-value { font-family: "Courier New", monospace; color: var(--muted); font-size: 0.9rem; }
+    .indice-change {
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+      font-size: 0.88rem;
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .boletim-noticias-title {
+      margin-top: 20px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+    }
+
     /* Notícias do mercado dentro do boletim */
     .noticia-card {
       display: block;
@@ -413,10 +460,20 @@
         </div>
       </div>
 
-      <!-- DIREITA: Boletim de Mercado Viver de Renda -->
+      <!-- DIREITA: Boletim de mercado -->
       <div>
-        <div class="panel-title boletim"><span class="dot"></span> Boletim de Mercado Viver de Renda</div>
+        <div class="panel-title boletim"><span class="dot"></span> Boletim de mercado</div>
         <div class="boletim-panel">
+          <div class="indices-rows" id="indicesRows">
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+          </div>
+
+          <div class="boletim-noticias-title">Últimas notícias</div>
           <div id="noticiasList">
             <div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Carregando notícias...</div></div></div>
           </div>
@@ -465,6 +522,113 @@
   </footer>
 
   <script>
+    // Token da brapi usado em todas as chamadas desta página (índices, notícias-relacionadas e busca de ativos)
+    const BRAPI_TOKEN = 'eJTYGhkHYGdQZy8kDmnHgy'; // TODO: mover para um proxy e remover daqui
+
+    /* ---------------------------------------------------------------
+       Índices atualizados: Ibovespa, Dólar, Euro, Bitcoin (USD),
+       IPCA e CPI (EUA) — buscados ao vivo via brapi.
+    ----------------------------------------------------------------*/
+    async function carregarIndices() {
+      const rowsEl = document.getElementById('indicesRows');
+      const headers = { Authorization: `Bearer ${BRAPI_TOKEN}` };
+
+      const pMercado = fetch('https://brapi.dev/api/quote/^BVSP,USDBRL,EURBRL', { headers })
+        .then(r => r.json())
+        .then(d => (d && d.results) || [])
+        .catch(() => []);
+
+      const pBitcoin = fetch('https://brapi.dev/api/v2/crypto?coin=BTC&currency=USD', { headers })
+        .then(r => r.json())
+        .then(d => {
+          const moeda = d && d.coins && d.coins[0];
+          if (!moeda) return null;
+          return {
+            label: 'Bitcoin (USD)',
+            prefixo: 'US$ ',
+            preco: moeda.regularMarketPrice,
+            variacao: moeda.regularMarketChangePercent,
+          };
+        })
+        .catch(() => null);
+
+      const pIpca = fetch('https://brapi.dev/api/v2/inflation?country=brazil', { headers })
+        .then(r => r.json())
+        .then(d => {
+          const item = Array.isArray(d) ? d[0] : (d && d.inflation && d.inflation[0]);
+          if (!item) return null;
+          return { label: 'IPCA', valor: item.value, taxa: true };
+        })
+        .catch(() => null);
+
+      const pCpi = fetch('https://brapi.dev/api/v2/inflation?country=usa', { headers })
+        .then(r => r.json())
+        .then(d => {
+          const item = Array.isArray(d) ? d[0] : (d && d.inflation && d.inflation[0]);
+          if (!item) return null;
+          return { label: 'CPI (EUA)', valor: item.value, taxa: true };
+        })
+        .catch(() => null);
+
+      const nomeMap = { '^BVSP': 'Ibovespa', 'USDBRL': 'Dólar', 'EURBRL': 'Euro' };
+
+      const [mercado, bitcoin, ipca, cpi] = await Promise.all([pMercado, pBitcoin, pIpca, pCpi]);
+      const extras = [bitcoin, ipca, cpi].filter(Boolean);
+
+      if (!mercado.length && !extras.length) {
+        rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Índices indisponíveis no momento</span></div>';
+        return;
+      }
+
+      let html = '';
+
+      mercado.forEach(item => {
+        const variacao = typeof item.regularMarketChangePercent === 'number' ? item.regularMarketChangePercent : 0;
+        const emAlta = variacao >= 0;
+        const preco = typeof item.regularMarketPrice === 'number'
+          ? item.regularMarketPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : '—';
+        const prefixo = /BRL$/.test(item.symbol) ? 'R$ ' : '';
+        const label = nomeMap[item.symbol] || item.symbol;
+
+        html += `
+          <div class="indice-row">
+            <span class="indice-label">${label}</span>
+            <span class="indice-value">${prefixo}${preco}</span>
+            <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+          </div>`;
+      });
+
+      extras.forEach(item => {
+        const precoFormatado = typeof item.preco === 'number'
+          ? item.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : (typeof item.valor === 'number' ? item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—');
+
+        if (item.taxa) {
+          const emAlta = item.valor >= 0;
+          html += `
+            <div class="indice-row">
+              <span class="indice-label">${item.label}</span>
+              <span class="indice-value">—</span>
+              <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${precoFormatado}%</span>
+            </div>`;
+        } else {
+          const variacao = typeof item.variacao === 'number' ? item.variacao : 0;
+          const emAlta = variacao >= 0;
+          html += `
+            <div class="indice-row">
+              <span class="indice-label">${item.label}</span>
+              <span class="indice-value">${item.prefixo || ''}${precoFormatado}</span>
+              <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+            </div>`;
+        }
+      });
+
+      rowsEl.innerHTML = html;
+    }
+
+    carregarIndices();
+
     /* ---------------------------------------------------------------
        Últimas notícias do mercado financeiro
        Lê noticias.json, gerado pelo mesmo robô (coletar_brapi_fiis.py),
@@ -498,7 +662,6 @@
     carregarNoticias();
 
     // Busca real de ações/FIIs/BDRs/ETFs via brapi — traz todas as características disponíveis
-    const BRAPI_TOKEN = 'eJTYGhkHYGdQZy8kDmnHgy'; // TODO: mover para um proxy e remover daqui
 
     function formatMoeda(valor) {
       return typeof valor === 'number'
