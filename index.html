@@ -114,7 +114,7 @@
     .panel-title.explorar .dot { background: var(--primary); }
     .panel-title.boletim .dot { background: var(--gold); }
 
-    /* ---------- Coluna esquerda: Explorar o mercado ---------- */
+    /* ---------- Coluna esquerda: Ranking do mercado ---------- */
     .search-container {
       background: rgba(17,27,46,0.7);
       border: 1px solid var(--border);
@@ -125,110 +125,55 @@
       height: 100%;
     }
 
-    .asset-types {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+    .ranking-block + .ranking-block {
+      margin-top: 26px;
+      padding-top: 26px;
+      border-top: 1px solid var(--border);
     }
-    .asset-type-btn {
-      padding: 8px 18px;
-      border-radius: 99px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.03);
-      color: var(--muted);
-      font-size: 0.95rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .asset-type-btn.active, .asset-type-btn:hover {
-      background: rgba(49,195,255,0.15);
-      color: var(--primary);
-      border-color: var(--primary);
-    }
-
-    .search-input-group {
-      display: flex;
-      gap: 12px;
-      position: relative;
-    }
-    .search-input-group input {
-      flex: 1;
-      padding: 16px 20px;
-      border-radius: 14px;
-      border: 2px solid var(--border);
-      background: #04101a;
-      color: var(--text);
-      font-size: 1.05rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .search-input-group input:focus {
-      border-color: var(--primary);
-    }
-    .search-input-group input::placeholder {
-      color: #4a5a7a;
-    }
-    .btn-search {
-      padding: 0 26px;
-      border-radius: 14px;
-      font-weight: 700;
+    .ranking-title {
       font-size: 1rem;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #04101a;
-      border: none;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px;
     }
-    .btn-search:hover { transform: scale(1.02); }
-
-    .result-card {
-      margin-top: 20px;
-      background: #04101a;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 22px;
+    .ranking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    .result-card-top {
+    .ranking-row {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .asset-info h2 {
-      font-size: 1.7rem;
-      color: var(--primary);
-      margin-bottom: 4px;
-      display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #04101a;
+      border: 1px solid var(--border);
     }
-    .asset-company { color: var(--muted); font-size: 0.95rem; }
-    .asset-meta {
+    .ranking-row.skeleton {
+      height: 48px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    .ranking-info { display: flex; flex-direction: column; min-width: 0; }
+    .ranking-ticker { font-weight: 700; color: var(--primary); font-size: 0.98rem; }
+    .ranking-nome {
       color: var(--muted);
-      font-size: 0.78rem;
-      margin-top: 4px;
-      opacity: 0.8;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
     }
-
-    .asset-price-box { text-align: right; }
-    .asset-price { font-size: 1.9rem; font-weight: bold; }
-    .asset-var { font-size: 1rem; }
-
-    .indicators {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 14px 16px;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-      width: 100%;
+    .ranking-numbers { text-align: right; flex-shrink: 0; }
+    .ranking-preco { font-family: "Courier New", monospace; font-size: 0.9rem; color: var(--text); }
+    .ranking-change {
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
     }
-    .indicator-item span { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 2px; }
-    .indicator-item strong { font-size: 1.02rem; }
 
     /* ---------- Coluna direita: Boletim Viver de Renda ---------- */
     .boletim-panel {
@@ -386,11 +331,7 @@
     @media (max-width: 900px) {
       .split-layout { grid-template-columns: 1fr; }
       .grid { grid-template-columns: 1fr; }
-      .search-input-group { flex-direction: column; }
-      .btn-search { padding: 16px; }
-      .result-card-top { flex-direction: column; text-align: center; }
-      .asset-price-box { text-align: center; width: 100%; }
-      .indicators { justify-content: center; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); text-align: center; }
+      .ranking-nome { max-width: 120px; }
     }
   </style>
 </head>
@@ -411,50 +352,36 @@
 
     <section class="section-intro" id="consultas">
       <h1>Explore o mercado. <br><span style="color: var(--primary);">Tome melhores decisões.</span></h1>
-      <p>Consulte fundamentos, preços e variações de Ações, Fundos Imobiliários, BDRs e ETFs listados na B3, além do boletim diário com os destaques de FIIs.</p>
+      <p>Acompanhe os destaques do dia: as ações e os Fundos Imobiliários com melhor desempenho no ranking da B3, além do boletim diário com índices e notícias do mercado.</p>
     </section>
 
     <section class="split-layout">
 
-      <!-- ESQUERDA: Explorar o mercado -->
+      <!-- ESQUERDA: Ranking do mercado -->
       <div>
         <div class="panel-title explorar"><span class="dot"></span> Explore o mercado</div>
         <div class="search-container">
-          <div class="asset-types">
-            <button class="asset-type-btn active">Ações</button>
-            <button class="asset-type-btn">FIIs</button>
-            <button class="asset-type-btn">BDRs</button>
-            <button class="asset-type-btn">ETFs</button>
-          </div>
-
-          <div class="search-input-group">
-            <input type="text" id="tickerInput" placeholder="Ex: ALOS3, MXRF11, IVVB11..." autocomplete="off" />
-            <button class="btn-search" id="btnBuscar">Analisar Ativo</button>
-          </div>
-
-          <div class="result-card" id="resultCard">
-            <div class="result-card-top">
-              <div class="asset-info">
-                <h2 id="resTicker">ALOS3</h2>
-                <div class="asset-company" id="resName">Allos S.A.</div>
-                <div class="asset-meta" id="resMeta"></div>
-              </div>
-
-              <div class="asset-price-box">
-                <div class="asset-price" id="resPrice">R$ 24,50</div>
-                <div class="asset-var val-up" id="resVar">+1.25% Hoje</div>
-              </div>
+          <div class="ranking-block">
+            <h3 class="ranking-title">🏆 6 melhores ações do momento</h3>
+            <div class="ranking-list" id="rankingAcoes">
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
             </div>
+          </div>
 
-            <div class="indicators" id="resIndicators">
-              <div class="indicator-item">
-                <span>Div. Yield</span>
-                <strong id="resDy">4.5%</strong>
-              </div>
-              <div class="indicator-item">
-                <span>P/VP</span>
-                <strong id="resPvp">0.85</strong>
-              </div>
+          <div class="ranking-block">
+            <h3 class="ranking-title">🏢 6 melhores FIIs do momento</h3>
+            <div class="ranking-list" id="rankingFiis">
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
             </div>
           </div>
         </div>
@@ -522,8 +449,6 @@
   </footer>
 
   <script>
-    // Token da brapi usado em todas as chamadas desta página (índices, notícias-relacionadas e busca de ativos)
-    const BRAPI_TOKEN = 'eJTYGhkHYGdQZy8kDmnHgy'; // TODO: mover para um proxy e remover daqui
 
     /* ---------------------------------------------------------------
        Índices atualizados: Ibovespa, Dólar, Euro, Bitcoin (USD),
@@ -607,153 +532,58 @@
 
     carregarNoticias();
 
-    // Busca real de ações/FIIs/BDRs/ETFs via brapi — traz todas as características disponíveis
-
+    /* ---------------------------------------------------------------
+       Ranking: 6 melhores ações e 6 melhores FIIs do momento.
+       Lê ranking.json, gerado pelo robô (coletar_brapi_fiis.py) via
+       brapi (/api/quote/list, ordenado por maior variação % do dia).
+    ----------------------------------------------------------------*/
     function formatMoeda(valor) {
       return typeof valor === 'number'
         ? valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-        : null;
+        : '—';
     }
 
-    function formatPercentual(valor) {
-      return typeof valor === 'number'
-        ? `${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`
-        : null;
-    }
+    function renderizarRanking(elId, lista) {
+      const listEl = document.getElementById(elId);
 
-    function formatCompacto(valor) {
-      return typeof valor === 'number'
-        ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
-        : null;
-    }
+      if (!Array.isArray(lista) || lista.length === 0) {
+        listEl.innerHTML = '<div class="ranking-row"><span class="ranking-nome">Ranking ainda não gerado — aguarde o robô rodar.</span></div>';
+        return;
+      }
 
-    function formatNumero(valor, casas = 2) {
-      return typeof valor === 'number'
-        ? valor.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas })
-        : null;
-    }
-
-    function formatData(valor) {
-      if (!valor) return null;
-      // brapi retorna alguns campos como timestamp em segundos
-      const data = typeof valor === 'number' ? new Date(valor * 1000) : new Date(valor);
-      if (isNaN(data.getTime())) return null;
-      return data.toLocaleDateString('pt-BR');
-    }
-
-    // Lista completa de características que tentamos exibir, na ordem desejada.
-    // Cada item só aparece no card se o dado existir na resposta da API.
-    function montarIndicadores(a) {
-      const stats = a.defaultKeyStatistics || {};
-      const financeiro = a.financialData || {};
-      const perfil = a.summaryProfile || {};
-      const dy = a.dividendYield || stats.dividendYield;
-
-      const campos = [
-        ['Abertura', formatMoeda(a.regularMarketOpen), 'R$ '],
-        ['Fech. anterior', formatMoeda(a.regularMarketPreviousClose), 'R$ '],
-        ['Máxima do dia', formatMoeda(a.regularMarketDayHigh), 'R$ '],
-        ['Mínima do dia', formatMoeda(a.regularMarketDayLow), 'R$ '],
-        ['Máxima 52 sem.', formatMoeda(a.fiftyTwoWeekHigh), 'R$ '],
-        ['Mínima 52 sem.', formatMoeda(a.fiftyTwoWeekLow), 'R$ '],
-        ['Volume', formatCompacto(a.regularMarketVolume)],
-        ['Volume médio', formatCompacto(a.averageDailyVolume10Day || a.regularMarketVolume)],
-        ['Valor de mercado', formatCompacto(a.marketCap), 'R$ '],
-        ['Dividend Yield', formatPercentual(dy)],
-        ['P/VP', formatNumero(stats.priceToBook)],
-        ['P/L', formatNumero(stats.trailingPE)],
-        ['LPA', formatNumero(stats.trailingEps || stats.earningsPerShare, 2)],
-        ['ROE', formatPercentual(financeiro.returnOnEquity ? financeiro.returnOnEquity * 100 : null)],
-        ['Margem líquida', formatPercentual(financeiro.profitMargins ? financeiro.profitMargins * 100 : null)],
-        ['Receita total', formatCompacto(financeiro.totalRevenue), 'R$ '],
-        ['Dívida/Patrimônio', formatNumero(financeiro.debtToEquity)],
-        ['Setor', perfil.sector || a.sector],
-        ['Indústria', perfil.industry || a.industry],
-        ['Moeda', a.currency],
-        ['Bolsa', a.market || a.exchangeName],
-        ['Próx. data com', formatData(a.exDividendDate)],
-      ];
-
-      return campos.filter(([, valor]) => valor !== null && valor !== undefined && valor !== '');
-    }
-
-    async function buscarAtivo() {
-      const input = document.getElementById('tickerInput');
-      const btn = document.getElementById('btnBuscar');
-      const ticker = input.value.trim().toUpperCase().split(',')[0].trim();
-      if (!ticker) return;
-
-      const resTicker = document.getElementById('resTicker');
-      const resName = document.getElementById('resName');
-      const resMeta = document.getElementById('resMeta');
-      const resPrice = document.getElementById('resPrice');
-      const resVar = document.getElementById('resVar');
-      const resIndicators = document.getElementById('resIndicators');
-
-      const textoOriginal = btn.textContent;
-      btn.textContent = 'Buscando...';
-      btn.disabled = true;
-      resTicker.textContent = ticker;
-      resName.textContent = 'Consultando todas as características...';
-      resMeta.textContent = '';
-      resIndicators.innerHTML = '';
-
-      try {
-        const url = `https://brapi.dev/api/quote/${ticker}?fundamental=true&dividends=true`;
-        const resp = await fetch(url, {
-          headers: { Authorization: `Bearer ${BRAPI_TOKEN}` }
-        });
-        const data = await resp.json();
-        const ativo = data && data.results && data.results[0];
-
-        if (!resp.ok || !ativo) {
-          const msg = (data && data.message) || 'Ticker não encontrado.';
-          resName.textContent = msg;
-          resPrice.textContent = '—';
-          resVar.textContent = '';
-          return;
-        }
-
-        const variacao = typeof ativo.regularMarketChangePercent === 'number'
-          ? ativo.regularMarketChangePercent
-          : 0;
+      listEl.innerHTML = lista.map(item => {
+        const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
         const emAlta = variacao >= 0;
 
-        resTicker.textContent = ativo.symbol;
-        resName.textContent = ativo.longName || ativo.shortName || '';
-        resMeta.textContent = [ativo.market || ativo.exchangeName, ativo.currency]
-          .filter(Boolean)
-          .join(' · ');
-        resPrice.textContent = `R$ ${formatMoeda(ativo.regularMarketPrice) ?? '—'}`;
-        resVar.textContent = `${emAlta ? '▲' : '▼'} ${formatMoeda(Math.abs(variacao)) ?? '0,00'}% Hoje`;
-        resVar.className = `asset-var ${emAlta ? 'val-up' : 'val-down'}`;
-
-        const indicadores = montarIndicadores(ativo);
-        if (indicadores.length === 0) {
-          resIndicators.innerHTML = '<div class="indicator-item"><span>Detalhes</span><strong>Sem dados fundamentalistas para este ativo</strong></div>';
-        } else {
-          resIndicators.innerHTML = indicadores.map(([label, valor, prefixo = '']) => `
-            <div class="indicator-item">
-              <span>${label}</span>
-              <strong>${prefixo}${valor}</strong>
+        return `
+          <div class="ranking-row">
+            <div class="ranking-info">
+              <span class="ranking-ticker">${item.ticker || '—'}</span>
+              <span class="ranking-nome">${item.nome || ''}</span>
             </div>
-          `).join('');
-        }
+            <div class="ranking-numbers">
+              <div class="ranking-preco">R$ ${formatMoeda(item.preco)}</div>
+              <div class="ranking-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function carregarRanking() {
+      try {
+        const resp = await fetch('ranking.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const ranking = await resp.json();
+
+        renderizarRanking('rankingAcoes', ranking.acoes);
+        renderizarRanking('rankingFiis', ranking.fiis);
       } catch (e) {
-        resName.textContent = 'Não foi possível consultar agora. Tente novamente.';
-        resPrice.textContent = '—';
-        resVar.textContent = '';
-        resIndicators.innerHTML = '';
-      } finally {
-        btn.textContent = textoOriginal;
-        btn.disabled = false;
+        renderizarRanking('rankingAcoes', []);
+        renderizarRanking('rankingFiis', []);
       }
     }
 
-    document.getElementById('btnBuscar').addEventListener('click', buscarAtivo);
-    document.getElementById('tickerInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') buscarAtivo();
-    });
+    carregarRanking();
   </script>
 
 </body>
