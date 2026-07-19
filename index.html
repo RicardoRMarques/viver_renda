@@ -301,6 +301,54 @@
     }
     .boletim-fonte a { color: var(--primary); }
 
+    /* Notícias do mercado dentro do boletim */
+    .boletim-noticias-title {
+      margin-top: 20px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+    }
+    .noticia-card {
+      display: block;
+      position: relative;
+      background: #04101a;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      color: var(--text);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .noticia-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+    }
+    .noticia-thumb {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+      background: rgba(255,255,255,0.04);
+    }
+    .noticia-body {
+      padding: 12px 14px;
+    }
+    .noticia-titulo {
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+    .noticia-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
     /* Seção de Apresentação e Curso */
     .presentation-section {
       padding: 60px 0;
@@ -452,6 +500,11 @@
         <div class="boletim-panel">
           <div class="boletim-status" id="boletimStatus">Carregando boletim...</div>
           <div class="boletim-list" id="boletimList"></div>
+
+          <div class="boletim-noticias-title">Últimas notícias do mercado</div>
+          <div id="noticiasList">
+            <div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Carregando notícias...</div></div></div>
+          </div>
         </div>
       </div>
 
@@ -537,6 +590,38 @@
     }
 
     carregarBoletim();
+
+    /* ---------------------------------------------------------------
+       Últimas notícias do mercado financeiro
+       Lê noticias.json, gerado pelo mesmo robô (coletar_brapi_fiis.py),
+       que busca o feed RSS de mercado e extrai título, link e imagem.
+       O card inteiro é um <a> clicável — a URL nunca aparece como texto,
+       fica "oculta" atrás da imagem/título.
+    ----------------------------------------------------------------*/
+    async function carregarNoticias() {
+      const listEl = document.getElementById('noticiasList');
+
+      try {
+        const resp = await fetch('noticias.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const noticias = await resp.json();
+        if (!Array.isArray(noticias) || noticias.length === 0) throw new Error('vazio');
+
+        listEl.innerHTML = noticias.slice(0, 3).map(n => `
+          <a class="noticia-card" href="${n.link}" target="_blank" rel="noopener noreferrer">
+            ${n.imagem ? `<img class="noticia-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+            <div class="noticia-body">
+              <div class="noticia-titulo">${n.titulo}</div>
+              <div class="noticia-meta">${n.fonte || 'Mercado financeiro'}</div>
+            </div>
+          </a>
+        `).join('');
+      } catch (e) {
+        listEl.innerHTML = '<div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Notícias ainda não geradas — aguarde o robô rodar.</div></div></div>';
+      }
+    }
+
+    carregarNoticias();
 
     // Busca real de ações/FIIs/BDRs/ETFs via brapi — traz todas as características disponíveis
     const BRAPI_TOKEN = 'eJTYGhkHYGdQZy8kDmnHgy'; // TODO: mover para um proxy e remover daqui
