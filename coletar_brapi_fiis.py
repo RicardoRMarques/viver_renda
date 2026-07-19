@@ -101,8 +101,10 @@ POOL_ACOES_TAMANHO = 25  # quantas ações líquidas usamos como base p/ DY e Re
 
 FIIS_LOGISTICA = ["BTLG11", "HGLG11", "XPLG11", "VILG11", "LVBI11",
                   "BRCO11", "GGRC11", "RBRL11", "ALZR11", "PATL11"]
-FIIS_PAPEL = ["MXRF11", "KNCR11", "KNIP11", "CPTS11", "IRDM11",
-              "VGIR11", "HGCR11", "RECR11", "MCCI11", "CVBI11"]
+# IRDM11 removido: não está mais listado. Incluídos KNHY11 e KNSC11 (Kinea),
+# além de KNCR11 e KNIP11 (também Kinea), que já estavam na lista.
+FIIS_PAPEL = ["MXRF11", "KNCR11", "KNIP11", "CPTS11", "KNHY11",
+              "KNSC11", "VGIR11", "HGCR11", "RECR11", "MCCI11", "CVBI11"]
 FIIS_LOGISTICA_QTD = 4
 FIIS_PAPEL_QTD = 2
 
