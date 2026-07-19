@@ -527,104 +527,50 @@
 
     /* ---------------------------------------------------------------
        Índices atualizados: Ibovespa, Dólar, Euro, Bitcoin (USD),
-       IPCA e CPI (EUA) — buscados ao vivo via brapi.
+       IPCA e CPI (EUA).
+       Lê indices.json, gerado pelo robô (coletar_brapi_fiis.py), que busca
+       Ibovespa/Dólar/Euro/Bitcoin no Yahoo Finance e IPCA/CPI em fontes
+       oficiais (Banco Central e BLS). Isso roda no servidor porque o Yahoo
+       Finance não libera CORS para chamadas direto do navegador.
     ----------------------------------------------------------------*/
     async function carregarIndices() {
       const rowsEl = document.getElementById('indicesRows');
-      const headers = { Authorization: `Bearer ${BRAPI_TOKEN}` };
 
-      const pMercado = fetch('https://brapi.dev/api/quote/^BVSP,USDBRL,EURBRL', { headers })
-        .then(r => r.json())
-        .then(d => (d && d.results) || [])
-        .catch(() => []);
+      try {
+        const resp = await fetch('indices.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const indices = await resp.json();
+        if (!Array.isArray(indices) || indices.length === 0) throw new Error('vazio');
 
-      const pBitcoin = fetch('https://brapi.dev/api/v2/crypto?coin=BTC&currency=USD', { headers })
-        .then(r => r.json())
-        .then(d => {
-          const moeda = d && d.coins && d.coins[0];
-          if (!moeda) return null;
-          return {
-            label: 'Bitcoin (USD)',
-            prefixo: 'US$ ',
-            preco: moeda.regularMarketPrice,
-            variacao: moeda.regularMarketChangePercent,
-          };
-        })
-        .catch(() => null);
+        rowsEl.innerHTML = indices.map(item => {
+          // Índices de mercado (Ibovespa, Dólar, Euro, Bitcoin) têm "valor" + "variacao_pct"
+          if (typeof item.valor === 'number') {
+            const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
+            const emAlta = variacao >= 0;
+            const prefixo = item.prefixo === 'pontos' ? '' : (item.prefixo || '');
+            const valorFormatado = item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-      const pIpca = fetch('https://brapi.dev/api/v2/inflation?country=brazil', { headers })
-        .then(r => r.json())
-        .then(d => {
-          const item = Array.isArray(d) ? d[0] : (d && d.inflation && d.inflation[0]);
-          if (!item) return null;
-          return { label: 'IPCA', valor: item.value, taxa: true };
-        })
-        .catch(() => null);
+            return `
+              <div class="indice-row">
+                <span class="indice-label">${item.label}</span>
+                <span class="indice-value">${prefixo}${valorFormatado}${item.prefixo === 'pontos' ? ' pts' : ''}</span>
+                <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+              </div>`;
+          }
 
-      const pCpi = fetch('https://brapi.dev/api/v2/inflation?country=usa', { headers })
-        .then(r => r.json())
-        .then(d => {
-          const item = Array.isArray(d) ? d[0] : (d && d.inflation && d.inflation[0]);
-          if (!item) return null;
-          return { label: 'CPI (EUA)', valor: item.value, taxa: true };
-        })
-        .catch(() => null);
-
-      const nomeMap = { '^BVSP': 'Ibovespa', 'USDBRL': 'Dólar', 'EURBRL': 'Euro' };
-
-      const [mercado, bitcoin, ipca, cpi] = await Promise.all([pMercado, pBitcoin, pIpca, pCpi]);
-      const extras = [bitcoin, ipca, cpi].filter(Boolean);
-
-      if (!mercado.length && !extras.length) {
-        rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Índices indisponíveis no momento</span></div>';
-        return;
-      }
-
-      let html = '';
-
-      mercado.forEach(item => {
-        const variacao = typeof item.regularMarketChangePercent === 'number' ? item.regularMarketChangePercent : 0;
-        const emAlta = variacao >= 0;
-        const preco = typeof item.regularMarketPrice === 'number'
-          ? item.regularMarketPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-          : '—';
-        const prefixo = /BRL$/.test(item.symbol) ? 'R$ ' : '';
-        const label = nomeMap[item.symbol] || item.symbol;
-
-        html += `
-          <div class="indice-row">
-            <span class="indice-label">${label}</span>
-            <span class="indice-value">${prefixo}${preco}</span>
-            <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
-          </div>`;
-      });
-
-      extras.forEach(item => {
-        const precoFormatado = typeof item.preco === 'number'
-          ? item.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-          : (typeof item.valor === 'number' ? item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—');
-
-        if (item.taxa) {
-          const emAlta = item.valor >= 0;
-          html += `
+          // IPCA e CPI têm só "valor_pct" (variação mensal)
+          const variacao = typeof item.valor_pct === 'number' ? item.valor_pct : 0;
+          const emAlta = variacao >= 0;
+          return `
             <div class="indice-row">
               <span class="indice-label">${item.label}</span>
               <span class="indice-value">—</span>
-              <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${precoFormatado}%</span>
-            </div>`;
-        } else {
-          const variacao = typeof item.variacao === 'number' ? item.variacao : 0;
-          const emAlta = variacao >= 0;
-          html += `
-            <div class="indice-row">
-              <span class="indice-label">${item.label}</span>
-              <span class="indice-value">${item.prefixo || ''}${precoFormatado}</span>
               <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
             </div>`;
-        }
-      });
-
-      rowsEl.innerHTML = html;
+        }).join('');
+      } catch (e) {
+        rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Índices ainda não gerados — aguarde o robô rodar.</span></div>';
+      }
     }
 
     carregarIndices();
