@@ -345,6 +345,9 @@
       .split-layout { grid-template-columns: 1fr; }
       .grid { grid-template-columns: 1fr; }
       .ranking-nome { max-width: 120px; }
+
+      /* No celular/tablet, o Boletim de mercado aparece primeiro */
+      .coluna-boletim { order: -1; }
     }
   </style>
 </head>
@@ -371,7 +374,7 @@
     <section class="split-layout">
 
       <!-- ESQUERDA: Ranking do mercado -->
-      <div>
+      <div class="coluna-explorar">
         <div class="panel-title explorar"><span class="dot"></span> Explore o mercado</div>
         <div class="search-container">
           <div class="ranking-block">
@@ -420,7 +423,7 @@
       </div>
 
       <!-- DIREITA: Boletim de mercado -->
-      <div>
+      <div class="coluna-boletim">
         <div class="panel-title boletim"><span class="dot"></span> Boletim de mercado</div>
         <div class="boletim-panel">
           <div class="indices-rows" id="indicesRows">
