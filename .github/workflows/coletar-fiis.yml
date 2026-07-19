@@ -1,4 +1,4 @@
-name: Coletar FIIs (Boletim Viver de Renda)
+name: Atualizar Notícias (Boletim Viver de Renda)
 
 on:
   # Roda em dias úteis, a cada hora, entre 12h e 22h UTC
@@ -26,20 +26,17 @@ jobs:
       - name: Instalar dependências
         run: pip install requests
 
-      - name: Rodar coleta de FIIs
-        env:
-          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
+      - name: Rodar coleta de notícias
         run: python coletar_brapi_fiis.py
 
-      - name: Commitar e enviar fiis_investidor10.json e noticias.json
+      - name: Commitar e enviar noticias.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add fiis_investidor10.json
-          if [ -f noticias.json ]; then git add noticias.json; fi
+          git add noticias.json
           if git diff --cached --quiet; then
-            echo "Sem alterações no boletim, nada para commitar."
+            echo "Sem alterações nas notícias, nada para commitar."
           else
-            git commit -m "chore: atualizar boletim de FIIs e notícias [skip ci]"
+            git commit -m "chore: atualizar notícias do boletim [skip ci]"
             git push
           fi
