@@ -6,6 +6,12 @@
     "variacao_pct": -2.334296605309622
   },
   {
+    "label": "IFIX",
+    "prefixo": "pontos",
+    "valor": 3847.2,
+    "variacao_pct": 0.024959440908524595
+  },
+  {
     "label": "Dólar",
     "prefixo": "R$ ",
     "valor": 5.1108,
@@ -20,17 +26,12 @@
   {
     "label": "Bitcoin (USD)",
     "prefixo": "US$ ",
-    "valor": 64806.25,
-    "variacao_pct": 0.14506498950162158
+    "valor": 64687.04,
+    "variacao_pct": -0.03915016254618862
   },
   {
     "label": "IPCA (mensal)",
     "valor_pct": 0.16,
     "referencia": "01/06/2026"
-  },
-  {
-    "label": "CPI (EUA, mensal)",
-    "valor_pct": -0.34942394285083156,
-    "referencia": "June"
   }
 ]
