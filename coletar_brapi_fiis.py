@@ -21,6 +21,7 @@ import json
 import re
 import sys
 import xml.etree.ElementTree as ET
+from datetime import date
 
 import requests
 
@@ -29,6 +30,7 @@ import requests
 # ---------------------------------------------------------------------------
 
 NOTICIAS_OUTPUT_FILE = "noticias.json"
+INDICES_OUTPUT_FILE = "indices.json"
 
 # Tenta cada feed nesta ordem até conseguir pelo menos 1 notícia.
 # Alguns provedores (ex: InfoMoney) às vezes bloqueiam requisições vindas
@@ -50,6 +52,23 @@ HEADERS_NAVEGADOR = {
     "Accept": "application/rss+xml, application/xml, text/xml, */*;q=0.9",
     "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
 }
+
+# Tickers do Yahoo Finance para os índices/câmbio/cripto do boletim.
+# O Yahoo não libera CORS para chamadas direto do navegador, então
+# buscamos aqui no robô (servidor) e publicamos em indices.json.
+YAHOO_TICKERS = [
+    ("Ibovespa", "^BVSP", "pontos"),
+    ("Dólar", "BRL=X", "R$ "),
+    ("Euro", "EURBRL=X", "R$ "),
+    ("Bitcoin (USD)", "BTC-USD", "US$ "),
+]
+YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
+
+# IPCA: variação mensal, via API pública do Banco Central (série SGS 433)
+BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
+
+# CPI (EUA): índice de preços ao consumidor, via API pública do BLS
+BLS_CPI_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/CUUR0000SA0"
 
 
 def _extrair_imagem_do_item(item):
@@ -123,8 +142,109 @@ def coletar_noticias():
     return []
 
 
+def _buscar_yahoo(nome, ticker, prefixo):
+    """Busca preço atual e variação % do dia de um ticker no Yahoo Finance."""
+    url = YAHOO_CHART_URL.format(ticker=ticker)
+    resp = requests.get(url, params={"interval": "1d", "range": "5d"},
+                         headers=HEADERS_NAVEGADOR, timeout=TIMEOUT)
+    resp.raise_for_status()
+    data = resp.json()
+
+    resultado = data.get("chart", {}).get("result")
+    if not resultado:
+        raise ValueError(f"Yahoo Finance não retornou dados para {ticker}")
+
+    meta = resultado[0].get("meta", {})
+    preco = meta.get("regularMarketPrice")
+    fechamento_anterior = meta.get("previousClose") or meta.get("chartPreviousClose")
+
+    variacao = None
+    if isinstance(preco, (int, float)) and isinstance(fechamento_anterior, (int, float)) and fechamento_anterior:
+        variacao = (preco - fechamento_anterior) / fechamento_anterior * 100
+
+    return {
+        "label": nome,
+        "prefixo": prefixo,
+        "valor": preco,
+        "variacao_pct": variacao,
+    }
+
+
+def coletar_indices_mercado():
+    """Busca Ibovespa, Dólar, Euro e Bitcoin (USD) no Yahoo Finance."""
+    indices = []
+    for nome, ticker, prefixo in YAHOO_TICKERS:
+        try:
+            indices.append(_buscar_yahoo(nome, ticker, prefixo))
+        except (requests.RequestException, ValueError, KeyError) as exc:
+            print(f"AVISO: falha ao buscar {nome} ({ticker}) no Yahoo Finance: {exc}", file=sys.stderr)
+    return indices
+
+
+def coletar_ipca():
+    """Variação mensal do IPCA, via API pública do Banco Central (série SGS 433)."""
+    try:
+        resp = requests.get(BCB_IPCA_URL, timeout=TIMEOUT)
+        resp.raise_for_status()
+        dados = resp.json()
+        if not dados:
+            return None
+        item = dados[-1]
+        valor = float(item["valor"].replace(",", "."))
+        return {"label": "IPCA (mensal)", "valor_pct": valor, "referencia": item.get("data")}
+    except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
+        print(f"AVISO: falha ao buscar IPCA no Banco Central: {exc}", file=sys.stderr)
+        return None
+
+
+def coletar_cpi_eua():
+    """Variação mensal do CPI (EUA), via API pública do BLS (Bureau of Labor Statistics)."""
+    try:
+        ano_atual = date.today().year
+        params = {"startyear": str(ano_atual - 1), "endyear": str(ano_atual)}
+        resp = requests.get(BLS_CPI_URL, params=params, timeout=TIMEOUT,
+                             headers={"Content-Type": "application/json"})
+        resp.raise_for_status()
+        dados = resp.json()
+        serie = dados.get("Results", {}).get("series", [])
+        pontos = serie[0].get("data", []) if serie else []
+        if len(pontos) < 2:
+            return None
+
+        # A API retorna do mais recente para o mais antigo
+        atual, anterior = float(pontos[0]["value"]), float(pontos[1]["value"])
+        variacao = (atual - anterior) / anterior * 100
+        return {"label": "CPI (EUA, mensal)", "valor_pct": variacao, "referencia": pontos[0].get("periodName", "")}
+    except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
+        print(f"AVISO: falha ao buscar CPI dos EUA no BLS: {exc}", file=sys.stderr)
+        return None
+
+
+def coletar_indices():
+    """Monta a lista completa de índices do boletim: mercado (Yahoo) + macro (BCB/BLS)."""
+    indices = coletar_indices_mercado()
+
+    ipca = coletar_ipca()
+    if ipca:
+        indices.append(ipca)
+
+    cpi = coletar_cpi_eua()
+    if cpi:
+        indices.append(cpi)
+
+    return indices
+
+
 def main():
     noticias = coletar_noticias()
+
+    indices = coletar_indices()
+    if indices:
+        with open(INDICES_OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(indices, f, ensure_ascii=False, indent=2)
+        print(f"OK: {len(indices)} índices salvos em {INDICES_OUTPUT_FILE}.")
+    else:
+        print("AVISO: nenhum índice coletado. Mantendo arquivo anterior, se existir.", file=sys.stderr)
 
     if not noticias:
         print("ERRO: nenhum dos feeds configurados retornou notícias. Mantendo arquivo anterior, se existir.", file=sys.stderr)
