@@ -184,7 +184,7 @@ def coletar_noticias(quantidade=NOTICIAS_QTD):
     return noticias
 
 
-
+def main():
     token = obter_token()
     resultados = []
     erros = []
