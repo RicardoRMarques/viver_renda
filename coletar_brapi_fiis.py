@@ -17,8 +17,10 @@ Uso local (opcional, para testar):
 
 import json
 import os
+import re
 import sys
 import time
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 
 import requests
@@ -43,6 +45,9 @@ TICKERS_FII = [
 
 BRAPI_BASE_URL = "https://brapi.dev/api/quote"
 OUTPUT_FILE = "fiis_investidor10.json"
+NOTICIAS_OUTPUT_FILE = "noticias.json"
+NOTICIAS_FEED_URL = "https://www.infomoney.com.br/mercados/feed/"
+NOTICIAS_QTD = 3
 LOTE = 8  # brapi aceita vários tickers por chamada; dividimos em lotes por segurança
 TIMEOUT = 20
 
@@ -118,7 +123,68 @@ def montar_registro(ativo):
     }
 
 
-def main():
+def _extrair_imagem_do_item(item):
+    """Tenta achar uma imagem para a notícia em diferentes formatos de RSS:
+    <enclosure>, <media:content>/<media:thumbnail> ou <img> dentro da descrição."""
+    ns_media = "{http://search.yahoo.com/mrss/}"
+
+    enclosure = item.find("enclosure")
+    if enclosure is not None and enclosure.get("url"):
+        return enclosure.get("url")
+
+    media_content = item.find(f"{ns_media}content")
+    if media_content is not None and media_content.get("url"):
+        return media_content.get("url")
+
+    media_thumb = item.find(f"{ns_media}thumbnail")
+    if media_thumb is not None and media_thumb.get("url"):
+        return media_thumb.get("url")
+
+    descricao = item.findtext("description") or ""
+    match = re.search(r'<img[^>]+src="([^"]+)"', descricao)
+    if match:
+        return match.group(1)
+
+    return None
+
+
+def coletar_noticias(quantidade=NOTICIAS_QTD):
+    """Busca as últimas notícias do feed RSS de mercado financeiro configurado
+    e retorna uma lista de dicts prontos para exibição no boletim."""
+    try:
+        resp = requests.get(NOTICIAS_FEED_URL, timeout=TIMEOUT, headers={
+            "User-Agent": "Mozilla/5.0 (compatible; ViverDeRendaBot/1.0)"
+        })
+        resp.raise_for_status()
+        raiz = ET.fromstring(resp.content)
+    except (requests.RequestException, ET.ParseError) as exc:
+        print(f"AVISO: falha ao buscar notícias: {exc}", file=sys.stderr)
+        return []
+
+    itens = raiz.findall("./channel/item")[:quantidade]
+    noticias = []
+
+    for item in itens:
+        titulo = (item.findtext("title") or "").strip()
+        link = (item.findtext("link") or "").strip()
+        data_pub = (item.findtext("pubDate") or "").strip()
+        imagem = _extrair_imagem_do_item(item)
+
+        if not titulo or not link:
+            continue
+
+        noticias.append({
+            "titulo": titulo,
+            "link": link,
+            "imagem": imagem,
+            "fonte": "InfoMoney",
+            "publicado_em": data_pub,
+        })
+
+    return noticias
+
+
+
     token = obter_token()
     resultados = []
     erros = []
@@ -152,6 +218,15 @@ def main():
     print(f"OK: {len(resultados)} FIIs salvos em {OUTPUT_FILE}.")
     if erros:
         print(f"AVISO: falha ao coletar os tickers: {', '.join(erros)}", file=sys.stderr)
+
+    # Notícias do mercado financeiro (não depende do token da brapi)
+    noticias = coletar_noticias()
+    if noticias:
+        with open(NOTICIAS_OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(noticias, f, ensure_ascii=False, indent=2)
+        print(f"OK: {len(noticias)} notícias salvas em {NOTICIAS_OUTPUT_FILE}.")
+    else:
+        print("AVISO: nenhuma notícia coletada. Mantendo arquivo anterior, se existir.", file=sys.stderr)
 
 
 if __name__ == "__main__":
