@@ -115,6 +115,111 @@
       border-color: var(--primary);
     }
 
+    /* ---------- Consulta rápida: Ações e FIIs (HG Brasil) ---------- */
+    .hg-busca { padding-top: 32px; }
+    .hg-titulo { font-size: 1.3rem; margin-bottom: 6px; }
+    .hg-subtitulo { color: var(--muted); font-size: 0.92rem; margin-bottom: 18px; }
+
+    .hg-painel {
+      background: rgba(17,27,46,0.7);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+    .hg-linha-busca { display: flex; gap: 10px; flex-wrap: wrap; }
+    .hg-linha-busca input {
+      flex: 1 1 200px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #04101a;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+    }
+    .hg-linha-busca input:focus { border-color: var(--primary); }
+    .hg-btn {
+      padding: 0 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--btn-text);
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .hg-btn:hover { opacity: 0.92; }
+
+    .hg-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .hg-chip {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #04101a;
+      font-size: 0.82rem;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .hg-chip:hover { color: var(--primary); border-color: var(--primary); }
+
+    .hg-chave { margin-top: 16px; font-size: 0.82rem; color: var(--muted); }
+    .hg-chave summary { cursor: pointer; color: var(--primary); }
+    .hg-chave p { margin: 10px 0; }
+    .hg-chave a { color: var(--primary); }
+    .hg-linha-chave { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+    .hg-linha-chave input {
+      flex: 1 1 220px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #04101a;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .hg-btn-small {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .hg-status { text-align: left; color: var(--muted); font-size: 0.88rem; margin: 14px 0; min-height: 1.2em; }
+    .hg-status.erro { color: var(--danger); }
+
+    .hg-card {
+      margin-top: 6px;
+      background: #04101a;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+    }
+    .hg-card-topo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+    .hg-card-topo img {
+      width: 46px; height: 46px; border-radius: 10px;
+      background: rgba(255,255,255,0.04); object-fit: contain; padding: 5px;
+    }
+    .hg-card-topo h3 { font-size: 1.2rem; }
+    .hg-card-topo .hg-setor { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+
+    .hg-preco-linha { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .hg-preco { font-size: 2rem; font-weight: 700; font-family: "Courier New", monospace; }
+    .hg-variacao { font-size: 1rem; font-weight: 700; font-family: "Courier New", monospace; }
+
+    .hg-grid-dados {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+      gap: 14px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .hg-grid-dados span { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 2px; }
+    .hg-grid-dados strong { font-size: 0.95rem; }
+
     .section-intro {
       text-align: center;
       padding: 50px 0 30px;
@@ -420,6 +525,43 @@
 
   <main class="container">
 
+    <!-- CONSULTA RÁPIDA: Ações e FIIs (HG Brasil) -->
+    <section class="hg-busca" id="consulta-rapida">
+      <h2 class="hg-titulo">🔎 Consultar Ações e FIIs</h2>
+      <p class="hg-subtitulo">Busque qualquer ativo da B3 e veja preço, variação e indicadores em tempo real.</p>
+
+      <div class="hg-painel">
+        <div class="hg-linha-busca">
+          <input type="text" id="hgTickerInput" value="PETR4" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" />
+          <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
+        </div>
+
+        <div class="hg-chips">
+          <span class="hg-chip" data-ticker="PETR4">PETR4</span>
+          <span class="hg-chip" data-ticker="VALE3">VALE3</span>
+          <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
+          <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
+          <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
+          <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
+        </div>
+
+        <details class="hg-chave">
+          <summary>Configurar chave da HG Brasil</summary>
+          <p>
+            Cole sua chave da <a href="https://console.hgbrasil.com" target="_blank" rel="noopener noreferrer">HG Brasil</a>
+            abaixo — ela fica salva só neste navegador, nunca no código do site.
+          </p>
+          <div class="hg-linha-chave">
+            <input type="text" id="hgChaveInput" placeholder="Cole sua chave HG Brasil aqui" />
+            <button class="hg-btn-small" id="hgSalvarChave">Salvar</button>
+          </div>
+        </details>
+
+        <div class="hg-status" id="hgStatus"></div>
+        <div id="hgResultado"></div>
+      </div>
+    </section>
+
     <section class="section-intro" id="consultas">
       <h1>Explore o mercado. <br><span style="color: var(--primary);">Tome melhores decisões.</span></h1>
       <p>Acompanhe os destaques do dia: os maiores Fundos Imobiliários e ações com melhor desempenho no ranking da B3, além do boletim diário com índices e notícias do mercado.</p>
@@ -544,6 +686,153 @@
   </footer>
 
   <script>
+    /* ---------------------------------------------------------------
+       Consulta rápida: Ações e FIIs via HG Brasil
+       API com CORS liberado — chamada direto do navegador, sem robô.
+       A chave fica salva só no localStorage do visitante, nunca no HTML.
+    ----------------------------------------------------------------*/
+    (function () {
+      const CHAVE_KEY = 'hgbrasil_chave';
+      const CHAVE_PADRAO = 'b4cda510'; // TODO: mover para um proxy e remover daqui
+      const inputTicker = document.getElementById('hgTickerInput');
+      const inputChave = document.getElementById('hgChaveInput');
+      const statusEl = document.getElementById('hgStatus');
+      const resultadoEl = document.getElementById('hgResultado');
+      const btnBuscar = document.getElementById('hgBtnBuscar');
+      const chips = document.querySelectorAll('.hg-chip');
+
+      if (!inputTicker) return; // seção não presente nesta página
+
+      inputChave.value = localStorage.getItem(CHAVE_KEY) || CHAVE_PADRAO;
+
+      document.getElementById('hgSalvarChave').addEventListener('click', () => {
+        localStorage.setItem(CHAVE_KEY, inputChave.value.trim());
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Chave salva neste navegador.';
+      });
+
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          inputTicker.value = chip.getAttribute('data-ticker');
+          hgBuscarAtivo();
+        });
+      });
+
+      function hgFormatMoeda(valor, moeda = 'BRL') {
+        if (typeof valor !== 'number') return '—';
+        const simbolo = moeda === 'BRL' ? 'R$ ' : (moeda === 'USD' ? 'US$ ' : '');
+        return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function hgFormatCompacto(valor) {
+        return typeof valor === 'number'
+          ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
+          : '—';
+      }
+
+      function hgFormatData(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        return isNaN(d.getTime()) ? '—' : d.toLocaleString('pt-BR');
+      }
+
+      async function hgBuscarAtivo() {
+        const digitado = inputTicker.value.trim().toUpperCase();
+        if (!digitado) return;
+        const ticker = digitado.startsWith('B3:') ? digitado : `B3:${digitado}`;
+        const chave = localStorage.getItem(CHAVE_KEY) || inputChave.value.trim() || CHAVE_PADRAO;
+
+        if (!chave) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Configure sua chave da HG Brasil primeiro (veja acima).';
+          return;
+        }
+
+        statusEl.className = 'hg-status';
+        statusEl.textContent = `Consultando ${digitado}...`;
+        resultadoEl.innerHTML = '';
+
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/quotes?tickers=${encodeURIComponent(ticker)}&key=${encodeURIComponent(chave)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+
+          if (data?.metadata?.key_status !== 'valid') {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = 'Chave inválida ou expirada. Confira em console.hgbrasil.com.';
+            return;
+          }
+
+          const ativo = data?.results?.[0];
+          if (!ativo) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Ticker "${digitado}" não encontrado.`;
+            return;
+          }
+
+          statusEl.textContent = '';
+          hgRenderizarAtivo(ativo);
+        } catch (e) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Não foi possível consultar agora. Tente novamente.';
+        }
+      }
+
+      function hgRenderizarAtivo(a) {
+        const q = a.quote || {};
+        const m = a.market || {};
+        const div = a.dividends || {};
+        const logo = a.logos?.square_large || a.logos?.square_small;
+        const emAlta = (q.change_percent || 0) >= 0;
+
+        const dadosGrid = [
+          ['Abertura', hgFormatMoeda(m.open, a.currency)],
+          ['Fech. anterior', hgFormatMoeda(m.previous_value, a.currency)],
+          ['Máxima', hgFormatMoeda(m.high, a.currency)],
+          ['Mínima', hgFormatMoeda(m.low, a.currency)],
+          ['Volume', hgFormatCompacto(m.volume)],
+          ['Valor de mercado', hgFormatMoeda(q.market_cap, a.currency)],
+          div.yield_12m_percent != null ? ['DY (12m)', `${div.yield_12m_percent.toFixed(2)}%`] : null,
+          div.yield_12m_cash != null ? ['Dividendos (12m)', hgFormatMoeda(div.yield_12m_cash, a.currency)] : null,
+          ['Atualizado em', hgFormatData(q.updated_at)],
+        ].filter(Boolean);
+
+        resultadoEl.innerHTML = `
+          <div class="hg-card">
+            <div class="hg-card-topo">
+              ${logo ? `<img src="${logo}" alt="" onerror="this.remove()">` : ''}
+              <div>
+                <h3>${a.name || a.symbol} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span></h3>
+                <div class="hg-setor">${a.classification?.sector || a.full_name || ''}</div>
+              </div>
+            </div>
+
+            <div class="hg-preco-linha">
+              <div class="hg-preco">${hgFormatMoeda(q.value, a.currency)}</div>
+              <div class="hg-variacao ${emAlta ? 'val-up' : 'val-down'}">
+                ${emAlta ? '▲' : '▼'} ${hgFormatMoeda(Math.abs(q.change_value || 0), a.currency)} (${Math.abs(q.change_percent || 0).toFixed(2)}%)
+              </div>
+            </div>
+
+            <div class="hg-grid-dados">
+              ${dadosGrid.map(([label, valor]) => `
+                <div>
+                  <span>${label}</span>
+                  <strong>${valor}</strong>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      btnBuscar.addEventListener('click', hgBuscarAtivo);
+      inputTicker.addEventListener('keydown', (e) => { if (e.key === 'Enter') hgBuscarAtivo(); });
+
+      // Já existe uma chave padrão embutida, então carrega o ticker inicial direto
+      hgBuscarAtivo();
+    })();
+
     async function carregarIndices() {
       const rowsEl = document.getElementById('indicesRows');
       try {
