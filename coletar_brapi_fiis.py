@@ -2,22 +2,27 @@
 """
 coletar_brapi_fiis.py
 ----------------------
-Busca as últimas notícias do mercado financeiro (feed RSS) e salva o
-resultado em noticias.json, na raiz do repositório. É o arquivo que o
-Boletim de Mercado Viver de Renda (index.html) exibe no lado direito.
+Robô que roda no GitHub Actions e coleta os dados exibidos no site (nunca
+diretamente no navegador do visitante), publicando os seguintes arquivos
+na raiz do repositório:
 
-Nada aqui depende de token da brapi — o nome do arquivo ficou por
-compatibilidade histórica com uma versão anterior que também coletava FIIs
-via API, mas essa parte foi removida porque:
-1) o boletim de FIIs não é mais exibido no site;
-2) fundamentos de FIIs via /api/quote (fundamental=true/dividends=true)
-   exigem o plano Pro da brapi — no Free/Startup a API retorna 403.
+- noticias.json : últimas notícias do mercado (feed RSS)
+- indices.json  : Ibovespa, IFIX, Dólar, Euro, Bitcoin (Yahoo Finance) +
+                   IPCA mensal/acumulado no ano (Banco Central) + CPI EUA (BLS)
+- ranking.json  : 6 melhores ações e 6 melhores FIIs do momento (brapi)
+
+Apenas o ranking.json depende de um token da brapi (variável de ambiente
+BRAPI_TOKEN, configurada como secret no GitHub Actions) — os demais usam
+fontes públicas sem autenticação. O token nunca fica no HTML nem é exposto
+ao navegador do visitante.
 
 Uso local (opcional, para testar):
+    export BRAPI_TOKEN="seu_token_aqui"   # opcional, só afeta o ranking
     python coletar_brapi_fiis.py
 """
 
 import json
+import os
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -31,6 +36,7 @@ import requests
 
 NOTICIAS_OUTPUT_FILE = "noticias.json"
 INDICES_OUTPUT_FILE = "indices.json"
+RANKING_OUTPUT_FILE = "ranking.json"
 
 # Tenta cada feed nesta ordem até conseguir pelo menos 1 notícia.
 # Alguns provedores (ex: InfoMoney) às vezes bloqueiam requisições vindas
@@ -74,6 +80,12 @@ BCB_IPCA_ANO_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados"
 
 # CPI (EUA): índice de preços ao consumidor, via API pública do BLS
 BLS_CPI_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/CUUR0000SA0"
+
+# Ranking das 6 melhores ações e 6 melhores FIIs do momento, via brapi.
+# Este endpoint (/api/quote/list) exige token — diferente do /api/quote
+# simples, funciona no plano gratuito, mas sempre autenticado.
+BRAPI_LIST_URL = "https://brapi.dev/api/quote/list"
+RANKING_QTD = 6
 
 
 def _extrair_imagem_do_item(item):
@@ -278,6 +290,63 @@ def coletar_indices():
     return indices
 
 
+def obter_token_brapi():
+    """Token da brapi, lido da variável de ambiente BRAPI_TOKEN (secret do
+    GitHub Actions). Só usado aqui no servidor — nunca fica no HTML."""
+    return os.environ.get("BRAPI_TOKEN", "").strip()
+
+
+def _buscar_ranking_brapi(tipo, token, quantidade=RANKING_QTD):
+    """Busca os ativos com maior variação % do dia via /api/quote/list."""
+    params = {
+        "type": tipo,
+        "sortBy": "change",
+        "sortOrder": "desc",
+        "limit": quantidade,
+        "page": 1,
+        "token": token,
+    }
+    resp = requests.get(BRAPI_LIST_URL, params=params, timeout=TIMEOUT)
+    resp.raise_for_status()
+    data = resp.json()
+    ativos = data.get("stocks") or data.get("indexes") or []
+
+    ranking = []
+    for ativo in ativos[:quantidade]:
+        ranking.append({
+            "ticker": ativo.get("stock") or ativo.get("symbol"),
+            "nome": ativo.get("name") or "",
+            "preco": ativo.get("close"),
+            "variacao_pct": ativo.get("change"),
+        })
+    return ranking
+
+
+def coletar_ranking():
+    """Monta o ranking das 6 melhores ações e 6 melhores FIIs do momento
+    (maior variação % do dia), via brapi. Retorna dict com listas 'acoes'
+    e 'fiis' (pode vir vazio se o token não estiver configurado ou a API
+    falhar — nesse caso o front-end mantém o ranking anterior)."""
+    token = obter_token_brapi()
+    if not token:
+        print("AVISO: BRAPI_TOKEN não configurado — pulando ranking de ações/FIIs.", file=sys.stderr)
+        return {"acoes": [], "fiis": []}
+
+    resultado = {"acoes": [], "fiis": []}
+
+    try:
+        resultado["acoes"] = _buscar_ranking_brapi("stock", token)
+    except (requests.RequestException, ValueError, KeyError) as exc:
+        print(f"AVISO: falha ao buscar ranking de ações: {exc}", file=sys.stderr)
+
+    try:
+        resultado["fiis"] = _buscar_ranking_brapi("fund", token)
+    except (requests.RequestException, ValueError, KeyError) as exc:
+        print(f"AVISO: falha ao buscar ranking de FIIs: {exc}", file=sys.stderr)
+
+    return resultado
+
+
 def main():
     noticias = coletar_noticias()
 
@@ -288,6 +357,15 @@ def main():
         print(f"OK: {len(indices)} índices salvos em {INDICES_OUTPUT_FILE}.")
     else:
         print("AVISO: nenhum índice coletado. Mantendo arquivo anterior, se existir.", file=sys.stderr)
+
+    ranking = coletar_ranking()
+    if ranking["acoes"] or ranking["fiis"]:
+        with open(RANKING_OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(ranking, f, ensure_ascii=False, indent=2)
+        print(f"OK: ranking salvo em {RANKING_OUTPUT_FILE} "
+              f"({len(ranking['acoes'])} ações, {len(ranking['fiis'])} FIIs).")
+    else:
+        print("AVISO: ranking vazio. Mantendo arquivo anterior, se existir.", file=sys.stderr)
 
     if not noticias:
         print("ERRO: nenhum dos feeds configurados retornou notícias. Mantendo arquivo anterior, se existir.", file=sys.stderr)
