@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dividendos | Viver de Renda & Consultas B3</title>
   <meta name="description" content="Consulte cotações de Ações, FIIs, BDRs e ETFs em tempo real. Educação financeira para construir patrimônio." />
-  <!-- Biblioteca de Gráficos ApexCharts -->
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <style>
     :root {
       --bg: #0b1220;
@@ -176,37 +174,75 @@
       border-radius: 16px;
       padding: 22px;
     }
-    .hg-card-topo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; justify-content: space-between; }
+    .hg-card-topo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+    .hg-card-topo img {
+      width: 46px; height: 46px; border-radius: 10px;
+      background: rgba(255,255,255,0.04); object-fit: contain; padding: 5px;
+    }
     .hg-card-topo h3 { font-size: 1.2rem; }
     .hg-card-topo .hg-setor { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
 
-    .hg-grid-detalhes {
+    /* Preço + gráfico lado a lado (empilha no mobile) */
+    .hg-preco-grafico {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1.4fr;
       gap: 20px;
-      border-top: 1px solid var(--border);
-      padding-top: 15px;
-      margin-top: 15px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
     }
-    .hg-grid-detalhes h4 {
-      font-size: 0.85rem;
+    .hg-preco-linha { display: flex; flex-direction: column; gap: 6px; }
+    .hg-preco { font-size: 2.1rem; font-weight: 700; font-family: "Courier New", monospace; }
+    .hg-variacao { font-size: 1rem; font-weight: 700; font-family: "Courier New", monospace; }
+    .hg-mercado-tag {
+      display: inline-block;
+      width: fit-content;
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
       color: var(--muted);
-      letter-spacing: 0.4px;
-      margin-bottom: 10px;
     }
-    .hg-linha-info {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
-      font-size: 0.95rem;
+    .hg-mercado-tag.aberto { color: var(--accent); border-color: rgba(124,255,146,0.4); }
+
+    .hg-grafico-box { min-width: 0; }
+    .hg-grafico-titulo { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; }
+    .hg-grafico-box svg { width: 100%; height: auto; display: block; }
+
+    .hg-grid-dados {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 14px 16px;
+    }
+    .hg-grid-dados > div { min-width: 0; }
+    .hg-grid-dados span { display: block; font-size: 0.72rem; color: var(--muted); margin-bottom: 2px; }
+    .hg-grid-dados strong {
+      font-size: 0.9rem;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    #chart {
-      margin-top: 20px;
-      background: #04101a;
-      border-radius: 16px;
-      padding: 16px;
-      border: 1px solid var(--border);
+    .hg-grupo-titulo {
+      grid-column: 1 / -1;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--primary);
+      margin-top: 14px;
+      margin-bottom: -2px;
+    }
+    .hg-grupo-titulo:first-child { margin-top: 0; }
+
+    .hg-relacionados { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+    .hg-relacionados .hg-grupo-titulo { margin: 0 0 10px; }
+    .hg-relacionados-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    @media (max-width: 640px) {
+      .hg-preco-grafico { grid-template-columns: 1fr; }
     }
 
     .section-intro {
@@ -486,7 +522,6 @@
       .grid { grid-template-columns: 1fr; }
       .ranking-nome { max-width: 120px; }
       .coluna-boletim { order: -1; }
-      .hg-grid-detalhes { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -506,6 +541,7 @@
       <nav class="nav">
         <a href="#consultas">Mercado</a>
         <a href="#educacao">Educação</a>
+        <!-- ALTERAÇÃO AQUI: Novo link para o Yubb -->
         <a href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">Renda Fixa</a>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
       </nav>
@@ -517,7 +553,7 @@
     <!-- CONSULTA RÁPIDA: Ações e FIIs (HG Brasil) -->
     <section class="hg-busca" id="consulta-rapida">
       <h2 class="hg-titulo">🔎 Consultar Ações e FIIs</h2>
-      <p class="hg-subtitulo">Busque qualquer ativo da B3 e veja preço, variação, indicadores e gráfico em tempo real.</p>
+      <p class="hg-subtitulo">Busque qualquer ativo da B3 e veja preço, variação e indicadores em tempo real.</p>
 
       <div class="hg-painel">
         <div class="hg-linha-busca">
@@ -536,7 +572,6 @@
 
         <div class="hg-status" id="hgStatus"></div>
         <div id="hgResultado"></div>
-        <div id="chart"></div>
       </div>
     </section>
 
@@ -665,18 +700,25 @@
 
   <script>
     /* ---------------------------------------------------------------
-       Consulta rápida: Ações e FIIs via HG Brasil com Gráfico ApexCharts
+       Consulta rápida: Ações e FIIs via HG Brasil
+       API com CORS liberado — chamada direto do navegador, sem robô.
+       IMPORTANTE: o parâmetro format=json-cors é obrigatório em toda
+       chamada feita pelo navegador; sem ele, a API não envia o cabeçalho
+       Access-Control-Allow-Origin e o fetch() é bloqueado por CORS,
+       mesmo com a chave/domínio corretos.
     ----------------------------------------------------------------*/
     (function () {
-      const CHAVE_HG = '850310af'; //[cite: 3]
+      // Chave "uso exposto" da HG Brasil, restrita ao domínio viverderenda.dev.br.
+      // Só funciona quando a página é servida exatamente por esse domínio —
+      // testar via file://, localhost ou outro domínio será bloqueado pela API.
+      const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
       const inputTicker = document.getElementById('hgTickerInput');
       const statusEl = document.getElementById('hgStatus');
       const resultadoEl = document.getElementById('hgResultado');
       const btnBuscar = document.getElementById('hgBtnBuscar');
       const chips = document.querySelectorAll('.hg-chip');
-      let chartInstance = null;
 
-      if (!inputTicker) return;
+      if (!inputTicker) return; // seção não presente nesta página
 
       chips.forEach(chip => {
         chip.addEventListener('click', () => {
@@ -686,9 +728,32 @@
       });
 
       function hgFormatMoeda(valor, moeda = 'BRL') {
-        if (typeof valor !== 'number') return '—';
-        const simbolo = moeda === 'BRL' ? 'R$ ' : '';
+        if (typeof valor !== 'number') return null;
+        const simbolo = moeda === 'BRL' ? 'R$ ' : (moeda === 'USD' ? 'US$ ' : '');
         return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function hgFormatNumero(valor, casas = 2) {
+        return typeof valor === 'number'
+          ? valor.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas })
+          : null;
+      }
+
+      function hgFormatCompacto(valor) {
+        return typeof valor === 'number'
+          ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
+          : null;
+      }
+
+      function hgFormatData(iso, comHora = true) {
+        if (!iso) return null;
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return null;
+        return comHora ? d.toLocaleString('pt-BR') : d.toLocaleDateString('pt-BR');
+      }
+
+      function hgDataYYYYMMDD(d) {
+        return d.toISOString().slice(0, 10);
       }
 
       async function hgBuscarAtivo() {
@@ -699,158 +764,292 @@
         statusEl.className = 'hg-status';
         statusEl.textContent = `Consultando ${digitado}...`;
         resultadoEl.innerHTML = '';
-        if (chartInstance) {
-          chartInstance.destroy();
-          chartInstance = null;
+
+        let resp, data;
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent(ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
+          resp = await fetch(url);
+        } catch (erroRede) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Falha de conexão com a HG Brasil. Verifique sua internet ou tente novamente.';
+          console.error('Erro de rede na consulta HG Brasil:', erroRede);
+          return;
         }
 
         try {
-          // Requisição com CORS corrigido conforme documentação
-          const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent(ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
-          const resp = await fetch(url);
-          const data = await resp.json();
-
-          const statusChave = data?.metadata?.key_status;
-          if (statusChave && statusChave !== 'valid') {
-            statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Chave da HG Brasil recusada (status: ${statusChave}).`;
-            return;
-          }
-
-          const ativo = data?.results?.[0];
-          if (!ativo) {
-            statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Ticker "${digitado}" não encontrado.`;
-            return;
-          }
-
-          statusEl.textContent = '';
-          hgRenderizarAtivo(ativo);
-        } catch (erroRede) {
+          data = await resp.json();
+        } catch (erroJson) {
           statusEl.className = 'hg-status erro';
-          statusEl.textContent = 'Falha de conexão com a HG Brasil.';
-          console.error('Erro de rede:', erroRede);
+          statusEl.textContent = `A HG Brasil respondeu algo inesperado (HTTP ${resp.status}). Tente novamente em instantes.`;
+          console.error('Erro ao interpretar resposta da HG Brasil:', erroJson);
+          return;
         }
+
+        const statusChave = data?.metadata?.key_status;
+        if (statusChave && statusChave !== 'valid') {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Chave da HG Brasil recusada (status: ${statusChave}). Confira o domínio autorizado e o plano em console.hgbrasil.com.`;
+          console.error('key_status retornado pela HG Brasil:', statusChave, data);
+          return;
+        }
+
+        if (!resp.ok) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Erro ${resp.status} ao consultar a HG Brasil. Tente novamente em instantes.`;
+          console.error('Resposta HTTP não-OK da HG Brasil:', resp.status, data);
+          return;
+        }
+
+        const ativo = data?.results?.[0];
+        if (!ativo) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Ticker "${digitado}" não encontrado.`;
+          return;
+        }
+
+        statusEl.textContent = '';
+        hgRenderizarAtivo(ativo);
+        hgCarregarGrafico(ativo.ticker || ticker);
+      }
+
+      // Monta o grid de "todas as variáveis" retornadas pela API, agrupadas
+      // por seção (Ativo, Cotação, Mercado, Dividendos, Fonte). Só mostra
+      // campos que realmente vieram preenchidos na resposta.
+      function hgMontarGrupos(a) {
+        const q = a.quote || {};
+        const m = a.market || {};
+        const div = a.dividends || {};
+        const cls = a.classification || {};
+        const src = a.source || {};
+        const moeda = a.currency;
+
+        const grupos = [
+          {
+            titulo: 'Ativo',
+            campos: [
+              ['Símbolo', a.symbol],
+              ['Tipo', a.kind],
+              ['Nome completo', a.full_name],
+              ['CNPJ/Documento', a.tax_id],
+              ['ISIN', a.isin],
+              ['Ações em circulação', hgFormatCompacto(a.shares_outstanding)],
+              ['Setor', cls.sector],
+              ['Subsetor', cls.subsector],
+              ['Segmento', cls.segment],
+              ['Unidade', a.unit],
+              ['Moeda', moeda],
+            ],
+          },
+          {
+            titulo: 'Cotação',
+            campos: [
+              ['Valor de mercado', hgFormatCompacto(q.market_cap)],
+              ['Variação (R$)', hgFormatMoeda(q.change_value, moeda)],
+              ['Variação (%)', typeof q.change_percent === 'number' ? `${hgFormatNumero(q.change_percent)}%` : null],
+              ['Cotação atualizada em', hgFormatData(q.updated_at)],
+            ],
+          },
+          {
+            titulo: 'Mercado',
+            campos: [
+              ['Abertura', hgFormatMoeda(m.open, moeda)],
+              ['Fech. anterior', hgFormatMoeda(m.previous_value, moeda)],
+              ['Máxima', hgFormatMoeda(m.high, moeda)],
+              ['Mínima', hgFormatMoeda(m.low, moeda)],
+              ['Fechamento', hgFormatMoeda(m.close, moeda)],
+              ['Volume', hgFormatCompacto(m.volume)],
+              ['Abertura do pregão', hgFormatData(m.open_time)],
+              ['Fechamento do pregão', hgFormatData(m.close_time)],
+              ['Sessão atualizada em', hgFormatData(m.updated_at)],
+            ],
+          },
+          {
+            titulo: 'Dividendos',
+            campos: [
+              ['DY (12 meses)', typeof div.yield_12m_percent === 'number' ? `${hgFormatNumero(div.yield_12m_percent)}%` : null],
+              ['Dividendos (12m, R$)', hgFormatMoeda(div.yield_12m_cash, moeda)],
+            ],
+          },
+          {
+            titulo: 'Fonte dos dados',
+            campos: [
+              ['Bolsa', src.full_name || src.name],
+              ['Fuso horário', src.location?.timezone],
+            ],
+          },
+        ];
+
+        // Remove campos vazios e grupos que ficaram sem nenhum campo
+        return grupos
+          .map(g => ({ ...g, campos: g.campos.filter(([, v]) => v !== null && v !== undefined && v !== '') }))
+          .filter(g => g.campos.length > 0);
       }
 
       function hgRenderizarAtivo(a) {
         const q = a.quote || {};
-        const m = a.market || {};
-        const div = a.dividends || {};
+        const logo = a.logos?.square_large || a.logos?.square_small;
         const emAlta = (q.change_percent || 0) >= 0;
+        const grupos = hgMontarGrupos(a);
 
-        const valPreço = hgFormatMoeda(q.value);
-        const valVar = `${emAlta ? '▲' : '▼'} ${Math.abs(q.change_percent || 0).toFixed(2)}%`;
-        const abert = hgFormatMoeda(m.open);
-        const max = hgFormatMoeda(m.high);
-        const min = hgFormatMoeda(m.low);
-        const dyPct = div.yield_12m_percent != null ? `${div.yield_12m_percent.toFixed(2)}%` : '—';
-        const dyCash = div.yield_12m_cash != null ? `R$ ${div.yield_12m_cash.toFixed(2)}/ação` : '—';
+        const relacionados = (a.related || []).map(t =>
+          `<span class="hg-chip" data-ticker="${t}">${t.replace('B3:', '')}</span>`
+        ).join('');
 
         resultadoEl.innerHTML = `
           <div class="hg-card">
             <div class="hg-card-topo">
+              ${logo ? `<img src="${logo}" alt="" onerror="this.remove()">` : ''}
               <div>
-                <h3>${a.name || a.symbol} <span style="color:var(--muted); font-size:0.9rem;">(${a.symbol})</span></h3>
+                <h3>${a.name || a.symbol} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span></h3>
                 <div class="hg-setor">${a.classification?.sector || a.full_name || ''}</div>
-              </div>
-              <div style="text-align: right;">
-                <div style="font-size: 1.8rem; font-weight: bold; font-family: 'Courier New', monospace;">${valPreço}</div>
-                <div class="${emAlta ? 'val-up' : 'val-down'}" style="font-size: 1rem; font-family: 'Courier New', monospace;">${valVar}</div>
               </div>
             </div>
 
-            <div class="hg-grid-detalhes">
-              <div>
-                <h4>COTAÇÃO DO DIA</h4>
-                <div class="hg-linha-info"><span>Abertura:</span> <strong>${abert}</strong></div>
-                <div class="hg-linha-info"><span>Máxima:</span> <strong>${max}</strong></div>
-                <div class="hg-linha-info"><span>Mínima:</span> <strong>${min}</strong></div>
+            <div class="hg-preco-grafico">
+              <div class="hg-preco-linha">
+                <div class="hg-preco">${hgFormatMoeda(q.value, a.currency) ?? '—'}</div>
+                <div class="hg-variacao ${emAlta ? 'val-up' : 'val-down'}">
+                  ${emAlta ? '▲' : '▼'} ${hgFormatMoeda(Math.abs(q.change_value || 0), a.currency) ?? '—'} (${hgFormatNumero(Math.abs(q.change_percent || 0))}%)
+                </div>
+                <span class="hg-mercado-tag ${a.market?.is_open ? 'aberto' : ''}">${a.market?.is_open ? 'Mercado aberto' : 'Mercado fechado'}</span>
               </div>
-              <div>
-                <h4>DIVIDENDOS (12M)</h4>
-                <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent); font-family: 'Courier New', monospace;">${dyPct}</div>
-                <div style="color: var(--muted); font-size: 0.9rem;">${dyCash}</div>
+
+              <div class="hg-grafico-box">
+                <div class="hg-grafico-titulo">Últimos 30 dias</div>
+                <div id="hgGrafico">
+                  <svg viewBox="0 0 300 90" preserveAspectRatio="none"><text x="10" y="45" fill="#5b6b8c" font-size="10">Carregando gráfico...</text></svg>
+                </div>
               </div>
             </div>
+
+            <div class="hg-grid-dados">
+              ${grupos.map(g => `
+                <div class="hg-grupo-titulo">${g.titulo}</div>
+                ${g.campos.map(([label, valor]) => `
+                  <div>
+                    <span>${label}</span>
+                    <strong title="${valor}">${valor}</strong>
+                  </div>
+                `).join('')}
+              `).join('')}
+            </div>
+
+            ${relacionados ? `
+              <div class="hg-relacionados">
+                <div class="hg-grupo-titulo">Ativos relacionados</div>
+                <div class="hg-relacionados-chips">${relacionados}</div>
+              </div>
+            ` : ''}
           </div>
         `;
 
-        // Renderização do gráfico estilizado com ApexCharts
-        const chartData = [
-          m.low || q.value, 
-          m.open || q.value, 
-          m.high || q.value, 
-          q.value || 0
-        ];
+        resultadoEl.querySelectorAll('.hg-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            inputTicker.value = chip.getAttribute('data-ticker');
+            hgBuscarAtivo();
+          });
+        });
+      }
 
-        const options = {
-          series: [{
-            name: 'Preço (R$)',
-            data: chartData
-          }],
-          chart: {
-            type: 'area',
-            height: 220,
-            toolbar: { show: false },
-            background: 'transparent'
-          },
-          colors: ['#31c3ff'],
-          dataLabels: { enabled: false },
-          stroke: { curve: 'smooth', width: 2 },
-          fill: {
-            type: 'gradient',
-            gradient: {
-              shadeIntensity: 1,
-              opacityFrom: 0.4,
-              opacityTo: 0.05,
-              stops: [0, 90, 100]
-            }
-          },
-          xaxis: {
-            categories: ['Mínima', 'Abertura', 'Máxima', 'Atual'],
-            labels: { style: { colors: '#a9b6d3' } }
-          },
-          yaxis: {
-            labels: { 
-              style: { colors: '#a9b6d3' },
-              formatter: (val) => 'R$ ' + val.toFixed(2)
-            }
-          },
-          grid: { borderColor: 'rgba(255,255,255,0.06)' },
-          theme: { mode: 'dark' },
-          tooltip: {
-            theme: 'dark',
-            y: { formatter: (val) => 'R$ ' + val.toFixed(2) }
+      // Busca o histórico diário dos últimos 30 dias e desenha um gráfico
+      // de linha simples em SVG (sem bibliotecas externas).
+      async function hgCarregarGrafico(ticker) {
+        const container = document.getElementById('hgGrafico');
+        if (!container) return;
+
+        const hoje = new Date();
+        const inicio = new Date();
+        inicio.setDate(hoje.getDate() - 30);
+
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent(ticker)}&sample_by=1d&start_date=${hgDataYYYYMMDD(inicio)}&end_date=${hgDataYYYYMMDD(hoje)}&key=${encodeURIComponent(CHAVE_HG)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+
+          const amostras = data?.results?.[0]?.samples;
+          if (!Array.isArray(amostras) || amostras.length < 2) {
+            container.innerHTML = '<svg viewBox="0 0 300 90"><text x="10" y="45" fill="#5b6b8c" font-size="10">Sem histórico suficiente para o gráfico</text></svg>';
+            return;
           }
-        };
 
-        chartInstance = new ApexCharts(document.querySelector("#chart"), options);
-        chartInstance.render();
+          hgDesenharGrafico(container, amostras);
+        } catch (e) {
+          container.innerHTML = '<svg viewBox="0 0 300 90"><text x="10" y="45" fill="#5b6b8c" font-size="10">Gráfico indisponível agora</text></svg>';
+          console.error('Erro ao carregar histórico HG Brasil:', e);
+        }
+      }
+
+      function hgDesenharGrafico(container, amostras) {
+        const largura = 300;
+        const altura = 90;
+        const margem = 4;
+
+        const fechamentos = amostras.map(s => s.close).filter(v => typeof v === 'number');
+        const minimo = Math.min(...fechamentos);
+        const maximo = Math.max(...fechamentos);
+        const amplitude = (maximo - minimo) || 1;
+
+        const emAlta = fechamentos[fechamentos.length - 1] >= fechamentos[0];
+        const cor = emAlta ? '#7cff92' : '#ff6b6b';
+
+        const pontos = fechamentos.map((valor, i) => {
+          const x = margem + (i / (fechamentos.length - 1)) * (largura - margem * 2);
+          const y = altura - margem - ((valor - minimo) / amplitude) * (altura - margem * 2);
+          return `${x.toFixed(1)},${y.toFixed(1)}`;
+        });
+
+        const linha = pontos.join(' ');
+        const areaPontos = `${margem},${altura - margem} ${linha} ${largura - margem},${altura - margem}`;
+
+        container.innerHTML = `
+          <svg viewBox="0 0 ${largura} ${altura}" preserveAspectRatio="none">
+            <polygon points="${areaPontos}" fill="${cor}" opacity="0.12"></polygon>
+            <polyline points="${linha}" fill="none" stroke="${cor}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"></polyline>
+          </svg>
+        `;
       }
 
       btnBuscar.addEventListener('click', hgBuscarAtivo);
       inputTicker.addEventListener('keydown', (e) => { if (e.key === 'Enter') hgBuscarAtivo(); });
 
-      // Carregar ativo inicial automaticamente
+      // Carrega o ticker inicial automaticamente (chave já embutida)
       hgBuscarAtivo();
     })();
 
-    // Funções originais para carregar índices, notícias e rankings do site
+
     async function carregarIndices() {
       const rowsEl = document.getElementById('indicesRows');
       try {
         const resp = await fetch('indices.json', { cache: 'no-store' });
-        if (!resp.ok) throw new Error();
+        if (!resp.ok) throw new Error('arquivo não encontrado');
         const indices = await resp.json();
-        rowsEl.innerHTML = indices.map(item => `
-          <div class="indice-row">
-            <span class="indice-label">${item.label}</span>
-            <span class="indice-value">${item.valor || '—'}</span>
-            <span class="indice-change ${item.variacao_pct >= 0 ? 'val-up' : 'val-down'}">${item.variacao_pct >= 0 ? '▲' : '▼'} ${Math.abs(item.variacao_pct || 0).toFixed(2)}%</span>
-          </div>`).join('');
+        if (!Array.isArray(indices) || indices.length === 0) throw new Error('vazio');
+
+        rowsEl.innerHTML = indices.map(item => {
+          if (typeof item.valor === 'number') {
+            const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
+            const emAlta = variacao >= 0;
+            const prefixo = item.prefixo === 'pontos' ? '' : (item.prefixo || '');
+            const valorFormatado = item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            return `
+              <div class="indice-row">
+                <span class="indice-label">${item.label}</span>
+                <span class="indice-value">${prefixo}${valorFormatado}${item.prefixo === 'pontos' ? ' pts' : ''}</span>
+                <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+              </div>`;
+          }
+          const variacao = typeof item.valor_pct === 'number' ? item.valor_pct : 0;
+          const emAlta = variacao >= 0;
+          return `
+            <div class="indice-row">
+              <span class="indice-label">${item.label}</span>
+              <span class="indice-value">—</span>
+              <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+            </div>`;
+        }).join('');
       } catch (e) {
-        rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Aguarde o robô rodar índices.</span></div>';
+        rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Índices ainda não gerados — aguarde o robô rodar.</span></div>';
       }
     }
     carregarIndices();
@@ -859,58 +1058,131 @@
       const listEl = document.getElementById('noticiasList');
       try {
         const resp = await fetch('noticias.json', { cache: 'no-store' });
-        if (!resp.ok) throw new Error();
+        if (!resp.ok) throw new Error('arquivo não encontrado');
         const noticias = await resp.json();
+        if (!Array.isArray(noticias) || noticias.length === 0) throw new Error('vazio');
+
         listEl.innerHTML = noticias.slice(0, 3).map(n => `
           <a class="noticia-card" href="${n.link}" target="_blank" rel="noopener noreferrer">
+            ${n.imagem ? `<img class="noticia-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.remove()">` : ''}
             <div class="noticia-body">
               <div class="noticia-titulo">${n.titulo}</div>
-              <div class="noticia-meta">${n.fonte || 'Mercado'}</div>
+              <div class="noticia-meta">${n.fonte || 'Mercado financeiro'}</div>
             </div>
-          </a>`).join('');
+          </a>
+        `).join('');
       } catch (e) {
-        listEl.innerHTML = '<div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Aguarde o robô rodar notícias.</div></div></div>';
+        listEl.innerHTML = '<div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Notícias ainda não geradas — aguarde o robô rodar.</div></div></div>';
       }
     }
     carregarNoticias();
 
+    function formatMoeda(valor) {
+      return typeof valor === 'number'
+        ? valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : '—';
+    }
+
+    function formatCompacto(valor) {
+      return typeof valor === 'number'
+        ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
+        : '—';
+    }
+
+    function renderizarRanking(elId, lista) {
+      const listEl = document.getElementById(elId);
+      if (!Array.isArray(lista) || lista.length === 0) {
+        listEl.innerHTML = '<div class="ranking-row"><span class="ranking-nome">Ranking ainda não gerado — aguarde o robô rodar.</span></div>';
+        return;
+      }
+
+      listEl.innerHTML = lista.map(item => {
+        const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
+        const emAlta = variacao >= 0;
+
+        return `
+          <div class="ranking-row">
+            <div class="ranking-info">
+              <span class="ranking-ticker">${item.ticker || '—'}</span>
+              <span class="ranking-nome">${item.nome || ''}</span>
+            </div>
+            <div class="ranking-numbers">
+              <div class="ranking-preco">R$ ${formatMoeda(item.preco)}</div>
+              <div class="ranking-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderizarRankingMetrica(elId, lista, formato) {
+      const listEl = document.getElementById(elId);
+      if (!Array.isArray(lista) || lista.length === 0) {
+        listEl.innerHTML = '<div class="ranking-row"><span class="ranking-nome">Ranking ainda não gerado — aguarde o robô rodar.</span></div>';
+        return;
+      }
+
+      listEl.innerHTML = lista.map(item => {
+        const valorFormatado = formato === 'percentual'
+          ? `${formatMoeda(item.valor)}%`
+          : `R$ ${formatCompacto(item.valor)}`;
+
+        return `
+          <div class="ranking-row">
+            <div class="ranking-info">
+              <span class="ranking-ticker">${item.ticker || '—'}</span>
+              <span class="ranking-nome">${item.nome || ''}</span>
+            </div>
+            <div class="ranking-numbers">
+              <div class="ranking-preco">R$ ${formatMoeda(item.preco)}</div>
+              <div class="ranking-change val-up">${valorFormatado}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
     async function carregarRanking() {
       try {
         const resp = await fetch('ranking.json', { cache: 'no-store' });
-        if (!resp.ok) throw new Error();
+        if (!resp.ok) throw new Error('arquivo não encontrado');
         const ranking = await resp.json();
         const acoes = ranking.acoes || {};
+
+        renderizarRankingMetrica('rankingDy', acoes.dividend_yield, 'percentual');
+        renderizarRankingMetrica('rankingValorMercado', acoes.valor_mercado, 'moeda');
+        renderizarRankingMetrica('rankingReceita', acoes.receita, 'moeda');
         
-        const renderList = (elId, list) => {
-          const el = document.getElementById(elId);
-          if (!list || !list.length) return;
-          el.innerHTML = list.map(item => `
-            <div class="ranking-row">
-              <div class="ranking-info"><span class="ranking-ticker">${item.ticker}</span><span class="ranking-nome">${item.nome}</span></div>
-              <div class="ranking-numbers"><div class="ranking-preco">R$ ${item.preco?.toFixed(2)}</div></div>
-            </div>`).join('');
-        };
-        renderList('rankingFiis', ranking.fiis);
-      } catch (e) {}
+        renderizarRanking('rankingFiis', ranking.fiis);
+      } catch (e) {
+        renderizarRankingMetrica('rankingDy', [], 'percentual');
+        renderizarRankingMetrica('rankingValorMercado', [], 'moeda');
+        renderizarRankingMetrica('rankingReceita', [], 'moeda');
+        renderizarRanking('rankingFiis', []);
+      }
     }
     carregarRanking();
 
     (function () {
       const botao = document.getElementById('themeToggle');
       const html = document.documentElement;
-      if (!botao) return;
-      botao.addEventListener('click', () => {
+
+      function atualizarIcone() {
         const claro = html.getAttribute('data-theme') === 'light';
-        if (claro) {
+        botao.textContent = claro ? '🌙' : '☀️';
+        botao.title = claro ? 'Escurecer a página' : 'Clarear a página';
+      }
+
+      botao.addEventListener('click', () => {
+        const claroAgora = html.getAttribute('data-theme') === 'light';
+        if (claroAgora) {
           html.removeAttribute('data-theme');
           localStorage.setItem('viverderenda_tema', 'dark');
-          botao.textContent = '☀️';
         } else {
           html.setAttribute('data-theme', 'light');
           localStorage.setItem('viverderenda_tema', 'light');
-          botao.textContent = '🌙';
         }
+        atualizarIcone();
       });
+      atualizarIcone();
     })();
   </script>
 </body>
