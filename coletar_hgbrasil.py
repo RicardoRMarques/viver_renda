@@ -198,7 +198,24 @@ def coletar_indices_hgbrasil(token):
     resp = requests.get(HGBRASIL_INDICES_URL, params={"key": token}, timeout=TIMEOUT)
     resp.raise_for_status()
     data = resp.json()
-    resultados = data.get("results") or {}
+
+    # A HG Brasil pode responder HTTP 200 mesmo com chave recusada (ex: chave
+    # restrita a um domínio, sendo usada aqui no servidor/GitHub Actions, que
+    # não tem domínio/referer de navegador). Nesse caso "results" pode vir
+    # vazio silenciosamente. Detectamos isso explicitamente para não mascarar
+    # o problema.
+    valida = data.get("valid")
+    if valida is False:
+        raise ValueError(f"Chave HG Brasil recusada no endpoint 'finance' (server-side). Resposta: {json.dumps(data, ensure_ascii=False)[:500]}")
+
+    resultados = data.get("results")
+    if not isinstance(resultados, dict) or not resultados:
+        print(
+            "AVISO: resposta da HG Brasil ('finance') veio sem 'results' utilizável. "
+            f"Resposta bruta: {json.dumps(data, ensure_ascii=False)[:500]}",
+            file=sys.stderr,
+        )
+        resultados = {}
 
     indices = []
 
@@ -326,6 +343,15 @@ def coletar_indices(token):
     else:
         try:
             indices = coletar_indices_hgbrasil(token)
+            if not indices:
+                print(
+                    "AVISO: nenhum índice de mercado (Ibovespa/Dólar/Euro/Bitcoin/Selic) "
+                    "veio da HG Brasil — provavelmente a chave não tem acesso ao endpoint "
+                    "'finance' nesse contexto (server-side). Confira em console.hgbrasil.com "
+                    "se a chave usada em HGBRASIL_TOKEN é do tipo servidor/sem restrição de "
+                    "domínio (diferente da chave 'uso exposto' embutida no index.html).",
+                    file=sys.stderr,
+                )
         except (requests.RequestException, ValueError, KeyError) as exc:
             print(f"AVISO: falha ao buscar índices na HG Brasil: {exc}", file=sys.stderr)
             indices = []
