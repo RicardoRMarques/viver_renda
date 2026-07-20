@@ -204,7 +204,7 @@ def coletar_indices_hgbrasil(token):
     # não tem domínio/referer de navegador). Nesse caso "results" pode vir
     # vazio silenciosamente. Detectamos isso explicitamente para não mascarar
     # o problema.
-    valida = data.get("valid")
+    valida = data.get("valid_key")
     if valida is False:
         raise ValueError(f"Chave HG Brasil recusada no endpoint 'finance' (server-side). Resposta: {json.dumps(data, ensure_ascii=False)[:500]}")
 
@@ -232,12 +232,20 @@ def coletar_indices_hgbrasil(token):
     mercados = resultados.get("stocks") or {}
     ibov = mercados.get("IBOVESPA") or {}
     ifix = mercados.get("IFIX") or {}
+    nasdaq = mercados.get("NASDAQ") or {}
+    dow = mercados.get("DOWJONES") or {}
     if ibov.get("points") is not None:
         indices.insert(0, {"label": "Ibovespa", "prefixo": "pontos", "valor": ibov.get("points"),
                             "variacao_pct": ibov.get("variation")})
     if ifix.get("points") is not None:
         indices.append({"label": "IFIX", "prefixo": "pontos", "valor": ifix.get("points"),
                          "variacao_pct": ifix.get("variation")})
+    if dow.get("points") is not None:
+        indices.append({"label": "Dow Jones", "prefixo": "pontos", "valor": dow.get("points"),
+                         "variacao_pct": dow.get("variation")})
+    if nasdaq.get("points") is not None:
+        indices.append({"label": "Nasdaq", "prefixo": "pontos", "valor": nasdaq.get("points"),
+                         "variacao_pct": nasdaq.get("variation")})
 
     # Bitcoin: usamos uma corretora cotada em USD (a HG cota BTC/BRL por
     # padrão em "currencies", mas o boletim exibe em dólar).
