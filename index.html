@@ -42,114 +42,933 @@
       --btn-text: #ffffff;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, rgba(49,195,255,0.15), transparent 40%), linear-gradient(180deg, var(--grad-a) 0%, var(--grad-b) 100%);
+      background:
+        radial-gradient(circle at top, rgba(49,195,255,0.15), transparent 40%),
+        linear-gradient(180deg, var(--grad-a) 0%, var(--grad-b) 100%);
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
     }
 
-    a { color: inherit; text-decoration: none; }
-    .container { width: min(1200px, 94%); margin: 0 auto; }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1200px, 94%);
+      margin: 0 auto;
+    }
+
     .val-up { color: var(--accent); font-weight: bold; }
     .val-down { color: var(--danger); font-weight: bold; }
 
+    /* Header */
     header { padding: 24px 0 0; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 18px; }
-    .brand { font-weight: 700; letter-spacing: 0.4px; color: var(--primary); font-size: 1.2rem; }
-    .nav { display: flex; gap: 24px; flex-wrap: wrap; color: var(--muted); font-size: 0.95rem; font-weight: bold; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 18px;
+    }
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+    .nav {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: bold;
+    }
     .nav a:hover { color: var(--primary); }
 
     .theme-toggle {
-      display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
-      border-radius: 50%; border: 1px solid var(--border); background: transparent; cursor: pointer;
-      font-size: 1.1rem; transition: transform 0.2s ease, border-color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
-    .theme-toggle:hover { transform: scale(1.08); border-color: var(--primary); }
+    .theme-toggle:hover {
+      transform: scale(1.08);
+      border-color: var(--primary);
+    }
 
+    /* ---------- Consulta rápida: Ações e FIIs (HG Brasil) ---------- */
     .hg-busca { padding-top: 32px; }
-    .hg-painel { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; box-shadow: var(--shadow); }
-    .hg-linha-busca { display: flex; gap: 10px; flex-wrap: wrap; }
-    .hg-linha-busca input { flex: 1 1 200px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border); background: #04101a; color: var(--text); font-size: 1rem; }
-    .hg-btn { padding: 0 24px; border-radius: 12px; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--btn-text); border: none; cursor: pointer; }
-    .hg-status { margin: 14px 0; color: var(--muted); min-height: 1.2em; }
-    .hg-card { margin-top: 6px; background: #04101a; border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
-    .hg-grid-dados { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 14px; padding-top: 16px; border-top: 1px solid var(--border); }
-    
-    .section-intro { text-align: center; padding: 50px 0 30px; }
-    .split-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; padding-bottom: 60px; }
-    .search-container, .boletim-panel { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 28px; box-shadow: var(--shadow); height: 100%; }
-    .ranking-row, .indice-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--deep); border: 1px solid var(--border); margin-bottom: 10px; }
-    .ranking-row.skeleton, .indice-row.skeleton { height: 48px; background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03)); animation: shimmer 1.4s infinite; }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .hg-titulo { font-size: 1.3rem; margin-bottom: 6px; }
+    .hg-subtitulo { color: var(--muted); font-size: 0.92rem; margin-bottom: 18px; }
 
-    .btn-buy { display: inline-block; padding: 16px 32px; border-radius: 12px; font-weight: 700; background: var(--accent); color: var(--btn-text); transition: transform 0.2s; }
+    .hg-painel {
+      background: rgba(17,27,46,0.7);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+    .hg-linha-busca { display: flex; gap: 10px; flex-wrap: wrap; }
+    .hg-linha-busca input {
+      flex: 1 1 200px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #04101a;
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+    }
+    .hg-linha-busca input:focus { border-color: var(--primary); }
+    .hg-btn {
+      padding: 0 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: var(--btn-text);
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .hg-btn:hover { opacity: 0.92; }
+
+    .hg-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .hg-chip {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #04101a;
+      font-size: 0.82rem;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .hg-chip:hover { color: var(--primary); border-color: var(--primary); }
+
+    .hg-status { text-align: left; color: var(--muted); font-size: 0.88rem; margin: 14px 0; min-height: 1.2em; }
+    .hg-status.erro { color: var(--danger); }
+
+    .hg-card {
+      margin-top: 6px;
+      background: #04101a;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+    }
+    .hg-card-topo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+    .hg-card-topo img {
+      width: 46px; height: 46px; border-radius: 10px;
+      background: rgba(255,255,255,0.04); object-fit: contain; padding: 5px;
+    }
+    .hg-card-topo h3 { font-size: 1.2rem; }
+    .hg-card-topo .hg-setor { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+
+    .hg-preco-linha { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    .hg-preco { font-size: 2rem; font-weight: 700; font-family: "Courier New", monospace; }
+    .hg-variacao { font-size: 1rem; font-weight: 700; font-family: "Courier New", monospace; }
+
+    .hg-grid-dados {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+      gap: 14px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .hg-grid-dados span { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 2px; }
+    .hg-grid-dados strong { font-size: 0.95rem; }
+
+    .section-intro {
+      text-align: center;
+      padding: 50px 0 30px;
+    }
+    .section-intro h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+    .section-intro p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* Layout dividido: Explorar mercado (esquerda) + Boletim (direita) */
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+      padding-bottom: 60px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .panel-title .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+    .panel-title.explorar .dot { background: var(--primary); }
+    .panel-title.boletim .dot { background: var(--gold); }
+
+    /* ---------- Coluna esquerda: Ranking do mercado ---------- */
+    .search-container {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      height: 100%;
+    }
+
+    .ranking-block + .ranking-block {
+      margin-top: 26px;
+      padding-top: 26px;
+      border-top: 1px solid var(--border);
+    }
+    .ranking-section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .ranking-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .ranking-title-sep {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border);
+    }
+    .ranking-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ranking-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--deep);
+      border: 1px solid var(--border);
+    }
+    .ranking-row.skeleton {
+      height: 48px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    .ranking-info { display: flex; flex-direction: column; min-width: 0; }
+    .ranking-ticker { font-weight: 700; color: var(--primary); font-size: 0.98rem; }
+    .ranking-nome {
+      color: var(--muted);
+      font-size: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
+    }
+    .ranking-numbers { text-align: right; flex-shrink: 0; }
+    .ranking-preco { font-family: "Courier New", monospace; font-size: 0.9rem; color: var(--text); }
+    .ranking-change {
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Coluna direita: Boletim Viver de Renda ---------- */
+    .boletim-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      height: 100%;
+    }
+
+    .indices-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .indice-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--deep);
+      border: 1px solid var(--border);
+    }
+    .indice-row.skeleton {
+      height: 44px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .indice-label { font-weight: 700; color: var(--text); font-size: 0.92rem; }
+    .indice-value { font-family: "Courier New", monospace; color: var(--muted); font-size: 0.9rem; }
+    .indice-change {
+      font-family: "Courier New", monospace;
+      font-weight: 700;
+      font-size: 0.88rem;
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .boletim-noticias-title {
+      margin-top: 20px;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+    }
+
+    .noticia-card {
+      display: block;
+      position: relative;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      color: var(--text);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .noticia-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+    }
+    .noticia-thumb {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+      background: rgba(15,30,60,0.05);
+    }
+    .noticia-body {
+      padding: 12px 14px;
+    }
+    .noticia-titulo {
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+    .noticia-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    /* Seção de Apresentação e Curso */
+    .presentation-section {
+      padding: 60px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 20px;
+    }
+    .presentation-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .presentation-header h2 { font-size: 2rem; margin-bottom: 12px; }
+    .presentation-header p { color: var(--muted); max-width: 700px; margin: 0 auto; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .card h3 { color: var(--primary); margin-bottom: 12px; font-size: 1.2rem; }
+    .card p { color: var(--muted); font-size: 0.95rem; }
+
+    .offer {
+      margin: 40px auto;
+      max-width: 800px;
+      background: linear-gradient(135deg, rgba(49,195,255,0.1), rgba(124,255,146,0.05));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .btn-buy {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: var(--accent);
+      color: var(--btn-text);
+      box-shadow: 0 4px 15px rgba(124,255,146,0.2);
+      transition: transform 0.2s;
+    }
+    .btn-buy:hover { transform: translateY(-3px); }
+
+    footer {
+      text-align: center;
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .disclaimer {
+      max-width: 720px;
+      margin: 12px auto 0;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      opacity: 0.75;
+    }
+
+    @media (max-width: 900px) {
+      .split-layout { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+      .ranking-nome { max-width: 120px; }
+      .coluna-boletim { order: -1; }
+    }
   </style>
 </head>
 <body>
+  <script>
+    (function () {
+      var temaSalvo = localStorage.getItem('viverderenda_tema');
+      if (temaSalvo === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
   <header>
     <div class="container topbar">
       <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
       <nav class="nav">
         <a href="#consultas">Mercado</a>
         <a href="#educacao">Educação</a>
+        <!-- ALTERAÇÃO AQUI: Novo link para o Yubb -->
         <a href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">Renda Fixa</a>
-        <button id="themeToggle" class="theme-toggle">☀️</button>
+        <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
       </nav>
     </div>
   </header>
 
   <main class="container">
-    <section class="hg-busca">
+
+    <!-- CONSULTA RÁPIDA: Ações e FIIs (HG Brasil) -->
+    <section class="hg-busca" id="consulta-rapida">
+      <h2 class="hg-titulo">🔎 Consultar Ações e FIIs</h2>
+      <p class="hg-subtitulo">Busque qualquer ativo da B3 e veja preço, variação e indicadores em tempo real.</p>
+
       <div class="hg-painel">
         <div class="hg-linha-busca">
-          <input type="text" id="hgTickerInput" value="PETR4" />
+          <input type="text" id="hgTickerInput" value="PETR4" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" />
           <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
         </div>
+
+        <div class="hg-chips">
+          <span class="hg-chip" data-ticker="PETR4">PETR4</span>
+          <span class="hg-chip" data-ticker="VALE3">VALE3</span>
+          <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
+          <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
+          <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
+          <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
+        </div>
+
         <div class="hg-status" id="hgStatus"></div>
         <div id="hgResultado"></div>
       </div>
     </section>
 
-    <!-- Estrutura de Rankings simplificada mantida do histórico -->
-    <section class="split-layout">
-        <div class="search-container">
-            <h3>🏢 Melhores FIIs: 4 de Logística e 2 de Papel</h3>
-            <div id="rankingFiis"><div class="ranking-row skeleton"></div></div>
-        </div>
-        <div class="boletim-panel">
-            <h3>Boletim de mercado</h3>
-            <div id="indicesRows"><div class="indice-row skeleton"></div></div>
-        </div>
+    <section class="section-intro" id="consultas">
+      <h1>Explore o mercado. <br><span style="color: var(--primary);">Tome melhores decisões.</span></h1>
+      <p>Acompanhe os destaques do dia: os maiores Fundos Imobiliários e ações com melhor desempenho no ranking da B3, além do boletim diário com índices e notícias do mercado.</p>
     </section>
+
+    <section class="split-layout">
+
+      <!-- ESQUERDA: Ranking do mercado -->
+      <div class="coluna-explorar">
+        <div class="panel-title explorar"><span class="dot"></span> Explore o mercado</div>
+        <div class="search-container">
+          <div class="ranking-block">
+            <h3 class="ranking-section-title">🏅 Rankings de Ativos — Ações</h3>
+
+            <h4 class="ranking-title">💰 Maiores Dividend Yield</h4>
+            <div class="ranking-list" id="rankingDy">
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+            </div>
+
+            <h4 class="ranking-title ranking-title-sep">📈 Maiores Valor de Mercado</h4>
+            <div class="ranking-list" id="rankingValorMercado">
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+            </div>
+
+            <h4 class="ranking-title ranking-title-sep">🧾 Maiores Receita</h4>
+            <div class="ranking-list" id="rankingReceita">
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+            </div>
+          </div>
+
+          <div class="ranking-block">
+            <h3 class="ranking-title">🏢 Melhores FIIs mais buscados</h3>
+            <div class="ranking-list" id="rankingFiis">
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+              <div class="ranking-row skeleton"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIREITA: Boletim de mercado -->
+      <div class="coluna-boletim">
+        <div class="panel-title boletim"><span class="dot"></span> Boletim de mercado</div>
+        <div class="boletim-panel">
+          <div class="indices-rows" id="indicesRows">
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+            <div class="indice-row skeleton"></div>
+          </div>
+
+          <div class="boletim-noticias-title">Últimas notícias</div>
+          <div id="noticiasList">
+            <div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Carregando notícias...</div></div></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ÁREA SECUNDÁRIA: EDUCAÇÃO E VENDA -->
+    <section class="presentation-section" id="educacao">
+      <div class="presentation-header">
+        <h2>Aprenda a investir e viva de renda</h2>
+        <p>A pesquisa de ativos é apenas o primeiro passo. Nossa apresentação didática organiza o conhecimento que você precisa para estruturar uma carteira vencedora no longo prazo.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Renda Fixa</h3>
+          <p>Entenda o porto seguro da sua carteira: Tesouro Direto, CDBs, LCIs e proteção do FGC.</p>
+        </div>
+        <div class="card">
+          <h3>Renda Variável</h3>
+          <p>Como lucrar com Ações, receber aluguéis mensais com FIIs e dolarizar com ETFs/BDRs.</p>
+        </div>
+        <div class="card">
+          <h3>Estratégia</h3>
+          <p>O segredo da diversificação e dos aportes constantes para gerar renda passiva vitalícia.</p>
+        </div>
+      </div>
+
+      <div class="offer" id="compra">
+        <h2 style="margin-bottom: 10px;">Adquira o material completo</h2>
+        <p style="color: var(--muted); margin-bottom: 20px;">Aprenda como os diferentes produtos financeiros se conectam na prática.</p>
+        <a class="btn-buy" href="https://go.hotmart.com/T105616628U" target="_blank" rel="noopener noreferrer">
+          Comprar Apresentação Agora
+        </a>
+      </div>
+    </section>
+
   </main>
 
+  <footer>
+    <div class="container">
+      <p>Desenvolvido para investidores. Dados fornecidos via integração com a B3.</p>
+      <p class="disclaimer">
+        As informações e conteúdos apresentados neste site têm caráter exclusivamente educativo e informativo,
+        não constituindo recomendação de compra, venda ou manutenção de qualquer ativo financeiro. Rentabilidade
+        passada não representa garantia de rentabilidade futura. Antes de investir, avalie seu perfil de risco e,
+        se necessário, consulte um profissional certificado.
+      </p>
+    </div>
+  </footer>
+
   <script>
+    /* ---------------------------------------------------------------
+       Consulta rápida: Ações e FIIs via HG Brasil
+       API com CORS liberado — chamada direto do navegador, sem robô.
+    ----------------------------------------------------------------*/
     (function () {
-      // CHAVE CORRETA PARA viverderenda.dev.br[cite: 3]
-      const CHAVE_HG = '850310af'; 
-      const btn = document.getElementById('hgBtnBuscar');
-      
-      async function hgBuscarAtivo() {
-        const ticker = document.getElementById('hgTickerInput').value;
-        const statusEl = document.getElementById('hgStatus');
-        statusEl.textContent = 'Consultando...';
-        
-        try {
-          // Parâmetro format=json-cors é obrigatório para navegadores[cite: 3]
-          const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=B3:${ticker}&key=${CHAVE_HG}`;
-          const resp = await fetch(url);
-          const data = await resp.json();
-          document.getElementById('hgResultado').innerHTML = data.results ? 'Ativo carregado.' : 'Erro.';
-          statusEl.textContent = '';
-        } catch (e) {
-          statusEl.textContent = 'Erro de CORS ou Conexão.';
-        }
+      // Chave "uso exposto" da HG Brasil, restrita ao domínio viverderenda.dev.br.
+      // Só funciona quando a página é servida exatamente por esse domínio —
+      // testar via file://, localhost ou outro domínio será bloqueado pela API.
+      const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
+      const inputTicker = document.getElementById('hgTickerInput');
+      const statusEl = document.getElementById('hgStatus');
+      const resultadoEl = document.getElementById('hgResultado');
+      const btnBuscar = document.getElementById('hgBtnBuscar');
+      const chips = document.querySelectorAll('.hg-chip');
+
+      if (!inputTicker) return; // seção não presente nesta página
+
+      chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          inputTicker.value = chip.getAttribute('data-ticker');
+          hgBuscarAtivo();
+        });
+      });
+
+      function hgFormatMoeda(valor, moeda = 'BRL') {
+        if (typeof valor !== 'number') return '—';
+        const simbolo = moeda === 'BRL' ? 'R$ ' : (moeda === 'USD' ? 'US$ ' : '');
+        return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
-      btn.addEventListener('click', hgBuscarAtivo);
+
+      function hgFormatCompacto(valor) {
+        return typeof valor === 'number'
+          ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
+          : '—';
+      }
+
+      function hgFormatData(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        return isNaN(d.getTime()) ? '—' : d.toLocaleString('pt-BR');
+      }
+
+      async function hgBuscarAtivo() {
+        const digitado = inputTicker.value.trim().toUpperCase();
+        if (!digitado) return;
+        const ticker = digitado.startsWith('B3:') ? digitado : `B3:${digitado}`;
+
+        statusEl.className = 'hg-status';
+        statusEl.textContent = `Consultando ${digitado}...`;
+        resultadoEl.innerHTML = '';
+
+        let resp, data;
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/quotes?tickers=${encodeURIComponent(ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
+          resp = await fetch(url);
+        } catch (erroRede) {
+          // Falha de rede/CORS antes mesmo de chegar resposta do servidor
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Falha de conexão com a HG Brasil. Se você não está em viverderenda.dev.br, é isso: a chave é restrita a esse domínio.';
+          console.error('Erro de rede na consulta HG Brasil:', erroRede);
+          return;
+        }
+
+        try {
+          data = await resp.json();
+        } catch (erroJson) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `A HG Brasil respondeu algo inesperado (HTTP ${resp.status}). Tente novamente em instantes.`;
+          console.error('Erro ao interpretar resposta da HG Brasil:', erroJson);
+          return;
+        }
+
+        const statusChave = data?.metadata?.key_status;
+        if (statusChave && statusChave !== 'valid') {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Chave da HG Brasil recusada (status: ${statusChave}). Confira o domínio autorizado e o plano em console.hgbrasil.com.`;
+          console.error('key_status retornado pela HG Brasil:', statusChave, data);
+          return;
+        }
+
+        if (!resp.ok) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Erro ${resp.status} ao consultar a HG Brasil. Tente novamente em instantes.`;
+          console.error('Resposta HTTP não-OK da HG Brasil:', resp.status, data);
+          return;
+        }
+
+        const ativo = data?.results?.[0];
+        if (!ativo) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Ticker "${digitado}" não encontrado.`;
+          return;
+        }
+
+        statusEl.textContent = '';
+        hgRenderizarAtivo(ativo);
+      }
+
+      function hgRenderizarAtivo(a) {
+        const q = a.quote || {};
+        const m = a.market || {};
+        const div = a.dividends || {};
+        const logo = a.logos?.square_large || a.logos?.square_small;
+        const emAlta = (q.change_percent || 0) >= 0;
+
+        const dadosGrid = [
+          ['Abertura', hgFormatMoeda(m.open, a.currency)],
+          ['Fech. anterior', hgFormatMoeda(m.previous_value, a.currency)],
+          ['Máxima', hgFormatMoeda(m.high, a.currency)],
+          ['Mínima', hgFormatMoeda(m.low, a.currency)],
+          ['Volume', hgFormatCompacto(m.volume)],
+          ['Valor de mercado', hgFormatMoeda(q.market_cap, a.currency)],
+          div.yield_12m_percent != null ? ['DY (12m)', `${div.yield_12m_percent.toFixed(2)}%`] : null,
+          div.yield_12m_cash != null ? ['Dividendos (12m)', hgFormatMoeda(div.yield_12m_cash, a.currency)] : null,
+          ['Atualizado em', hgFormatData(q.updated_at)],
+        ].filter(Boolean);
+
+        resultadoEl.innerHTML = `
+          <div class="hg-card">
+            <div class="hg-card-topo">
+              ${logo ? `<img src="${logo}" alt="" onerror="this.remove()">` : ''}
+              <div>
+                <h3>${a.name || a.symbol} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span></h3>
+                <div class="hg-setor">${a.classification?.sector || a.full_name || ''}</div>
+              </div>
+            </div>
+
+            <div class="hg-preco-linha">
+              <div class="hg-preco">${hgFormatMoeda(q.value, a.currency)}</div>
+              <div class="hg-variacao ${emAlta ? 'val-up' : 'val-down'}">
+                ${emAlta ? '▲' : '▼'} ${hgFormatMoeda(Math.abs(q.change_value || 0), a.currency)} (${Math.abs(q.change_percent || 0).toFixed(2)}%)
+              </div>
+            </div>
+
+            <div class="hg-grid-dados">
+              ${dadosGrid.map(([label, valor]) => `
+                <div>
+                  <span>${label}</span>
+                  <strong>${valor}</strong>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      btnBuscar.addEventListener('click', hgBuscarAtivo);
+      inputTicker.addEventListener('keydown', (e) => { if (e.key === 'Enter') hgBuscarAtivo(); });
+
+      // Carrega o ticker inicial automaticamente (chave já embutida)
+      hgBuscarAtivo();
+    })();
+
+    async function carregarIndices() {
+      const rowsEl = document.getElementById('indicesRows');
+      try {
+        const resp = await fetch('indices.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const indices = await resp.json();
+        if (!Array.isArray(indices) || indices.length === 0) throw new Error('vazio');
+
+        rowsEl.innerHTML = indices.map(item => {
+          if (typeof item.valor === 'number') {
+            const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
+            const emAlta = variacao >= 0;
+            const prefixo = item.prefixo === 'pontos' ? '' : (item.prefixo || '');
+            const valorFormatado = item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            return `
+              <div class="indice-row">
+                <span class="indice-label">${item.label}</span>
+                <span class="indice-value">${prefixo}${valorFormatado}${item.prefixo === 'pontos' ? ' pts' : ''}</span>
+                <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+              </div>`;
+          }
+          const variacao = typeof item.valor_pct === 'number' ? item.valor_pct : 0;
+          const emAlta = variacao >= 0;
+          return `
+            <div class="indice-row">
+              <span class="indice-label">${item.label}</span>
+              <span class="indice-value">—</span>
+              <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+            </div>`;
+        }).join('');
+      } catch (e) {
+        rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Índices ainda não gerados — aguarde o robô rodar.</span></div>';
+      }
+    }
+    carregarIndices();
+
+    async function carregarNoticias() {
+      const listEl = document.getElementById('noticiasList');
+      try {
+        const resp = await fetch('noticias.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const noticias = await resp.json();
+        if (!Array.isArray(noticias) || noticias.length === 0) throw new Error('vazio');
+
+        listEl.innerHTML = noticias.slice(0, 3).map(n => `
+          <a class="noticia-card" href="${n.link}" target="_blank" rel="noopener noreferrer">
+            ${n.imagem ? `<img class="noticia-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+            <div class="noticia-body">
+              <div class="noticia-titulo">${n.titulo}</div>
+              <div class="noticia-meta">${n.fonte || 'Mercado financeiro'}</div>
+            </div>
+          </a>
+        `).join('');
+      } catch (e) {
+        listEl.innerHTML = '<div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Notícias ainda não geradas — aguarde o robô rodar.</div></div></div>';
+      }
+    }
+    carregarNoticias();
+
+    function formatMoeda(valor) {
+      return typeof valor === 'number'
+        ? valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : '—';
+    }
+
+    function formatCompacto(valor) {
+      return typeof valor === 'number'
+        ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
+        : '—';
+    }
+
+    function renderizarRanking(elId, lista) {
+      const listEl = document.getElementById(elId);
+      if (!Array.isArray(lista) || lista.length === 0) {
+        listEl.innerHTML = '<div class="ranking-row"><span class="ranking-nome">Ranking ainda não gerado — aguarde o robô rodar.</span></div>';
+        return;
+      }
+
+      listEl.innerHTML = lista.map(item => {
+        const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
+        const emAlta = variacao >= 0;
+
+        return `
+          <div class="ranking-row">
+            <div class="ranking-info">
+              <span class="ranking-ticker">${item.ticker || '—'}</span>
+              <span class="ranking-nome">${item.nome || ''}</span>
+            </div>
+            <div class="ranking-numbers">
+              <div class="ranking-preco">R$ ${formatMoeda(item.preco)}</div>
+              <div class="ranking-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderizarRankingMetrica(elId, lista, formato) {
+      const listEl = document.getElementById(elId);
+      if (!Array.isArray(lista) || lista.length === 0) {
+        listEl.innerHTML = '<div class="ranking-row"><span class="ranking-nome">Ranking ainda não gerado — aguarde o robô rodar.</span></div>';
+        return;
+      }
+
+      listEl.innerHTML = lista.map(item => {
+        const valorFormatado = formato === 'percentual'
+          ? `${formatMoeda(item.valor)}%`
+          : `R$ ${formatCompacto(item.valor)}`;
+
+        return `
+          <div class="ranking-row">
+            <div class="ranking-info">
+              <span class="ranking-ticker">${item.ticker || '—'}</span>
+              <span class="ranking-nome">${item.nome || ''}</span>
+            </div>
+            <div class="ranking-numbers">
+              <div class="ranking-preco">R$ ${formatMoeda(item.preco)}</div>
+              <div class="ranking-change val-up">${valorFormatado}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function carregarRanking() {
+      try {
+        const resp = await fetch('ranking.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const ranking = await resp.json();
+        const acoes = ranking.acoes || {};
+
+        renderizarRankingMetrica('rankingDy', acoes.dividend_yield, 'percentual');
+        renderizarRankingMetrica('rankingValorMercado', acoes.valor_mercado, 'moeda');
+        renderizarRankingMetrica('rankingReceita', acoes.receita, 'moeda');
+        
+        renderizarRanking('rankingFiis', ranking.fiis);
+      } catch (e) {
+        renderizarRankingMetrica('rankingDy', [], 'percentual');
+        renderizarRankingMetrica('rankingValorMercado', [], 'moeda');
+        renderizarRankingMetrica('rankingReceita', [], 'moeda');
+        renderizarRanking('rankingFiis', []);
+      }
+    }
+    carregarRanking();
+
+    (function () {
+      const botao = document.getElementById('themeToggle');
+      const html = document.documentElement;
+
+      function atualizarIcone() {
+        const claro = html.getAttribute('data-theme') === 'light';
+        botao.textContent = claro ? '🌙' : '☀️';
+        botao.title = claro ? 'Escurecer a página' : 'Clarear a página';
+      }
+
+      botao.addEventListener('click', () => {
+        const claroAgora = html.getAttribute('data-theme') === 'light';
+        if (claroAgora) {
+          html.removeAttribute('data-theme');
+          localStorage.setItem('viverderenda_tema', 'dark');
+        } else {
+          html.setAttribute('data-theme', 'light');
+          localStorage.setItem('viverderenda_tema', 'light');
+        }
+        atualizarIcone();
+      });
+      atualizarIcone();
     })();
   </script>
 </body>
