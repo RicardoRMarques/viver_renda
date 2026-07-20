@@ -134,7 +134,7 @@
       padding: 14px 16px;
       border-radius: 12px;
       border: 1px solid var(--border);
-      background: #04101a;
+      background: var(--deep);
       color: var(--text);
       font-size: 1rem;
       outline: none;
@@ -157,7 +157,7 @@
       padding: 6px 12px;
       border-radius: 999px;
       border: 1px solid var(--border);
-      background: #04101a;
+      background: var(--deep);
       font-size: 0.82rem;
       cursor: pointer;
       color: var(--muted);
@@ -169,7 +169,7 @@
 
     .hg-card {
       margin-top: 6px;
-      background: #04101a;
+      background: var(--deep);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 22px;
@@ -917,7 +917,7 @@
               <div class="hg-grafico-box">
                 <div class="hg-grafico-titulo">Últimos 30 dias</div>
                 <div id="hgGrafico">
-                  <svg viewBox="0 0 300 90" preserveAspectRatio="none"><text x="10" y="45" fill="#5b6b8c" font-size="10">Carregando gráfico...</text></svg>
+                  <svg viewBox="0 0 300 90" preserveAspectRatio="none"><text x="10" y="45" fill="var(--muted)" font-size="10">Carregando gráfico...</text></svg>
                 </div>
               </div>
             </div>
@@ -968,13 +968,13 @@
 
           const amostras = data?.results?.[0]?.samples;
           if (!Array.isArray(amostras) || amostras.length < 2) {
-            container.innerHTML = '<svg viewBox="0 0 300 90"><text x="10" y="45" fill="#5b6b8c" font-size="10">Sem histórico suficiente para o gráfico</text></svg>';
+            container.innerHTML = '<svg viewBox="0 0 300 90"><text x="10" y="45" fill="var(--muted)" font-size="10">Sem histórico suficiente para o gráfico</text></svg>';
             return;
           }
 
           hgDesenharGrafico(container, amostras);
         } catch (e) {
-          container.innerHTML = '<svg viewBox="0 0 300 90"><text x="10" y="45" fill="#5b6b8c" font-size="10">Gráfico indisponível agora</text></svg>';
+          container.innerHTML = '<svg viewBox="0 0 300 90"><text x="10" y="45" fill="var(--muted)" font-size="10">Gráfico indisponível agora</text></svg>';
           console.error('Erro ao carregar histórico HG Brasil:', e);
         }
       }
@@ -990,7 +990,10 @@
         const amplitude = (maximo - minimo) || 1;
 
         const emAlta = fechamentos[fechamentos.length - 1] >= fechamentos[0];
-        const cor = emAlta ? '#7cff92' : '#ff6b6b';
+        const estilos = getComputedStyle(document.documentElement);
+        const corAlta = estilos.getPropertyValue('--accent').trim() || '#7cff92';
+        const corBaixa = estilos.getPropertyValue('--danger').trim() || '#ff6b6b';
+        const cor = emAlta ? corAlta : corBaixa;
 
         const pontos = fechamentos.map((valor, i) => {
           const x = margem + (i / (fechamentos.length - 1)) * (largura - margem * 2);
