@@ -28,8 +28,8 @@ jobs:
 
       - name: Rodar coleta de notícias, índices e ranking
         env:
-          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
-        run: python coletar_brapi_fiis.py
+          HGBRASIL_TOKEN: ${{ secrets.HGBRASIL_TOKEN }}
+        run: python coletar_hgbrasil.py
 
       - name: Commitar e enviar noticias.json, indices.json e ranking.json
         run: |
