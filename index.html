@@ -1097,19 +1097,40 @@
 
       // Busca o P/VP (e VPA) de um FII na brapi.dev, já que a HG Brasil não
       // retorna esse indicador. Atualiza os campos injetados no card.
+      //
+      // Importante: /api/quote/{symbol}?modules=defaultKeyStatistics é voltado
+      // para ações e não preenche priceToBook/bookValue para FIIs. O endpoint
+      // certo para fundos imobiliários é o /api/v2/fii/indicators, que usa os
+      // nomes priceToNav (P/VP) e navPerShare (VPA).
       async function hgCarregarPVP(symbol) {
         const elPvp = document.getElementById('hgPvpValor');
         const elVpa = document.getElementById('hgVpaValor');
         if (!elPvp || !elVpa) return;
 
         try {
-          const url = `https://brapi.dev/api/quote/${encodeURIComponent(symbol)}?modules=defaultKeyStatistics&token=${encodeURIComponent(CHAVE_BRAPI)}`;
+          const url = `https://brapi.dev/api/v2/fii/indicators?symbols=${encodeURIComponent(symbol)}&token=${encodeURIComponent(CHAVE_BRAPI)}`;
           const resp = await fetch(url);
           const data = await resp.json();
-          const stats = data?.results?.[0]?.defaultKeyStatistics;
 
-          const pvp = stats?.priceToBook;
-          const vpa = stats?.bookValue;
+          // A API pode responder em "indicators" ou "fiis" dependendo da versão.
+          const lista = data?.indicators ?? data?.fiis ?? [];
+          const info = Array.isArray(lista)
+            ? lista.find(f => f?.symbol?.toUpperCase() === symbol.toUpperCase()) ?? lista[0]
+            : null;
+
+          let pvp = info?.priceToNav ?? info?.pvp;
+          let vpa = info?.navPerShare ?? info?.vpa;
+
+          // Fallback: se o endpoint dedicado de FIIs não trouxer nada, tenta o
+          // endpoint genérico de ações (raramente populado para FIIs, mas não custa tentar).
+          if (typeof pvp !== 'number' && typeof vpa !== 'number') {
+            const urlFallback = `https://brapi.dev/api/quote/${encodeURIComponent(symbol)}?modules=defaultKeyStatistics&token=${encodeURIComponent(CHAVE_BRAPI)}`;
+            const respFallback = await fetch(urlFallback);
+            const dataFallback = await respFallback.json();
+            const stats = dataFallback?.results?.[0]?.defaultKeyStatistics;
+            pvp = stats?.priceToBook;
+            vpa = stats?.bookValue;
+          }
 
           elPvp.textContent = typeof pvp === 'number' ? hgFormatNumero(pvp) : 'Indisponível';
           elPvp.title = elPvp.textContent;
