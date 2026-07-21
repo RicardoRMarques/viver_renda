@@ -205,9 +205,9 @@
     /* Preço + gráfico lado a lado (empilha no mobile) */
     .hg-preco-grafico {
       display: grid;
-      grid-template-columns: 1fr 1.4fr;
+      grid-template-columns: 1fr 1.6fr;
       gap: 20px;
-      align-items: center;
+      align-items: start;
       margin-bottom: 18px;
       padding-bottom: 18px;
       border-bottom: 1px solid var(--border);
@@ -226,9 +226,16 @@
     }
     .hg-mercado-tag.aberto { color: var(--accent); border-color: rgba(124,255,146,0.4); }
 
-    .hg-grafico-box { min-width: 0; }
-    .hg-grafico-titulo { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; }
-    .hg-grafico-box svg { width: 100%; height: auto; display: block; }
+    .hg-grafico-box { min-width: 0; position: relative; }
+    .hg-grafico-titulo { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .hg-grafico-periodo-valor { font-family: "Courier New", monospace; font-size: 0.72rem; }
+    .hg-grafico-box svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .hg-grafico-eixo-label { font-size: 8.5px; fill: var(--muted); font-family: "Courier New", monospace; }
+    .hg-grafico-grid-linha { stroke: var(--border); stroke-width: 1; }
+    .hg-grafico-tooltip-grupo { pointer-events: none; opacity: 0; transition: opacity 0.1s ease; }
+    .hg-grafico-tooltip-caixa { fill: var(--card); stroke: var(--border); stroke-width: 1; }
+    .hg-grafico-tooltip-texto { font-size: 9px; font-family: "Courier New", monospace; fill: var(--text); }
+    .hg-grafico-overlay { fill: transparent; cursor: crosshair; }
 
     .hg-grid-dados {
       display: grid;
@@ -1103,25 +1110,66 @@
 
           const amostras = data?.results?.[0]?.samples;
           if (!Array.isArray(amostras) || amostras.length < 2) {
-            container.innerHTML = '<svg viewBox="0 0 300 90"><text x="10" y="45" fill="var(--muted)" font-size="10">Sem histórico suficiente para o gráfico</text></svg>';
+            container.innerHTML = '<svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Sem histórico suficiente para o gráfico</text></svg>';
             return;
           }
 
           hgDesenharGrafico(container, amostras);
         } catch (e) {
-          container.innerHTML = '<svg viewBox="0 0 300 90"><text x="10" y="45" fill="var(--muted)" font-size="10">Gráfico indisponível agora</text></svg>';
+          container.innerHTML = '<svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Gráfico indisponível agora</text></svg>';
           console.error('Erro ao carregar histórico HG Brasil:', e);
         }
       }
 
-      function hgDesenharGrafico(container, amostras) {
-        const largura = 300;
-        const altura = 90;
-        const margem = 4;
+      // Converte uma lista de pontos {x,y} numa string de path SVG suavizada
+      // (curva de Catmull-Rom convertida para Béziers cúbicas), em vez de
+      // linhas retas ligando ponto a ponto.
+      function hgSuavizarLinha(pontos) {
+        if (pontos.length < 3) {
+          return `M ${pontos.map(p => `${p.x},${p.y}`).join(' L ')}`;
+        }
+        let d = `M ${pontos[0].x},${pontos[0].y}`;
+        for (let i = 0; i < pontos.length - 1; i++) {
+          const p0 = pontos[i === 0 ? 0 : i - 1];
+          const p1 = pontos[i];
+          const p2 = pontos[i + 1];
+          const p3 = pontos[i + 2 < pontos.length ? i + 2 : i + 1];
+          const c1x = p1.x + (p2.x - p0.x) / 6;
+          const c1y = p1.y + (p2.y - p0.y) / 6;
+          const c2x = p2.x - (p3.x - p1.x) / 6;
+          const c2y = p2.y - (p3.y - p1.y) / 6;
+          d += ` C ${c1x.toFixed(2)},${c1y.toFixed(2)} ${c2x.toFixed(2)},${c2y.toFixed(2)} ${p2.x.toFixed(2)},${p2.y.toFixed(2)}`;
+        }
+        return d;
+      }
 
-        const fechamentos = amostras.map(s => s.close).filter(v => typeof v === 'number');
-        const minimo = Math.min(...fechamentos);
-        const maximo = Math.max(...fechamentos);
+      function hgFormatDataCurta(valor) {
+        if (!valor) return '';
+        const d = new Date(valor);
+        if (isNaN(d.getTime())) return '';
+        return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      }
+
+      function hgDesenharGrafico(container, amostras) {
+        const larguraTotal = 640;
+        const alturaTotal = 260;
+        const margemEsq = 50;
+        const margemDir = 14;
+        const margemTop = 16;
+        const margemBaixo = 30;
+        const largura = larguraTotal - margemEsq - margemDir;
+        const altura = alturaTotal - margemTop - margemBaixo;
+
+        const validas = amostras
+          .map(s => ({ close: s.close, data: s.date || s.day || s.data || null }))
+          .filter(s => typeof s.close === 'number');
+
+        const fechamentos = validas.map(s => s.close);
+        const minimoBruto = Math.min(...fechamentos);
+        const maximoBruto = Math.max(...fechamentos);
+        const folga = ((maximoBruto - minimoBruto) || maximoBruto * 0.02) * 0.12;
+        const minimo = minimoBruto - folga;
+        const maximo = maximoBruto + folga;
         const amplitude = (maximo - minimo) || 1;
 
         const emAlta = fechamentos[fechamentos.length - 1] >= fechamentos[0];
@@ -1129,22 +1177,118 @@
         const corAlta = estilos.getPropertyValue('--accent').trim() || '#7cff92';
         const corBaixa = estilos.getPropertyValue('--danger').trim() || '#ff6b6b';
         const cor = emAlta ? corAlta : corBaixa;
+        const gradienteId = `hgGrad_${Date.now()}`;
 
-        const pontos = fechamentos.map((valor, i) => {
-          const x = margem + (i / (fechamentos.length - 1)) * (largura - margem * 2);
-          const y = altura - margem - ((valor - minimo) / amplitude) * (altura - margem * 2);
-          return `${x.toFixed(1)},${y.toFixed(1)}`;
-        });
+        const paraX = i => margemEsq + (i / (fechamentos.length - 1)) * largura;
+        const paraY = valor => margemTop + altura - ((valor - minimo) / amplitude) * altura;
 
-        const linha = pontos.join(' ');
-        const areaPontos = `${margem},${altura - margem} ${linha} ${largura - margem},${altura - margem}`;
+        const pontos = fechamentos.map((valor, i) => ({ x: paraX(i), y: paraY(valor) }));
+        const pathLinha = hgSuavizarLinha(pontos);
+        const pathArea = `${pathLinha} L ${pontos[pontos.length - 1].x.toFixed(2)},${margemTop + altura} L ${pontos[0].x.toFixed(2)},${margemTop + altura} Z`;
+
+        // Grade horizontal (4 níveis) com rótulo de preço em cada linha
+        const niveisGrade = 4;
+        let gradeSvg = '';
+        for (let i = 0; i <= niveisGrade; i++) {
+          const valorNivel = minimo + (amplitude * i / niveisGrade);
+          const y = paraY(valorNivel);
+          gradeSvg += `
+            <line x1="${margemEsq}" y1="${y.toFixed(1)}" x2="${larguraTotal - margemDir}" y2="${y.toFixed(1)}" class="hg-grafico-grid-linha" stroke-dasharray="${i === 0 ? '0' : '2,3'}"></line>
+            <text x="${margemEsq - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" class="hg-grafico-eixo-label">${hgFormatCompacto(valorNivel)}</text>`;
+        }
+
+        // Rótulos de data: início, meio e fim do período
+        const idxMeio = Math.floor((fechamentos.length - 1) / 2);
+        const datasLabel = [0, idxMeio, fechamentos.length - 1].map(i => ({
+          x: paraX(i),
+          texto: hgFormatDataCurta(validas[i]?.data) || (i === fechamentos.length - 1 ? 'Hoje' : ''),
+        }));
+        const datasSvg = datasLabel.map(d => d.texto ? `
+          <text x="${d.x.toFixed(1)}" y="${alturaTotal - 8}" text-anchor="middle" class="hg-grafico-eixo-label">${d.texto}</text>
+        ` : '').join('');
+
+        const ultimoPonto = pontos[pontos.length - 1];
 
         container.innerHTML = `
-          <svg viewBox="0 0 ${largura} ${altura}" preserveAspectRatio="none">
-            <polygon points="${areaPontos}" fill="${cor}" opacity="0.12"></polygon>
-            <polyline points="${linha}" fill="none" stroke="${cor}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"></polyline>
+          <svg viewBox="0 0 ${larguraTotal} ${alturaTotal}" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="${gradienteId}" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="${cor}" stop-opacity="0.28"></stop>
+                <stop offset="100%" stop-color="${cor}" stop-opacity="0"></stop>
+              </linearGradient>
+            </defs>
+
+            ${gradeSvg}
+            ${datasSvg}
+
+            <path d="${pathArea}" fill="url(#${gradienteId})" stroke="none"></path>
+            <path d="${pathLinha}" fill="none" stroke="${cor}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"></path>
+
+            <circle cx="${ultimoPonto.x.toFixed(2)}" cy="${ultimoPonto.y.toFixed(2)}" r="4" fill="${cor}"></circle>
+            <circle cx="${ultimoPonto.x.toFixed(2)}" cy="${ultimoPonto.y.toFixed(2)}" r="8" fill="${cor}" opacity="0.25"></circle>
+
+            <g id="hgTooltipLinha" class="hg-grafico-tooltip-grupo">
+              <line x1="0" y1="${margemTop}" x2="0" y2="${margemTop + altura}" stroke="${cor}" stroke-width="1" stroke-dasharray="3,3"></line>
+              <circle r="4.5" fill="${cor}" stroke="var(--card)" stroke-width="1.5"></circle>
+            </g>
+            <g id="hgTooltipCaixa" class="hg-grafico-tooltip-grupo">
+              <rect class="hg-grafico-tooltip-caixa" rx="6" width="86" height="34"></rect>
+              <text id="hgTooltipData" class="hg-grafico-tooltip-texto" x="8" y="14"></text>
+              <text id="hgTooltipPreco" class="hg-grafico-tooltip-texto" x="8" y="27" font-weight="700"></text>
+            </g>
+
+            <rect class="hg-grafico-overlay" x="${margemEsq}" y="0" width="${largura}" height="${alturaTotal}"></rect>
           </svg>
         `;
+
+        const svgEl = container.querySelector('svg');
+        const overlay = container.querySelector('.hg-grafico-overlay');
+        const grupoLinha = container.querySelector('#hgTooltipLinha');
+        const grupoCaixa = container.querySelector('#hgTooltipCaixa');
+        const linhaVertical = grupoLinha.querySelector('line');
+        const circuloTooltip = grupoLinha.querySelector('circle');
+        const caixaRect = grupoCaixa.querySelector('rect');
+        const textoData = grupoCaixa.querySelector('#hgTooltipData');
+        const textoPreco = grupoCaixa.querySelector('#hgTooltipPreco');
+
+        function hgMoverTooltip(evt) {
+          const ponto = svgEl.createSVGPoint();
+          ponto.x = evt.clientX;
+          ponto.y = evt.clientY;
+          const ctm = svgEl.getScreenCTM();
+          if (!ctm) return;
+          const local = ponto.matrixTransform(ctm.inverse());
+
+          let i = Math.round(((local.x - margemEsq) / largura) * (fechamentos.length - 1));
+          i = Math.max(0, Math.min(fechamentos.length - 1, i));
+          const p = pontos[i];
+
+          linhaVertical.setAttribute('x1', p.x.toFixed(2));
+          linhaVertical.setAttribute('x2', p.x.toFixed(2));
+          circuloTooltip.setAttribute('cx', p.x.toFixed(2));
+          circuloTooltip.setAttribute('cy', p.y.toFixed(2));
+
+          const caixaX = Math.min(Math.max(p.x - 43, margemEsq), larguraTotal - margemDir - 86);
+          const caixaY = p.y - 44 < margemTop ? p.y + 12 : p.y - 44;
+          caixaRect.setAttribute('x', caixaX.toFixed(2));
+          caixaRect.setAttribute('y', caixaY.toFixed(2));
+          textoData.setAttribute('x', (caixaX + 8).toFixed(2));
+          textoData.setAttribute('y', (caixaY + 14).toFixed(2));
+          textoPreco.setAttribute('x', (caixaX + 8).toFixed(2));
+          textoPreco.setAttribute('y', (caixaY + 27).toFixed(2));
+          textoData.textContent = hgFormatDataCurta(validas[i]?.data) || `Dia ${i + 1}`;
+          textoPreco.textContent = `R$ ${formatMoeda(fechamentos[i])}`;
+
+          grupoLinha.style.opacity = '1';
+          grupoCaixa.style.opacity = '1';
+        }
+
+        overlay.addEventListener('mousemove', hgMoverTooltip);
+        overlay.addEventListener('touchmove', (e) => { if (e.touches[0]) hgMoverTooltip(e.touches[0]); }, { passive: true });
+        overlay.addEventListener('mouseleave', () => {
+          grupoLinha.style.opacity = '0';
+          grupoCaixa.style.opacity = '0';
+        });
       }
 
       btnBuscar.addEventListener('click', hgBuscarAtivo);
