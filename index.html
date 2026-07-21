@@ -85,7 +85,14 @@
     .val-down { color: var(--danger); font-weight: 800; }
 
     /* Header */
-    header { padding: 24px 0 0; }
+    header {
+      padding: 24px 0 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--bg);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
     .topbar {
       display: flex;
       justify-content: space-between;
@@ -98,7 +105,9 @@
       letter-spacing: 0.4px;
       color: var(--primary);
       font-size: 1.2rem;
+      text-decoration: none;
     }
+    .brand:hover { opacity: 0.85; }
     .nav {
       display: flex;
       gap: 24px;
@@ -616,7 +625,7 @@
 
   <header>
     <div class="container topbar">
-      <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
+      <a class="brand" href="/" title="Ir para a página inicial">DIVIDENDOS | VIVER DE RENDA</a>
       <nav class="nav">
         <a href="#consultas">Mercado</a>
         <a href="#educacao">Educação</a>
