@@ -370,6 +370,22 @@
       background: var(--deep);
       border: 1px solid var(--border);
     }
+    .ranking-row-clicavel {
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+    .ranking-row-clicavel:hover,
+    .ranking-row-clicavel:focus-visible {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 8%, var(--deep));
+      transform: translateY(-1px);
+      outline: none;
+    }
+    .ranking-row-clicavel:hover .ranking-ticker,
+    .ranking-row-clicavel:focus-visible .ranking-ticker {
+      text-decoration: underline;
+    }
+    .ranking-row-clicavel:active { transform: translateY(0); }
     .ranking-row.skeleton {
       height: 48px;
       background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
@@ -1134,6 +1150,15 @@
       btnBuscar.addEventListener('click', hgBuscarAtivo);
       inputTicker.addEventListener('keydown', (e) => { if (e.key === 'Enter') hgBuscarAtivo(); });
 
+      // Permite que qualquer lugar da página (ex: os rankings de "Explore o
+      // mercado") dispare a consulta de um ticker específico, preenchendo o
+      // campo e rolando até a seção de consulta.
+      window.hgConsultarAtivo = function (ticker) {
+        inputTicker.value = ticker;
+        document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        hgBuscarAtivo();
+      };
+
       // Por padrão o campo de consulta abre vazio, sem buscar nada
       // automaticamente. Só dispara a busca sozinha se o link tiver
       // ?ticker=XXX (ex: vindo de um compartilhamento) — nesse caso também
@@ -1230,9 +1255,10 @@
       listEl.innerHTML = lista.map(item => {
         const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
         const emAlta = variacao >= 0;
+        const ticker = item.ticker || '';
 
         return `
-          <div class="ranking-row">
+          <div class="ranking-row${ticker ? ' ranking-row-clicavel' : ''}" ${ticker ? `data-ticker="${ticker}" tabindex="0" role="button" title="Consultar ${ticker}"` : ''}>
             <div class="ranking-info">
               <span class="ranking-ticker">${item.ticker || '—'}</span>
               <span class="ranking-nome">${item.nome || ''}</span>
@@ -1243,6 +1269,7 @@
             </div>
           </div>`;
       }).join('');
+      ativarCliqueRanking(listEl);
     }
 
     function renderizarRankingMetrica(elId, lista, formato) {
@@ -1256,9 +1283,10 @@
         const valorFormatado = formato === 'percentual'
           ? `${formatMoeda(item.valor)}%`
           : `R$ ${formatCompacto(item.valor)}`;
+        const ticker = item.ticker || '';
 
         return `
-          <div class="ranking-row">
+          <div class="ranking-row${ticker ? ' ranking-row-clicavel' : ''}" ${ticker ? `data-ticker="${ticker}" tabindex="0" role="button" title="Consultar ${ticker}"` : ''}>
             <div class="ranking-info">
               <span class="ranking-ticker">${item.ticker || '—'}</span>
               <span class="ranking-nome">${item.nome || ''}</span>
@@ -1269,6 +1297,25 @@
             </div>
           </div>`;
       }).join('');
+      ativarCliqueRanking(listEl);
+    }
+
+    // Delegação de clique/teclado para as linhas clicáveis de um ranking:
+    // ao clicar (ou apertar Enter/Espaço) num ativo, dispara a consulta
+    // dele no widget de "Consultar Ações e FIIs" e rola até lá.
+    function ativarCliqueRanking(listEl) {
+      listEl.querySelectorAll('.ranking-row-clicavel').forEach(row => {
+        const ticker = row.getAttribute('data-ticker');
+        if (!ticker) return;
+        const consultar = () => window.hgConsultarAtivo && window.hgConsultarAtivo(ticker);
+        row.addEventListener('click', consultar);
+        row.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            consultar();
+          }
+        });
+      });
     }
 
     async function carregarRanking() {
