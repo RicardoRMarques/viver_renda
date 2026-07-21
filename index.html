@@ -175,6 +175,26 @@
       padding: 22px;
     }
     .hg-card-topo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+    .hg-card-topo-info { display: flex; align-items: center; gap: 14px; flex: 1 1 auto; }
+    .hg-btn-compartilhar {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease;
+      white-space: nowrap;
+    }
+    .hg-btn-compartilhar:hover { color: var(--primary); border-color: var(--primary); }
+    .hg-btn-compartilhar.copiado { color: var(--accent); border-color: var(--accent); }
+    .hg-btn-compartilhar svg { width: 15px; height: 15px; flex-shrink: 0; }
     .hg-card-topo img {
       width: 46px; height: 46px; border-radius: 10px;
       background: rgba(255,255,255,0.04); object-fit: contain; padding: 5px;
@@ -952,11 +972,17 @@
         resultadoEl.innerHTML = `
           <div class="hg-card">
             <div class="hg-card-topo">
-              ${logo ? `<img src="${logo}" alt="" onerror="this.remove()">` : ''}
-              <div>
-                <h3>${a.name || a.symbol} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span></h3>
-                <div class="hg-setor">${a.classification?.sector || a.full_name || ''}</div>
+              <div class="hg-card-topo-info">
+                ${logo ? `<img src="${logo}" alt="" onerror="this.remove()">` : ''}
+                <div>
+                  <h3>${a.name || a.symbol} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span></h3>
+                  <div class="hg-setor">${a.classification?.sector || a.full_name || ''}</div>
+                </div>
               </div>
+              <button type="button" class="hg-btn-compartilhar" id="hgBtnCompartilhar" title="Copiar link desta consulta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                <span id="hgBtnCompartilharTexto">Compartilhar</span>
+              </button>
             </div>
 
             <div class="hg-preco-grafico">
@@ -1003,6 +1029,45 @@
             hgBuscarAtivo();
           });
         });
+
+        const btnCompartilhar = document.getElementById('hgBtnCompartilhar');
+        if (btnCompartilhar) {
+          btnCompartilhar.addEventListener('click', () => hgCompartilharAtivo(a, btnCompartilhar));
+        }
+      }
+
+      // Gera um link para esta consulta específica (ex: .../?ticker=PETR4)
+      // e usa o compartilhamento nativo do celular (se disponível) ou copia
+      // o link para a área de transferência.
+      async function hgCompartilharAtivo(a, botao) {
+        const tickerLimpo = (a.symbol || '').replace('B3:', '');
+        const link = `${window.location.origin}${window.location.pathname}?ticker=${encodeURIComponent(tickerLimpo)}`;
+        const titulo = `${a.name || tickerLimpo} (${tickerLimpo}) — Viver de Renda`;
+
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: titulo, url: link });
+            return;
+          } catch (e) {
+            // Usuário cancelou o compartilhamento nativo — não faz nada.
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        const textoOriginal = document.getElementById('hgBtnCompartilharTexto');
+        try {
+          await navigator.clipboard.writeText(link);
+          botao.classList.add('copiado');
+          if (textoOriginal) textoOriginal.textContent = 'Link copiado!';
+        } catch (e) {
+          // Fallback bem simples caso a área de transferência esteja bloqueada.
+          window.prompt('Copie o link da consulta:', link);
+        }
+
+        setTimeout(() => {
+          botao.classList.remove('copiado');
+          if (textoOriginal) textoOriginal.textContent = 'Compartilhar';
+        }, 2500);
       }
 
       // Busca o histórico diário dos últimos 30 dias e desenha um gráfico
@@ -1068,6 +1133,16 @@
 
       btnBuscar.addEventListener('click', hgBuscarAtivo);
       inputTicker.addEventListener('keydown', (e) => { if (e.key === 'Enter') hgBuscarAtivo(); });
+
+      // Se o link tiver ?ticker=XXX (ex: vindo de um compartilhamento), usa
+      // esse ticker como ponto de partida em vez do padrão (PETR4) e rola a
+      // página até a seção de consulta.
+      const parametrosUrl = new URLSearchParams(window.location.search);
+      const tickerDaUrl = parametrosUrl.get('ticker');
+      if (tickerDaUrl) {
+        inputTicker.value = tickerDaUrl.toUpperCase();
+        document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
 
       // Carrega o ticker inicial automaticamente (chave já embutida)
       hgBuscarAtivo();
