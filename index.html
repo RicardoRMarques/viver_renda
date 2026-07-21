@@ -822,10 +822,6 @@
       // Só funciona quando a página é servida exatamente por esse domínio —
       // testar via file://, localhost ou outro domínio será bloqueado pela API.
       const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
-      // Chave da brapi.dev usada só pra buscar o P/VP dos FIIs (a HG Brasil
-      // não retorna esse dado). Idealmente também restrita ao domínio
-      // viverderenda.dev.br no painel da brapi.dev.
-      const CHAVE_BRAPI = 'eJTYGhkHYGdQZy8kDmnHgy'; // TODO: mover para um proxy e remover daqui
       const inputTicker = document.getElementById('hgTickerInput');
       const statusEl = document.getElementById('hgStatus');
       const resultadoEl = document.getElementById('hgResultado');
@@ -935,6 +931,7 @@
         const div = a.dividends || {};
         const cls = a.classification || {};
         const src = a.source || {};
+        const fin = a.financials || {};
         const moeda = a.currency;
 
         const grupos = [
@@ -982,6 +979,15 @@
             campos: [
               ['DY (12 meses)', typeof div.yield_12m_percent === 'number' ? `${hgFormatNumero(div.yield_12m_percent)}%` : null],
               ['Dividendos (12m, R$)', hgFormatMoeda(div.yield_12m_cash, moeda)],
+            ],
+          },
+          {
+            titulo: 'Valuation',
+            campos: [
+              ['P/VP', typeof fin.price_to_book_ratio === 'number' ? hgFormatNumero(fin.price_to_book_ratio) : null],
+              ['VPA (valor patrimonial/cota)', hgFormatMoeda(fin.equity_per_share, moeda)],
+              ['Patrimônio líquido', hgFormatCompacto(fin.equity)],
+              ['Cotas emitidas', hgFormatCompacto(fin.quota_count)],
             ],
           },
           {
@@ -1075,72 +1081,6 @@
           btnCompartilhar.addEventListener('click', () => hgCompartilharAtivo(a, btnCompartilhar));
         }
 
-        // P/VP não vem na HG Brasil — busca à parte na brapi.dev, só para FIIs.
-        if (a.kind === 'fii') {
-          const grid = resultadoEl.querySelector('.hg-grid-dados');
-          if (grid) {
-            grid.insertAdjacentHTML('beforeend', `
-              <div class="hg-grupo-titulo">Valuation</div>
-              <div>
-                <span>P/VP</span>
-                <strong id="hgPvpValor" title="Carregando...">Carregando...</strong>
-              </div>
-              <div>
-                <span>VPA (valor patrimonial/cota)</span>
-                <strong id="hgVpaValor" title="Carregando...">Carregando...</strong>
-              </div>
-            `);
-            hgCarregarPVP(a.symbol);
-          }
-        }
-      }
-
-      // Busca o P/VP (e VPA) de um FII na brapi.dev, já que a HG Brasil não
-      // retorna esse indicador. Atualiza os campos injetados no card.
-      //
-      // Importante: /api/quote/{symbol}?modules=defaultKeyStatistics é voltado
-      // para ações e não preenche priceToBook/bookValue para FIIs. O endpoint
-      // certo para fundos imobiliários é o /api/v2/fii/indicators, que usa os
-      // nomes priceToNav (P/VP) e navPerShare (VPA).
-      async function hgCarregarPVP(symbol) {
-        const elPvp = document.getElementById('hgPvpValor');
-        const elVpa = document.getElementById('hgVpaValor');
-        if (!elPvp || !elVpa) return;
-
-        try {
-          const url = `https://brapi.dev/api/v2/fii/indicators?symbols=${encodeURIComponent(symbol)}&token=${encodeURIComponent(CHAVE_BRAPI)}`;
-          const resp = await fetch(url);
-          const data = await resp.json();
-
-          // A API pode responder em "indicators" ou "fiis" dependendo da versão.
-          const lista = data?.indicators ?? data?.fiis ?? [];
-          const info = Array.isArray(lista)
-            ? lista.find(f => f?.symbol?.toUpperCase() === symbol.toUpperCase()) ?? lista[0]
-            : null;
-
-          let pvp = info?.priceToNav ?? info?.pvp;
-          let vpa = info?.navPerShare ?? info?.vpa;
-
-          // Fallback: se o endpoint dedicado de FIIs não trouxer nada, tenta o
-          // endpoint genérico de ações (raramente populado para FIIs, mas não custa tentar).
-          if (typeof pvp !== 'number' && typeof vpa !== 'number') {
-            const urlFallback = `https://brapi.dev/api/quote/${encodeURIComponent(symbol)}?modules=defaultKeyStatistics&token=${encodeURIComponent(CHAVE_BRAPI)}`;
-            const respFallback = await fetch(urlFallback);
-            const dataFallback = await respFallback.json();
-            const stats = dataFallback?.results?.[0]?.defaultKeyStatistics;
-            pvp = stats?.priceToBook;
-            vpa = stats?.bookValue;
-          }
-
-          elPvp.textContent = typeof pvp === 'number' ? hgFormatNumero(pvp) : 'Indisponível';
-          elPvp.title = elPvp.textContent;
-          elVpa.textContent = typeof vpa === 'number' ? (hgFormatMoeda(vpa, 'BRL') ?? '—') : 'Indisponível';
-          elVpa.title = elVpa.textContent;
-        } catch (e) {
-          elPvp.textContent = 'Indisponível';
-          elVpa.textContent = 'Indisponível';
-          console.error('Erro ao buscar P/VP na brapi.dev:', e);
-        }
       }
 
       // Gera um link para esta consulta específica (ex: .../?ticker=PETR4)
