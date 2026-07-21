@@ -100,13 +100,18 @@ POOL_ACOES = [
     "ELET3", "CPLE6", "SBSP3", "CMIG4", "BBSE3", "VIVT3", "TAEE11", "AXIA3",
     "ALOS3",
 ]
-POOL_FIIS = [
-    "KNCR11", "CPTS11", "RECR11", "HGLG11", "VILG11", "VISC11", "MXRF11",
-    "XPML11", "BTLG11", "HFOF11", "KNSC11", "VGIR11", "GARE11", "TRXF11",
-    "IRIM11", "ALZR11", "XPCA11", "BTHF11",
-]
-RANKING_ACOES_QTD = 5
+POOL_FIIS_PAPEL = ["KNCR11", "KNSC11", "MCCI11"]
+POOL_FIIS_TIJOLO = ["BTLG11", "HGLG11", "XPLG11", "TRXF11"]
+POOL_FIIS = POOL_FIIS_PAPEL + POOL_FIIS_TIJOLO
+
+# Classificação tijolo (imóveis físicos) x papel (CRI/recebíveis), conforme
+# definido por Ricardo. Ajuste as listas acima (POOL_FIIS_PAPEL/TIJOLO) para
+# incluir/trocar tickers de cada categoria.
+FII_TIPO = {ticker: "papel" for ticker in POOL_FIIS_PAPEL}
+FII_TIPO.update({ticker: "tijolo" for ticker in POOL_FIIS_TIJOLO})
+RANKING_ACOES_QTD = 6
 RANKING_FIIS_QTD = 6
+RANKING_FIIS_POR_TIPO = 3  # 3 tijolo + 3 papel = 6 no total
 
 
 
@@ -403,7 +408,9 @@ def _tickers_b3(simbolos):
 
 def coletar_ranking_fiis(token, pool=None, quantidade=RANKING_FIIS_QTD):
     """Busca, dentro do pool de FIIs líquidos, os mais negociados (maior
-    volume do dia) via /v2/finance/quotes com sort=volume:desc."""
+    volume do dia) via /v2/finance/quotes com sort=volume:desc.
+    (Mantida para compatibilidade — não é mais usada no ranking principal,
+    que agora usa coletar_ranking_fiis_tijolo_papel.)"""
     pool = pool or POOL_FIIS
     params = {"tickers": _tickers_b3(pool), "sort": "volume:desc", "key": token}
     resp = requests.get(HGBRASIL_QUOTES_URL, params=params, timeout=TIMEOUT)
@@ -421,6 +428,82 @@ def coletar_ranking_fiis(token, pool=None, quantidade=RANKING_FIIS_QTD):
             "variacao_pct": quote.get("change_percent"),
         })
     return ranking
+
+
+def _extrair_p_vp(ativo):
+    """Tenta localizar o campo de P/VP na resposta da HG Brasil, testando os
+    nomes de campo mais prováveis (a doc pública não é 100% clara sobre o
+    nome exato para FIIs). Se nenhum bater, retorna None.
+    DEBUG: se o ranking de FIIs sair sem P/VP, veja no log do Actions o
+    "AVISO: campos disponíveis..." abaixo para descobrir o nome certo e me
+    avise para eu ajustar essa função."""
+    quote = ativo.get("quote") or {}
+    fund = ativo.get("fund") or ativo.get("fii") or {}
+    for fonte in (quote, fund, ativo):
+        for chave in ("p_vp", "pvp", "price_to_book", "priceToBook", "p_l"):
+            valor = fonte.get(chave)
+            if isinstance(valor, (int, float)):
+                return valor
+    return None
+
+
+def coletar_ranking_fiis_tijolo_papel(token, pool=None, por_tipo=RANKING_FIIS_POR_TIPO):
+    """Monta o ranking de 'Melhores FIIs' combinando P/VP e Dividend Yield
+    (mesma lógica usada na escolha dos '6 melhores FIIs' do boletim diário):
+    quanto menor o P/VP e maior o DY, melhor a pontuação. Retorna os
+    `por_tipo` melhores de cada categoria (tijolo/papel), juntos numa lista
+    (ex: 3 + 3 = 6)."""
+    pool = pool or POOL_FIIS
+    params = {"tickers": _tickers_b3(pool), "key": token}
+    resp = requests.get(HGBRASIL_QUOTES_URL, params=params, timeout=TIMEOUT)
+    resp.raise_for_status()
+    data = resp.json()
+    ativos = data.get("results") or []
+
+    if ativos:
+        print(
+            f"DEBUG: campos disponíveis num FII de exemplo ({ativos[0].get('symbol')}): "
+            f"{json.dumps(ativos[0], ensure_ascii=False)[:800]}",
+            file=sys.stderr,
+        )
+
+    candidatos = []
+    for ativo in ativos:
+        symbol = ativo.get("symbol")
+        if not symbol:
+            continue
+        quote = ativo.get("quote") or {}
+        dividendos = ativo.get("dividends") or {}
+        dy = dividendos.get("yield_12m_percent")
+        p_vp = _extrair_p_vp(ativo)
+
+        # Pontuação: prioriza DY alto; usa P/VP como desempate/penalização
+        # quando disponível (quanto mais longe de 1.0, pior).
+        if not isinstance(dy, (int, float)):
+            continue
+        pontuacao = dy - (abs(p_vp - 1.0) * 10 if isinstance(p_vp, (int, float)) else 0)
+
+        candidatos.append({
+            "ticker": symbol,
+            "nome": ativo.get("name") or "",
+            "preco": quote.get("value"),
+            "variacao_pct": quote.get("change_percent"),
+            "dividend_yield_pct": dy,
+            "p_vp": p_vp,
+            "tipo": FII_TIPO.get(symbol, "outros"),
+            "pontuacao": pontuacao,
+        })
+
+    ranking_final = []
+    for tipo in ("tijolo", "papel"):
+        do_tipo = sorted(
+            (c for c in candidatos if c["tipo"] == tipo),
+            key=lambda c: c["pontuacao"],
+            reverse=True,
+        )
+        ranking_final.extend(do_tipo[:por_tipo])
+
+    return ranking_final
 
 
 def _buscar_fundamentos_acoes(pool, token):
@@ -518,9 +601,9 @@ def coletar_ranking(token):
         print(f"AVISO: falha ao montar rankings de ações: {exc}", file=sys.stderr)
 
     try:
-        resultado["fiis"] = coletar_ranking_fiis(token)
+        resultado["fiis"] = coletar_ranking_fiis_tijolo_papel(token)
     except (requests.RequestException, ValueError, KeyError) as exc:
-        print(f"AVISO: falha ao buscar ranking de FIIs: {exc}", file=sys.stderr)
+        print(f"AVISO: falha ao buscar ranking de FIIs (tijolo/papel): {exc}", file=sys.stderr)
 
     return resultado
 

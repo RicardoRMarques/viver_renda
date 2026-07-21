@@ -319,6 +319,22 @@
       padding-top: 20px;
       border-top: 1px dashed var(--border);
     }
+    .ranking-acoes-colunas {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .ranking-coluna .ranking-title-sep {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+    @media (max-width: 760px) {
+      .ranking-acoes-colunas {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
     .ranking-list {
       display: flex;
       flex-direction: column;
@@ -589,36 +605,44 @@
           <div class="ranking-block">
             <h3 class="ranking-section-title">🏅 Rankings de Ativos — Ações</h3>
 
-            <h4 class="ranking-title">💰 Maiores Dividend Yield</h4>
-            <div class="ranking-list" id="rankingDy">
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-            </div>
+            <div class="ranking-acoes-colunas">
+              <div class="ranking-coluna">
+                <h4 class="ranking-title">💰 Maiores Dividend Yield</h4>
+                <div class="ranking-list" id="rankingDy">
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                </div>
+              </div>
 
-            <h4 class="ranking-title ranking-title-sep">📈 Maiores Valor de Mercado</h4>
-            <div class="ranking-list" id="rankingValorMercado">
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-            </div>
+              <div class="ranking-coluna">
+                <h4 class="ranking-title">📈 Maiores Valor de Mercado</h4>
+                <div class="ranking-list" id="rankingValorMercado">
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                </div>
+              </div>
 
-            <h4 class="ranking-title ranking-title-sep">🧾 Maiores Receita</h4>
-            <div class="ranking-list" id="rankingReceita">
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
+              <div class="ranking-coluna">
+                <h4 class="ranking-title">🧾 Maiores Receita</h4>
+                <div class="ranking-list" id="rankingReceita">
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="ranking-block">
-            <h3 class="ranking-title">🏢 Melhores FIIs mais buscados</h3>
+            <h3 class="ranking-title">🏢 6 Melhores FIIs (3 Tijolo + 3 Papel)</h3>
             <div class="ranking-list" id="rankingFiis">
               <div class="ranking-row skeleton"></div>
               <div class="ranking-row skeleton"></div>
