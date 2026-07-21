@@ -931,7 +931,6 @@
         const div = a.dividends || {};
         const cls = a.classification || {};
         const src = a.source || {};
-        const fin = a.financials || {};
         const moeda = a.currency;
 
         const grupos = [
@@ -979,15 +978,6 @@
             campos: [
               ['DY (12 meses)', typeof div.yield_12m_percent === 'number' ? `${hgFormatNumero(div.yield_12m_percent)}%` : null],
               ['Dividendos (12m, R$)', hgFormatMoeda(div.yield_12m_cash, moeda)],
-            ],
-          },
-          {
-            titulo: 'Valuation',
-            campos: [
-              ['P/VP', typeof fin.price_to_book_ratio === 'number' ? hgFormatNumero(fin.price_to_book_ratio) : null],
-              ['VPA (valor patrimonial/cota)', hgFormatMoeda(fin.equity_per_share, moeda)],
-              ['Patrimônio líquido', hgFormatCompacto(fin.equity)],
-              ['Cotas emitidas', hgFormatCompacto(fin.quota_count)],
             ],
           },
           {
@@ -1081,6 +1071,56 @@
           btnCompartilhar.addEventListener('click', () => hgCompartilharAtivo(a, btnCompartilhar));
         }
 
+        // P/VP e VPA (equity_per_share) só vêm no endpoint mais antigo da HG
+        // Brasil, /finance/stock_price (o /v2/finance/quotes usado acima é um
+        // payload enxuto e não inclui "financials"). Busca à parte e injeta
+        // no card assim que chegar. Vale tanto para ações quanto para FIIs.
+        if (a.kind === 'fii' || a.kind === 'stock') {
+          const grid = resultadoEl.querySelector('.hg-grid-dados');
+          if (grid) {
+            grid.insertAdjacentHTML('beforeend', `
+              <div class="hg-grupo-titulo">Valuation</div>
+              <div>
+                <span>P/VP</span>
+                <strong id="hgPvpValor" title="Carregando...">Carregando...</strong>
+              </div>
+              <div>
+                <span>VPA (valor patrimonial/cota)</span>
+                <strong id="hgVpaValor" title="Carregando...">Carregando...</strong>
+              </div>
+            `);
+            hgCarregarValuation(a.symbol, a.currency);
+          }
+        }
+      }
+
+      // Busca o P/VP e VPA (campo "financials") no endpoint /finance/stock_price
+      // da própria HG Brasil, que não vem no /v2/finance/quotes usado no resto
+      // do card. Atualiza os elementos já injetados no DOM.
+      async function hgCarregarValuation(symbol, moeda) {
+        const elPvp = document.getElementById('hgPvpValor');
+        const elVpa = document.getElementById('hgVpaValor');
+        if (!elPvp || !elVpa) return;
+
+        try {
+          const url = `https://api.hgbrasil.com/finance/stock_price?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&symbol=${encodeURIComponent(symbol)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const info = data?.results?.[symbol] || data?.results?.[symbol?.toUpperCase()];
+          const fin = info?.financials || {};
+
+          const pvp = fin?.price_to_book_ratio;
+          const vpa = fin?.equity_per_share;
+
+          elPvp.textContent = typeof pvp === 'number' ? hgFormatNumero(pvp) : 'Indisponível';
+          elPvp.title = elPvp.textContent;
+          elVpa.textContent = typeof vpa === 'number' ? (hgFormatMoeda(vpa, moeda) ?? '—') : 'Indisponível';
+          elVpa.title = elVpa.textContent;
+        } catch (e) {
+          elPvp.textContent = 'Indisponível';
+          elVpa.textContent = 'Indisponível';
+          console.error('Erro ao buscar P/VP na HG Brasil (stock_price):', e);
+        }
       }
 
       // Gera um link para esta consulta específica (ex: .../?ticker=PETR4)
