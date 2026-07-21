@@ -432,6 +432,12 @@ def _buscar_fundamentos_fiis(pool, token):
             f"{json.dumps(ativos[0], ensure_ascii=False)[:800]}",
             file=sys.stderr,
         )
+    else:
+        print(
+            "DEBUG: /v2/finance/quotes (FIIs) voltou sem 'results'. Resposta bruta: "
+            f"{json.dumps(data, ensure_ascii=False)[:800]}",
+            file=sys.stderr,
+        )
 
     fundamentos = {}
     for ativo in ativos:
@@ -487,9 +493,17 @@ def _buscar_fundamentos_acoes(pool, token):
     resp = requests.get(HGBRASIL_QUOTES_URL, params=params, timeout=TIMEOUT)
     resp.raise_for_status()
     data = resp.json()
+    resultados_brutos = data.get("results") or []
+
+    if not resultados_brutos:
+        print(
+            "DEBUG: /v2/finance/quotes (ações) voltou sem 'results'. Resposta bruta: "
+            f"{json.dumps(data, ensure_ascii=False)[:800]}",
+            file=sys.stderr,
+        )
 
     fundamentos = {}
-    for ativo in data.get("results") or []:
+    for ativo in resultados_brutos:
         symbol = ativo.get("symbol")
         if not symbol:
             continue
