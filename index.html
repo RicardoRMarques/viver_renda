@@ -593,7 +593,7 @@
 
       <div class="hg-painel">
         <div class="hg-linha-busca">
-          <input type="text" id="hgTickerInput" value="PETR4" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" />
+          <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" />
           <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
         </div>
 
@@ -627,7 +627,7 @@
 
             <div class="ranking-acoes-colunas">
               <div class="ranking-coluna">
-                <h4 class="ranking-title">💰 Maiores Dividend Yield</h4>
+                <h4 class="ranking-title">💰 Maior Dividend Yield</h4>
                 <div class="ranking-list" id="rankingDy">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -638,7 +638,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">📈 Maiores Valor de Mercado</h4>
+                <h4 class="ranking-title">📈 Maior Valor de Mercado</h4>
                 <div class="ranking-list" id="rankingValorMercado">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -649,7 +649,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">🧾 Maiores Receita</h4>
+                <h4 class="ranking-title">🧾 Maior Receita</h4>
                 <div class="ranking-list" id="rankingReceita">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -1134,18 +1134,17 @@
       btnBuscar.addEventListener('click', hgBuscarAtivo);
       inputTicker.addEventListener('keydown', (e) => { if (e.key === 'Enter') hgBuscarAtivo(); });
 
-      // Se o link tiver ?ticker=XXX (ex: vindo de um compartilhamento), usa
-      // esse ticker como ponto de partida em vez do padrão (PETR4) e rola a
-      // página até a seção de consulta.
+      // Por padrão o campo de consulta abre vazio, sem buscar nada
+      // automaticamente. Só dispara a busca sozinha se o link tiver
+      // ?ticker=XXX (ex: vindo de um compartilhamento) — nesse caso também
+      // rola a página até a seção de consulta.
       const parametrosUrl = new URLSearchParams(window.location.search);
       const tickerDaUrl = parametrosUrl.get('ticker');
       if (tickerDaUrl) {
         inputTicker.value = tickerDaUrl.toUpperCase();
         document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        hgBuscarAtivo();
       }
-
-      // Carrega o ticker inicial automaticamente (chave já embutida)
-      hgBuscarAtivo();
     })();
 
 
