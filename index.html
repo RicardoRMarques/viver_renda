@@ -1552,6 +1552,148 @@
     }
     carregarIndices();
 
+    // ============================================================
+    // ANÁLISE FUNDAMENTALISTA (histórico anual: P/L, P/VP, margens,
+    // ROE, ROIC, endividamento, dividendos) via /v2/finance/fundamentals
+    // ============================================================
+    (function () {
+      const inputFund = document.getElementById('hgFundTickerInput');
+      const btnFund = document.getElementById('hgFundBtnBuscar');
+      const statusFund = document.getElementById('hgFundStatus');
+      const resultadoFund = document.getElementById('hgFundResultado');
+      const chipsFund = document.querySelectorAll('#analise-fundamentalista .hg-chip');
+
+      // Linhas da tabela: [rótulo, grupo, campo, formato]
+      // formato: 'num' (2 casas), 'pct' (percentual), 'moeda'
+      const LINHAS_FUND = [
+        ['P/L',               'valuation',     'price_to_earnings_ratio', 'num'],
+        ['P/VP',               'valuation',     'price_to_book_ratio',     'num'],
+        ['PEG',                'valuation',     'peg_ratio',               'num'],
+        ['P/Receita',          'valuation',     'price_to_sales_ratio',    'num'],
+        ['P/EBIT',             'valuation',     'price_to_ebit',           'num'],
+        ['P/EBITDA',           'valuation',     'price_to_ebitda',         'num'],
+        ['EV/EBITDA',          'valuation',     'ev_to_ebitda',            'num'],
+        ['EV/EBIT',            'valuation',     'ev_to_ebit',              'num'],
+        ['VPA',                'valuation',     'book_value_per_share',    'moeda'],
+        ['LPA',                'valuation',     'earnings_per_share',      'moeda'],
+        ['Margem bruta',       'margins',       'gross_profit_margin',     'pct'],
+        ['Margem EBITDA',      'margins',       'ebitda_margin',           'pct'],
+        ['Margem EBIT',        'margins',       'ebit_margin',             'pct'],
+        ['Margem líquida',     'margins',       'net_profit_margin',       'pct'],
+        ['ROE',                'profitability', 'return_on_equity',        'pct'],
+        ['ROA',                'profitability', 'return_on_assets',        'pct'],
+        ['ROIC',               'profitability', 'return_on_invested_capital', 'pct'],
+        ['ROCE',               'profitability', 'return_on_capital_employed', 'pct'],
+        ['Liquidez corrente',  'leverage',      'current_ratio',           'num'],
+        ['Dív.Líq/PL',         'leverage',      'debt_to_equity_ratio',    'num'],
+        ['Dív.Líq/EBITDA',     'leverage',      'net_debt_to_ebitda_ratio','num'],
+        ['PL/Ativos',          'leverage',      'equity_to_asset_ratio',   'num'],
+        ['Dividend Yield',     'dividends',     'yield_percent',           'pct'],
+      ];
+
+      function fmtCelula(valor, formato) {
+        if (typeof valor !== 'number') return '–';
+        if (formato === 'pct') return `${valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+        if (formato === 'moeda') return hgFormatMoeda(valor) ?? '–';
+        return hgFormatNumero(valor);
+      }
+
+      async function buscarFundamentos() {
+        const digitado = inputFund.value.trim().toUpperCase();
+        if (!digitado) return;
+        const ticker = digitado.startsWith('B3:') ? digitado : `B3:${digitado}`;
+        const simbolo = digitado.replace(/^B3:/, '');
+
+        statusFund.className = 'hg-status';
+        statusFund.textContent = `Carregando análise fundamentalista de ${simbolo}...`;
+        resultadoFund.innerHTML = '';
+
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent(ticker)}&period=annual`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+
+          if (data?.metadata?.key_status && data.metadata.key_status !== 'valid') {
+            throw new Error('Chave da HG Brasil inválida ou sem plano compatível com dados fundamentalistas.');
+          }
+
+          const info = data?.results?.[0];
+          if (!info || !Array.isArray(info.statements) || info.statements.length === 0) {
+            throw new Error(`Não encontramos dados fundamentalistas para "${simbolo}". Verifique o ticker ou tente outra ação.`);
+          }
+
+          renderizarFundamentos(info);
+          statusFund.textContent = '';
+        } catch (e) {
+          statusFund.className = 'hg-status erro';
+          statusFund.textContent = e.message || 'Erro ao consultar a análise fundamentalista. Tente novamente.';
+          console.error('Erro na análise fundamentalista:', e);
+        }
+      }
+
+      function renderizarFundamentos(info) {
+        const statements = info.statements;
+
+        // Cabeçalho de cada coluna: TTM primeiro (se houver), depois anos em ordem decrescente
+        const colunas = statements.map(s => ({
+          rotulo: s.period_type === 'ttm' ? 'TTM' : String(s.fiscal_year ?? s.fiscal_period ?? '—'),
+          statement: s,
+        }));
+
+        const linhasHtml = LINHAS_FUND.map(([rotulo, grupo, campo, formato]) => {
+          const celulas = colunas.map(col => {
+            const valor = col.statement?.[grupo]?.[campo];
+            return `<td>${fmtCelula(valor, formato)}</td>`;
+          }).join('');
+          return `<tr><th scope="row">${rotulo}</th>${celulas}</tr>`;
+        }).join('');
+
+        const cabecalhoHtml = colunas.map(c => `<th>${c.rotulo}</th>`).join('');
+
+        const nomeExibicao = info.name || info.symbol || '';
+        const setorHtml = info.classification?.sector
+          ? `<span class="hg-setor">${info.classification.sector}</span>`
+          : '';
+
+        resultadoFund.innerHTML = `
+          <div class="hg-card">
+            <div class="hg-card-topo">
+              <div class="hg-card-topo-info">
+                <div>
+                  <h3>${nomeExibicao} <span style="color:var(--muted); font-weight:600;">(${info.symbol})</span></h3>
+                  ${setorHtml}
+                </div>
+              </div>
+            </div>
+            <div class="hg-tabela-scroll" style="overflow-x:auto;">
+              <table class="hg-tabela-fundamentos" style="width:100%; border-collapse:collapse; font-family:'Courier New', monospace; font-size:0.85rem;">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit;">Indicador</th>
+                    ${cabecalhoHtml.replace(/<th>/g, '<th style="text-align:right; padding:8px 10px; color:var(--muted); font-family:inherit; white-space:nowrap;">')}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${linhasHtml.replace(/<th scope="row">/g, '<th scope="row" style="text-align:left; padding:6px 10px; font-family:inherit; font-weight:700; white-space:nowrap; border-top:1px solid var(--border);">').replace(/<td>/g, '<td style="text-align:right; padding:6px 10px; border-top:1px solid var(--border);">')}
+                </tbody>
+              </table>
+            </div>
+            <p style="margin-top:12px; font-size:0.78rem; color:var(--muted);">
+              Fonte: HG Brasil · Período: anual (TTM = últimos 12 meses acumulados).
+            </p>
+          </div>`;
+      }
+
+      btnFund.addEventListener('click', buscarFundamentos);
+      inputFund.addEventListener('keydown', (e) => { if (e.key === 'Enter') buscarFundamentos(); });
+      chipsFund.forEach(chip => {
+        chip.addEventListener('click', () => {
+          inputFund.value = chip.dataset.ticker;
+          buscarFundamentos();
+        });
+      });
+    })();
+
     async function carregarNoticias() {
       const listEl = document.getElementById('noticiasList');
       try {
