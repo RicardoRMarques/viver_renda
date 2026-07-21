@@ -809,6 +809,10 @@
       // Só funciona quando a página é servida exatamente por esse domínio —
       // testar via file://, localhost ou outro domínio será bloqueado pela API.
       const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
+      // Chave da brapi.dev usada só pra buscar o P/VP dos FIIs (a HG Brasil
+      // não retorna esse dado). Idealmente também restrita ao domínio
+      // viverderenda.dev.br no painel da brapi.dev.
+      const CHAVE_BRAPI = 'eJTYGhkHYGdQZy8kDmnHgy'; // TODO: mover para um proxy e remover daqui
       const inputTicker = document.getElementById('hgTickerInput');
       const statusEl = document.getElementById('hgStatus');
       const resultadoEl = document.getElementById('hgResultado');
@@ -1056,6 +1060,52 @@
         const btnCompartilhar = document.getElementById('hgBtnCompartilhar');
         if (btnCompartilhar) {
           btnCompartilhar.addEventListener('click', () => hgCompartilharAtivo(a, btnCompartilhar));
+        }
+
+        // P/VP não vem na HG Brasil — busca à parte na brapi.dev, só para FIIs.
+        if (a.kind === 'fii') {
+          const grid = resultadoEl.querySelector('.hg-grid-dados');
+          if (grid) {
+            grid.insertAdjacentHTML('beforeend', `
+              <div class="hg-grupo-titulo">Valuation</div>
+              <div>
+                <span>P/VP</span>
+                <strong id="hgPvpValor" title="Carregando...">Carregando...</strong>
+              </div>
+              <div>
+                <span>VPA (valor patrimonial/cota)</span>
+                <strong id="hgVpaValor" title="Carregando...">Carregando...</strong>
+              </div>
+            `);
+            hgCarregarPVP(a.symbol);
+          }
+        }
+      }
+
+      // Busca o P/VP (e VPA) de um FII na brapi.dev, já que a HG Brasil não
+      // retorna esse indicador. Atualiza os campos injetados no card.
+      async function hgCarregarPVP(symbol) {
+        const elPvp = document.getElementById('hgPvpValor');
+        const elVpa = document.getElementById('hgVpaValor');
+        if (!elPvp || !elVpa) return;
+
+        try {
+          const url = `https://brapi.dev/api/quote/${encodeURIComponent(symbol)}?modules=defaultKeyStatistics&token=${encodeURIComponent(CHAVE_BRAPI)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const stats = data?.results?.[0]?.defaultKeyStatistics;
+
+          const pvp = stats?.priceToBook;
+          const vpa = stats?.bookValue;
+
+          elPvp.textContent = typeof pvp === 'number' ? hgFormatNumero(pvp) : 'Indisponível';
+          elPvp.title = elPvp.textContent;
+          elVpa.textContent = typeof vpa === 'number' ? (hgFormatMoeda(vpa, 'BRL') ?? '—') : 'Indisponível';
+          elVpa.title = elVpa.textContent;
+        } catch (e) {
+          elPvp.textContent = 'Indisponível';
+          elVpa.textContent = 'Indisponível';
+          console.error('Erro ao buscar P/VP na brapi.dev:', e);
         }
       }
 
