@@ -857,6 +857,38 @@
     // widgets da página (busca rápida, índices/sparkline, análise fundamentalista).
     const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
 
+    // Formatadores compartilhados por todos os widgets da página (busca
+    // rápida, índices/sparkline, análise fundamentalista). Escopo global —
+    // fora das IIFEs — para não repetir/perder acesso entre os blocos.
+    function hgFormatMoeda(valor, moeda = 'BRL') {
+      if (typeof valor !== 'number') return null;
+      const simbolo = moeda === 'BRL' ? 'R$ ' : (moeda === 'USD' ? 'US$ ' : '');
+      return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function hgFormatNumero(valor, casas = 2) {
+      return typeof valor === 'number'
+        ? valor.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas })
+        : null;
+    }
+
+    function hgFormatCompacto(valor) {
+      return typeof valor === 'number'
+        ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
+        : null;
+    }
+
+    function hgFormatData(iso, comHora = true) {
+      if (!iso) return null;
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return null;
+      return comHora ? d.toLocaleString('pt-BR') : d.toLocaleDateString('pt-BR');
+    }
+
+    function hgDataYYYYMMDD(d) {
+      return d.toISOString().slice(0, 10);
+    }
+
     (function () {
       const inputTicker = document.getElementById('hgTickerInput');
       const statusEl = document.getElementById('hgStatus');
@@ -872,35 +904,6 @@
           hgBuscarAtivo();
         });
       });
-
-      function hgFormatMoeda(valor, moeda = 'BRL') {
-        if (typeof valor !== 'number') return null;
-        const simbolo = moeda === 'BRL' ? 'R$ ' : (moeda === 'USD' ? 'US$ ' : '');
-        return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      }
-
-      function hgFormatNumero(valor, casas = 2) {
-        return typeof valor === 'number'
-          ? valor.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas })
-          : null;
-      }
-
-      function hgFormatCompacto(valor) {
-        return typeof valor === 'number'
-          ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
-          : null;
-      }
-
-      function hgFormatData(iso, comHora = true) {
-        if (!iso) return null;
-        const d = new Date(iso);
-        if (isNaN(d.getTime())) return null;
-        return comHora ? d.toLocaleString('pt-BR') : d.toLocaleDateString('pt-BR');
-      }
-
-      function hgDataYYYYMMDD(d) {
-        return d.toISOString().slice(0, 10);
-      }
 
       async function hgBuscarAtivo() {
         const digitado = inputTicker.value.trim().toUpperCase();
