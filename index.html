@@ -642,14 +642,44 @@
           </div>
 
           <div class="ranking-block">
-            <h3 class="ranking-title">🏢 6 Melhores FIIs (3 Tijolo + 3 Papel)</h3>
-            <div class="ranking-list" id="rankingFiis">
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
-              <div class="ranking-row skeleton"></div>
+            <h3 class="ranking-section-title">🏢 Rankings de Ativos — FIIs</h3>
+
+            <div class="ranking-acoes-colunas">
+              <div class="ranking-coluna">
+                <h4 class="ranking-title">🏦 Maiores Valor Patrimonial</h4>
+                <div class="ranking-list" id="rankingFiisPatrimonio">
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                </div>
+              </div>
+
+              <div class="ranking-coluna">
+                <h4 class="ranking-title">💰 Maiores Dividend Yield</h4>
+                <div class="ranking-list" id="rankingFiisDy">
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                </div>
+              </div>
+
+              <div class="ranking-coluna">
+                <h4 class="ranking-title">🔎 Mais Negociados</h4>
+                <div class="ranking-list" id="rankingFiisNegociados">
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                  <div class="ranking-row skeleton"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1173,17 +1203,22 @@
         if (!resp.ok) throw new Error('arquivo não encontrado');
         const ranking = await resp.json();
         const acoes = ranking.acoes || {};
+        const fiis = ranking.fiis || {};
 
         renderizarRankingMetrica('rankingDy', acoes.dividend_yield, 'percentual');
         renderizarRankingMetrica('rankingValorMercado', acoes.valor_mercado, 'moeda');
         renderizarRankingMetrica('rankingReceita', acoes.receita, 'moeda');
-        
-        renderizarRanking('rankingFiis', ranking.fiis);
+
+        renderizarRankingMetrica('rankingFiisPatrimonio', fiis.valor_patrimonial, 'moeda');
+        renderizarRankingMetrica('rankingFiisDy', fiis.dividend_yield, 'percentual');
+        renderizarRanking('rankingFiisNegociados', fiis.mais_negociados);
       } catch (e) {
         renderizarRankingMetrica('rankingDy', [], 'percentual');
         renderizarRankingMetrica('rankingValorMercado', [], 'moeda');
         renderizarRankingMetrica('rankingReceita', [], 'moeda');
-        renderizarRanking('rankingFiis', []);
+        renderizarRankingMetrica('rankingFiisPatrimonio', [], 'moeda');
+        renderizarRankingMetrica('rankingFiisDy', [], 'percentual');
+        renderizarRanking('rankingFiisNegociados', []);
       }
     }
     carregarRanking();
