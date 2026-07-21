@@ -453,6 +453,7 @@
       border-radius: 12px;
       background: var(--deep);
       border: 1px solid var(--border);
+      gap: 10px;
     }
     .indice-row.skeleton {
       height: 44px;
@@ -464,8 +465,14 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
+    .indice-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
     .indice-label { font-weight: 700; color: var(--text); font-size: 0.92rem; }
     .indice-value { font-family: "Courier New", monospace; color: var(--muted); font-size: 0.9rem; }
+    .indice-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .indice-sparkline { display: block; width: 70px; height: 30px; flex-shrink: 0; }
+    .indice-sparkline .spark-linha { fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .indice-sparkline .spark-referencia { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.5; }
+    .indice-sparkline .spark-area { opacity: 0.12; }
     .indice-change {
       font-family: "Courier New", monospace;
       font-weight: 800;
@@ -646,6 +653,32 @@
         <div id="hgResultado"></div>
       </div>
     </section>
+
+    <!-- ANÁLISE FUNDAMENTALISTA: histórico de indicadores por ano (HG Brasil) -->
+    <section class="hg-busca" id="analise-fundamentalista">
+      <h2 class="hg-titulo">📊 Consultar Ações — Análise Fundamentalista</h2>
+      <p class="hg-subtitulo">Veja o histórico anual de P/L, P/VP, margens, ROE, ROIC e mais — TTM e exercícios anteriores.</p>
+
+      <div class="hg-painel">
+        <div class="hg-linha-busca">
+          <input type="text" id="hgFundTickerInput" placeholder="Ex: PETR4, VALE3, KLBN11..." autocomplete="off" />
+          <button class="hg-btn" id="hgFundBtnBuscar">Consultar</button>
+        </div>
+
+        <div class="hg-chips">
+          <span class="hg-chip" data-ticker="PETR4">PETR4</span>
+          <span class="hg-chip" data-ticker="VALE3">VALE3</span>
+          <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
+          <span class="hg-chip" data-ticker="KLBN11">KLBN11</span>
+          <span class="hg-chip" data-ticker="WEGE3">WEGE3</span>
+          <span class="hg-chip" data-ticker="BBAS3">BBAS3</span>
+        </div>
+
+        <div class="hg-status" id="hgFundStatus"></div>
+        <div id="hgFundResultado"></div>
+      </div>
+    </section>
+
 
     <section class="section-intro" id="consultas">
       <h1>Explore o mercado. <br><span style="color: var(--primary);">Tome melhores decisões.</span></h1>
@@ -1381,6 +1414,88 @@
     })();
 
 
+    // Mapeia o rótulo exibido no boletim para o símbolo usado no endpoint
+    // histórico intradiário da HG Brasil (/v2/finance/historical). Índices
+    // fora dessa lista (IPCA, CPI EUA, Selic etc.) não têm sparkline, pois
+    // são séries mensais/de baixa frequência — não fazem sentido como
+    // gráfico intradiário.
+    const HG_SPARK_SIMBOLOS = {
+      'IBOVESPA': 'BVSP',
+      'IBOV': 'BVSP',
+      'DÓLAR': 'USDBRL',
+      'DOLAR': 'USDBRL',
+      'USD/BRL': 'USDBRL',
+      'EURO': 'EURBRL',
+      'EUR/BRL': 'EURBRL',
+      'BITCOIN': 'BTCBRL',
+      'DOW JONES': 'DJI',
+      'DOW': 'DJI',
+      'NASDAQ': 'IXIC',
+    };
+
+    function hgSimboloSparkline(label) {
+      if (!label) return null;
+      const chave = label.trim().toUpperCase();
+      return HG_SPARK_SIMBOLOS[chave] || null;
+    }
+
+    // Desenha um sparkline SVG (linha + área leve + linha tracejada de
+    // referência no valor inicial), no mesmo espírito do widget de
+    // "Mercados" do Bing/MSN: verde subindo, vermelho caindo.
+    function hgDesenharSparkline(valores) {
+      if (!Array.isArray(valores) || valores.length < 2) return '';
+      const largura = 70, altura = 30, margem = 3;
+      const min = Math.min(...valores);
+      const max = Math.max(...valores);
+      const alcance = (max - min) || 1;
+      const emAlta = valores[valores.length - 1] >= valores[0];
+      const cor = emAlta ? '#3ddc73' : '#ff5a5a';
+
+      const x = (i) => margem + (i / (valores.length - 1)) * (largura - margem * 2);
+      const y = (v) => altura - margem - ((v - min) / alcance) * (altura - margem * 2);
+
+      const pontos = valores.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+      const linha = 'M' + pontos.join(' L');
+      const areaBase = altura - margem;
+      const area = `M${x(0).toFixed(1)},${areaBase} L${pontos.join(' L')} L${x(valores.length - 1).toFixed(1)},${areaBase} Z`;
+      const yReferencia = y(valores[0]).toFixed(1);
+
+      return `
+        <svg class="indice-sparkline" viewBox="0 0 ${largura} ${altura}" preserveAspectRatio="none" aria-hidden="true">
+          <line class="spark-referencia" x1="${margem}" y1="${yReferencia}" x2="${largura - margem}" y2="${yReferencia}" />
+          <path class="spark-area" d="${area}" fill="${cor}" />
+          <path class="spark-linha" d="${linha}" stroke="${cor}" />
+        </svg>`;
+    }
+
+    // Busca o histórico intradiário (amostrado de 15 em 15 min) de um índice
+    // na HG Brasil e injeta o sparkline já renderizado no lugar do
+    // placeholder. Chamado de forma independente por item, sem travar a
+    // renderização do restante do boletim.
+    async function hgCarregarSparkline(simbolo, elId) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      try {
+        const url = `https://api.hgbrasil.com/v2/finance/historical?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&symbols=${encodeURIComponent(simbolo)}&days_ago=1&sample_by=15m`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        const serie = data?.results?.[simbolo] || data?.results?.[simbolo.toLowerCase()] || data?.results?.[simbolo.toUpperCase()];
+        const pontos = Array.isArray(serie) ? serie : (Array.isArray(serie?.history) ? serie.history : null);
+        const valores = pontos
+          ?.map(p => (typeof p === 'number' ? p : (p?.close ?? p?.value ?? p?.price)))
+          .filter(v => typeof v === 'number');
+
+        if (valores && valores.length >= 2) {
+          el.innerHTML = hgDesenharSparkline(valores);
+        } else {
+          el.remove();
+        }
+      } catch (e) {
+        el.remove();
+        console.error(`Erro ao buscar sparkline de ${simbolo}:`, e);
+      }
+    }
+
     async function carregarIndices() {
       const rowsEl = document.getElementById('indicesRows');
       try {
@@ -1389,7 +1504,14 @@
         const indices = await resp.json();
         if (!Array.isArray(indices) || indices.length === 0) throw new Error('vazio');
 
-        rowsEl.innerHTML = indices.map(item => {
+        const sparksParaCarregar = [];
+
+        rowsEl.innerHTML = indices.map((item, i) => {
+          const simboloSpark = hgSimboloSparkline(item.label);
+          const sparkId = `hgSpark${i}`;
+          if (simboloSpark) sparksParaCarregar.push({ simbolo: simboloSpark, elId: sparkId });
+          const sparkHtml = simboloSpark ? `<span class="indice-sparkline" id="${sparkId}"></span>` : '';
+
           if (typeof item.valor === 'number') {
             const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
             const emAlta = variacao >= 0;
@@ -1398,20 +1520,32 @@
 
             return `
               <div class="indice-row">
-                <span class="indice-label">${item.label}</span>
-                <span class="indice-value">${prefixo}${valorFormatado}${item.prefixo === 'pontos' ? ' pts' : ''}</span>
-                <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+                <div class="indice-info">
+                  <span class="indice-label">${item.label}</span>
+                  <span class="indice-value">${prefixo}${valorFormatado}${item.prefixo === 'pontos' ? ' pts' : ''}</span>
+                </div>
+                <div class="indice-right">
+                  ${sparkHtml}
+                  <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+                </div>
               </div>`;
           }
           const variacao = typeof item.valor_pct === 'number' ? item.valor_pct : 0;
           const emAlta = variacao >= 0;
           return `
             <div class="indice-row">
-              <span class="indice-label">${item.label}</span>
-              <span class="indice-value">—</span>
-              <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+              <div class="indice-info">
+                <span class="indice-label">${item.label}</span>
+                <span class="indice-value">—</span>
+              </div>
+              <div class="indice-right">
+                ${sparkHtml}
+                <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+              </div>
             </div>`;
         }).join('');
+
+        sparksParaCarregar.forEach(({ simbolo, elId }) => hgCarregarSparkline(simbolo, elId));
       } catch (e) {
         rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Índices ainda não gerados — aguarde o robô rodar.</span></div>';
       }
