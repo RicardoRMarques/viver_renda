@@ -401,6 +401,34 @@ def _tickers_b3(simbolos):
     return ",".join(f"B3:{s}" for s in simbolos)
 
 
+# O plano da chave usada aqui (server-side) limita a 5 tickers por
+# requisição no endpoint /v2/finance/quotes (erro "MAX_PER_REQUEST" quando
+# excedido). Por isso, toda busca de fundamentos é feita em lotes.
+HGBRASIL_MAX_TICKERS_POR_REQUISICAO = 5
+
+
+def _buscar_quotes_em_lotes(pool, token, tamanho_lote=HGBRASIL_MAX_TICKERS_POR_REQUISICAO):
+    """Busca cotações/fundamentos de um pool de tickers via /v2/finance/quotes,
+    dividindo em lotes de `tamanho_lote` para respeitar o limite do plano
+    (erro MAX_PER_REQUEST). Retorna a lista combinada de 'results' de todos
+    os lotes."""
+    resultados = []
+    for i in range(0, len(pool), tamanho_lote):
+        lote = pool[i:i + tamanho_lote]
+        params = {"tickers": _tickers_b3(lote), "key": token}
+        resp = requests.get(HGBRASIL_QUOTES_URL, params=params, timeout=TIMEOUT)
+        resp.raise_for_status()
+        data = resp.json()
+        lote_resultados = data.get("results") or []
+        if not lote_resultados and data.get("errors"):
+            print(
+                f"AVISO: lote {lote} retornou erro da HG Brasil: {data.get('errors')}",
+                file=sys.stderr,
+            )
+        resultados.extend(lote_resultados)
+    return resultados
+
+
 def _extrair_patrimonio(ativo):
     """Tenta localizar o campo de patrimônio líquido/valor patrimonial do
     fundo na resposta da HG Brasil, testando os nomes mais prováveis. Se
@@ -418,13 +446,9 @@ def _extrair_patrimonio(ativo):
 
 
 def _buscar_fundamentos_fiis(pool, token):
-    """Busca, num único request, preço, variação, Dividend Yield (12m) e
+    """Busca, em lotes de 5 tickers, preço, variação, Dividend Yield (12m) e
     valor patrimonial de todo o pool de FIIs via /v2/finance/quotes."""
-    params = {"tickers": _tickers_b3(pool), "key": token}
-    resp = requests.get(HGBRASIL_QUOTES_URL, params=params, timeout=TIMEOUT)
-    resp.raise_for_status()
-    data = resp.json()
-    ativos = data.get("results") or []
+    ativos = _buscar_quotes_em_lotes(pool, token)
 
     if ativos:
         print(
@@ -433,11 +457,7 @@ def _buscar_fundamentos_fiis(pool, token):
             file=sys.stderr,
         )
     else:
-        print(
-            "DEBUG: /v2/finance/quotes (FIIs) voltou sem 'results'. Resposta bruta: "
-            f"{json.dumps(data, ensure_ascii=False)[:800]}",
-            file=sys.stderr,
-        )
+        print("DEBUG: /v2/finance/quotes (FIIs) não retornou nenhum resultado em nenhum lote.", file=sys.stderr)
 
     fundamentos = {}
     for ativo in ativos:
@@ -487,20 +507,12 @@ def coletar_rankings_fiis(token, pool=None, qtd=RANKING_FIIS_QTD):
 
 
 def _buscar_fundamentos_acoes(pool, token):
-    """Busca, num único request, preço, Dividend Yield (12m) e valor de
+    """Busca, em lotes de 5 tickers, preço, Dividend Yield (12m) e valor de
     mercado de todo o pool de ações via /v2/finance/quotes."""
-    params = {"tickers": _tickers_b3(pool), "key": token}
-    resp = requests.get(HGBRASIL_QUOTES_URL, params=params, timeout=TIMEOUT)
-    resp.raise_for_status()
-    data = resp.json()
-    resultados_brutos = data.get("results") or []
+    resultados_brutos = _buscar_quotes_em_lotes(pool, token)
 
     if not resultados_brutos:
-        print(
-            "DEBUG: /v2/finance/quotes (ações) voltou sem 'results'. Resposta bruta: "
-            f"{json.dumps(data, ensure_ascii=False)[:800]}",
-            file=sys.stderr,
-        )
+        print("DEBUG: /v2/finance/quotes (ações) não retornou nenhum resultado em nenhum lote.", file=sys.stderr)
 
     fundamentos = {}
     for ativo in resultados_brutos:
@@ -522,18 +534,20 @@ def _buscar_fundamentos_acoes(pool, token):
 
 def _buscar_receita_acoes(pool, token):
     """Busca a receita TTM de cada ação do pool via /v2/finance/income-statements
-    (endpoint Beta — requer plano compatível). Retorna {ticker: receita}."""
-    params = {"tickers": _tickers_b3(pool), "period": "annual", "key": token}
-    resp = requests.get(HGBRASIL_INCOME_URL, params=params, timeout=TIMEOUT)
-    resp.raise_for_status()
-    data = resp.json()
-
+    (endpoint Beta — requer plano compatível). Retorna {ticker: receita}.
+    Também respeita o limite de tickers por requisição do plano."""
     receitas = {}
-    for ativo in data.get("results") or []:
-        symbol = ativo.get("symbol")
-        statements = ativo.get("statements") or []
-        if symbol and statements:
-            receitas[symbol] = statements[0].get("revenue")  # TTM (ou mais recente)
+    for i in range(0, len(pool), HGBRASIL_MAX_TICKERS_POR_REQUISICAO):
+        lote = pool[i:i + HGBRASIL_MAX_TICKERS_POR_REQUISICAO]
+        params = {"tickers": _tickers_b3(lote), "period": "annual", "key": token}
+        resp = requests.get(HGBRASIL_INCOME_URL, params=params, timeout=TIMEOUT)
+        resp.raise_for_status()
+        data = resp.json()
+        for ativo in data.get("results") or []:
+            symbol = ativo.get("symbol")
+            statements = ativo.get("statements") or []
+            if symbol and statements:
+                receitas[symbol] = statements[0].get("revenue")  # TTM (ou mais recente)
     return receitas
 
 
