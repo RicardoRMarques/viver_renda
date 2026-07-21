@@ -204,6 +204,49 @@
         "valor": 13.36
       }
     ],
-    "mais_negociados": []
+    "mais_negociados": [
+      {
+        "ticker": "MXRF11",
+        "nome": "FII Maxi Ren",
+        "preco": 9.7,
+        "variacao_pct": -0.3083,
+        "valor": 1376662
+      },
+      {
+        "ticker": "GARE11",
+        "nome": "FII Guardian",
+        "preco": 8.13,
+        "variacao_pct": 0.1232,
+        "valor": 1296268
+      },
+      {
+        "ticker": "CPTS11",
+        "nome": "FII Capi Sec",
+        "preco": 7.49,
+        "variacao_pct": 0.0,
+        "valor": 601074
+      },
+      {
+        "ticker": "KNSC11",
+        "nome": "FII Kinea Sc",
+        "preco": 9.18,
+        "variacao_pct": 0.2183,
+        "valor": 598067
+      },
+      {
+        "ticker": "VGIR11",
+        "nome": "FII Valreiii",
+        "preco": 9.68,
+        "variacao_pct": 0.0,
+        "valor": 372694
+      },
+      {
+        "ticker": "BTHF11",
+        "nome": "FII BTHF",
+        "preco": 9.01,
+        "variacao_pct": -0.1109,
+        "valor": 327117
+      }
+    ]
   }
 }
