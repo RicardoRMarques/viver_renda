@@ -465,13 +465,14 @@ def _buscar_fundamentos_fiis(pool, token):
         if not symbol:
             continue
         quote = ativo.get("quote") or {}
+        mercado = ativo.get("market") or {}
         dividendos = ativo.get("dividends") or {}
         fundamentos[symbol] = {
             "ticker": symbol,
             "nome": ativo.get("name") or "",
             "preco": quote.get("value"),
             "variacao_pct": quote.get("change_percent"),
-            "volume": quote.get("volume"),
+            "volume": mercado.get("volume"),
             "dividend_yield_pct": dividendos.get("yield_12m_percent"),
             "patrimonio": _extrair_patrimonio(ativo),
         }
