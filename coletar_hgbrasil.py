@@ -91,9 +91,11 @@ HGBRASIL_INCOME_URL = "https://api.hgbrasil.com/v2/finance/income-statements"
 # IPCA: variação mensal, via API pública do Banco Central (série SGS 433)
 BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
 
-# IPCA acumulado no ano: não existe uma série pronta pra isso no BCB, então
-# compomos os valores mensais (série 433) desde janeiro do ano corrente.
-BCB_IPCA_ANO_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados"
+# IPCA acumulado em 12 meses (janela móvel, não calendário): compomos os
+# últimos 12 valores mensais da série 433. É a métrica de inflação anual
+# "de verdade" usada pelo mercado (bem diferente do acumulado desde
+# janeiro, que amplifica demais quando anualizado no meio do ano).
+BCB_IPCA_12M_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/12?formato=json"
 
 # CPI (EUA): índice de preços ao consumidor, via API pública do BLS
 BLS_CPI_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/CUUR0000SA0"
@@ -291,18 +293,14 @@ def coletar_ipca():
         return None
 
 
-def coletar_ipca_acumulado_ano():
-    """IPCA acumulado no ano corrente, compondo os valores mensais (série SGS 433)
-    de janeiro até o mês mais recente disponível. Não existe uma série pronta
-    para o acumulado do ano no BCB, então o cálculo é feito aqui."""
+def coletar_ipca_12_meses():
+    """IPCA acumulado nos últimos 12 meses (janela móvel), compondo os
+    valores mensais mais recentes da série SGS 433. Essa é a métrica de
+    inflação anual usada pelo mercado (Focus, corretoras etc.) — diferente
+    do acumulado desde janeiro do ano corrente, que só reflete o ano
+    calendário e distorce muito se anualizado no meio do ano."""
     try:
-        hoje = date.today()
-        params = {
-            "formato": "json",
-            "dataInicial": f"01/01/{hoje.year}",
-            "dataFinal": hoje.strftime("%d/%m/%Y"),
-        }
-        resp = requests.get(BCB_IPCA_ANO_URL, params=params, timeout=TIMEOUT)
+        resp = requests.get(BCB_IPCA_12M_URL, timeout=TIMEOUT)
         resp.raise_for_status()
         dados = resp.json()
         if not dados:
@@ -316,13 +314,12 @@ def coletar_ipca_acumulado_ano():
         acumulado_pct = (fator_acumulado - 1) * 100
         ultimo_mes = dados[-1].get("data")
         return {
-            "label": "IPCA (acum. ano)",
+            "label": "IPCA (12 meses)",
             "valor_pct": acumulado_pct,
             "referencia": ultimo_mes,
-            # Número de meses que compõem o acumulado acima (jan até o mês
-            # mais recente). Usado no site para anualizar corretamente esse
-            # valor (ex: 7 meses acumulados -> projeção para 12 meses),
-            # em vez de usar o acumulado parcial como se já fosse anual.
+            # Sempre 12 (ou o que a API tiver retornado, se faltar histórico).
+            # Mantido por compatibilidade com o cálculo de anualização no site
+            # — com 12 meses reais, o valor já é o anual, sem distorção.
             "meses": len(dados),
         }
     except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
@@ -389,9 +386,9 @@ def coletar_indices(token):
     if ipca:
         indices.append(ipca)
 
-    ipca_ano = coletar_ipca_acumulado_ano()
-    if ipca_ano:
-        indices.append(ipca_ano)
+    ipca_12m = coletar_ipca_12_meses()
+    if ipca_12m:
+        indices.append(ipca_12m)
 
     cpi = coletar_cpi_eua()
     if cpi:

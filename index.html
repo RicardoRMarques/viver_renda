@@ -2150,11 +2150,12 @@
 
       function ipcaAnualPct() {
         // Importante: existem dois índices de IPCA no indices.json — o
-        // "IPCA (mensal)" (variação de só 1 mês, ex: 0,16%) e o "IPCA (acum.
-        // ano)" (acumulado de jan até o mês mais recente). Para uso anual
-        // na calculadora, sempre usamos o acumulado do ano, anualizado
-        // (projetado para 12 meses) — nunca o valor mensal isolado.
-        const item = obterItemIndice('IPCA (acum. ano)');
+        // "IPCA (mensal)" (variação de só 1 mês, ex: 0,16%) e o "IPCA (12
+        // meses)" (acumulado móvel dos últimos 12 meses, a métrica anual
+        // de mercado). Para uso anual na calculadora, sempre usamos o
+        // acumulado de 12 meses — nunca o valor mensal isolado nem o
+        // acumulado do ano-calendário anualizado (que distorce demais).
+        const item = obterItemIndice('IPCA (12 meses)');
         if (item && typeof item.valor_pct === 'number' && typeof item.meses === 'number' && item.meses > 0) {
           const fatorAcumulado = 1 + item.valor_pct / 100;
           const fatorAnualizado = Math.pow(fatorAcumulado, 12 / item.meses);
