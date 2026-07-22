@@ -1,11 +1,15 @@
 name: Atualizar Boletim (Notícias, Índices e Ranking)
 
 on:
-  # Roda em dias úteis, a cada hora, entre 12h e 22h UTC
-  # (aprox. 9h às 19h no horário de Brasília, cobrindo o pregão)
   schedule:
-    - cron: "0 12-22 * * 1-5"
-  # Permite rodar manualmente pela aba "Actions" no GitHub
+    # Índices e notícias: todos os dias, a cada 15 minutos, o dia inteiro.
+    - cron: "*/15 * * * *"
+    # Rankings de Ações/FIIs: só 1x por dia, às 12h UTC (9h em Brasília).
+    # Consome bem mais requisições (vários lotes de tickers + endpoint
+    # Beta de receita), por isso roda separado do restante.
+    - cron: "0 12 * * *"
+  # Permite rodar manualmente pela aba "Actions" no GitHub. Ao disparar
+  # manualmente, sempre atualiza os rankings também (fica marcado abaixo).
   workflow_dispatch: {}
 
 permissions:
@@ -26,9 +30,12 @@ jobs:
       - name: Instalar dependências
         run: pip install requests
 
-      - name: Rodar coleta de notícias, índices e ranking
+      - name: Rodar coleta de notícias, índices e (às vezes) ranking
         env:
           HGBRASIL_TOKEN: ${{ secrets.HGBRASIL_TOKEN }}
+          # Só ativa a coleta de rankings quando o disparo foi o cron das
+          # 12h UTC (1x/dia) ou quando rodou manualmente pela aba Actions.
+          COLETAR_RANKING: ${{ (github.event.schedule == '0 12 * * *' || github.event_name == 'workflow_dispatch') && '1' || '0' }}
         run: python coletar_hgbrasil.py
 
       - name: Commitar e enviar noticias.json, indices.json e ranking.json
