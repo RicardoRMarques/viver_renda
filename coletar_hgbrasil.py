@@ -319,6 +319,11 @@ def coletar_ipca_acumulado_ano():
             "label": "IPCA (acum. ano)",
             "valor_pct": acumulado_pct,
             "referencia": ultimo_mes,
+            # Número de meses que compõem o acumulado acima (jan até o mês
+            # mais recente). Usado no site para anualizar corretamente esse
+            # valor (ex: 7 meses acumulados -> projeção para 12 meses),
+            # em vez de usar o acumulado parcial como se já fosse anual.
+            "meses": len(dados),
         }
     except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
         print(f"AVISO: falha ao calcular IPCA acumulado no ano: {exc}", file=sys.stderr)

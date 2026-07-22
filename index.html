@@ -2131,30 +2131,47 @@
 
       // Tenta pegar Selic e IPCA já coletados pelo robô (indices.json) para
       // usar como padrão realista; se não achar, cai em valores de reserva.
-      function obterIndiceBase(label, chave) {
+      function obterItemIndice(labelExato) {
         const indices = window.hgIndicesCache;
         if (!Array.isArray(indices)) return null;
-        const item = indices.find(i => (i.label || '').toUpperCase().includes(label.toUpperCase()));
-        return item ? item[chave] : null;
+        return indices.find(i => (i.label || '').toUpperCase() === labelExato.toUpperCase()) || null;
       }
 
       function selicAnualPct() {
-        return obterIndiceBase('SELIC', 'valor_pct') ?? 15.0;
+        const item = obterItemIndice('Selic (meta)') || obterItemIndice('Selic');
+        return item?.valor_pct ?? 15.0;
       }
+
+      // CDI de mercado costuma ficar ~0,10 p.p. abaixo da Selic meta.
+      const SPREAD_CDI_SELIC = 0.10;
+      function cdiAnualPct() {
+        return selicAnualPct() - SPREAD_CDI_SELIC;
+      }
+
       function ipcaAnualPct() {
-        // Preferimos o IPCA acumulado 12 meses se o robô guardar em campo
-        // separado; senão usamos o valor_pct padrão como aproximação.
-        return obterIndiceBase('IPCA', 'valor_pct') ?? 4.5;
+        // Importante: existem dois índices de IPCA no indices.json — o
+        // "IPCA (mensal)" (variação de só 1 mês, ex: 0,16%) e o "IPCA (acum.
+        // ano)" (acumulado de jan até o mês mais recente). Para uso anual
+        // na calculadora, sempre usamos o acumulado do ano, anualizado
+        // (projetado para 12 meses) — nunca o valor mensal isolado.
+        const item = obterItemIndice('IPCA (acum. ano)');
+        if (item && typeof item.valor_pct === 'number' && typeof item.meses === 'number' && item.meses > 0) {
+          const fatorAcumulado = 1 + item.valor_pct / 100;
+          const fatorAnualizado = Math.pow(fatorAcumulado, 12 / item.meses);
+          return (fatorAnualizado - 1) * 100;
+        }
+        return 4.5; // reserva, caso o robô ainda não tenha gerado esse campo
       }
 
       // Definição dos produtos comparáveis, cada um com sua regra de taxa
       // padrão (usada na tabela de comparação) e se é tributado/tem custódia.
       function produtosComparaveis() {
         const selic = selicAnualPct();
+        const cdi = cdiAnualPct();
         const ipca = ipcaAnualPct();
         return [
-          { id: 'cdb', nome: 'CDB', tributado: true, custodia: false, taxaAnual: selic * 1.00 },
-          { id: 'lci', nome: 'LCI/LCA', tributado: false, custodia: false, taxaAnual: selic * 0.90 },
+          { id: 'cdb', nome: 'CDB', tributado: true, custodia: false, taxaAnual: cdi * 1.00 },
+          { id: 'lci', nome: 'LCI/LCA', tributado: false, custodia: false, taxaAnual: cdi * 0.90 },
           { id: 'tesouro_selic', nome: 'Tesouro Selic', tributado: true, custodia: true, taxaAnual: selic * 1.00 },
           { id: 'tesouro_pre', nome: 'Tesouro Prefixado', tributado: true, custodia: true, taxaAnual: selic + 0.5 },
           { id: 'tesouro_ipca', nome: 'Tesouro IPCA+', tributado: true, custodia: true, taxaAnual: (1 + 6.0 / 100) * (1 + ipca / 100) * 100 - 100 },
@@ -2205,7 +2222,7 @@
         if (ehCdbOuLci && indexador === 'cdi') {
           labelTaxa.textContent = '% do CDI';
           inTaxa.value = tipo === 'lci' ? '90' : '100';
-          ajudaTaxa.textContent = 'Percentual do CDI oferecido pelo banco/corretora (ex: 100% = rende igual ao CDI).';
+          ajudaTaxa.textContent = `Percentual do CDI oferecido pelo banco/corretora (ex: 100% = rende igual ao CDI). Selic atual ≈ ${selicAnualPct().toFixed(2)}% a.a., com spread de -0,10 p.p. o CDI fica ≈ ${cdiAnualPct().toFixed(2)}% a.a.`;
         } else if (ehCdbOuLci && indexador === 'pre') {
           labelTaxa.textContent = 'Taxa prefixada (% ao ano)';
           inTaxa.value = selicAnualPct().toFixed(2);
@@ -2242,7 +2259,7 @@
 
         if (tipo === 'cdb' || tipo === 'lci') {
           const indexador = selIndexador.value;
-          if (indexador === 'cdi') return selicAnualPct() * (taxaInformada / 100);
+          if (indexador === 'cdi') return cdiAnualPct() * (taxaInformada / 100);
           if (indexador === 'pre') return taxaInformada;
           if (indexador === 'ipca') return (1 + taxaInformada / 100) * (1 + ipcaAnualPct() / 100) * 100 - 100;
         }
@@ -2333,9 +2350,10 @@
             <tbody>${linhasTabela}</tbody>
           </table>
           <p class="calc-ajuda" style="margin-top:10px;">
-            Simulação aproximada (capitalização mensal composta), com base em Selic ≈ ${selicAnualPct().toFixed(2)}% a.a.
-            e IPCA ≈ ${ipcaAnualPct().toFixed(2)}% a.a. Os demais produtos da tabela usam taxas de mercado estimadas
-            para efeito de comparação. Não substitui o cálculo oficial da sua corretora.
+            Simulação aproximada (capitalização mensal composta), com base em Selic ≈ ${selicAnualPct().toFixed(2)}% a.a.,
+            CDI ≈ ${cdiAnualPct().toFixed(2)}% a.a. (Selic − 0,10 p.p. de spread) e IPCA anualizado ≈ ${ipcaAnualPct().toFixed(2)}% a.a.
+            Os demais produtos da tabela usam taxas de mercado estimadas para efeito de comparação.
+            Não substitui o cálculo oficial da sua corretora.
           </p>`;
       }
 
