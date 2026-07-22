@@ -2175,7 +2175,7 @@
           { id: 'lci', nome: 'LCI/LCA', tributado: false, custodia: false, taxaAnual: cdi * 0.90 },
           { id: 'tesouro_selic', nome: 'Tesouro Selic', tributado: true, custodia: true, taxaAnual: selic * 1.00 },
           { id: 'tesouro_pre', nome: 'Tesouro Prefixado', tributado: true, custodia: true, taxaAnual: selic + 0.5 },
-          { id: 'tesouro_ipca', nome: 'Tesouro IPCA+', tributado: true, custodia: true, taxaAnual: (1 + 6.0 / 100) * (1 + ipca / 100) * 100 - 100 },
+          { id: 'tesouro_ipca', nome: 'Tesouro IPCA+', tributado: true, custodia: true, taxaAnual: 6.0 + ipca },
           { id: 'poupanca', nome: 'Poupança', tributado: false, custodia: false, taxaAnual: selic > 8.5 ? 6.17 : selic * 0.70 },
         ];
       }
@@ -2262,7 +2262,7 @@
           const indexador = selIndexador.value;
           if (indexador === 'cdi') return cdiAnualPct() * (taxaInformada / 100);
           if (indexador === 'pre') return taxaInformada;
-          if (indexador === 'ipca') return (1 + taxaInformada / 100) * (1 + ipcaAnualPct() / 100) * 100 - 100;
+          if (indexador === 'ipca') return taxaInformada + ipcaAnualPct();
         }
         if (tipo === 'tesouro_selic') {
           return selicAnualPct() * (taxaInformada / 100);
@@ -2271,7 +2271,7 @@
           return taxaInformada;
         }
         if (tipo === 'tesouro_ipca') {
-          return (1 + taxaInformada / 100) * (1 + ipcaAnualPct() / 100) * 100 - 100;
+          return taxaInformada + ipcaAnualPct();
         }
         // poupança: já vem calculada
         return taxaInformada;
