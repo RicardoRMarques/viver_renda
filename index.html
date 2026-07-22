@@ -765,7 +765,7 @@
           </button>
           <div class="nav-dropdown-menu" id="navRendaFixaMenu">
             <button type="button" class="nav-dropdown-item" id="navAbrirCalculadora">🧮 Calculadora</button>
-            <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Yubb Busca Investimento</a>
+            <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
           </div>
         </div>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
@@ -837,8 +837,8 @@
           <div class="calc-campo">
             <label for="calcTipo">Tipo de investimento</label>
             <select id="calcTipo">
-              <option value="cdb">CDB (pós-fixado, % do CDI)</option>
-              <option value="lci">LCI/LCA (pós-fixado, % do CDI — isento de IR)</option>
+              <option value="cdb">CDB</option>
+              <option value="lci">LCI/LCA (isento de IR)</option>
               <option value="tesouro_selic">Tesouro Selic (pós-fixado)</option>
               <option value="tesouro_pre">Tesouro Prefixado (taxa fixa ao ano)</option>
               <option value="tesouro_ipca">Tesouro IPCA+ (taxa real + inflação)</option>
@@ -869,6 +869,15 @@
                 <option value="anos">Anos</option>
               </select>
             </div>
+          </div>
+
+          <div class="calc-campo" id="calcCampoIndexadorWrap" hidden>
+            <label for="calcIndexador">Indexador</label>
+            <select id="calcIndexador">
+              <option value="cdi">% do CDI</option>
+              <option value="pre">Prefixado (a.a.)</option>
+              <option value="ipca">IPCA+ (a.a.)</option>
+            </select>
           </div>
 
           <div class="calc-campo" id="calcCampoTaxaWrap">
@@ -2106,6 +2115,8 @@
       const btnAbrir = document.getElementById('navAbrirCalculadora');
       const btnFechar = document.getElementById('calcFechar');
       const selTipo = document.getElementById('calcTipo');
+      const campoIndexadorWrap = document.getElementById('calcCampoIndexadorWrap');
+      const selIndexador = document.getElementById('calcIndexador');
       const inValorInicial = document.getElementById('calcValorInicial');
       const inAporte = document.getElementById('calcAporteMensal');
       const inPrazo = document.getElementById('calcPrazo');
@@ -2187,10 +2198,22 @@
 
       function atualizarCampoTaxa() {
         const tipo = selTipo.value;
-        if (tipo === 'cdb' || tipo === 'lci') {
+        const ehCdbOuLci = tipo === 'cdb' || tipo === 'lci';
+        campoIndexadorWrap.hidden = !ehCdbOuLci;
+        const indexador = ehCdbOuLci ? selIndexador.value : null;
+
+        if (ehCdbOuLci && indexador === 'cdi') {
           labelTaxa.textContent = '% do CDI';
           inTaxa.value = tipo === 'lci' ? '90' : '100';
           ajudaTaxa.textContent = 'Percentual do CDI oferecido pelo banco/corretora (ex: 100% = rende igual ao CDI).';
+        } else if (ehCdbOuLci && indexador === 'pre') {
+          labelTaxa.textContent = 'Taxa prefixada (% ao ano)';
+          inTaxa.value = selicAnualPct().toFixed(2);
+          ajudaTaxa.textContent = 'Taxa fixa contratada no momento da aplicação, informada pelo banco/corretora.';
+        } else if (ehCdbOuLci && indexador === 'ipca') {
+          labelTaxa.textContent = 'Taxa real (% ao ano, acima da inflação)';
+          inTaxa.value = '6.00';
+          ajudaTaxa.textContent = `Rende essa taxa real + a inflação (IPCA). Estimamos IPCA em ${ipcaAnualPct().toFixed(2)}% a.a.`;
         } else if (tipo === 'tesouro_selic') {
           labelTaxa.textContent = '% da Selic';
           inTaxa.value = '100';
@@ -2216,7 +2239,14 @@
       function obterTaxaAnualEfetiva() {
         const tipo = selTipo.value;
         const taxaInformada = parseFloat(inTaxa.value) || 0;
-        if (tipo === 'cdb' || tipo === 'lci' || tipo === 'tesouro_selic') {
+
+        if (tipo === 'cdb' || tipo === 'lci') {
+          const indexador = selIndexador.value;
+          if (indexador === 'cdi') return selicAnualPct() * (taxaInformada / 100);
+          if (indexador === 'pre') return taxaInformada;
+          if (indexador === 'ipca') return (1 + taxaInformada / 100) * (1 + ipcaAnualPct() / 100) * 100 - 100;
+        }
+        if (tipo === 'tesouro_selic') {
           return selicAnualPct() * (taxaInformada / 100);
         }
         if (tipo === 'tesouro_pre') {
@@ -2327,6 +2357,7 @@
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       selTipo.addEventListener('change', atualizarCampoTaxa);
+      selIndexador.addEventListener('change', atualizarCampoTaxa);
       btnCalcular.addEventListener('click', calcular);
     })();
   </script>
