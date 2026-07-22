@@ -18,9 +18,16 @@ IPCA/CPI continuam vindo de fontes públicas sem token (BCB/BLS), pois a HG
 Brasil não cobre esses indicadores. O token nunca fica no HTML nem é
 exposto ao navegador do visitante.
 
+A coleta de rankings (Ações/FIIs) é mais pesada em requisições do que
+índices/notícias (vários lotes de tickers + endpoint Beta de receita), por
+isso é opcional nesta execução: só roda com a flag --com-ranking (ou
+variável de ambiente COLETAR_RANKING=1). Isso permite agendar índices e
+notícias a cada 15 min, e os rankings só 1x por dia.
+
 Uso local (opcional, para testar):
     export HGBRASIL_TOKEN="seu_token_aqui"   # afeta índices e ranking
-    python coletar_hgbrasil.py
+    python coletar_hgbrasil.py                 # só índices + notícias
+    python coletar_hgbrasil.py --com-ranking    # também atualiza os rankings
 """
 
 import json
@@ -613,6 +620,18 @@ def coletar_ranking(token):
 
 
 def main():
+    # Coleta de rankings (Ações/FIIs) é mais pesada em requisições à API
+    # (vários lotes de tickers, mais o endpoint Beta de receita) do que
+    # índices/notícias. Por isso ela é opcional: só roda quando o workflow
+    # passar --com-ranking (ou a variável de ambiente COLETAR_RANKING=1),
+    # permitindo agendar índices/notícias a cada 15 min e os rankings só
+    # 1x por dia, sem gerar chamadas desnecessárias à HG Brasil no resto
+    # do dia.
+    coletar_rankings_agora = (
+        "--com-ranking" in sys.argv
+        or os.environ.get("COLETAR_RANKING", "").strip() == "1"
+    )
+
     token = obter_token_hgbrasil()
     noticias = coletar_noticias()
 
@@ -624,19 +643,23 @@ def main():
     else:
         print("AVISO: nenhum índice coletado. Mantendo arquivo anterior, se existir.", file=sys.stderr)
 
-    ranking = coletar_ranking(token)
-    acoes_r = ranking.get("acoes", {})
-    total_acoes = len(acoes_r.get("dividend_yield", [])) + len(acoes_r.get("valor_mercado", [])) + len(acoes_r.get("receita", []))
-    fiis_r = ranking.get("fiis", {})
-    total_fiis = len(fiis_r.get("valor_patrimonial", [])) + len(fiis_r.get("dividend_yield", [])) + len(fiis_r.get("mais_negociados", []))
+    if coletar_rankings_agora:
+        ranking = coletar_ranking(token)
+        acoes_r = ranking.get("acoes", {})
+        total_acoes = len(acoes_r.get("dividend_yield", [])) + len(acoes_r.get("valor_mercado", [])) + len(acoes_r.get("receita", []))
+        fiis_r = ranking.get("fiis", {})
+        total_fiis = len(fiis_r.get("valor_patrimonial", [])) + len(fiis_r.get("dividend_yield", [])) + len(fiis_r.get("mais_negociados", []))
 
-    if total_acoes or total_fiis:
-        with open(RANKING_OUTPUT_FILE, "w", encoding="utf-8") as f:
-            json.dump(ranking, f, ensure_ascii=False, indent=2)
-        print(f"OK: ranking salvo em {RANKING_OUTPUT_FILE} "
-              f"({total_acoes} entradas de ações, {total_fiis} FIIs).")
+        if total_acoes or total_fiis:
+            with open(RANKING_OUTPUT_FILE, "w", encoding="utf-8") as f:
+                json.dump(ranking, f, ensure_ascii=False, indent=2)
+            print(f"OK: ranking salvo em {RANKING_OUTPUT_FILE} "
+                  f"({total_acoes} entradas de ações, {total_fiis} FIIs).")
+        else:
+            print("AVISO: ranking vazio. Mantendo arquivo anterior, se existir.", file=sys.stderr)
     else:
-        print("AVISO: ranking vazio. Mantendo arquivo anterior, se existir.", file=sys.stderr)
+        print("INFO: coleta de rankings (Ações/FIIs) pulada nesta execução "
+              "(roda só 1x/dia — use --com-ranking para forçar).")
 
     if not noticias:
         print("ERRO: nenhum dos feeds configurados retornou notícias. Mantendo arquivo anterior, se existir.", file=sys.stderr)
