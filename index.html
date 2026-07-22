@@ -118,6 +118,54 @@
     }
     .nav a:hover { color: var(--primary); }
 
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-dropdown-btn:hover { color: var(--primary); }
+    .nav-dropdown-seta { font-size: 0.7rem; transition: transform 0.15s ease; }
+    .nav-dropdown.aberto .nav-dropdown-seta { transform: rotate(180deg); }
+    .nav-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      min-width: 220px;
+      padding: 6px;
+      display: none;
+      flex-direction: column;
+      z-index: 1100;
+    }
+    .nav-dropdown.aberto .nav-dropdown-menu { display: flex; }
+    .nav-dropdown-item {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: left;
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: block;
+    }
+    .nav-dropdown-item:hover { background: var(--deep); color: var(--primary); }
+
     .theme-toggle {
       display: inline-flex;
       align-items: center;
@@ -611,6 +659,88 @@
       .ranking-nome { max-width: 120px; }
       .coluna-boletim { order: -1; }
     }
+
+    /* Calculadora de Investimentos (modal) */
+    .calc-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .calc-overlay[hidden] { display: none; }
+    .calc-modal {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .calc-modal-topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 1;
+    }
+    .calc-modal-topo h3 { margin: 0; font-size: 1.05rem; }
+    .calc-fechar {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+    .calc-fechar:hover { border-color: var(--primary); color: var(--primary); }
+    .calc-corpo { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .calc-campo { display: flex; flex-direction: column; gap: 6px; }
+    .calc-campo label { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
+    .calc-campo input, .calc-campo select {
+      background: var(--deep);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .calc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .calc-ajuda { font-size: 0.76rem; color: var(--muted); margin: 2px 0 0; }
+    .calc-resultado-card {
+      margin-top: 8px;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .calc-resultado-linha {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 0.9rem;
+      border-bottom: 1px dashed var(--border);
+    }
+    .calc-resultado-linha:last-child { border-bottom: none; }
+    .calc-resultado-linha strong { font-family: "Courier New", monospace; }
+    .calc-destaque { color: var(--primary); font-size: 1.15rem !important; }
+    .calc-tabela-comp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.82rem; }
+    .calc-tabela-comp th, .calc-tabela-comp td { text-align: right; padding: 6px 8px; border-top: 1px solid var(--border); }
+    .calc-tabela-comp th:first-child, .calc-tabela-comp td:first-child { text-align: left; }
+    .calc-tabela-comp tr.calc-linha-selecionada td { color: var(--primary); font-weight: 700; }
   </style>
 </head>
 <body>
@@ -629,8 +759,15 @@
       <nav class="nav">
         <a href="#consultas">Mercado</a>
         <a href="#educacao">Educação</a>
-        <!-- ALTERAÇÃO AQUI: Novo link para o Yubb -->
-        <a href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">Renda Fixa</a>
+        <div class="nav-dropdown">
+          <button type="button" class="nav-dropdown-btn" id="navRendaFixaBtn" aria-haspopup="true" aria-expanded="false">
+            Renda Fixa <span class="nav-dropdown-seta">▾</span>
+          </button>
+          <div class="nav-dropdown-menu" id="navRendaFixaMenu">
+            <button type="button" class="nav-dropdown-item" id="navAbrirCalculadora">🧮 Calculadora</button>
+            <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Yubb Busca Investimento</a>
+          </div>
+        </div>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
       </nav>
     </div>
@@ -687,6 +824,65 @@
         <div id="hgFundResultado"></div>
       </div>
     </section>
+
+    <!-- Modal da calculadora (abre dentro da própria página, sem sair dela) -->
+    <div id="calcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="calcTitulo" hidden>
+      <div class="calc-modal">
+        <div class="calc-modal-topo">
+          <h3 id="calcTitulo">🧮 Calculadora de Investimentos</h3>
+          <button id="calcFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <div class="calc-campo">
+            <label for="calcTipo">Tipo de investimento</label>
+            <select id="calcTipo">
+              <option value="cdb">CDB (pós-fixado, % do CDI)</option>
+              <option value="lci">LCI/LCA (pós-fixado, % do CDI — isento de IR)</option>
+              <option value="tesouro_selic">Tesouro Selic (pós-fixado)</option>
+              <option value="tesouro_pre">Tesouro Prefixado (taxa fixa ao ano)</option>
+              <option value="tesouro_ipca">Tesouro IPCA+ (taxa real + inflação)</option>
+              <option value="poupanca">Poupança (isenta de IR)</option>
+            </select>
+          </div>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="calcValorInicial">Valor inicial (R$)</label>
+              <input type="number" id="calcValorInicial" min="0" step="0.01" value="1000" />
+            </div>
+            <div class="calc-campo">
+              <label for="calcAporteMensal">Aporte mensal (R$)</label>
+              <input type="number" id="calcAporteMensal" min="0" step="0.01" value="0" />
+            </div>
+          </div>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="calcPrazo">Prazo</label>
+              <input type="number" id="calcPrazo" min="1" step="1" value="12" />
+            </div>
+            <div class="calc-campo">
+              <label for="calcPrazoUnidade">&nbsp;</label>
+              <select id="calcPrazoUnidade">
+                <option value="meses">Meses</option>
+                <option value="anos">Anos</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="calc-campo" id="calcCampoTaxaWrap">
+            <label id="calcLabelTaxa" for="calcTaxa">% do CDI</label>
+            <input type="number" id="calcTaxa" min="0" step="0.01" value="100" />
+            <p class="calc-ajuda" id="calcAjudaTaxa"></p>
+          </div>
+
+          <button class="hg-btn" id="calcBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
+
+          <div id="calcResultado"></div>
+        </div>
+      </div>
+    </div>
 
 
     <section class="section-intro" id="consultas">
@@ -1511,12 +1707,14 @@
       }
     }
 
+    window.hgIndicesCache = null;
     async function carregarIndices() {
       const rowsEl = document.getElementById('indicesRows');
       try {
         const resp = await fetch('indices.json', { cache: 'no-store' });
         if (!resp.ok) throw new Error('arquivo não encontrado');
         const indices = await resp.json();
+        window.hgIndicesCache = indices;
         if (!Array.isArray(indices) || indices.length === 0) throw new Error('vazio');
 
         const sparksParaCarregar = [];
@@ -1865,6 +2063,271 @@
         atualizarIcone();
       });
       atualizarIcone();
+    })();
+
+    // ============================================================
+    // DROPDOWN "Renda Fixa" (Calculadora / Yubb Busca Investimento)
+    // ============================================================
+    function fecharDropdownRendaFixa() {
+      const dropdown = document.querySelector('.nav-dropdown');
+      const botao = document.getElementById('navRendaFixaBtn');
+      if (dropdown) dropdown.classList.remove('aberto');
+      if (botao) botao.setAttribute('aria-expanded', 'false');
+    }
+    (function () {
+      const dropdown = document.querySelector('.nav-dropdown');
+      const botao = document.getElementById('navRendaFixaBtn');
+      if (!dropdown || !botao) return;
+
+      botao.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const abrindo = !dropdown.classList.contains('aberto');
+        dropdown.classList.toggle('aberto', abrindo);
+        botao.setAttribute('aria-expanded', String(abrindo));
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) fecharDropdownRendaFixa();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') fecharDropdownRendaFixa();
+      });
+    })();
+
+    // ============================================================
+    // CALCULADORA DE INVESTIMENTOS — RENDA FIXA
+    // Simula CDB, LCI/LCA, Tesouro Selic/Prefixado/IPCA+ e Poupança.
+    // Cálculo aproximado por capitalização mensal composta (não usa a
+    // convenção over-252 dias úteis usada pelas corretoras/B3) — serve
+    // para planejamento e comparação, não substitui o extrato oficial.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('calcOverlay');
+      const btnAbrir = document.getElementById('navAbrirCalculadora');
+      const btnFechar = document.getElementById('calcFechar');
+      const selTipo = document.getElementById('calcTipo');
+      const inValorInicial = document.getElementById('calcValorInicial');
+      const inAporte = document.getElementById('calcAporteMensal');
+      const inPrazo = document.getElementById('calcPrazo');
+      const selPrazoUnidade = document.getElementById('calcPrazoUnidade');
+      const inTaxa = document.getElementById('calcTaxa');
+      const labelTaxa = document.getElementById('calcLabelTaxa');
+      const ajudaTaxa = document.getElementById('calcAjudaTaxa');
+      const btnCalcular = document.getElementById('calcBtnCalcular');
+      const resultadoEl = document.getElementById('calcResultado');
+
+      if (!overlay || !btnAbrir) return; // seção não presente nesta página
+
+      // Tenta pegar Selic e IPCA já coletados pelo robô (indices.json) para
+      // usar como padrão realista; se não achar, cai em valores de reserva.
+      function obterIndiceBase(label, chave) {
+        const indices = window.hgIndicesCache;
+        if (!Array.isArray(indices)) return null;
+        const item = indices.find(i => (i.label || '').toUpperCase().includes(label.toUpperCase()));
+        return item ? item[chave] : null;
+      }
+
+      function selicAnualPct() {
+        return obterIndiceBase('SELIC', 'valor_pct') ?? 15.0;
+      }
+      function ipcaAnualPct() {
+        // Preferimos o IPCA acumulado 12 meses se o robô guardar em campo
+        // separado; senão usamos o valor_pct padrão como aproximação.
+        return obterIndiceBase('IPCA', 'valor_pct') ?? 4.5;
+      }
+
+      // Definição dos produtos comparáveis, cada um com sua regra de taxa
+      // padrão (usada na tabela de comparação) e se é tributado/tem custódia.
+      function produtosComparaveis() {
+        const selic = selicAnualPct();
+        const ipca = ipcaAnualPct();
+        return [
+          { id: 'cdb', nome: 'CDB', tributado: true, custodia: false, taxaAnual: selic * 1.00 },
+          { id: 'lci', nome: 'LCI/LCA', tributado: false, custodia: false, taxaAnual: selic * 0.90 },
+          { id: 'tesouro_selic', nome: 'Tesouro Selic', tributado: true, custodia: true, taxaAnual: selic * 1.00 },
+          { id: 'tesouro_pre', nome: 'Tesouro Prefixado', tributado: true, custodia: true, taxaAnual: selic + 0.5 },
+          { id: 'tesouro_ipca', nome: 'Tesouro IPCA+', tributado: true, custodia: true, taxaAnual: (1 + 6.0 / 100) * (1 + ipca / 100) * 100 - 100 },
+          { id: 'poupanca', nome: 'Poupança', tributado: false, custodia: false, taxaAnual: selic > 8.5 ? 6.17 : selic * 0.70 },
+        ];
+      }
+
+      function aliquotaIR(dias) {
+        if (dias <= 180) return 0.225;
+        if (dias <= 360) return 0.20;
+        if (dias <= 720) return 0.175;
+        return 0.15;
+      }
+
+      // Simula um produto: retorna { totalInvestido, valorBruto, ir, custodia, valorLiquido }
+      function simularProduto({ taxaAnualPct, tributado, custodia }, valorInicial, aporteMensal, prazoMeses) {
+        const taxaMensal = Math.pow(1 + taxaAnualPct / 100, 1 / 12) - 1;
+        let saldo = valorInicial;
+        for (let m = 0; m < prazoMeses; m++) {
+          saldo = saldo * (1 + taxaMensal) + (m < prazoMeses - 1 ? aporteMensal : aporteMensal); // aporte todo mês, inclusive o último
+        }
+        const totalInvestido = valorInicial + aporteMensal * prazoMeses;
+        const valorBruto = saldo;
+        let rendimentoBruto = valorBruto - totalInvestido;
+
+        let custodiaValor = 0;
+        if (custodia) {
+          // Aproximação simples: 0,20% a.a. sobre o saldo médio, pró-rata do prazo.
+          const saldoMedio = (valorInicial + valorBruto) / 2;
+          custodiaValor = saldoMedio * 0.002 * (prazoMeses / 12);
+          rendimentoBruto -= custodiaValor;
+        }
+
+        const dias = Math.round(prazoMeses * 30.44);
+        const ir = tributado && rendimentoBruto > 0 ? rendimentoBruto * aliquotaIR(dias) : 0;
+        const rendimentoLiquido = rendimentoBruto - ir;
+        const valorLiquido = totalInvestido + rendimentoLiquido;
+
+        return { totalInvestido, valorBruto, rendimentoBruto, custodiaValor, ir, rendimentoLiquido, valorLiquido, aliquota: tributado ? aliquotaIR(dias) : 0 };
+      }
+
+      function atualizarCampoTaxa() {
+        const tipo = selTipo.value;
+        if (tipo === 'cdb' || tipo === 'lci') {
+          labelTaxa.textContent = '% do CDI';
+          inTaxa.value = tipo === 'lci' ? '90' : '100';
+          ajudaTaxa.textContent = 'Percentual do CDI oferecido pelo banco/corretora (ex: 100% = rende igual ao CDI).';
+        } else if (tipo === 'tesouro_selic') {
+          labelTaxa.textContent = '% da Selic';
+          inTaxa.value = '100';
+          ajudaTaxa.textContent = 'Tesouro Selic rende próximo de 100% da taxa Selic, menos a taxa de custódia da B3 (0,20% a.a.).';
+        } else if (tipo === 'tesouro_pre') {
+          labelTaxa.textContent = 'Taxa prefixada (% ao ano)';
+          inTaxa.value = selicAnualPct().toFixed(2);
+          ajudaTaxa.textContent = 'Taxa fixa contratada no momento da compra do título.';
+        } else if (tipo === 'tesouro_ipca') {
+          labelTaxa.textContent = 'Taxa real (% ao ano, acima da inflação)';
+          inTaxa.value = '6.00';
+          ajudaTaxa.textContent = `Rende essa taxa real + a inflação (IPCA). Estimamos IPCA em ${ipcaAnualPct().toFixed(2)}% a.a.`;
+        } else if (tipo === 'poupanca') {
+          labelTaxa.textContent = 'Taxa (definida automaticamente)';
+          const selic = selicAnualPct();
+          inTaxa.value = (selic > 8.5 ? 6.17 : selic * 0.70).toFixed(2);
+          ajudaTaxa.textContent = 'Poupança rende 0,5% a.m. + TR quando a Selic está acima de 8,5% a.a., ou 70% da Selic quando está igual ou abaixo.';
+        }
+        const semTaxaEditavel = tipo === 'poupanca';
+        inTaxa.disabled = semTaxaEditavel;
+      }
+
+      function obterTaxaAnualEfetiva() {
+        const tipo = selTipo.value;
+        const taxaInformada = parseFloat(inTaxa.value) || 0;
+        if (tipo === 'cdb' || tipo === 'lci' || tipo === 'tesouro_selic') {
+          return selicAnualPct() * (taxaInformada / 100);
+        }
+        if (tipo === 'tesouro_pre') {
+          return taxaInformada;
+        }
+        if (tipo === 'tesouro_ipca') {
+          return (1 + taxaInformada / 100) * (1 + ipcaAnualPct() / 100) * 100 - 100;
+        }
+        // poupança: já vem calculada
+        return taxaInformada;
+      }
+
+      function infoTipo(tipo) {
+        return {
+          cdb: { nome: 'CDB', tributado: true, custodia: false },
+          lci: { nome: 'LCI/LCA', tributado: false, custodia: false },
+          tesouro_selic: { nome: 'Tesouro Selic', tributado: true, custodia: true },
+          tesouro_pre: { nome: 'Tesouro Prefixado', tributado: true, custodia: true },
+          tesouro_ipca: { nome: 'Tesouro IPCA+', tributado: true, custodia: true },
+          poupanca: { nome: 'Poupança', tributado: false, custodia: false },
+        }[tipo];
+      }
+
+      function calcular() {
+        const tipo = selTipo.value;
+        const valorInicial = Math.max(0, parseFloat(inValorInicial.value) || 0);
+        const aporteMensal = Math.max(0, parseFloat(inAporte.value) || 0);
+        const prazoInformado = Math.max(1, parseFloat(inPrazo.value) || 1);
+        const prazoMeses = Math.round(selPrazoUnidade.value === 'anos' ? prazoInformado * 12 : prazoInformado);
+
+        const tipoInfo = infoTipo(tipo);
+        const taxaAnual = obterTaxaAnualEfetiva();
+        const resultadoPrincipal = simularProduto(
+          { taxaAnualPct: taxaAnual, tributado: tipoInfo.tributado, custodia: tipoInfo.custodia },
+          valorInicial, aporteMensal, prazoMeses
+        );
+
+        const irTexto = tipoInfo.tributado
+          ? `<div class="calc-resultado-linha"><span>IR (${(resultadoPrincipal.aliquota * 100).toFixed(1)}% sobre o rendimento)</span><strong>- ${hgFormatMoeda(resultadoPrincipal.ir)}</strong></div>`
+          : `<div class="calc-resultado-linha"><span>Imposto de Renda</span><strong>Isento</strong></div>`;
+
+        const custodiaTexto = tipoInfo.custodia
+          ? `<div class="calc-resultado-linha"><span>Taxa de custódia B3 (aprox. 0,20% a.a.)</span><strong>- ${hgFormatMoeda(resultadoPrincipal.custodiaValor)}</strong></div>`
+          : '';
+
+        // Tabela comparativa: todos os produtos, mesmo valor/prazo/aportes,
+        // usando as taxas padrão de mercado (o produto escolhido usa a taxa
+        // que o usuário informou; os demais usam a taxa padrão estimada).
+        const produtos = produtosComparaveis().map(p => {
+          const taxaUsada = p.id === tipo ? taxaAnual : p.taxaAnual;
+          const r = simularProduto({ taxaAnualPct: taxaUsada, tributado: p.tributado, custodia: p.custodia }, valorInicial, aporteMensal, prazoMeses);
+          return { ...p, ...r };
+        }).sort((a, b) => b.valorLiquido - a.valorLiquido);
+
+        const linhasTabela = produtos.map(p => `
+          <tr class="${p.id === tipo ? 'calc-linha-selecionada' : ''}">
+            <td>${p.nome}${p.id === tipo ? ' ✓' : ''}</td>
+            <td>${hgFormatMoeda(p.valorLiquido)}</td>
+            <td>${hgFormatMoeda(p.rendimentoLiquido)}</td>
+          </tr>`).join('');
+
+        resultadoEl.innerHTML = `
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha">
+              <span>Total investido</span>
+              <strong>${hgFormatMoeda(resultadoPrincipal.totalInvestido)}</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Rendimento bruto</span>
+              <strong>${hgFormatMoeda(resultadoPrincipal.rendimentoBruto + resultadoPrincipal.custodiaValor)}</strong>
+            </div>
+            ${custodiaTexto}
+            ${irTexto}
+            <div class="calc-resultado-linha calc-destaque">
+              <span>Valor líquido final</span>
+              <strong>${hgFormatMoeda(resultadoPrincipal.valorLiquido)}</strong>
+            </div>
+          </div>
+
+          <table class="calc-tabela-comp">
+            <thead>
+              <tr><th>Produto</th><th>Valor líquido</th><th>Rendimento líquido</th></tr>
+            </thead>
+            <tbody>${linhasTabela}</tbody>
+          </table>
+          <p class="calc-ajuda" style="margin-top:10px;">
+            Simulação aproximada (capitalização mensal composta), com base em Selic ≈ ${selicAnualPct().toFixed(2)}% a.a.
+            e IPCA ≈ ${ipcaAnualPct().toFixed(2)}% a.a. Os demais produtos da tabela usam taxas de mercado estimadas
+            para efeito de comparação. Não substitui o cálculo oficial da sua corretora.
+          </p>`;
+      }
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        atualizarCampoTaxa();
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      btnAbrir.addEventListener('click', () => {
+        fecharDropdownRendaFixa();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      selTipo.addEventListener('change', atualizarCampoTaxa);
+      btnCalcular.addEventListener('click', calcular);
     })();
   </script>
 </body>
