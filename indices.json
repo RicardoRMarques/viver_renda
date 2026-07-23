@@ -2,8 +2,8 @@
   {
     "label": "Ibovespa",
     "prefixo": "pontos",
-    "valor": 176624.63,
-    "variacao_pct": -0.52
+    "valor": 176723.63,
+    "variacao_pct": -0.46
   },
   {
     "label": "Selic (meta)",
@@ -13,38 +13,38 @@
   {
     "label": "Dólar",
     "prefixo": "R$ ",
-    "valor": 5.0854,
-    "variacao_pct": 0.56
+    "valor": 5.0824,
+    "variacao_pct": 0.5
   },
   {
     "label": "Euro",
     "prefixo": "R$ ",
-    "valor": 5.7855,
-    "variacao_pct": 0.343
+    "valor": 5.7812,
+    "variacao_pct": 0.269
   },
   {
     "label": "IFIX",
     "prefixo": "pontos",
-    "valor": 3801.95,
-    "variacao_pct": -0.34
+    "valor": 3803.93,
+    "variacao_pct": -0.28
   },
   {
     "label": "Dow Jones",
     "prefixo": "pontos",
-    "valor": 51649.82,
-    "variacao_pct": -1.09
+    "valor": 51711.65,
+    "variacao_pct": -0.97
   },
   {
     "label": "Nasdaq",
     "prefixo": "pontos",
-    "valor": 25063.3,
-    "variacao_pct": -2.44
+    "valor": 25137.69,
+    "variacao_pct": -2.15
   },
   {
     "label": "Bitcoin (USD)",
     "prefixo": "US$ ",
-    "valor": 64781.84,
-    "variacao_pct": -1.663
+    "valor": 65072.54,
+    "variacao_pct": -1.222
   },
   {
     "label": "IPCA (mensal)",
@@ -56,10 +56,5 @@
     "valor_pct": 4.641327552554153,
     "referencia": "01/06/2026",
     "meses": 12
-  },
-  {
-    "label": "CPI (EUA, mensal)",
-    "valor_pct": -0.34942394285083156,
-    "referencia": "June"
   }
 ]
