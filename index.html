@@ -2149,6 +2149,14 @@
         return selicAnualPct() - SPREAD_CDI_SELIC;
       }
 
+      // Taxa real padrão sugerida para Tesouro/CDB/LCI indexados ao IPCA+,
+      // com base nas taxas praticadas em títulos de prazo mais longo no
+      // mercado (levantado em jul/2026: IPCA+8,33% a IPCA+8,44% a.a. em
+      // títulos como o Tesouro IPCA+ 2035). Como a taxa real varia bastante
+      // conforme o vencimento do título, isso é só um ponto de partida —
+      // o campo continua editável.
+      const TAXA_REAL_IPCA_PADRAO = 8.30;
+
       function ipcaAnualPct() {
         // Importante: existem dois índices de IPCA no indices.json — o
         // "IPCA (mensal)" (variação de só 1 mês, ex: 0,16%) e o "IPCA (12
@@ -2176,7 +2184,7 @@
           { id: 'lci', nome: 'LCI/LCA', tributado: false, custodia: false, taxaAnual: cdi * 0.90 },
           { id: 'tesouro_selic', nome: 'Tesouro Selic', tributado: true, custodia: true, taxaAnual: selic * 1.00 },
           { id: 'tesouro_pre', nome: 'Tesouro Prefixado', tributado: true, custodia: true, taxaAnual: selic + 0.5 },
-          { id: 'tesouro_ipca', nome: 'Tesouro IPCA+', tributado: true, custodia: true, taxaAnual: 6.0 + ipca },
+          { id: 'tesouro_ipca', nome: 'Tesouro IPCA+', tributado: true, custodia: true, taxaAnual: TAXA_REAL_IPCA_PADRAO + ipca },
           { id: 'poupanca', nome: 'Poupança', tributado: false, custodia: false, taxaAnual: selic > 8.5 ? 6.17 : selic * 0.70 },
         ];
       }
@@ -2231,8 +2239,8 @@
           ajudaTaxa.textContent = 'Taxa fixa contratada no momento da aplicação, informada pelo banco/corretora.';
         } else if (ehCdbOuLci && indexador === 'ipca') {
           labelTaxa.textContent = 'Taxa real (% ao ano, acima da inflação)';
-          inTaxa.value = '6.00';
-          ajudaTaxa.textContent = `Rende essa taxa real + a inflação (IPCA). Estimamos IPCA em ${ipcaAnualPct().toFixed(2)}% a.a.`;
+          inTaxa.value = TAXA_REAL_IPCA_PADRAO.toFixed(2);
+          ajudaTaxa.textContent = `Rende essa taxa real + a inflação (IPCA). Estimamos IPCA em ${ipcaAnualPct().toFixed(2)}% a.a. Sugestão inicial de ${TAXA_REAL_IPCA_PADRAO.toFixed(2)}% real com base nas taxas atuais do mercado — ajuste conforme a oferta do seu banco/corretora.`;
         } else if (tipo === 'tesouro_selic') {
           labelTaxa.textContent = '% da Selic';
           inTaxa.value = '100';
@@ -2243,8 +2251,8 @@
           ajudaTaxa.textContent = 'Taxa fixa contratada no momento da compra do título.';
         } else if (tipo === 'tesouro_ipca') {
           labelTaxa.textContent = 'Taxa real (% ao ano, acima da inflação)';
-          inTaxa.value = '6.00';
-          ajudaTaxa.textContent = `Rende essa taxa real + a inflação (IPCA). Estimamos IPCA em ${ipcaAnualPct().toFixed(2)}% a.a.`;
+          inTaxa.value = TAXA_REAL_IPCA_PADRAO.toFixed(2);
+          ajudaTaxa.textContent = `Rende essa taxa real + a inflação (IPCA). Estimamos IPCA em ${ipcaAnualPct().toFixed(2)}% a.a. Sugestão inicial de ${TAXA_REAL_IPCA_PADRAO.toFixed(2)}% real (próxima da praticada hoje em títulos de prazo mais longo) — a taxa real varia bastante conforme o vencimento escolhido, então ajuste pelo título específico que você está comparando.`;
         } else if (tipo === 'poupanca') {
           labelTaxa.textContent = 'Taxa (definida automaticamente)';
           const selic = selicAnualPct();
