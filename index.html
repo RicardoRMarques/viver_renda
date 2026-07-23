@@ -259,7 +259,7 @@
     .hg-busca-compacta .hg-btn { padding: 0 18px; font-size: 0.92rem; }
 
     /* Notícias lado a lado, largura toda, abaixo das consultas */
-    .coluna-noticias-horizontal { min-width: 0; margin-top: 32px; }
+    .coluna-noticias-horizontal { min-width: 0; margin-top: 8px; }
     .noticias-lista-horizontal {
       display: flex;
       gap: 14px;
@@ -871,6 +871,14 @@
           </div>
         </section>
 
+        <!-- NOTÍCIAS (cards lado a lado) -->
+        <div class="coluna-noticias-horizontal">
+          <div class="boletim-noticias-title">Últimas notícias</div>
+          <div id="noticiasList" class="noticias-lista-horizontal">
+            <div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Carregando notícias...</div></div></div>
+          </div>
+        </div>
+
       </div>
 
       <!-- BOLETIM DE MERCADO (canto direito, ao lado das consultas) -->
@@ -886,14 +894,6 @@
             <div class="indice-row skeleton"></div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- NOTÍCIAS (cards lado a lado, largura toda) -->
-    <div class="coluna-noticias-horizontal">
-      <div class="boletim-noticias-title">Últimas notícias</div>
-      <div id="noticiasList" class="noticias-lista-horizontal">
-        <div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Carregando notícias...</div></div></div>
       </div>
     </div>
 
