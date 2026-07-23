@@ -238,15 +238,28 @@
     }
     .hg-chip:hover { color: var(--primary); border-color: var(--primary); }
 
-    /* Grid: notícias (lado a lado, à esquerda) + boletim de mercado (canto direito) */
-    .noticias-boletim-grid {
+    /* Grid: consultas (esquerda, compactas) + boletim de mercado (canto direito) */
+    .consultas-boletim-grid {
       display: grid;
       grid-template-columns: 1fr 320px;
       gap: 28px;
       align-items: start;
-      margin-top: 32px;
     }
-    .coluna-noticias-horizontal { min-width: 0; }
+    .coluna-consultas { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .coluna-boletim-canto { min-width: 0; position: sticky; top: 90px; }
+    @media (max-width: 900px) {
+      .consultas-boletim-grid { grid-template-columns: 1fr; }
+      .coluna-boletim-canto { position: static; }
+    }
+
+    /* Versão compacta das consultas, usada quando ficam ao lado do boletim */
+    .hg-busca-compacta .hg-painel { padding: 18px; }
+    .hg-busca-compacta .hg-titulo { font-size: 1.1rem; }
+    .hg-busca-compacta .hg-linha-busca input { padding: 10px 14px; font-size: 0.92rem; }
+    .hg-busca-compacta .hg-btn { padding: 0 18px; font-size: 0.92rem; }
+
+    /* Notícias lado a lado, largura toda, abaixo das consultas */
+    .coluna-noticias-horizontal { min-width: 0; margin-top: 32px; }
     .noticias-lista-horizontal {
       display: flex;
       gap: 14px;
@@ -256,10 +269,6 @@
     .noticias-lista-horizontal .noticia-card {
       flex: 0 0 260px;
       margin-bottom: 0;
-    }
-    .coluna-boletim-canto { min-width: 0; }
-    @media (max-width: 900px) {
-      .noticias-boletim-grid { grid-template-columns: 1fr; }
     }
 
     .hg-status { text-align: left; color: var(--muted); font-size: 0.88rem; margin: 14px 0; min-height: 1.2em; }
@@ -811,63 +820,60 @@
       <p>Acompanhe os destaques do dia: os maiores Fundos Imobiliários e ações com melhor desempenho no ranking da B3, além do boletim diário com índices e notícias do mercado.</p>
     </section>
 
-    <!-- CONSULTA RÁPIDA: Ações e FIIs (HG Brasil) -->
-    <section class="hg-busca" id="consulta-rapida">
-      <h2 class="hg-titulo">🔎 Consultar Ações e FIIs</h2>
+    <div class="consultas-boletim-grid">
+      <div class="coluna-consultas">
 
-      <div class="hg-painel">
-        <div class="hg-linha-busca">
-          <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" />
-          <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
-        </div>
+        <!-- CONSULTA RÁPIDA: Ações e FIIs (HG Brasil) -->
+        <section class="hg-busca hg-busca-compacta" id="consulta-rapida">
+          <h2 class="hg-titulo">🔎 Consultar Ações e FIIs</h2>
 
-        <div class="hg-chips">
-          <span class="hg-chip" data-ticker="PETR4">PETR4</span>
-          <span class="hg-chip" data-ticker="VALE3">VALE3</span>
-          <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
-          <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
-          <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
-          <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
-        </div>
+          <div class="hg-painel">
+            <div class="hg-linha-busca">
+              <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" />
+              <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
+            </div>
 
-        <div class="hg-status" id="hgStatus"></div>
-        <div id="hgResultado"></div>
-      </div>
-    </section>
+            <div class="hg-chips">
+              <span class="hg-chip" data-ticker="PETR4">PETR4</span>
+              <span class="hg-chip" data-ticker="VALE3">VALE3</span>
+              <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
+              <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
+              <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
+              <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
+            </div>
 
-    <!-- ANÁLISE FUNDAMENTALISTA: histórico de indicadores por ano (HG Brasil) -->
-    <section class="hg-busca" id="analise-fundamentalista">
-      <h2 class="hg-titulo">📊 Consultar Ações — Análise Fundamentalista</h2>
+            <div class="hg-status" id="hgStatus"></div>
+            <div id="hgResultado"></div>
+          </div>
+        </section>
 
-      <div class="hg-painel">
-        <div class="hg-linha-busca">
-          <input type="text" id="hgFundTickerInput" placeholder="Ex: PETR4, VALE3, KLBN11..." autocomplete="off" />
-          <button class="hg-btn" id="hgFundBtnBuscar">Consultar</button>
-        </div>
+        <!-- ANÁLISE FUNDAMENTALISTA: histórico de indicadores por ano (HG Brasil) -->
+        <section class="hg-busca hg-busca-compacta" id="analise-fundamentalista">
+          <h2 class="hg-titulo">📊 Consultar Ações — Análise Fundamentalista</h2>
 
-        <div class="hg-chips">
-          <span class="hg-chip" data-ticker="PETR4">PETR4</span>
-          <span class="hg-chip" data-ticker="VALE3">VALE3</span>
-          <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
-          <span class="hg-chip" data-ticker="KLBN11">KLBN11</span>
-          <span class="hg-chip" data-ticker="WEGE3">WEGE3</span>
-          <span class="hg-chip" data-ticker="BBAS3">BBAS3</span>
-        </div>
+          <div class="hg-painel">
+            <div class="hg-linha-busca">
+              <input type="text" id="hgFundTickerInput" placeholder="Ex: PETR4, VALE3, KLBN11..." autocomplete="off" />
+              <button class="hg-btn" id="hgFundBtnBuscar">Consultar</button>
+            </div>
 
-        <div class="hg-status" id="hgFundStatus"></div>
-        <div id="hgFundResultado"></div>
-      </div>
-    </section>
+            <div class="hg-chips">
+              <span class="hg-chip" data-ticker="PETR4">PETR4</span>
+              <span class="hg-chip" data-ticker="VALE3">VALE3</span>
+              <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
+              <span class="hg-chip" data-ticker="KLBN11">KLBN11</span>
+              <span class="hg-chip" data-ticker="WEGE3">WEGE3</span>
+              <span class="hg-chip" data-ticker="BBAS3">BBAS3</span>
+            </div>
 
-    <!-- NOTÍCIAS (cards lado a lado) + BOLETIM DE MERCADO (canto direito) -->
-    <div class="noticias-boletim-grid">
-      <div class="coluna-noticias-horizontal">
-        <div class="boletim-noticias-title">Últimas notícias</div>
-        <div id="noticiasList" class="noticias-lista-horizontal">
-          <div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Carregando notícias...</div></div></div>
-        </div>
+            <div class="hg-status" id="hgFundStatus"></div>
+            <div id="hgFundResultado"></div>
+          </div>
+        </section>
+
       </div>
 
+      <!-- BOLETIM DE MERCADO (canto direito, ao lado das consultas) -->
       <div class="coluna-boletim-canto">
         <div class="panel-title boletim"><span class="dot"></span> Boletim de mercado</div>
         <div class="boletim-panel">
@@ -880,6 +886,14 @@
             <div class="indice-row skeleton"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- NOTÍCIAS (cards lado a lado, largura toda) -->
+    <div class="coluna-noticias-horizontal">
+      <div class="boletim-noticias-title">Últimas notícias</div>
+      <div id="noticiasList" class="noticias-lista-horizontal">
+        <div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Carregando notícias...</div></div></div>
       </div>
     </div>
 
