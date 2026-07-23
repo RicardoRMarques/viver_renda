@@ -1104,6 +1104,43 @@
       return d.toISOString().slice(0, 10);
     }
 
+    // Compartilha/copia o link de uma consulta (ação ou FII). Genérico —
+    // usado tanto pela busca rápida quanto pela análise fundamentalista.
+    // Busca o texto a atualizar dentro do próprio botão (via classe), em
+    // vez de um ID fixo, pra funcionar mesmo com vários botões na página.
+    async function hgCompartilharAtivo(a, botao, params = {}) {
+      const tickerLimpo = (a.symbol || '').replace('B3:', '');
+      const query = new URLSearchParams({ ticker: tickerLimpo, ...params }).toString();
+      const link = `${window.location.origin}${window.location.pathname}?${query}`;
+      const titulo = `${a.name || tickerLimpo} (${tickerLimpo}) — Viver de Renda`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: titulo, url: link });
+          return;
+        } catch (e) {
+          // Usuário cancelou o compartilhamento nativo — não faz nada.
+          if (e?.name === 'AbortError') return;
+        }
+      }
+
+      const textoOriginal = botao.querySelector('.hg-btn-compartilhar-texto');
+      const textoPadrao = textoOriginal ? textoOriginal.textContent : null;
+      try {
+        await navigator.clipboard.writeText(link);
+        botao.classList.add('copiado');
+        if (textoOriginal) textoOriginal.textContent = 'Link copiado!';
+      } catch (e) {
+        // Fallback bem simples caso a área de transferência esteja bloqueada.
+        window.prompt('Copie o link da consulta:', link);
+      }
+
+      setTimeout(() => {
+        botao.classList.remove('copiado');
+        if (textoOriginal && textoPadrao) textoOriginal.textContent = textoPadrao;
+      }, 2500);
+    }
+
     (function () {
       const inputTicker = document.getElementById('hgTickerInput');
       const statusEl = document.getElementById('hgStatus');
@@ -1271,7 +1308,7 @@
               </div>
               <button type="button" class="hg-btn-compartilhar" id="hgBtnCompartilhar" title="Copiar link desta consulta">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                <span id="hgBtnCompartilharTexto">Compartilhar</span>
+                <span class="hg-btn-compartilhar-texto" id="hgBtnCompartilharTexto">Compartilhar</span>
               </button>
             </div>
 
@@ -1380,37 +1417,6 @@
       // Gera um link para esta consulta específica (ex: .../?ticker=PETR4)
       // e usa o compartilhamento nativo do celular (se disponível) ou copia
       // o link para a área de transferência.
-      async function hgCompartilharAtivo(a, botao) {
-        const tickerLimpo = (a.symbol || '').replace('B3:', '');
-        const link = `${window.location.origin}${window.location.pathname}?ticker=${encodeURIComponent(tickerLimpo)}`;
-        const titulo = `${a.name || tickerLimpo} (${tickerLimpo}) — Viver de Renda`;
-
-        if (navigator.share) {
-          try {
-            await navigator.share({ title: titulo, url: link });
-            return;
-          } catch (e) {
-            // Usuário cancelou o compartilhamento nativo — não faz nada.
-            if (e?.name === 'AbortError') return;
-          }
-        }
-
-        const textoOriginal = document.getElementById('hgBtnCompartilharTexto');
-        try {
-          await navigator.clipboard.writeText(link);
-          botao.classList.add('copiado');
-          if (textoOriginal) textoOriginal.textContent = 'Link copiado!';
-        } catch (e) {
-          // Fallback bem simples caso a área de transferência esteja bloqueada.
-          window.prompt('Copie o link da consulta:', link);
-        }
-
-        setTimeout(() => {
-          botao.classList.remove('copiado');
-          if (textoOriginal) textoOriginal.textContent = 'Compartilhar';
-        }, 2500);
-      }
-
       // Busca o histórico diário dos últimos 30 dias e desenha um gráfico
       // de linha simples em SVG (sem bibliotecas externas).
       async function hgCarregarGrafico(ticker) {
@@ -1887,6 +1893,10 @@
                   ${setorHtml}
                 </div>
               </div>
+              <button type="button" class="hg-btn-compartilhar" id="hgFundBtnCompartilhar" title="Copiar link desta análise">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+              </button>
             </div>
             <div class="hg-tabela-scroll" style="overflow-x:auto;">
               <table class="hg-tabela-fundamentos" style="width:100%; border-collapse:collapse; font-family:'Courier New', monospace; font-size:0.85rem;">
@@ -1905,6 +1915,13 @@
               Fonte: HG Brasil · Período: anual (TTM = últimos 12 meses acumulados).
             </p>
           </div>`;
+
+        const btnCompartilharFund = document.getElementById('hgFundBtnCompartilhar');
+        if (btnCompartilharFund) {
+          btnCompartilharFund.addEventListener('click', () =>
+            hgCompartilharAtivo(info, btnCompartilharFund, { view: 'fundamentos' })
+          );
+        }
       }
 
       btnFund.addEventListener('click', buscarFundamentos);
