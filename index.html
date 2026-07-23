@@ -1916,12 +1916,12 @@
               <table class="hg-tabela-fundamentos" style="width:100%; border-collapse:collapse; font-family:'Courier New', monospace; font-size:0.85rem;">
                 <thead>
                   <tr>
-                    <th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit;">Indicador</th>
+                    <th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit; position:sticky; left:0; background:var(--deep); z-index:2;">Indicador</th>
                     ${cabecalhoHtml.replace(/<th>/g, '<th style="text-align:right; padding:8px 10px; color:var(--muted); font-family:inherit; white-space:nowrap;">')}
                   </tr>
                 </thead>
                 <tbody>
-                  ${linhasHtml.replace(/<th scope="row">/g, '<th scope="row" style="text-align:left; padding:6px 10px; font-family:inherit; font-weight:700; white-space:nowrap; border-top:1px solid var(--border);">').replace(/<td>/g, '<td style="text-align:right; padding:6px 10px; border-top:1px solid var(--border);">')}
+                  ${linhasHtml.replace(/<th scope="row">/g, '<th scope="row" style="text-align:left; padding:6px 10px; font-family:inherit; font-weight:700; white-space:nowrap; border-top:1px solid var(--border); position:sticky; left:0; background:var(--deep); z-index:1;">').replace(/<td>/g, '<td style="text-align:right; padding:6px 10px; border-top:1px solid var(--border);">')}
                 </tbody>
               </table>
             </div>
