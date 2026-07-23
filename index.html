@@ -106,8 +106,12 @@
       color: var(--primary);
       font-size: 1rem;
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
     .brand:hover { opacity: 0.85; }
+    .brand-logo { display: block; border-radius: 50%; flex-shrink: 0; }
     .nav {
       display: flex;
       gap: 20px;
@@ -756,7 +760,10 @@
 
   <header>
     <div class="container topbar">
-      <a class="brand" href="/" title="Ir para a página inicial">DIVIDENDOS | VIVER DE RENDA</a>
+      <a class="brand" href="/" title="Ir para a página inicial">
+        <img src="logo-header-96.png" srcset="logo-header-48.png 48w, logo-header-96.png 96w" sizes="34px" alt="" class="brand-logo" width="34" height="34" />
+        DIVIDENDOS | VIVER DE RENDA
+      </a>
       <nav class="nav">
         <a href="#consultas">Mercado</a>
         <a href="#educacao">Educação</a>
