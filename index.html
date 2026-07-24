@@ -830,6 +830,16 @@
     .financ-print-doc tr:nth-child(even) td:not(:first-child) { background: #eef1f6; }
     .financ-print-doc tr:nth-child(odd) td:not(:first-child) { background: #f7f9fc; }
     .financ-print-doc .financ-print-aviso { margin-top: 18px; font-size: 0.75rem; color: #555; font-style: italic; border-top: 1px solid #ccc; padding-top: 10px; }
+    .financ-print-doc .financ-print-h2 { font-size: 1rem; margin: 26px 0 6px; color: #1a1a1a; }
+
+    /* Tabela mês a mês: estilo diferente (mais compacta, linhas riscadas,
+       cabeçalho repetido em cada página impressa). */
+    .financ-print-tabela-parcelas th { background: #2b2b2b; font-size: 0.72rem; padding: 6px 8px; }
+    .financ-print-tabela-parcelas td { padding: 5px 8px; font-size: 0.74rem; text-align: right; background: transparent !important; color: #1a1a1a !important; font-weight: 400 !important; }
+    .financ-print-tabela-parcelas td:first-child { text-align: left; background: transparent !important; color: #1a1a1a !important; font-weight: 700 !important; }
+    .financ-print-tabela-parcelas tbody tr:nth-child(even) { background: #f2f4f8; }
+    .financ-print-tabela-parcelas thead { display: table-header-group; }
+    .financ-print-tabela-parcelas tr { break-inside: avoid; }
 
     @media print {
       body * { visibility: hidden; }
@@ -1104,7 +1114,7 @@
               <label for="financValor">Valor do financiamento</label>
               <div class="calc-input-prefixado">
                 <span class="calc-prefixo">R$</span>
-                <input type="number" id="financValor" min="0" step="0.01" placeholder="0,00" />
+                <input type="text" inputmode="numeric" id="financValor" placeholder="0,00" />
               </div>
             </div>
             <div class="calc-campo">
@@ -1124,7 +1134,7 @@
           <div class="calc-grid-2">
             <div class="calc-campo">
               <label for="financTaxa">Taxa de juros (%)</label>
-              <input type="number" id="financTaxa" min="0" step="0.01" value="11.5" />
+              <input type="text" inputmode="decimal" id="financTaxa" value="11,5" />
             </div>
             <div class="calc-campo">
               <label for="financJurosPeriodo">Juros</label>
@@ -2773,6 +2783,32 @@
 
       if (!overlay || !btnAbrirMenu) return; // seção não presente nesta página
 
+      // Máscara de moeda: digita da direita pra esquerda (como caixa
+      // eletrônico). Guarda os centavos como número inteiro no dataset
+      // do próprio input, e mostra sempre formatado como "1.234,56".
+      inValor.dataset.centavos = '0';
+      inValor.addEventListener('input', () => {
+        const somenteDigitos = inValor.value.replace(/\D/g, '');
+        const centavos = somenteDigitos === '' ? 0 : parseInt(somenteDigitos, 10);
+        inValor.dataset.centavos = String(centavos);
+        inValor.value = (centavos / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      });
+      function valorFinanciamentoNumero() {
+        return parseInt(inValor.dataset.centavos || '0', 10) / 100;
+      }
+
+      // Converte texto digitado (aceitando vírgula OU ponto como decimal)
+      // para número. Ex: "11,5" -> 11.5 | "11.5" -> 11.5 | "1.234,56" -> 1234.56
+      function parseNumeroBr(texto) {
+        if (typeof texto !== 'string') return parseFloat(texto) || 0;
+        let limpo = texto.trim();
+        if (limpo.includes(',')) {
+          // vírgula presente = separador decimal; pontos (se houver) são de milhar
+          limpo = limpo.replace(/\./g, '').replace(',', '.');
+        }
+        return parseFloat(limpo) || 0;
+      }
+
       const NOMES_MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 
       function formatMesAno(ano, mesIndex0) {
@@ -2845,9 +2881,9 @@
       }
 
       function simular() {
-        const valor = Math.max(0, parseFloat(inValor.value) || 0);
+        const valor = Math.max(0, valorFinanciamentoNumero());
         const sistema = selSistema.value;
-        const taxaPct = Math.max(0, parseFloat(inTaxa.value) || 0);
+        const taxaPct = Math.max(0, parseNumeroBr(inTaxa.value));
         const periodo = selJurosPeriodo.value;
         const parcelas = Math.max(1, Math.round(parseFloat(inParcelas.value) || 1));
 
@@ -2929,6 +2965,7 @@
           anoInicio, mesInicio0, totalPago, totalJuros,
           primeiraParcela, ultimaParcela,
           dataUltimaParcela: linhas[linhas.length - 1]?.rotuloData ?? '—',
+          linhas,
         };
 
         document.getElementById('financBtnPdf').addEventListener('click', gerarPdf);
@@ -2972,6 +3009,32 @@
                 ${linhasResumo.map(([rotulo, valorFmt]) => `<tr><td>${rotulo}</td><td>${valorFmt}</td></tr>`).join('')}
               </tbody>
             </table>
+
+            <h2 class="financ-print-h2">Tabela de parcelas — ${s.sistema === 'price' ? 'Price' : 'SAC'}</h2>
+            <table class="financ-print-tabela-parcelas">
+              <thead>
+                <tr>
+                  <th>Mês</th>
+                  <th>Dívida</th>
+                  <th>Juros</th>
+                  <th>Amortização</th>
+                  <th>Parcela</th>
+                  <th>Saldo devedor</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${s.linhas.map(l => `
+                  <tr>
+                    <td>${l.mes} | ${l.rotuloData}</td>
+                    <td>${hgFormatMoeda(l.divida)}</td>
+                    <td>${hgFormatMoeda(l.juros)}</td>
+                    <td>${hgFormatMoeda(l.amortizacao)}</td>
+                    <td>${hgFormatMoeda(l.parcela)}</td>
+                    <td>${hgFormatMoeda(l.saldoDevedor)}</td>
+                  </tr>`).join('')}
+              </tbody>
+            </table>
+
             <p class="financ-print-aviso">
               Aviso: Este documento é apenas uma simulação. Os valores são estimativos e podem variar conforme
               as condições reais do financiamento junto ao seu banco/financeira.
