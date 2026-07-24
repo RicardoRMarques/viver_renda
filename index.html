@@ -3090,6 +3090,7 @@
         };
 
         document.getElementById('financBtnPdf').addEventListener('click', gerarPdf);
+        document.getElementById('financBtnAmortizar').addEventListener('click', abrirModalAmort);
         document.getElementById('financBtnCompartilhar').addEventListener('click', (e) => {
           compartilharSimulacao(e.currentTarget);
         });
@@ -3273,7 +3274,6 @@
 
       // --- Modal "Amortizar financiamento" ---
       const amortOverlay = document.getElementById('amortOverlay');
-      const btnAbrirAmort = document.getElementById('financBtnAmortizar');
       const amortFechar = document.getElementById('amortFechar');
       const amortBtnFechar2 = document.getElementById('amortBtnFechar2');
       const amortBtnLimpar = document.getElementById('amortBtnLimpar');
@@ -3298,7 +3298,6 @@
         document.body.style.overflow = '';
       }
 
-      if (btnAbrirAmort) btnAbrirAmort.addEventListener('click', abrirModalAmort);
       if (amortFechar) amortFechar.addEventListener('click', fecharModalAmort);
       if (amortBtnFechar2) amortBtnFechar2.addEventListener('click', fecharModalAmort);
       if (amortOverlay) {
