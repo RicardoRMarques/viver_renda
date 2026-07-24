@@ -1126,8 +1126,8 @@
           <div class="calc-campo">
             <label for="financSistema">Sistema de amortização</label>
             <select id="financSistema">
+              <option value="sac" selected>SAC — parcelas decrescentes</option>
               <option value="price">Price — parcelas fixas</option>
-              <option value="sac">SAC — parcelas decrescentes</option>
             </select>
           </div>
 
@@ -2977,10 +2977,32 @@
       // Monta o documento (título + tabela de resumo) na área escondida de
       // impressão e chama o diálogo de impressão do navegador — de lá, o
       // usuário escolhe "Salvar como PDF" para baixar o arquivo.
-      function gerarPdf() {
-        if (!ultimaSimulacao) return;
+      // Monta o PDF de verdade com jsPDF (não é mais via impressão do
+      // navegador): cabeçalho + tabela-resumo + tabela completa de
+      // parcelas. Retorna o documento jsPDF pronto para salvar/compartilhar.
+      function montarDocumentoPdf() {
+        if (!ultimaSimulacao) return null;
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
         const s = ultimaSimulacao;
-        const areaImpressao = document.getElementById('financPrintArea');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Simulação de Financiamento Imobiliário', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(
+          `Valor financiado: ${hgFormatMoeda(s.valor)}  ·  Início: ${formatMesAno(s.anoInicio, s.mesInicio0)}  ·  ` +
+          `Gerado em ${new Date().toLocaleDateString('pt-BR')} — Dividendos | Viver de Renda`,
+          40, 58
+        );
+        doc.setTextColor(0);
 
         const linhasResumo = [
           ['Valor financiado', hgFormatMoeda(s.valor)],
@@ -2996,89 +3018,100 @@
           ['Sistema de amortização', s.sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'],
         ];
 
-        areaImpressao.innerHTML = `
-          <div class="financ-print-doc">
-            <h1>Simulação de Financiamento Imobiliário</h1>
-            <p class="financ-print-sub">
-              Valor financiado: ${hgFormatMoeda(s.valor)} · Início: ${formatMesAno(s.anoInicio, s.mesInicio0)} ·
-              Gerado em ${new Date().toLocaleDateString('pt-BR')} — Dividendos | Viver de Renda
-            </p>
-            <table>
-              <thead><tr><th></th><th>Valores estimados</th></tr></thead>
-              <tbody>
-                ${linhasResumo.map(([rotulo, valorFmt]) => `<tr><td>${rotulo}</td><td>${valorFmt}</td></tr>`).join('')}
-              </tbody>
-            </table>
+        doc.autoTable({
+          startY: 74,
+          head: [['', 'Valores estimados']],
+          body: linhasResumo,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
 
-            <h2 class="financ-print-h2">Tabela de parcelas — ${s.sistema === 'price' ? 'Price' : 'SAC'}</h2>
-            <table class="financ-print-tabela-parcelas">
-              <thead>
-                <tr>
-                  <th>Mês</th>
-                  <th>Dívida</th>
-                  <th>Juros</th>
-                  <th>Amortização</th>
-                  <th>Parcela</th>
-                  <th>Saldo devedor</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${s.linhas.map(l => `
-                  <tr>
-                    <td>${l.mes} | ${l.rotuloData}</td>
-                    <td>${hgFormatMoeda(l.divida)}</td>
-                    <td>${hgFormatMoeda(l.juros)}</td>
-                    <td>${hgFormatMoeda(l.amortizacao)}</td>
-                    <td>${hgFormatMoeda(l.parcela)}</td>
-                    <td>${hgFormatMoeda(l.saldoDevedor)}</td>
-                  </tr>`).join('')}
-              </tbody>
-            </table>
+        const yTabelaParcelas = doc.lastAutoTable.finalY + 24;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text(`Tabela de parcelas — ${s.sistema === 'price' ? 'Price' : 'SAC'}`, 40, yTabelaParcelas);
 
-            <p class="financ-print-aviso">
-              Aviso: Este documento é apenas uma simulação. Os valores são estimativos e podem variar conforme
-              as condições reais do financiamento junto ao seu banco/financeira.
-            </p>
-          </div>`;
+        doc.autoTable({
+          startY: yTabelaParcelas + 10,
+          head: [['Mês', 'Dívida', 'Juros', 'Amortização', 'Parcela', 'Saldo devedor']],
+          body: s.linhas.map(l => [
+            `${l.mes} | ${l.rotuloData}`,
+            hgFormatMoeda(l.divida),
+            hgFormatMoeda(l.juros),
+            hgFormatMoeda(l.amortizacao),
+            hgFormatMoeda(l.parcela),
+            hgFormatMoeda(l.saldoDevedor),
+          ]),
+          theme: 'striped',
+          styles: { fontSize: 7.5, cellPadding: 4 },
+          headStyles: { fillColor: [43, 43, 43], fontSize: 8 },
+          columnStyles: { 0: { fontStyle: 'bold' } },
+          didDrawPage: () => {
+            const paginas = doc.internal.getNumberOfPages();
+            doc.setFontSize(8);
+            doc.setTextColor(140);
+            doc.text(`Página ${paginas}`, doc.internal.pageSize.getWidth() - 60, doc.internal.pageSize.getHeight() - 20);
+            doc.setTextColor(0);
+          },
+        });
 
-        window.print();
+        const yAviso = doc.lastAutoTable.finalY + 20;
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(90);
+        doc.text(
+          'Aviso: Este documento é apenas uma simulação. Os valores são estimativos e podem variar conforme as\n' +
+          'condições reais do financiamento junto ao seu banco/financeira.',
+          40, yAviso
+        );
+
+        return doc;
       }
 
-      // Compartilha um resumo em texto da simulação (nativo no celular, ou
-      // copia pra área de transferência no desktop).
-      async function compartilharSimulacao(botao) {
-        if (!ultimaSimulacao) return;
+      function nomeArquivoPdf() {
         const s = ultimaSimulacao;
-        const texto = `Simulação de Financiamento Imobiliário — Dividendos | Viver de Renda\n\n`
-          + `Valor financiado: ${hgFormatMoeda(s.valor)}\n`
-          + `Sistema: ${s.sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'}\n`
-          + `Taxa de juros: ${hgFormatNumero(s.taxaPct)}% (${s.periodo === 'anual' ? 'a.a' : 'a.m'})\n`
-          + `Parcelas: ${s.parcelas}\n`
-          + `1ª parcela: ${hgFormatMoeda(s.primeiraParcela)} · Última parcela: ${hgFormatMoeda(s.ultimaParcela)}\n`
-          + `Total de juros: ${hgFormatMoeda(s.totalJuros)} · Total a pagar: ${hgFormatMoeda(s.totalPago)}`;
+        return `simulacao-financiamento-${s.sistema}-${hgDataYYYYMMDD(new Date())}.pdf`;
+      }
 
-        if (navigator.share) {
+      function gerarPdf() {
+        const doc = montarDocumentoPdf();
+        if (!doc) return;
+        doc.save(nomeArquivoPdf());
+      }
+
+      // Compartilha o PDF gerado como arquivo de verdade (WhatsApp, etc,
+      // via Web Share API com anexo). Se o navegador/dispositivo não
+      // suportar compartilhar arquivos, cai para baixar o PDF direto.
+      async function compartilharSimulacao(botao) {
+        const doc = montarDocumentoPdf();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoPdf();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
           try {
-            await navigator.share({ title: 'Simulação de Financiamento Imobiliário', text: texto });
+            await navigator.share({
+              title: 'Simulação de Financiamento Imobiliário',
+              text: 'Simulação de financiamento — Dividendos | Viver de Renda',
+              files: [arquivo],
+            });
             return;
           } catch (e) {
             if (e?.name === 'AbortError') return;
           }
         }
 
+        // Sem suporte a compartilhar arquivos (comum no desktop): baixa o
+        // PDF direto, já que não tem como "enviar" o arquivo por aqui.
+        doc.save(nomeArquivo);
         const textoSpan = botao.querySelector('.hg-btn-compartilhar-texto');
         const textoOriginal = textoSpan ? textoSpan.textContent : null;
-        try {
-          await navigator.clipboard.writeText(texto);
-          botao.classList.add('copiado');
-          if (textoSpan) textoSpan.textContent = 'Copiado!';
-        } catch (e) {
-          window.prompt('Copie o resumo da simulação:', texto);
-        }
-        setTimeout(() => {
-          botao.classList.remove('copiado');
-          if (textoSpan && textoOriginal) textoSpan.textContent = textoOriginal;
-        }, 2500);
+        if (textoSpan) textoSpan.textContent = 'PDF baixado!';
+        setTimeout(() => { if (textoSpan && textoOriginal) textoSpan.textContent = textoOriginal; }, 2500);
       }
 
 
@@ -3345,5 +3378,10 @@
       btnLimpar.addEventListener('click', limpar);
     })();
   </script>
+
+  <!-- jsPDF: usada só pelo Simulador de Financiamento Imobiliário, para
+       gerar o PDF de verdade (baixar e compartilhar como arquivo). -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
 </body>
 </html>
