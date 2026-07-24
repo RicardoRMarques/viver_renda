@@ -760,6 +760,40 @@
     }
     .calc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .calc-ajuda { font-size: 0.76rem; color: var(--muted); margin: 2px 0 0; }
+
+    /* Campo com prefixo (R$, %, etc.) */
+    .calc-input-prefixado {
+      display: flex;
+      align-items: stretch;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .calc-input-prefixado .calc-prefixo {
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      background: rgba(127,127,127,0.12);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-right: 1px solid var(--border);
+    }
+    .calc-input-prefixado input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .calc-input-prefixado input:focus { outline: none; }
+    .calc-input-prefixado:focus-within { border-color: var(--primary); }
+
     .calc-resultado-card {
       margin-top: 8px;
       background: var(--deep);
@@ -784,6 +818,24 @@
 
     /* Simulador de Financiamento Imobiliário */
     .financ-modal { max-width: 720px; }
+    .financ-print-area { display: none; }
+
+    .financ-print-doc { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; padding: 24px; }
+    .financ-print-doc h1 { font-size: 1.3rem; margin: 0 0 4px; }
+    .financ-print-doc .financ-print-sub { font-size: 0.85rem; color: #555; margin: 0 0 18px; }
+    .financ-print-doc table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    .financ-print-doc th { background: #777; color: #fff; padding: 10px 14px; text-align: center; font-size: 0.85rem; }
+    .financ-print-doc td { padding: 10px 14px; text-align: center; font-size: 0.9rem; }
+    .financ-print-doc td:first-child { background: #777; color: #fff; text-align: left; font-weight: 700; }
+    .financ-print-doc tr:nth-child(even) td:not(:first-child) { background: #eef1f6; }
+    .financ-print-doc tr:nth-child(odd) td:not(:first-child) { background: #f7f9fc; }
+    .financ-print-doc .financ-print-aviso { margin-top: 18px; font-size: 0.75rem; color: #555; font-style: italic; border-top: 1px solid #ccc; padding-top: 10px; }
+
+    @media print {
+      body * { visibility: hidden; }
+      #financPrintArea, #financPrintArea * { visibility: visible; }
+      #financPrintArea { display: block; position: absolute; top: 0; left: 0; width: 100%; }
+    }
     .financ-resumo-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1049,8 +1101,11 @@
         <div class="calc-corpo">
           <div class="calc-grid-2">
             <div class="calc-campo">
-              <label for="financValor">Valor do financiamento (R$)</label>
-              <input type="number" id="financValor" min="0" step="0.01" value="300000" />
+              <label for="financValor">Valor do financiamento</label>
+              <div class="calc-input-prefixado">
+                <span class="calc-prefixo">R$</span>
+                <input type="number" id="financValor" min="0" step="0.01" placeholder="0,00" />
+              </div>
             </div>
             <div class="calc-campo">
               <label for="financDataInicio">Data de início</label>
@@ -1091,6 +1146,10 @@
         </div>
       </div>
     </div>
+
+    <!-- Área usada só na hora de gerar o PDF (impressão) — fica escondida
+         na tela normal e só aparece quando o usuário clica em "Baixar PDF". -->
+    <div id="financPrintArea" class="financ-print-area"></div>
 
     <!-- Modal: Calculadora de Juros Compostos -->
     <div id="jcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="jcTitulo" hidden>
@@ -2710,6 +2769,7 @@
       const inParcelas = document.getElementById('financParcelas');
       const btnSimular = document.getElementById('financBtnSimular');
       const resultadoEl = document.getElementById('financResultado');
+      let ultimaSimulacao = null;
 
       if (!overlay || !btnAbrirMenu) return; // seção não presente nesta página
 
@@ -2834,6 +2894,14 @@
             <div class="financ-resumo-card"><span>Total de juros</span><strong>${hgFormatMoeda(totalJuros)}</strong></div>
           </div>
 
+          <div style="display:flex; gap:10px; margin-top:14px;">
+            <button type="button" class="hg-btn" id="financBtnPdf" style="flex:1;">📄 Baixar PDF</button>
+            <button type="button" class="hg-btn-compartilhar" id="financBtnCompartilhar" style="flex:1; justify-content:center;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+          </div>
+
           <div class="financ-tabela-scroll">
             <table class="financ-tabela">
               <thead>
@@ -2854,7 +2922,102 @@
             pelo sistema ${sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'}.
             Não substitui a simulação oficial do seu banco/financeira.
           </p>`;
+
+        // Guarda os dados da última simulação para o PDF e o compartilhamento.
+        ultimaSimulacao = {
+          valor, sistema, taxaPct, periodo, parcelas,
+          anoInicio, mesInicio0, totalPago, totalJuros,
+          primeiraParcela, ultimaParcela,
+          dataUltimaParcela: linhas[linhas.length - 1]?.rotuloData ?? '—',
+        };
+
+        document.getElementById('financBtnPdf').addEventListener('click', gerarPdf);
+        document.getElementById('financBtnCompartilhar').addEventListener('click', (e) => {
+          compartilharSimulacao(e.currentTarget);
+        });
       }
+
+      // Monta o documento (título + tabela de resumo) na área escondida de
+      // impressão e chama o diálogo de impressão do navegador — de lá, o
+      // usuário escolhe "Salvar como PDF" para baixar o arquivo.
+      function gerarPdf() {
+        if (!ultimaSimulacao) return;
+        const s = ultimaSimulacao;
+        const areaImpressao = document.getElementById('financPrintArea');
+
+        const linhasResumo = [
+          ['Valor financiado', hgFormatMoeda(s.valor)],
+          ['Total a ser pago', hgFormatMoeda(s.totalPago)],
+          ['Total de juros', hgFormatMoeda(s.totalJuros)],
+          ['Total de taxas/seguros', hgFormatMoeda(0)],
+          ['Correção', hgFormatMoeda(0)],
+          ['Taxa de juros', `${hgFormatNumero(s.taxaPct)}% (${s.periodo === 'anual' ? 'a.a' : 'a.m'})`],
+          ['Quantidade de parcelas', String(s.parcelas)],
+          ['Valor da primeira parcela', hgFormatMoeda(s.primeiraParcela)],
+          ['Valor da última parcela', hgFormatMoeda(s.ultimaParcela)],
+          ['Data da última parcela', s.dataUltimaParcela],
+          ['Sistema de amortização', s.sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'],
+        ];
+
+        areaImpressao.innerHTML = `
+          <div class="financ-print-doc">
+            <h1>Simulação de Financiamento Imobiliário</h1>
+            <p class="financ-print-sub">
+              Valor financiado: ${hgFormatMoeda(s.valor)} · Início: ${formatMesAno(s.anoInicio, s.mesInicio0)} ·
+              Gerado em ${new Date().toLocaleDateString('pt-BR')} — Dividendos | Viver de Renda
+            </p>
+            <table>
+              <thead><tr><th></th><th>Valores estimados</th></tr></thead>
+              <tbody>
+                ${linhasResumo.map(([rotulo, valorFmt]) => `<tr><td>${rotulo}</td><td>${valorFmt}</td></tr>`).join('')}
+              </tbody>
+            </table>
+            <p class="financ-print-aviso">
+              Aviso: Este documento é apenas uma simulação. Os valores são estimativos e podem variar conforme
+              as condições reais do financiamento junto ao seu banco/financeira.
+            </p>
+          </div>`;
+
+        window.print();
+      }
+
+      // Compartilha um resumo em texto da simulação (nativo no celular, ou
+      // copia pra área de transferência no desktop).
+      async function compartilharSimulacao(botao) {
+        if (!ultimaSimulacao) return;
+        const s = ultimaSimulacao;
+        const texto = `Simulação de Financiamento Imobiliário — Dividendos | Viver de Renda\n\n`
+          + `Valor financiado: ${hgFormatMoeda(s.valor)}\n`
+          + `Sistema: ${s.sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'}\n`
+          + `Taxa de juros: ${hgFormatNumero(s.taxaPct)}% (${s.periodo === 'anual' ? 'a.a' : 'a.m'})\n`
+          + `Parcelas: ${s.parcelas}\n`
+          + `1ª parcela: ${hgFormatMoeda(s.primeiraParcela)} · Última parcela: ${hgFormatMoeda(s.ultimaParcela)}\n`
+          + `Total de juros: ${hgFormatMoeda(s.totalJuros)} · Total a pagar: ${hgFormatMoeda(s.totalPago)}`;
+
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: 'Simulação de Financiamento Imobiliário', text: texto });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        const textoSpan = botao.querySelector('.hg-btn-compartilhar-texto');
+        const textoOriginal = textoSpan ? textoSpan.textContent : null;
+        try {
+          await navigator.clipboard.writeText(texto);
+          botao.classList.add('copiado');
+          if (textoSpan) textoSpan.textContent = 'Copiado!';
+        } catch (e) {
+          window.prompt('Copie o resumo da simulação:', texto);
+        }
+        setTimeout(() => {
+          botao.classList.remove('copiado');
+          if (textoSpan && textoOriginal) textoSpan.textContent = textoOriginal;
+        }, 2500);
+      }
+
 
       function abrirModal() {
         if (!inDataInicio.value) {
