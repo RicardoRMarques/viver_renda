@@ -781,6 +781,60 @@
     .calc-tabela-comp th, .calc-tabela-comp td { text-align: right; padding: 6px 8px; border-top: 1px solid var(--border); }
     .calc-tabela-comp th:first-child, .calc-tabela-comp td:first-child { text-align: left; }
     .calc-tabela-comp tr.calc-linha-selecionada td { color: var(--primary); font-weight: 700; }
+
+    /* Simulador de Financiamento Imobiliário */
+    .financ-modal { max-width: 720px; }
+    .financ-resumo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .financ-resumo-card {
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .financ-resumo-card span { display: block; font-size: 0.72rem; color: var(--muted); margin-bottom: 4px; }
+    .financ-resumo-card strong { font-family: "Courier New", monospace; font-size: 0.92rem; }
+    .financ-totais {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .financ-totais .financ-resumo-card strong { color: var(--primary); }
+    .financ-tabela-scroll { max-height: 420px; overflow-y: auto; overflow-x: auto; margin-top: 16px; border: 1px solid var(--border); border-radius: 10px; }
+    .financ-tabela {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: "Courier New", monospace;
+      font-size: 0.78rem;
+    }
+    .financ-tabela th {
+      position: sticky; top: 0;
+      background: var(--deep);
+      color: var(--muted);
+      text-align: right;
+      padding: 8px 10px;
+      white-space: nowrap;
+      z-index: 1;
+    }
+    .financ-tabela th:first-child, .financ-tabela td:first-child {
+      text-align: left;
+      position: sticky; left: 0;
+      background: var(--deep);
+      z-index: 2;
+    }
+    .financ-tabela th:first-child { z-index: 3; }
+    .financ-tabela td {
+      text-align: right;
+      padding: 6px 10px;
+      border-top: 1px solid var(--border);
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -811,6 +865,9 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="8" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line><line x1="16" y1="18" x2="16" y2="18"></line></svg>Calculadora
             </button>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
+            <button type="button" class="nav-dropdown-item" id="navAbrirFinanciamento">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"></path></svg>Financiamento Imobiliário
+            </button>
           </div>
         </div>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
@@ -969,6 +1026,62 @@
           <button class="hg-btn" id="calcBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
 
           <div id="calcResultado"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal do simulador de financiamento imobiliário (Price / SAC) -->
+    <div id="financOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="financTitulo" hidden>
+      <div class="calc-modal financ-modal">
+        <div class="calc-modal-topo">
+          <h3 id="financTitulo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"></path></svg>Simulador de Financiamento Imobiliário
+          </h3>
+          <button id="financFechar" class="calc-fechar" aria-label="Fechar simulador" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="financValor">Valor do financiamento (R$)</label>
+              <input type="number" id="financValor" min="0" step="0.01" value="300000" />
+            </div>
+            <div class="calc-campo">
+              <label for="financDataInicio">Data de início</label>
+              <input type="month" id="financDataInicio" />
+            </div>
+          </div>
+
+          <div class="calc-campo">
+            <label for="financSistema">Sistema de amortização</label>
+            <select id="financSistema">
+              <option value="price">Price — parcelas fixas</option>
+              <option value="sac">SAC — parcelas decrescentes</option>
+            </select>
+          </div>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="financTaxa">Taxa de juros (%)</label>
+              <input type="number" id="financTaxa" min="0" step="0.01" value="11.5" />
+            </div>
+            <div class="calc-campo">
+              <label for="financJurosPeriodo">Juros</label>
+              <select id="financJurosPeriodo">
+                <option value="anual">Anual (a.a)</option>
+                <option value="mensal">Mensal (a.m)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="calc-campo">
+            <label for="financParcelas">Quantidade de parcelas</label>
+            <input type="number" id="financParcelas" min="1" step="1" value="360" />
+          </div>
+
+          <button class="hg-btn" id="financBtnSimular" style="width:100%; margin-top:6px;">Simular</button>
+
+          <div id="financResultado"></div>
         </div>
       </div>
     </div>
@@ -2474,6 +2587,190 @@
       selTipo.addEventListener('change', atualizarCampoTaxa);
       selIndexador.addEventListener('change', atualizarCampoTaxa);
       btnCalcular.addEventListener('click', calcular);
+    })();
+
+    // ============================================================
+    // SIMULADOR DE FINANCIAMENTO IMOBILIÁRIO (Price / SAC)
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('financOverlay');
+      const btnAbrirMenu = document.getElementById('navAbrirFinanciamento');
+      const btnFechar = document.getElementById('financFechar');
+      const inValor = document.getElementById('financValor');
+      const inDataInicio = document.getElementById('financDataInicio');
+      const selSistema = document.getElementById('financSistema');
+      const inTaxa = document.getElementById('financTaxa');
+      const selJurosPeriodo = document.getElementById('financJurosPeriodo');
+      const inParcelas = document.getElementById('financParcelas');
+      const btnSimular = document.getElementById('financBtnSimular');
+      const resultadoEl = document.getElementById('financResultado');
+
+      if (!overlay || !btnAbrirMenu) return; // seção não presente nesta página
+
+      const NOMES_MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+
+      function formatMesAno(ano, mesIndex0) {
+        return `${NOMES_MESES[mesIndex0]}/${ano}`;
+      }
+
+      // Converte a taxa informada (anual ou mensal) para taxa mensal efetiva.
+      function taxaMensalEfetiva(taxaPct, periodo) {
+        if (periodo === 'mensal') return taxaPct / 100;
+        return Math.pow(1 + taxaPct / 100, 1 / 12) - 1;
+      }
+
+      // Gera a tabela de amortização completa (Price ou SAC).
+      function simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0 }) {
+        const linhas = [];
+        let saldo = valor;
+
+        // Linha 0: situação inicial, antes da primeira parcela.
+        linhas.push({
+          mes: 0,
+          rotuloData: formatMesAno(anoInicio, mesInicio0),
+          divida: 0,
+          juros: 0,
+          amortizacao: 0,
+          parcela: 0,
+          saldoDevedor: valor,
+        });
+
+        let amortizacaoConstante = valor / parcelas; // usada no SAC
+        let parcelaFixaPrice = 0;
+        if (sistema === 'price') {
+          parcelaFixaPrice = taxaMensal > 0
+            ? valor * (taxaMensal * Math.pow(1 + taxaMensal, parcelas)) / (Math.pow(1 + taxaMensal, parcelas) - 1)
+            : valor / parcelas;
+        }
+
+        for (let m = 1; m <= parcelas; m++) {
+          const juros = saldo * taxaMensal;
+          let amortizacao, parcela;
+
+          if (sistema === 'sac') {
+            amortizacao = amortizacaoConstante;
+            parcela = amortizacao + juros;
+          } else {
+            parcela = parcelaFixaPrice;
+            amortizacao = parcela - juros;
+          }
+
+          // Ajuste na última parcela para zerar o saldo exatamente (evita sobra de centavos).
+          if (m === parcelas) amortizacao = saldo;
+          const dividaAntes = saldo;
+          saldo = Math.max(0, saldo - amortizacao);
+
+          const totalMeses = mesInicio0 + m;
+          const anoLinha = anoInicio + Math.floor(totalMeses / 12);
+          const mesLinha0 = totalMeses % 12;
+
+          linhas.push({
+            mes: m,
+            rotuloData: formatMesAno(anoLinha, mesLinha0),
+            divida: dividaAntes,
+            juros,
+            amortizacao,
+            parcela: sistema === 'sac' ? amortizacao + juros : parcela,
+            saldoDevedor: saldo,
+          });
+        }
+
+        return linhas;
+      }
+
+      function simular() {
+        const valor = Math.max(0, parseFloat(inValor.value) || 0);
+        const sistema = selSistema.value;
+        const taxaPct = Math.max(0, parseFloat(inTaxa.value) || 0);
+        const periodo = selJurosPeriodo.value;
+        const parcelas = Math.max(1, Math.round(parseFloat(inParcelas.value) || 1));
+
+        let anoInicio, mesInicio0;
+        if (inDataInicio.value) {
+          const [a, m] = inDataInicio.value.split('-').map(Number);
+          anoInicio = a; mesInicio0 = m - 1;
+        } else {
+          const hoje = new Date();
+          anoInicio = hoje.getFullYear(); mesInicio0 = hoje.getMonth();
+        }
+
+        const taxaMensal = taxaMensalEfetiva(taxaPct, periodo);
+        const linhas = simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0 });
+
+        const totalJuros = linhas.reduce((acc, l) => acc + l.juros, 0);
+        const totalPago = linhas.reduce((acc, l) => acc + l.parcela, 0);
+        const primeiraParcela = linhas[1]?.parcela ?? 0;
+        const ultimaParcela = linhas[linhas.length - 1]?.parcela ?? 0;
+
+        const linhasTabelaHtml = linhas.map(l => `
+          <tr>
+            <td>${l.mes} | ${l.rotuloData}</td>
+            <td>${hgFormatMoeda(l.divida)}</td>
+            <td>${hgFormatMoeda(l.juros)}</td>
+            <td>${hgFormatMoeda(l.amortizacao)}</td>
+            <td>${hgFormatMoeda(l.parcela)}</td>
+            <td>${hgFormatMoeda(l.saldoDevedor)}</td>
+          </tr>`).join('');
+
+        resultadoEl.innerHTML = `
+          <div class="financ-resumo-grid">
+            <div class="financ-resumo-card"><span>Empréstimo</span><strong>${hgFormatMoeda(valor)}</strong></div>
+            <div class="financ-resumo-card"><span>Início</span><strong>${formatMesAno(anoInicio, mesInicio0)}</strong></div>
+            <div class="financ-resumo-card"><span>Sistema</span><strong>${sistema === 'price' ? 'Price' : 'SAC'}</strong></div>
+            <div class="financ-resumo-card"><span>Taxa de juros</span><strong>${hgFormatNumero(taxaPct)}%</strong></div>
+            <div class="financ-resumo-card"><span>Juros</span><strong>${periodo === 'anual' ? 'a.a' : 'a.m'}</strong></div>
+            <div class="financ-resumo-card"><span>Nº de parcelas</span><strong>${parcelas}</strong></div>
+          </div>
+
+          <div class="financ-totais">
+            <div class="financ-resumo-card"><span>${sistema === 'price' ? 'Parcela fixa' : '1ª parcela'}</span><strong>${hgFormatMoeda(primeiraParcela)}</strong></div>
+            ${sistema === 'sac' ? `<div class="financ-resumo-card"><span>Última parcela</span><strong>${hgFormatMoeda(ultimaParcela)}</strong></div>` : `<div class="financ-resumo-card"><span>Total pago</span><strong>${hgFormatMoeda(totalPago)}</strong></div>`}
+            <div class="financ-resumo-card"><span>Total de juros</span><strong>${hgFormatMoeda(totalJuros)}</strong></div>
+          </div>
+
+          <div class="financ-tabela-scroll">
+            <table class="financ-tabela">
+              <thead>
+                <tr>
+                  <th>Mês</th>
+                  <th>Dívida</th>
+                  <th>Juros</th>
+                  <th>Amortização</th>
+                  <th>Parcela</th>
+                  <th>Saldo devedor</th>
+                </tr>
+              </thead>
+              <tbody>${linhasTabelaHtml}</tbody>
+            </table>
+          </div>
+          <p class="calc-ajuda" style="margin-top:10px;">
+            Simulação sem correção monetária, seguro ou taxas administrativas — apenas juros e amortização
+            pelo sistema ${sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'}.
+            Não substitui a simulação oficial do seu banco/financeira.
+          </p>`;
+      }
+
+      function abrirModal() {
+        if (!inDataInicio.value) {
+          const hoje = new Date();
+          inDataInicio.value = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+        }
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnSimular.addEventListener('click', simular);
     })();
   </script>
 </body>
