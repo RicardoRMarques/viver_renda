@@ -858,16 +858,22 @@
         <a href="#educacao">Educação</a>
         <div class="nav-dropdown">
           <button type="button" class="nav-dropdown-btn" id="navRendaFixaBtn" aria-haspopup="true" aria-expanded="false">
-            Renda Fixa <span class="nav-dropdown-seta">▾</span>
+            Simuladores <span class="nav-dropdown-seta">▾</span>
           </button>
           <div class="nav-dropdown-menu" id="navRendaFixaMenu">
             <button type="button" class="nav-dropdown-item" id="navAbrirCalculadora">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="8" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line><line x1="16" y1="18" x2="16" y2="18"></line></svg>Calculadora
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="8" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line><line x1="16" y1="18" x2="16" y2="18"></line></svg>Calculadora Renda Fixa
+            </button>
+            <button type="button" class="nav-dropdown-item" id="navAbrirJurosCompostos">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M3 17 9 11 13 15 21 7"></path><path d="M15 7h6v6"></path></svg>Calculadora de Juros Compostos
+            </button>
+            <button type="button" class="nav-dropdown-item" id="navAbrirEmprestimo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><rect x="2" y="6" width="20" height="12" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line><line x1="6" y1="14" x2="10" y2="14"></line></svg>Calculadora de Empréstimo
+            </button>
+            <button type="button" class="nav-dropdown-item" id="navAbrirFinanciamento">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"></path></svg>Calculadora Financiamento Imobiliário
             </button>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
-            <button type="button" class="nav-dropdown-item" id="navAbrirFinanciamento">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"></path></svg>Financiamento Imobiliário
-            </button>
           </div>
         </div>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
@@ -1082,6 +1088,106 @@
           <button class="hg-btn" id="financBtnSimular" style="width:100%; margin-top:6px;">Simular</button>
 
           <div id="financResultado"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Calculadora de Juros Compostos -->
+    <div id="jcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="jcTitulo" hidden>
+      <div class="calc-modal financ-modal">
+        <div class="calc-modal-topo">
+          <h3 id="jcTitulo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M3 17 9 11 13 15 21 7"></path><path d="M15 7h6v6"></path></svg>Calculadora de Juros Compostos
+          </h3>
+          <button id="jcFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="jcValorInicial">Valor inicial (R$)</label>
+              <input type="number" id="jcValorInicial" min="0" step="0.01" value="1000" />
+            </div>
+            <div class="calc-campo">
+              <label for="jcInvestimentoMensal">Investimento mensal (R$)</label>
+              <input type="number" id="jcInvestimentoMensal" min="0" step="0.01" value="0" />
+            </div>
+          </div>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="jcTaxa">Taxa de juros (%)</label>
+              <input type="number" id="jcTaxa" min="0" step="0.01" value="10" />
+            </div>
+            <div class="calc-campo">
+              <label for="jcTaxaPeriodo">&nbsp;</label>
+              <select id="jcTaxaPeriodo">
+                <option value="anual">Anual</option>
+                <option value="mensal">Mensal</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="jcPeriodo">Período</label>
+              <input type="number" id="jcPeriodo" min="1" step="1" value="10" />
+            </div>
+            <div class="calc-campo">
+              <label for="jcPeriodoUnidade">&nbsp;</label>
+              <select id="jcPeriodoUnidade">
+                <option value="anos">Anos</option>
+                <option value="meses">Meses</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="hg-btn" id="jcBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
+
+          <div id="jcResultado"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Calculadora de Empréstimo (financiamento com prestações fixas — Price) -->
+    <div id="empOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="empTitulo" hidden>
+      <div class="calc-modal">
+        <div class="calc-modal-topo">
+          <h3 id="empTitulo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><rect x="2" y="6" width="20" height="12" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line><line x1="6" y1="14" x2="10" y2="14"></line></svg>Calculadora de Empréstimo
+          </h3>
+          <button id="empFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <p class="calc-ajuda" style="margin-top:0;">
+            Financiamento com prestações fixas (Tabela Price). Preencha <strong>3 dos 4 campos</strong> e deixe o que
+            você quer descobrir em branco (ou zerado) — a calculadora resolve o valor que falta.
+          </p>
+
+          <div class="calc-campo">
+            <label for="empMeses">Nº de meses</label>
+            <input type="number" id="empMeses" min="0" step="1" placeholder="Ex: 60" />
+          </div>
+          <div class="calc-campo">
+            <label for="empTaxaMensal">Taxa de juros mensal (%)</label>
+            <input type="number" id="empTaxaMensal" min="0" step="0.01" placeholder="Ex: 1,5" />
+          </div>
+          <div class="calc-campo">
+            <label for="empPrestacao">Valor da prestação (R$)</label>
+            <input type="number" id="empPrestacao" min="0" step="0.01" placeholder="Considera-se que a 1ª prestação não seja no ato" />
+          </div>
+          <div class="calc-campo">
+            <label for="empValorFinanciado">Valor financiado (R$)</label>
+            <input type="number" id="empValorFinanciado" min="0" step="0.01" placeholder="Não inclui o valor da entrada" />
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:6px;">
+            <button class="hg-btn" id="empBtnCalcular" style="flex:1;">Calcular</button>
+            <button class="hg-btn" id="empBtnLimpar" style="flex:1; background:var(--deep); color:var(--text); border:1px solid var(--border);">Limpar</button>
+          </div>
+
+          <div id="empResultado"></div>
         </div>
       </div>
     </div>
@@ -2771,6 +2877,246 @@
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnSimular.addEventListener('click', simular);
+    })();
+
+    // ============================================================
+    // CALCULADORA DE JUROS COMPOSTOS
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('jcOverlay');
+      const btnAbrirMenu = document.getElementById('navAbrirJurosCompostos');
+      const btnFechar = document.getElementById('jcFechar');
+      const inValorInicial = document.getElementById('jcValorInicial');
+      const inInvestimentoMensal = document.getElementById('jcInvestimentoMensal');
+      const inTaxa = document.getElementById('jcTaxa');
+      const selTaxaPeriodo = document.getElementById('jcTaxaPeriodo');
+      const inPeriodo = document.getElementById('jcPeriodo');
+      const selPeriodoUnidade = document.getElementById('jcPeriodoUnidade');
+      const btnCalcular = document.getElementById('jcBtnCalcular');
+      const resultadoEl = document.getElementById('jcResultado');
+
+      if (!overlay || !btnAbrirMenu) return;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function calcular() {
+        const valorInicial = Math.max(0, parseFloat(inValorInicial.value) || 0);
+        const aporteMensal = Math.max(0, parseFloat(inInvestimentoMensal.value) || 0);
+        const taxaInformada = Math.max(0, parseFloat(inTaxa.value) || 0);
+        const periodoInformado = Math.max(1, parseFloat(inPeriodo.value) || 1);
+
+        const taxaMensal = selTaxaPeriodo.value === 'anual'
+          ? Math.pow(1 + taxaInformada / 100, 1 / 12) - 1
+          : taxaInformada / 100;
+        const meses = Math.round(selPeriodoUnidade.value === 'anos' ? periodoInformado * 12 : periodoInformado);
+
+        let saldo = valorInicial;
+        for (let m = 0; m < meses; m++) {
+          saldo = saldo * (1 + taxaMensal) + aporteMensal;
+        }
+
+        const totalInvestido = valorInicial + aporteMensal * meses;
+        const totalJuros = saldo - totalInvestido;
+
+        resultadoEl.innerHTML = `
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha">
+              <span>Total investido</span>
+              <strong>${hgFormatMoeda(totalInvestido)}</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Total em juros</span>
+              <strong>${hgFormatMoeda(totalJuros)}</strong>
+            </div>
+            <div class="calc-resultado-linha calc-destaque">
+              <span>Valor final</span>
+              <strong>${hgFormatMoeda(saldo)}</strong>
+            </div>
+          </div>
+          <p class="calc-ajuda" style="margin-top:10px;">
+            Simulação com capitalização mensal composta, ${selTaxaPeriodo.value === 'anual' ? `taxa anual de ${hgFormatNumero(taxaInformada)}% convertida para juros mensais` : `taxa mensal de ${hgFormatNumero(taxaInformada)}%`}.
+          </p>`;
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
+    })();
+
+    // ============================================================
+    // CALCULADORA DE EMPRÉSTIMO (Tabela Price — resolve o campo em
+    // branco a partir dos outros 3: nº de meses, taxa mensal,
+    // prestação, valor financiado)
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('empOverlay');
+      const btnAbrirMenu = document.getElementById('navAbrirEmprestimo');
+      const btnFechar = document.getElementById('empFechar');
+      const inMeses = document.getElementById('empMeses');
+      const inTaxa = document.getElementById('empTaxaMensal');
+      const inPrestacao = document.getElementById('empPrestacao');
+      const inValorFinanciado = document.getElementById('empValorFinanciado');
+      const btnCalcular = document.getElementById('empBtnCalcular');
+      const btnLimpar = document.getElementById('empBtnLimpar');
+      const resultadoEl = document.getElementById('empResultado');
+
+      if (!overlay || !btnAbrirMenu) return;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function erro(msg) {
+        resultadoEl.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a; margin-top:14px;">${msg}</p>`;
+      }
+
+      // PMT = PV * i(1+i)^n / ((1+i)^n - 1)
+      function calcularPrestacao(pv, i, n) {
+        if (i === 0) return pv / n;
+        const f = Math.pow(1 + i, n);
+        return pv * (i * f) / (f - 1);
+      }
+      // PV = PMT * ((1+i)^n - 1) / (i(1+i)^n)
+      function calcularValorFinanciado(pmt, i, n) {
+        if (i === 0) return pmt * n;
+        const f = Math.pow(1 + i, n);
+        return pmt * (f - 1) / (i * f);
+      }
+      // n = -ln(1 - PV*i/PMT) / ln(1+i)
+      function calcularMeses(pv, pmt, i) {
+        if (i === 0) return pv / pmt;
+        const razao = 1 - (pv * i) / pmt;
+        if (razao <= 0) return null; // prestação não cobre nem os juros — nunca quita
+        return -Math.log(razao) / Math.log(1 + i);
+      }
+      // Taxa: sem fórmula fechada — resolve por bisseção numérica.
+      function calcularTaxa(pv, pmt, n) {
+        if (pmt * n <= pv) return null; // prestações não cobrem o valor financiado
+        let baixo = 0.00001, alto = 1; // 0,001% a 100% ao mês
+        for (let iter = 0; iter < 100; iter++) {
+          const meio = (baixo + alto) / 2;
+          const pmtCalculado = calcularPrestacao(pv, meio, n);
+          if (pmtCalculado > pmt) alto = meio; else baixo = meio;
+        }
+        return (baixo + alto) / 2;
+      }
+
+      function calcular() {
+        const vMeses = parseFloat(inMeses.value);
+        const vTaxa = parseFloat(inTaxa.value);
+        const vPrestacao = parseFloat(inPrestacao.value);
+        const vValorFinanciado = parseFloat(inValorFinanciado.value);
+
+        const preenchidos = [
+          !isNaN(vMeses) && vMeses > 0,
+          !isNaN(vTaxa) && vTaxa >= 0,
+          !isNaN(vPrestacao) && vPrestacao > 0,
+          !isNaN(vValorFinanciado) && vValorFinanciado > 0,
+        ];
+        const totalPreenchidos = preenchidos.filter(Boolean).length;
+
+        if (totalPreenchidos < 3) {
+          erro('Preencha pelo menos 3 dos 4 campos (deixe só o que você quer descobrir em branco).');
+          return;
+        }
+        if (totalPreenchidos === 4) {
+          erro('Deixe um dos 4 campos em branco — é ele que a calculadora vai descobrir. Ou apague um para conferir a conta.');
+          return;
+        }
+
+        let meses = vMeses, taxa = vTaxa, prestacao = vPrestacao, valorFinanciado = vValorFinanciado;
+        let campoCalculado = '';
+
+        if (isNaN(vMeses) || vMeses <= 0) {
+          const i = taxa / 100;
+          meses = calcularMeses(valorFinanciado, prestacao, i);
+          campoCalculado = 'meses';
+          if (meses === null || !isFinite(meses)) { erro('Com esses valores, a prestação não é suficiente nem para cobrir os juros — o financiamento nunca seria quitado. Revise a taxa ou a prestação.'); return; }
+        } else if (isNaN(vTaxa)) {
+          const i = calcularTaxa(valorFinanciado, prestacao, meses);
+          campoCalculado = 'taxa';
+          if (i === null) { erro('Com esses valores, o total das prestações não cobre o valor financiado — não há taxa de juros positiva que resolva essa conta. Revise os números.'); return; }
+          taxa = i * 100;
+        } else if (isNaN(vPrestacao) || vPrestacao <= 0) {
+          const i = taxa / 100;
+          prestacao = calcularPrestacao(valorFinanciado, i, meses);
+          campoCalculado = 'prestacao';
+        } else {
+          const i = taxa / 100;
+          valorFinanciado = calcularValorFinanciado(prestacao, i, meses);
+          campoCalculado = 'valorFinanciado';
+        }
+
+        const totalPago = prestacao * meses;
+        const totalJuros = totalPago - valorFinanciado;
+
+        const rotulos = {
+          meses: 'Nº de meses',
+          taxa: 'Taxa de juros mensal',
+          prestacao: 'Valor da prestação',
+          valorFinanciado: 'Valor financiado',
+        };
+        const valoresFormatados = {
+          meses: `${Math.round(meses)} meses`,
+          taxa: `${hgFormatNumero(taxa)}%`,
+          prestacao: hgFormatMoeda(prestacao),
+          valorFinanciado: hgFormatMoeda(valorFinanciado),
+        };
+
+        resultadoEl.innerHTML = `
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha calc-destaque">
+              <span>${rotulos[campoCalculado]} (calculado)</span>
+              <strong>${valoresFormatados[campoCalculado]}</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Total pago (todas as prestações)</span>
+              <strong>${hgFormatMoeda(totalPago)}</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Total de juros</span>
+              <strong>${hgFormatMoeda(totalJuros)}</strong>
+            </div>
+          </div>
+          <p class="calc-ajuda" style="margin-top:10px;">
+            Cálculo pela Tabela Price (prestações fixas), assumindo que a 1ª prestação é paga um mês após a liberação do valor financiado.
+          </p>`;
+      }
+
+      function limpar() {
+        inMeses.value = '';
+        inTaxa.value = '';
+        inPrestacao.value = '';
+        inValorFinanciado.value = '';
+        resultadoEl.innerHTML = '';
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
+      btnLimpar.addEventListener('click', limpar);
     })();
   </script>
 </body>
