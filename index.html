@@ -3087,6 +3087,9 @@
           primeiraParcela, ultimaParcela,
           dataUltimaParcela: linhas[linhas.length - 1]?.rotuloData ?? '—',
           linhas,
+          amortizacao: estadoAmortizacao.ativo
+            ? { valor: estadoAmortizacao.valor, modo: estadoAmortizacao.modo, pontos: Array.from(estadoAmortizacao.pontos).sort((a, b) => a - b) }
+            : null,
         };
 
         document.getElementById('financBtnPdf').addEventListener('click', gerarPdf);
@@ -3140,6 +3143,17 @@
           ['Sistema de amortização', s.sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'],
         ];
 
+        if (s.amortizacao) {
+          const listaPontos = s.amortizacao.pontos.length > 8
+            ? `${s.amortizacao.pontos.slice(0, 8).join(', ')}... (${s.amortizacao.pontos.length} parcelas)`
+            : s.amortizacao.pontos.join(', ');
+          linhasResumo.push([
+            'Amortização extra',
+            `${hgFormatMoeda(s.amortizacao.valor)} após a(s) parcela(s) ${listaPontos} — ` +
+            `${s.amortizacao.modo === 'prazo' ? 'reduzindo o prazo' : 'reduzindo a parcela'}`,
+          ]);
+        }
+
         doc.autoTable({
           startY: 74,
           head: [['', 'Valores estimados']],
@@ -3157,7 +3171,7 @@
 
         doc.autoTable({
           startY: yTabelaParcelas + 10,
-          head: [['Mês', 'Dívida', 'Juros', 'Amortização', 'Parcela', 'Saldo devedor']],
+          head: [['Mês', 'Dívida', 'Juros', 'Amortização', 'Parcela', 'Saldo devedor', 'Extra']],
           body: s.linhas.map(l => [
             `${l.mes} | ${l.rotuloData}`,
             hgFormatMoeda(l.divida),
@@ -3165,11 +3179,17 @@
             hgFormatMoeda(l.amortizacao),
             hgFormatMoeda(l.parcela),
             hgFormatMoeda(l.saldoDevedor),
+            l.amortizacaoExtra ? hgFormatMoeda(s.amortizacao?.valor ?? 0) : '',
           ]),
           theme: 'striped',
           styles: { fontSize: 7.5, cellPadding: 4 },
           headStyles: { fillColor: [43, 43, 43], fontSize: 8 },
-          columnStyles: { 0: { fontStyle: 'bold' } },
+          columnStyles: { 0: { fontStyle: 'bold' }, 6: { textColor: [61, 150, 90], fontStyle: 'bold' } },
+          didParseCell: (data) => {
+            if (data.section === 'body' && s.linhas[data.row.index]?.amortizacaoExtra) {
+              data.cell.styles.fillColor = [223, 245, 230];
+            }
+          },
           didDrawPage: () => {
             const paginas = doc.internal.getNumberOfPages();
             doc.setFontSize(8);
