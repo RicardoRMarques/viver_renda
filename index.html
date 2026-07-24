@@ -1053,12 +1053,18 @@
 
           <div class="calc-grid-2">
             <div class="calc-campo">
-              <label for="calcValorInicial">Valor inicial (R$)</label>
-              <input type="number" id="calcValorInicial" min="0" step="0.01" value="1000" />
+              <label for="calcValorInicial">Valor inicial</label>
+              <div class="calc-input-prefixado">
+                <span class="calc-prefixo">R$</span>
+                <input type="text" inputmode="numeric" id="calcValorInicial" placeholder="0,00" />
+              </div>
             </div>
             <div class="calc-campo">
-              <label for="calcAporteMensal">Aporte mensal (R$)</label>
-              <input type="number" id="calcAporteMensal" min="0" step="0.01" value="0" />
+              <label for="calcAporteMensal">Aporte mensal</label>
+              <div class="calc-input-prefixado">
+                <span class="calc-prefixo">R$</span>
+                <input type="text" inputmode="numeric" id="calcAporteMensal" placeholder="0,00" />
+              </div>
             </div>
           </div>
 
@@ -1161,6 +1167,56 @@
          na tela normal e só aparece quando o usuário clica em "Baixar PDF". -->
     <div id="financPrintArea" class="financ-print-area"></div>
 
+    <!-- Modal: Amortizar financiamento (aplica amortizações extras na simulação já feita) -->
+    <div id="amortOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="amortTitulo" hidden>
+      <div class="calc-modal">
+        <div class="calc-modal-topo">
+          <h3 id="amortTitulo">Amortizar financiamento</h3>
+          <button id="amortFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <p class="calc-ajuda" style="margin-top:0;">
+            Informe após quais parcelas você pretende fazer uma amortização extra e o valor de cada uma.
+            Você pode listar números soltos (<code>5,8,12</code>), um intervalo (<code>20-30</code>) ou
+            combinar as duas formas com vírgula: <code>5,8,12-15,20</code>.
+          </p>
+
+          <div class="calc-campo">
+            <label for="amortSequencia">Amortizar após pagamento das parcelas</label>
+            <input type="text" id="amortSequencia" placeholder="ex: 5,8,12,20-30,40" />
+          </div>
+
+          <div class="calc-campo">
+            <label for="amortValor">Valor a ser amortizado</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="amortValor" placeholder="0,00" />
+            </div>
+          </div>
+
+          <div class="calc-campo">
+            <label style="margin-bottom:6px;">
+              <input type="radio" name="amortModo" value="prazo" checked style="margin-right:6px;" />
+              Amortizar por prazo <span style="color:var(--muted); font-weight:400;">(mantém a parcela, reduz o nº de meses)</span>
+            </label>
+            <label>
+              <input type="radio" name="amortModo" value="parcela" style="margin-right:6px;" />
+              Amortizar por parcela <span style="color:var(--muted); font-weight:400;">(mantém o prazo, reduz o valor da parcela)</span>
+            </label>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:6px;">
+            <button class="hg-btn" id="amortBtnFechar2" style="flex:1; background:var(--deep); color:var(--text); border:1px solid var(--border);">Fechar</button>
+            <button class="hg-btn" id="amortBtnLimpar" style="flex:1; background:#7a1f1f; color:#fff;">Limpar amortizações</button>
+            <button class="hg-btn" id="amortBtnAplicar" style="flex:1;">Amortizar</button>
+          </div>
+
+          <div id="amortStatus" class="hg-status"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal: Calculadora de Juros Compostos -->
     <div id="jcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="jcTitulo" hidden>
       <div class="calc-modal financ-modal">
@@ -1174,12 +1230,18 @@
         <div class="calc-corpo">
           <div class="calc-grid-2">
             <div class="calc-campo">
-              <label for="jcValorInicial">Valor inicial (R$)</label>
-              <input type="number" id="jcValorInicial" min="0" step="0.01" value="1000" />
+              <label for="jcValorInicial">Valor inicial</label>
+              <div class="calc-input-prefixado">
+                <span class="calc-prefixo">R$</span>
+                <input type="text" inputmode="numeric" id="jcValorInicial" placeholder="0,00" />
+              </div>
             </div>
             <div class="calc-campo">
-              <label for="jcInvestimentoMensal">Investimento mensal (R$)</label>
-              <input type="number" id="jcInvestimentoMensal" min="0" step="0.01" value="0" />
+              <label for="jcInvestimentoMensal">Investimento mensal</label>
+              <div class="calc-input-prefixado">
+                <span class="calc-prefixo">R$</span>
+                <input type="text" inputmode="numeric" id="jcInvestimentoMensal" placeholder="0,00" />
+              </div>
             </div>
           </div>
 
@@ -1243,12 +1305,20 @@
             <input type="number" id="empTaxaMensal" min="0" step="0.01" placeholder="Ex: 1,5" />
           </div>
           <div class="calc-campo">
-            <label for="empPrestacao">Valor da prestação (R$)</label>
-            <input type="number" id="empPrestacao" min="0" step="0.01" placeholder="Considera-se que a 1ª prestação não seja no ato" />
+            <label for="empPrestacao">Valor da prestação</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="empPrestacao" placeholder="0,00" />
+            </div>
+            <p class="calc-ajuda">Considera-se que a 1ª prestação não seja no ato.</p>
           </div>
           <div class="calc-campo">
-            <label for="empValorFinanciado">Valor financiado (R$)</label>
-            <input type="number" id="empValorFinanciado" min="0" step="0.01" placeholder="Não inclui o valor da entrada" />
+            <label for="empValorFinanciado">Valor financiado</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="empValorFinanciado" placeholder="0,00" />
+            </div>
+            <p class="calc-ajuda">Não inclui o valor da entrada.</p>
           </div>
 
           <div style="display:flex; gap:10px; margin-top:6px;">
@@ -1444,6 +1514,28 @@
 
     function hgDataYYYYMMDD(d) {
       return d.toISOString().slice(0, 10);
+    }
+
+    // Aplica máscara de moeda num input: digita da direita pra esquerda
+    // (tipo caixa eletrônico). Guarda os centavos como inteiro no dataset
+    // do próprio input, e mostra sempre formatado como "1.234,56".
+    // Reaproveitável em qualquer campo de valor (R$) do site.
+    function hgAplicarMascaraMoeda(input, valorInicialReais) {
+      if (!input) return;
+      input.dataset.centavos = String(Math.round((valorInicialReais || 0) * 100));
+      if (valorInicialReais) {
+        input.value = valorInicialReais.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      input.addEventListener('input', () => {
+        const somenteDigitos = input.value.replace(/\D/g, '');
+        const centavos = somenteDigitos === '' ? 0 : parseInt(somenteDigitos, 10);
+        input.dataset.centavos = String(centavos);
+        input.value = (centavos / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      });
+    }
+    function hgValorMascarado(input) {
+      if (!input) return 0;
+      return parseInt(input.dataset.centavos || '0', 10) / 100;
     }
 
     // Compartilha/copia o link de uma consulta (ação ou FII). Genérico —
@@ -2505,6 +2597,9 @@
 
       if (!overlay || !btnAbrir) return; // seção não presente nesta página
 
+      hgAplicarMascaraMoeda(inValorInicial, 1000);
+      hgAplicarMascaraMoeda(inAporte, 0);
+
       // Tenta pegar Selic e IPCA já coletados pelo robô (indices.json) para
       // usar como padrão realista; se não achar, cai em valores de reserva.
       function obterItemIndice(labelExato) {
@@ -2674,8 +2769,8 @@
 
       function calcular() {
         const tipo = selTipo.value;
-        const valorInicial = Math.max(0, parseFloat(inValorInicial.value) || 0);
-        const aporteMensal = Math.max(0, parseFloat(inAporte.value) || 0);
+        const valorInicial = Math.max(0, hgValorMascarado(inValorInicial));
+        const aporteMensal = Math.max(0, hgValorMascarado(inAporte));
         const prazoInformado = Math.max(1, parseFloat(inPrazo.value) || 1);
         const prazoMeses = Math.round(selPrazoUnidade.value === 'anos' ? prazoInformado * 12 : prazoInformado);
 
@@ -2780,21 +2875,15 @@
       const btnSimular = document.getElementById('financBtnSimular');
       const resultadoEl = document.getElementById('financResultado');
       let ultimaSimulacao = null;
+      // Estado da amortização extra aplicada (se houver). "ativo" controla
+      // se a última simulação deve considerar essas amortizações ou não.
+      let estadoAmortizacao = { ativo: false, pontos: new Set(), valor: 0, modo: 'prazo' };
 
       if (!overlay || !btnAbrirMenu) return; // seção não presente nesta página
 
-      // Máscara de moeda: digita da direita pra esquerda (como caixa
-      // eletrônico). Guarda os centavos como número inteiro no dataset
-      // do próprio input, e mostra sempre formatado como "1.234,56".
-      inValor.dataset.centavos = '0';
-      inValor.addEventListener('input', () => {
-        const somenteDigitos = inValor.value.replace(/\D/g, '');
-        const centavos = somenteDigitos === '' ? 0 : parseInt(somenteDigitos, 10);
-        inValor.dataset.centavos = String(centavos);
-        inValor.value = (centavos / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      });
+      hgAplicarMascaraMoeda(inValor);
       function valorFinanciamentoNumero() {
-        return parseInt(inValor.dataset.centavos || '0', 10) / 100;
+        return hgValorMascarado(inValor);
       }
 
       // Converte texto digitado (aceitando vírgula OU ponto como decimal)
@@ -2821,10 +2910,22 @@
         return Math.pow(1 + taxaPct / 100, 1 / 12) - 1;
       }
 
-      // Gera a tabela de amortização completa (Price ou SAC).
-      function simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0 }) {
+      function calcularParcelaPrice(pv, i, n) {
+        if (n <= 0) return 0;
+        return i > 0
+          ? pv * (i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1)
+          : pv / n;
+      }
+
+      // Gera a tabela de amortização completa (Price ou SAC), aplicando
+      // amortizações extras nas parcelas indicadas (se houver). O parâmetro
+      // amort é opcional: { pontos: Set<number>, valor: number, modo: 'prazo'|'parcela' }
+      function simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0, amort }) {
         const linhas = [];
         let saldo = valor;
+        const pontosAmort = amort?.pontos ?? new Set();
+        const valorAmort = amort?.valor ?? 0;
+        const modoAmort = amort?.modo ?? 'prazo';
 
         // Linha 0: situação inicial, antes da primeira parcela.
         linhas.push({
@@ -2838,14 +2939,11 @@
         });
 
         let amortizacaoConstante = valor / parcelas; // usada no SAC
-        let parcelaFixaPrice = 0;
-        if (sistema === 'price') {
-          parcelaFixaPrice = taxaMensal > 0
-            ? valor * (taxaMensal * Math.pow(1 + taxaMensal, parcelas)) / (Math.pow(1 + taxaMensal, parcelas) - 1)
-            : valor / parcelas;
-        }
+        let parcelaFixaPrice = sistema === 'price' ? calcularParcelaPrice(valor, taxaMensal, parcelas) : 0;
 
-        for (let m = 1; m <= parcelas; m++) {
+        const LIMITE_SEGURANCA = Math.max(parcelas * 2, 6000); // evita loop infinito em cenário degenerado
+        let m = 1;
+        while (saldo > 0.005 && m <= LIMITE_SEGURANCA) {
           const juros = saldo * taxaMensal;
           let amortizacao, parcela;
 
@@ -2857,8 +2955,8 @@
             amortizacao = parcela - juros;
           }
 
-          // Ajuste na última parcela para zerar o saldo exatamente (evita sobra de centavos).
-          if (m === parcelas) amortizacao = saldo;
+          // Ajuste no fim natural do financiamento, pra zerar o saldo exato.
+          if (amortizacao >= saldo) amortizacao = saldo;
           const dividaAntes = saldo;
           saldo = Math.max(0, saldo - amortizacao);
 
@@ -2874,11 +2972,33 @@
             amortizacao,
             parcela: sistema === 'sac' ? amortizacao + juros : parcela,
             saldoDevedor: saldo,
+            amortizacaoExtra: false,
           });
+
+          // Amortização extra solicitada nesta parcela.
+          if (pontosAmort.has(m) && saldo > 0.005 && valorAmort > 0) {
+            saldo = Math.max(0, saldo - valorAmort);
+            linhas[linhas.length - 1].amortizacaoExtra = true;
+            linhas[linhas.length - 1].saldoDevedor = saldo;
+
+            const parcelasRestantesOriginal = parcelas - m;
+            if (modoAmort === 'parcela' && parcelasRestantesOriginal > 0 && saldo > 0.005) {
+              if (sistema === 'sac') {
+                amortizacaoConstante = saldo / parcelasRestantesOriginal;
+              } else {
+                parcelaFixaPrice = calcularParcelaPrice(saldo, taxaMensal, parcelasRestantesOriginal);
+              }
+            }
+            // modo 'prazo': mantém os mesmos valores de amortização/parcela,
+            // o saldo menor faz o financiamento terminar mais cedo sozinho.
+          }
+
+          m++;
         }
 
         return linhas;
       }
+
 
       function simular() {
         const valor = Math.max(0, valorFinanciamentoNumero());
@@ -2897,7 +3017,7 @@
         }
 
         const taxaMensal = taxaMensalEfetiva(taxaPct, periodo);
-        const linhas = simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0 });
+        const linhas = simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0, amort: estadoAmortizacao.ativo ? estadoAmortizacao : null });
 
         const totalJuros = linhas.reduce((acc, l) => acc + l.juros, 0);
         const totalPago = linhas.reduce((acc, l) => acc + l.parcela, 0);
@@ -2905,13 +3025,13 @@
         const ultimaParcela = linhas[linhas.length - 1]?.parcela ?? 0;
 
         const linhasTabelaHtml = linhas.map(l => `
-          <tr>
+          <tr${l.amortizacaoExtra ? ' style="background:rgba(61,220,115,0.08);"' : ''}>
             <td>${l.mes} | ${l.rotuloData}</td>
             <td>${hgFormatMoeda(l.divida)}</td>
             <td>${hgFormatMoeda(l.juros)}</td>
             <td>${hgFormatMoeda(l.amortizacao)}</td>
             <td>${hgFormatMoeda(l.parcela)}</td>
-            <td>${hgFormatMoeda(l.saldoDevedor)}</td>
+            <td>${hgFormatMoeda(l.saldoDevedor)}${l.amortizacaoExtra ? ' 🔧' : ''}</td>
           </tr>`).join('');
 
         resultadoEl.innerHTML = `
@@ -2921,7 +3041,7 @@
             <div class="financ-resumo-card"><span>Sistema</span><strong>${sistema === 'price' ? 'Price' : 'SAC'}</strong></div>
             <div class="financ-resumo-card"><span>Taxa de juros</span><strong>${hgFormatNumero(taxaPct)}%</strong></div>
             <div class="financ-resumo-card"><span>Juros</span><strong>${periodo === 'anual' ? 'a.a' : 'a.m'}</strong></div>
-            <div class="financ-resumo-card"><span>Nº de parcelas</span><strong>${parcelas}</strong></div>
+            <div class="financ-resumo-card"><span>Nº de parcelas</span><strong>${linhas.length - 1}${linhas.length - 1 !== parcelas ? ` de ${parcelas}` : ''}</strong></div>
           </div>
 
           <div class="financ-totais">
@@ -2930,9 +3050,10 @@
             <div class="financ-resumo-card"><span>Total de juros</span><strong>${hgFormatMoeda(totalJuros)}</strong></div>
           </div>
 
-          <div style="display:flex; gap:10px; margin-top:14px;">
-            <button type="button" class="hg-btn" id="financBtnPdf" style="flex:1;">📄 Baixar PDF</button>
-            <button type="button" class="hg-btn-compartilhar" id="financBtnCompartilhar" style="flex:1; justify-content:center;">
+          <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+            <button type="button" class="hg-btn" id="financBtnPdf" style="flex:1 1 140px;">📄 Baixar PDF</button>
+            <button type="button" class="hg-btn" id="financBtnAmortizar" style="flex:1 1 140px; background:var(--deep); color:var(--text); border:1px solid var(--border);">🔧 Amortizar</button>
+            <button type="button" class="hg-btn-compartilhar" id="financBtnCompartilhar" style="flex:1 1 140px; justify-content:center;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
               <span class="hg-btn-compartilhar-texto">Compartilhar</span>
             </button>
@@ -3128,6 +3249,97 @@
         document.body.style.overflow = '';
       }
 
+      // Converte "5,8,12-15,20" num Set de números: {5,8,12,13,14,15,20}
+      function parseSequenciaParcelas(texto) {
+        const pontos = new Set();
+        if (!texto || !texto.trim()) return pontos;
+        const partes = texto.split(',');
+        for (const parteBruta of partes) {
+          const parte = parteBruta.trim();
+          if (!parte) continue;
+          if (parte.includes('-')) {
+            const [ini, fim] = parte.split('-').map(n => parseInt(n.trim(), 10));
+            if (!isNaN(ini) && !isNaN(fim)) {
+              const de = Math.min(ini, fim), ate = Math.max(ini, fim);
+              for (let n = de; n <= ate; n++) pontos.add(n);
+            }
+          } else {
+            const n = parseInt(parte, 10);
+            if (!isNaN(n)) pontos.add(n);
+          }
+        }
+        return pontos;
+      }
+
+      // --- Modal "Amortizar financiamento" ---
+      const amortOverlay = document.getElementById('amortOverlay');
+      const btnAbrirAmort = document.getElementById('financBtnAmortizar');
+      const amortFechar = document.getElementById('amortFechar');
+      const amortBtnFechar2 = document.getElementById('amortBtnFechar2');
+      const amortBtnLimpar = document.getElementById('amortBtnLimpar');
+      const amortBtnAplicar = document.getElementById('amortBtnAplicar');
+      const amortSequencia = document.getElementById('amortSequencia');
+      const amortValor = document.getElementById('amortValor');
+      const amortStatus = document.getElementById('amortStatus');
+
+      if (amortValor) hgAplicarMascaraMoeda(amortValor);
+
+      function abrirModalAmort() {
+        if (!ultimaSimulacao) {
+          alert('Faça uma simulação primeiro, clicando em "Simular".');
+          return;
+        }
+        amortStatus.textContent = '';
+        amortOverlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModalAmort() {
+        amortOverlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      if (btnAbrirAmort) btnAbrirAmort.addEventListener('click', abrirModalAmort);
+      if (amortFechar) amortFechar.addEventListener('click', fecharModalAmort);
+      if (amortBtnFechar2) amortBtnFechar2.addEventListener('click', fecharModalAmort);
+      if (amortOverlay) {
+        amortOverlay.addEventListener('click', (e) => { if (e.target === amortOverlay) fecharModalAmort(); });
+      }
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && amortOverlay && !amortOverlay.hidden) fecharModalAmort(); });
+
+      if (amortBtnAplicar) {
+        amortBtnAplicar.addEventListener('click', () => {
+          const pontos = parseSequenciaParcelas(amortSequencia.value);
+          const valor = hgValorMascarado(amortValor);
+          const modo = document.querySelector('input[name="amortModo"]:checked')?.value || 'prazo';
+
+          if (pontos.size === 0) {
+            amortStatus.className = 'hg-status erro';
+            amortStatus.textContent = 'Informe ao menos uma parcela (ex: 5,8,12-15,20).';
+            return;
+          }
+          if (valor <= 0) {
+            amortStatus.className = 'hg-status erro';
+            amortStatus.textContent = 'Informe o valor a ser amortizado.';
+            return;
+          }
+
+          estadoAmortizacao = { ativo: true, pontos, valor, modo };
+          fecharModalAmort();
+          simular();
+        });
+      }
+
+      if (amortBtnLimpar) {
+        amortBtnLimpar.addEventListener('click', () => {
+          estadoAmortizacao = { ativo: false, pontos: new Set(), valor: 0, modo: 'prazo' };
+          amortSequencia.value = '';
+          amortValor.value = '';
+          amortValor.dataset.centavos = '0';
+          fecharModalAmort();
+          simular();
+        });
+      }
+
       btnAbrirMenu.addEventListener('click', () => {
         if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
         abrirModal();
@@ -3135,7 +3347,10 @@
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
-      btnSimular.addEventListener('click', simular);
+      btnSimular.addEventListener('click', () => {
+        estadoAmortizacao = { ativo: false, pontos: new Set(), valor: 0, modo: 'prazo' };
+        simular();
+      });
     })();
 
     // ============================================================
@@ -3156,6 +3371,9 @@
 
       if (!overlay || !btnAbrirMenu) return;
 
+      hgAplicarMascaraMoeda(inValorInicial, 1000);
+      hgAplicarMascaraMoeda(inInvestimentoMensal, 0);
+
       function abrirModal() {
         overlay.hidden = false;
         document.body.style.overflow = 'hidden';
@@ -3166,8 +3384,8 @@
       }
 
       function calcular() {
-        const valorInicial = Math.max(0, parseFloat(inValorInicial.value) || 0);
-        const aporteMensal = Math.max(0, parseFloat(inInvestimentoMensal.value) || 0);
+        const valorInicial = Math.max(0, hgValorMascarado(inValorInicial));
+        const aporteMensal = Math.max(0, hgValorMascarado(inInvestimentoMensal));
         const taxaInformada = Math.max(0, parseFloat(inTaxa.value) || 0);
         const periodoInformado = Math.max(1, parseFloat(inPeriodo.value) || 1);
 
@@ -3233,6 +3451,9 @@
 
       if (!overlay || !btnAbrirMenu) return;
 
+      hgAplicarMascaraMoeda(inPrestacao);
+      hgAplicarMascaraMoeda(inValorFinanciado);
+
       function abrirModal() {
         overlay.hidden = false;
         document.body.style.overflow = 'hidden';
@@ -3280,14 +3501,14 @@
       function calcular() {
         const vMeses = parseFloat(inMeses.value);
         const vTaxa = parseFloat(inTaxa.value);
-        const vPrestacao = parseFloat(inPrestacao.value);
-        const vValorFinanciado = parseFloat(inValorFinanciado.value);
+        const vPrestacao = hgValorMascarado(inPrestacao);
+        const vValorFinanciado = hgValorMascarado(inValorFinanciado);
 
         const preenchidos = [
           !isNaN(vMeses) && vMeses > 0,
           !isNaN(vTaxa) && vTaxa >= 0,
-          !isNaN(vPrestacao) && vPrestacao > 0,
-          !isNaN(vValorFinanciado) && vValorFinanciado > 0,
+          vPrestacao > 0,
+          vValorFinanciado > 0,
         ];
         const totalPreenchidos = preenchidos.filter(Boolean).length;
 
@@ -3363,7 +3584,9 @@
         inMeses.value = '';
         inTaxa.value = '';
         inPrestacao.value = '';
+        inPrestacao.dataset.centavos = '0';
         inValorFinanciado.value = '';
+        inValorFinanciado.dataset.centavos = '0';
         resultadoEl.innerHTML = '';
       }
 
