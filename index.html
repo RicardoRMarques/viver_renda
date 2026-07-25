@@ -1060,6 +1060,9 @@
             Simuladores <span class="nav-dropdown-seta">▾</span>
           </button>
           <div class="nav-dropdown-menu" id="navRendaFixaMenu">
+            <button type="button" class="nav-dropdown-item" id="navAbrirAposentadoria">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0 1 16 0v1"></path></svg>Calculadora de Aposentadoria
+            </button>
             <button type="button" class="nav-dropdown-item" id="navAbrirCalculadora">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="8" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line><line x1="16" y1="18" x2="16" y2="18"></line></svg>Calculadora Renda Fixa
             </button>
@@ -1166,6 +1169,61 @@
 
 
     <!-- Modal da calculadora (abre dentro da própria página, sem sair dela) -->
+    <div id="aposOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="aposTitulo" hidden>
+      <div class="calc-modal financ-modal">
+        <div class="calc-modal-topo">
+          <h3 id="aposTitulo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0 1 16 0v1"></path></svg>Calculadora de Aposentadoria
+          </h3>
+          <button id="aposFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <p class="calc-ajuda" style="margin-top:0;">
+            Simulação com base nas regras do INSS após a Reforma da Previdência (EC 103/2019): Regra Geral e, para quem
+            já contribuía antes da reforma, as regras de transição (Pontos, Idade Mínima Progressiva, Pedágio de 50% e
+            Pedágio de 100%). É uma estimativa educativa — não substitui o cálculo oficial nem considera categorias
+            especiais (rural, professor, PCD, insalubridade, servidor público/RPPS).
+          </p>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="aposSexo">Sexo</label>
+              <select id="aposSexo">
+                <option value="homem">Homem</option>
+                <option value="mulher">Mulher</option>
+              </select>
+            </div>
+            <div class="calc-campo">
+              <label for="aposNascimento">Data de nascimento</label>
+              <input type="date" id="aposNascimento" />
+            </div>
+          </div>
+
+          <div class="calc-campo">
+            <label for="aposTempoContrib">Tempo de contribuição já cumprido (anos)</label>
+            <input type="number" inputmode="decimal" id="aposTempoContrib" min="0" step="0.1" placeholder="Ex: 18,5" />
+            <p class="calc-ajuda">Pode usar casas decimais (ex: 18 anos e 6 meses = 18,5).</p>
+          </div>
+
+          <div class="calc-campo">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--text); font-size:0.9rem; font-weight:600;">
+              <input type="checkbox" id="aposContribuiaAntes" style="width:auto;" checked />
+              Já contribuía ao INSS antes de 13/11/2019
+            </label>
+            <p class="calc-ajuda">Define se você também tem direito às regras de transição, além da regra geral.</p>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:6px;">
+            <button class="hg-btn" id="aposBtnCalcular" style="flex:1;">Calcular</button>
+            <button class="hg-btn" id="aposBtnLimpar" style="flex:1; background:var(--deep); color:var(--text); border:1px solid var(--border);">Limpar</button>
+          </div>
+
+          <div id="aposResultado"></div>
+        </div>
+      </div>
+    </div>
+
     <div id="calcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="calcTitulo" hidden>
       <div class="calc-modal">
         <div class="calc-modal-topo">
@@ -3586,6 +3644,261 @@
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
+    })();
+
+    // ============================================================
+    // CALCULADORA DE APOSENTADORIA (Regra Geral + regras de
+    // transição da Reforma da Previdência — EC 103/2019: Pontos,
+    // Idade Mínima Progressiva, Pedágio de 50% e Pedágio de 100%)
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('aposOverlay');
+      const btnAbrirMenu = document.getElementById('navAbrirAposentadoria');
+      const btnFechar = document.getElementById('aposFechar');
+      const selSexo = document.getElementById('aposSexo');
+      const inNascimento = document.getElementById('aposNascimento');
+      const inTempoContrib = document.getElementById('aposTempoContrib');
+      const chkAntes = document.getElementById('aposContribuiaAntes');
+      const btnCalcular = document.getElementById('aposBtnCalcular');
+      const btnLimpar = document.getElementById('aposBtnLimpar');
+      const resultadoEl = document.getElementById('aposResultado');
+
+      if (!overlay || !btnAbrirMenu) return;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function erro(msg) {
+        resultadoEl.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a; margin-top:14px;">${msg}</p>`;
+      }
+
+      // Soma meses a uma data preservando o dia (ajustando pro último
+      // dia do mês quando necessário — ex: 31/jan + 1 mês = 28/fev).
+      function addMeses(data, meses) {
+        const d = new Date(data.getTime());
+        const diaOriginal = d.getDate();
+        d.setDate(1);
+        d.setMonth(d.getMonth() + Math.round(meses));
+        const ultimoDiaMes = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        d.setDate(Math.min(diaOriginal, ultimoDiaMes));
+        return d;
+      }
+      function diffAnos(inicio, fim) {
+        return (fim.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+      }
+      function formatarData(d) {
+        return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+      }
+      function formatarFalta(hoje, alvo) {
+        const meses = Math.round(diffAnos(hoje, alvo) * 12);
+        if (meses <= 0) return 'Você já cumpre os requisitos desta regra.';
+        const anos = Math.floor(meses / 12);
+        const restoMeses = meses % 12;
+        const partes = [];
+        if (anos > 0) partes.push(`${anos} ano${anos > 1 ? 's' : ''}`);
+        if (restoMeses > 0) partes.push(`${restoMeses} ${restoMeses > 1 ? 'meses' : 'mês'}`);
+        return `Faltam ${partes.join(' e ')}`;
+      }
+
+      // Pontuação exigida (idade + tempo de contribuição), sobe 1
+      // ponto por ano a partir de 2019 até estabilizar.
+      function pontosNecessarios(ano, sexo) {
+        if (sexo === 'homem') {
+          if (ano <= 2019) return 96;
+          if (ano >= 2028) return 105;
+          return 96 + (ano - 2019);
+        }
+        if (ano <= 2019) return 86;
+        if (ano >= 2033) return 100;
+        return 86 + (ano - 2019);
+      }
+
+      // Idade mínima da transição progressiva, sobe 6 meses por ano
+      // a partir de 2019 até estabilizar.
+      function idadeMinTransicao(ano, sexo) {
+        if (sexo === 'homem') return Math.min(65, 61 + 0.5 * (ano - 2019));
+        return Math.min(62, 56 + 0.5 * (ano - 2019));
+      }
+
+      function calcular() {
+        const sexo = selSexo.value;
+        const contribAtual = parseFloat((inTempoContrib.value || '').replace(',', '.'));
+        const contribuiaAntes = chkAntes.checked;
+
+        if (!inNascimento.value) return erro('Preencha a data de nascimento.');
+        if (isNaN(contribAtual) || contribAtual < 0) return erro('Preencha o tempo de contribuição (em anos).');
+
+        const hoje = new Date();
+        const dataNasc = new Date(inNascimento.value + 'T00:00:00');
+        if (isNaN(dataNasc.getTime()) || dataNasc > hoje) return erro('Data de nascimento inválida.');
+
+        const idadeAtual = diffAnos(dataNasc, hoje);
+        const REFORMA = new Date('2019-11-13T00:00:00');
+        const tempoDesdeReforma = Math.max(0, diffAnos(REFORMA, hoje));
+        const contribNaReforma = Math.max(0, contribAtual - tempoDesdeReforma);
+
+        const idadeMinGeral = sexo === 'homem' ? 65 : 62;
+        const tempoMinGeral = sexo === 'homem' ? 20 : 15;
+        const tempoMinIntegral = sexo === 'homem' ? 35 : 30;
+        const idadeMinPedagio100 = sexo === 'homem' ? 60 : 57;
+
+        const resultados = [];
+
+        // Regra Geral — vale pra qualquer pessoa, sem transição.
+        {
+          const anosParaIdade = Math.max(0, idadeMinGeral - idadeAtual);
+          const anosParaContrib = Math.max(0, tempoMinGeral - contribAtual);
+          resultados.push({
+            nome: 'Regra Geral (idade mínima)',
+            data: addMeses(hoje, Math.max(anosParaIdade, anosParaContrib) * 12),
+            detalhe: `${idadeMinGeral} anos de idade + ${tempoMinGeral} anos de contribuição (tempo mínimo).`,
+            elegivel: true,
+          });
+        }
+
+        if (contribuiaAntes) {
+          // Transição por pontos — simulação mês a mês.
+          {
+            let alvo = null;
+            for (let m = 0; m <= 600; m++) {
+              const dataSim = addMeses(hoje, m);
+              const idadeSim = idadeAtual + m / 12;
+              const contribSim = contribAtual + m / 12;
+              const ano = dataSim.getFullYear();
+              if (idadeSim + contribSim >= pontosNecessarios(ano, sexo) && contribSim >= tempoMinIntegral) {
+                alvo = dataSim;
+                break;
+              }
+            }
+            resultados.push({
+              nome: 'Transição — Sistema de Pontos',
+              data: alvo,
+              detalhe: `Soma de idade + tempo de contribuição precisa bater ${pontosNecessarios(hoje.getFullYear(), sexo)} pontos (regra de ${hoje.getFullYear()}), com no mínimo ${tempoMinIntegral} anos de contribuição.`,
+              elegivel: !!alvo,
+            });
+          }
+
+          // Transição por idade mínima progressiva.
+          {
+            let alvo = null;
+            for (let m = 0; m <= 600; m++) {
+              const dataSim = addMeses(hoje, m);
+              const idadeSim = idadeAtual + m / 12;
+              const contribSim = contribAtual + m / 12;
+              const ano = dataSim.getFullYear();
+              if (idadeSim >= idadeMinTransicao(ano, sexo) && contribSim >= tempoMinIntegral) {
+                alvo = dataSim;
+                break;
+              }
+            }
+            resultados.push({
+              nome: 'Transição — Idade Mínima Progressiva',
+              data: alvo,
+              detalhe: `Idade mínima sobe 6 meses por ano até ${sexo === 'homem' ? '65 anos (em 2027)' : '62 anos (em 2031)'}, mais ${tempoMinIntegral} anos de contribuição.`,
+              elegivel: !!alvo,
+            });
+          }
+
+          // Pedágio de 50%.
+          {
+            const faltavamEm2019 = Math.max(0, tempoMinIntegral - contribNaReforma);
+            if (faltavamEm2019 <= 2) {
+              resultados.push({
+                nome: 'Pedágio de 50%',
+                data: addMeses(REFORMA, faltavamEm2019 * 1.5 * 12),
+                detalhe: `Só vale pra quem, em 13/11/2019, tinha até 2 anos faltando para completar ${tempoMinIntegral} anos de contribuição. Sem idade mínima exigida.`,
+                elegivel: true,
+              });
+            } else {
+              resultados.push({
+                nome: 'Pedágio de 50%',
+                data: null,
+                detalhe: `Não se aplica: em 13/11/2019 faltavam ${faltavamEm2019.toFixed(1).replace('.', ',')} anos para completar ${tempoMinIntegral} anos de contribuição (o limite dessa regra é 2 anos).`,
+                elegivel: false,
+              });
+            }
+          }
+
+          // Pedágio de 100%.
+          {
+            const faltavamEm2019 = Math.max(0, tempoMinIntegral - contribNaReforma);
+            const dataPorContrib = addMeses(REFORMA, faltavamEm2019 * 2 * 12);
+            const anosParaIdade = Math.max(0, idadeMinPedagio100 - idadeAtual);
+            const dataPorIdade = addMeses(hoje, anosParaIdade * 12);
+            resultados.push({
+              nome: 'Pedágio de 100%',
+              data: dataPorContrib.getTime() > dataPorIdade.getTime() ? dataPorContrib : dataPorIdade,
+              detalhe: `Exige ${idadeMinPedagio100} anos de idade mínima e um pedágio de 100% sobre o tempo que faltava, em 13/11/2019, para completar ${tempoMinIntegral} anos de contribuição.`,
+              elegivel: true,
+            });
+          }
+        }
+
+        renderResultados(resultados, hoje);
+      }
+
+      function renderResultados(resultados, hoje) {
+        let dataMinima = null;
+        resultados.forEach(r => {
+          if (r.elegivel && r.data && (!dataMinima || r.data.getTime() < dataMinima.getTime())) dataMinima = r.data;
+        });
+
+        const cards = resultados.map(r => {
+          if (!r.elegivel || !r.data) {
+            return `
+              <div class="calc-resultado-card" style="opacity:0.65;">
+                <div class="calc-resultado-linha"><span>${r.nome}</span><strong>Não elegível</strong></div>
+                <p class="calc-ajuda" style="margin-top:6px;">${r.detalhe}</p>
+              </div>`;
+          }
+          const recomendada = dataMinima && r.data.getTime() === dataMinima.getTime();
+          return `
+            <div class="calc-resultado-card" style="${recomendada ? 'border:2px solid var(--primary);' : ''}">
+              ${recomendada ? '<p style="color:var(--primary); font-weight:700; font-size:0.78rem; margin:0 0 8px;">⭐ REGRA MAIS RÁPIDA PRA VOCÊ</p>' : ''}
+              <div class="calc-resultado-linha calc-destaque">
+                <span>${r.nome}</span>
+                <strong>${formatarData(r.data)}</strong>
+              </div>
+              <div class="calc-resultado-linha">
+                <span>${formatarFalta(hoje, r.data)}</span>
+              </div>
+              <p class="calc-ajuda" style="margin-top:6px;">${r.detalhe}</p>
+            </div>`;
+        }).join('');
+
+        resultadoEl.innerHTML = `
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:8px;">
+            ${cards}
+          </div>
+          <p class="calc-ajuda" style="margin-top:12px;">
+            Estimativa educativa que assume contribuição contínua e sem interrupções a partir de hoje. Não considera
+            categorias especiais (rural, professor, PCD, insalubridade, servidor público/RPPS) nem vale como cálculo
+            oficial — confirme sempre pelo Meu INSS (app/site gov.br) ou com um especialista em direito previdenciário.
+          </p>`;
+      }
+
+      function limpar() {
+        inNascimento.value = '';
+        inTempoContrib.value = '';
+        chkAntes.checked = true;
+        resultadoEl.innerHTML = '';
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
+      btnLimpar.addEventListener('click', limpar);
     })();
 
     // ============================================================
