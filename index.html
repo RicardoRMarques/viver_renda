@@ -1567,6 +1567,13 @@
           <button class="hg-btn" id="calcBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
 
           <div id="calcResultado"></div>
+          <div id="calcAcoesWrap" style="display:none; gap:10px; margin-top:10px; flex-wrap:wrap;">
+            <button type="button" class="hg-btn" id="calcBtnPdf" style="flex:1 1 140px;">📄 Baixar PDF</button>
+            <button type="button" class="hg-btn-compartilhar" id="calcBtnCompartilhar" style="flex:1 1 140px; justify-content:center;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-3px; margin-right:6px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -3098,6 +3105,10 @@
       const ajudaTaxa = document.getElementById('calcAjudaTaxa');
       const btnCalcular = document.getElementById('calcBtnCalcular');
       const resultadoEl = document.getElementById('calcResultado');
+      const acoesWrap = document.getElementById('calcAcoesWrap');
+      const btnPdf = document.getElementById('calcBtnPdf');
+      const btnCompartilhar = document.getElementById('calcBtnCompartilhar');
+      let ultimoCalculo = null;
 
       if (!overlay || !btnAbrir) return; // seção não presente nesta página
 
@@ -3339,12 +3350,172 @@
             Os demais produtos da tabela usam taxas de mercado estimadas para efeito de comparação.
             Não substitui o cálculo oficial da sua corretora.
           </p>`;
+
+        const prazoTexto = selPrazoUnidade.value === 'anos'
+          ? `${prazoInformado} ano${prazoInformado > 1 ? 's' : ''}`
+          : `${prazoMeses} mes${prazoMeses > 1 ? 'es' : ''}`;
+
+        ultimoCalculo = {
+          tipoNome: tipoInfo.nome,
+          tipoTributado: tipoInfo.tributado,
+          tipoCustodia: tipoInfo.custodia,
+          valorInicial, aporteMensal, prazoTexto, prazoMeses,
+          taxaAnual,
+          totalInvestido: resultadoPrincipal.totalInvestido,
+          rendimentoBruto: resultadoPrincipal.rendimentoBruto + resultadoPrincipal.custodiaValor,
+          custodiaValor: resultadoPrincipal.custodiaValor,
+          ir: resultadoPrincipal.ir,
+          aliquotaIR: resultadoPrincipal.aliquota,
+          valorLiquido: resultadoPrincipal.valorLiquido,
+          ranking: produtos.map(p => ({ nome: p.nome, escolhido: p.id === tipo, valorLiquido: p.valorLiquido, rendimentoLiquido: p.rendimentoLiquido })),
+          selicUsada: selicAnualPct(),
+          cdiUsado: cdiAnualPct(),
+          ipcaUsado: ipcaAnualPct(),
+        };
+
+        if (acoesWrap) acoesWrap.style.display = 'flex';
+      }
+
+      // Monta o PDF da simulação de renda fixa com jsPDF: cabeçalho com
+      // aviso do site + data/hora de geração, resumo do resultado e a
+      // tabela comparativa entre os produtos.
+      function montarDocumentoPdf() {
+        if (!ultimoCalculo) return null;
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const c = ultimoCalculo;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        // Aviso do site + data/hora, sempre no topo do documento.
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Simulação — Calculadora de Renda Fixa', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(
+          `Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`,
+          40, 58
+        );
+        doc.setFontSize(8);
+        doc.text(
+          'Aviso: simulação aproximada e educacional, sem garantia de rentabilidade futura. Não substitui o cálculo oficial da sua corretora/banco.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        const linhasResumo = [
+          ['Tipo de investimento', c.tipoNome],
+          ['Valor inicial', hgFormatMoeda(c.valorInicial)],
+          ['Aporte mensal', hgFormatMoeda(c.aporteMensal)],
+          ['Prazo', c.prazoTexto],
+          ['Taxa anual efetiva', `${c.taxaAnual.toFixed(2)}% a.a.`],
+          ['Total investido', hgFormatMoeda(c.totalInvestido)],
+          ['Rendimento bruto', hgFormatMoeda(c.rendimentoBruto)],
+          ...(c.tipoCustodia ? [['Taxa de custódia B3 (aprox.)', '- ' + hgFormatMoeda(c.custodiaValor)]] : []),
+          [c.tipoTributado ? `IR (${(c.aliquotaIR * 100).toFixed(1)}% sobre o rendimento)` : 'Imposto de Renda', c.tipoTributado ? '- ' + hgFormatMoeda(c.ir) : 'Isento'],
+          ['Valor líquido final', hgFormatMoeda(c.valorLiquido)],
+        ];
+
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Resultado da simulação']],
+          body: linhasResumo,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        const yTabela = doc.lastAutoTable.finalY + 24;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text('Comparativo entre produtos (mesmo valor, aporte e prazo)', 40, yTabela);
+
+        doc.autoTable({
+          startY: yTabela + 10,
+          head: [['Produto', 'Valor líquido', 'Rendimento líquido']],
+          body: c.ranking.map(p => [p.nome + (p.escolhido ? ' (escolhido)' : ''), hgFormatMoeda(p.valorLiquido), hgFormatMoeda(p.rendimentoLiquido)]),
+          theme: 'striped',
+          styles: { fontSize: 8.5, cellPadding: 5 },
+          headStyles: { fillColor: [43, 43, 43], fontSize: 9 },
+          didParseCell: (data) => {
+            if (data.section === 'body' && c.ranking[data.row.index]?.escolhido) {
+              data.cell.styles.fillColor = [223, 245, 230];
+            }
+          },
+        });
+
+        const yTaxas = doc.lastAutoTable.finalY + 20;
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(90);
+        doc.text(
+          `Taxas de referência usadas: Selic ≈ ${c.selicUsada.toFixed(2)}% a.a. · CDI ≈ ${c.cdiUsado.toFixed(2)}% a.a. · IPCA anualizado ≈ ${c.ipcaUsado.toFixed(2)}% a.a.`,
+          40, yTaxas
+        );
+
+        return doc;
+      }
+
+      function nomeArquivoPdf() {
+        return 'calculodeinvestimento.pdf';
+      }
+
+      function gerarPdf() {
+        const doc = montarDocumentoPdf();
+        if (!doc) return;
+        doc.save(nomeArquivoPdf());
+      }
+
+      // Compartilha o PDF gerado como arquivo de verdade (WhatsApp, etc,
+      // via Web Share API com anexo). Sem suporte a compartilhar arquivos
+      // (comum no desktop), cai para baixar o PDF direto.
+      async function compartilharResultado(botao) {
+        const doc = montarDocumentoPdf();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoPdf();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({
+              title: 'Simulação — Calculadora de Renda Fixa',
+              text: 'Simulação de investimento — Dividendos | Viver de Renda',
+              files: [arquivo],
+            });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoSpan = botao.querySelector('.hg-btn-compartilhar-texto');
+        const textoOriginal = textoSpan ? textoSpan.textContent : null;
+        if (textoSpan) textoSpan.textContent = 'PDF baixado!';
+        setTimeout(() => { if (textoSpan && textoOriginal) textoSpan.textContent = textoOriginal; }, 2500);
+      }
+
+      function resetarAcoes() {
+        ultimoCalculo = null;
+        if (acoesWrap) acoesWrap.style.display = 'none';
       }
 
       function abrirModal() {
         overlay.hidden = false;
         document.body.style.overflow = 'hidden';
         atualizarCampoTaxa();
+        resetarAcoes();
+        resultadoEl.innerHTML = '';
       }
       function fecharModal() {
         overlay.hidden = true;
@@ -3358,9 +3529,11 @@
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
-      selTipo.addEventListener('change', atualizarCampoTaxa);
-      selIndexador.addEventListener('change', atualizarCampoTaxa);
+      selTipo.addEventListener('change', () => { atualizarCampoTaxa(); resetarAcoes(); });
+      selIndexador.addEventListener('change', () => { atualizarCampoTaxa(); resetarAcoes(); });
       btnCalcular.addEventListener('click', calcular);
+      if (btnPdf) btnPdf.addEventListener('click', gerarPdf);
+      if (btnCompartilhar) btnCompartilhar.addEventListener('click', (e) => compartilharResultado(e.currentTarget));
     })();
 
     // ============================================================
