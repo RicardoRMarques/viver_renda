@@ -3293,6 +3293,8 @@
         const taxaAnual = obterTaxaAnualEfetiva();
         const ehTaxaReal = labelTaxa.textContent.indexOf('Taxa real') === 0;
         const taxaRealInformada = ehTaxaReal ? parseFloat(inTaxa.value) || 0 : null;
+        const ehPctCdi = labelTaxa.textContent.indexOf('% do CDI') === 0;
+        const pctCdiInformado = (tipo === 'cdb' && ehPctCdi) ? parseFloat(inTaxa.value) || 0 : null;
         const resultadoPrincipal = simularProduto(
           { taxaAnualPct: taxaAnual, tributado: tipoInfo.tributado, custodia: tipoInfo.custodia },
           valorInicial, aporteMensal, prazoMeses
@@ -3364,6 +3366,7 @@
           valorInicial, aporteMensal, prazoTexto, prazoMeses,
           taxaAnual,
           taxaRealInformada,
+          pctCdiInformado,
           totalInvestido: resultadoPrincipal.totalInvestido,
           rendimentoBruto: resultadoPrincipal.rendimentoBruto + resultadoPrincipal.custodiaValor,
           custodiaValor: resultadoPrincipal.custodiaValor,
@@ -3420,6 +3423,7 @@
           ['Prazo', c.prazoTexto],
           ['Taxa anual efetiva', `${c.taxaAnual.toFixed(2)}% a.a.`],
           ...(c.taxaRealInformada !== null ? [['Taxa real (% ao ano, acima da inflação)', `${c.taxaRealInformada.toFixed(2)}% a.a.`]] : []),
+          ...(c.pctCdiInformado !== null ? [['% do CDI', `${c.pctCdiInformado.toFixed(2)}%`]] : []),
           ['Total investido', hgFormatMoeda(c.totalInvestido)],
           ['Rendimento bruto', hgFormatMoeda(c.rendimentoBruto)],
           ...(c.tipoCustodia ? [['Taxa de custódia B3 (aprox.)', '- ' + hgFormatMoeda(c.custodiaValor)]] : []),
