@@ -400,6 +400,37 @@
       margin: 0 auto;
     }
 
+    .atalhos-simuladores {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      max-width: 900px;
+      margin: 24px auto 0;
+    }
+    .atalho-simulador {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--deep);
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .atalho-simulador svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .atalho-simulador:hover { border-color: var(--primary); color: var(--primary); }
+    @media (max-width: 640px) {
+      .atalhos-simuladores { gap: 8px; }
+      .atalho-simulador { font-size: 0.76rem; padding: 8px 12px; }
+    }
+
     /* Layout dividido: Explorar mercado (esquerda) + Boletim (direita) */
     .split-layout {
       display: grid;
@@ -1180,7 +1211,45 @@
     <section class="section-intro" id="consultas">
       <h1>Explore o mercado. <br><span style="color: var(--primary);">Tome melhores decisões.</span></h1>
       <p>Acompanhe os destaques do dia: os maiores Fundos Imobiliários e ações com melhor desempenho no ranking da B3, além do boletim diário com índices e notícias do mercado.</p>
+
+      <div class="atalhos-simuladores">
+        <button type="button" class="atalho-simulador" data-alvo="navAbrirRendaPassiva">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
+          Aposentadoria Renda Passiva
+        </button>
+        <button type="button" class="atalho-simulador" data-alvo="navAbrirAposentadoria">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0 1 16 0v1"></path></svg>
+          Calculadora Aposentadoria INSS
+        </button>
+        <button type="button" class="atalho-simulador" data-alvo="navAbrirCalculadora">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="8" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line><line x1="16" y1="18" x2="16" y2="18"></line></svg>
+          Calculadora Renda Fixa
+        </button>
+        <button type="button" class="atalho-simulador" data-alvo="navAbrirJurosCompostos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 9 11 13 15 21 7"></path><path d="M15 7h6v6"></path></svg>
+          Calculadora de Juros Compostos
+        </button>
+        <button type="button" class="atalho-simulador" data-alvo="navAbrirEmprestimo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line><line x1="6" y1="14" x2="10" y2="14"></line></svg>
+          Calculadora de Empréstimo
+        </button>
+        <button type="button" class="atalho-simulador" data-alvo="navAbrirFinanciamento">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"></path></svg>
+          Calculadora Financiamento Imobiliário
+        </button>
+      </div>
     </section>
+
+    <script>
+      // Cada atalho só "aciona" o botão correspondente do menu Simuladores —
+      // reaproveita toda a lógica de abertura de modal que já existe lá,
+      // sem duplicar código.
+      document.querySelectorAll('.atalho-simulador').forEach(botao => {
+        botao.addEventListener('click', () => {
+          document.getElementById(botao.dataset.alvo)?.click();
+        });
+      });
+    </script>
 
     <div class="consultas-boletim-grid">
       <div class="coluna-consultas">
