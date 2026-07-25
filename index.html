@@ -846,19 +846,38 @@
       color: var(--text);
     }
     .rp-toggle-refinar {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 0.82rem;
+      gap: 10px;
+      width: 100%;
+      background: rgba(224,184,77,0.1);
+      border: 1px dashed var(--gold);
+      border-radius: 12px;
+      color: var(--gold);
+      font-size: 0.92rem;
       font-weight: 700;
       font-family: inherit;
       cursor: pointer;
-      padding: 4px 0;
+      padding: 12px 14px;
+      margin-top: 6px;
+      text-align: left;
     }
-    .rp-toggle-refinar:hover { color: var(--primary); }
+    .rp-toggle-refinar:hover { background: rgba(224,184,77,0.18); border-color: var(--gold); }
+    .rp-toggle-refinar .rp-toggle-icone {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--btn-text, #04101a);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: transform 0.15s ease;
+    }
+    .rp-toggle-refinar.aberto .rp-toggle-icone { transform: rotate(180deg); }
+    .rp-toggle-refinar .rp-toggle-sub { display: block; font-size: 0.74rem; font-weight: 500; color: var(--muted); margin-top: 1px; }
     .rp-refinar-campos { display: none; flex-direction: column; gap: 14px; margin-top: 8px; }
     .rp-refinar-campos.aberto { display: flex; }
     .rp-layout { display: grid; grid-template-columns: 1fr; gap: 20px; }
@@ -1360,7 +1379,11 @@
 
               <!-- Refinar (opcional) -->
               <button type="button" class="rp-toggle-refinar" id="rpToggleRefinar">
-                <span id="rpToggleIcone">▸</span> Se você quiser, refine sua simulação
+                <span class="rp-toggle-icone" id="rpToggleIcone">▾</span>
+                <span>
+                  Se você quiser, refine sua simulação
+                  <span class="rp-toggle-sub">Patrimônio atual, renda desejada e prazo para se aposentar</span>
+                </span>
               </button>
               <div class="rp-refinar-campos" id="rpRefinarCampos">
                 <div class="calc-campo">
@@ -1378,8 +1401,9 @@
                   </div>
                 </div>
                 <div class="calc-campo">
-                  <label for="rpAnosAposentar">Em quantos anos pretende se aposentar?</label>
+                  <label for="rpAnosAposentar">Em quantos anos pretende se aposentar? (a partir de hoje)</label>
                   <input type="number" inputmode="numeric" id="rpAnosAposentar" min="1" step="1" placeholder="Ex: 20" />
+                  <p class="calc-ajuda" style="margin-top:4px;">É a contagem de anos a partir de agora — não a idade de aposentadoria. Ex.: se você tem 45 anos e quer se aposentar aos 58, informe <strong>13</strong>.</p>
                 </div>
               </div>
 
@@ -4212,7 +4236,7 @@
 
       btnToggleRefinar.addEventListener('click', () => {
         const aberto = refinarCampos.classList.toggle('aberto');
-        toggleIcone.textContent = aberto ? '▾' : '▸';
+        btnToggleRefinar.classList.toggle('aberto', aberto);
       });
 
       function calcular() {
@@ -4229,6 +4253,17 @@
 
         if (!idade || (!PV && !PMT)) {
           resultadoEl.innerHTML = '<p class="calc-ajuda" style="color:#ff5a5a;">Informe pelo menos a idade, o valor já guardado e a poupança mensal.</p>';
+          layoutEl.classList.remove('com-resultado');
+          return;
+        }
+
+        if (anosInformados > 0 && (idade + anosInformados) > 100) {
+          resultadoEl.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a;">
+            Com ${hgFormatNumero(idade, 0)} anos + ${hgFormatNumero(anosInformados, 0)} anos informados, você estaria se aposentando aos
+            ${hgFormatNumero(idade + anosInformados, 0)} anos — isso não parece certo. Lembre-se: o campo "em quantos anos pretende se
+            aposentar" conta a partir de hoje, não é a idade de aposentadoria. Se você quer se aposentar aos ${hgFormatNumero(anosInformados, 0)}
+            anos, informe ${hgFormatNumero(Math.max(anosInformados - idade, 1), 0)} nesse campo.
+          </p>`;
           layoutEl.classList.remove('com-resultado');
           return;
         }
@@ -4302,7 +4337,7 @@
         riscoGrid.querySelectorAll('.rp-risco-chip').forEach((c) => c.classList.remove('selecionado'));
         atualizarDescricaoRisco();
         refinarCampos.classList.remove('aberto');
-        toggleIcone.textContent = '▸';
+        btnToggleRefinar.classList.remove('aberto');
         layoutEl.classList.remove('com-resultado');
         resultadoEl.innerHTML = '<p class="rp-placeholder">Escolha uma faixa de risco e informe idade, valor guardado e poupança mensal para ver a projeção.</p>';
       }
