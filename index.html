@@ -816,6 +816,76 @@
     .calc-tabela-comp th:first-child, .calc-tabela-comp td:first-child { text-align: left; }
     .calc-tabela-comp tr.calc-linha-selecionada td { color: var(--primary); font-weight: 700; }
 
+    /* Simulador de Aposentadoria Renda Passiva */
+    .rp-modal { max-width: 860px; }
+    .rp-risco-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+    .rp-risco-chip {
+      flex: 1 1 60px;
+      min-width: 56px;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 6px 8px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--muted);
+      font-family: inherit;
+    }
+    .rp-risco-chip .rp-letra { display: block; font-size: 1.15rem; font-weight: 800; color: var(--text); line-height: 1.1; }
+    .rp-risco-chip .rp-grupo { display: block; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+    .rp-risco-chip:hover { border-color: var(--primary); }
+    .rp-risco-chip.selecionado { border-color: var(--gold); background: rgba(224,184,77,0.14); color: var(--gold); }
+    .rp-risco-chip.selecionado .rp-letra { color: var(--gold); }
+    .rp-risco-desc {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-left: 3px solid var(--gold);
+      background: rgba(224,184,77,0.08);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.82rem;
+      color: var(--text);
+    }
+    .rp-toggle-refinar {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .rp-toggle-refinar:hover { color: var(--primary); }
+    .rp-refinar-campos { display: none; flex-direction: column; gap: 14px; margin-top: 8px; }
+    .rp-refinar-campos.aberto { display: flex; }
+    .rp-layout { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    .rp-layout.com-resultado { grid-template-columns: 1.05fr 0.95fr; align-items: start; }
+    @media (max-width: 680px) {
+      .rp-layout.com-resultado { grid-template-columns: 1fr; }
+    }
+    .rp-painel-resultado {
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      position: sticky;
+      top: 10px;
+    }
+    .rp-painel-resultado h4 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 12px; }
+    .rp-donut-wrap { display: flex; justify-content: center; margin-bottom: 10px; }
+    .rp-legenda { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .rp-legenda-linha { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; }
+    .rp-legenda-cor { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .rp-legenda-nome { flex: 1; color: var(--muted); }
+    .rp-legenda-pct { font-family: "Courier New", monospace; font-weight: 700; }
+    .rp-verdict { margin-top: 10px; padding: 10px 12px; border-radius: 10px; font-size: 0.82rem; line-height: 1.5; }
+    .rp-verdict.ok { background: rgba(124,255,146,0.12); color: var(--accent); }
+    .rp-verdict.alerta { background: rgba(255,107,107,0.1); color: var(--danger); }
+    .rp-placeholder { font-size: 0.82rem; color: var(--muted); text-align: center; padding: 30px 8px; }
+
     /* Simulador de Financiamento Imobiliário */
     .financ-modal { max-width: 720px; }
     .financ-print-area { display: none; }
@@ -1060,8 +1130,11 @@
             Simuladores <span class="nav-dropdown-seta">▾</span>
           </button>
           <div class="nav-dropdown-menu" id="navRendaFixaMenu">
+            <button type="button" class="nav-dropdown-item" id="navAbrirRendaPassiva">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>Aposentadoria Renda Passiva
+            </button>
             <button type="button" class="nav-dropdown-item" id="navAbrirAposentadoria">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0 1 16 0v1"></path></svg>Calculadora de Aposentadoria
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0 1 16 0v1"></path></svg>Calculadora Aposentadoria INSS
             </button>
             <button type="button" class="nav-dropdown-item" id="navAbrirCalculadora">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="8" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line><line x1="16" y1="18" x2="16" y2="18"></line></svg>Calculadora Renda Fixa
@@ -1173,7 +1246,7 @@
       <div class="calc-modal financ-modal">
         <div class="calc-modal-topo">
           <h3 id="aposTitulo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0 1 16 0v1"></path></svg>Calculadora de Aposentadoria
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0 1 16 0v1"></path></svg>Calculadora Aposentadoria INSS
           </h3>
           <button id="aposFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
         </div>
@@ -1220,6 +1293,109 @@
           </div>
 
           <div id="aposResultado"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal do simulador de Aposentadoria Renda Passiva -->
+    <div id="rpOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="rpTitulo" hidden>
+      <div class="calc-modal rp-modal">
+        <div class="calc-modal-topo">
+          <h3 id="rpTitulo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>Aposentadoria Renda Passiva
+          </h3>
+          <button id="rpFechar" class="calc-fechar" aria-label="Fechar simulador" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <p class="calc-ajuda" style="margin-top:0;">
+            Simulação educativa de juros compostos para estimar o capital e a renda passiva mensal que seu perfil de
+            risco pode sustentar. Não considera inflação, impostos ou taxas — e não é recomendação de investimento.
+          </p>
+
+          <div class="rp-layout" id="rpLayout">
+            <div>
+              <!-- Idade -->
+              <div class="calc-campo">
+                <label for="rpIdade">Qual é a sua idade atual?</label>
+                <input type="number" inputmode="numeric" id="rpIdade" min="0" step="1" placeholder="Ex: 32" />
+              </div>
+
+              <!-- Escala de risco -->
+              <div class="calc-campo">
+                <label>Escala de risco</label>
+                <div class="rp-risco-grid" id="rpRiscoGrid">
+                  <button type="button" class="rp-risco-chip" data-faixa="A"><span class="rp-letra">A</span><span class="rp-grupo">Conservador</span></button>
+                  <button type="button" class="rp-risco-chip" data-faixa="B"><span class="rp-letra">B</span><span class="rp-grupo">Moderado</span></button>
+                  <button type="button" class="rp-risco-chip" data-faixa="C"><span class="rp-letra">C</span><span class="rp-grupo">Moderado</span></button>
+                  <button type="button" class="rp-risco-chip" data-faixa="D"><span class="rp-letra">D</span><span class="rp-grupo">Arrojado</span></button>
+                  <button type="button" class="rp-risco-chip" data-faixa="E"><span class="rp-letra">E</span><span class="rp-grupo">Agressivo</span></button>
+                </div>
+                <div class="rp-risco-desc" id="rpRiscoDesc"></div>
+              </div>
+
+              <!-- Cenário atual -->
+              <p class="calc-ajuda" style="margin:8px 0 -2px; color:var(--text); font-weight:700;">Para estimar seu cenário atual, me informe:</p>
+              <div class="calc-campo">
+                <label for="rpMetaRenda">Qual é a sua meta de renda mensal desejada?</label>
+                <div class="calc-input-prefixado">
+                  <span class="calc-prefixo">R$</span>
+                  <input type="text" inputmode="numeric" id="rpMetaRenda" placeholder="0,00" />
+                </div>
+              </div>
+              <div class="calc-campo">
+                <label for="rpJaGuardado">Quanto você já tem guardado para investir?</label>
+                <div class="calc-input-prefixado">
+                  <span class="calc-prefixo">R$</span>
+                  <input type="text" inputmode="numeric" id="rpJaGuardado" placeholder="0,00" />
+                </div>
+              </div>
+              <div class="calc-campo">
+                <label for="rpPoupancaMensal">Quanto consegue poupar por mês?</label>
+                <div class="calc-input-prefixado">
+                  <span class="calc-prefixo">R$</span>
+                  <input type="text" inputmode="numeric" id="rpPoupancaMensal" placeholder="0,00" />
+                </div>
+              </div>
+
+              <!-- Refinar (opcional) -->
+              <button type="button" class="rp-toggle-refinar" id="rpToggleRefinar">
+                <span id="rpToggleIcone">▸</span> Se você quiser, refine sua simulação
+              </button>
+              <div class="rp-refinar-campos" id="rpRefinarCampos">
+                <div class="calc-campo">
+                  <label for="rpPatrimonioAtual">Qual o seu patrimônio atual? (substitui "já guardado")</label>
+                  <div class="calc-input-prefixado">
+                    <span class="calc-prefixo">R$</span>
+                    <input type="text" inputmode="numeric" id="rpPatrimonioAtual" placeholder="0,00" />
+                  </div>
+                </div>
+                <div class="calc-campo">
+                  <label for="rpRendaDesejada">Quanto quer receber de renda mensal? (substitui a meta)</label>
+                  <div class="calc-input-prefixado">
+                    <span class="calc-prefixo">R$</span>
+                    <input type="text" inputmode="numeric" id="rpRendaDesejada" placeholder="0,00" />
+                  </div>
+                </div>
+                <div class="calc-campo">
+                  <label for="rpAnosAposentar">Em quantos anos pretende se aposentar?</label>
+                  <input type="number" inputmode="numeric" id="rpAnosAposentar" min="1" step="1" placeholder="Ex: 20" />
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; margin-top:14px;">
+                <button class="hg-btn" id="rpBtnCalcular" style="flex:1;">Calcular</button>
+                <button class="hg-btn" id="rpBtnLimpar" style="flex:1; background:var(--deep); color:var(--text); border:1px solid var(--border);">Limpar</button>
+              </div>
+            </div>
+
+            <div class="rp-painel-resultado" id="rpPainelResultado">
+              <h4>Alocação sugerida &amp; resultado</h4>
+              <div id="rpResultadoConteudo">
+                <p class="rp-placeholder">Escolha uma faixa de risco e informe idade, valor guardado e poupança mensal para ver a projeção.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -3888,6 +4064,247 @@
         inTempoContrib.value = '';
         chkAntes.checked = true;
         resultadoEl.innerHTML = '';
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
+      btnLimpar.addEventListener('click', limpar);
+    })();
+
+    // ============================================================
+    // SIMULADOR DE APOSENTADORIA RENDA PASSIVA (idade + escala de
+    // risco A–E + meta de renda, com gráfico de alocação em SVG)
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('rpOverlay');
+      const btnAbrirMenu = document.getElementById('navAbrirRendaPassiva');
+      const btnFechar = document.getElementById('rpFechar');
+      const inIdade = document.getElementById('rpIdade');
+      const riscoGrid = document.getElementById('rpRiscoGrid');
+      const riscoDescEl = document.getElementById('rpRiscoDesc');
+      const inMetaRenda = document.getElementById('rpMetaRenda');
+      const inJaGuardado = document.getElementById('rpJaGuardado');
+      const inPoupancaMensal = document.getElementById('rpPoupancaMensal');
+      const btnToggleRefinar = document.getElementById('rpToggleRefinar');
+      const toggleIcone = document.getElementById('rpToggleIcone');
+      const refinarCampos = document.getElementById('rpRefinarCampos');
+      const inPatrimonioAtual = document.getElementById('rpPatrimonioAtual');
+      const inRendaDesejada = document.getElementById('rpRendaDesejada');
+      const inAnosAposentar = document.getElementById('rpAnosAposentar');
+      const btnCalcular = document.getElementById('rpBtnCalcular');
+      const btnLimpar = document.getElementById('rpBtnLimpar');
+      const resultadoEl = document.getElementById('rpResultadoConteudo');
+      const layoutEl = document.getElementById('rpLayout');
+
+      if (!overlay || !btnAbrirMenu) return;
+
+      const FAIXAS = {
+        A: {
+          grupo: 'Conservador',
+          descricao: 'Faixa A · Conservador: risco muito baixo, ideal para proteger o dinheiro (ex: Tesouro Direto Selic).',
+          retornoAA: 0.105,
+          alocacao: [
+            { nome: 'Renda Fixa (Tesouro Selic)', pct: 90, cor: '#31c3ff' },
+            { nome: 'Reserva / Caixa', pct: 10, cor: '#7cff92' },
+          ],
+        },
+        B: {
+          grupo: 'Moderado',
+          descricao: 'Faixa B · Moderado: risco médio, com oscilações aceitáveis no curto prazo.',
+          retornoAA: 0.11,
+          alocacao: [
+            { nome: 'Renda Fixa', pct: 60, cor: '#31c3ff' },
+            { nome: 'Fundos Multimercado', pct: 25, cor: '#e0b84d' },
+            { nome: 'Ações', pct: 15, cor: '#ff6b6b' },
+          ],
+        },
+        C: {
+          grupo: 'Moderado',
+          descricao: 'Faixa C · Moderado: risco médio, com oscilações aceitáveis no curto prazo.',
+          retornoAA: 0.125,
+          alocacao: [
+            { nome: 'Renda Fixa', pct: 45, cor: '#31c3ff' },
+            { nome: 'Fundos Multimercado', pct: 25, cor: '#e0b84d' },
+            { nome: 'Ações', pct: 30, cor: '#ff6b6b' },
+          ],
+        },
+        D: {
+          grupo: 'Arrojado',
+          descricao: 'Faixa D · Arrojado: risco alto de perdas ou oscilação forte, voltado para ações ou criptomoedas.',
+          retornoAA: 0.145,
+          alocacao: [
+            { nome: 'Renda Fixa', pct: 25, cor: '#31c3ff' },
+            { nome: 'Fundos Multimercado', pct: 15, cor: '#e0b84d' },
+            { nome: 'Ações', pct: 50, cor: '#ff6b6b' },
+            { nome: 'Criptomoedas', pct: 10, cor: '#b26fe0' },
+          ],
+        },
+        E: {
+          grupo: 'Agressivo',
+          descricao: 'Faixa E · Agressivo: risco alto de perdas ou oscilação forte, voltado para ações ou criptomoedas.',
+          retornoAA: 0.17,
+          alocacao: [
+            { nome: 'Renda Fixa', pct: 10, cor: '#31c3ff' },
+            { nome: 'Ações', pct: 60, cor: '#ff6b6b' },
+            { nome: 'Criptomoedas', pct: 30, cor: '#b26fe0' },
+          ],
+        },
+      };
+
+      let faixaSelecionada = null;
+
+      hgAplicarMascaraMoeda(inMetaRenda);
+      hgAplicarMascaraMoeda(inJaGuardado);
+      hgAplicarMascaraMoeda(inPoupancaMensal);
+      hgAplicarMascaraMoeda(inPatrimonioAtual);
+      hgAplicarMascaraMoeda(inRendaDesejada);
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function parseNumeroPt(str) {
+        if (!str) return 0;
+        const v = parseFloat(String(str).replace(/\./g, '').replace(',', '.'));
+        return isNaN(v) ? 0 : v;
+      }
+
+      // Monta um donut em SVG puro (sem libs) a partir da alocação da faixa.
+      function gerarDonutSVG(alocacao) {
+        const r = 54, cx = 80, cy = 80, largura = 18;
+        const circunferencia = 2 * Math.PI * r;
+        let acumulado = 0;
+        const circulos = alocacao.map((item) => {
+          const comprimento = (item.pct / 100) * circunferencia;
+          const offset = -((acumulado / 100) * circunferencia);
+          acumulado += item.pct;
+          return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${item.cor}" stroke-width="${largura}" stroke-dasharray="${comprimento} ${circunferencia}" stroke-dashoffset="${offset}"></circle>`;
+        }).join('');
+        return `<svg width="160" height="160" viewBox="0 0 160 160" role="img" aria-label="Gráfico de alocação de ativos">
+          <g transform="rotate(-90 ${cx} ${cy})">${circulos}</g>
+        </svg>`;
+      }
+
+      function atualizarDescricaoRisco() {
+        if (!faixaSelecionada) { riscoDescEl.style.display = 'none'; return; }
+        riscoDescEl.style.display = 'block';
+        riscoDescEl.textContent = FAIXAS[faixaSelecionada].descricao;
+      }
+
+      riscoGrid.querySelectorAll('.rp-risco-chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+          faixaSelecionada = chip.dataset.faixa;
+          riscoGrid.querySelectorAll('.rp-risco-chip').forEach((c) => c.classList.toggle('selecionado', c === chip));
+          atualizarDescricaoRisco();
+        });
+      });
+
+      btnToggleRefinar.addEventListener('click', () => {
+        const aberto = refinarCampos.classList.toggle('aberto');
+        toggleIcone.textContent = aberto ? '▾' : '▸';
+      });
+
+      function calcular() {
+        if (!faixaSelecionada) {
+          resultadoEl.innerHTML = '<p class="calc-ajuda" style="color:#ff5a5a;">Escolha uma faixa de risco (A a E) para calcular.</p>';
+          layoutEl.classList.remove('com-resultado');
+          return;
+        }
+        const idade = parseNumeroPt(inIdade.value);
+        const PV = hgValorMascarado(inPatrimonioAtual) || hgValorMascarado(inJaGuardado);
+        const meta = hgValorMascarado(inRendaDesejada) || hgValorMascarado(inMetaRenda);
+        const PMT = hgValorMascarado(inPoupancaMensal);
+        const anosInformados = parseNumeroPt(inAnosAposentar.value);
+
+        if (!idade || (!PV && !PMT)) {
+          resultadoEl.innerHTML = '<p class="calc-ajuda" style="color:#ff5a5a;">Informe pelo menos a idade, o valor já guardado e a poupança mensal.</p>';
+          layoutEl.classList.remove('com-resultado');
+          return;
+        }
+
+        const faixa = FAIXAS[faixaSelecionada];
+        const n = anosInformados > 0 ? Math.round(anosInformados * 12) : Math.max((65 - idade) * 12, 12);
+        const i = Math.pow(1 + faixa.retornoAA, 1 / 12) - 1;
+        const FV = PV * Math.pow(1 + i, n) + PMT * ((Math.pow(1 + i, n) - 1) / i);
+        const rendaSustentavel = FV * i;
+
+        let verdictHtml = '';
+        if (meta > 0) {
+          const FValvo = meta / i;
+          const atingiuMeta = rendaSustentavel >= meta;
+          const pmtNecessario = Math.max(0, ((FValvo - PV * Math.pow(1 + i, n)) * i) / (Math.pow(1 + i, n) - 1));
+          verdictHtml = atingiuMeta
+            ? `<div class="rp-verdict ok">✅ Sua meta de ${hgFormatMoeda(meta)}/mês é alcançada nesse prazo e perfil, mantendo a poupança mensal informada.</div>`
+            : `<div class="rp-verdict alerta">⚠️ Para alcançar ${hgFormatMoeda(meta)}/mês nesse prazo e perfil, seria necessário poupar cerca de ${hgFormatMoeda(pmtNecessario)}/mês (informado: ${hgFormatMoeda(PMT)}).</div>`;
+        }
+
+        const legenda = faixa.alocacao.map((item) => `
+          <div class="rp-legenda-linha">
+            <span class="rp-legenda-cor" style="background:${item.cor};"></span>
+            <span class="rp-legenda-nome">${item.nome}</span>
+            <span class="rp-legenda-pct">${item.pct}%</span>
+          </div>`).join('');
+
+        resultadoEl.innerHTML = `
+          <div class="rp-donut-wrap">${gerarDonutSVG(faixa.alocacao)}</div>
+          <div class="rp-legenda">${legenda}</div>
+          <div class="calc-resultado-card" style="margin-top:0;">
+            <div class="calc-resultado-linha">
+              <span>Horizonte considerado</span>
+              <strong>${Math.round(n / 12)} anos</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Retorno estimado (${faixa.grupo})</span>
+              <strong>${hgFormatNumero(faixa.retornoAA * 100, 1)}% a.a.</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Capital projetado</span>
+              <strong>${hgFormatMoeda(FV)}</strong>
+            </div>
+            <div class="calc-resultado-linha calc-destaque">
+              <span>Renda passiva estimada / mês</span>
+              <strong>${hgFormatMoeda(rendaSustentavel)}</strong>
+            </div>
+          </div>
+          ${verdictHtml}
+          <p class="calc-ajuda" style="margin-top:10px;">
+            Simulação com juros compostos, sem considerar inflação, taxas ou impostos. Retornos passados não garantem
+            resultados futuros. Não constitui recomendação de investimento.
+          </p>`;
+        layoutEl.classList.add('com-resultado');
+      }
+
+      function limparCampoMoeda(input) {
+        input.value = '';
+        input.dataset.centavos = '0';
+      }
+
+      function limpar() {
+        inIdade.value = '';
+        limparCampoMoeda(inMetaRenda);
+        limparCampoMoeda(inJaGuardado);
+        limparCampoMoeda(inPoupancaMensal);
+        limparCampoMoeda(inPatrimonioAtual);
+        limparCampoMoeda(inRendaDesejada);
+        inAnosAposentar.value = '';
+        faixaSelecionada = null;
+        riscoGrid.querySelectorAll('.rp-risco-chip').forEach((c) => c.classList.remove('selecionado'));
+        atualizarDescricaoRisco();
+        refinarCampos.classList.remove('aberto');
+        toggleIcone.textContent = '▸';
+        layoutEl.classList.remove('com-resultado');
+        resultadoEl.innerHTML = '<p class="rp-placeholder">Escolha uma faixa de risco e informe idade, valor guardado e poupança mensal para ver a projeção.</p>';
       }
 
       btnAbrirMenu.addEventListener('click', () => {
