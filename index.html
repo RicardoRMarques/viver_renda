@@ -3294,7 +3294,7 @@
         const ehTaxaReal = labelTaxa.textContent.indexOf('Taxa real') === 0;
         const taxaRealInformada = ehTaxaReal ? parseFloat(inTaxa.value) || 0 : null;
         const ehPctCdi = labelTaxa.textContent.indexOf('% do CDI') === 0;
-        const pctCdiInformado = (tipo === 'cdb' && ehPctCdi) ? parseFloat(inTaxa.value) || 0 : null;
+        const pctCdiInformado = ((tipo === 'cdb' || tipo === 'lci') && ehPctCdi) ? parseFloat(inTaxa.value) || 0 : null;
         const resultadoPrincipal = simularProduto(
           { taxaAnualPct: taxaAnual, tributado: tipoInfo.tributado, custodia: tipoInfo.custodia },
           valorInicial, aporteMensal, prazoMeses
