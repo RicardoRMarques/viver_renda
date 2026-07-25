@@ -846,6 +846,143 @@
       #financPrintArea, #financPrintArea * { visibility: visible; }
       #financPrintArea { display: block; position: absolute; top: 0; left: 0; width: 100%; }
     }
+
+    /* Assistente Viver de Renda (chat com IA) */
+    .chat-ia-botao {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      z-index: 1500;
+      transition: transform 0.15s ease;
+    }
+    .chat-ia-botao:hover { transform: scale(1.06); }
+    .chat-ia-botao svg { width: 26px; height: 26px; }
+
+    .chat-ia-painel {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      height: min(560px, calc(100vh - 100px));
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      z-index: 1500;
+      overflow: hidden;
+    }
+    .chat-ia-painel[hidden] { display: none; }
+
+    .chat-ia-topo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--deep);
+    }
+    .chat-ia-topo-info { display: flex; align-items: center; gap: 10px; }
+    .chat-ia-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .chat-ia-titulo { font-weight: 700; font-size: 0.92rem; }
+    .chat-ia-subtitulo { font-size: 0.74rem; color: var(--muted); }
+
+    .chat-ia-mensagens {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chat-ia-msg {
+      max-width: 85%;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 0.86rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    .chat-ia-msg-bot {
+      align-self: flex-start;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 3px;
+    }
+    .chat-ia-msg-usuario {
+      align-self: flex-end;
+      background: var(--primary);
+      color: #fff;
+      border-bottom-right-radius: 3px;
+    }
+    .chat-ia-msg-erro {
+      align-self: flex-start;
+      background: rgba(255,90,90,0.1);
+      border: 1px solid #ff5a5a;
+      color: #ff5a5a;
+    }
+    .chat-ia-digitando { align-self: flex-start; color: var(--muted); font-size: 0.8rem; padding: 0 4px; }
+
+    .chat-ia-rodape {
+      display: flex;
+      gap: 8px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      align-items: flex-end;
+    }
+    .chat-ia-input {
+      flex: 1;
+      resize: none;
+      max-height: 90px;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 0.86rem;
+      font-family: inherit;
+    }
+    .chat-ia-input:focus { outline: none; border-color: var(--primary); }
+    .chat-ia-enviar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .chat-ia-enviar:disabled { opacity: 0.5; cursor: default; }
+    .chat-ia-enviar svg { width: 17px; height: 17px; }
+    .chat-ia-aviso { font-size: 0.68rem; color: var(--muted); text-align: center; padding: 0 12px 10px; }
+
+    @media (max-width: 480px) {
+      .chat-ia-painel { right: 16px; bottom: 16px; width: calc(100vw - 32px); }
+      .chat-ia-botao { right: 16px; bottom: 16px; }
+    }
     .financ-resumo-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -3625,5 +3762,163 @@
        gerar o PDF de verdade (baixar e compartilhar como arquivo). -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
+
+  <script>
+    (function () {
+      // ⚠️ IMPORTANTE: troque pela URL do SEU Cloudflare Worker depois de
+      // publicá-lo (veja o arquivo worker-chat-ia.js e o passo a passo que
+      // te mandei junto). Sem isso configurado, o chat mostra um aviso em
+      // vez de travar/quebrar.
+      const CHAT_IA_ENDPOINT = 'https://viverderenda-chat.marquesr.workers.dev'; // Worker gratuito (Workers AI da Cloudflare)
+
+      const botao = document.getElementById('chatIaBotao');
+      const painel = document.getElementById('chatIaPainel');
+      const btnFechar = document.getElementById('chatIaFechar');
+      const mensagensEl = document.getElementById('chatIaMensagens');
+      const inputEl = document.getElementById('chatIaInput');
+      const btnEnviar = document.getElementById('chatIaEnviar');
+
+      if (!botao || !painel) return;
+
+      // Histórico da conversa (formato aceito pela API da Anthropic).
+      let historico = [];
+      let enviando = false;
+
+      function abrirPainel() {
+        painel.hidden = false;
+        botao.hidden = true;
+        inputEl.focus();
+      }
+      function fecharPainel() {
+        painel.hidden = true;
+        botao.hidden = false;
+      }
+
+      function adicionarMensagem(texto, tipo) {
+        const div = document.createElement('div');
+        div.className = `chat-ia-msg chat-ia-msg-${tipo}`;
+        div.textContent = texto;
+        mensagensEl.appendChild(div);
+        mensagensEl.scrollTop = mensagensEl.scrollHeight;
+        return div;
+      }
+
+      function mostrarDigitando() {
+        const div = document.createElement('div');
+        div.className = 'chat-ia-digitando';
+        div.id = 'chatIaDigitando';
+        div.textContent = 'Assistente está digitando...';
+        mensagensEl.appendChild(div);
+        mensagensEl.scrollTop = mensagensEl.scrollHeight;
+      }
+      function removerDigitando() {
+        document.getElementById('chatIaDigitando')?.remove();
+      }
+
+      async function enviarMensagem() {
+        const texto = inputEl.value.trim();
+        if (!texto || enviando) return;
+
+        if (!CHAT_IA_ENDPOINT) {
+          adicionarMensagem(
+            'O assistente ainda não foi configurado neste site — falta apontar o endereço do proxy ' +
+            '(Cloudflare Worker) na constante CHAT_IA_ENDPOINT do código.',
+            'erro'
+          );
+          return;
+        }
+
+        adicionarMensagem(texto, 'usuario');
+        historico.push({ role: 'user', content: texto });
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+
+        enviando = true;
+        btnEnviar.disabled = true;
+        mostrarDigitando();
+
+        try {
+          const resp = await fetch(CHAT_IA_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: historico }),
+          });
+
+          if (!resp.ok) throw new Error(`Erro ${resp.status}`);
+          const data = await resp.json();
+          const respostaTexto = data?.reply || 'Não consegui gerar uma resposta agora. Tente de novo em instantes.';
+
+          removerDigitando();
+          adicionarMensagem(respostaTexto, 'bot');
+          historico.push({ role: 'assistant', content: respostaTexto });
+
+          // Mantém o histórico enviado enxuto (últimas ~12 mensagens).
+          if (historico.length > 12) historico = historico.slice(-12);
+        } catch (e) {
+          removerDigitando();
+          adicionarMensagem('Não consegui falar com o assistente agora. Tente novamente em instantes.', 'erro');
+          console.error('Erro no chat IA:', e);
+        } finally {
+          enviando = false;
+          btnEnviar.disabled = false;
+        }
+      }
+
+      botao.addEventListener('click', abrirPainel);
+      btnFechar.addEventListener('click', fecharPainel);
+      btnEnviar.addEventListener('click', enviarMensagem);
+      inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          enviarMensagem();
+        }
+      });
+      inputEl.addEventListener('input', () => {
+        inputEl.style.height = 'auto';
+        inputEl.style.height = Math.min(inputEl.scrollHeight, 90) + 'px';
+      });
+    })();
+  </script>
+
+  <!-- ============================================================
+       ASSISTENTE VIVER DE RENDA (chat com IA)
+       Front-end apenas: as chamadas reais à IA passam por um proxy
+       seguro (Cloudflare Worker) — a chave da API nunca fica aqui.
+       Configure a URL do seu Worker na constante CHAT_IA_ENDPOINT,
+       logo no início do <script> deste widget, mais abaixo.
+  ============================================================ -->
+  <button id="chatIaBotao" class="chat-ia-botao" type="button" aria-label="Abrir assistente Viver de Renda" title="Assistente Viver de Renda">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+  </button>
+
+  <div id="chatIaPainel" class="chat-ia-painel" hidden role="dialog" aria-modal="false" aria-labelledby="chatIaTitulo">
+    <div class="chat-ia-topo">
+      <div class="chat-ia-topo-info">
+        <span class="chat-ia-avatar">💬</span>
+        <div>
+          <div id="chatIaTitulo" class="chat-ia-titulo">Assistente Viver de Renda</div>
+          <div class="chat-ia-subtitulo">Dúvidas sobre investimentos e o mercado</div>
+        </div>
+      </div>
+      <button id="chatIaFechar" class="calc-fechar" aria-label="Fechar assistente" title="Fechar">✕</button>
+    </div>
+
+    <div id="chatIaMensagens" class="chat-ia-mensagens">
+      <div class="chat-ia-msg chat-ia-msg-bot">
+        Oi! Posso ajudar com dúvidas sobre ações, FIIs, dividendos, indicadores (P/L, P/VP, DY...) e conceitos
+        de investimento em geral. Não dou recomendação de compra/venda — sou só pra te ajudar a entender melhor
+        o mercado. O que você quer saber?
+      </div>
+    </div>
+
+    <div class="chat-ia-rodape">
+      <textarea id="chatIaInput" class="chat-ia-input" rows="1" placeholder="Pergunte algo sobre investimentos..."></textarea>
+      <button id="chatIaEnviar" class="chat-ia-enviar" type="button" aria-label="Enviar mensagem" title="Enviar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </div>
+    <p class="chat-ia-aviso">As respostas são geradas por IA e podem conter erros. Não constitui recomendação de investimento.</p>
+  </div>
+
 </body>
 </html>
