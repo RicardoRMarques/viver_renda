@@ -1357,7 +1357,7 @@
             </div>
             <div class="calc-campo">
               <label for="aposNascimento">Data de nascimento</label>
-              <input type="date" id="aposNascimento" />
+              <input type="text" inputmode="numeric" id="aposNascimento" placeholder="DD/MM/AAAA" maxlength="10" autocomplete="bday" />
             </div>
           </div>
 
@@ -1615,9 +1615,18 @@
             </div>
           </div>
 
-          <div class="calc-campo">
-            <label for="financParcelas">Quantidade de parcelas</label>
-            <input type="number" id="financParcelas" min="1" step="1" value="360" />
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="financParcelas">Quantidade de parcelas</label>
+              <input type="number" id="financParcelas" min="1" step="1" value="360" />
+            </div>
+            <div class="calc-campo">
+              <label for="financParcelasUnidade">&nbsp;</label>
+              <select id="financParcelasUnidade">
+                <option value="meses" selected>Meses</option>
+                <option value="anos">Anos</option>
+              </select>
+            </div>
           </div>
 
           <button class="hg-btn" id="financBtnSimular" style="width:100%; margin-top:6px;">Simular</button>
@@ -2000,6 +2009,34 @@
     function hgValorMascarado(input) {
       if (!input) return 0;
       return parseInt(input.dataset.centavos || '0', 10) / 100;
+    }
+
+    // Aplica máscara de data num campo de texto: digita só números e o
+    // "/" aparece sozinho (DD/MM/AAAA). Bem mais rápido que o seletor de
+    // calendário nativo quando a pessoa precisa voltar décadas no tempo.
+    function hgAplicarMascaraData(input) {
+      if (!input) return;
+      input.addEventListener('input', () => {
+        const digitos = input.value.replace(/\D/g, '').slice(0, 8);
+        let formatado = digitos;
+        if (digitos.length > 4) {
+          formatado = `${digitos.slice(0, 2)}/${digitos.slice(2, 4)}/${digitos.slice(4)}`;
+        } else if (digitos.length > 2) {
+          formatado = `${digitos.slice(0, 2)}/${digitos.slice(2)}`;
+        }
+        input.value = formatado;
+      });
+    }
+    // Converte "DD/MM/AAAA" digitado num Date válido, ou null se estiver
+    // incompleto/inválido (inclusive datas "inexistentes" tipo 31/02).
+    function hgParseDataBr(str) {
+      const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec((str || '').trim());
+      if (!m) return null;
+      const dia = parseInt(m[1], 10), mes = parseInt(m[2], 10), ano = parseInt(m[3], 10);
+      if (mes < 1 || mes > 12 || dia < 1 || dia > 31 || ano < 1900) return null;
+      const d = new Date(ano, mes - 1, dia, 0, 0, 0);
+      if (d.getFullYear() !== ano || d.getMonth() !== mes - 1 || d.getDate() !== dia) return null;
+      return d;
     }
 
     // Compartilha/copia o link de uma consulta (ação ou FII). Genérico —
@@ -3336,6 +3373,7 @@
       const inTaxa = document.getElementById('financTaxa');
       const selJurosPeriodo = document.getElementById('financJurosPeriodo');
       const inParcelas = document.getElementById('financParcelas');
+      const selParcelasUnidade = document.getElementById('financParcelasUnidade');
       const btnSimular = document.getElementById('financBtnSimular');
       const resultadoEl = document.getElementById('financResultado');
       let ultimaSimulacao = null;
@@ -3469,7 +3507,8 @@
         const sistema = selSistema.value;
         const taxaPct = Math.max(0, parseNumeroBr(inTaxa.value));
         const periodo = selJurosPeriodo.value;
-        const parcelas = Math.max(1, Math.round(parseFloat(inParcelas.value) || 1));
+        const parcelasInformadas = Math.max(1, Math.round(parseFloat(inParcelas.value) || 1));
+        const parcelas = selParcelasUnidade.value === 'anos' ? parcelasInformadas * 12 : parcelasInformadas;
 
         let anoInicio, mesInicio0;
         if (inDataInicio.value) {
@@ -3934,6 +3973,8 @@
 
       if (!overlay || !btnAbrirMenu) return;
 
+      hgAplicarMascaraData(inNascimento);
+
       function abrirModal() {
         overlay.hidden = false;
         document.body.style.overflow = 'hidden';
@@ -4004,8 +4045,8 @@
         if (isNaN(contribAtual) || contribAtual < 0) return erro('Preencha o tempo de contribuição (em anos).');
 
         const hoje = new Date();
-        const dataNasc = new Date(inNascimento.value + 'T00:00:00');
-        if (isNaN(dataNasc.getTime()) || dataNasc > hoje) return erro('Data de nascimento inválida.');
+        const dataNasc = hgParseDataBr(inNascimento.value);
+        if (!dataNasc || dataNasc > hoje) return erro('Data de nascimento inválida. Use o formato DD/MM/AAAA.');
 
         const idadeAtual = diffAnos(dataNasc, hoje);
         const REFORMA = new Date('2019-11-13T00:00:00');
