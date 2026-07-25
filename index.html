@@ -3764,7 +3764,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
 
   <script>
-    (function () {
+    document.addEventListener('DOMContentLoaded', function () {
       // ⚠️ IMPORTANTE: troque pela URL do SEU Cloudflare Worker depois de
       // publicá-lo (veja o arquivo worker-chat-ia.js e o passo a passo que
       // te mandei junto). Sem isso configurado, o chat mostra um aviso em
@@ -3877,7 +3877,7 @@
         inputEl.style.height = 'auto';
         inputEl.style.height = Math.min(inputEl.scrollHeight, 90) + 'px';
       });
-    })();
+    });
   </script>
 
   <!-- ============================================================
