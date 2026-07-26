@@ -967,13 +967,11 @@
     }
     .cmp-info-btn:hover { border-color: var(--primary); color: var(--primary); }
     .cmp-info-balao {
-      display: none; position: fixed; z-index: 4000; margin-top: 0; margin-left: 0;
+      display: none; position: fixed; z-index: 99999;
       width: 260px; max-width: 78vw; background: #fff; color: #1a1a1a; text-align: left;
       font-weight: 400; font-size: 0.74rem; line-height: 1.45; border-radius: 10px;
       padding: 12px 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); white-space: normal;
     }
-    .cmp-label:hover .cmp-info-balao.cmp-info-posicionado,
-    .cmp-info-balao.cmp-info-aberto { display: block; }
     .cmp-tabela td.cmp-ativo-col strong { display: block; }
     .cmp-tabela .cmp-melhor { color: var(--primary); font-weight: 700; }
     #cmpTabelaStatus { margin: 0; min-height: 0; }
@@ -3235,7 +3233,6 @@
               <tr>
                 <td class="cmp-label">${l.label}${l.ajuda ? `
                   <button type="button" class="cmp-info-btn" data-cmp-info="${i}" aria-label="O que é ${l.label}?" title="O que é ${l.label}?">?</button>
-                  <span class="cmp-info-balao" id="cmpInfoBalao${i}">${l.ajuda.replace(/\n/g, '<br>')}</span>
                 ` : ''}</td>
                 ${ativosValidos.map(a => `<td>${l.get(a)}</td>`).join('')}
               </tr>
@@ -3243,62 +3240,72 @@
           </tbody>`;
 
         tabelaEl.innerHTML = thead + tbody;
-        ativarTooltipsIndicadores();
+        ativarTooltipsIndicadores(linhas);
         ultimaComparacao = { ativos: ativosValidos, linhas };
       }
 
-      // Tooltips dos indicadores: posição calculada via JS (position: fixed),
-      // pois a tabela tem overflow-x:auto e um tooltip position:absolute
-      // fica cortado pelo container ao "vazar" da área visível.
-      // Abre no hover (desktop) e no clique (funciona também no celular).
-      function ativarTooltipsIndicadores() {
-        function fecharTodos() {
-          tabelaEl.querySelectorAll('.cmp-info-balao').forEach(b => {
-            b.classList.remove('cmp-info-aberto', 'cmp-info-posicionado');
-            b.style.display = 'none';
-          });
+      // Tooltips dos indicadores: um único balão reaproveitado, anexado
+      // diretamente ao <body> (fora da tabela). Isso é necessário porque a
+      // coluna de rótulos usa position:sticky para ficar fixa ao rolar a
+      // tabela para os lados no celular — e colunas sticky são renderizadas
+      // pelo navegador em uma camada própria que fica por cima de qualquer
+      // elemento posicionado (mesmo position:fixed + z-index alto) que esteja
+      // dentro da própria tabela. Ficando fora da tabela, esse problema não
+      // existe mais.
+      let cmpTooltipEl = document.getElementById('cmpTooltipGlobal');
+      if (!cmpTooltipEl) {
+        cmpTooltipEl = document.createElement('div');
+        cmpTooltipEl.id = 'cmpTooltipGlobal';
+        cmpTooltipEl.className = 'cmp-info-balao';
+        document.body.appendChild(cmpTooltipEl);
+      }
+
+      function ativarTooltipsIndicadores(linhas) {
+        function fechar() {
+          cmpTooltipEl.classList.remove('cmp-info-aberto');
+          cmpTooltipEl.style.display = 'none';
         }
 
-        function posicionar(botao, balao) {
+        function abrir(botao, texto) {
+          cmpTooltipEl.innerHTML = texto.replace(/\n/g, '<br>');
+          cmpTooltipEl.style.display = 'block'; // para medir a largura real antes de posicionar
           const rectBotao = botao.getBoundingClientRect();
-          balao.style.display = 'block'; // para medir a largura real antes de posicionar
-          const largura = balao.offsetWidth;
+          const largura = cmpTooltipEl.offsetWidth;
           let left = rectBotao.left;
           if (left + largura > window.innerWidth - 8) left = window.innerWidth - largura - 8;
           if (left < 8) left = 8;
-          balao.style.top = `${rectBotao.bottom + 6}px`;
-          balao.style.left = `${left}px`;
+          let top = rectBotao.bottom + 6;
+          const altura = cmpTooltipEl.offsetHeight;
+          if (top + altura > window.innerHeight - 8) top = rectBotao.top - altura - 6;
+          cmpTooltipEl.style.top = `${top}px`;
+          cmpTooltipEl.style.left = `${left}px`;
         }
 
-        const botoes = tabelaEl.querySelectorAll('.cmp-info-btn');
-        botoes.forEach(botao => {
-          const balao = document.getElementById(`cmpInfoBalao${botao.getAttribute('data-cmp-info')}`);
+        tabelaEl.querySelectorAll('.cmp-info-btn').forEach(botao => {
+          const linha = linhas[Number(botao.getAttribute('data-cmp-info'))];
+          if (!linha?.ajuda) return;
 
           botao.addEventListener('click', (e) => {
             e.stopPropagation();
-            const jaAberto = balao.classList.contains('cmp-info-aberto');
-            fecharTodos();
-            if (!jaAberto) {
-              posicionar(botao, balao);
-              balao.classList.add('cmp-info-aberto', 'cmp-info-posicionado');
-            }
+            const meuIndice = botao.getAttribute('data-cmp-info');
+            const jaAbertoAqui = cmpTooltipEl.classList.contains('cmp-info-aberto') && cmpTooltipEl.dataset.origem === meuIndice;
+            if (jaAbertoAqui) { fechar(); return; }
+            abrir(botao, linha.ajuda);
+            cmpTooltipEl.classList.add('cmp-info-aberto');
+            cmpTooltipEl.dataset.origem = meuIndice;
           });
           botao.addEventListener('mouseenter', () => {
-            fecharTodos();
-            posicionar(botao, balao);
-            balao.classList.add('cmp-info-posicionado');
+            if (cmpTooltipEl.classList.contains('cmp-info-aberto')) return; // já aberto por clique
+            abrir(botao, linha.ajuda);
           });
           botao.addEventListener('mouseleave', () => {
-            if (!balao.classList.contains('cmp-info-aberto')) {
-              balao.classList.remove('cmp-info-posicionado');
-              balao.style.display = 'none';
-            }
+            if (!cmpTooltipEl.classList.contains('cmp-info-aberto')) fechar();
           });
         });
 
-        document.addEventListener('click', fecharTodos);
-        document.querySelector('.cmp-tabela-wrap')?.addEventListener('scroll', fecharTodos);
-        window.addEventListener('scroll', fecharTodos, { passive: true });
+        document.addEventListener('click', fechar);
+        document.querySelector('.cmp-tabela-wrap')?.addEventListener('scroll', fechar);
+        window.addEventListener('scroll', fechar, { passive: true });
       }
 
       // Nome do arquivo no formato TICKER1-TICKER2-TICKER3.pdf
