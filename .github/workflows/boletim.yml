@@ -1,0 +1,56 @@
+name: Gerar Boletim de Mercado Diário
+
+on:
+  schedule:
+    # 6h de Brasília = 9h UTC (Brasil não tem horário de verão desde 2019,
+    # então esse horário é fixo o ano todo — não precisa ajustar depois).
+    # Roda de segunda (1) a sexta (5).
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
+
+# Evita que duas execuções rodem ao mesmo tempo e briguem pelo commit
+concurrency:
+  group: boletim-diario
+  cancel-in-progress: false
+
+jobs:
+  gerar-boletim:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # necessário para commitar o boletim de volta no repo
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+        with:
+          # Garante que estamos sempre no HEAD mais recente, evitando
+          # conflito com o robô de indices.json/noticias.json/ranking.json
+          # se ele rodar próximo desse horário.
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # -----------------------------------------------------------------
+      # IMPORTANTE: este passo assume que indices.json, noticias.json e
+      # ranking.json já foram atualizados hoje (por outro workflow/robô já
+      # existente no repositório). Se esse(s) robô(s) rodar(em) depois das
+      # 6h, ajuste o cron acima para um horário depois deles, ou adicione
+      # aqui os passos que geram esses 3 arquivos antes de continuar.
+      # -----------------------------------------------------------------
+      - name: Gerar o boletim do dia
+        run: node robo-boletim/gerar-boletim.js
+
+      - name: Commitar e enviar o boletim gerado
+        run: |
+          git config user.name "robo-boletim"
+          git config user.email "robo-boletim@users.noreply.github.com"
+          git add boletins/
+          if git diff --cached --quiet; then
+            echo "Nada novo para commitar (o boletim de hoje já existia)."
+          else
+            git commit -m "Boletim de Mercado: $(date -u -d '-3 hours' '+%d-%m-%Y')"
+            git push
+          fi
