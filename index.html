@@ -966,6 +966,8 @@
       cursor: pointer; font-family: inherit; padding: 0;
     }
     .cmp-info-btn:hover, .hg-info-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .hg-info-vermelho { border-color: #e05555 !important; color: #e05555 !important; }
+    .hg-info-vermelho:hover { background: #e05555 !important; color: #fff !important; }
     .cmp-info-balao {
       display: none; position: fixed; z-index: 99999;
       width: 260px; max-width: 78vw; background: #fff; color: #1a1a1a; text-align: left;
@@ -2040,7 +2042,7 @@
 
             <div class="ranking-acoes-colunas">
               <div class="ranking-coluna">
-                <h4 class="ranking-title">💰 Maior Dividend Yield</h4>
+                <h4 class="ranking-title">💰 Maior Dividend Yield <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="dy-acoes" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></h4>
                 <div class="ranking-list" id="rankingDy">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2051,7 +2053,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">📈 Maior Valor de Mercado</h4>
+                <h4 class="ranking-title">📈 Maior Valor de Mercado <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="valor-mercado" aria-label="O que é Valor de Mercado?" title="O que é Valor de Mercado?">?</button></h4>
                 <div class="ranking-list" id="rankingValorMercado">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2062,7 +2064,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">🧾 Maior Receita</h4>
+                <h4 class="ranking-title">🧾 Maior Receita <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="receita" aria-label="O que é Receita?" title="O que é Receita?">?</button></h4>
                 <div class="ranking-list" id="rankingReceita">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2079,7 +2081,7 @@
 
             <div class="ranking-acoes-colunas">
               <div class="ranking-coluna">
-                <h4 class="ranking-title">🏦 Maior Valor Patrimonial</h4>
+                <h4 class="ranking-title">🏦 Maior Valor Patrimonial <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="valor-patrimonial" aria-label="O que é Valor Patrimonial?" title="O que é Valor Patrimonial?">?</button></h4>
                 <div class="ranking-list" id="rankingFiisPatrimonio">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2091,7 +2093,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">💰 Maior Dividend Yield</h4>
+                <h4 class="ranking-title">💰 Maior Dividend Yield <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="dy-fii" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></h4>
                 <div class="ranking-list" id="rankingFiisDy">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2103,7 +2105,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">🔎 Mais Negociados</h4>
+                <h4 class="ranking-title">🔎 Mais Negociados <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="mais-negociados" aria-label="O que é 'Mais Negociados'?" title="O que é 'Mais Negociados'?">?</button></h4>
                 <div class="ranking-list" id="rankingFiisNegociados">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -3032,6 +3034,72 @@
       }
     }
     carregarIndices();
+
+    // ============================================================
+    // GLOSSÁRIO DOS RANKINGS (Ações e FIIs) — ícone "?" vermelho ao
+    // lado de cada título, com balão explicativo (mesmo padrão de
+    // tooltip único fixo, fora de qualquer container com overflow).
+    // ============================================================
+    (function () {
+      const GLOSSARIO = {
+        'dy-acoes': 'Dividend Yield (DY) = quanto a empresa pagou em dividendos/proventos nos últimos 12 meses, em relação à cotação atual da ação.\n\nCálculo: dividendos pagos em 12 meses / cotação atual × 100',
+        'valor-mercado': 'Valor de Mercado (Market Cap) = valor total da empresa negociado na bolsa.\n\nCálculo: cotação atual × número total de ações em circulação.',
+        'receita': 'Receita = valor total que a empresa faturou com a venda de seus produtos/serviços em um determinado período, antes de descontar custos e despesas.',
+        'valor-patrimonial': 'Valor Patrimonial = soma de todos os imóveis, direitos e recursos que pertencem ao fundo (FII), refletindo o patrimônio líquido total do fundo.',
+        'dy-fii': 'Dividend Yield (DY) = quanto o fundo imobiliário pagou de rendimentos aos cotistas nos últimos 12 meses, em relação à cotação atual da cota.\n\nCálculo: rendimentos pagos em 12 meses / cotação atual × 100',
+        'mais-negociados': '"Mais Negociados" = fundos imobiliários com maior liquidez diária (volume financeiro médio negociado por dia), o que facilita comprar e vender cotas sem grandes variações de preço.',
+      };
+
+      let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
+      if (!glossarioTooltipEl) {
+        glossarioTooltipEl = document.createElement('div');
+        glossarioTooltipEl.id = 'glossarioTooltipGlobal';
+        glossarioTooltipEl.className = 'cmp-info-balao';
+        document.body.appendChild(glossarioTooltipEl);
+      }
+      function fechar() {
+        glossarioTooltipEl.classList.remove('cmp-info-aberto');
+        glossarioTooltipEl.style.display = 'none';
+      }
+      function abrir(botao, texto) {
+        glossarioTooltipEl.innerHTML = texto.replace(/\n/g, '<br>');
+        glossarioTooltipEl.style.display = 'block';
+        const rect = botao.getBoundingClientRect();
+        const largura = glossarioTooltipEl.offsetWidth;
+        let left = rect.left;
+        if (left + largura > window.innerWidth - 8) left = window.innerWidth - largura - 8;
+        if (left < 8) left = 8;
+        let top = rect.bottom + 6;
+        const altura = glossarioTooltipEl.offsetHeight;
+        if (top + altura > window.innerHeight - 8) top = rect.top - altura - 6;
+        glossarioTooltipEl.style.top = `${top}px`;
+        glossarioTooltipEl.style.left = `${left}px`;
+      }
+
+      document.querySelectorAll('[data-glossario]').forEach(botao => {
+        const texto = GLOSSARIO[botao.getAttribute('data-glossario')];
+        if (!texto) return;
+        botao.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const meuIndice = botao.getAttribute('data-glossario');
+          const jaAbertoAqui = glossarioTooltipEl.classList.contains('cmp-info-aberto') && glossarioTooltipEl.dataset.origem === meuIndice;
+          if (jaAbertoAqui) { fechar(); return; }
+          abrir(botao, texto);
+          glossarioTooltipEl.classList.add('cmp-info-aberto');
+          glossarioTooltipEl.dataset.origem = meuIndice;
+        });
+        botao.addEventListener('mouseenter', () => {
+          if (glossarioTooltipEl.classList.contains('cmp-info-aberto')) return;
+          abrir(botao, texto);
+        });
+        botao.addEventListener('mouseleave', () => {
+          if (!glossarioTooltipEl.classList.contains('cmp-info-aberto')) fechar();
+        });
+      });
+
+      document.addEventListener('click', fechar);
+      window.addEventListener('scroll', fechar, { passive: true });
+    })();
 
     // ============================================================
     // TABELA DO ÍNDICE DE BASILEIA DOS BANCOS
