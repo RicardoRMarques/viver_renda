@@ -2980,24 +2980,28 @@
       { nome: 'IFIX' },
       { nome: 'DÓLAR', aliases: ['DOLAR', 'USD/BRL'] },
       { nome: 'EURO', aliases: ['EUR/BRL'] },
-      { nome: 'BITCOIN', aliases: ['BTC', 'BTC/BRL'] },
-      { nome: 'SELIC', aliases: ['TAXA SELIC'] },
+      { nome: 'BITCOIN', aliases: ['BTC'] },
+      { nome: 'SELIC' },
     ];
     function renderizarTickerCarrossel(indices) {
       const track = document.getElementById('tickerTrack');
       if (!track) return;
 
-      const porLabel = {};
-      (Array.isArray(indices) ? indices : []).forEach(item => {
-        if (item?.label) porLabel[item.label.trim().toUpperCase()] = item;
-      });
+      const lista = Array.isArray(indices) ? indices : [];
+
+      // Faz correspondência por prefixo (case-insensitive), pois o robô
+      // costuma gravar rótulos com sufixo entre parênteses, como
+      // "Selic (meta)", "Bitcoin (USD)" etc.
+      function encontrarItem(nome, aliases) {
+        const chaves = [nome, ...(aliases || [])].map(c => c.toUpperCase());
+        return lista.find(i => {
+          const label = (i.label || '').trim().toUpperCase();
+          return chaves.some(c => label === c || label.startsWith(c + ' ') || label.startsWith(c + '('));
+        }) || null;
+      }
 
       const itens = TICKER_ATIVOS
-        .map(({ nome, aliases }) => {
-          const chaves = [nome, ...(aliases || [])];
-          const item = chaves.map(c => porLabel[c]).find(Boolean);
-          return { nome, item };
-        })
+        .map(({ nome, aliases }) => ({ nome, item: encontrarItem(nome, aliases) }))
         .filter(({ item }) => item);
 
       if (itens.length === 0) {
@@ -3008,17 +3012,33 @@
       const nomeExibicao = { 'DÓLAR': 'Dólar', 'IBOVESPA': 'Ibovespa', 'IFIX': 'IFIX', 'EURO': 'Euro', 'BITCOIN': 'Bitcoin', 'SELIC': 'Selic' };
 
       const montarItem = ({ nome, item }) => {
-        const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : (typeof item.valor_pct === 'number' ? item.valor_pct : 0);
-        const emAlta = variacao >= 0;
-        const prefixo = item.prefixo === 'pontos' ? '' : (item.prefixo || '');
-        const valorFormatado = typeof item.valor === 'number'
-          ? `${prefixo}${item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${item.prefixo === 'pontos' ? ' pts' : ''}`
-          : '—';
+        // Itens do tipo "cotação" (Ibovespa, IFIX, Dólar, Euro, Bitcoin): têm
+        // valor numérico + variação percentual do dia.
+        if (typeof item.valor === 'number') {
+          const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
+          const emAlta = variacao >= 0;
+          const prefixo = item.prefixo === 'pontos' ? '' : (item.prefixo || '');
+          const valorFormatado = `${prefixo}${item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${item.prefixo === 'pontos' ? ' pts' : ''}`;
+          return `
+            <span class="ticker-item">
+              <span class="ticker-nome">${nomeExibicao[nome] || nome}</span>
+              <span class="ticker-valor">${valorFormatado}</span>
+              <span class="ticker-var ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+            </span>`;
+        }
+        // Itens do tipo "taxa" (Selic, IPCA etc.): o valor É o percentual em
+        // si (valor_pct), não uma variação diária — exibido sem seta.
+        if (typeof item.valor_pct === 'number') {
+          return `
+            <span class="ticker-item">
+              <span class="ticker-nome">${nomeExibicao[nome] || nome}</span>
+              <span class="ticker-valor">${item.valor_pct.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% a.a.</span>
+            </span>`;
+        }
         return `
           <span class="ticker-item">
             <span class="ticker-nome">${nomeExibicao[nome] || nome}</span>
-            <span class="ticker-valor">${valorFormatado}</span>
-            <span class="ticker-var ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+            <span class="ticker-valor">—</span>
           </span>`;
       };
 
