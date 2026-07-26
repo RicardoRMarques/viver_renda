@@ -967,12 +967,12 @@
     }
     .cmp-info-btn:hover { border-color: var(--primary); color: var(--primary); }
     .cmp-info-balao {
-      display: none; position: absolute; z-index: 20; top: 100%; left: 0; margin-top: 6px;
+      display: none; position: fixed; z-index: 4000; margin-top: 0; margin-left: 0;
       width: 260px; max-width: 78vw; background: #fff; color: #1a1a1a; text-align: left;
       font-weight: 400; font-size: 0.74rem; line-height: 1.45; border-radius: 10px;
-      padding: 12px 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); white-space: normal;
+      padding: 12px 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.45); white-space: normal;
     }
-    .cmp-label:hover .cmp-info-balao,
+    .cmp-label:hover .cmp-info-balao.cmp-info-posicionado,
     .cmp-info-balao.cmp-info-aberto { display: block; }
     .cmp-tabela td.cmp-ativo-col strong { display: block; }
     .cmp-tabela .cmp-melhor { color: var(--primary); font-weight: 700; }
@@ -3247,23 +3247,58 @@
         ultimaComparacao = { ativos: ativosValidos, linhas };
       }
 
-      // Tooltips dos indicadores: abre no hover (desktop) e também no clique
-      // (funciona no celular, onde não existe "passar o mouse"). Fecha ao
-      // clicar fora ou em outro "?".
+      // Tooltips dos indicadores: posição calculada via JS (position: fixed),
+      // pois a tabela tem overflow-x:auto e um tooltip position:absolute
+      // fica cortado pelo container ao "vazar" da área visível.
+      // Abre no hover (desktop) e no clique (funciona também no celular).
       function ativarTooltipsIndicadores() {
+        function fecharTodos() {
+          tabelaEl.querySelectorAll('.cmp-info-balao').forEach(b => {
+            b.classList.remove('cmp-info-aberto', 'cmp-info-posicionado');
+            b.style.display = 'none';
+          });
+        }
+
+        function posicionar(botao, balao) {
+          const rectBotao = botao.getBoundingClientRect();
+          balao.style.display = 'block'; // para medir a largura real antes de posicionar
+          const largura = balao.offsetWidth;
+          let left = rectBotao.left;
+          if (left + largura > window.innerWidth - 8) left = window.innerWidth - largura - 8;
+          if (left < 8) left = 8;
+          balao.style.top = `${rectBotao.bottom + 6}px`;
+          balao.style.left = `${left}px`;
+        }
+
         const botoes = tabelaEl.querySelectorAll('.cmp-info-btn');
         botoes.forEach(botao => {
+          const balao = document.getElementById(`cmpInfoBalao${botao.getAttribute('data-cmp-info')}`);
+
           botao.addEventListener('click', (e) => {
             e.stopPropagation();
-            const balao = document.getElementById(`cmpInfoBalao${botao.getAttribute('data-cmp-info')}`);
-            const aberto = balao.classList.contains('cmp-info-aberto');
-            tabelaEl.querySelectorAll('.cmp-info-balao').forEach(b => b.classList.remove('cmp-info-aberto'));
-            if (!aberto) balao.classList.add('cmp-info-aberto');
+            const jaAberto = balao.classList.contains('cmp-info-aberto');
+            fecharTodos();
+            if (!jaAberto) {
+              posicionar(botao, balao);
+              balao.classList.add('cmp-info-aberto', 'cmp-info-posicionado');
+            }
+          });
+          botao.addEventListener('mouseenter', () => {
+            fecharTodos();
+            posicionar(botao, balao);
+            balao.classList.add('cmp-info-posicionado');
+          });
+          botao.addEventListener('mouseleave', () => {
+            if (!balao.classList.contains('cmp-info-aberto')) {
+              balao.classList.remove('cmp-info-posicionado');
+              balao.style.display = 'none';
+            }
           });
         });
-        document.addEventListener('click', () => {
-          tabelaEl.querySelectorAll('.cmp-info-balao').forEach(b => b.classList.remove('cmp-info-aberto'));
-        });
+
+        document.addEventListener('click', fecharTodos);
+        document.querySelector('.cmp-tabela-wrap')?.addEventListener('scroll', fecharTodos);
+        window.addEventListener('scroll', fecharTodos, { passive: true });
       }
 
       // Nome do arquivo no formato TICKER1-TICKER2-TICKER3.pdf
