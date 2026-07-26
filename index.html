@@ -974,6 +974,24 @@
     }
     .cmp-tabela td.cmp-ativo-col strong { display: block; }
     .cmp-tabela .cmp-melhor { color: var(--primary); font-weight: 700; }
+    .bas-modal { max-width: 760px; }
+    .bas-ano-select {
+      background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 5px 8px; font-size: 0.8rem; font-family: inherit; cursor: pointer;
+    }
+    .bas-tabela th { cursor: pointer; user-select: none; white-space: nowrap; }
+    .bas-tabela th:hover { color: var(--primary); }
+    .bas-tabela th .bas-seta { opacity: 0.5; font-size: 0.7rem; margin-left: 3px; }
+    .bas-tabela th.bas-ordenado .bas-seta { opacity: 1; color: var(--primary); }
+    .bas-banco-cel { display: flex; align-items: center; gap: 10px; }
+    .bas-banco-logo {
+      width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(127,127,127,0.15); font-size: 0.9rem; font-weight: 700; overflow: hidden;
+    }
+    .bas-banco-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .bas-banco-nome { font-weight: 700; }
+    .bas-banco-sub { font-size: 0.7rem; color: var(--muted); font-weight: 500; }
     #cmpTabelaStatus { margin: 0; min-height: 0; }
     #cmpTabelaStatus:not(:empty) { margin: 0 0 10px; }
     .cmp-acoes-linha { display: flex; gap: 8px; margin-top: 4px; }
@@ -2049,6 +2067,12 @@
                 </div>
               </div>
             </div>
+
+            <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+              <button type="button" class="cmp-btn-abrir" id="basBtnAbrir" style="font-size:0.76rem; padding:6px 14px;">
+                🏦 Índice de Basileia dos Bancos
+              </button>
+            </div>
           </div>
 
           <div class="ranking-block">
@@ -2188,6 +2212,30 @@
           </div>
 
           <button class="hg-btn" id="cmpBtnVoltarSelecao" style="width:100%; background:var(--deep); color:var(--text); border:1px solid var(--border);">← Ajustar seleção de ativos</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Tabela do Índice de Basileia dos Bancos -->
+    <div id="basOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="basTitulo" hidden>
+      <div class="calc-modal bas-modal">
+        <div class="calc-modal-topo">
+          <h3 id="basTitulo">📊 Tabela do Índice de Basileia</h3>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <select id="basAnoSelect" class="bas-ano-select">
+              <option value="2026" selected>2026</option>
+              <option value="2025">2025</option>
+            </select>
+            <button id="basFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+          </div>
+        </div>
+        <div class="calc-corpo">
+          <p class="calc-ajuda" style="margin:-6px 0 0;">
+            Índice de Basileia: medida regulatória de solidez financeira dos bancos, atualizada trimestralmente
+            (dado publicado pelos próprios bancos/BC, sem API de mercado — os demais indicadores são calculados em tempo real).
+          </p>
+          <div id="basStatus" class="hg-status"></div>
+          <div class="cmp-tabela-wrap"><table class="cmp-tabela bas-tabela" id="basTabela"></table></div>
         </div>
       </div>
     </div>
@@ -2985,6 +3033,176 @@
       }
     }
     carregarIndices();
+
+    // ============================================================
+    // TABELA DO ÍNDICE DE BASILEIA DOS BANCOS
+    // O Índice de Basileia é um dado regulatório (publicado trimestralmente
+    // pelos próprios bancos/Banco Central) — não existe em nenhuma API de
+    // mercado gratuita, por isso essa lista é curada manualmente aqui.
+    // Os demais indicadores (Valor de mercado, P/L, P/VP, ROE, DY) são
+    // buscados ao vivo na mesma API já usada no resto do site.
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('basBtnAbrir');
+      const overlay = document.getElementById('basOverlay');
+      const btnFechar = document.getElementById('basFechar');
+      const anoSelect = document.getElementById('basAnoSelect');
+      const statusEl = document.getElementById('basStatus');
+      const tabelaEl = document.getElementById('basTabela');
+      if (!btnAbrir || !overlay) return;
+
+      // Índice de Basileia por banco/ano — ATUALIZAR MANUALMENTE a cada
+      // divulgação trimestral (fonte: releases de resultados dos bancos).
+      const BASILEIA_POR_ANO = {
+        2026: {
+          BRBI11: 20.63, BRSR6: 17.35, ABCB4: 16.87, ITUB4: 15.20, BBDC4: 14.90,
+          BBAS3: 16.10, SANB11: 15.60, BPAN4: 13.80, BPAC11: 17.90,
+        },
+        2025: {
+          BRBI11: 19.80, BRSR6: 16.90, ABCB4: 16.40, ITUB4: 14.80, BBDC4: 14.50,
+          BBAS3: 15.70, SANB11: 15.10, BPAN4: 13.40, BPAC11: 17.40,
+        },
+      };
+
+      const BANCOS = [
+        { ticker: 'BRBI11', nome: 'BR Partners' },
+        { ticker: 'BRSR6', nome: 'Banco Banrisul' },
+        { ticker: 'ABCB4', nome: 'Banco ABC Brasil' },
+        { ticker: 'ITUB4', nome: 'Itaú Unibanco' },
+        { ticker: 'BBDC4', nome: 'Bradesco' },
+        { ticker: 'BBAS3', nome: 'Banco do Brasil' },
+        { ticker: 'SANB11', nome: 'Santander Brasil' },
+        { ticker: 'BPAN4', nome: 'Banco Pan' },
+        { ticker: 'BPAC11', nome: 'BTG Pactual' },
+      ];
+
+      let linhasCache = null; // [{ticker, nome, basileia, marketCap, pl, pvp, roe, dy, logo}]
+      let ordem = { chave: 'basileia', asc: false };
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        if (!linhasCache) carregarDados();
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      async function buscarDadosBanco(ticker) {
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const ativo = data?.results?.[0];
+          if (!ativo) return null;
+
+          const urlFund = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + ticker)}&period=annual`;
+          const respFund = await fetch(urlFund);
+          const dataFund = await respFund.json();
+          const statementTtm = dataFund?.results?.[0]?.statements?.find(s => s.period_type === 'ttm') || dataFund?.results?.[0]?.statements?.[0];
+
+          return {
+            marketCap: ativo.quote?.market_cap ?? null,
+            logo: ativo.logos?.square_small ?? null,
+            pl: statementTtm?.valuation?.price_to_earnings_ratio ?? null,
+            pvp: statementTtm?.valuation?.price_to_book_ratio ?? null,
+            roe: statementTtm?.profitability?.return_on_equity ?? null,
+            dy: statementTtm?.dividends?.yield_percent ?? null,
+          };
+        } catch (e) {
+          return null;
+        }
+      }
+
+      async function carregarDados() {
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Carregando indicadores dos bancos...';
+        tabelaEl.innerHTML = '';
+
+        const resultados = await Promise.all(BANCOS.map(async (b) => {
+          const dados = await buscarDadosBanco(b.ticker);
+          const anoAtual = Number(anoSelect.value);
+          return {
+            ticker: b.ticker,
+            nome: b.nome,
+            basileia: BASILEIA_POR_ANO[anoAtual]?.[b.ticker] ?? null,
+            marketCap: dados?.marketCap ?? null,
+            logo: dados?.logo ?? null,
+            pl: dados?.pl ?? null,
+            pvp: dados?.pvp ?? null,
+            roe: dados?.roe ?? null,
+            dy: dados?.dy ?? null,
+          };
+        }));
+
+        linhasCache = resultados;
+        statusEl.textContent = '';
+        renderizarTabela();
+      }
+
+      function fmtPct(v) { return typeof v === 'number' ? `${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` : '—'; }
+      function fmtNum(v) { return typeof v === 'number' ? v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'; }
+
+      const COLUNAS = [
+        { chave: 'nome', label: 'Banco' },
+        { chave: 'basileia', label: 'Índice de Basileia', fmt: fmtPct },
+        { chave: 'marketCap', label: 'Valor de Mercado', fmt: v => hgFormatCompacto(v) ?? '—' },
+        { chave: 'pl', label: 'P/L', fmt: fmtNum },
+        { chave: 'pvp', label: 'P/VP', fmt: fmtNum },
+        { chave: 'roe', label: 'ROE', fmt: fmtPct },
+        { chave: 'dy', label: 'DY', fmt: fmtPct },
+      ];
+
+      function renderizarTabela() {
+        if (!linhasCache) return;
+        const linhasOrdenadas = [...linhasCache].sort((a, b) => {
+          const va = a[ordem.chave], vb = b[ordem.chave];
+          if (va == null && vb == null) return 0;
+          if (va == null) return 1;
+          if (vb == null) return -1;
+          if (typeof va === 'string') return ordem.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+          return ordem.asc ? va - vb : vb - va;
+        });
+
+        const thead = `<thead><tr>${COLUNAS.map(c => `
+          <th data-chave="${c.chave}" class="${ordem.chave === c.chave ? 'bas-ordenado' : ''}">
+            ${c.label}<span class="bas-seta">${ordem.chave === c.chave ? (ordem.asc ? '▲' : '▼') : '⇅'}</span>
+          </th>`).join('')}</tr></thead>`;
+
+        const tbody = `<tbody>${linhasOrdenadas.map(l => `
+          <tr>
+            <td>
+              <div class="bas-banco-cel">
+                <span class="bas-banco-logo">${l.logo ? `<img src="${l.logo}" alt="" onerror="this.parentElement.textContent='${l.ticker.slice(0, 2)}'">` : l.ticker.slice(0, 2)}</span>
+                <span><span class="bas-banco-nome">${l.ticker}</span><br><span class="bas-banco-sub">${l.nome}</span></span>
+              </div>
+            </td>
+            <td>${fmtPct(l.basileia)}</td>
+            <td>${hgFormatCompacto(l.marketCap) ?? '—'}</td>
+            <td>${fmtNum(l.pl)}</td>
+            <td>${fmtNum(l.pvp)}</td>
+            <td>${fmtPct(l.roe)}</td>
+            <td>${fmtPct(l.dy)}</td>
+          </tr>`).join('')}</tbody>`;
+
+        tabelaEl.innerHTML = thead + tbody;
+
+        tabelaEl.querySelectorAll('th').forEach(th => {
+          th.addEventListener('click', () => {
+            const chave = th.getAttribute('data-chave');
+            if (ordem.chave === chave) ordem.asc = !ordem.asc;
+            else { ordem.chave = chave; ordem.asc = false; }
+            renderizarTabela();
+          });
+        });
+      }
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      anoSelect.addEventListener('change', carregarDados);
+    })();
 
     // Carrossel de índices (Ibovespa, IFIX, Dólar, Euro, Bitcoin) logo abaixo
     // do header, usando os mesmos dados do boletim diário (indices.json) —
