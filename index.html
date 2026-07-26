@@ -1003,6 +1003,14 @@
     .boletim-btn.boletim-btn-whatsapp:hover { background: #25d366; color: #06210f; }
     .boletim-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
     .boletim-vazio { color: var(--muted); font-size: 0.82rem; }
+    .boletim-historico-linha {
+      display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap;
+    }
+    .boletim-historico-linha label { font-size: 0.76rem; color: var(--muted); white-space: nowrap; }
+    .boletim-historico-select {
+      flex: 1 1 140px; min-width: 0; background: var(--deep); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 6px 8px; font-size: 0.78rem; font-family: inherit; cursor: pointer;
+    }
     @media (max-width: 480px) {
       .boletim-item { flex-wrap: wrap; }
       .boletim-btn { padding: 6px 8px; font-size: 0.68rem; }
@@ -1561,8 +1569,6 @@
           <div class="hg-painel">
             <p class="calc-ajuda" style="margin:0 0 10px;">Boletins gerados automaticamente de segunda a sexta. Abra ou compartilhe direto no WhatsApp.</p>
             <div id="boletinsLista" class="boletins-lista">
-              <div class="boletim-item boletim-skeleton"></div>
-              <div class="boletim-item boletim-skeleton"></div>
               <div class="boletim-item boletim-skeleton"></div>
             </div>
           </div>
@@ -4051,6 +4057,30 @@
         window.open(`https://wa.me/?text=${encodeURIComponent(`${textoBase}\n\n${url}`)}`, '_blank');
       }
 
+      function itemHtml(entrada, ehHoje) {
+        const url = `boletins/${entrada.arquivo}`;
+        return `
+          <div class="boletim-item ${ehHoje ? 'boletim-hoje' : ''}" data-arquivo="${entrada.arquivo}">
+            <div class="boletim-info">
+              <div class="boletim-data">${entrada.dataExibicao}${ehHoje ? '<span class="boletim-tag-hoje">HOJE</span>' : ''}</div>
+              <div class="boletim-dia-semana">${(entrada.labelDia || '').split(',')[0]}</div>
+            </div>
+            <div class="boletim-acoes">
+              <a class="boletim-btn boletim-btn-ver" href="${url}" target="_blank" rel="noopener noreferrer">${iconeAbrir()} Ver</a>
+              <button type="button" class="boletim-btn boletim-btn-whatsapp" data-arquivo="${entrada.arquivo}">${iconeWhatsapp()} Compartilhar</button>
+            </div>
+          </div>`;
+      }
+
+      function ativarBotaoCompartilhar(botao, boletins) {
+        botao.addEventListener('click', () => {
+          const arquivo = botao.getAttribute('data-arquivo');
+          const entrada = boletins.find(b => b.arquivo === arquivo);
+          const url = `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}boletins/${arquivo}`;
+          compartilharBoletim(entrada, url, botao);
+        });
+      }
+
       async function carregarBoletins() {
         try {
           const resp = await fetch('boletins/index.json', { cache: 'no-store' });
@@ -4059,31 +4089,39 @@
           if (!Array.isArray(boletins) || boletins.length === 0) throw new Error('vazio');
 
           const hoje = hojeDataArquivo();
+          const entradaHoje = boletins.find(b => b.dataExibicao === hoje) || boletins[0];
+          const outrosDias = boletins.filter(b => b.arquivo !== entradaHoje.arquivo);
 
-          listaEl.innerHTML = boletins.map(entrada => {
-            const url = `boletins/${entrada.arquivo}`;
-            const ehHoje = entrada.dataExibicao === hoje;
-            return `
-              <div class="boletim-item ${ehHoje ? 'boletim-hoje' : ''}">
-                <div class="boletim-info">
-                  <div class="boletim-data">${entrada.dataExibicao}${ehHoje ? '<span class="boletim-tag-hoje">HOJE</span>' : ''}</div>
-                  <div class="boletim-dia-semana">${(entrada.labelDia || '').split(',')[0]}</div>
-                </div>
-                <div class="boletim-acoes">
-                  <a class="boletim-btn" href="${url}" target="_blank" rel="noopener noreferrer">${iconeAbrir()} Ver</a>
-                  <button type="button" class="boletim-btn boletim-btn-whatsapp" data-arquivo="${entrada.arquivo}">${iconeWhatsapp()} Compartilhar</button>
-                </div>
+          // Boletim de hoje (ou o mais recente) sempre fica visível como
+          // card fixo. Os demais dias da semana viram opções de um <select>
+          // — assim o quadro não cresce conforme os boletins vão se
+          // acumulando ao longo da semana, mesmo com o histórico completo.
+          let html = itemHtml(entradaHoje, entradaHoje.dataExibicao === hoje);
+
+          if (outrosDias.length > 0) {
+            html += `
+              <div class="boletim-historico-linha">
+                <label for="boletimHistoricoSelect">Ver outro dia:</label>
+                <select id="boletimHistoricoSelect" class="boletim-historico-select">
+                  ${outrosDias.map(e => `<option value="${e.arquivo}">${e.dataExibicao} — ${(e.labelDia || '').split(',')[0]}</option>`).join('')}
+                </select>
+                <a class="boletim-btn boletim-btn-ver" id="boletimHistoricoVer" href="boletins/${outrosDias[0].arquivo}" target="_blank" rel="noopener noreferrer">${iconeAbrir()} Ver</a>
+                <button type="button" class="boletim-btn boletim-btn-whatsapp" id="boletimHistoricoCompartilhar" data-arquivo="${outrosDias[0].arquivo}">${iconeWhatsapp()} Compartilhar</button>
               </div>`;
-          }).join('');
+          }
 
-          listaEl.querySelectorAll('.boletim-btn-whatsapp').forEach(botao => {
-            botao.addEventListener('click', () => {
-              const arquivo = botao.getAttribute('data-arquivo');
-              const entrada = boletins.find(b => b.arquivo === arquivo);
-              const url = `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}boletins/${arquivo}`;
-              compartilharBoletim(entrada, url, botao);
+          listaEl.innerHTML = html;
+
+          listaEl.querySelectorAll('.boletim-btn-whatsapp').forEach(botao => ativarBotaoCompartilhar(botao, boletins));
+
+          const selectHistorico = document.getElementById('boletimHistoricoSelect');
+          if (selectHistorico) {
+            selectHistorico.addEventListener('change', () => {
+              const arquivo = selectHistorico.value;
+              document.getElementById('boletimHistoricoVer').href = `boletins/${arquivo}`;
+              document.getElementById('boletimHistoricoCompartilhar').setAttribute('data-arquivo', arquivo);
             });
-          });
+          }
         } catch (e) {
           listaEl.innerHTML = '<div class="boletim-vazio">Nenhum boletim disponível ainda — aguarde o robô rodar (seg. a sex., 6h).</div>';
         }
