@@ -4033,18 +4033,22 @@
       }
 
       async function compartilharBoletim(entrada, url, botao) {
-        const texto = `📊 Boletim de Mercado — ${entrada.labelDia}\nDividendos | Viver de Renda\n\n${url}`;
+        const textoBase = `📊 Boletim de Mercado — ${entrada.labelDia}\nDividendos | Viver de Renda`;
         if (navigator.share) {
           try {
-            await navigator.share({ title: 'Boletim de Mercado', text: texto, url });
+            // Sem o link dentro de "text": o campo "url" já é anexado
+            // separadamente pelo próprio WhatsApp/sistema. Colocar nos dois
+            // lugares fazia o link aparecer duplicado na mensagem.
+            await navigator.share({ title: 'Boletim de Mercado', text: textoBase, url });
             return;
           } catch (e) {
             if (e?.name === 'AbortError') return; // usuário cancelou, não faz nada
           }
         }
-        // Fallback universal: abre o WhatsApp com o texto pronto (usuário
-        // escolhe o grupo "Dividendos Viver de Renda" na tela seguinte).
-        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+        // Fallback universal (desktop / navegadores sem Web Share API):
+        // aqui sim o link precisa estar dentro do texto, pois é a única
+        // forma de ele aparecer na mensagem do wa.me.
+        window.open(`https://wa.me/?text=${encodeURIComponent(`${textoBase}\n\n${url}`)}`, '_blank');
       }
 
       async function carregarBoletins() {
