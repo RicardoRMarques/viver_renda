@@ -122,6 +122,54 @@
     }
     .nav a:hover { color: var(--primary); }
 
+    /* Carrossel de índices em tempo real, logo abaixo do header */
+    .ticker-carrossel {
+      width: 100%;
+      overflow: hidden;
+      background: var(--deep);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 0;
+    }
+    .ticker-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      animation: ticker-rolar 32s linear infinite;
+    }
+    .ticker-carrossel:hover .ticker-track { animation-play-state: paused; }
+    @keyframes ticker-rolar {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 22px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .ticker-item .ticker-nome { color: var(--muted); font-weight: 700; }
+    .ticker-item .ticker-valor { color: var(--text); }
+    .ticker-item .ticker-var { font-weight: 700; }
+    .ticker-item .ticker-var.val-up { color: #3ddc73; }
+    .ticker-item .ticker-var.val-down { color: #ff5a5a; }
+    .ticker-skeleton {
+      width: 140px;
+      height: 14px;
+      border-radius: 6px;
+      background: rgba(127,127,127,0.15);
+      border-right: none;
+    }
+    @media (max-width: 640px) {
+      .ticker-carrossel { padding: 7px 0; }
+      .ticker-item { padding: 0 16px; font-size: 0.72rem; gap: 6px; }
+    }
+
     @media (max-width: 640px) {
       header { padding: 10px 0 0; }
       .topbar { gap: 8px; flex-wrap: nowrap; }
@@ -1320,6 +1368,16 @@
       </nav>
     </div>
   </header>
+
+  <div class="ticker-carrossel" id="tickerCarrossel" aria-label="Índices do mercado em tempo real">
+    <div class="ticker-track" id="tickerTrack">
+      <span class="ticker-item ticker-skeleton"></span>
+      <span class="ticker-item ticker-skeleton"></span>
+      <span class="ticker-item ticker-skeleton"></span>
+      <span class="ticker-item ticker-skeleton"></span>
+      <span class="ticker-item ticker-skeleton"></span>
+    </div>
+  </div>
 
   <main class="container">
 
@@ -2906,11 +2964,56 @@
         }).join('');
 
         sparksParaCarregar.forEach(({ simbolo, elId }) => hgCarregarSparkline(simbolo, elId));
+        renderizarTickerCarrossel(indices);
       } catch (e) {
         rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Índices ainda não gerados — aguarde o robô rodar.</span></div>';
+        renderizarTickerCarrossel(null);
       }
     }
     carregarIndices();
+
+    // Carrossel de índices (Ibovespa, IFIX, Dólar, Euro, Bitcoin) logo abaixo
+    // do header, usando os mesmos dados do boletim diário (indices.json) —
+    // sem chamada extra de API. Duplica os itens para o loop ficar contínuo.
+    const TICKER_ATIVOS = ['IBOVESPA', 'IFIX', 'DÓLAR', 'EURO', 'BITCOIN'];
+    function renderizarTickerCarrossel(indices) {
+      const track = document.getElementById('tickerTrack');
+      if (!track) return;
+
+      const porLabel = {};
+      (Array.isArray(indices) ? indices : []).forEach(item => {
+        if (item?.label) porLabel[item.label.trim().toUpperCase()] = item;
+      });
+
+      const itens = TICKER_ATIVOS
+        .map(nome => ({ nome, item: porLabel[nome] }))
+        .filter(({ item }) => item);
+
+      if (itens.length === 0) {
+        track.innerHTML = '<span class="ticker-item">Índices indisponíveis no momento.</span>';
+        return;
+      }
+
+      const nomeExibicao = { 'DÓLAR': 'Dólar', 'IBOVESPA': 'Ibovespa', 'IFIX': 'IFIX', 'EURO': 'Euro', 'BITCOIN': 'Bitcoin' };
+
+      const montarItem = ({ nome, item }) => {
+        const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : (typeof item.valor_pct === 'number' ? item.valor_pct : 0);
+        const emAlta = variacao >= 0;
+        const prefixo = item.prefixo === 'pontos' ? '' : (item.prefixo || '');
+        const valorFormatado = typeof item.valor === 'number'
+          ? `${prefixo}${item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${item.prefixo === 'pontos' ? ' pts' : ''}`
+          : '—';
+        return `
+          <span class="ticker-item">
+            <span class="ticker-nome">${nomeExibicao[nome] || nome}</span>
+            <span class="ticker-valor">${valorFormatado}</span>
+            <span class="ticker-var ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+          </span>`;
+      };
+
+      // Duplica a sequência para permitir o scroll infinito sem "salto" visível.
+      track.innerHTML = itens.map(montarItem).join('') + itens.map(montarItem).join('');
+    }
 
     // ============================================================
     // COMPARADOR DE ATIVOS (até 5 ações/FIIs lado a lado)
