@@ -253,11 +253,13 @@
     }
 
     /* Versão compacta das consultas, usada quando ficam ao lado do boletim */
-    .hg-busca-compacta .hg-painel { padding: 14px; }
-    .hg-busca-compacta .hg-titulo { font-size: 1rem; }
-    .hg-busca-compacta .hg-linha-busca input { padding: 9px 12px; font-size: 0.88rem; }
-    .hg-busca-compacta .hg-btn { padding: 0 16px; font-size: 0.88rem; }
-    .hg-busca-compacta .hg-chip { padding: 3px 8px; font-size: 0.7rem; }
+    .hg-busca-compacta { padding-top: 0; }
+    .hg-busca-compacta .hg-painel { padding: 12px 14px; border-radius: 16px; }
+    .hg-busca-compacta .hg-titulo { font-size: 0.92rem; margin-bottom: 4px; }
+    .hg-busca-compacta .hg-linha-busca input { padding: 8px 11px; font-size: 0.82rem; border-radius: 10px; }
+    .hg-busca-compacta .hg-btn { padding: 0 14px; font-size: 0.82rem; border-radius: 10px; }
+    .hg-busca-compacta .hg-chips { margin-top: 10px; gap: 6px; }
+    .hg-busca-compacta .hg-chip { padding: 3px 8px; font-size: 0.68rem; }
 
     /* Notícias lado a lado, largura toda, abaixo das consultas */
     .coluna-noticias-horizontal { min-width: 0; width: 100%; margin-top: 8px; }
@@ -839,21 +841,22 @@
     .cmp-btn-abrir {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 12px;
-      padding: 10px 16px;
-      border-radius: 10px;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
       border: 1px solid var(--border);
       background: var(--deep);
-      color: var(--text);
-      font-size: 0.85rem;
+      color: var(--muted);
+      font-size: 0.72rem;
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
       transition: border-color 0.15s ease, color 0.15s ease;
+      white-space: nowrap;
     }
     .cmp-btn-abrir:hover { border-color: var(--primary); color: var(--primary); }
-    .cmp-btn-abrir svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .cmp-btn-abrir svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .cmp-btn-linha { display: flex; justify-content: flex-end; margin-top: 10px; }
     .cmp-modal { max-width: 520px; }
     .cmp-tabela-modal { max-width: 900px; }
     .cmp-busca-linha { display: flex; gap: 8px; }
@@ -1159,6 +1162,19 @@
       .chat-ia-painel { right: 16px; bottom: 16px; width: calc(100vw - 32px); }
       .chat-ia-botao { right: 16px; bottom: 16px; }
     }
+
+    /* Consultas (Ações/FIIs e Análise Fundamentalista) no celular: tudo cabe
+       na largura da tela, sem cortar input/botão nem forçar zoom/scroll lateral. */
+    @media (max-width: 640px) {
+      .hg-busca-compacta .hg-painel { padding: 10px 12px; }
+      .hg-busca-compacta .hg-linha-busca { flex-wrap: nowrap; }
+      .hg-busca-compacta .hg-linha-busca input { flex: 1 1 auto; min-width: 0; font-size: 0.8rem; padding: 8px 10px; }
+      .hg-busca-compacta .hg-btn { flex: 0 0 auto; padding: 0 12px; font-size: 0.78rem; }
+      .hg-busca-compacta .hg-chips { gap: 5px; }
+      .hg-busca-compacta .hg-chip { padding: 3px 7px; font-size: 0.65rem; }
+      .cmp-btn-abrir { font-size: 0.68rem; padding: 5px 10px; }
+      .cmp-btn-abrir span, .cmp-btn-abrir { white-space: nowrap; }
+    }
     .financ-resumo-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1335,10 +1351,12 @@
             <div class="hg-status" id="hgStatus"></div>
             <div id="hgResultado"></div>
 
-            <button type="button" class="cmp-btn-abrir" id="cmpBtnAbrir">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-              Comparador de Ativos
-            </button>
+            <div class="cmp-btn-linha">
+              <button type="button" class="cmp-btn-abrir" id="cmpBtnAbrir">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                Comparador de Ativos
+              </button>
+            </div>
           </div>
         </section>
 
