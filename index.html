@@ -902,6 +902,17 @@
     .cmp-tabela td.cmp-label { color: var(--muted); font-weight: 600; position: sticky; left: 0; background: var(--bg); }
     .cmp-tabela td.cmp-ativo-col strong { display: block; }
     .cmp-tabela .cmp-melhor { color: var(--primary); font-weight: 700; }
+    #cmpTabelaStatus { margin: 0; min-height: 0; }
+    #cmpTabelaStatus:not(:empty) { margin: 0 0 10px; }
+    .cmp-acoes-linha { display: flex; gap: 8px; margin-top: 4px; }
+    .cmp-btn-secundario {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      background: var(--deep); color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; font-size: 0.82rem; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+    }
+    .cmp-btn-secundario:hover { border-color: var(--primary); color: var(--primary); }
+    .cmp-btn-secundario svg { width: 15px; height: 15px; flex-shrink: 0; }
 
     .calc-resultado-card {
       margin-top: 8px;
@@ -2082,6 +2093,18 @@
         <div class="calc-corpo">
           <div id="cmpTabelaStatus" class="hg-status"></div>
           <div class="cmp-tabela-wrap"><table class="cmp-tabela" id="cmpTabela"></table></div>
+
+          <div class="cmp-acoes-linha">
+            <button type="button" class="cmp-btn-secundario" id="cmpBtnPdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+              Baixar PDF
+            </button>
+            <button type="button" class="cmp-btn-secundario" id="cmpBtnCompartilhar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              Compartilhar
+            </button>
+          </div>
+
           <button class="hg-btn" id="cmpBtnVoltarSelecao" style="width:100%; background:var(--deep); color:var(--text); border:1px solid var(--border);">← Ajustar seleção de ativos</button>
         </div>
       </div>
@@ -2904,6 +2927,7 @@
 
       const MAX_ATIVOS = 5;
       let selecionados = []; // array de tickers (sem "B3:")
+      let ultimaComparacao = null; // { ativos: [...], linhas: [...] } — usado no PDF/compartilhar
 
       function abrirSelecao() {
         overlaySelecao.hidden = false;
@@ -3040,6 +3064,95 @@
           </tbody>`;
 
         tabelaEl.innerHTML = thead + tbody;
+        ultimaComparacao = { ativos: ativosValidos, linhas };
+      }
+
+      // Nome do arquivo no formato TICKER1-TICKER2-TICKER3.pdf
+      function nomeArquivoComparador() {
+        if (!ultimaComparacao) return 'comparador-de-ativos.pdf';
+        return ultimaComparacao.ativos.map(a => a.symbol).join('-') + '.pdf';
+      }
+
+      // Monta o PDF da comparação com jsPDF: mesmo cabeçalho padrão usado
+      // nos outros PDFs do site (título + aviso do site + data/hora), depois
+      // a tabela comparativa dos indicadores.
+      function montarPdfComparador() {
+        if (!ultimaComparacao) return null;
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const { ativos, linhas } = ultimaComparacao;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        // Cabeçalho padrão: título + aviso do site + data/hora de geração.
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Comparação dos Indicadores', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(
+          `Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`,
+          40, 58
+        );
+        doc.setFontSize(8);
+        doc.text(
+          'Aviso: dados informativos e educacionais, sem recomendação de compra ou venda. Confira sempre a fonte oficial antes de investir.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        doc.autoTable({
+          startY: 88,
+          head: [['Indicador', ...ativos.map(a => a.symbol)]],
+          body: linhas.map(l => [l.label, ...ativos.map(a => String(l.get(a)))]),
+          theme: 'grid',
+          styles: { fontSize: 8.5, cellPadding: 6 },
+          headStyles: { fillColor: [43, 43, 43], textColor: 255 },
+          columnStyles: { 0: { fontStyle: 'bold' } },
+        });
+
+        return doc;
+      }
+
+      function gerarPdfComparador() {
+        const doc = montarPdfComparador();
+        if (!doc) return;
+        doc.save(nomeArquivoComparador());
+      }
+
+      // Compartilha o PDF como arquivo de verdade (WhatsApp, etc, via Web
+      // Share API). Sem suporte a compartilhar arquivos, baixa o PDF direto.
+      async function compartilharComparador(botao) {
+        const doc = montarPdfComparador();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoComparador();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({
+              title: 'Comparação dos Indicadores',
+              text: 'Comparação de ativos — Dividendos | Viver de Renda',
+              files: [arquivo],
+            });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoOriginal = botao.innerHTML;
+        botao.innerHTML = 'PDF baixado!';
+        setTimeout(() => { botao.innerHTML = textoOriginal; }, 2500);
       }
 
       btnAbrir.addEventListener('click', abrirSelecao);
@@ -3051,6 +3164,8 @@
       buscaInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); adicionarAtivo(); } });
       btnComparar.addEventListener('click', compararAtivos);
       btnVoltarSelecao.addEventListener('click', () => { overlayTabela.hidden = true; overlaySelecao.hidden = false; });
+      document.getElementById('cmpBtnPdf').addEventListener('click', gerarPdfComparador);
+      document.getElementById('cmpBtnCompartilhar').addEventListener('click', (e) => compartilharComparador(e.currentTarget));
     })();
 
     // ============================================================
