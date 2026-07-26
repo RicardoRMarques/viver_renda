@@ -958,14 +958,14 @@
     .cmp-tabela th, .cmp-tabela td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
     .cmp-tabela th { color: var(--muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.03em; position: sticky; top: 0; background: var(--bg); }
     .cmp-tabela td.cmp-label { color: var(--muted); font-weight: 600; position: sticky; left: 0; background: var(--bg); }
-    .cmp-info-btn {
+    .cmp-info-btn, .hg-info-btn {
       display: inline-flex; align-items: center; justify-content: center;
       width: 15px; height: 15px; margin-left: 5px; vertical-align: 2px;
       border-radius: 50%; border: 1px solid var(--muted); background: transparent;
       color: var(--muted); font-size: 0.62rem; font-weight: 700; line-height: 1;
       cursor: pointer; font-family: inherit; padding: 0;
     }
-    .cmp-info-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .cmp-info-btn:hover, .hg-info-btn:hover { border-color: var(--primary); color: var(--primary); }
     .cmp-info-balao {
       display: none; position: fixed; z-index: 99999;
       width: 260px; max-width: 78vw; background: #fff; color: #1a1a1a; text-align: left;
@@ -1872,11 +1872,11 @@
           <div class="calc-campo">
             <label style="margin-bottom:6px;">
               <input type="radio" name="amortModo" value="prazo" checked style="margin-right:6px;" />
-              Amortizar por prazo <span style="color:var(--muted); font-weight:400;">(mantém a parcela, reduz o nº de meses)</span>
+              Amortizar por prazo <span id="amortDescPrazo" style="color:var(--muted); font-weight:400;">(reduz o nº de meses)</span>
             </label>
             <label>
               <input type="radio" name="amortModo" value="parcela" style="margin-right:6px;" />
-              Amortizar por parcela <span style="color:var(--muted); font-weight:400;">(mantém o prazo, reduz o valor da parcela)</span>
+              Amortizar por parcela <span id="amortDescParcela" style="color:var(--muted); font-weight:400;">(mantém o prazo, reduz o valor da parcela)</span>
             </label>
           </div>
 
@@ -3455,6 +3455,71 @@
         return hgFormatNumero(valor);
       }
 
+      // Explicações dos principais indicadores (ícone "?" ao lado do rótulo).
+      const AJUDA_FUND = {
+        'P/L': 'P/L = Preço sobre o Lucro.\n\nIndica quantos anos de lucro atual seriam necessários para "pagar" o preço da ação, ou quanto o mercado está disposto a pagar por cada R$ 1 de lucro anual.\n\nCálculo: preço atual da ação / lucro por ação (LPA)',
+        'P/VP': 'P/VP = Preço sobre o Valor Patrimonial.\n\nIndica quanto o mercado está disposto a pagar pelo patrimônio da empresa. Abaixo de 1, indica que a empresa está sendo vendida por menos que seu valor real.\n\nCálculo: preço atual da ação / valor patrimonial da ação (VPA)',
+        'VPA': 'VPA (Valor Patrimonial por Ação) = quanto do patrimônio líquido da empresa corresponde a cada ação.\n\nCálculo: patrimônio líquido total / número de ações em circulação',
+        'Margem bruta': 'Margem Bruta = percentual da receita que sobra depois de descontar apenas o custo direto do produto/serviço vendido.\n\nCálculo: (receita - custo dos produtos vendidos) / receita × 100',
+        'Margem líquida': 'Margem Líquida = percentual da receita que sobra como lucro líquido, depois de todos os custos, despesas, juros e impostos.\n\nCálculo: lucro líquido / receita × 100',
+        'ROE': 'ROE (Return on Equity / Retorno sobre o Patrimônio Líquido) = quanto a empresa lucra para cada R$ 1 investido pelos acionistas.\n\nCálculo: lucro líquido / patrimônio líquido × 100',
+        'Dividend Yield': 'Dividend Yield (DY) = quanto a empresa pagou em dividendos/proventos no período, em relação à cotação atual da ação.\n\nCálculo: dividendos pagos / cotação atual × 100',
+      };
+
+      // Tooltip próprio desta seção: mesmo padrão usado no Comparador de
+      // Ativos (elemento único fixo, anexado ao <body>, fora da tabela —
+      // necessário porque a 1ª coluna da tabela usa position:sticky, e
+      // colunas sticky ficam por cima de tooltips que fiquem dentro dela).
+      let fundTooltipEl = document.getElementById('fundTooltipGlobal');
+      if (!fundTooltipEl) {
+        fundTooltipEl = document.createElement('div');
+        fundTooltipEl.id = 'fundTooltipGlobal';
+        fundTooltipEl.className = 'cmp-info-balao';
+        document.body.appendChild(fundTooltipEl);
+      }
+      function fundFecharTooltip() {
+        fundTooltipEl.classList.remove('cmp-info-aberto');
+        fundTooltipEl.style.display = 'none';
+      }
+      function fundAbrirTooltip(botao, texto) {
+        fundTooltipEl.innerHTML = texto.replace(/\n/g, '<br>');
+        fundTooltipEl.style.display = 'block';
+        const rect = botao.getBoundingClientRect();
+        const largura = fundTooltipEl.offsetWidth;
+        let left = rect.left;
+        if (left + largura > window.innerWidth - 8) left = window.innerWidth - largura - 8;
+        if (left < 8) left = 8;
+        let top = rect.bottom + 6;
+        const altura = fundTooltipEl.offsetHeight;
+        if (top + altura > window.innerHeight - 8) top = rect.top - altura - 6;
+        fundTooltipEl.style.top = `${top}px`;
+        fundTooltipEl.style.left = `${left}px`;
+      }
+      function ativarTooltipsFundamentos() {
+        resultadoFund.querySelectorAll('.hg-info-btn').forEach(botao => {
+          const chave = botao.getAttribute('data-indicador');
+          const texto = AJUDA_FUND[chave];
+          if (!texto) return;
+          botao.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const jaAbertoAqui = fundTooltipEl.classList.contains('cmp-info-aberto') && fundTooltipEl.dataset.origem === chave;
+            if (jaAbertoAqui) { fundFecharTooltip(); return; }
+            fundAbrirTooltip(botao, texto);
+            fundTooltipEl.classList.add('cmp-info-aberto');
+            fundTooltipEl.dataset.origem = chave;
+          });
+          botao.addEventListener('mouseenter', () => {
+            if (fundTooltipEl.classList.contains('cmp-info-aberto')) return;
+            fundAbrirTooltip(botao, texto);
+          });
+          botao.addEventListener('mouseleave', () => {
+            if (!fundTooltipEl.classList.contains('cmp-info-aberto')) fundFecharTooltip();
+          });
+        });
+        document.addEventListener('click', fundFecharTooltip);
+        window.addEventListener('scroll', fundFecharTooltip, { passive: true });
+      }
+
       async function buscarFundamentos() {
         const digitado = inputFund.value.trim().toUpperCase();
         if (!digitado) return;
@@ -3502,7 +3567,10 @@
             const valor = col.statement?.[grupo]?.[campo];
             return `<td>${fmtCelula(valor, formato)}</td>`;
           }).join('');
-          return `<tr><th scope="row">${rotulo}</th>${celulas}</tr>`;
+          const botaoInfo = AJUDA_FUND[rotulo]
+            ? ` <button type="button" class="hg-info-btn" data-indicador="${rotulo}" aria-label="O que é ${rotulo}?" title="O que é ${rotulo}?">?</button>`
+            : '';
+          return `<tr><th scope="row">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
         }).join('');
 
         const cabecalhoHtml = colunas.map(c => `<th>${c.rotulo}</th>`).join('');
@@ -3550,6 +3618,7 @@
             hgCompartilharAtivo(info, btnCompartilharFund, { view: 'fundamentos' })
           );
         }
+        ativarTooltipsFundamentos();
       }
 
       btnFund.addEventListener('click', buscarFundamentos);
@@ -4679,6 +4748,18 @@
         amortStatus.textContent = '';
         amortOverlay.hidden = false;
         document.body.style.overflow = 'hidden';
+
+        // No SAC, a parcela sempre cai mês a mês (juros incidem sobre um
+        // saldo cada vez menor) — mesmo sem amortização extra. Por isso,
+        // "amortizar por prazo" no SAC mantém a AMORTIZAÇÃO mensal igual
+        // (não a parcela) e só termina o financiamento mais cedo. Já no
+        // Price, a parcela é fixa e realmente não muda até o fim do prazo.
+        const descPrazoEl = document.getElementById('amortDescPrazo');
+        if (descPrazoEl) {
+          descPrazoEl.textContent = ultimaSimulacao.sistema === 'sac'
+            ? '(mantém a amortização mensal igual; a parcela continua caindo mês a mês por causa dos juros, e o financiamento termina mais cedo)'
+            : '(mantém a parcela igual até o fim, reduz o nº de meses)';
+        }
       }
       function fecharModalAmort() {
         amortOverlay.hidden = true;
