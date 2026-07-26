@@ -110,6 +110,10 @@ function fmtCompacto(valor) {
 }
 
 // ---------- Montagem dos indicadores principais (grid do topo) ----------
+// Alguns itens (Ibovespa, Dólar, Bitcoin...) têm "valor" numérico + uma
+// variação do dia. Outros (IPCA, Selic) são taxas — o indices.json guarda
+// isso em "valor_pct", sem variação diária (não faz sentido "variar" uma
+// taxa anual do dia pro outro). Por isso tratamos os dois casos.
 function montarIndicadoresHtml(indices) {
   const definicoes = [
     { chaves: ['IBOVESPA'], label: 'Ibovespa' },
@@ -127,9 +131,21 @@ function montarIndicadoresHtml(indices) {
   return definicoes.map(({ chaves, label }) => {
     const item = buscarIndicador(indices, ...chaves);
     if (!item) return `<div class="indicator"><div class="label">${label}</div><div class="value">—</div></div>`;
-    const valor = fmtValorIndicador(item);
-    const variacao = fmtVariacao(item);
-    return `<div class="indicator"><div class="label">${label}</div><div class="value ${variacao.classe}">${valor}${variacao.texto}</div></div>`;
+
+    // Caso 1: item de cotação (tem "valor" numérico) → valor + variação do dia
+    if (typeof item.valor === 'number') {
+      const valor = fmtValorIndicador(item);
+      const variacao = fmtVariacao(item);
+      return `<div class="indicator"><div class="label">${label}</div><div class="value ${variacao.classe}">${valor}${variacao.texto}</div></div>`;
+    }
+
+    // Caso 2: item de taxa (IPCA, Selic — só tem "valor_pct") → mostra a taxa em si
+    if (typeof item.valor_pct === 'number') {
+      const sufixo = label === 'Selic' ? '% a.a.' : '%';
+      return `<div class="indicator"><div class="label">${label}</div><div class="value">${item.valor_pct.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${sufixo}</div></div>`;
+    }
+
+    return `<div class="indicator"><div class="label">${label}</div><div class="value">—</div></div>`;
   }).join('\n  ');
 }
 
@@ -223,15 +239,16 @@ function montarHtml({ dataExtenso, dataFechamento, indicadoresHtml, destaquesHtm
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* Paleta igual à do site (Dividendos | Viver de Renda) */
   :root{
-    --bg:#0a0a0a; --card:#141414; --card-border:#232323;
-    --gold:#d4af37; --gold-soft:#e8c766; --green:#3ecf8e; --red:#ff5c5c;
-    --text:#f2f2f2; --muted:#9a9a9a;
+    --bg:#0b1220; --card:#101b2e; --card-border:rgba(255,255,255,0.08);
+    --gold:#31c3ff; --gold-soft:#31c3ff; --green:#7cff92; --red:#ff5c5c;
+    --text:#e8eefc; --muted:#a9b6d3;
   }
   body.light{
-    --bg:#f7f5f0; --card:#ffffff; --card-border:#e2ddd1;
-    --gold:#b8860b; --gold-soft:#96690a; --green:#1f9d63; --red:#d64545;
-    --text:#1a1a1a; --muted:#6b6b6b;
+    --bg:#eef2f9; --card:#ffffff; --card-border:rgba(15,30,60,0.1);
+    --gold:#0f8fce; --gold-soft:#0f8fce; --green:#0e9e46; --red:#d64545;
+    --text:#16223b; --muted:#5b6b8c;
   }
   body{transition:background 0.2s ease, color 0.2s ease;}
   .theme-toggle{position:absolute;top:20px;right:20px;background:var(--card);border:1px solid var(--card-border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;user-select:none;}
@@ -259,7 +276,7 @@ function montarHtml({ dataExtenso, dataFechamento, indicadoresHtml, destaquesHtm
   .news-item{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
   .news-item .n-title{font-weight:600;font-size:13.5px;margin-bottom:4px;}
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
-  .alert{margin-top:30px;background:linear-gradient(135deg,#2a1a05,#1a1005);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
+  .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
