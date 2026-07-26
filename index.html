@@ -135,7 +135,7 @@
       display: flex;
       align-items: center;
       width: max-content;
-      animation: ticker-rolar 32s linear infinite;
+      animation: ticker-rolar 18s linear infinite;
     }
     .ticker-carrossel:hover .ticker-track { animation-play-state: paused; }
     @keyframes ticker-rolar {
@@ -2975,7 +2975,14 @@
     // Carrossel de índices (Ibovespa, IFIX, Dólar, Euro, Bitcoin) logo abaixo
     // do header, usando os mesmos dados do boletim diário (indices.json) —
     // sem chamada extra de API. Duplica os itens para o loop ficar contínuo.
-    const TICKER_ATIVOS = ['IBOVESPA', 'IFIX', 'DÓLAR', 'EURO', 'BITCOIN'];
+    const TICKER_ATIVOS = [
+      { nome: 'IBOVESPA' },
+      { nome: 'IFIX' },
+      { nome: 'DÓLAR', aliases: ['DOLAR', 'USD/BRL'] },
+      { nome: 'EURO', aliases: ['EUR/BRL'] },
+      { nome: 'BITCOIN', aliases: ['BTC', 'BTC/BRL'] },
+      { nome: 'SELIC', aliases: ['TAXA SELIC'] },
+    ];
     function renderizarTickerCarrossel(indices) {
       const track = document.getElementById('tickerTrack');
       if (!track) return;
@@ -2986,7 +2993,11 @@
       });
 
       const itens = TICKER_ATIVOS
-        .map(nome => ({ nome, item: porLabel[nome] }))
+        .map(({ nome, aliases }) => {
+          const chaves = [nome, ...(aliases || [])];
+          const item = chaves.map(c => porLabel[c]).find(Boolean);
+          return { nome, item };
+        })
         .filter(({ item }) => item);
 
       if (itens.length === 0) {
@@ -2994,7 +3005,7 @@
         return;
       }
 
-      const nomeExibicao = { 'DÓLAR': 'Dólar', 'IBOVESPA': 'Ibovespa', 'IFIX': 'IFIX', 'EURO': 'Euro', 'BITCOIN': 'Bitcoin' };
+      const nomeExibicao = { 'DÓLAR': 'Dólar', 'IBOVESPA': 'Ibovespa', 'IFIX': 'IFIX', 'EURO': 'Euro', 'BITCOIN': 'Bitcoin', 'SELIC': 'Selic' };
 
       const montarItem = ({ nome, item }) => {
         const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : (typeof item.valor_pct === 'number' ? item.valor_pct : 0);
