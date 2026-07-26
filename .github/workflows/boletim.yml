@@ -33,7 +33,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 'lts/*' # sempre usa a LTS vigente, evitando ficar preso a uma versão depreciada
 
       # -----------------------------------------------------------------
       # IMPORTANTE: este passo assume que indices.json, noticias.json e
