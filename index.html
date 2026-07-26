@@ -555,7 +555,13 @@
       font-weight: 700;
       color: var(--text);
       margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px 6px;
     }
+    .ranking-title-texto { flex: 1 1 auto; min-width: 0; }
+    .ranking-title .hg-info-btn { flex-shrink: 0; margin-left: 0; }
     .ranking-title-sep {
       margin-top: 20px;
       padding-top: 20px;
@@ -2042,7 +2048,7 @@
 
             <div class="ranking-acoes-colunas">
               <div class="ranking-coluna">
-                <h4 class="ranking-title">💰 Maior Dividend Yield <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="dy-acoes" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></h4>
+                <h4 class="ranking-title"><span class="ranking-title-texto">💰 Maior Dividend Yield</span> <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="dy-acoes" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></h4>
                 <div class="ranking-list" id="rankingDy">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2053,7 +2059,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">📈 Maior Valor de Mercado <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="valor-mercado" aria-label="O que é Valor de Mercado?" title="O que é Valor de Mercado?">?</button></h4>
+                <h4 class="ranking-title"><span class="ranking-title-texto">📈 Maior Valor de Mercado</span> <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="valor-mercado" aria-label="O que é Valor de Mercado?" title="O que é Valor de Mercado?">?</button></h4>
                 <div class="ranking-list" id="rankingValorMercado">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2064,7 +2070,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">🧾 Maior Receita <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="receita" aria-label="O que é Receita?" title="O que é Receita?">?</button></h4>
+                <h4 class="ranking-title"><span class="ranking-title-texto">🧾 Maior Receita</span> <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="receita" aria-label="O que é Receita?" title="O que é Receita?">?</button></h4>
                 <div class="ranking-list" id="rankingReceita">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2081,7 +2087,7 @@
 
             <div class="ranking-acoes-colunas">
               <div class="ranking-coluna">
-                <h4 class="ranking-title">🏦 Maior Valor Patrimonial <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="valor-patrimonial" aria-label="O que é Valor Patrimonial?" title="O que é Valor Patrimonial?">?</button></h4>
+                <h4 class="ranking-title"><span class="ranking-title-texto">🏦 Maior Valor Patrimonial</span> <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="valor-patrimonial" aria-label="O que é Valor Patrimonial?" title="O que é Valor Patrimonial?">?</button></h4>
                 <div class="ranking-list" id="rankingFiisPatrimonio">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2093,7 +2099,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">💰 Maior Dividend Yield <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="dy-fii" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></h4>
+                <h4 class="ranking-title"><span class="ranking-title-texto">💰 Maior Dividend Yield</span> <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="dy-fii" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></h4>
                 <div class="ranking-list" id="rankingFiisDy">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
@@ -2105,7 +2111,7 @@
               </div>
 
               <div class="ranking-coluna">
-                <h4 class="ranking-title">🔎 Mais Negociados <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="mais-negociados" aria-label="O que é 'Mais Negociados'?" title="O que é 'Mais Negociados'?">?</button></h4>
+                <h4 class="ranking-title"><span class="ranking-title-texto">🔎 Mais Negociados</span> <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="mais-negociados" aria-label="O que é 'Mais Negociados'?" title="O que é 'Mais Negociados'?">?</button></h4>
                 <div class="ranking-list" id="rankingFiisNegociados">
                   <div class="ranking-row skeleton"></div>
                   <div class="ranking-row skeleton"></div>
