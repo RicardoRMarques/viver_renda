@@ -835,6 +835,52 @@
     .calc-input-prefixado input:focus { outline: none; }
     .calc-input-prefixado:focus-within { border-color: var(--primary); }
 
+    /* Comparador de Ativos */
+    .cmp-btn-abrir {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--deep);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .cmp-btn-abrir:hover { border-color: var(--primary); color: var(--primary); }
+    .cmp-btn-abrir svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .cmp-modal { max-width: 520px; }
+    .cmp-tabela-modal { max-width: 900px; }
+    .cmp-busca-linha { display: flex; gap: 8px; }
+    .cmp-busca-linha input {
+      flex: 1; background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 10px 12px; font-size: 0.95rem; font-family: inherit;
+    }
+    .cmp-lista-selecionados { display: flex; flex-wrap: wrap; gap: 8px; min-height: 20px; }
+    .cmp-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(127,127,127,0.12); border: 1px solid var(--border);
+      border-radius: 999px; padding: 6px 10px 6px 12px; font-size: 0.82rem; font-weight: 600;
+    }
+    .cmp-pill button {
+      background: transparent; border: none; color: var(--muted); cursor: pointer;
+      font-size: 0.9rem; line-height: 1; padding: 2px;
+    }
+    .cmp-pill button:hover { color: #e05555; }
+    .cmp-vazio { color: var(--muted); font-size: 0.82rem; padding: 4px 0; }
+    .cmp-tabela-wrap { overflow-x: auto; }
+    .cmp-tabela { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 480px; }
+    .cmp-tabela th, .cmp-tabela td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+    .cmp-tabela th { color: var(--muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.03em; position: sticky; top: 0; background: var(--bg); }
+    .cmp-tabela td.cmp-label { color: var(--muted); font-weight: 600; position: sticky; left: 0; background: var(--bg); }
+    .cmp-tabela td.cmp-ativo-col strong { display: block; }
+    .cmp-tabela .cmp-melhor { color: var(--primary); font-weight: 700; }
+
     .calc-resultado-card {
       margin-top: 8px;
       background: var(--deep);
@@ -1288,6 +1334,11 @@
 
             <div class="hg-status" id="hgStatus"></div>
             <div id="hgResultado"></div>
+
+            <button type="button" class="cmp-btn-abrir" id="cmpBtnAbrir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+              Comparador de Ativos
+            </button>
           </div>
         </section>
 
@@ -1946,6 +1997,58 @@
         </a>
       </div>
     </section>
+
+    <!-- Modal: Comparador de Ativos (seleção) -->
+    <div id="cmpOverlaySelecao" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="cmpTituloSelecao" hidden>
+      <div class="calc-modal cmp-modal">
+        <div class="calc-modal-topo">
+          <h3 id="cmpTituloSelecao">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>Comparador entre Ativos
+          </h3>
+          <button id="cmpFecharSelecao" class="calc-fechar" aria-label="Fechar comparador" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <p class="calc-ajuda" style="margin:-6px 0 0;">Compare até 5 ativos entre os seguintes tipos: ações e fundos imobiliários.</p>
+
+          <div class="calc-campo">
+            <div class="cmp-busca-linha">
+              <input type="text" id="cmpBuscaInput" placeholder="Ex: PETR4, HGLG11, KNCR11..." autocomplete="off" />
+              <button class="hg-btn" id="cmpBtnAdicionar">Adicionar</button>
+            </div>
+          </div>
+
+          <div class="calc-campo">
+            <label>Ativos selecionados:</label>
+            <div class="cmp-lista-selecionados" id="cmpListaSelecionados">
+              <span class="cmp-vazio">Nenhum ativo selecionado ainda.</span>
+            </div>
+          </div>
+
+          <div id="cmpSelecaoStatus" class="hg-status"></div>
+
+          <button class="hg-btn" id="cmpBtnComparar" style="width:100%; margin-top:4px;">Comparar ativos selecionados</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Comparador de Ativos (tabela de resultado) -->
+    <div id="cmpOverlayTabela" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="cmpTituloTabela" hidden>
+      <div class="calc-modal cmp-tabela-modal">
+        <div class="calc-modal-topo">
+          <h3 id="cmpTituloTabela">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>Comparação dos indicadores
+          </h3>
+          <button id="cmpFecharTabela" class="calc-fechar" aria-label="Fechar comparação" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <div id="cmpTabelaStatus" class="hg-status"></div>
+          <div class="cmp-tabela-wrap"><table class="cmp-tabela" id="cmpTabela"></table></div>
+          <button class="hg-btn" id="cmpBtnVoltarSelecao" style="width:100%; background:var(--deep); color:var(--text); border:1px solid var(--border);">← Ajustar seleção de ativos</button>
+        </div>
+      </div>
+    </div>
 
   </main>
 
@@ -2738,6 +2841,180 @@
       }
     }
     carregarIndices();
+
+    // ============================================================
+    // COMPARADOR DE ATIVOS (até 5 ações/FIIs lado a lado)
+    // Reaproveita a HG Brasil (mesma API já usada na consulta rápida
+    // e no P/VP): /v2/finance/quotes para dados gerais e dividendos,
+    // /finance/stock_price para P/VP e VPA.
+    // ============================================================
+    (function () {
+      const overlaySelecao = document.getElementById('cmpOverlaySelecao');
+      const overlayTabela = document.getElementById('cmpOverlayTabela');
+      const btnAbrir = document.getElementById('cmpBtnAbrir');
+      const btnFecharSelecao = document.getElementById('cmpFecharSelecao');
+      const btnFecharTabela = document.getElementById('cmpFecharTabela');
+      const buscaInput = document.getElementById('cmpBuscaInput');
+      const btnAdicionar = document.getElementById('cmpBtnAdicionar');
+      const listaSelecionados = document.getElementById('cmpListaSelecionados');
+      const selecaoStatus = document.getElementById('cmpSelecaoStatus');
+      const btnComparar = document.getElementById('cmpBtnComparar');
+      const btnVoltarSelecao = document.getElementById('cmpBtnVoltarSelecao');
+      const tabelaStatus = document.getElementById('cmpTabelaStatus');
+      const tabelaEl = document.getElementById('cmpTabela');
+
+      if (!overlaySelecao || !btnAbrir) return;
+
+      const MAX_ATIVOS = 5;
+      let selecionados = []; // array de tickers (sem "B3:")
+
+      function abrirSelecao() {
+        overlaySelecao.hidden = false;
+        buscaInput.value = '';
+        selecaoStatus.textContent = '';
+        renderizarPills();
+        setTimeout(() => buscaInput.focus(), 50);
+      }
+      function fecharSelecao() { overlaySelecao.hidden = true; }
+      function fecharTabela() { overlayTabela.hidden = true; }
+
+      function renderizarPills() {
+        if (selecionados.length === 0) {
+          listaSelecionados.innerHTML = '<span class="cmp-vazio">Nenhum ativo selecionado ainda.</span>';
+          return;
+        }
+        listaSelecionados.innerHTML = selecionados.map(t => `
+          <span class="cmp-pill">${t}<button type="button" data-remover="${t}" title="Remover" aria-label="Remover ${t}">✕</button></span>
+        `).join('');
+        listaSelecionados.querySelectorAll('[data-remover]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selecionados = selecionados.filter(t => t !== btn.getAttribute('data-remover'));
+            renderizarPills();
+          });
+        });
+      }
+
+      function adicionarAtivo() {
+        const digitado = buscaInput.value.trim().toUpperCase();
+        if (!digitado) return;
+        if (selecionados.includes(digitado)) {
+          selecaoStatus.className = 'hg-status erro';
+          selecaoStatus.textContent = `${digitado} já está na lista.`;
+          return;
+        }
+        if (selecionados.length >= MAX_ATIVOS) {
+          selecaoStatus.className = 'hg-status erro';
+          selecaoStatus.textContent = `Você já selecionou o máximo de ${MAX_ATIVOS} ativos.`;
+          return;
+        }
+        selecionados.push(digitado);
+        buscaInput.value = '';
+        selecaoStatus.textContent = '';
+        renderizarPills();
+        buscaInput.focus();
+      }
+
+      async function buscarValuation(symbol) {
+        try {
+          const url = `https://api.hgbrasil.com/finance/stock_price?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&symbol=${encodeURIComponent(symbol)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const fin = data?.results?.[symbol]?.financials;
+          return {
+            pvp: fin?.price_to_book_ratio ?? null,
+            vpa: fin?.equity_per_share ?? null,
+          };
+        } catch (e) {
+          return { pvp: null, vpa: null };
+        }
+      }
+
+      async function buscarAtivoCompleto(tickerDigitado) {
+        const ticker = tickerDigitado.startsWith('B3:') ? tickerDigitado : `B3:${tickerDigitado}`;
+        const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent(ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        const ativo = data?.results?.[0];
+        if (!ativo) return null;
+        const valuation = await buscarValuation(ativo.symbol);
+        return { ...ativo, ...valuation };
+      }
+
+      function fmtOuTraco(valor) {
+        return (valor === null || valor === undefined || valor === '') ? '—' : valor;
+      }
+
+      async function compararAtivos() {
+        if (selecionados.length < 2) {
+          selecaoStatus.className = 'hg-status erro';
+          selecaoStatus.textContent = 'Selecione ao menos 2 ativos para comparar.';
+          return;
+        }
+
+        overlaySelecao.hidden = true;
+        overlayTabela.hidden = false;
+        tabelaStatus.className = 'hg-status';
+        tabelaStatus.textContent = 'Buscando dados dos ativos...';
+        tabelaEl.innerHTML = '';
+
+        const resultados = await Promise.all(selecionados.map(t => buscarAtivoCompleto(t).catch(() => null)));
+        const ativosValidos = resultados.filter(Boolean);
+        const naoEncontrados = selecionados.filter((t, i) => !resultados[i]);
+
+        if (ativosValidos.length < 2) {
+          tabelaStatus.className = 'hg-status erro';
+          tabelaStatus.textContent = 'Não foi possível carregar dados suficientes para comparar. Tente novamente.';
+          return;
+        }
+
+        tabelaStatus.className = naoEncontrados.length ? 'hg-status erro' : 'hg-status';
+        tabelaStatus.textContent = naoEncontrados.length
+          ? `Não encontrado: ${naoEncontrados.join(', ')}. Exibindo os demais ativos.`
+          : '';
+
+        const linhas = [
+          { label: 'Tipo', get: a => a.kind === 'fii' ? 'Fundo Imobiliário' : (a.kind === 'stock' ? 'Ação' : (a.kind || '—')) },
+          { label: 'Setor / Segmento', get: a => a.classification?.sector || a.classification?.segment || '—' },
+          { label: 'Cotação', get: a => hgFormatMoeda(a.quote?.value, a.currency) ?? '—' },
+          { label: 'Variação (dia)', get: a => typeof a.quote?.change_percent === 'number' ? `${hgFormatNumero(a.quote.change_percent)}%` : '—' },
+          { label: 'DY (12 meses)', get: a => typeof a.dividends?.yield_12m_percent === 'number' ? `${hgFormatNumero(a.dividends.yield_12m_percent)}%` : '—' },
+          { label: 'P/VP', get: a => typeof a.pvp === 'number' ? hgFormatNumero(a.pvp) : fmtOuTraco(a.pvp) },
+          { label: 'VPA (valor patrim./cota)', get: a => typeof a.vpa === 'number' ? hgFormatMoeda(a.vpa, a.currency) : '—' },
+          { label: 'Valor de mercado', get: a => hgFormatCompacto(a.quote?.market_cap) ?? '—' },
+          { label: 'Ações/cotas em circulação', get: a => hgFormatCompacto(a.shares_outstanding) ?? '—' },
+        ];
+
+        const thead = `
+          <thead>
+            <tr>
+              <th>Indicador</th>
+              ${ativosValidos.map(a => `<th class="cmp-ativo-col">${(a.logos?.square_small ? `<img src="${a.logos.square_small}" alt="" style="width:20px; height:20px; border-radius:4px; vertical-align:-5px; margin-right:6px;" onerror="this.remove()">` : '')}<strong>${a.symbol}</strong></th>`).join('')}
+            </tr>
+          </thead>`;
+
+        const tbody = `
+          <tbody>
+            ${linhas.map(l => `
+              <tr>
+                <td class="cmp-label">${l.label}</td>
+                ${ativosValidos.map(a => `<td>${l.get(a)}</td>`).join('')}
+              </tr>
+            `).join('')}
+          </tbody>`;
+
+        tabelaEl.innerHTML = thead + tbody;
+      }
+
+      btnAbrir.addEventListener('click', abrirSelecao);
+      btnFecharSelecao.addEventListener('click', fecharSelecao);
+      btnFecharTabela.addEventListener('click', fecharTabela);
+      overlaySelecao.addEventListener('click', e => { if (e.target === overlaySelecao) fecharSelecao(); });
+      overlayTabela.addEventListener('click', e => { if (e.target === overlayTabela) fecharTabela(); });
+      btnAdicionar.addEventListener('click', adicionarAtivo);
+      buscaInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); adicionarAtivo(); } });
+      btnComparar.addEventListener('click', compararAtivos);
+      btnVoltarSelecao.addEventListener('click', () => { overlayTabela.hidden = true; overlaySelecao.hidden = false; });
+    })();
 
     // ============================================================
     // ANÁLISE FUNDAMENTALISTA (histórico anual: P/L, P/VP, margens,
