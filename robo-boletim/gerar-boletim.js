@@ -134,6 +134,11 @@ function montarIndicadoresHtml(indices) {
 }
 
 // ---------- Montagem da tabela de FIIs / Ações (a partir do ranking.json) ----------
+// Importante: o ranking.json usa os campos reais { ticker, nome, valor, preco }
+// — "valor" é a própria métrica do ranking (aqui, o DY em %). Não existe
+// P/VP nem P/L nesses dados (o robô de ranking não calcula isso), então
+// a coluna "Destaque" usa o nome do ativo, que é o único texto descritivo
+// disponível na fonte.
 function montarTabelaFiis(ranking) {
   const lista = (ranking?.fiis?.dividend_yield || []).slice(0, 6);
   if (lista.length === 0) {
@@ -142,9 +147,9 @@ function montarTabelaFiis(ranking) {
   return lista.map(f => `
   <tr>
     <td class="name">${f.ticker || '—'}</td>
-    <td>${typeof f.dy === 'number' ? f.dy.toFixed(2) + '%' : (f.dividend_yield_fmt || '—')}</td>
-    <td>${typeof f.pvp === 'number' ? f.pvp.toFixed(2) : (f.pvp_fmt || '—')}</td>
-    <td class="rationale">${f.segmento || f.setor || '—'}</td>
+    <td>${typeof f.valor === 'number' ? f.valor.toFixed(2) + '%' : '—'}</td>
+    <td>${typeof f.preco === 'number' ? 'R$ ' + f.preco.toFixed(2) : '—'}</td>
+    <td class="rationale">${f.nome || '—'}</td>
   </tr>`).join('');
 }
 
@@ -156,13 +161,16 @@ function montarTabelaAcoes(ranking) {
   return lista.map(a => `
   <tr>
     <td class="name">${a.ticker || '—'}</td>
-    <td>${typeof a.dy === 'number' ? a.dy.toFixed(2) + '%' : (a.dividend_yield_fmt || '—')}</td>
-    <td>${typeof a.pl === 'number' ? a.pl.toFixed(2) : (a.pl_fmt || '—')}</td>
-    <td class="rationale">${a.setor || '—'}</td>
+    <td>${typeof a.valor === 'number' ? a.valor.toFixed(2) + '%' : '—'}</td>
+    <td>${typeof a.preco === 'number' ? 'R$ ' + a.preco.toFixed(2) : '—'}</td>
+    <td class="rationale">${a.nome || '—'}</td>
   </tr>`).join('');
 }
 
 // ---------- Montagem das notícias (top 3, vindas do noticias.json) ----------
+// Campos reais do noticias.json: { titulo, link, fonte, imagem } — não
+// existe um campo de resumo/descrição na fonte, por isso mostramos só a
+// fonte da notícia como texto de apoio.
 function montarNoticiasHtml(noticias) {
   const lista = Array.isArray(noticias) ? noticias.slice(0, 3) : [];
   if (lista.length === 0) {
@@ -171,7 +179,7 @@ function montarNoticiasHtml(noticias) {
   return lista.map((n, i) => `
 <div class="news-item">
   <div class="n-title">${i + 1}. ${n.titulo || 'Sem título'}</div>
-  <div class="n-body">${n.resumo || n.descricao || ''}${n.fonte ? ` <em>(${n.fonte})</em>` : ''}</div>
+  ${n.fonte ? `<div class="n-body">Fonte: ${n.fonte}</div>` : ''}
 </div>`).join('\n');
 }
 
@@ -278,13 +286,13 @@ function montarHtml({ dataExtenso, dataFechamento, indicadoresHtml, destaquesHtm
 
 <h2 class="section">6 Melhores FIIs</h2>
 <table>
-  <tr><th>Ticker</th><th>DY (12m)</th><th>P/VP</th><th>Destaque</th></tr>
+  <tr><th>Ticker</th><th>DY (12m)</th><th>Preço</th><th>Nome</th></tr>
   ${tabelaFiisHtml}
 </table>
 
 <h2 class="section">6 Melhores Ações de Dividendos</h2>
 <table>
-  <tr><th>Ticker</th><th>DY (TTM)</th><th>P/L</th><th>Destaque</th></tr>
+  <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   ${tabelaAcoesHtml}
 </table>
 
