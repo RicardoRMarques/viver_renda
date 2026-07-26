@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout do repositório
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Garante que estamos sempre no HEAD mais recente, evitando
           # conflito com o robô de indices.json/noticias.json/ranking.json
@@ -31,7 +31,7 @@ jobs:
           fetch-depth: 0
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 'lts/*' # sempre usa a LTS vigente, evitando ficar preso a uma versão depreciada
 
