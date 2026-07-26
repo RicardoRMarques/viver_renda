@@ -1,0 +1,12 @@
+{
+  "_comentario": "Arquivo OPCIONAL. Copie este arquivo para 'boletim-editorial.json' na raiz do repositório e edite os campos abaixo antes das 6h (ou deixe um processo/pessoa editar todo dia). Se este arquivo não existir, o robô usa um fallback automático (repete as manchetes das notícias e um aviso genérico de risco).",
+
+  "destaques": [
+    { "titulo": "Nasdaq / Techs", "obs": "▲ retomada dos chips" },
+    { "titulo": "Vale (VALE3)", "obs": "foco: relatório de produção 2T26" },
+    { "titulo": "CPLE6", "obs": "▲ reforço de compra Safra" },
+    { "titulo": "Rede D'Or", "obs": "▼ forte queda no pregão" }
+  ],
+
+  "alerta": "Tensões geopolíticas no Oriente Médio seguem pressionando o petróleo e trazendo volatilidade aos mercados globais. Ibovespa opera lateral/fraco à espera de resultados corporativos do 2T26. Recomenda-se cautela com posições alavancadas e atenção ao Copom (próxima reunião em 04-05/08)."
+}
