@@ -254,12 +254,14 @@
 
     /* Versão compacta das consultas, usada quando ficam ao lado do boletim */
     .hg-busca-compacta { padding-top: 0; }
-    .hg-busca-compacta .hg-painel { padding: 12px 14px; border-radius: 16px; }
-    .hg-busca-compacta .hg-titulo { font-size: 0.92rem; margin-bottom: 4px; }
-    .hg-busca-compacta .hg-linha-busca input { padding: 8px 11px; font-size: 0.82rem; border-radius: 10px; }
-    .hg-busca-compacta .hg-btn { padding: 0 14px; font-size: 0.82rem; border-radius: 10px; }
-    .hg-busca-compacta .hg-chips { margin-top: 10px; gap: 6px; }
-    .hg-busca-compacta .hg-chip { padding: 3px 8px; font-size: 0.68rem; }
+    .hg-busca-compacta .hg-painel { padding: 10px 12px; border-radius: 14px; }
+    .hg-busca-compacta .hg-titulo { font-size: 0.84rem; margin-bottom: 3px; }
+    .hg-busca-compacta .hg-linha-busca { gap: 6px; }
+    .hg-busca-compacta .hg-linha-busca input { padding: 7px 10px; font-size: 0.78rem; border-radius: 9px; }
+    .hg-busca-compacta .hg-btn { padding: 0 12px; font-size: 0.78rem; border-radius: 9px; }
+    .hg-busca-compacta .hg-chips { margin-top: 8px; gap: 5px; }
+    .hg-busca-compacta .hg-chip { padding: 2px 7px; font-size: 0.64rem; }
+    .coluna-consultas { gap: 6px; }
 
     /* Notícias lado a lado, largura toda, abaixo das consultas */
     .coluna-noticias-horizontal { min-width: 0; width: 100%; margin-top: 8px; }
@@ -873,8 +875,13 @@
       .cmp-busca-linha input { font-size: 0.8rem; padding: 8px 10px; }
       .cmp-busca-linha .hg-btn { padding: 0 10px; font-size: 0.72rem; }
       .cmp-pill { font-size: 0.74rem; padding: 5px 8px 5px 10px; }
-      .cmp-tabela { font-size: 0.76rem; min-width: 420px; }
-      .cmp-tabela th, .cmp-tabela td { padding: 7px 8px; }
+      .cmp-tabela-modal .calc-corpo { padding: 12px 10px; gap: 10px; }
+      .cmp-tabela-modal .calc-modal-topo { padding: 12px 14px; }
+      .cmp-tabela-modal .calc-modal-topo h3 { font-size: 0.88rem; }
+      .cmp-tabela { font-size: 0.68rem; min-width: 340px; }
+      .cmp-tabela th, .cmp-tabela td { padding: 6px 6px; }
+      .cmp-tabela td.cmp-label { font-size: 0.66rem; max-width: 90px; white-space: normal; }
+      .cmp-tabela th.cmp-ativo-col img { display: none; }
     }
     .cmp-lista-selecionados { display: flex; flex-wrap: wrap; gap: 8px; min-height: 20px; }
     .cmp-pill {
@@ -1178,13 +1185,13 @@
     /* Consultas (Ações/FIIs e Análise Fundamentalista) no celular: tudo cabe
        na largura da tela, sem cortar input/botão nem forçar zoom/scroll lateral. */
     @media (max-width: 640px) {
-      .hg-busca-compacta .hg-painel { padding: 10px 12px; }
+      .hg-busca-compacta .hg-painel { padding: 8px 10px; }
       .hg-busca-compacta .hg-linha-busca { flex-wrap: nowrap; }
-      .hg-busca-compacta .hg-linha-busca input { flex: 1 1 auto; min-width: 0; font-size: 0.8rem; padding: 8px 10px; }
-      .hg-busca-compacta .hg-btn { flex: 0 0 auto; padding: 0 12px; font-size: 0.78rem; }
-      .hg-busca-compacta .hg-chips { gap: 5px; }
-      .hg-busca-compacta .hg-chip { padding: 3px 7px; font-size: 0.65rem; }
-      .cmp-btn-abrir { font-size: 0.68rem; padding: 5px 10px; }
+      .hg-busca-compacta .hg-linha-busca input { flex: 1 1 auto; min-width: 0; font-size: 0.74rem; padding: 7px 9px; }
+      .hg-busca-compacta .hg-btn { flex: 0 0 auto; padding: 0 10px; font-size: 0.72rem; }
+      .hg-busca-compacta .hg-chips { gap: 4px; }
+      .hg-busca-compacta .hg-chip { padding: 2px 6px; font-size: 0.6rem; }
+      .cmp-btn-abrir { font-size: 0.64rem; padding: 4px 9px; }
       .cmp-btn-abrir span, .cmp-btn-abrir { white-space: nowrap; }
     }
     .financ-resumo-grid {
