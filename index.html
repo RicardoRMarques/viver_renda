@@ -958,6 +958,22 @@
     .cmp-tabela th, .cmp-tabela td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
     .cmp-tabela th { color: var(--muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.03em; position: sticky; top: 0; background: var(--bg); }
     .cmp-tabela td.cmp-label { color: var(--muted); font-weight: 600; position: sticky; left: 0; background: var(--bg); }
+    .cmp-info-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 15px; height: 15px; margin-left: 5px; vertical-align: 2px;
+      border-radius: 50%; border: 1px solid var(--muted); background: transparent;
+      color: var(--muted); font-size: 0.62rem; font-weight: 700; line-height: 1;
+      cursor: pointer; font-family: inherit; padding: 0;
+    }
+    .cmp-info-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .cmp-info-balao {
+      display: none; position: absolute; z-index: 20; top: 100%; left: 0; margin-top: 6px;
+      width: 260px; max-width: 78vw; background: #fff; color: #1a1a1a; text-align: left;
+      font-weight: 400; font-size: 0.74rem; line-height: 1.45; border-radius: 10px;
+      padding: 12px 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); white-space: normal;
+    }
+    .cmp-label:hover .cmp-info-balao,
+    .cmp-info-balao.cmp-info-aberto { display: block; }
     .cmp-tabela td.cmp-ativo-col strong { display: block; }
     .cmp-tabela .cmp-melhor { color: var(--primary); font-weight: 700; }
     #cmpTabelaStatus { margin: 0; min-height: 0; }
@@ -3182,10 +3198,26 @@
           { label: 'Setor / Segmento', get: a => a.classification?.sector || a.classification?.segment || '—' },
           { label: 'Cotação', get: a => hgFormatMoeda(a.quote?.value, a.currency) ?? '—' },
           { label: 'Variação (dia)', get: a => typeof a.quote?.change_percent === 'number' ? `${hgFormatNumero(a.quote.change_percent)}%` : '—' },
-          { label: 'DY (12 meses)', get: a => typeof a.dividends?.yield_12m_percent === 'number' ? `${hgFormatNumero(a.dividends.yield_12m_percent)}%` : '—' },
-          { label: 'P/VP', get: a => typeof a.pvp === 'number' ? hgFormatNumero(a.pvp) : fmtOuTraco(a.pvp) },
-          { label: 'VPA (valor patrim./cota)', get: a => typeof a.vpa === 'number' ? hgFormatMoeda(a.vpa, a.currency) : '—' },
-          { label: 'Valor de mercado', get: a => hgFormatCompacto(a.quote?.market_cap) ?? '—' },
+          {
+            label: 'DY (12 meses)',
+            ajuda: 'DY (Dividend Yield) = quanto o ativo pagou de dividendos/rendimentos nos últimos 12 meses, em relação à cotação atual.\n\nCálculo: (dividendos pagos em 12 meses / cotação atual) × 100',
+            get: a => typeof a.dividends?.yield_12m_percent === 'number' ? `${hgFormatNumero(a.dividends.yield_12m_percent)}%` : '—',
+          },
+          {
+            label: 'P/VP',
+            ajuda: 'P/VP = Preço sobre o Valor Patrimonial.\n\nIndica quanto o mercado está disposto a pagar pelo patrimônio do ativo. Abaixo de 1, indica que está sendo negociado por menos que seu valor patrimonial.\n\nCálculo: preço atual / valor patrimonial por ação (ou cota)',
+            get: a => typeof a.pvp === 'number' ? hgFormatNumero(a.pvp) : fmtOuTraco(a.pvp),
+          },
+          {
+            label: 'VPA (valor patrim./cota)',
+            ajuda: 'VPA (Valor Patrimonial por Ação/Cota) = quanto do patrimônio do ativo corresponde a cada ação ou cota, calculado dividindo o patrimônio líquido total pelo número de ações/cotas em circulação.',
+            get: a => typeof a.vpa === 'number' ? hgFormatMoeda(a.vpa, a.currency) : '—',
+          },
+          {
+            label: 'Valor de mercado',
+            ajuda: 'Valor de mercado (Market Cap) = valor total do ativo negociado na bolsa.\n\nCálculo: cotação atual × número de ações (ou cotas) em circulação.',
+            get: a => hgFormatCompacto(a.quote?.market_cap) ?? '—',
+          },
           { label: 'Ações/cotas em circulação', get: a => hgFormatCompacto(a.shares_outstanding) ?? '—' },
         ];
 
@@ -3199,16 +3231,39 @@
 
         const tbody = `
           <tbody>
-            ${linhas.map(l => `
+            ${linhas.map((l, i) => `
               <tr>
-                <td class="cmp-label">${l.label}</td>
+                <td class="cmp-label">${l.label}${l.ajuda ? `
+                  <button type="button" class="cmp-info-btn" data-cmp-info="${i}" aria-label="O que é ${l.label}?" title="O que é ${l.label}?">?</button>
+                  <span class="cmp-info-balao" id="cmpInfoBalao${i}">${l.ajuda.replace(/\n/g, '<br>')}</span>
+                ` : ''}</td>
                 ${ativosValidos.map(a => `<td>${l.get(a)}</td>`).join('')}
               </tr>
             `).join('')}
           </tbody>`;
 
         tabelaEl.innerHTML = thead + tbody;
+        ativarTooltipsIndicadores();
         ultimaComparacao = { ativos: ativosValidos, linhas };
+      }
+
+      // Tooltips dos indicadores: abre no hover (desktop) e também no clique
+      // (funciona no celular, onde não existe "passar o mouse"). Fecha ao
+      // clicar fora ou em outro "?".
+      function ativarTooltipsIndicadores() {
+        const botoes = tabelaEl.querySelectorAll('.cmp-info-btn');
+        botoes.forEach(botao => {
+          botao.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const balao = document.getElementById(`cmpInfoBalao${botao.getAttribute('data-cmp-info')}`);
+            const aberto = balao.classList.contains('cmp-info-aberto');
+            tabelaEl.querySelectorAll('.cmp-info-balao').forEach(b => b.classList.remove('cmp-info-aberto'));
+            if (!aberto) balao.classList.add('cmp-info-aberto');
+          });
+        });
+        document.addEventListener('click', () => {
+          tabelaEl.querySelectorAll('.cmp-info-balao').forEach(b => b.classList.remove('cmp-info-aberto'));
+        });
       }
 
       // Nome do arquivo no formato TICKER1-TICKER2-TICKER3.pdf
