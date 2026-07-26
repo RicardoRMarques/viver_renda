@@ -856,13 +856,25 @@
     }
     .cmp-btn-abrir:hover { border-color: var(--primary); color: var(--primary); }
     .cmp-btn-abrir svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .cmp-btn-linha { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .cmp-btn-linha { display: flex; justify-content: flex-end; margin-top: 2px; }
     .cmp-modal { max-width: 520px; }
     .cmp-tabela-modal { max-width: 900px; }
     .cmp-busca-linha { display: flex; gap: 8px; }
     .cmp-busca-linha input {
       flex: 1; background: var(--deep); border: 1px solid var(--border); color: var(--text);
-      border-radius: 10px; padding: 10px 12px; font-size: 0.95rem; font-family: inherit;
+      border-radius: 10px; padding: 10px 12px; font-size: 0.95rem; font-family: inherit; min-width: 0;
+    }
+    .cmp-busca-linha .hg-btn {
+      flex: 0 0 auto; padding: 0 14px; font-size: 0.8rem; border-radius: 10px; white-space: nowrap;
+    }
+    @media (max-width: 480px) {
+      .cmp-modal, .cmp-tabela-modal { max-width: calc(100vw - 24px); }
+      .cmp-busca-linha { flex-wrap: nowrap; }
+      .cmp-busca-linha input { font-size: 0.8rem; padding: 8px 10px; }
+      .cmp-busca-linha .hg-btn { padding: 0 10px; font-size: 0.72rem; }
+      .cmp-pill { font-size: 0.74rem; padding: 5px 8px 5px 10px; }
+      .cmp-tabela { font-size: 0.76rem; min-width: 420px; }
+      .cmp-tabela th, .cmp-tabela td { padding: 7px 8px; }
     }
     .cmp-lista-selecionados { display: flex; flex-wrap: wrap; gap: 8px; min-height: 20px; }
     .cmp-pill {
