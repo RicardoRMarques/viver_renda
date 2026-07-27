@@ -341,6 +341,20 @@ ${noticiasHtml}
 }
 
 // ---------- Retenção: apaga boletins com mais de 7 dias ----------
+// Reconciliação (parte 2): o caminho inverso do de cima — se um arquivo
+// foi apagado manualmente da pasta (ex: durante um teste), a entrada dele
+// continuava presa no index.json para sempre, e o site continuava
+// mostrando um boletim que não existe mais. Aqui removemos do índice
+// qualquer entrada cujo arquivo .html não exista de fato na pasta.
+function removerEntradasSemArquivo(indiceAtual) {
+  const mantidos = indiceAtual.filter(entrada => {
+    const existe = fs.existsSync(path.join(PASTA_BOLETINS, entrada.arquivo));
+    if (!existe) console.log(`[boletim] Removido do índice (arquivo não existe mais na pasta): ${entrada.arquivo}`);
+    return existe;
+  });
+  return mantidos;
+}
+
 function limparBoletinsAntigos(indiceAtual, hojeMs) {
   const limiteMs = DIAS_RETENCAO * 24 * 60 * 60 * 1000;
   const mantidos = [];
@@ -444,6 +458,7 @@ function main() {
   });
 
   indiceAtual = reconciliarComPasta(indiceAtual);
+  indiceAtual = removerEntradasSemArquivo(indiceAtual);
   indiceAtual = limparBoletinsAntigos(indiceAtual, agora.getTime());
   // Mantém sempre ordenado do mais novo pro mais antigo
   indiceAtual.sort((a, b) => new Date(b.dataIso) - new Date(a.dataIso));
