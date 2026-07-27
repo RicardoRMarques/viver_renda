@@ -1835,6 +1835,16 @@
                 <button class="hg-btn" id="rpBtnCalcular" style="flex:1;">Calcular</button>
                 <button class="hg-btn" id="rpBtnLimpar" style="flex:1; background:var(--deep); color:var(--text); border:1px solid var(--border);">Limpar</button>
               </div>
+              <div class="cmp-acoes-linha" style="margin-top:8px;">
+                <button type="button" class="cmp-btn-secundario" id="rpBtnPdf">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+                  Baixar PDF
+                </button>
+                <button type="button" class="cmp-btn-secundario" id="rpBtnCompartilhar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                  Compartilhar
+                </button>
+              </div>
             </div>
 
             <div class="rp-painel-resultado" id="rpPainelResultado">
@@ -5993,8 +6003,12 @@
       const inAnosAposentar = document.getElementById('rpAnosAposentar');
       const btnCalcular = document.getElementById('rpBtnCalcular');
       const btnLimpar = document.getElementById('rpBtnLimpar');
+      const btnPdf = document.getElementById('rpBtnPdf');
+      const btnCompartilhar = document.getElementById('rpBtnCompartilhar');
       const resultadoEl = document.getElementById('rpResultadoConteudo');
       const layoutEl = document.getElementById('rpLayout');
+
+      let ultimoCalculoRp = null; // guarda as variáveis do último cálculo bem-sucedido, para o PDF
 
       if (!overlay || !btnAbrirMenu) return;
 
@@ -6110,6 +6124,7 @@
       });
 
       function calcular() {
+        ultimoCalculoRp = null;
         if (!faixaSelecionada) {
           resultadoEl.innerHTML = '<p class="calc-ajuda" style="color:#ff5a5a;">Escolha uma faixa de risco (A a E) para calcular.</p>';
           layoutEl.classList.remove('com-resultado');
@@ -6188,6 +6203,14 @@
             resultados futuros. Não constitui recomendação de investimento.
           </p>`;
         layoutEl.classList.add('com-resultado');
+
+        // Guarda as variáveis desta simulação para o "Baixar PDF" / "Compartilhar".
+        ultimoCalculoRp = {
+          idade, faixa, faixaLetra: faixaSelecionada, PV, PMT, meta, anosInformados,
+          n, i, FV, rendaSustentavel,
+          metaAtingida: meta > 0 ? (rendaSustentavel >= meta) : null,
+          pmtNecessario: meta > 0 ? Math.max(0, ((meta / i - PV * Math.pow(1 + i, n)) * i) / (Math.pow(1 + i, n) - 1)) : null,
+        };
       }
 
       function limparCampoMoeda(input) {
@@ -6196,6 +6219,7 @@
       }
 
       function limpar() {
+        ultimoCalculoRp = null;
         inIdade.value = '';
         limparCampoMoeda(inMetaRenda);
         limparCampoMoeda(inJaGuardado);
@@ -6212,6 +6236,121 @@
         resultadoEl.innerHTML = '<p class="rp-placeholder">Escolha uma faixa de risco e informe idade, valor guardado e poupança mensal para ver a projeção.</p>';
       }
 
+      function nomeArquivoPdfRp() {
+        return 'aposentadoria-renda-passiva.pdf';
+      }
+
+      // Monta o PDF com o mesmo cabeçalho padrão dos demais relatórios do
+      // site (título + "Dividendos | Viver de Renda" + data/hora + aviso),
+      // seguido das variáveis informadas pelo usuário e do resultado.
+      function montarDocumentoPdfRp() {
+        if (!ultimoCalculoRp) {
+          alert('Faça uma simulação primeiro, clicando em "Calcular".');
+          return null;
+        }
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const c = ultimoCalculoRp;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Simulação — Aposentadoria Renda Passiva', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(
+          `Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`,
+          40, 58
+        );
+        doc.setFontSize(8);
+        doc.text(
+          'Aviso: simulação educativa de juros compostos, sem considerar inflação, taxas ou impostos. Não constitui recomendação de investimento.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        // Variáveis informadas pelo usuário + resultado calculado.
+        const linhasResumo = [
+          ['Idade atual', `${c.idade} anos`],
+          ['Faixa de risco', `${c.faixaLetra} · ${c.faixa.grupo}`],
+          ['Retorno estimado da faixa', `${hgFormatNumero(c.faixa.retornoAA * 100, 1)}% a.a.`],
+          ['Valor já guardado / patrimônio atual', hgFormatMoeda(c.PV)],
+          ['Poupança mensal informada', hgFormatMoeda(c.PMT)],
+          ...(c.meta > 0 ? [['Meta de renda mensal desejada', hgFormatMoeda(c.meta)]] : []),
+          ...(c.anosInformados > 0 ? [['Prazo informado para se aposentar', `${c.anosInformados} anos`]] : [['Horizonte considerado (padrão: até os 65 anos)', `${Math.round(c.n / 12)} anos`]]),
+          ['Capital projetado ao final do prazo', hgFormatMoeda(c.FV)],
+          ['Renda passiva estimada por mês', hgFormatMoeda(c.rendaSustentavel)],
+          ...(c.metaAtingida !== null ? [[
+            'Meta atingida?',
+            c.metaAtingida ? 'Sim, com a poupança mensal informada' : `Não — seria necessário poupar aprox. ${hgFormatMoeda(c.pmtNecessario)}/mês`,
+          ]] : []),
+        ];
+
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Resultado da simulação']],
+          body: linhasResumo,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        const yTabela = doc.lastAutoTable.finalY + 24;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text('Alocação sugerida para essa faixa de risco', 40, yTabela);
+
+        doc.autoTable({
+          startY: yTabela + 10,
+          head: [['Classe de ativo', '% da carteira']],
+          body: c.faixa.alocacao.map(a => [a.nome, `${a.pct}%`]),
+          theme: 'striped',
+          styles: { fontSize: 8.5, cellPadding: 5 },
+          headStyles: { fillColor: [43, 43, 43], fontSize: 9 },
+        });
+
+        return doc;
+      }
+
+      function gerarPdfRp() {
+        const doc = montarDocumentoPdfRp();
+        if (!doc) return;
+        doc.save(nomeArquivoPdfRp());
+      }
+
+      // Compartilha o PDF como arquivo de verdade (WhatsApp etc, via Web
+      // Share API). Sem suporte a compartilhar arquivos, baixa direto.
+      async function compartilharResultadoRp(botao) {
+        const doc = montarDocumentoPdfRp();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoPdfRp();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Simulação — Aposentadoria Renda Passiva', files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoOriginal = botao.innerHTML;
+        botao.innerHTML = 'PDF baixado!';
+        setTimeout(() => { botao.innerHTML = textoOriginal; }, 2500);
+      }
+
       btnAbrirMenu.addEventListener('click', () => {
         if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
         abrirModal();
@@ -6221,6 +6360,8 @@
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
+      btnPdf.addEventListener('click', gerarPdfRp);
+      btnCompartilhar.addEventListener('click', (e) => compartilharResultadoRp(e.currentTarget));
     })();
 
     // ============================================================
