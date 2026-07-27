@@ -979,6 +979,17 @@
     .hg-info-vermelho { border-color: #e05555 !important; color: #e05555 !important; }
     .hg-info-vermelho:hover { background: #e05555 !important; color: #fff !important; }
 
+    /* Gráficos de projeção (Juros Compostos, Aposentadoria Renda Passiva) */
+    .hg-grafico-bloco { margin-top: 18px; }
+    .hg-grafico-legenda {
+      display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 8px;
+      font-size: 0.74rem; color: var(--muted);
+    }
+    .hg-grafico-legenda span { display: flex; align-items: center; gap: 5px; }
+    .hg-grafico-legenda-cor { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    .hg-grafico-wrap { position: relative; width: 100%; height: 220px; }
+    .hg-grafico-titulo { font-size: 0.8rem; font-weight: 700; color: var(--text); margin: 18px 0 8px; }
+
     /* Conversor de Moedas */
     .conv-modal { max-width: 420px; position: relative; }
     .conv-corpo { padding-top: 4px; }
@@ -1852,6 +1863,16 @@
               <div id="rpResultadoConteudo">
                 <p class="rp-placeholder">Escolha uma faixa de risco e informe idade, valor guardado e poupança mensal para ver a projeção.</p>
               </div>
+              <div class="hg-grafico-bloco" id="rpGraficoBloco" hidden>
+                <div class="hg-grafico-titulo" style="margin-top:0;">Evolução do patrimônio até a aposentadoria</div>
+                <div class="hg-grafico-legenda">
+                  <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Capital projetado</span>
+                  <span><span class="hg-grafico-legenda-cor" style="background:#7cff92;"></span>Total investido</span>
+                </div>
+                <div class="hg-grafico-wrap">
+                  <canvas id="rpChartLinha" role="img" aria-label="Gráfico de linha mostrando a evolução do capital projetado e do total investido até a aposentadoria">Gráfico de evolução do patrimônio.</canvas>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2121,6 +2142,25 @@
           <button class="hg-btn" id="jcBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
 
           <div id="jcResultado"></div>
+
+          <div class="hg-grafico-bloco" id="jcGraficoBloco" hidden>
+            <div class="hg-grafico-legenda">
+              <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Montante total</span>
+              <span><span class="hg-grafico-legenda-cor" style="background:#7cff92;"></span>Total investido</span>
+            </div>
+            <div class="hg-grafico-wrap">
+              <canvas id="jcChartLinha" role="img" aria-label="Gráfico de linha mostrando o crescimento do montante total e do total investido ao longo do tempo">Gráfico de evolução do investimento.</canvas>
+            </div>
+
+            <div class="hg-grafico-titulo">Aportes x Juros por período</div>
+            <div class="hg-grafico-legenda">
+              <span><span class="hg-grafico-legenda-cor" style="background:#7cff92;"></span>Aportes</span>
+              <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Juros</span>
+            </div>
+            <div class="hg-grafico-wrap">
+              <canvas id="jcChartBarras" role="img" aria-label="Gráfico de barras empilhadas mostrando aportes e juros ganhos em cada período">Gráfico de aportes versus juros por período.</canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2498,6 +2538,34 @@
       return typeof valor === 'number'
         ? valor.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 })
         : null;
+    }
+
+    // Carrega o Chart.js sob demanda (só quando alguma calculadora abre um
+    // gráfico), em vez de deixá-lo no carregamento inicial da página.
+    // Reaproveitado por todas as calculadoras que têm gráfico.
+    function hgCarregarChartJs() {
+      if (window.Chart) return Promise.resolve();
+      if (window.__chartJsPromise) return window.__chartJsPromise;
+      window.__chartJsPromise = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+      return window.__chartJsPromise;
+    }
+
+    // Paleta usada nos gráficos, igual às cores oficiais do site.
+    const HG_COR_PRIMARIA = '#31c3ff';
+    const HG_COR_ACCENT = '#7cff92';
+    const HG_COR_MUTED = '#a9b6d3';
+    const HG_COR_GRID = 'rgba(169,182,211,0.15)';
+
+    function hgFormatCompactoEixo(v) {
+      if (Math.abs(v) >= 1e6) return (v / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'M';
+      if (Math.abs(v) >= 1e3) return (v / 1e3).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) + 'k';
+      return String(v);
     }
 
     function hgFormatData(iso, comHora = true) {
@@ -5660,11 +5728,15 @@
       const selPeriodoUnidade = document.getElementById('jcPeriodoUnidade');
       const btnCalcular = document.getElementById('jcBtnCalcular');
       const resultadoEl = document.getElementById('jcResultado');
+      const graficoBlocoEl = document.getElementById('jcGraficoBloco');
 
       if (!overlay || !btnAbrirMenu) return;
 
       hgAplicarMascaraMoeda(inValorInicial, 1000);
       hgAplicarMascaraMoeda(inInvestimentoMensal, 0);
+
+      let jcChartLinha = null;
+      let jcChartBarras = null;
 
       function abrirModal() {
         overlay.hidden = false;
@@ -5673,6 +5745,90 @@
       function fecharModal() {
         overlay.hidden = true;
         document.body.style.overflow = '';
+      }
+
+      // Monta os dois gráficos (linha: montante x investido / barras:
+      // aportes x juros). Agrupa por ano quando o prazo é longo (>24
+      // meses), ou mês a mês quando é curto, para o eixo não ficar poluído.
+      async function montarGraficos(valorInicial, aporteMensal, taxaMensal, meses) {
+        await hgCarregarChartJs();
+
+        const agruparPorAno = meses > 24;
+        const passo = agruparPorAno ? 12 : 1;
+        const labels = [];
+        const montanteSerie = [];
+        const investidoSerie = [];
+        const aportesPeriodo = [];
+        const jurosPeriodo = [];
+
+        let saldo = valorInicial;
+        let investido = valorInicial;
+        labels.push(agruparPorAno ? 'Início' : 'Mês 0');
+        montanteSerie.push(saldo);
+        investidoSerie.push(investido);
+
+        let acumAporte = 0;
+        let acumJuros = 0;
+        for (let m = 1; m <= meses; m++) {
+          const juros = saldo * taxaMensal;
+          saldo += juros + aporteMensal;
+          investido += aporteMensal;
+          acumAporte += aporteMensal;
+          acumJuros += juros;
+
+          if (m % passo === 0 || m === meses) {
+            labels.push(agruparPorAno ? `Ano ${Math.round(m / 12)}` : `Mês ${m}`);
+            montanteSerie.push(saldo);
+            investidoSerie.push(investido);
+            aportesPeriodo.push(Math.round(acumAporte));
+            jurosPeriodo.push(Math.round(acumJuros));
+            acumAporte = 0;
+            acumJuros = 0;
+          }
+        }
+
+        if (jcChartLinha) jcChartLinha.destroy();
+        if (jcChartBarras) jcChartBarras.destroy();
+
+        jcChartLinha = new Chart(document.getElementById('jcChartLinha'), {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              { label: 'Montante total', data: montanteSerie, borderColor: HG_COR_PRIMARIA, backgroundColor: 'rgba(49,195,255,0.12)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.25 },
+              { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_ACCENT, borderDash: [5, 4], borderWidth: 2, pointRadius: 0, tension: 0.1, fill: false },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
+            scales: {
+              x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
+              y: { ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+            },
+          },
+        });
+
+        jcChartBarras = new Chart(document.getElementById('jcChartBarras'), {
+          type: 'bar',
+          data: {
+            labels: labels.slice(1),
+            datasets: [
+              { label: 'Aportes', data: aportesPeriodo, backgroundColor: HG_COR_ACCENT, stack: 's' },
+              { label: 'Juros', data: jurosPeriodo, backgroundColor: HG_COR_PRIMARIA, stack: 's' },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
+            scales: {
+              x: { stacked: true, ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
+              y: { stacked: true, ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+            },
+          },
+        });
+
+        graficoBlocoEl.hidden = false;
       }
 
       function calcular() {
@@ -5712,6 +5868,8 @@
           <p class="calc-ajuda" style="margin-top:10px;">
             Simulação com capitalização mensal composta, ${selTaxaPeriodo.value === 'anual' ? `taxa anual de ${hgFormatNumero(taxaInformada)}% convertida para juros mensais` : `taxa mensal de ${hgFormatNumero(taxaInformada)}%`}.
           </p>`;
+
+        montarGraficos(valorInicial, aporteMensal, taxaMensal, meses);
       }
 
       btnAbrirMenu.addEventListener('click', () => {
@@ -6007,6 +6165,7 @@
       const btnCompartilhar = document.getElementById('rpBtnCompartilhar');
       const resultadoEl = document.getElementById('rpResultadoConteudo');
       const layoutEl = document.getElementById('rpLayout');
+      const graficoBlocoEl = document.getElementById('rpGraficoBloco');
 
       let ultimoCalculoRp = null; // guarda as variáveis do último cálculo bem-sucedido, para o PDF
 
@@ -6066,6 +6225,7 @@
       };
 
       let faixaSelecionada = null;
+      let rpChartLinha = null;
 
       hgAplicarMascaraMoeda(inMetaRenda);
       hgAplicarMascaraMoeda(inJaGuardado);
@@ -6104,6 +6264,52 @@
         </svg>`;
       }
 
+      // Gráfico de linha: evolução mês a mês (agrupada por ano quando o
+      // prazo é longo) do capital projetado x total investido.
+      async function montarGraficoRp(PV, PMT, i, n) {
+        await hgCarregarChartJs();
+
+        const agruparPorAno = n > 24;
+        const passo = agruparPorAno ? 12 : 1;
+        const labels = ['Início'];
+        const capitalSerie = [PV];
+        const investidoSerie = [PV];
+
+        let saldo = PV;
+        let investido = PV;
+        for (let m = 1; m <= n; m++) {
+          saldo = saldo * (1 + i) + PMT;
+          investido += PMT;
+          if (m % passo === 0 || m === n) {
+            labels.push(agruparPorAno ? `Ano ${Math.round(m / 12)}` : `Mês ${m}`);
+            capitalSerie.push(saldo);
+            investidoSerie.push(investido);
+          }
+        }
+
+        if (rpChartLinha) rpChartLinha.destroy();
+        rpChartLinha = new Chart(document.getElementById('rpChartLinha'), {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              { label: 'Capital projetado', data: capitalSerie, borderColor: HG_COR_PRIMARIA, backgroundColor: 'rgba(49,195,255,0.12)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.25 },
+              { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_ACCENT, borderDash: [5, 4], borderWidth: 2, pointRadius: 0, tension: 0.1, fill: false },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
+            scales: {
+              x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
+              y: { ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+            },
+          },
+        });
+
+        graficoBlocoEl.hidden = false;
+      }
+
       function atualizarDescricaoRisco() {
         if (!faixaSelecionada) { riscoDescEl.style.display = 'none'; return; }
         riscoDescEl.style.display = 'block';
@@ -6125,6 +6331,7 @@
 
       function calcular() {
         ultimoCalculoRp = null;
+        graficoBlocoEl.hidden = true;
         if (!faixaSelecionada) {
           resultadoEl.innerHTML = '<p class="calc-ajuda" style="color:#ff5a5a;">Escolha uma faixa de risco (A a E) para calcular.</p>';
           layoutEl.classList.remove('com-resultado');
@@ -6211,6 +6418,8 @@
           metaAtingida: meta > 0 ? (rendaSustentavel >= meta) : null,
           pmtNecessario: meta > 0 ? Math.max(0, ((meta / i - PV * Math.pow(1 + i, n)) * i) / (Math.pow(1 + i, n) - 1)) : null,
         };
+
+        montarGraficoRp(PV, PMT, i, n);
       }
 
       function limparCampoMoeda(input) {
@@ -6234,6 +6443,7 @@
         btnToggleRefinar.classList.remove('aberto');
         layoutEl.classList.remove('com-resultado');
         resultadoEl.innerHTML = '<p class="rp-placeholder">Escolha uma faixa de risco e informe idade, valor guardado e poupança mensal para ver a projeção.</p>';
+        graficoBlocoEl.hidden = true;
       }
 
       function nomeArquivoPdfRp() {
