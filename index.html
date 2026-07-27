@@ -2568,6 +2568,24 @@
       return String(v);
     }
 
+    // Desenha, no PDF, a legenda colorida de um gráfico (quadradinho + texto),
+    // já que ela é um elemento HTML separado do <canvas> e por isso não sai
+    // junto quando exportamos só a imagem do gráfico via toDataURL().
+    // itens: [{ cor: [r,g,b], texto: 'Nome' }, ...]
+    function hgDesenharLegendaPdf(doc, x, y, itens) {
+      let cursorX = x;
+      doc.setFontSize(8.5);
+      itens.forEach((item) => {
+        doc.setFillColor(item.cor[0], item.cor[1], item.cor[2]);
+        doc.rect(cursorX, y - 7, 8, 8, 'F');
+        doc.setTextColor(90);
+        doc.text(item.texto, cursorX + 12, y);
+        cursorX += 12 + doc.getTextWidth(item.texto) + 16;
+      });
+      doc.setTextColor(0);
+      return y + 14; // Y sugerido para o que vier logo abaixo (ex: a imagem do gráfico)
+    }
+
     function hgFormatData(iso, comHora = true) {
       if (!iso) return null;
       const d = new Date(iso);
@@ -5611,16 +5629,21 @@
           doc.setTextColor(90);
           doc.text('Evolução do saldo devedor', 40, 62);
           doc.setTextColor(0);
+          let yCursor = hgDesenharLegendaPdf(doc, 40, 76, [{ cor: [49, 195, 255], texto: 'Saldo devedor' }]);
           const alturaImg1 = (larguraImg * canvasLinha.height) / canvasLinha.width;
-          doc.addImage(canvasLinha.toDataURL('image/png', 1), 'PNG', 40, 72, larguraImg, alturaImg1);
+          doc.addImage(canvasLinha.toDataURL('image/png', 1), 'PNG', 40, yCursor, larguraImg, alturaImg1);
 
-          const yBarras = 72 + alturaImg1 + 28;
+          const yBarras = yCursor + alturaImg1 + 28;
           doc.setFontSize(9);
           doc.setTextColor(90);
           doc.text('Juros x Amortização por período', 40, yBarras - 10);
           doc.setTextColor(0);
+          const yCursor2 = hgDesenharLegendaPdf(doc, 40, yBarras + 4, [
+            { cor: [124, 255, 146], texto: 'Amortização' },
+            { cor: [49, 195, 255], texto: 'Juros' },
+          ]);
           const alturaImg2 = (larguraImg * canvasBarras.height) / canvasBarras.width;
-          doc.addImage(canvasBarras.toDataURL('image/png', 1), 'PNG', 40, yBarras, larguraImg, alturaImg2);
+          doc.addImage(canvasBarras.toDataURL('image/png', 1), 'PNG', 40, yCursor2, larguraImg, alturaImg2);
         }
 
         doc.addPage();
@@ -6666,18 +6689,24 @@
           const larguraImg = doc.internal.pageSize.getWidth() - 80;
           const alturaImg = (larguraImg * canvasRp.height) / canvasRp.width;
           const alturaPagina = doc.internal.pageSize.getHeight();
+          const legendaItens = [
+            { cor: [49, 195, 255], texto: 'Capital projetado' },
+            { cor: [124, 255, 146], texto: 'Total investido' },
+          ];
 
-          if (yGrafico + alturaImg + 20 > alturaPagina) {
+          if (yGrafico + alturaImg + 40 > alturaPagina) {
             doc.addPage();
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(11);
             doc.text('Evolução do patrimônio até a aposentadoria', 40, 40);
-            doc.addImage(canvasRp.toDataURL('image/png', 1), 'PNG', 40, 52, larguraImg, alturaImg);
+            const yImg = hgDesenharLegendaPdf(doc, 40, 58, legendaItens);
+            doc.addImage(canvasRp.toDataURL('image/png', 1), 'PNG', 40, yImg, larguraImg, alturaImg);
           } else {
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(11);
             doc.text('Evolução do patrimônio até a aposentadoria', 40, yGrafico);
-            doc.addImage(canvasRp.toDataURL('image/png', 1), 'PNG', 40, yGrafico + 12, larguraImg, alturaImg);
+            const yImg = hgDesenharLegendaPdf(doc, 40, yGrafico + 18, legendaItens);
+            doc.addImage(canvasRp.toDataURL('image/png', 1), 'PNG', 40, yImg, larguraImg, alturaImg);
           }
         }
 
