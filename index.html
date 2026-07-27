@@ -979,6 +979,30 @@
     .hg-info-vermelho { border-color: #e05555 !important; color: #e05555 !important; }
     .hg-info-vermelho:hover { background: #e05555 !important; color: #fff !important; }
 
+    /* Conversor de Moedas */
+    .conv-modal { max-width: 420px; }
+    .conv-valor-input {
+      width: 100%; background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 10px 12px; font-size: 1rem; font-family: inherit;
+    }
+    .conv-linha-moedas { display: flex; align-items: flex-end; gap: 8px; margin-top: 4px; }
+    .conv-select {
+      width: 100%; background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 9px 8px; font-size: 0.86rem; font-family: inherit; cursor: pointer;
+    }
+    .conv-btn-inverter {
+      flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--deep); color: var(--text);
+      font-size: 1rem; cursor: pointer; margin-bottom: 1px;
+    }
+    .conv-btn-inverter:hover { border-color: var(--primary); color: var(--primary); }
+    .conv-resultado {
+      margin-top: 14px; background: var(--deep); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px; text-align: center;
+    }
+    .conv-resultado-valor { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+    .conv-resultado-taxa { font-size: 0.76rem; color: var(--muted); margin-top: 4px; }
+
     /* Boletim de Mercado Diário (lista da semana) */
     .boletins-lista { display: flex; flex-direction: column; gap: 8px; }
     .boletim-item {
@@ -1441,6 +1465,9 @@
             </button>
             <button type="button" class="nav-dropdown-item" id="navAbrirFinanciamento">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"></path></svg>Calculadora Financiamento Imobiliário
+            </button>
+            <button type="button" class="nav-dropdown-item" id="navAbrirConversor">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M7 10h11M7 10l3-3M7 10l3 3"></path><path d="M17 14H6M17 14l-3-3M17 14l-3 3"></path></svg>Conversor de Moedas
             </button>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
           </div>
@@ -2299,6 +2326,52 @@
       </div>
     </div>
 
+    <!-- Modal: Conversor de Moedas -->
+    <div id="convOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="convTitulo" hidden>
+      <div class="calc-modal conv-modal">
+        <div class="calc-modal-topo">
+          <h3 id="convTitulo">💱 Conversor de Moedas</h3>
+          <button id="convFechar" class="calc-fechar" aria-label="Fechar conversor" title="Fechar">✕</button>
+        </div>
+        <div class="calc-corpo">
+          <p class="calc-ajuda" style="margin:-6px 0 0;">Cotações do dia (mesma fonte usada no resto do site).</p>
+
+          <div class="calc-campo">
+            <label for="convValorInput">Valor</label>
+            <input type="text" id="convValorInput" class="conv-valor-input" inputmode="decimal" placeholder="1,00" value="1,00" />
+          </div>
+
+          <div class="conv-linha-moedas">
+            <div class="calc-campo" style="flex:1;">
+              <label for="convDeSelect">De</label>
+              <select id="convDeSelect" class="conv-select">
+                <option value="BRL">🇧🇷 Real (BRL)</option>
+                <option value="USD" selected>🇺🇸 Dólar (USD)</option>
+                <option value="EUR">🇪🇺 Euro (EUR)</option>
+                <option value="BTC">₿ Bitcoin (BTC)</option>
+              </select>
+            </div>
+            <button type="button" id="convInverter" class="conv-btn-inverter" title="Inverter moedas" aria-label="Inverter moedas">⇄</button>
+            <div class="calc-campo" style="flex:1;">
+              <label for="convParaSelect">Para</label>
+              <select id="convParaSelect" class="conv-select">
+                <option value="BRL" selected>🇧🇷 Real (BRL)</option>
+                <option value="USD">🇺🇸 Dólar (USD)</option>
+                <option value="EUR">🇪🇺 Euro (EUR)</option>
+                <option value="BTC">₿ Bitcoin (BTC)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="convStatus" class="hg-status"></div>
+          <div id="convResultado" class="conv-resultado" hidden>
+            <div class="conv-resultado-valor" id="convResultadoValor"></div>
+            <div class="conv-resultado-taxa" id="convResultadoTaxa"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <footer>
@@ -3092,6 +3165,125 @@
       }
     }
     carregarIndices();
+
+    // ============================================================
+    // CONVERSOR DE MOEDAS — reaproveita window.hgIndicesCache (o mesmo
+    // indices.json já usado no carrossel de índices), sem nenhuma chamada
+    // extra de API. Suporta BRL, USD, EUR e BTC.
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('navAbrirConversor');
+      const overlay = document.getElementById('convOverlay');
+      const btnFechar = document.getElementById('convFechar');
+      const valorInput = document.getElementById('convValorInput');
+      const deSelect = document.getElementById('convDeSelect');
+      const paraSelect = document.getElementById('convParaSelect');
+      const btnInverter = document.getElementById('convInverter');
+      const statusEl = document.getElementById('convStatus');
+      const resultadoEl = document.getElementById('convResultado');
+      const resultadoValorEl = document.getElementById('convResultadoValor');
+      const resultadoTaxaEl = document.getElementById('convResultadoTaxa');
+      if (!btnAbrir || !overlay) return;
+
+      const NOMES = { BRL: 'Real', USD: 'Dólar', EUR: 'Euro', BTC: 'Bitcoin' };
+
+      function buscarNoCache(...chaves) {
+        const cache = window.hgIndicesCache;
+        if (!Array.isArray(cache)) return null;
+        const alvo = chaves.map(c => c.toUpperCase());
+        return cache.find(i => {
+          const label = (i.label || '').trim().toUpperCase();
+          return alvo.some(a => label === a || label.startsWith(a + ' ') || label.startsWith(a + '('));
+        }) || null;
+      }
+
+      // Retorna quantos BRL vale 1 unidade da moeda informada.
+      function taxaParaBRL(moeda) {
+        if (moeda === 'BRL') return 1;
+        if (moeda === 'USD') {
+          const item = buscarNoCache('DÓLAR', 'DOLAR');
+          return typeof item?.valor === 'number' ? item.valor : null;
+        }
+        if (moeda === 'EUR') {
+          const item = buscarNoCache('EURO');
+          return typeof item?.valor === 'number' ? item.valor : null;
+        }
+        if (moeda === 'BTC') {
+          // O Bitcoin no indices.json vem cotado em USD, não em BRL — por
+          // isso precisamos multiplicar pela cotação do dólar também.
+          const btc = buscarNoCache('BITCOIN', 'BTC');
+          const usdBrl = taxaParaBRL('USD');
+          if (typeof btc?.valor !== 'number' || typeof usdBrl !== 'number') return null;
+          return btc.valor * usdBrl;
+        }
+        return null;
+      }
+
+      function parseValor(texto) {
+        const limpo = String(texto).trim().replace(/\./g, '').replace(',', '.');
+        const num = parseFloat(limpo);
+        return isNaN(num) ? null : num;
+      }
+
+      function formatarResultado(valor, moeda) {
+        const casas = moeda === 'BTC' ? 8 : 2;
+        return `${moeda === 'BTC' ? '₿ ' : (moeda === 'USD' ? 'US$ ' : moeda === 'EUR' ? '€ ' : 'R$ ')}${valor.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas })}`;
+      }
+
+      function converter() {
+        const valor = parseValor(valorInput.value);
+        const de = deSelect.value;
+        const para = paraSelect.value;
+
+        if (valor === null) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Digite um valor válido.';
+          resultadoEl.hidden = true;
+          return;
+        }
+
+        const taxaDe = taxaParaBRL(de);
+        const taxaPara = taxaParaBRL(para);
+
+        if (taxaDe === null || taxaPara === null) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Cotação ainda não carregada — aguarde alguns segundos e tente de novo.';
+          resultadoEl.hidden = true;
+          return;
+        }
+
+        const emBrl = valor * taxaDe;
+        const resultado = emBrl / taxaPara;
+
+        statusEl.textContent = '';
+        resultadoValorEl.textContent = formatarResultado(resultado, para);
+        resultadoTaxaEl.textContent = `1 ${NOMES[de]} = ${formatarResultado(taxaDe / taxaPara, para)}`;
+        resultadoEl.hidden = false;
+      }
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        converter();
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      valorInput.addEventListener('input', converter);
+      deSelect.addEventListener('change', converter);
+      paraSelect.addEventListener('change', converter);
+      btnInverter.addEventListener('click', () => {
+        const temp = deSelect.value;
+        deSelect.value = paraSelect.value;
+        paraSelect.value = temp;
+        converter();
+      });
+    })();
 
     // ============================================================
     // GLOSSÁRIO DOS RANKINGS (Ações e FIIs) — ícone "?" vermelho ao
@@ -4676,7 +4868,7 @@
         doc.setFontSize(8);
         doc.setTextColor(90);
         doc.text(
-          `Taxas de referência usadas: Selic ≈ ${c.selicUsada.toFixed(2)}% a.a. · CDI ≈ ${c.cdiUsado.toFixed(2)}% a.a. · IPCA anualizado ≈ ${c.ipcaUsado.toFixed(2)}% a.a.`,
+          `Taxas de referência usadas: Selic aprox. ${c.selicUsada.toFixed(2)}% a.a. · CDI aprox. ${c.cdiUsado.toFixed(2)}% a.a. · IPCA anualizado aprox. ${c.ipcaUsado.toFixed(2)}% a.a.`,
           40, yTaxas
         );
 
