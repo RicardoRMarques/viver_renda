@@ -980,28 +980,75 @@
     .hg-info-vermelho:hover { background: #e05555 !important; color: #fff !important; }
 
     /* Conversor de Moedas */
-    .conv-modal { max-width: 420px; }
+    .conv-modal { max-width: 420px; position: relative; }
+    .conv-corpo { padding-top: 4px; }
+    .conv-card {
+      background: var(--deep); border: 1px solid var(--border); border-radius: 16px;
+      padding: 14px 16px;
+    }
+    .conv-label { display: block; font-size: 0.72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; }
+    .conv-campo-moeda { display: flex; align-items: center; gap: 10px; }
+    .conv-select-moeda {
+      display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+      background: rgba(127,127,127,0.12); border: 1px solid var(--border); border-radius: 10px;
+      padding: 7px 10px; cursor: pointer; font-family: inherit; color: var(--text);
+      font-weight: 700; font-size: 0.9rem; transition: border-color 0.15s ease;
+    }
+    .conv-select-moeda:hover { border-color: var(--primary); }
+    .conv-bandeira { font-size: 1.15rem; line-height: 1; }
+    .conv-seta-select { width: 13px; height: 13px; color: var(--muted); flex-shrink: 0; }
     .conv-valor-input {
-      width: 100%; background: var(--deep); border: 1px solid var(--border); color: var(--text);
-      border-radius: 10px; padding: 10px 12px; font-size: 1rem; font-family: inherit;
+      flex: 1; min-width: 0; background: transparent; border: none; color: var(--text);
+      font-size: 1.5rem; font-weight: 700; font-family: inherit; text-align: right;
+      padding: 0;
     }
-    .conv-linha-moedas { display: flex; align-items: flex-end; gap: 8px; margin-top: 4px; }
-    .conv-select {
-      width: 100%; background: var(--deep); border: 1px solid var(--border); color: var(--text);
-      border-radius: 10px; padding: 9px 8px; font-size: 0.86rem; font-family: inherit; cursor: pointer;
+    .conv-valor-input:focus { outline: none; }
+    .conv-resultado-valor {
+      flex: 1; min-width: 0; text-align: right; font-size: 1.5rem; font-weight: 800;
+      color: var(--primary); overflow-wrap: anywhere;
     }
+    .conv-linha-inverter { display: flex; align-items: center; gap: 10px; margin: 2px 0; }
+    .conv-linha-traco { flex: 1; height: 1px; background: var(--border); }
     .conv-btn-inverter {
-      flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
-      border: 1px solid var(--border); background: var(--deep); color: var(--text);
-      font-size: 1rem; cursor: pointer; margin-bottom: 1px;
+      flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--card, var(--bg));
+      color: var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: transform 0.15s ease, border-color 0.15s ease;
     }
-    .conv-btn-inverter:hover { border-color: var(--primary); color: var(--primary); }
-    .conv-resultado {
-      margin-top: 14px; background: var(--deep); border: 1px solid var(--border);
-      border-radius: 12px; padding: 16px; text-align: center;
+    .conv-btn-inverter:hover { border-color: var(--primary); transform: rotate(180deg); }
+    .conv-btn-inverter svg { width: 16px; height: 16px; }
+    .conv-taxa-linha {
+      display: flex; align-items: center; gap: 6px; justify-content: center;
+      font-size: 0.74rem; color: var(--muted); margin-top: 12px;
     }
-    .conv-resultado-valor { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
-    .conv-resultado-taxa { font-size: 0.76rem; color: var(--muted); margin-top: 4px; }
+    .conv-taxa-linha svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+    /* Lista customizada de moedas (dropdown próprio) */
+    .conv-lista-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+      display: flex; align-items: flex-end; justify-content: center; z-index: 30;
+      border-radius: inherit;
+    }
+    .conv-lista-painel {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 16px 16px 0 0;
+      width: 100%; max-height: 70%; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .conv-lista-topo {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 0.9rem;
+    }
+    .conv-lista-itens { overflow-y: auto; padding: 6px; }
+    .conv-lista-item {
+      display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+      background: transparent; border: none; border-radius: 10px; padding: 10px 10px;
+      cursor: pointer; font-family: inherit; color: var(--text);
+    }
+    .conv-lista-item:hover { background: rgba(127,127,127,0.12); }
+    .conv-lista-item .conv-bandeira { font-size: 1.3rem; }
+    .conv-lista-item-nome { display: flex; flex-direction: column; }
+    .conv-lista-item-nome b { font-size: 0.88rem; }
+    .conv-lista-item-nome small { color: var(--muted); font-size: 0.72rem; }
+    .conv-lista-item.conv-selecionado { background: rgba(49,195,255,0.12); }
 
     /* Boletim de Mercado Diário (lista da semana) */
     .boletins-lista { display: flex; flex-direction: column; gap: 8px; }
@@ -2333,42 +2380,56 @@
           <h3 id="convTitulo">💱 Conversor de Moedas</h3>
           <button id="convFechar" class="calc-fechar" aria-label="Fechar conversor" title="Fechar">✕</button>
         </div>
-        <div class="calc-corpo">
-          <p class="calc-ajuda" style="margin:-6px 0 0;">Cotações do dia (mesma fonte usada no resto do site).</p>
+        <div class="calc-corpo conv-corpo">
 
-          <div class="calc-campo">
-            <label for="convValorInput">Valor</label>
-            <input type="text" id="convValorInput" class="conv-valor-input" inputmode="decimal" placeholder="1,00" value="1,00" />
-          </div>
-
-          <div class="conv-linha-moedas">
-            <div class="calc-campo" style="flex:1;">
-              <label for="convDeSelect">De</label>
-              <select id="convDeSelect" class="conv-select">
-                <option value="BRL">🇧🇷 Real (BRL)</option>
-                <option value="USD" selected>🇺🇸 Dólar (USD)</option>
-                <option value="EUR">🇪🇺 Euro (EUR)</option>
-                <option value="BTC">₿ Bitcoin (BTC)</option>
-              </select>
-            </div>
-            <button type="button" id="convInverter" class="conv-btn-inverter" title="Inverter moedas" aria-label="Inverter moedas">⇄</button>
-            <div class="calc-campo" style="flex:1;">
-              <label for="convParaSelect">Para</label>
-              <select id="convParaSelect" class="conv-select">
-                <option value="BRL" selected>🇧🇷 Real (BRL)</option>
-                <option value="USD">🇺🇸 Dólar (USD)</option>
-                <option value="EUR">🇪🇺 Euro (EUR)</option>
-                <option value="BTC">₿ Bitcoin (BTC)</option>
-              </select>
+          <div class="conv-card">
+            <label class="conv-label" for="convValorInput">Valor</label>
+            <div class="conv-campo-moeda">
+              <button type="button" class="conv-select-moeda" id="convDeBotao" data-lado="de" aria-haspopup="listbox" aria-expanded="false">
+                <span class="conv-bandeira" id="convDeBandeira">🇺🇸</span>
+                <span class="conv-codigo" id="convDeCodigo">USD</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="conv-seta-select"><path d="m6 9 6 6 6-6"></path></svg>
+              </button>
+              <input type="text" id="convValorInput" class="conv-valor-input" inputmode="decimal" placeholder="1,00" value="1,00" />
             </div>
           </div>
 
-          <div id="convStatus" class="hg-status"></div>
-          <div id="convResultado" class="conv-resultado" hidden>
-            <div class="conv-resultado-valor" id="convResultadoValor"></div>
-            <div class="conv-resultado-taxa" id="convResultadoTaxa"></div>
+          <div class="conv-linha-inverter">
+            <div class="conv-linha-traco"></div>
+            <button type="button" id="convInverter" class="conv-btn-inverter" title="Inverter moedas" aria-label="Inverter moedas">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+            </button>
+            <div class="conv-linha-traco"></div>
           </div>
-        </div>
+
+          <div class="conv-card">
+            <label class="conv-label">Convertido para</label>
+            <div class="conv-campo-moeda">
+              <button type="button" class="conv-select-moeda" id="convParaBotao" data-lado="para" aria-haspopup="listbox" aria-expanded="false">
+                <span class="conv-bandeira" id="convParaBandeira">🇧🇷</span>
+                <span class="conv-codigo" id="convParaCodigo">BRL</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="conv-seta-select"><path d="m6 9 6 6 6-6"></path></svg>
+              </button>
+              <div class="conv-resultado-valor" id="convResultadoValor">—</div>
+            </div>
+          </div>
+
+          <div id="convStatus" class="hg-status" style="margin:10px 0 0;"></div>
+          <div class="conv-taxa-linha" id="convTaxaLinha" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6l4 2"></path><circle cx="12" cy="12" r="10"></circle></svg>
+            <span id="convResultadoTaxa"></span>
+          </div>
+
+          <!-- Lista de moedas (dropdown customizado próprio, com bandeira) -->
+          <div id="convListaOverlay" class="conv-lista-overlay" hidden>
+            <div class="conv-lista-painel">
+              <div class="conv-lista-topo">
+                <span>Escolha a moeda</span>
+                <button type="button" id="convListaFechar" class="calc-fechar" aria-label="Fechar lista">✕</button>
+              </div>
+              <div id="convListaItens" class="conv-lista-itens"></div>
+            </div>
+          </div>
       </div>
     </div>
 
@@ -3167,56 +3228,69 @@
     carregarIndices();
 
     // ============================================================
-    // CONVERSOR DE MOEDAS — reaproveita window.hgIndicesCache (o mesmo
-    // indices.json já usado no carrossel de índices), sem nenhuma chamada
-    // extra de API. Suporta BRL, USD, EUR e BTC.
+    // CONVERSOR DE MOEDAS — busca direta no endpoint geral da HG Brasil
+    // (mesma chave/API já usada no resto do site), que traz TODAS as
+    // moedas numa única chamada: BRL (base), USD, EUR, GBP, ARS, CAD,
+    // AUD, JPY, CNY e BTC. Cotações ficam em cache por alguns minutos
+    // pra não repetir a chamada toda vez que o modal abre.
     // ============================================================
     (function () {
       const btnAbrir = document.getElementById('navAbrirConversor');
       const overlay = document.getElementById('convOverlay');
       const btnFechar = document.getElementById('convFechar');
       const valorInput = document.getElementById('convValorInput');
-      const deSelect = document.getElementById('convDeSelect');
-      const paraSelect = document.getElementById('convParaSelect');
       const btnInverter = document.getElementById('convInverter');
       const statusEl = document.getElementById('convStatus');
-      const resultadoEl = document.getElementById('convResultado');
       const resultadoValorEl = document.getElementById('convResultadoValor');
+      const taxaLinhaEl = document.getElementById('convTaxaLinha');
       const resultadoTaxaEl = document.getElementById('convResultadoTaxa');
+      const deBotao = document.getElementById('convDeBotao');
+      const paraBotao = document.getElementById('convParaBotao');
+      const deBandeira = document.getElementById('convDeBandeira');
+      const paraBandeira = document.getElementById('convParaBandeira');
+      const deCodigo = document.getElementById('convDeCodigo');
+      const paraCodigo = document.getElementById('convParaCodigo');
+      const listaOverlay = document.getElementById('convListaOverlay');
+      const listaItensEl = document.getElementById('convListaItens');
+      const listaFechar = document.getElementById('convListaFechar');
       if (!btnAbrir || !overlay) return;
 
-      const NOMES = { BRL: 'Real', USD: 'Dólar', EUR: 'Euro', BTC: 'Bitcoin' };
+      const MOEDAS = [
+        { codigo: 'BRL', nome: 'Real Brasileiro', bandeira: '🇧🇷', prefixo: 'R$ ', casas: 2 },
+        { codigo: 'USD', nome: 'Dólar Americano', bandeira: '🇺🇸', prefixo: 'US$ ', casas: 2 },
+        { codigo: 'EUR', nome: 'Euro', bandeira: '🇪🇺', prefixo: '€ ', casas: 2 },
+        { codigo: 'GBP', nome: 'Libra Esterlina', bandeira: '🇬🇧', prefixo: '£ ', casas: 2 },
+        { codigo: 'ARS', nome: 'Peso Argentino', bandeira: '🇦🇷', prefixo: 'AR$ ', casas: 2 },
+        { codigo: 'CAD', nome: 'Dólar Canadense', bandeira: '🇨🇦', prefixo: 'C$ ', casas: 2 },
+        { codigo: 'AUD', nome: 'Dólar Australiano', bandeira: '🇦🇺', prefixo: 'A$ ', casas: 2 },
+        { codigo: 'JPY', nome: 'Iene Japonês', bandeira: '🇯🇵', prefixo: '¥ ', casas: 2 },
+        { codigo: 'CNY', nome: 'Yuan Chinês', bandeira: '🇨🇳', prefixo: '¥ ', casas: 2 },
+        { codigo: 'BTC', nome: 'Bitcoin', bandeira: '₿', prefixo: '₿ ', casas: 8 },
+      ];
+      const MOEDAS_POR_CODIGO = Object.fromEntries(MOEDAS.map(m => [m.codigo, m]));
 
-      function buscarNoCache(...chaves) {
-        const cache = window.hgIndicesCache;
-        if (!Array.isArray(cache)) return null;
-        const alvo = chaves.map(c => c.toUpperCase());
-        return cache.find(i => {
-          const label = (i.label || '').trim().toUpperCase();
-          return alvo.some(a => label === a || label.startsWith(a + ' ') || label.startsWith(a + '('));
-        }) || null;
-      }
+      let estado = { de: 'USD', para: 'BRL' };
+      let cotacoesCache = null; // { USD: taxaEmBRL, EUR: ..., ... }
+      let cacheEm = 0;
+      const CACHE_VALIDADE_MS = 5 * 60 * 1000; // 5 minutos
 
-      // Retorna quantos BRL vale 1 unidade da moeda informada.
-      function taxaParaBRL(moeda) {
-        if (moeda === 'BRL') return 1;
-        if (moeda === 'USD') {
-          const item = buscarNoCache('DÓLAR', 'DOLAR');
-          return typeof item?.valor === 'number' ? item.valor : null;
+      async function buscarCotacoes() {
+        const agora = Date.now();
+        if (cotacoesCache && (agora - cacheEm) < CACHE_VALIDADE_MS) return cotacoesCache;
+
+        const url = `https://api.hgbrasil.com/finance?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        const currencies = data?.results?.currencies;
+        if (!currencies) throw new Error('sem dados de moedas');
+
+        const taxas = { BRL: 1 };
+        for (const [codigo, info] of Object.entries(currencies)) {
+          if (typeof info?.buy === 'number') taxas[codigo] = info.buy;
         }
-        if (moeda === 'EUR') {
-          const item = buscarNoCache('EURO');
-          return typeof item?.valor === 'number' ? item.valor : null;
-        }
-        if (moeda === 'BTC') {
-          // O Bitcoin no indices.json vem cotado em USD, não em BRL — por
-          // isso precisamos multiplicar pela cotação do dólar também.
-          const btc = buscarNoCache('BITCOIN', 'BTC');
-          const usdBrl = taxaParaBRL('USD');
-          if (typeof btc?.valor !== 'number' || typeof usdBrl !== 'number') return null;
-          return btc.valor * usdBrl;
-        }
-        return null;
+        cotacoesCache = taxas;
+        cacheEm = agora;
+        return taxas;
       }
 
       function parseValor(texto) {
@@ -3225,62 +3299,116 @@
         return isNaN(num) ? null : num;
       }
 
-      function formatarResultado(valor, moeda) {
-        const casas = moeda === 'BTC' ? 8 : 2;
-        return `${moeda === 'BTC' ? '₿ ' : (moeda === 'USD' ? 'US$ ' : moeda === 'EUR' ? '€ ' : 'R$ ')}${valor.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas })}`;
+      function formatarValor(valor, codigo) {
+        const m = MOEDAS_POR_CODIGO[codigo];
+        return `${m.prefixo}${valor.toLocaleString('pt-BR', { minimumFractionDigits: m.casas, maximumFractionDigits: m.casas })}`;
       }
 
-      function converter() {
-        const valor = parseValor(valorInput.value);
-        const de = deSelect.value;
-        const para = paraSelect.value;
+      function atualizarBotaoMoeda(lado) {
+        const codigo = estado[lado];
+        const m = MOEDAS_POR_CODIGO[codigo];
+        const bandeiraEl = lado === 'de' ? deBandeira : paraBandeira;
+        const codigoEl = lado === 'de' ? deCodigo : paraCodigo;
+        bandeiraEl.textContent = m.bandeira;
+        codigoEl.textContent = m.codigo;
+      }
 
+      async function converter() {
+        const valor = parseValor(valorInput.value);
         if (valor === null) {
           statusEl.className = 'hg-status erro';
           statusEl.textContent = 'Digite um valor válido.';
-          resultadoEl.hidden = true;
+          resultadoValorEl.textContent = '—';
+          taxaLinhaEl.hidden = true;
           return;
         }
 
-        const taxaDe = taxaParaBRL(de);
-        const taxaPara = taxaParaBRL(para);
+        statusEl.className = 'hg-status';
+        statusEl.textContent = '';
 
-        if (taxaDe === null || taxaPara === null) {
+        let taxas;
+        try {
+          taxas = await buscarCotacoes();
+        } catch (e) {
           statusEl.className = 'hg-status erro';
-          statusEl.textContent = 'Cotação ainda não carregada — aguarde alguns segundos e tente de novo.';
-          resultadoEl.hidden = true;
+          statusEl.textContent = 'Não foi possível buscar as cotações agora. Tente novamente em instantes.';
+          resultadoValorEl.textContent = '—';
+          taxaLinhaEl.hidden = true;
+          return;
+        }
+
+        const taxaDe = taxas[estado.de];
+        const taxaPara = taxas[estado.para];
+        if (typeof taxaDe !== 'number' || typeof taxaPara !== 'number') {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Cotação indisponível para uma das moedas selecionadas.';
+          resultadoValorEl.textContent = '—';
+          taxaLinhaEl.hidden = true;
           return;
         }
 
         const emBrl = valor * taxaDe;
         const resultado = emBrl / taxaPara;
 
-        statusEl.textContent = '';
-        resultadoValorEl.textContent = formatarResultado(resultado, para);
-        resultadoTaxaEl.textContent = `1 ${NOMES[de]} = ${formatarResultado(taxaDe / taxaPara, para)}`;
-        resultadoEl.hidden = false;
+        resultadoValorEl.textContent = formatarValor(resultado, estado.para);
+        resultadoTaxaEl.textContent = `1 ${estado.de} = ${formatarValor(taxaDe / taxaPara, estado.para)}`;
+        taxaLinhaEl.hidden = false;
+      }
+
+      // ---------- Dropdown customizado de moedas (com bandeira) ----------
+      let ladoAtual = null;
+
+      function abrirListaMoedas(lado) {
+        ladoAtual = lado;
+        listaItensEl.innerHTML = MOEDAS.map(m => `
+          <button type="button" class="conv-lista-item ${estado[lado] === m.codigo ? 'conv-selecionado' : ''}" data-codigo="${m.codigo}">
+            <span class="conv-bandeira">${m.bandeira}</span>
+            <span class="conv-lista-item-nome"><b>${m.codigo}</b><small>${m.nome}</small></span>
+          </button>`).join('');
+        listaItensEl.querySelectorAll('.conv-lista-item').forEach(item => {
+          item.addEventListener('click', () => {
+            estado[ladoAtual] = item.getAttribute('data-codigo');
+            atualizarBotaoMoeda(ladoAtual);
+            fecharListaMoedas();
+            converter();
+          });
+        });
+        listaOverlay.hidden = false;
+        (lado === 'de' ? deBotao : paraBotao).setAttribute('aria-expanded', 'true');
+      }
+      function fecharListaMoedas() {
+        listaOverlay.hidden = true;
+        deBotao.setAttribute('aria-expanded', 'false');
+        paraBotao.setAttribute('aria-expanded', 'false');
       }
 
       function abrirModal() {
         overlay.hidden = false;
         document.body.style.overflow = 'hidden';
+        atualizarBotaoMoeda('de');
+        atualizarBotaoMoeda('para');
         converter();
       }
       function fecharModal() {
         overlay.hidden = true;
         document.body.style.overflow = '';
+        fecharListaMoedas();
       }
 
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       valorInput.addEventListener('input', converter);
-      deSelect.addEventListener('change', converter);
-      paraSelect.addEventListener('change', converter);
+      deBotao.addEventListener('click', () => abrirListaMoedas('de'));
+      paraBotao.addEventListener('click', () => abrirListaMoedas('para'));
+      listaFechar.addEventListener('click', fecharListaMoedas);
+      listaOverlay.addEventListener('click', (e) => { if (e.target === listaOverlay) fecharListaMoedas(); });
       btnInverter.addEventListener('click', () => {
-        const temp = deSelect.value;
-        deSelect.value = paraSelect.value;
-        paraSelect.value = temp;
+        const temp = estado.de;
+        estado.de = estado.para;
+        estado.para = temp;
+        atualizarBotaoMoeda('de');
+        atualizarBotaoMoeda('para');
         converter();
       });
     })();
