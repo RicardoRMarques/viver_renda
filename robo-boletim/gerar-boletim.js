@@ -360,6 +360,37 @@ function limparBoletinsAntigos(indiceAtual, hojeMs) {
   return mantidos;
 }
 
+// Reconciliação: o site só enxerga os boletins que estão listados no
+// index.json (ele não lê a pasta diretamente). Se algum arquivo
+// "Boletim_de_Mercado_DD-MM-AAAA.html" for colocado manualmente na pasta
+// (ex: para teste) sem passar pelo script, ele fica "invisível" pro site.
+// Esta função varre a pasta e adiciona ao índice qualquer arquivo válido
+// que ainda não esteja lá, usando a própria data no nome do arquivo.
+function reconciliarComPasta(indiceAtual) {
+  const regex = /^Boletim_de_Mercado_(\d{2})-(\d{2})-(\d{4})\.html$/;
+  const arquivosNaPasta = fs.readdirSync(PASTA_BOLETINS).filter(f => regex.test(f));
+  const jaNoIndice = new Set(indiceAtual.map(e => e.arquivo));
+
+  for (const arquivo of arquivosNaPasta) {
+    if (jaNoIndice.has(arquivo)) continue;
+
+    const [, dd, mm, yyyy] = arquivo.match(regex);
+    // Meio-dia UTC-3 (meio-dia de Brasília) evita qualquer problema de
+    // fuso horário na hora de calcular a idade do arquivo depois.
+    const dataIso = new Date(`${yyyy}-${mm}-${dd}T12:00:00-03:00`).toISOString();
+
+    indiceAtual.push({
+      arquivo,
+      dataIso,
+      dataExibicao: `${dd}-${mm}-${yyyy}`,
+      labelDia: formatarDataExtenso(new Date(`${yyyy}-${mm}-${dd}T12:00:00-03:00`)),
+    });
+    console.log(`[boletim] Reconciliado (achado na pasta, adicionado ao índice): ${arquivo}`);
+  }
+
+  return indiceAtual;
+}
+
 // ---------- Execução principal ----------
 function main() {
   fs.mkdirSync(PASTA_BOLETINS, { recursive: true });
@@ -412,6 +443,7 @@ function main() {
     labelDia: dataExtenso,
   });
 
+  indiceAtual = reconciliarComPasta(indiceAtual);
   indiceAtual = limparBoletinsAntigos(indiceAtual, agora.getTime());
   // Mantém sempre ordenado do mais novo pro mais antigo
   indiceAtual.sort((a, b) => new Date(b.dataIso) - new Date(a.dataIso));
