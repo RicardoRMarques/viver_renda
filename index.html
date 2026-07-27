@@ -5203,6 +5203,8 @@
       const btnSimular = document.getElementById('financBtnSimular');
       const resultadoEl = document.getElementById('financResultado');
       let ultimaSimulacao = null;
+      let financChartLinha = null;
+      let financChartBarras = null;
       // Estado da amortização extra aplicada (se houver). "ativo" controla
       // se a última simulação deve considerar essas amortizações ou não.
       let estadoAmortizacao = { ativo: false, pontos: new Set(), valor: 0, modo: 'prazo' };
@@ -5328,6 +5330,84 @@
       }
 
 
+      // Gráfico de linha: queda do saldo devedor ao longo do financiamento.
+      // Gráfico de barras: juros x amortização por período. Agrupa por ano
+      // quando o financiamento é longo (>24 meses), como costuma ser o caso.
+      async function montarGraficosFinanc(linhas) {
+        await hgCarregarChartJs();
+
+        const totalMeses = linhas.length - 1; // linhas[0] é o "mês 0"
+        const agruparPorAno = totalMeses > 24;
+        const passo = agruparPorAno ? 12 : 1;
+
+        const labelsSaldo = [linhas[0].rotuloData];
+        const saldoSerie = [linhas[0].saldoDevedor];
+        const labelsBarras = [];
+        const amortPeriodo = [];
+        const jurosPeriodo = [];
+
+        let acumAmort = 0;
+        let acumJuros = 0;
+        for (let idx = 1; idx < linhas.length; idx++) {
+          const l = linhas[idx];
+          acumAmort += l.amortizacao;
+          acumJuros += l.juros;
+
+          const fimDeGrupo = (idx % passo === 0) || (idx === linhas.length - 1);
+          if (fimDeGrupo) {
+            labelsSaldo.push(l.rotuloData);
+            saldoSerie.push(l.saldoDevedor);
+            labelsBarras.push(agruparPorAno ? `Ano ${Math.ceil(idx / 12)}` : l.rotuloData);
+            amortPeriodo.push(Math.round(acumAmort));
+            jurosPeriodo.push(Math.round(acumJuros));
+            acumAmort = 0;
+            acumJuros = 0;
+          }
+        }
+
+        if (financChartLinha) financChartLinha.destroy();
+        if (financChartBarras) financChartBarras.destroy();
+
+        financChartLinha = new Chart(document.getElementById('financChartLinha'), {
+          type: 'line',
+          data: {
+            labels: labelsSaldo,
+            datasets: [
+              { label: 'Saldo devedor', data: saldoSerie, borderColor: HG_COR_PRIMARIA, backgroundColor: 'rgba(49,195,255,0.12)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.15 },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
+            scales: {
+              x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
+              y: { ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+            },
+          },
+        });
+
+        financChartBarras = new Chart(document.getElementById('financChartBarras'), {
+          type: 'bar',
+          data: {
+            labels: labelsBarras,
+            datasets: [
+              { label: 'Amortização', data: amortPeriodo, backgroundColor: HG_COR_ACCENT, stack: 's' },
+              { label: 'Juros', data: jurosPeriodo, backgroundColor: HG_COR_PRIMARIA, stack: 's' },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
+            scales: {
+              x: { stacked: true, ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
+              y: { stacked: true, ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+            },
+          },
+        });
+
+        document.getElementById('financGraficoBloco').hidden = false;
+      }
+
       function simular() {
         const valor = Math.max(0, valorFinanciamentoNumero());
         const sistema = selSistema.value;
@@ -5388,6 +5468,25 @@
             </button>
           </div>
 
+          <div class="hg-grafico-bloco" id="financGraficoBloco" hidden>
+            <div class="hg-grafico-titulo" style="margin-top:0;">Evolução do saldo devedor</div>
+            <div class="hg-grafico-legenda">
+              <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Saldo devedor</span>
+            </div>
+            <div class="hg-grafico-wrap">
+              <canvas id="financChartLinha" role="img" aria-label="Gráfico de linha mostrando a queda do saldo devedor ao longo do financiamento">Gráfico de evolução do saldo devedor.</canvas>
+            </div>
+
+            <div class="hg-grafico-titulo">Juros x Amortização por período</div>
+            <div class="hg-grafico-legenda">
+              <span><span class="hg-grafico-legenda-cor" style="background:#7cff92;"></span>Amortização</span>
+              <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Juros</span>
+            </div>
+            <div class="hg-grafico-wrap">
+              <canvas id="financChartBarras" role="img" aria-label="Gráfico de barras empilhadas mostrando juros e amortização pagos em cada período">Gráfico de juros versus amortização por período.</canvas>
+            </div>
+          </div>
+
           <div class="financ-tabela-scroll">
             <table class="financ-tabela">
               <thead>
@@ -5426,6 +5525,8 @@
         document.getElementById('financBtnCompartilhar').addEventListener('click', (e) => {
           compartilharSimulacao(e.currentTarget);
         });
+
+        montarGraficosFinanc(linhas);
       }
 
       // Monta o documento (título + tabela de resumo) na área escondida de
