@@ -252,6 +252,14 @@ function montarHtml({ dataExtenso, dataFechamento, indicadoresHtml, destaquesHtm
   }
   body{transition:background 0.2s ease, color 0.2s ease;}
   .theme-toggle{position:absolute;top:20px;right:20px;background:var(--card);border:1px solid var(--card-border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;user-select:none;}
+  .voltar-site-barra{
+    position:sticky;top:0;z-index:50;
+    background:var(--bg);border-bottom:1px solid var(--card-border);
+    padding:10px 0;margin:0 0 20px;
+  }
+  .voltar-site{display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:12px;text-decoration:none;font-family:'Inter',sans-serif;}
+  .voltar-site:hover{color:var(--gold-soft);}
+  .voltar-site svg{width:14px;height:14px;flex-shrink:0;}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;padding:0 0 40px;}
   .wrap{max-width:640px;margin:0 auto;padding:24px 18px;}
@@ -283,6 +291,13 @@ function montarHtml({ dataExtenso, dataFechamento, indicadoresHtml, destaquesHtm
 </head>
 <body>
 <div class="wrap">
+
+<div class="voltar-site-barra">
+  <a class="voltar-site" href="https://viverderenda.dev.br/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+    Voltar ao site
+  </a>
+</div>
 
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
