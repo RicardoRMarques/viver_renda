@@ -995,7 +995,8 @@
       font-weight: 700; font-size: 0.9rem; transition: border-color 0.15s ease;
     }
     .conv-select-moeda:hover { border-color: var(--primary); }
-    .conv-bandeira { font-size: 1.15rem; line-height: 1; }
+    .conv-bandeira { width: 22px; height: 16px; border-radius: 3px; object-fit: cover; flex-shrink: 0; background: rgba(127,127,127,0.2); }
+    .conv-bandeira.conv-bandeira-cripto { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
     .conv-seta-select { width: 13px; height: 13px; color: var(--muted); flex-shrink: 0; }
     .conv-valor-input {
       flex: 1; min-width: 0; background: transparent; border: none; color: var(--text);
@@ -1023,28 +1024,31 @@
     }
     .conv-taxa-linha svg { width: 12px; height: 12px; flex-shrink: 0; }
 
-    /* Lista customizada de moedas (dropdown próprio) */
+    /* Lista customizada de moedas (dropdown próprio, em overlay fixo —
+       igual aos demais modais do site) */
     .conv-lista-overlay {
-      position: absolute; inset: 0; background: rgba(0,0,0,0.55);
-      display: flex; align-items: flex-end; justify-content: center; z-index: 30;
-      border-radius: inherit;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      display: flex; align-items: flex-end; justify-content: center; z-index: 2100;
+      padding: 0;
     }
+    .conv-lista-overlay[hidden] { display: none; }
     .conv-lista-painel {
       background: var(--bg); border: 1px solid var(--border); border-radius: 16px 16px 0 0;
-      width: 100%; max-height: 70%; overflow: hidden; display: flex; flex-direction: column;
+      width: 100%; max-width: 420px; max-height: 75vh; overflow: hidden; display: flex; flex-direction: column;
     }
     .conv-lista-topo {
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 16px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 0.9rem;
+      flex-shrink: 0;
     }
-    .conv-lista-itens { overflow-y: auto; padding: 6px; }
+    .conv-lista-itens { overflow-y: auto; padding: 6px; flex: 1 1 auto; min-height: 0; }
     .conv-lista-item {
       display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
       background: transparent; border: none; border-radius: 10px; padding: 10px 10px;
       cursor: pointer; font-family: inherit; color: var(--text);
     }
     .conv-lista-item:hover { background: rgba(127,127,127,0.12); }
-    .conv-lista-item .conv-bandeira { font-size: 1.3rem; }
+    .conv-lista-item .conv-bandeira { width: 28px; height: 20px; }
     .conv-lista-item-nome { display: flex; flex-direction: column; }
     .conv-lista-item-nome b { font-size: 0.88rem; }
     .conv-lista-item-nome small { color: var(--muted); font-size: 0.72rem; }
@@ -2386,7 +2390,7 @@
             <label class="conv-label" for="convValorInput">Valor</label>
             <div class="conv-campo-moeda">
               <button type="button" class="conv-select-moeda" id="convDeBotao" data-lado="de" aria-haspopup="listbox" aria-expanded="false">
-                <span class="conv-bandeira" id="convDeBandeira">🇺🇸</span>
+                <img class="conv-bandeira" id="convDeBandeira" src="" alt="" />
                 <span class="conv-codigo" id="convDeCodigo">USD</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="conv-seta-select"><path d="m6 9 6 6 6-6"></path></svg>
               </button>
@@ -2406,7 +2410,7 @@
             <label class="conv-label">Convertido para</label>
             <div class="conv-campo-moeda">
               <button type="button" class="conv-select-moeda" id="convParaBotao" data-lado="para" aria-haspopup="listbox" aria-expanded="false">
-                <span class="conv-bandeira" id="convParaBandeira">🇧🇷</span>
+                <img class="conv-bandeira" id="convParaBandeira" src="" alt="" />
                 <span class="conv-codigo" id="convParaCodigo">BRL</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="conv-seta-select"><path d="m6 9 6 6 6-6"></path></svg>
               </button>
@@ -2419,17 +2423,19 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6l4 2"></path><circle cx="12" cy="12" r="10"></circle></svg>
             <span id="convResultadoTaxa"></span>
           </div>
+        </div>
+      </div>
+    </div>
 
-          <!-- Lista de moedas (dropdown customizado próprio, com bandeira) -->
-          <div id="convListaOverlay" class="conv-lista-overlay" hidden>
-            <div class="conv-lista-painel">
-              <div class="conv-lista-topo">
-                <span>Escolha a moeda</span>
-                <button type="button" id="convListaFechar" class="calc-fechar" aria-label="Fechar lista">✕</button>
-              </div>
-              <div id="convListaItens" class="conv-lista-itens"></div>
-            </div>
-          </div>
+    <!-- Lista de moedas (overlay próprio, fixo na tela — mesmo padrão dos
+         demais modais do site, evita depender da altura variável do modal pai) -->
+    <div id="convListaOverlay" class="conv-lista-overlay" hidden>
+      <div class="conv-lista-painel">
+        <div class="conv-lista-topo">
+          <span>Escolha a moeda</span>
+          <button type="button" id="convListaFechar" class="calc-fechar" aria-label="Fechar lista">✕</button>
+        </div>
+        <div id="convListaItens" class="conv-lista-itens"></div>
       </div>
     </div>
 
@@ -3246,8 +3252,6 @@
       const resultadoTaxaEl = document.getElementById('convResultadoTaxa');
       const deBotao = document.getElementById('convDeBotao');
       const paraBotao = document.getElementById('convParaBotao');
-      const deBandeira = document.getElementById('convDeBandeira');
-      const paraBandeira = document.getElementById('convParaBandeira');
       const deCodigo = document.getElementById('convDeCodigo');
       const paraCodigo = document.getElementById('convParaCodigo');
       const listaOverlay = document.getElementById('convListaOverlay');
@@ -3256,18 +3260,27 @@
       if (!btnAbrir || !overlay) return;
 
       const MOEDAS = [
-        { codigo: 'BRL', nome: 'Real Brasileiro', bandeira: '🇧🇷', prefixo: 'R$ ', casas: 2 },
-        { codigo: 'USD', nome: 'Dólar Americano', bandeira: '🇺🇸', prefixo: 'US$ ', casas: 2 },
-        { codigo: 'EUR', nome: 'Euro', bandeira: '🇪🇺', prefixo: '€ ', casas: 2 },
-        { codigo: 'GBP', nome: 'Libra Esterlina', bandeira: '🇬🇧', prefixo: '£ ', casas: 2 },
-        { codigo: 'ARS', nome: 'Peso Argentino', bandeira: '🇦🇷', prefixo: 'AR$ ', casas: 2 },
-        { codigo: 'CAD', nome: 'Dólar Canadense', bandeira: '🇨🇦', prefixo: 'C$ ', casas: 2 },
-        { codigo: 'AUD', nome: 'Dólar Australiano', bandeira: '🇦🇺', prefixo: 'A$ ', casas: 2 },
-        { codigo: 'JPY', nome: 'Iene Japonês', bandeira: '🇯🇵', prefixo: '¥ ', casas: 2 },
-        { codigo: 'CNY', nome: 'Yuan Chinês', bandeira: '🇨🇳', prefixo: '¥ ', casas: 2 },
-        { codigo: 'BTC', nome: 'Bitcoin', bandeira: '₿', prefixo: '₿ ', casas: 8 },
+        { codigo: 'BRL', nome: 'Real Brasileiro', iso: 'br', prefixo: 'R$ ', casas: 2 },
+        { codigo: 'USD', nome: 'Dólar Americano', iso: 'us', prefixo: 'US$ ', casas: 2 },
+        { codigo: 'EUR', nome: 'Euro', iso: 'eu', prefixo: '€ ', casas: 2 },
+        { codigo: 'GBP', nome: 'Libra Esterlina', iso: 'gb', prefixo: '£ ', casas: 2 },
+        { codigo: 'ARS', nome: 'Peso Argentino', iso: 'ar', prefixo: 'AR$ ', casas: 2 },
+        { codigo: 'CAD', nome: 'Dólar Canadense', iso: 'ca', prefixo: 'C$ ', casas: 2 },
+        { codigo: 'AUD', nome: 'Dólar Australiano', iso: 'au', prefixo: 'A$ ', casas: 2 },
+        { codigo: 'JPY', nome: 'Iene Japonês', iso: 'jp', prefixo: '¥ ', casas: 2 },
+        { codigo: 'CNY', nome: 'Yuan Chinês', iso: 'cn', prefixo: '¥ ', casas: 2 },
+        { codigo: 'BTC', nome: 'Bitcoin', iso: null, prefixo: '₿ ', casas: 8 },
       ];
       const MOEDAS_POR_CODIGO = Object.fromEntries(MOEDAS.map(m => [m.codigo, m]));
+
+      // Bandeira via flagcdn.com (imagem de verdade — não depende da fonte
+      // de emoji do aparelho, que em muitos celulares/Windows não sabe
+      // desenhar bandeiras e mostra as duas letras do país como texto cru).
+      // Bitcoin não tem bandeira; usamos um ícone próprio em SVG.
+      function urlBandeira(iso) {
+        return `https://flagcdn.com/w40/${iso}.png`;
+      }
+      const SVG_BITCOIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" fill="#f7931a" stroke="none"></circle><path d="M9.5 8h3.2a2 2 0 0 1 0 4H9.5m0-4v8m0-4h3.6a2 2 0 0 1 0 4H9.5m0-8V6m0 10v2m2.5-12V6m0 10v2" stroke="#fff" stroke-width="1.4"></path></svg>';
 
       let estado = { de: 'USD', para: 'BRL' };
       let cotacoesCache = null; // { USD: taxaEmBRL, EUR: ..., ... }
@@ -3307,9 +3320,27 @@
       function atualizarBotaoMoeda(lado) {
         const codigo = estado[lado];
         const m = MOEDAS_POR_CODIGO[codigo];
-        const bandeiraEl = lado === 'de' ? deBandeira : paraBandeira;
+        const botaoEl = lado === 'de' ? deBotao : paraBotao;
         const codigoEl = lado === 'de' ? deCodigo : paraCodigo;
-        bandeiraEl.textContent = m.bandeira;
+        const bandeiraAtualEl = botaoEl.querySelector('.conv-bandeira');
+
+        if (m.iso) {
+          // Se o slot atual não for uma <img> (ex: veio do Bitcoin antes), recria como <img>.
+          let img = bandeiraAtualEl.tagName === 'IMG' ? bandeiraAtualEl : null;
+          if (!img) {
+            img = document.createElement('img');
+            img.className = 'conv-bandeira';
+            img.alt = '';
+            bandeiraAtualEl.replaceWith(img);
+          }
+          img.src = urlBandeira(m.iso);
+        } else {
+          // Bitcoin: ícone SVG próprio (círculo laranja), não depende de emoji.
+          const span = document.createElement('span');
+          span.className = 'conv-bandeira conv-bandeira-cripto';
+          span.innerHTML = SVG_BITCOIN;
+          bandeiraAtualEl.replaceWith(span);
+        }
         codigoEl.textContent = m.codigo;
       }
 
@@ -3362,7 +3393,9 @@
         ladoAtual = lado;
         listaItensEl.innerHTML = MOEDAS.map(m => `
           <button type="button" class="conv-lista-item ${estado[lado] === m.codigo ? 'conv-selecionado' : ''}" data-codigo="${m.codigo}">
-            <span class="conv-bandeira">${m.bandeira}</span>
+            ${m.iso
+              ? `<img class="conv-bandeira" src="${urlBandeira(m.iso)}" alt="" />`
+              : `<span class="conv-bandeira conv-bandeira-cripto">${SVG_BITCOIN}</span>`}
             <span class="conv-lista-item-nome"><b>${m.codigo}</b><small>${m.nome}</small></span>
           </button>`).join('');
         listaItensEl.querySelectorAll('.conv-lista-item').forEach(item => {
