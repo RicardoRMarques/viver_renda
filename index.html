@@ -1035,6 +1035,26 @@
     }
     .conv-taxa-linha svg { width: 12px; height: 12px; flex-shrink: 0; }
 
+    /* IOF + taxas */
+    .conv-iof-card {
+      margin-top: 14px; background: var(--deep); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 16px;
+    }
+    .conv-iof-topo {
+      display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;
+      font-size: 0.8rem; font-weight: 700; color: var(--text);
+    }
+    .conv-iof-select {
+      background: rgba(127,127,127,0.12); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 7px 8px; font-size: 0.74rem; font-family: inherit; cursor: pointer;
+    }
+    .conv-iof-linhas { display: flex; flex-direction: column; gap: 6px; }
+    .conv-iof-linha { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--muted); }
+    .conv-iof-linha strong { color: var(--text); font-weight: 700; }
+    .conv-iof-linha.conv-iof-total { margin-top: 4px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 0.9rem; }
+    .conv-iof-linha.conv-iof-total strong { color: var(--primary); font-size: 1.05rem; }
+    .conv-iof-aviso { font-size: 0.68rem; color: var(--muted); line-height: 1.5; margin: 12px 0 0; }
+
     /* Lista customizada de moedas (dropdown próprio, em overlay fixo —
        igual aos demais modais do site) */
     .conv-lista-overlay {
@@ -2473,6 +2493,35 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6l4 2"></path><circle cx="12" cy="12" r="10"></circle></svg>
             <span id="convResultadoTaxa"></span>
           </div>
+
+          <div class="conv-iof-card" id="convIofCard" hidden>
+            <div class="conv-iof-topo">
+              <span>💳 Se for comprar/converter de verdade</span>
+              <select id="convIofTipo" class="conv-iof-select">
+                <option value="0.035">Espécie / cartão internacional (IOF 3,5%)</option>
+                <option value="0.011">Remessa para investimento no exterior (IOF 1,1%)</option>
+              </select>
+            </div>
+            <div class="conv-iof-linhas">
+              <div class="conv-iof-linha">
+                <span>Valor convertido (sem taxas)</span>
+                <strong id="convIofBase">—</strong>
+              </div>
+              <div class="conv-iof-linha">
+                <span>IOF (<span id="convIofPct">3,5</span>%)</span>
+                <strong id="convIofValor">—</strong>
+              </div>
+              <div class="conv-iof-linha conv-iof-total">
+                <span>Total estimado com IOF</span>
+                <strong id="convIofTotal">—</strong>
+              </div>
+            </div>
+            <p class="conv-iof-aviso">
+              Estimativa só do IOF (Decreto 6.306/2007, alíquotas vigentes em 2026). Não inclui o <strong>spread</strong>
+              (a diferença que bancos/casas de câmbio cobram em cima da cotação — costuma variar de 2% a 6% a mais,
+              dependendo de onde você converte). Confira sempre o custo total antes de fechar a operação.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -3345,6 +3394,12 @@
       const statusEl = document.getElementById('convStatus');
       const resultadoValorEl = document.getElementById('convResultadoValor');
       const taxaLinhaEl = document.getElementById('convTaxaLinha');
+      const iofCardEl = document.getElementById('convIofCard');
+      const iofTipoSelect = document.getElementById('convIofTipo');
+      const iofBaseEl = document.getElementById('convIofBase');
+      const iofPctEl = document.getElementById('convIofPct');
+      const iofValorEl = document.getElementById('convIofValor');
+      const iofTotalEl = document.getElementById('convIofTotal');
       const resultadoTaxaEl = document.getElementById('convResultadoTaxa');
       const deBotao = document.getElementById('convDeBotao');
       const paraBotao = document.getElementById('convParaBotao');
@@ -3447,6 +3502,7 @@
           statusEl.textContent = 'Digite um valor válido.';
           resultadoValorEl.textContent = '—';
           taxaLinhaEl.hidden = true;
+          iofCardEl.hidden = true;
           return;
         }
 
@@ -3461,6 +3517,7 @@
           statusEl.textContent = 'Não foi possível buscar as cotações agora. Tente novamente em instantes.';
           resultadoValorEl.textContent = '—';
           taxaLinhaEl.hidden = true;
+          iofCardEl.hidden = true;
           return;
         }
 
@@ -3471,6 +3528,7 @@
           statusEl.textContent = 'Cotação indisponível para uma das moedas selecionadas.';
           resultadoValorEl.textContent = '—';
           taxaLinhaEl.hidden = true;
+          iofCardEl.hidden = true;
           return;
         }
 
@@ -3480,6 +3538,30 @@
         resultadoValorEl.textContent = formatarValor(resultado, estado.para);
         resultadoTaxaEl.textContent = `1 ${estado.de} = ${formatarValor(taxaDe / taxaPara, estado.para)}`;
         taxaLinhaEl.hidden = false;
+
+        atualizarIof(resultado);
+      }
+
+      // O IOF de câmbio (Decreto 6.306/2007) incide sobre a compra de moeda
+      // estrangeira com reais — por isso só faz sentido mostrar quando a
+      // conversão parte do BRL para outra moeda (comprando moeda
+      // estrangeira). Não se aplica do mesmo jeito nos outros sentidos
+      // (vender moeda estrangeira, ou converter entre duas moedas
+      // estrangeiras), então o card fica escondido nesses casos.
+      function atualizarIof(valorConvertido) {
+        if (estado.de !== 'BRL' || estado.para === 'BRL') {
+          iofCardEl.hidden = true;
+          return;
+        }
+        const aliquota = parseFloat(iofTipoSelect.value);
+        const iof = valorConvertido * aliquota;
+        const total = valorConvertido + iof;
+
+        iofBaseEl.textContent = formatarValor(valorConvertido, estado.para);
+        iofPctEl.textContent = (aliquota * 100).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+        iofValorEl.textContent = formatarValor(iof, estado.para);
+        iofTotalEl.textContent = formatarValor(total, estado.para);
+        iofCardEl.hidden = false;
       }
 
       // ---------- Dropdown customizado de moedas (com bandeira) ----------
@@ -3528,6 +3610,7 @@
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       valorInput.addEventListener('input', converter);
+      iofTipoSelect.addEventListener('change', converter);
       deBotao.addEventListener('click', () => abrirListaMoedas('de'));
       paraBotao.addEventListener('click', () => abrirListaMoedas('para'));
       listaFechar.addEventListener('click', fecharListaMoedas);
