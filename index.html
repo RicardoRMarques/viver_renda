@@ -5377,7 +5377,7 @@
             ],
           },
           options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
               x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
@@ -5396,7 +5396,7 @@
             ],
           },
           options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
               x: { stacked: true, ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
@@ -5594,7 +5594,37 @@
           columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
         });
 
-        const yTabelaParcelas = doc.lastAutoTable.finalY + 24;
+        // Gráficos (mesmos exibidos na tela) — cada um em página própria,
+        // como imagem exportada diretamente dos canvases já renderizados.
+        const canvasLinha = document.getElementById('financChartLinha');
+        const canvasBarras = document.getElementById('financChartBarras');
+        const larguraImg = doc.internal.pageSize.getWidth() - 80;
+
+        if (canvasLinha && canvasBarras) {
+          doc.addPage();
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(13);
+          doc.text('Gráficos da simulação', 40, 40);
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
+          doc.setTextColor(90);
+          doc.text('Evolução do saldo devedor', 40, 62);
+          doc.setTextColor(0);
+          const alturaImg1 = (larguraImg * canvasLinha.height) / canvasLinha.width;
+          doc.addImage(canvasLinha.toDataURL('image/png', 1), 'PNG', 40, 72, larguraImg, alturaImg1);
+
+          const yBarras = 72 + alturaImg1 + 28;
+          doc.setFontSize(9);
+          doc.setTextColor(90);
+          doc.text('Juros x Amortização por período', 40, yBarras - 10);
+          doc.setTextColor(0);
+          const alturaImg2 = (larguraImg * canvasBarras.height) / canvasBarras.width;
+          doc.addImage(canvasBarras.toDataURL('image/png', 1), 'PNG', 40, yBarras, larguraImg, alturaImg2);
+        }
+
+        doc.addPage();
+        const yTabelaParcelas = 40;
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(11);
         doc.text(`Tabela de parcelas — ${s.sistema === 'price' ? 'Price' : 'SAC'}`, 40, yTabelaParcelas);
@@ -5901,7 +5931,7 @@
             ],
           },
           options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
               x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
@@ -5920,7 +5950,7 @@
             ],
           },
           options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
               x: { stacked: true, ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
@@ -6399,7 +6429,7 @@
             ],
           },
           options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
               x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
@@ -6627,6 +6657,29 @@
           styles: { fontSize: 8.5, cellPadding: 5 },
           headStyles: { fillColor: [43, 43, 43], fontSize: 9 },
         });
+
+        // Gráfico de evolução do patrimônio (mesmo exibido na tela),
+        // exportado como imagem diretamente do canvas já renderizado.
+        const canvasRp = document.getElementById('rpChartLinha');
+        if (canvasRp) {
+          const yGrafico = doc.lastAutoTable.finalY + 26;
+          const larguraImg = doc.internal.pageSize.getWidth() - 80;
+          const alturaImg = (larguraImg * canvasRp.height) / canvasRp.width;
+          const alturaPagina = doc.internal.pageSize.getHeight();
+
+          if (yGrafico + alturaImg + 20 > alturaPagina) {
+            doc.addPage();
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text('Evolução do patrimônio até a aposentadoria', 40, 40);
+            doc.addImage(canvasRp.toDataURL('image/png', 1), 'PNG', 40, 52, larguraImg, alturaImg);
+          } else {
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text('Evolução do patrimônio até a aposentadoria', 40, yGrafico);
+            doc.addImage(canvasRp.toDataURL('image/png', 1), 'PNG', 40, yGrafico + 12, larguraImg, alturaImg);
+          }
+        }
 
         return doc;
       }
