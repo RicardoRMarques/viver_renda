@@ -806,6 +806,14 @@
       line-height: 1.5;
       opacity: 0.75;
     }
+    .footer-contato-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-contato-link:hover {
+      text-decoration: underline;
+    }
 
     @media (max-width: 900px) {
       .split-layout { grid-template-columns: 1fr; }
@@ -2697,8 +2705,27 @@
         passada não representa garantia de rentabilidade futura. Antes de investir, avalie seu perfil de risco e,
         se necessário, consulte um profissional certificado.
       </p>
+      <p class="disclaimer" style="margin-top:10px;">
+        Dúvidas, sugestões ou parcerias: <a href="#" id="footerContatoLink" class="footer-contato-link">carregando contato...</a>
+      </p>
     </div>
   </footer>
+
+  <script>
+    // E-mail de contato montado em tempo de execução (não fica em texto
+    // puro no HTML), dificultando a coleta automática por bots de spam
+    // que só leem o código-fonte da página, sem executar JavaScript.
+    (function () {
+      const usuario = 'marquesr';
+      const dominio = 'gmail.com';
+      const enderecoCompleto = `${usuario}@${dominio}`;
+      const link = document.getElementById('footerContatoLink');
+      if (link) {
+        link.href = `mailto:${enderecoCompleto}`;
+        link.textContent = enderecoCompleto;
+      }
+    })();
+  </script>
 
   <script>
     /* ---------------------------------------------------------------
