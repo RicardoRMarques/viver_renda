@@ -1086,6 +1086,13 @@
     .conv-iof-linha.conv-iof-total strong { color: var(--primary); font-size: 1.05rem; }
     .conv-iof-aviso { font-size: 0.68rem; color: var(--muted); line-height: 1.5; margin: 12px 0 0; }
 
+    /* Calculadora FIRE — modal mais largo, formulário em 2 colunas */
+    .fire-modal { max-width: 720px; }
+    .fire-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-top: 4px; }
+    @media (max-width: 640px) {
+      .fire-form-grid { grid-template-columns: 1fr; }
+    }
+
     /* Lista customizada de moedas (dropdown próprio, em overlay fixo —
        igual aos demais modais do site) */
     .conv-lista-overlay {
@@ -2344,7 +2351,7 @@
 
     <!-- Modal: Calculadora FIRE (independência financeira) -->
     <div id="fireOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="fireTitulo" hidden>
-      <div class="calc-modal">
+      <div class="calc-modal fire-modal">
         <div class="calc-modal-topo">
           <h3 id="fireTitulo">🔥 Calculadora FIRE</h3>
           <button id="fireFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
@@ -2357,26 +2364,27 @@
             atual de poupança.
           </p>
 
-          <div class="calc-campo">
-            <label for="fireGastoMensal">Gasto mensal desejado na independência</label>
-            <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="fireGastoMensal" inputmode="decimal" placeholder="5.000,00" /></div>
-          </div>
+          <div class="fire-form-grid">
+            <div class="calc-campo">
+              <label for="fireGastoMensal">Gasto mensal desejado na independência</label>
+              <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="fireGastoMensal" inputmode="decimal" placeholder="5.000,00" /></div>
+            </div>
 
-          <div class="calc-campo">
-            <label for="firePatrimonioAtual">Patrimônio já investido hoje</label>
-            <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="firePatrimonioAtual" inputmode="decimal" placeholder="0,00" /></div>
-          </div>
+            <div class="calc-campo">
+              <label for="firePatrimonioAtual">Patrimônio já investido hoje</label>
+              <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="firePatrimonioAtual" inputmode="decimal" placeholder="0,00" /></div>
+            </div>
 
-          <div class="calc-campo">
-            <label for="fireAporteMensal">Quanto consegue poupar por mês</label>
-            <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="fireAporteMensal" inputmode="decimal" placeholder="1.000,00" /></div>
-          </div>
+            <div class="calc-campo">
+              <label for="fireAporteMensal">Quanto consegue poupar por mês</label>
+              <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="fireAporteMensal" inputmode="decimal" placeholder="1.000,00" /></div>
+            </div>
 
-          <div class="calc-grid-2">
             <div class="calc-campo">
               <label for="fireTaxaJuros">Retorno anual esperado dos investimentos (%)</label>
               <input type="text" id="fireTaxaJuros" inputmode="decimal" placeholder="11,5" value="11,5" />
             </div>
+
             <div class="calc-campo">
               <label for="fireTaxaRetirada">
                 Taxa de retirada anual (%)
@@ -2386,9 +2394,20 @@
             </div>
           </div>
 
-          <button class="hg-btn" id="fireBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
+          <button class="hg-btn" id="fireBtnCalcular" style="width:100%; margin-top:10px;">Calcular</button>
 
           <div id="fireResultado"></div>
+
+          <div class="hg-grafico-bloco" id="fireGraficoBloco" hidden>
+            <div class="hg-grafico-titulo" style="margin-top:0;">Evolução do patrimônio até a independência</div>
+            <div class="hg-grafico-legenda">
+              <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Patrimônio projetado</span>
+              <span><span class="hg-grafico-legenda-cor" style="background:#a9b6d3; border-radius:0; height:2px; width:14px;"></span>Meta FIRE</span>
+            </div>
+            <div class="hg-grafico-wrap">
+              <canvas id="fireChart" role="img" aria-label="Gráfico de linha mostrando a evolução do patrimônio até atingir a meta de independência financeira">Gráfico de evolução do patrimônio até o FIRE.</canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -3622,7 +3641,11 @@
       const inTaxaRetirada = document.getElementById('fireTaxaRetirada');
       const btnCalcular = document.getElementById('fireBtnCalcular');
       const resultadoEl = document.getElementById('fireResultado');
+      const graficoBlocoEl = document.getElementById('fireGraficoBloco');
       if (!btnAbrir || !overlay) return;
+
+      let fireChart = null;
+      let ultimoCalculoFire = null;
 
       hgAplicarMascaraMoeda(inGasto, 5000);
       hgAplicarMascaraMoeda(inPatrimonio, 0);
@@ -3638,6 +3661,7 @@
       }
 
       function calcular() {
+        graficoBlocoEl.hidden = true;
         const gastoMensal = hgValorMascarado(inGasto);
         const patrimonioAtual = Math.max(0, hgValorMascarado(inPatrimonio));
         const aporteMensal = Math.max(0, hgValorMascarado(inAporte));
@@ -3714,7 +3738,61 @@
             leva pra chegar lá com juros compostos mensais, considerando o patrimônio atual e o aporte mensal informados.
             Simulação educativa, sem considerar inflação, impostos ou mudanças na taxa de retorno ao longo do tempo.
           </p>`;
+
+        ultimoCalculoFire = { patrimonioAtual, aporteMensal, taxaMensal, meses, patrimonioNecessario };
+        montarGraficoFire(patrimonioAtual, aporteMensal, taxaMensal, meses, patrimonioNecessario);
       }
+
+      // Gráfico de linha: evolução do patrimônio (mês a mês, agrupado por
+      // ano em prazos longos) até cruzar a meta FIRE — com uma linha
+      // horizontal tracejada marcando o patrimônio necessário.
+      async function montarGraficoFire(patrimonioAtual, aporteMensal, taxaMensal, meses, patrimonioNecessario) {
+        await hgCarregarChartJs();
+
+        const agruparPorAno = meses > 24;
+        const passo = agruparPorAno ? 12 : 1;
+        const labels = ['0'];
+        const patrimonioSerie = [patrimonioAtual];
+
+        let saldo = patrimonioAtual;
+        for (let m = 1; m <= meses; m++) {
+          saldo = saldo * (1 + taxaMensal) + aporteMensal;
+          if (m % passo === 0 || m === meses) {
+            labels.push(agruparPorAno ? String(Math.round(m / 12)) : String(m));
+            patrimonioSerie.push(saldo);
+          }
+        }
+        const metaSerie = labels.map(() => patrimonioNecessario);
+
+        if (fireChart) fireChart.destroy();
+        fireChart = new Chart(document.getElementById('fireChart'), {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              { label: 'Patrimônio projetado', data: patrimonioSerie, borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.2 },
+              { label: 'Meta FIRE', data: metaSerie, borderColor: HG_COR_MUTED(), borderDash: [6, 5], borderWidth: 1.5, pointRadius: 0, fill: false },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
+            scales: {
+              x: { title: { display: true, text: agruparPorAno ? 'Anos' : 'Meses', color: HG_COR_MUTED(), font: { size: 10 } }, ticks: { autoSkip: true, maxTicksLimit: 10, color: HG_COR_MUTED() }, grid: { display: false } },
+              y: { ticks: { color: HG_COR_MUTED(), callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID() } },
+            },
+          },
+        });
+
+        graficoBlocoEl.hidden = false;
+      }
+
+      window.addEventListener('hg-tema-mudou', () => {
+        if (ultimoCalculoFire) {
+          const c = ultimoCalculoFire;
+          montarGraficoFire(c.patrimonioAtual, c.aporteMensal, c.taxaMensal, c.meses, c.patrimonioNecessario);
+        }
+      });
 
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
