@@ -2327,11 +2327,11 @@
           </div>
           <div class="sim-visual-controle" style="grid-column: 1 / -1;">
             <div class="sim-visual-controle-topo">
-              <span>% do rendimento reinvestido na fase de retirada <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="taxa-retirada-sv" aria-label="O que é isso?" title="O que é isso?">?</button></span>
-              <strong id="svReinvesteOut">50%</strong>
+              <span>Taxa de retirada mensal (% do saldo) <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="taxa-retirada-sv" aria-label="O que é isso?" title="O que é isso?">?</button></span>
+              <strong id="svReinvesteOut">0,5%</strong>
             </div>
-            <input type="range" id="svReinveste" min="0" max="100" step="5" value="50" class="sim-visual-slider" />
-            <div class="sim-visual-extremos"><span>0% (saca tudo)</span><span>100% (reinveste tudo)</span></div>
+            <input type="range" id="svReinveste" min="0.1" max="2" step="0.05" value="0.5" class="sim-visual-slider" />
+            <div class="sim-visual-extremos"><span>0,1% (conservador)</span><span>2% (agressivo)</span></div>
           </div>
         </div>
 
@@ -2355,14 +2355,16 @@
           <span><span class="hg-grafico-legenda-cor" style="background:#ffb84d;"></span>Fase de retirada</span>
         </div>
         <div class="hg-grafico-wrap" style="height:280px;">
-          <canvas id="svChart" role="img" aria-label="Gráfico de área mostrando o patrimônio crescendo na fase de aportes e continuando a evoluir na fase de retirada, onde parte do rendimento é reinvestido">Gráfico de evolução do patrimônio com aportes e depois retirada parcial dos rendimentos.</canvas>
+          <canvas id="svChart" role="img" aria-label="Gráfico de área mostrando o patrimônio crescendo na fase de aportes e depois subindo, estabilizando ou caindo na fase de retirada, dependendo da taxa de retirada escolhida em relação ao rendimento">Gráfico de evolução do patrimônio com aportes e depois retirada mensal.</canvas>
         </div>
+        <p class="hg-status erro" id="svAvisoEsgotamento" style="margin-top:10px;" hidden></p>
 
         <p class="calc-ajuda" style="margin-top:14px;">
-          <strong>Como funciona a fase de retirada:</strong> o principal nunca é sacado diretamente. Todo mês calculamos
-          o rendimento gerado pelo patrimônio daquele mês; a fração que você escolher fica reinvestida, e o restante vira
-          a "retirada" pra viver. Por isso o patrimônio final tende a continuar subindo (mais devagar) em vez de cair —
-          quanto menor a % reinvestida, maior a retirada mensal, mas menor o crescimento futuro do patrimônio.
+          <strong>Como funciona a fase de retirada:</strong> todo mês você saca a % informada sobre o saldo <em>daquele
+          momento</em>. Se essa taxa for <strong>menor</strong> que o rendimento do mês, o patrimônio continua
+          crescendo (mesmo sacando todo mês). Se for <strong>maior</strong>, o patrimônio começa a cair — e, dependendo
+          do tamanho da retirada e do prazo, pode até se esgotar antes do fim do período (o gráfico mostra isso
+          claramente, com a curva caindo até zero).
           Simulação educativa, com juros compostos mensais, sem considerar inflação, taxas ou impostos.
         </p>
       </div>
@@ -3603,14 +3605,14 @@
         const taxaAnual = Number(elTaxa.value);
         const anosAporte = Number(elAnosAporte.value);
         const anosRetirada = Number(elAnosRetirada.value);
-        const fracReinveste = Number(elReinveste.value) / 100;
+        const taxaRetiradaMensal = Number(elReinveste.value) / 100;
         const taxaMensal = Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
 
         outAporte.textContent = fmt(aporte);
         outTaxa.textContent = `${taxaAnual.toLocaleString('pt-BR', { minimumFractionDigits: taxaAnual % 1 === 0 ? 0 : 1 })}%`;
         outAnosAporte.textContent = `${anosAporte} ${anosAporte === 1 ? 'ano' : 'anos'}`;
         outAnosRetirada.textContent = `${anosRetirada} ${anosRetirada === 1 ? 'ano' : 'anos'}`;
-        outReinveste.textContent = `${Number(elReinveste.value)}%`;
+        outReinveste.textContent = `${Number(elReinveste.value).toLocaleString('pt-BR', { minimumFractionDigits: 1 })}%`;
 
         const mesesAporte = anosAporte * 12;
         const mesesRetirada = anosRetirada * 12;
@@ -3625,19 +3627,22 @@
 
         let saldo = 0;
         let primeiraRetirada = null;
+        let mesEsgotou = null;
 
         for (let m = 1; m <= totalMeses; m++) {
           if (m <= mesesAporte) {
             saldo = saldo * (1 + taxaMensal) + aporte;
-          } else {
-            const rendimento = saldo * taxaMensal;
-            const retirado = rendimento * (1 - fracReinveste);
-            const reinvestido = rendimento * fracReinveste;
+          } else if (saldo > 0) {
+            const retirado = saldo * taxaRetiradaMensal;
             if (primeiraRetirada === null) primeiraRetirada = retirado;
-            saldo = saldo + reinvestido;
+            saldo = saldo * (1 + taxaMensal) - retirado;
+            if (saldo <= 0) {
+              saldo = 0;
+              mesEsgotou = m;
+            }
           }
 
-          if (m % 12 === 0 || m === mesesAporte || m === totalMeses) {
+          if (m % 12 === 0 || m === mesesAporte || m === totalMeses || m === mesEsgotou) {
             labels.push(String(Math.round(m / 12)));
             serieAporte.push(m <= mesesAporte ? saldo : null);
             serieRetirada.push(m >= mesesAporte ? saldo : null);
@@ -3650,6 +3655,15 @@
         outPatrimonioPico.textContent = fmt(patrimonioPico);
         outPatrimonioFinal.textContent = fmt(patrimonioFinal);
         outRendaPassiva.textContent = mesesRetirada > 0 ? `${fmt(primeiraRetirada || 0)}/mês` : '—';
+
+        const avisoEl = document.getElementById('svAvisoEsgotamento');
+        if (mesEsgotou !== null) {
+          const anosAteEsgotar = ((mesEsgotou - mesesAporte) / 12).toFixed(1);
+          avisoEl.textContent = `⚠️ Nesse ritmo, o patrimônio se esgotaria ${anosAteEsgotar} anos depois do início da retirada — antes do fim do período de ${anosRetirada} anos.`;
+          avisoEl.hidden = false;
+        } else {
+          avisoEl.hidden = true;
+        }
 
         if (recalculando) return; // evita recriar o Chart.js várias vezes em paralelo
         recalculando = true;
@@ -4119,7 +4133,7 @@
         'valor-patrimonial': 'Valor Patrimonial = soma de todos os imóveis, direitos e recursos que pertencem ao fundo (FII), refletindo o patrimônio líquido total do fundo.',
         'dy-fii': 'Dividend Yield (DY) = quanto o fundo imobiliário pagou de rendimentos aos cotistas nos últimos 12 meses, em relação à cotação atual da cota.\n\nCálculo: rendimentos pagos em 12 meses / cotação atual × 100',
         'mais-negociados': '"Mais Negociados" = fundos imobiliários com maior liquidez diária (volume financeiro médio negociado por dia), o que facilita comprar e vender cotas sem grandes variações de preço.',
-        'taxa-retirada-sv': '% do rendimento reinvestido = na fase de retirada, o principal nunca é sacado diretamente. Todo mês calculamos o rendimento que o patrimônio gerou naquele mês, e essa % é a fatia que fica reinvestida — o restante vira a retirada mensal pra viver.\n\nExemplo: com 50% reinvestido, metade do rendimento do mês continua investida (o patrimônio ainda cresce, só que mais devagar) e a outra metade você retira.\n\n0% reinvestido = você saca o rendimento inteiro (patrimônio fica estável). 100% reinvestido = você não retira nada (patrimônio continua crescendo igual à fase de aportes, só sem dinheiro novo entrando).',
+        'taxa-retirada-sv': 'Taxa de retirada mensal = percentual do saldo atual que você saca todo mês, na fase de retirada.\n\nSe essa taxa for menor que o rendimento do mês, o patrimônio continua crescendo mesmo sacando. Se for maior, o patrimônio cai — e pode se esgotar antes do fim do período, se a retirada for grande demais ou o prazo for muito longo.\n\nReferência comum: 0,3% a.m. (≈ 4% a.a., a "regra dos 4%") costuma ser considerada uma taxa conservadora, que o patrimônio aguenta por décadas. Taxas acima de 1% a.m. são bem mais agressivas e arriscam esgotar o patrimônio mais rápido.',
         'taxa-retirada-fire': 'Taxa de retirada = percentual do patrimônio que você saca por ano, na teoria sem nunca "zerar" o patrimônio no longo prazo (o rendimento repõe o que foi retirado).\n\n4% ao ano é a referência mais usada (conhecida como "regra dos 4%", baseada no estudo Trinity). Taxas menores (ex: 3%) são mais conservadoras — o patrimônio necessário fica maior, mas o risco de ficar sem dinheiro é menor.',
       };
 
