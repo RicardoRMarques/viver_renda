@@ -3710,16 +3710,33 @@
       // dispositivo suporta compartilhar arquivo + link ao mesmo tempo.
       const btnCompartilhar = document.getElementById('svBtnCompartilhar');
 
+      // Compacta os 5 valores da simulação num único código curto (em vez
+      // de 5 parâmetros separados), deixando o link bem mais enxuto pra
+      // compartilhar. Não depende de nenhum encurtador de terceiros (a
+      // maioria bloqueia chamadas diretas do navegador por CORS, já que o
+      // site é estático, sem servidor próprio) — é só uma codificação
+      // compacta dentro do próprio domínio, sem risco de parar de
+      // funcionar por causa de um serviço externo.
+      function codificarSimulacao() {
+        const partes = [
+          Math.round(Number(elAporte.value)),
+          Math.round(Number(elTaxa.value) * 10),
+          Number(elAnosAporte.value),
+          Number(elAnosRetirada.value),
+          Math.round(Number(elReinveste.value) * 100),
+        ];
+        return partes.map(n => n.toString(36)).join('-');
+      }
+      function decodificarSimulacao(codigo) {
+        const partes = codigo.split('-').map(p => parseInt(p, 36));
+        if (partes.length !== 5 || partes.some(isNaN)) return null;
+        const [aporte, taxaX10, anosAporte, anosRetirada, retiradaX100] = partes;
+        return { aporte, taxa: taxaX10 / 10, anosAporte, anosRetirada, retirada: retiradaX100 / 100 };
+      }
+
       function montarUrlCompartilhavel() {
-        const params = new URLSearchParams({
-          sv_aporte: elAporte.value,
-          sv_taxa: elTaxa.value,
-          sv_anosAporte: elAnosAporte.value,
-          sv_anosRetirada: elAnosRetirada.value,
-          sv_retirada: elReinveste.value,
-        });
         const base = `${window.location.origin}${window.location.pathname}`;
-        return `${base}?${params.toString()}#simuladorVisual`;
+        return `${base}?s=${codificarSimulacao()}#simuladorVisual`;
       }
 
       async function compartilharGrafico() {
@@ -3761,18 +3778,22 @@
       }
       if (btnCompartilhar) btnCompartilhar.addEventListener('click', compartilharGrafico);
 
-      // Se a página foi aberta a partir de um link compartilhado (com os
-      // parâmetros sv_*), pré-preenche os controles com os valores
+      // Se a página foi aberta a partir de um link compartilhado (com o
+      // código compacto ?s=...), pré-preenche os controles com os valores
       // recebidos e rola suavemente até o simulador.
       (function aplicarParametrosDaUrl() {
         const params = new URLSearchParams(window.location.search);
-        if (!params.has('sv_aporte')) return;
+        const codigo = params.get('s');
+        if (!codigo) return;
 
-        if (params.has('sv_aporte')) elAporte.value = params.get('sv_aporte');
-        if (params.has('sv_taxa')) elTaxa.value = params.get('sv_taxa');
-        if (params.has('sv_anosAporte')) elAnosAporte.value = params.get('sv_anosAporte');
-        if (params.has('sv_anosRetirada')) elAnosRetirada.value = params.get('sv_anosRetirada');
-        if (params.has('sv_retirada')) elReinveste.value = params.get('sv_retirada');
+        const valores = decodificarSimulacao(codigo);
+        if (!valores) return;
+
+        elAporte.value = valores.aporte;
+        elTaxa.value = valores.taxa;
+        elAnosAporte.value = valores.anosAporte;
+        elAnosRetirada.value = valores.anosRetirada;
+        elReinveste.value = valores.retirada;
 
         recalcular().then(() => {
           document.getElementById('simuladorVisual')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
