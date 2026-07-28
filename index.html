@@ -990,6 +990,35 @@
     .hg-grafico-wrap { position: relative; width: 100%; height: 220px; }
     .hg-grafico-titulo { font-size: 0.8rem; font-weight: 700; color: var(--text); margin: 18px 0 8px; }
 
+    /* Simulador visual (sliders) antes de "Explore o mercado" */
+    .sim-visual-painel { padding: 22px 24px; }
+    .sim-visual-controles {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px 24px; margin-bottom: 20px;
+    }
+    .sim-visual-controle-topo {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 0.82rem; color: var(--muted); margin-bottom: 6px;
+    }
+    .sim-visual-controle-topo strong { color: var(--text); font-size: 0.92rem; }
+    .sim-visual-slider {
+      width: 100%; accent-color: var(--primary); cursor: pointer; height: 20px;
+    }
+    .sim-visual-extremos { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+    .sim-visual-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .sim-visual-card {
+      background: var(--deep); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 16px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .sim-visual-card span { font-size: 0.72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
+    .sim-visual-card strong { font-size: 1.15rem; font-weight: 800; color: var(--text); }
+    .sim-visual-card-destaque { border-color: var(--primary); }
+    .sim-visual-card-destaque strong { color: var(--primary); }
+    @media (max-width: 640px) {
+      .sim-visual-painel { padding: 16px; }
+      .sim-visual-controles { grid-template-columns: 1fr; gap: 14px; }
+      .sim-visual-cards { grid-template-columns: 1fr; }
+    }
+
     /* Conversor de Moedas */
     .conv-modal { max-width: 420px; position: relative; }
     .conv-corpo { padding-top: 4px; }
@@ -2237,6 +2266,74 @@
     </div>
 
 
+    <!-- SIMULADOR VISUAL DE JUROS COMPOSTOS (com controles deslizantes),
+         exibido direto na página, antes da seção "Explore o mercado". -->
+    <section class="hg-busca" id="simuladorVisual" style="padding-top:0;">
+      <div class="hg-painel sim-visual-painel">
+        <h2 class="hg-titulo" style="margin-bottom:6px;">📈 Veja o poder dos juros compostos</h2>
+        <p class="calc-ajuda" style="margin:0 0 18px;">
+          Arraste os controles abaixo e veja, em tempo real, como um aporte mensal constante se transforma em patrimônio ao
+          longo do tempo — e quanto desse patrimônio poderia virar renda passiva todo mês. A linha <strong>cheia</strong>
+          mostra o total acumulado (com o efeito dos juros compostos); a linha <strong>tracejada</strong> mostra só a soma
+          do que você colocou do próprio bolso, sem nenhum rendimento — a diferença entre as duas é o quanto os juros
+          "trabalharam" por você.
+        </p>
+
+        <div class="sim-visual-controles">
+          <div class="sim-visual-controle">
+            <div class="sim-visual-controle-topo"><span>Aporte mensal</span><strong id="svAporteOut">R$ 700</strong></div>
+            <input type="range" id="svAporte" min="100" max="5000" step="50" value="700" class="sim-visual-slider" />
+            <div class="sim-visual-extremos"><span>R$ 100</span><span>R$ 5.000</span></div>
+          </div>
+          <div class="sim-visual-controle">
+            <div class="sim-visual-controle-topo"><span>Taxa de juros anual</span><strong id="svTaxaOut">11,5%</strong></div>
+            <input type="range" id="svTaxa" min="4" max="16" step="0.5" value="11.5" class="sim-visual-slider" />
+            <div class="sim-visual-extremos"><span>4%</span><span>16%</span></div>
+          </div>
+          <div class="sim-visual-controle">
+            <div class="sim-visual-controle-topo"><span>Prazo</span><strong id="svPrazoOut">15 anos</strong></div>
+            <input type="range" id="svPrazo" min="1" max="40" step="1" value="15" class="sim-visual-slider" />
+            <div class="sim-visual-extremos"><span>1 ano</span><span>40 anos</span></div>
+          </div>
+          <div class="sim-visual-controle">
+            <div class="sim-visual-controle-topo"><span>Taxa de retirada mensal</span><strong id="svRetiradaOut">0,5%</strong></div>
+            <input type="range" id="svRetirada" min="0.3" max="1" step="0.05" value="0.5" class="sim-visual-slider" />
+            <div class="sim-visual-extremos"><span>0,3%</span><span>1%</span></div>
+          </div>
+        </div>
+
+        <div class="sim-visual-cards">
+          <div class="sim-visual-card">
+            <span>Total investido</span>
+            <strong id="svTotalInvestido">—</strong>
+          </div>
+          <div class="sim-visual-card sim-visual-card-destaque">
+            <span>Patrimônio final</span>
+            <strong id="svPatrimonioFinal">—</strong>
+          </div>
+          <div class="sim-visual-card">
+            <span>Renda passiva/mês</span>
+            <strong id="svRendaPassiva">—</strong>
+          </div>
+        </div>
+
+        <div class="hg-grafico-legenda" style="margin-top:18px;">
+          <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Patrimônio acumulado</span>
+          <span><span class="hg-grafico-legenda-cor" style="background:#a9b6d3; border-radius:0; height:2px; width:14px;"></span>Total investido (sem juros)</span>
+        </div>
+        <div class="hg-grafico-wrap" style="height:280px;">
+          <canvas id="svChart" role="img" aria-label="Gráfico de área mostrando o crescimento do patrimônio com juros compostos comparado ao total investido">Gráfico de evolução do patrimônio com juros compostos.</canvas>
+        </div>
+
+        <p class="calc-ajuda" style="margin-top:14px;">
+          <strong>Como a renda passiva é calculada:</strong> patrimônio final × taxa de retirada mensal. É a mesma lógica
+          por trás da "regra dos 4% ao ano" (≈ 0,33% ao mês) usada em planejamento de aposentadoria — aqui você pode
+          ajustar essa taxa livremente para ver cenários mais ou menos conservadores.
+          Simulação educativa, com juros compostos mensais, sem considerar inflação, taxas ou impostos.
+        </p>
+      </div>
+    </section>
+
     <section class="split-layout">
 
       <!-- ESQUERDA: Ranking do mercado -->
@@ -3338,6 +3435,103 @@
       }
     }
     carregarIndices();
+
+    // ============================================================
+    // SIMULADOR VISUAL DE JUROS COMPOSTOS (sliders, antes de "Explore o
+    // mercado"). Recalcula e redesenha o gráfico a cada movimento dos
+    // controles, sem precisar clicar em nenhum botão "calcular".
+    // ============================================================
+    (function () {
+      const elAporte = document.getElementById('svAporte');
+      const elTaxa = document.getElementById('svTaxa');
+      const elPrazo = document.getElementById('svPrazo');
+      const elRetirada = document.getElementById('svRetirada');
+      if (!elAporte) return;
+
+      const outAporte = document.getElementById('svAporteOut');
+      const outTaxa = document.getElementById('svTaxaOut');
+      const outPrazo = document.getElementById('svPrazoOut');
+      const outRetirada = document.getElementById('svRetiradaOut');
+      const outTotalInvestido = document.getElementById('svTotalInvestido');
+      const outPatrimonioFinal = document.getElementById('svPatrimonioFinal');
+      const outRendaPassiva = document.getElementById('svRendaPassiva');
+
+      let svChart = null;
+      let recalculando = false;
+
+      function fmt(v) {
+        return `R$ ${Math.round(v).toLocaleString('pt-BR')}`;
+      }
+
+      async function recalcular() {
+        const aporte = Number(elAporte.value);
+        const taxaAnual = Number(elTaxa.value);
+        const anos = Number(elPrazo.value);
+        const retiradaMensal = Number(elRetirada.value);
+        const meses = anos * 12;
+        const taxaMensal = Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
+
+        outAporte.textContent = fmt(aporte);
+        outTaxa.textContent = `${taxaAnual.toLocaleString('pt-BR', { minimumFractionDigits: taxaAnual % 1 === 0 ? 0 : 1 })}%`;
+        outPrazo.textContent = `${anos} ${anos === 1 ? 'ano' : 'anos'}`;
+        outRetirada.textContent = `${retiradaMensal.toLocaleString('pt-BR', { minimumFractionDigits: 1 })}%`;
+
+        // Agrupa por ano para o gráfico não ficar com centenas de pontos
+        // em prazos longos.
+        const labels = ['0'];
+        const patrimonioSerie = [0];
+        const investidoSerie = [0];
+        let saldo = 0;
+        let investido = 0;
+        for (let m = 1; m <= meses; m++) {
+          saldo = saldo * (1 + taxaMensal) + aporte;
+          investido += aporte;
+          if (m % 12 === 0 || m === meses) {
+            labels.push(String(Math.round(m / 12)));
+            patrimonioSerie.push(saldo);
+            investidoSerie.push(investido);
+          }
+        }
+
+        const patrimonioFinal = saldo;
+        const rendaPassiva = patrimonioFinal * (retiradaMensal / 100);
+
+        outTotalInvestido.textContent = fmt(investido);
+        outPatrimonioFinal.textContent = fmt(patrimonioFinal);
+        outRendaPassiva.textContent = fmt(rendaPassiva);
+
+        if (recalculando) return; // evita recriar o Chart.js várias vezes em paralelo
+        recalculando = true;
+        try {
+          await hgCarregarChartJs();
+          const canvas = document.getElementById('svChart');
+          if (svChart) svChart.destroy();
+          svChart = new Chart(canvas, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [
+                { label: 'Patrimônio acumulado', data: patrimonioSerie, borderColor: HG_COR_PRIMARIA, backgroundColor: 'rgba(49,195,255,0.15)', fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.25 },
+                { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_MUTED, borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, tension: 0.1, fill: false },
+              ],
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false, animation: false,
+              plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
+              scales: {
+                x: { title: { display: true, text: 'Anos', color: HG_COR_MUTED, font: { size: 10 } }, ticks: { autoSkip: true, maxTicksLimit: 10, color: HG_COR_MUTED }, grid: { display: false } },
+                y: { ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+              },
+            },
+          });
+        } finally {
+          recalculando = false;
+        }
+      }
+
+      [elAporte, elTaxa, elPrazo, elRetirada].forEach(el => el.addEventListener('input', recalcular));
+      recalcular();
+    })();
 
     // ============================================================
     // CONVERSOR DE MOEDAS — busca direta no endpoint geral da HG Brasil
