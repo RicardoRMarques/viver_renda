@@ -2331,10 +2331,68 @@
           ajustar essa taxa livremente para ver cenários mais ou menos conservadores.
           Simulação educativa, com juros compostos mensais, sem considerar inflação, taxas ou impostos.
         </p>
+
+        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+          <button type="button" class="cmp-btn-abrir" id="fireBtnAbrir" style="font-size:0.8rem; padding:8px 16px;">
+            🔥 Calculadora de Independência Financeira (FIRE)
+          </button>
+        </div>
       </div>
     </section>
 
+    <!-- Modal: Calculadora FIRE (independência financeira) -->
+    <div id="fireOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="fireTitulo" hidden>
+      <div class="calc-modal">
+        <div class="calc-modal-topo">
+          <h3 id="fireTitulo">🔥 Calculadora FIRE</h3>
+          <button id="fireFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+        <div class="calc-corpo">
+          <p class="calc-ajuda" style="margin:-6px 0 0;">
+            FIRE = <em>Financial Independence, Retire Early</em>. A ideia: acumular um patrimônio grande o
+            suficiente para que a renda gerada por ele (sem tocar no principal) cubra seus gastos mensais para sempre —
+            aí o trabalho vira opcional. Preencha os campos abaixo pra ver em quantos anos isso acontece no seu ritmo
+            atual de poupança.
+          </p>
+
+          <div class="calc-campo">
+            <label for="fireGastoMensal">Gasto mensal desejado na independência</label>
+            <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="fireGastoMensal" inputmode="decimal" placeholder="5.000,00" /></div>
+          </div>
+
+          <div class="calc-campo">
+            <label for="firePatrimonioAtual">Patrimônio já investido hoje</label>
+            <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="firePatrimonioAtual" inputmode="decimal" placeholder="0,00" /></div>
+          </div>
+
+          <div class="calc-campo">
+            <label for="fireAporteMensal">Quanto consegue poupar por mês</label>
+            <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="fireAporteMensal" inputmode="decimal" placeholder="1.000,00" /></div>
+          </div>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="fireTaxaJuros">Retorno anual esperado dos investimentos (%)</label>
+              <input type="text" id="fireTaxaJuros" inputmode="decimal" placeholder="11,5" value="11,5" />
+            </div>
+            <div class="calc-campo">
+              <label for="fireTaxaRetirada">
+                Taxa de retirada anual (%)
+                <button type="button" class="hg-info-btn" data-glossario="taxa-retirada-fire" aria-label="O que é a taxa de retirada?" title="O que é a taxa de retirada?">?</button>
+              </label>
+              <input type="text" id="fireTaxaRetirada" inputmode="decimal" placeholder="4" value="4" />
+            </div>
+          </div>
+
+          <button class="hg-btn" id="fireBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
+
+          <div id="fireResultado"></div>
+        </div>
+      </div>
+    </div>
+
     <section class="split-layout">
+
 
       <!-- ESQUERDA: Ranking do mercado -->
       <div class="coluna-explorar">
@@ -2664,10 +2722,24 @@
     }
 
     // Paleta usada nos gráficos, igual às cores oficiais do site.
-    const HG_COR_PRIMARIA = '#31c3ff';
-    const HG_COR_ACCENT = '#7cff92';
-    const HG_COR_MUTED = '#a9b6d3';
-    const HG_COR_GRID = 'rgba(169,182,211,0.15)';
+    // Cores usadas nos gráficos — lidas ao vivo das variáveis CSS do tema
+    // ativo (dark/light), em vez de fixas, para não ficarem "sumidas" no
+    // modo claro (ex: verde clarinho e cinza-azulado do modo escuro
+    // ficam com contraste ruim em fundo branco).
+    function hgCssVar(nome) {
+      return getComputedStyle(document.documentElement).getPropertyValue(nome).trim();
+    }
+    function HG_COR_PRIMARIA() { return hgCssVar('--primary') || '#31c3ff'; }
+    function HG_COR_ACCENT() { return hgCssVar('--accent') || '#7cff92'; }
+    function HG_COR_MUTED() { return hgCssVar('--muted') || '#a9b6d3'; }
+    function HG_COR_GRID() {
+      const isClaro = document.documentElement.getAttribute('data-theme') === 'light';
+      return isClaro ? 'rgba(15,30,60,0.12)' : 'rgba(169,182,211,0.15)';
+    }
+    function hgCorPrimariaFundo() {
+      const isClaro = document.documentElement.getAttribute('data-theme') === 'light';
+      return isClaro ? 'rgba(15,143,206,0.15)' : 'rgba(49,195,255,0.12)';
+    }
 
     function hgFormatCompactoEixo(v) {
       if (Math.abs(v) >= 1e6) return (v / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'M';
@@ -3511,16 +3583,16 @@
             data: {
               labels,
               datasets: [
-                { label: 'Patrimônio acumulado', data: patrimonioSerie, borderColor: HG_COR_PRIMARIA, backgroundColor: 'rgba(49,195,255,0.15)', fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.25 },
-                { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_MUTED, borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, tension: 0.1, fill: false },
+                { label: 'Patrimônio acumulado', data: patrimonioSerie, borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.25 },
+                { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_MUTED(), borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, tension: 0.1, fill: false },
               ],
             },
             options: {
               responsive: true, maintainAspectRatio: false, animation: false,
               plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
               scales: {
-                x: { title: { display: true, text: 'Anos', color: HG_COR_MUTED, font: { size: 10 } }, ticks: { autoSkip: true, maxTicksLimit: 10, color: HG_COR_MUTED }, grid: { display: false } },
-                y: { ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+                x: { title: { display: true, text: 'Anos', color: HG_COR_MUTED(), font: { size: 10 } }, ticks: { autoSkip: true, maxTicksLimit: 10, color: HG_COR_MUTED() }, grid: { display: false } },
+                y: { ticks: { color: HG_COR_MUTED(), callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID() } },
               },
             },
           });
@@ -3530,7 +3602,123 @@
       }
 
       [elAporte, elTaxa, elPrazo, elRetirada].forEach(el => el.addEventListener('input', recalcular));
+      window.addEventListener('hg-tema-mudou', () => { if (svChart) recalcular(); });
       recalcular();
+    })();
+
+    // ============================================================
+    // CALCULADORA FIRE (Independência Financeira)
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('fireBtnAbrir');
+      const overlay = document.getElementById('fireOverlay');
+      const btnFechar = document.getElementById('fireFechar');
+      const inGasto = document.getElementById('fireGastoMensal');
+      const inPatrimonio = document.getElementById('firePatrimonioAtual');
+      const inAporte = document.getElementById('fireAporteMensal');
+      const inTaxaJuros = document.getElementById('fireTaxaJuros');
+      const inTaxaRetirada = document.getElementById('fireTaxaRetirada');
+      const btnCalcular = document.getElementById('fireBtnCalcular');
+      const resultadoEl = document.getElementById('fireResultado');
+      if (!btnAbrir || !overlay) return;
+
+      hgAplicarMascaraMoeda(inGasto, 5000);
+      hgAplicarMascaraMoeda(inPatrimonio, 0);
+      hgAplicarMascaraMoeda(inAporte, 1000);
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function calcular() {
+        const gastoMensal = hgValorMascarado(inGasto);
+        const patrimonioAtual = Math.max(0, hgValorMascarado(inPatrimonio));
+        const aporteMensal = Math.max(0, hgValorMascarado(inAporte));
+        const taxaAnual = parseFloat((inTaxaJuros.value || '0').replace(',', '.')) || 0;
+        const taxaRetiradaAnual = parseFloat((inTaxaRetirada.value || '0').replace(',', '.')) || 0;
+
+        if (!gastoMensal || gastoMensal <= 0) {
+          resultadoEl.innerHTML = '<p class="hg-status erro">Informe o gasto mensal desejado na independência.</p>';
+          return;
+        }
+        if (taxaRetiradaAnual <= 0) {
+          resultadoEl.innerHTML = '<p class="hg-status erro">A taxa de retirada precisa ser maior que zero.</p>';
+          return;
+        }
+
+        // Patrimônio necessário = quanto, sacando a "taxa de retirada" ao
+        // ano, gera o gasto mensal desejado sem esgotar o principal.
+        const patrimonioNecessario = (gastoMensal * 12) / (taxaRetiradaAnual / 100);
+
+        const taxaMensal = Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
+        const LIMITE_MESES = 1200; // 100 anos — teto de segurança pro loop
+        let saldo = patrimonioAtual;
+        let meses = 0;
+        if (saldo < patrimonioNecessario) {
+          while (saldo < patrimonioNecessario && meses < LIMITE_MESES) {
+            saldo = saldo * (1 + taxaMensal) + aporteMensal;
+            meses++;
+          }
+        }
+
+        if (saldo < patrimonioNecessario) {
+          resultadoEl.innerHTML = `
+            <div class="calc-resultado-card">
+              <div class="calc-resultado-linha">
+                <span>Patrimônio necessário para o FIRE</span>
+                <strong>${hgFormatMoeda(patrimonioNecessario)}</strong>
+              </div>
+            </div>
+            <p class="calc-ajuda" style="margin-top:10px;">
+              Com o aporte mensal informado, não dá pra alcançar esse patrimônio em menos de 100 anos. Tente aumentar o
+              aporte mensal, mirar um gasto mensal menor na independência, ou aceitar uma taxa de retirada um pouco maior.
+            </p>`;
+          return;
+        }
+
+        const anos = Math.floor(meses / 12);
+        const mesesRestantes = meses % 12;
+        const dataAlvo = new Date();
+        dataAlvo.setMonth(dataAlvo.getMonth() + meses);
+        const dataAlvoFmt = dataAlvo.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+        resultadoEl.innerHTML = `
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha">
+              <span>Patrimônio necessário para o FIRE</span>
+              <strong>${hgFormatMoeda(patrimonioNecessario)}</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Tempo até atingir</span>
+              <strong>${meses === 0 ? 'Você já atingiu! 🎉' : `${anos} ano${anos !== 1 ? 's' : ''}${mesesRestantes > 0 ? ` e ${mesesRestantes} ${mesesRestantes === 1 ? 'mês' : 'meses'}` : ''}`}</strong>
+            </div>
+            ${meses > 0 ? `
+            <div class="calc-resultado-linha">
+              <span>Mês/ano estimado</span>
+              <strong>${dataAlvoFmt.charAt(0).toUpperCase()}${dataAlvoFmt.slice(1)}</strong>
+            </div>` : ''}
+            <div class="calc-resultado-linha calc-destaque">
+              <span>Renda mensal na independência</span>
+              <strong>${hgFormatMoeda(gastoMensal)}</strong>
+            </div>
+          </div>
+          <p class="calc-ajuda" style="margin-top:10px;">
+            Cálculo: patrimônio necessário = (gasto mensal × 12) ÷ taxa de retirada anual — depois projeta quanto tempo
+            leva pra chegar lá com juros compostos mensais, considerando o patrimônio atual e o aporte mensal informados.
+            Simulação educativa, sem considerar inflação, impostos ou mudanças na taxa de retorno ao longo do tempo.
+          </p>`;
+      }
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
     })();
 
     // ============================================================
@@ -3793,6 +3981,7 @@
         'valor-patrimonial': 'Valor Patrimonial = soma de todos os imóveis, direitos e recursos que pertencem ao fundo (FII), refletindo o patrimônio líquido total do fundo.',
         'dy-fii': 'Dividend Yield (DY) = quanto o fundo imobiliário pagou de rendimentos aos cotistas nos últimos 12 meses, em relação à cotação atual da cota.\n\nCálculo: rendimentos pagos em 12 meses / cotação atual × 100',
         'mais-negociados': '"Mais Negociados" = fundos imobiliários com maior liquidez diária (volume financeiro médio negociado por dia), o que facilita comprar e vender cotas sem grandes variações de preço.',
+        'taxa-retirada-fire': 'Taxa de retirada = percentual do patrimônio que você saca por ano, na teoria sem nunca "zerar" o patrimônio no longo prazo (o rendimento repõe o que foi retirado).\n\n4% ao ano é a referência mais usada (conhecida como "regra dos 4%", baseada no estudo Trinity). Taxas menores (ex: 3%) são mais conservadoras — o patrimônio necessário fica maior, mas o risco de ficar sem dinheiro é menor.',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
@@ -4948,6 +5137,9 @@
           localStorage.setItem('viverderenda_tema', 'light');
         }
         atualizarIcone();
+        // Avisa os gráficos já abertos (Chart.js) pra se redesenharem com
+        // as cores do novo tema, sem precisar mexer nos controles de novo.
+        window.dispatchEvent(new CustomEvent('hg-tema-mudou'));
       });
       atualizarIcone();
     })();
@@ -5630,15 +5822,15 @@
           data: {
             labels: labelsSaldo,
             datasets: [
-              { label: 'Saldo devedor', data: saldoSerie, borderColor: HG_COR_PRIMARIA, backgroundColor: 'rgba(49,195,255,0.12)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.15 },
+              { label: 'Saldo devedor', data: saldoSerie, borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true, borderWidth: 2, pointRadius: 0, tension: 0.15 },
             ],
           },
           options: {
             responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
-              x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
-              y: { ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+              x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED() }, grid: { display: false } },
+              y: { ticks: { color: HG_COR_MUTED(), callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID() } },
             },
           },
         });
@@ -5648,16 +5840,16 @@
           data: {
             labels: labelsBarras,
             datasets: [
-              { label: 'Amortização', data: amortPeriodo, backgroundColor: HG_COR_ACCENT, stack: 's' },
-              { label: 'Juros', data: jurosPeriodo, backgroundColor: HG_COR_PRIMARIA, stack: 's' },
+              { label: 'Amortização', data: amortPeriodo, backgroundColor: HG_COR_ACCENT(), stack: 's' },
+              { label: 'Juros', data: jurosPeriodo, backgroundColor: HG_COR_PRIMARIA(), stack: 's' },
             ],
           },
           options: {
             responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
-              x: { stacked: true, ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
-              y: { stacked: true, ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+              x: { stacked: true, ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED() }, grid: { display: false } },
+              y: { stacked: true, ticks: { color: HG_COR_MUTED(), callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID() } },
             },
           },
         });
@@ -5785,6 +5977,10 @@
 
         montarGraficosFinanc(linhas);
       }
+
+      window.addEventListener('hg-tema-mudou', () => {
+        if (ultimaSimulacao?.linhas) montarGraficosFinanc(ultimaSimulacao.linhas);
+      });
 
       // Monta o documento (título + tabela de resumo) na área escondida de
       // impressão e chama o diálogo de impressão do navegador — de lá, o
@@ -6188,16 +6384,16 @@
           data: {
             labels,
             datasets: [
-              { label: 'Montante total', data: montanteSerie, borderColor: HG_COR_PRIMARIA, backgroundColor: 'rgba(49,195,255,0.12)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.25 },
-              { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_ACCENT, borderDash: [5, 4], borderWidth: 2, pointRadius: 0, tension: 0.1, fill: false },
+              { label: 'Montante total', data: montanteSerie, borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true, borderWidth: 2, pointRadius: 0, tension: 0.25 },
+              { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_ACCENT(), borderDash: [5, 4], borderWidth: 2, pointRadius: 0, tension: 0.1, fill: false },
             ],
           },
           options: {
             responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
-              x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
-              y: { ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+              x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED() }, grid: { display: false } },
+              y: { ticks: { color: HG_COR_MUTED(), callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID() } },
             },
           },
         });
@@ -6207,16 +6403,16 @@
           data: {
             labels: labels.slice(1),
             datasets: [
-              { label: 'Aportes', data: aportesPeriodo, backgroundColor: HG_COR_ACCENT, stack: 's' },
-              { label: 'Juros', data: jurosPeriodo, backgroundColor: HG_COR_PRIMARIA, stack: 's' },
+              { label: 'Aportes', data: aportesPeriodo, backgroundColor: HG_COR_ACCENT(), stack: 's' },
+              { label: 'Juros', data: jurosPeriodo, backgroundColor: HG_COR_PRIMARIA(), stack: 's' },
             ],
           },
           options: {
             responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
-              x: { stacked: true, ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
-              y: { stacked: true, ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+              x: { stacked: true, ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED() }, grid: { display: false } },
+              y: { stacked: true, ticks: { color: HG_COR_MUTED(), callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID() } },
             },
           },
         });
@@ -6264,6 +6460,8 @@
 
         montarGraficos(valorInicial, aporteMensal, taxaMensal, meses);
       }
+
+      window.addEventListener('hg-tema-mudou', () => { if (jcChartLinha) calcular(); });
 
       btnAbrirMenu.addEventListener('click', () => {
         if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
@@ -6686,16 +6884,16 @@
           data: {
             labels,
             datasets: [
-              { label: 'Capital projetado', data: capitalSerie, borderColor: HG_COR_PRIMARIA, backgroundColor: 'rgba(49,195,255,0.12)', fill: true, borderWidth: 2, pointRadius: 0, tension: 0.25 },
-              { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_ACCENT, borderDash: [5, 4], borderWidth: 2, pointRadius: 0, tension: 0.1, fill: false },
+              { label: 'Capital projetado', data: capitalSerie, borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true, borderWidth: 2, pointRadius: 0, tension: 0.25 },
+              { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_ACCENT(), borderDash: [5, 4], borderWidth: 2, pointRadius: 0, tension: 0.1, fill: false },
             ],
           },
           options: {
             responsive: true, maintainAspectRatio: false, animation: false,
             plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
             scales: {
-              x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED }, grid: { display: false } },
-              y: { ticks: { color: HG_COR_MUTED, callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID } },
+              x: { ticks: { autoSkip: true, maxTicksLimit: 8, color: HG_COR_MUTED() }, grid: { display: false } },
+              y: { ticks: { color: HG_COR_MUTED(), callback: hgFormatCompactoEixo }, grid: { color: HG_COR_GRID() } },
             },
           },
         });
@@ -6814,6 +7012,10 @@
 
         montarGraficoRp(PV, PMT, i, n);
       }
+
+      window.addEventListener('hg-tema-mudou', () => {
+        if (ultimoCalculoRp) montarGraficoRp(ultimoCalculoRp.PV, ultimoCalculoRp.PMT, ultimoCalculoRp.i, ultimoCalculoRp.n);
+      });
 
       function limparCampoMoeda(input) {
         input.value = '';
