@@ -2309,7 +2309,7 @@
             <div class="sim-visual-extremos"><span>1 ano</span><span>40 anos</span></div>
           </div>
           <div class="sim-visual-controle">
-            <div class="sim-visual-controle-topo"><span>Taxa de retirada mensal</span><strong id="svRetiradaOut">0,5%</strong></div>
+            <div class="sim-visual-controle-topo"><span>Taxa de retirada mensal <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="taxa-retirada-sv" aria-label="O que é a taxa de retirada mensal?" title="O que é a taxa de retirada mensal?">?</button></span><strong id="svRetiradaOut">0,5%</strong></div>
             <input type="range" id="svRetirada" min="0.3" max="1" step="0.05" value="0.5" class="sim-visual-slider" />
             <div class="sim-visual-extremos"><span>0,3%</span><span>1%</span></div>
           </div>
@@ -4059,6 +4059,7 @@
         'valor-patrimonial': 'Valor Patrimonial = soma de todos os imóveis, direitos e recursos que pertencem ao fundo (FII), refletindo o patrimônio líquido total do fundo.',
         'dy-fii': 'Dividend Yield (DY) = quanto o fundo imobiliário pagou de rendimentos aos cotistas nos últimos 12 meses, em relação à cotação atual da cota.\n\nCálculo: rendimentos pagos em 12 meses / cotação atual × 100',
         'mais-negociados': '"Mais Negociados" = fundos imobiliários com maior liquidez diária (volume financeiro médio negociado por dia), o que facilita comprar e vender cotas sem grandes variações de preço.',
+        'taxa-retirada-sv': 'Taxa de retirada mensal = percentual do patrimônio acumulado que você "saca" todo mês, em tese sem nunca esgotar o principal (o rendimento repõe o que foi retirado).\n\nCálculo: Renda passiva/mês = Patrimônio final × Taxa de retirada mensal.\n\nÉ a versão mensal da "regra dos 4% ao ano" (4% ÷ 12 ≈ 0,33% ao mês). Taxas menores (perto de 0,3%) são mais conservadoras — o patrimônio dura mais, mas a renda mensal é menor. Taxas maiores (perto de 1%) dão mais renda agora, mas arriscam corroer o patrimônio se o rendimento real ficar abaixo disso.',
         'taxa-retirada-fire': 'Taxa de retirada = percentual do patrimônio que você saca por ano, na teoria sem nunca "zerar" o patrimônio no longo prazo (o rendimento repõe o que foi retirado).\n\n4% ao ano é a referência mais usada (conhecida como "regra dos 4%", baseada no estudo Trinity). Taxas menores (ex: 3%) são mais conservadoras — o patrimônio necessário fica maior, mas o risco de ficar sem dinheiro é menor.',
       };
 
