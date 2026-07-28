@@ -2280,16 +2280,20 @@
 
 
     <!-- SIMULADOR VISUAL DE JUROS COMPOSTOS (com controles deslizantes),
-         exibido direto na página, antes da seção "Explore o mercado". -->
+         exibido direto na página, antes da seção "Explore o mercado".
+         Duas fases: aportes (acumulação) e retirada (parte do rendimento
+         é sacada pra viver, parte fica reinvestida — o principal nunca é
+         tocado diretamente). -->
     <section class="hg-busca" id="simuladorVisual" style="padding-top:0;">
       <div class="hg-painel sim-visual-painel">
         <h2 class="hg-titulo" style="margin-bottom:6px;">📈 Veja o poder dos juros compostos</h2>
         <p class="calc-ajuda" style="margin:0 0 18px;">
-          Arraste os controles abaixo e veja, em tempo real, como um aporte mensal constante se transforma em patrimônio ao
-          longo do tempo — e quanto desse patrimônio poderia virar renda passiva todo mês. A linha <strong>cheia</strong>
-          mostra o total acumulado (com o efeito dos juros compostos); a linha <strong>tracejada</strong> mostra só a soma
-          do que você colocou do próprio bolso, sem nenhum rendimento — a diferença entre as duas é o quanto os juros
-          "trabalharam" por você.
+          Arraste os controles abaixo e veja, em tempo real, duas fases da sua jornada: primeiro os <strong>anos de
+          aporte</strong> (você deposita todo mês, do salário, e o patrimônio cresce com os juros compostos); depois os
+          <strong>anos de retirada</strong> (os aportes param e você passa a viver do patrimônio) — mas sem tocar no
+          principal diretamente: todo mês calculamos o rendimento gerado, você escolhe quanto reinveste e quanto retira
+          pra viver. A cor <strong>azul</strong> do gráfico mostra a fase de aportes; a <strong>laranja</strong> mostra a
+          fase de retirada.
         </p>
 
         <div class="sim-visual-controles">
@@ -2304,44 +2308,53 @@
             <div class="sim-visual-extremos"><span>4%</span><span>16%</span></div>
           </div>
           <div class="sim-visual-controle">
-            <div class="sim-visual-controle-topo"><span>Prazo</span><strong id="svPrazoOut">15 anos</strong></div>
-            <input type="range" id="svPrazo" min="1" max="40" step="1" value="15" class="sim-visual-slider" />
+            <div class="sim-visual-controle-topo"><span>Anos de aporte</span><strong id="svAnosAporteOut">20 anos</strong></div>
+            <input type="range" id="svAnosAporte" min="1" max="40" step="1" value="20" class="sim-visual-slider" />
             <div class="sim-visual-extremos"><span>1 ano</span><span>40 anos</span></div>
           </div>
           <div class="sim-visual-controle">
-            <div class="sim-visual-controle-topo"><span>Taxa de retirada mensal <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="taxa-retirada-sv" aria-label="O que é a taxa de retirada mensal?" title="O que é a taxa de retirada mensal?">?</button></span><strong id="svRetiradaOut">0,5%</strong></div>
-            <input type="range" id="svRetirada" min="0.3" max="1" step="0.05" value="0.5" class="sim-visual-slider" />
-            <div class="sim-visual-extremos"><span>0,3%</span><span>1%</span></div>
+            <div class="sim-visual-controle-topo"><span>Anos de retirada</span><strong id="svAnosRetiradaOut">10 anos</strong></div>
+            <input type="range" id="svAnosRetirada" min="1" max="40" step="1" value="10" class="sim-visual-slider" />
+            <div class="sim-visual-extremos"><span>1 ano</span><span>40 anos</span></div>
+          </div>
+          <div class="sim-visual-controle" style="grid-column: 1 / -1;">
+            <div class="sim-visual-controle-topo">
+              <span>% do rendimento reinvestido na fase de retirada <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="taxa-retirada-sv" aria-label="O que é isso?" title="O que é isso?">?</button></span>
+              <strong id="svReinvesteOut">50%</strong>
+            </div>
+            <input type="range" id="svReinveste" min="0" max="100" step="5" value="50" class="sim-visual-slider" />
+            <div class="sim-visual-extremos"><span>0% (saca tudo)</span><span>100% (reinveste tudo)</span></div>
           </div>
         </div>
 
         <div class="sim-visual-cards">
           <div class="sim-visual-card">
-            <span>Total investido</span>
-            <strong id="svTotalInvestido">—</strong>
+            <span>Patrimônio no fim dos aportes</span>
+            <strong id="svPatrimonioPico">—</strong>
           </div>
           <div class="sim-visual-card sim-visual-card-destaque">
-            <span>Patrimônio final</span>
-            <strong id="svPatrimonioFinal">—</strong>
+            <span>Retirada inicial/mês</span>
+            <strong id="svRendaPassiva">—</strong>
           </div>
           <div class="sim-visual-card">
-            <span>Renda passiva/mês</span>
-            <strong id="svRendaPassiva">—</strong>
+            <span>Patrimônio no final</span>
+            <strong id="svPatrimonioFinal">—</strong>
           </div>
         </div>
 
         <div class="hg-grafico-legenda" style="margin-top:18px;">
-          <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Patrimônio acumulado</span>
-          <span><span class="hg-grafico-legenda-cor" style="background:#a9b6d3; border-radius:0; height:2px; width:14px;"></span>Total investido (sem juros)</span>
+          <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Fase de aportes</span>
+          <span><span class="hg-grafico-legenda-cor" style="background:#ffb84d;"></span>Fase de retirada</span>
         </div>
         <div class="hg-grafico-wrap" style="height:280px;">
-          <canvas id="svChart" role="img" aria-label="Gráfico de área mostrando o crescimento do patrimônio com juros compostos comparado ao total investido">Gráfico de evolução do patrimônio com juros compostos.</canvas>
+          <canvas id="svChart" role="img" aria-label="Gráfico de área mostrando o patrimônio crescendo na fase de aportes e continuando a evoluir na fase de retirada, onde parte do rendimento é reinvestido">Gráfico de evolução do patrimônio com aportes e depois retirada parcial dos rendimentos.</canvas>
         </div>
 
         <p class="calc-ajuda" style="margin-top:14px;">
-          <strong>Como a renda passiva é calculada:</strong> patrimônio final × taxa de retirada mensal. É a mesma lógica
-          por trás da "regra dos 4% ao ano" (≈ 0,33% ao mês) usada em planejamento de aposentadoria — aqui você pode
-          ajustar essa taxa livremente para ver cenários mais ou menos conservadores.
+          <strong>Como funciona a fase de retirada:</strong> o principal nunca é sacado diretamente. Todo mês calculamos
+          o rendimento gerado pelo patrimônio daquele mês; a fração que você escolher fica reinvestida, e o restante vira
+          a "retirada" pra viver. Por isso o patrimônio final tende a continuar subindo (mais devagar) em vez de cair —
+          quanto menor a % reinvestida, maior a retirada mensal, mas menor o crescimento futuro do patrimônio.
           Simulação educativa, com juros compostos mensais, sem considerar inflação, taxas ou impostos.
         </p>
       </div>
@@ -3529,21 +3542,25 @@
 
     // ============================================================
     // SIMULADOR VISUAL DE JUROS COMPOSTOS (sliders, antes de "Explore o
-    // mercado"). Recalcula e redesenha o gráfico a cada movimento dos
-    // controles, sem precisar clicar em nenhum botão "calcular".
+    // mercado"). Duas fases: aportes (acumulação) e retirada (parte do
+    // rendimento mensal é reinvestida, parte é retirada pra viver — o
+    // principal nunca é sacado diretamente). Recalcula e redesenha o
+    // gráfico a cada movimento dos controles.
     // ============================================================
     (function () {
       const elAporte = document.getElementById('svAporte');
       const elTaxa = document.getElementById('svTaxa');
-      const elPrazo = document.getElementById('svPrazo');
-      const elRetirada = document.getElementById('svRetirada');
+      const elAnosAporte = document.getElementById('svAnosAporte');
+      const elAnosRetirada = document.getElementById('svAnosRetirada');
+      const elReinveste = document.getElementById('svReinveste');
       if (!elAporte) return;
 
       const outAporte = document.getElementById('svAporteOut');
       const outTaxa = document.getElementById('svTaxaOut');
-      const outPrazo = document.getElementById('svPrazoOut');
-      const outRetirada = document.getElementById('svRetiradaOut');
-      const outTotalInvestido = document.getElementById('svTotalInvestido');
+      const outAnosAporte = document.getElementById('svAnosAporteOut');
+      const outAnosRetirada = document.getElementById('svAnosRetiradaOut');
+      const outReinveste = document.getElementById('svReinvesteOut');
+      const outPatrimonioPico = document.getElementById('svPatrimonioPico');
       const outPatrimonioFinal = document.getElementById('svPatrimonioFinal');
       const outRendaPassiva = document.getElementById('svRendaPassiva');
 
@@ -3557,39 +3574,55 @@
       async function recalcular() {
         const aporte = Number(elAporte.value);
         const taxaAnual = Number(elTaxa.value);
-        const anos = Number(elPrazo.value);
-        const retiradaMensal = Number(elRetirada.value);
-        const meses = anos * 12;
+        const anosAporte = Number(elAnosAporte.value);
+        const anosRetirada = Number(elAnosRetirada.value);
+        const fracReinveste = Number(elReinveste.value) / 100;
         const taxaMensal = Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
 
         outAporte.textContent = fmt(aporte);
         outTaxa.textContent = `${taxaAnual.toLocaleString('pt-BR', { minimumFractionDigits: taxaAnual % 1 === 0 ? 0 : 1 })}%`;
-        outPrazo.textContent = `${anos} ${anos === 1 ? 'ano' : 'anos'}`;
-        outRetirada.textContent = `${retiradaMensal.toLocaleString('pt-BR', { minimumFractionDigits: 1 })}%`;
+        outAnosAporte.textContent = `${anosAporte} ${anosAporte === 1 ? 'ano' : 'anos'}`;
+        outAnosRetirada.textContent = `${anosRetirada} ${anosRetirada === 1 ? 'ano' : 'anos'}`;
+        outReinveste.textContent = `${Number(elReinveste.value)}%`;
+
+        const mesesAporte = anosAporte * 12;
+        const mesesRetirada = anosRetirada * 12;
+        const totalMeses = mesesAporte + mesesRetirada;
 
         // Agrupa por ano para o gráfico não ficar com centenas de pontos
-        // em prazos longos.
+        // em prazos longos. Duas séries (aporte/retirada) compartilham o
+        // ponto de transição, criando a mudança de cor no gráfico.
         const labels = ['0'];
-        const patrimonioSerie = [0];
-        const investidoSerie = [0];
+        const serieAporte = [0];
+        const serieRetirada = [null];
+
         let saldo = 0;
-        let investido = 0;
-        for (let m = 1; m <= meses; m++) {
-          saldo = saldo * (1 + taxaMensal) + aporte;
-          investido += aporte;
-          if (m % 12 === 0 || m === meses) {
+        let primeiraRetirada = null;
+
+        for (let m = 1; m <= totalMeses; m++) {
+          if (m <= mesesAporte) {
+            saldo = saldo * (1 + taxaMensal) + aporte;
+          } else {
+            const rendimento = saldo * taxaMensal;
+            const retirado = rendimento * (1 - fracReinveste);
+            const reinvestido = rendimento * fracReinveste;
+            if (primeiraRetirada === null) primeiraRetirada = retirado;
+            saldo = saldo + reinvestido;
+          }
+
+          if (m % 12 === 0 || m === mesesAporte || m === totalMeses) {
             labels.push(String(Math.round(m / 12)));
-            patrimonioSerie.push(saldo);
-            investidoSerie.push(investido);
+            serieAporte.push(m <= mesesAporte ? saldo : null);
+            serieRetirada.push(m >= mesesAporte ? saldo : null);
           }
         }
 
+        const patrimonioPico = serieAporte.filter(v => v !== null).slice(-1)[0] ?? 0;
         const patrimonioFinal = saldo;
-        const rendaPassiva = patrimonioFinal * (retiradaMensal / 100);
 
-        outTotalInvestido.textContent = fmt(investido);
+        outPatrimonioPico.textContent = fmt(patrimonioPico);
         outPatrimonioFinal.textContent = fmt(patrimonioFinal);
-        outRendaPassiva.textContent = fmt(rendaPassiva);
+        outRendaPassiva.textContent = mesesRetirada > 0 ? `${fmt(primeiraRetirada || 0)}/mês` : '—';
 
         if (recalculando) return; // evita recriar o Chart.js várias vezes em paralelo
         recalculando = true;
@@ -3602,8 +3635,8 @@
             data: {
               labels,
               datasets: [
-                { label: 'Patrimônio acumulado', data: patrimonioSerie, borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.25 },
-                { label: 'Total investido', data: investidoSerie, borderColor: HG_COR_MUTED(), borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, tension: 0.1, fill: false },
+                { label: 'Fase de aportes', data: serieAporte, borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.2, spanGaps: false },
+                { label: 'Fase de retirada', data: serieRetirada, borderColor: '#ffb84d', backgroundColor: 'rgba(255,184,77,0.15)', fill: true, borderWidth: 2.5, pointRadius: 0, tension: 0.2, spanGaps: false },
               ],
             },
             options: {
@@ -3620,7 +3653,7 @@
         }
       }
 
-      [elAporte, elTaxa, elPrazo, elRetirada].forEach(el => el.addEventListener('input', recalcular));
+      [elAporte, elTaxa, elAnosAporte, elAnosRetirada, elReinveste].forEach(el => el.addEventListener('input', recalcular));
       window.addEventListener('hg-tema-mudou', () => { if (svChart) recalcular(); });
       recalcular();
     })();
@@ -4059,7 +4092,7 @@
         'valor-patrimonial': 'Valor Patrimonial = soma de todos os imóveis, direitos e recursos que pertencem ao fundo (FII), refletindo o patrimônio líquido total do fundo.',
         'dy-fii': 'Dividend Yield (DY) = quanto o fundo imobiliário pagou de rendimentos aos cotistas nos últimos 12 meses, em relação à cotação atual da cota.\n\nCálculo: rendimentos pagos em 12 meses / cotação atual × 100',
         'mais-negociados': '"Mais Negociados" = fundos imobiliários com maior liquidez diária (volume financeiro médio negociado por dia), o que facilita comprar e vender cotas sem grandes variações de preço.',
-        'taxa-retirada-sv': 'Taxa de retirada mensal = percentual do patrimônio acumulado que você "saca" todo mês, em tese sem nunca esgotar o principal (o rendimento repõe o que foi retirado).\n\nCálculo: Renda passiva/mês = Patrimônio final × Taxa de retirada mensal.\n\nÉ a versão mensal da "regra dos 4% ao ano" (4% ÷ 12 ≈ 0,33% ao mês). Taxas menores (perto de 0,3%) são mais conservadoras — o patrimônio dura mais, mas a renda mensal é menor. Taxas maiores (perto de 1%) dão mais renda agora, mas arriscam corroer o patrimônio se o rendimento real ficar abaixo disso.',
+        'taxa-retirada-sv': '% do rendimento reinvestido = na fase de retirada, o principal nunca é sacado diretamente. Todo mês calculamos o rendimento que o patrimônio gerou naquele mês, e essa % é a fatia que fica reinvestida — o restante vira a retirada mensal pra viver.\n\nExemplo: com 50% reinvestido, metade do rendimento do mês continua investida (o patrimônio ainda cresce, só que mais devagar) e a outra metade você retira.\n\n0% reinvestido = você saca o rendimento inteiro (patrimônio fica estável). 100% reinvestido = você não retira nada (patrimônio continua crescendo igual à fase de aportes, só sem dinheiro novo entrando).',
         'taxa-retirada-fire': 'Taxa de retirada = percentual do patrimônio que você saca por ano, na teoria sem nunca "zerar" o patrimônio no longo prazo (o rendimento repõe o que foi retirado).\n\n4% ao ano é a referência mais usada (conhecida como "regra dos 4%", baseada no estudo Trinity). Taxas menores (ex: 3%) são mais conservadoras — o patrimônio necessário fica maior, mas o risco de ficar sem dinheiro é menor.',
       };
 
