@@ -2244,45 +2244,6 @@
         <div class="panel-title explorar"><span class="dot"></span> Explore o mercado</div>
         <div class="search-container">
           <div class="ranking-block">
-            <h3 class="ranking-section-title">🏅 Rankings de Ativos — Ações</h3>
-
-            <div class="ranking-acoes-colunas">
-              <div class="ranking-coluna">
-                <h4 class="ranking-title"><span class="ranking-title-texto">💰 Maior Dividend Yield</span> <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="dy-acoes" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></h4>
-                <div class="ranking-list" id="rankingDy">
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                </div>
-              </div>
-
-              <div class="ranking-coluna">
-                <h4 class="ranking-title"><span class="ranking-title-texto">📈 Maior Valor de Mercado</span> <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="valor-mercado" aria-label="O que é Valor de Mercado?" title="O que é Valor de Mercado?">?</button></h4>
-                <div class="ranking-list" id="rankingValorMercado">
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                </div>
-              </div>
-
-              <div class="ranking-coluna">
-                <h4 class="ranking-title"><span class="ranking-title-texto">📄 Maior Receita</span> <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="receita" aria-label="O que é Receita?" title="O que é Receita?">?</button></h4>
-                <div class="ranking-list" id="rankingReceita">
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                  <div class="ranking-row skeleton"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="ranking-block">
             <h3 class="ranking-section-title">🏢 Rankings de Ativos — FIIs</h3>
 
             <div class="ranking-acoes-colunas">
@@ -4702,6 +4663,7 @@
 
     function renderizarRankingMetrica(elId, lista, formato) {
       const listEl = document.getElementById(elId);
+      if (!listEl) return; // seção removida do HTML (ex: Rankings de Ações)
       if (!Array.isArray(lista) || lista.length === 0) {
         listEl.innerHTML = '<div class="ranking-row"><span class="ranking-nome">Ranking ainda não gerado — aguarde o robô rodar.</span></div>';
         return;
