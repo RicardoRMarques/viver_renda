@@ -2367,6 +2367,13 @@
           claramente, com a curva caindo até zero).
           Simulação educativa, com juros compostos mensais, sem considerar inflação, taxas ou impostos.
         </p>
+
+        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+          <button type="button" class="cmp-btn-secundario" id="svBtnCompartilhar" style="flex:0 0 auto;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            Compartilhar gráfico
+          </button>
+        </div>
       </div>
     </section>
 
@@ -3693,6 +3700,84 @@
           recalculando = false;
         }
       }
+
+      // Compartilha o gráfico atual como imagem (com um resumo em texto),
+      // Compartilha um LINK do próprio site (com os valores simulados como
+      // parâmetros na URL), em vez de só uma imagem estática — assim quem
+      // recebe abre o site de verdade, já com a simulação carregada e
+      // rolado até o gráfico, podendo navegar pelo resto do site também.
+      // A imagem do gráfico ainda vai junto como anexo, quando o
+      // dispositivo suporta compartilhar arquivo + link ao mesmo tempo.
+      const btnCompartilhar = document.getElementById('svBtnCompartilhar');
+
+      function montarUrlCompartilhavel() {
+        const params = new URLSearchParams({
+          sv_aporte: elAporte.value,
+          sv_taxa: elTaxa.value,
+          sv_anosAporte: elAnosAporte.value,
+          sv_anosRetirada: elAnosRetirada.value,
+          sv_retirada: elReinveste.value,
+        });
+        const base = `${window.location.origin}${window.location.pathname}`;
+        return `${base}?${params.toString()}#simuladorVisual`;
+      }
+
+      async function compartilharGrafico() {
+        if (!svChart) return;
+
+        const anosAporte = elAnosAporte.value;
+        const anosRetirada = elAnosRetirada.value;
+        const url = montarUrlCompartilhavel();
+        const texto = `📈 Simulei ${anosAporte} anos de aportes + ${anosRetirada} anos de retirada no simulador de juros compostos da Dividendos | Viver de Renda.\n\nPatrimônio no fim dos aportes: ${outPatrimonioPico.textContent}\nRetirada mensal: ${outRendaPassiva.textContent}\nPatrimônio final: ${outPatrimonioFinal.textContent}\n\nAbra o link pra ver o gráfico interativo e mexer nos números você mesmo:`;
+
+        const dataUrl = document.getElementById('svChart').toDataURL('image/png', 1);
+        const blob = await (await fetch(dataUrl)).blob();
+        const arquivo = new File([blob], 'juros-compostos.png', { type: 'image/png' });
+
+        // Tenta compartilhar texto + link + imagem juntos. Alguns apps
+        // (ex: WhatsApp) ignoram o "url" quando há arquivo anexado, então
+        // o link também vai dentro do texto, por garantia.
+        const textoComLink = `${texto}\n${url}`;
+        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Simulador de Juros Compostos', text: textoComLink, files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: 'Simulador de Juros Compostos', text: texto, url });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        // Fallback (desktop / navegadores sem Web Share API): abre o
+        // WhatsApp com o texto + link prontos.
+        window.open(`https://wa.me/?text=${encodeURIComponent(textoComLink)}`, '_blank');
+      }
+      if (btnCompartilhar) btnCompartilhar.addEventListener('click', compartilharGrafico);
+
+      // Se a página foi aberta a partir de um link compartilhado (com os
+      // parâmetros sv_*), pré-preenche os controles com os valores
+      // recebidos e rola suavemente até o simulador.
+      (function aplicarParametrosDaUrl() {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has('sv_aporte')) return;
+
+        if (params.has('sv_aporte')) elAporte.value = params.get('sv_aporte');
+        if (params.has('sv_taxa')) elTaxa.value = params.get('sv_taxa');
+        if (params.has('sv_anosAporte')) elAnosAporte.value = params.get('sv_anosAporte');
+        if (params.has('sv_anosRetirada')) elAnosRetirada.value = params.get('sv_anosRetirada');
+        if (params.has('sv_retirada')) elReinveste.value = params.get('sv_retirada');
+
+        recalcular().then(() => {
+          document.getElementById('simuladorVisual')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      })();
 
       [elAporte, elTaxa, elAnosAporte, elAnosRetirada, elReinveste].forEach(el => el.addEventListener('input', recalcular));
       window.addEventListener('hg-tema-mudou', () => { if (svChart) recalcular(); });
