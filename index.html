@@ -35,6 +35,7 @@
       --border: rgba(255,255,255,0.08);
       --shadow: 0 16px 40px rgba(0,0,0,0.28);
       --btn-text: #04101a;
+      --painel-bg: rgba(17,27,46,0.7);
     }
 
     html[data-theme="light"] {
@@ -53,6 +54,7 @@
       --border: rgba(15,30,60,0.1);
       --shadow: 0 12px 30px rgba(20,40,80,0.12);
       --btn-text: #ffffff;
+      --painel-bg: rgba(255,255,255,0.75);
     }
 
     * {
@@ -253,7 +255,7 @@
     .hg-subtitulo { color: var(--muted); font-size: 0.92rem; margin-bottom: 18px; }
 
     .hg-painel {
-      background: rgba(17,27,46,0.7);
+      background: var(--painel-bg);
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 24px;
