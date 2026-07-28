@@ -186,17 +186,24 @@ function montarTabelaAcoes(ranking) {
 // ---------- Montagem das notícias (top 3, vindas do noticias.json) ----------
 // Campos reais do noticias.json: { titulo, link, fonte, imagem } — não
 // existe um campo de resumo/descrição na fonte, por isso mostramos só a
-// fonte da notícia como texto de apoio.
+// fonte da notícia como texto de apoio. O título agora é um link clicável
+// pra matéria original, quando o campo "link" existe.
 function montarNoticiasHtml(noticias) {
   const lista = Array.isArray(noticias) ? noticias.slice(0, 3) : [];
   if (lista.length === 0) {
     return '<div class="news-item"><div class="n-title">Sem notícias disponíveis hoje</div></div>';
   }
-  return lista.map((n, i) => `
+  return lista.map((n, i) => {
+    const titulo = n.titulo || 'Sem título';
+    const tituloHtml = n.link
+      ? `<a href="${n.link}" target="_blank" rel="noopener noreferrer" class="n-link">${i + 1}. ${titulo}</a>`
+      : `${i + 1}. ${titulo}`;
+    return `
 <div class="news-item">
-  <div class="n-title">${i + 1}. ${n.titulo || 'Sem título'}</div>
+  <div class="n-title">${tituloHtml}</div>
   ${n.fonte ? `<div class="n-body">Fonte: ${n.fonte}</div>` : ''}
-</div>`).join('\n');
+</div>`;
+  }).join('\n');
 }
 
 // ---------- Bloco editorial (Destaques da Bolsa + Alerta de Risco) ----------
@@ -211,9 +218,10 @@ function carregarEditorial(noticias) {
   }
 
   // Fallback automático: usa as manchetes das notícias como "destaques"
-  // e um aviso genérico de risco (sempre válido, nunca trava a geração).
+  // (com link pra matéria, quando existir) e um aviso genérico de risco
+  // (sempre válido, nunca trava a geração).
   const destaquesFallback = (Array.isArray(noticias) ? noticias.slice(0, 4) : [])
-    .map(n => ({ titulo: n.titulo, obs: n.fonte || '' }));
+    .map(n => ({ titulo: n.titulo, obs: n.fonte || '', link: n.link || null }));
 
   return {
     destaques: destaquesFallback,
@@ -225,7 +233,12 @@ function montarDestaquesHtml(destaques) {
   if (!destaques || destaques.length === 0) {
     return '<div class="mover-row"><span class="tk">Sem destaques cadastrados hoje</span></div>';
   }
-  return destaques.map(d => `<div class="mover-row"><span class="tk">${d.titulo}</span>${d.obs ? `<span class="pct">${d.obs}</span>` : ''}</div>`).join('\n  ');
+  return destaques.map(d => {
+    const tituloHtml = d.link
+      ? `<a href="${d.link}" target="_blank" rel="noopener noreferrer" class="tk-link">${d.titulo}</a>`
+      : d.titulo;
+    return `<div class="mover-row"><span class="tk">${tituloHtml}</span>${d.obs ? `<span class="pct">${d.obs}</span>` : ''}</div>`;
+  }).join('\n  ');
 }
 
 // ---------- Template do boletim (mesmo layout do original) ----------
@@ -283,6 +296,8 @@ function montarHtml({ dataExtenso, dataFechamento, indicadoresHtml, destaquesHtm
   .mover-row .pct{font-family:'IBM Plex Mono',monospace;font-size:13px;}
   .news-item{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
   .news-item .n-title{font-weight:600;font-size:13.5px;margin-bottom:4px;}
+  .n-title a.n-link, .tk a.tk-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--gold); }
+  .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
   .alert b{color:var(--gold-soft);}
