@@ -3772,23 +3772,15 @@
           }
         }
 
-        // Fallback (desktop / navegadores sem Web Share API): forçar a
-        // abertura do WhatsApp é intrusivo demais (só funciona bem se a
-        // pessoa já tiver o WhatsApp Web logado, e nem todo mundo quer
-        // compartilhar especificamente por lá). Em vez disso, copia o
-        // texto + link pra área de transferência — a pessoa cola onde
-        // quiser (WhatsApp Web, e-mail, Slack, Telegram etc.).
-        try {
-          await navigator.clipboard.writeText(textoComLink);
-          if (botao) {
-            const textoOriginal = botao.innerHTML;
-            botao.innerHTML = '✅ Link copiado!';
-            setTimeout(() => { botao.innerHTML = textoOriginal; }, 2500);
-          }
-        } catch (e) {
-          // Navegador sem suporte à Clipboard API (raro): abre o
-          // WhatsApp como último recurso, já que copiar não funcionou.
-          window.open(`https://wa.me/?text=${encodeURIComponent(textoComLink)}`, '_blank');
+        // Fallback (desktop / navegadores sem Web Share API): abre o
+        // próprio link numa nova aba, já direto na seção do gráfico —
+        // simples e direto, sem depender de área de transferência nem
+        // forçar a abertura de um app específico como o WhatsApp.
+        window.open(url, '_blank');
+        if (botao) {
+          const textoOriginal = botao.innerHTML;
+          botao.innerHTML = '✅ Link aberto em nova aba!';
+          setTimeout(() => { botao.innerHTML = textoOriginal; }, 2500);
         }
       }
       if (btnCompartilhar) btnCompartilhar.addEventListener('click', (e) => compartilharGrafico(e.currentTarget));
@@ -3797,22 +3789,35 @@
       // código compacto ?s=...), pré-preenche os controles com os valores
       // recebidos e rola suavemente até o simulador.
       (function aplicarParametrosDaUrl() {
-        const params = new URLSearchParams(window.location.search);
-        const codigo = params.get('s');
-        if (!codigo) return;
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const codigo = params.get('s');
+          if (!codigo) return;
 
-        const valores = decodificarSimulacao(codigo);
-        if (!valores) return;
+          const valores = decodificarSimulacao(codigo);
+          if (!valores) return;
 
-        elAporte.value = valores.aporte;
-        elTaxa.value = valores.taxa;
-        elAnosAporte.value = valores.anosAporte;
-        elAnosRetirada.value = valores.anosRetirada;
-        elReinveste.value = valores.retirada;
+          // Limita os valores decodificados às mesmas faixas dos sliders,
+          // caso o link tenha sido editado/corrompido manualmente — evita
+          // valores absurdos (ex: 0 anos, taxa negativa) quebrarem o cálculo.
+          const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+          elAporte.value = clamp(valores.aporte, Number(elAporte.min), Number(elAporte.max));
+          elTaxa.value = clamp(valores.taxa, Number(elTaxa.min), Number(elTaxa.max));
+          elAnosAporte.value = clamp(valores.anosAporte, Number(elAnosAporte.min), Number(elAnosAporte.max));
+          elAnosRetirada.value = clamp(valores.anosRetirada, Number(elAnosRetirada.min), Number(elAnosRetirada.max));
+          elReinveste.value = clamp(valores.retirada, Number(elReinveste.min), Number(elReinveste.max));
 
-        recalcular().then(() => {
-          document.getElementById('simuladorVisual')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
+          recalcular()
+            .then(() => {
+              document.getElementById('simuladorVisual')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            })
+            .catch((e) => console.warn('[simulador visual] erro ao aplicar link compartilhado:', e));
+        } catch (e) {
+          // Nunca deixa um link malformado quebrar o resto da página —
+          // na dúvida, simplesmente ignora o parâmetro e segue com os
+          // valores padrão dos sliders.
+          console.warn('[simulador visual] link compartilhado inválido, ignorando:', e);
+        }
       })();
 
       [elAporte, elTaxa, elAnosAporte, elAnosRetirada, elReinveste].forEach(el => el.addEventListener('input', recalcular));
