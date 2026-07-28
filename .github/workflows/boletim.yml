@@ -2,12 +2,11 @@ name: Gerar Boletim de Mercado Diário
 
 on:
   schedule:
-    # 6h05 de Brasília = 9h05 UTC (Brasil não tem horário de verão desde
+    # 3h05 de Brasília = 6h05 UTC (Brasil não tem horário de verão desde
     # 2019, então esse horário é fixo o ano todo — não precisa ajustar
-    # depois). 5 minutos depois das 6h para dar tempo dos outros robôs
-    # (indices.json / noticias.json / ranking.json) terminarem antes.
+    # depois).
     # Roda de segunda (1) a sexta (5).
-    - cron: '5 9 * * 1-5'
+    - cron: '5 6 * * 1-5'
   workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
 
 # Evita que duas execuções rodem ao mesmo tempo e briguem pelo commit
