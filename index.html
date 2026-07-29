@@ -2235,8 +2235,12 @@
               </div>
             </div>
             <div class="calc-campo">
-              <label for="financDataInicio">Data de início</label>
-              <input type="month" id="financDataInicio" />
+              <label for="financMesInicio">Data de início</label>
+              <div class="calc-grid-2" style="gap:8px;">
+                <select id="financMesInicio"></select>
+                <select id="financAnoInicio"></select>
+              </div>
+              <input type="hidden" id="financDataInicio" />
             </div>
           </div>
 
@@ -6354,6 +6358,30 @@
       const btnFechar = document.getElementById('financFechar');
       const inValor = document.getElementById('financValor');
       const inDataInicio = document.getElementById('financDataInicio');
+      const selMesInicio = document.getElementById('financMesInicio');
+      const selAnoInicio = document.getElementById('financAnoInicio');
+
+      // Monta os selects de Mês/Ano em português (em vez do <input
+      // type="month"> nativo, que usa o idioma do navegador/SO — por isso
+      // aparecia "July" em inglês mesmo com o site todo em português).
+      const NOMES_MESES_FINANC_SELECT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+      selMesInicio.innerHTML = NOMES_MESES_FINANC_SELECT.map((nome, i) => `<option value="${i + 1}">${nome}</option>`).join('');
+
+      const anoAtualFinanc = new Date().getFullYear();
+      const anosFinanc = [];
+      for (let a = anoAtualFinanc - 2; a <= anoAtualFinanc + 10; a++) anosFinanc.push(a);
+      selAnoInicio.innerHTML = anosFinanc.map(a => `<option value="${a}">${a}</option>`).join('');
+
+      // Mantém o campo escondido (formato "AAAA-MM") sempre sincronizado
+      // com os dois selects visíveis — o resto do código já lê esse
+      // formato, então nada mais precisa mudar.
+      function sincronizarDataInicio() {
+        const mes = String(selMesInicio.value).padStart(2, '0');
+        inDataInicio.value = `${selAnoInicio.value}-${mes}`;
+      }
+      selMesInicio.addEventListener('change', sincronizarDataInicio);
+      selAnoInicio.addEventListener('change', sincronizarDataInicio);
+
       const selSistema = document.getElementById('financSistema');
       const inTaxa = document.getElementById('financTaxa');
       const selJurosPeriodo = document.getElementById('financJurosPeriodo');
@@ -6888,7 +6916,9 @@
       function abrirModal() {
         if (!inDataInicio.value) {
           const hoje = new Date();
-          inDataInicio.value = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}`;
+          selMesInicio.value = String(hoje.getMonth() + 1);
+          selAnoInicio.value = String(hoje.getFullYear());
+          sincronizarDataInicio();
         }
         overlay.hidden = false;
         document.body.style.overflow = 'hidden';
