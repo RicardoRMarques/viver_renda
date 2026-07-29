@@ -6743,10 +6743,15 @@
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.setTextColor(90);
+        const dataHoraFinanc = `${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
         doc.text(
-          `Valor financiado: ${hgFormatMoeda(s.valor)}  ·  Início: ${formatMesAno(s.anoInicio, s.mesInicio0)}  ·  ` +
-          `Gerado em ${new Date().toLocaleDateString('pt-BR')} — Dividendos | Viver de Renda`,
+          `Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHoraFinanc}`,
           40, 58
+        );
+        doc.setFontSize(8);
+        doc.text(
+          'Aviso: simulação aproximada e educacional, sem garantia de rentabilidade futura. Não substitui o cálculo oficial da sua corretora/banco.',
+          40, 70
         );
         doc.setTextColor(0);
 
@@ -6776,7 +6781,7 @@
         }
 
         doc.autoTable({
-          startY: 74,
+          startY: 88,
           head: [['', 'Valores estimados']],
           body: linhasResumo,
           theme: 'grid',
