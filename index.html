@@ -2110,7 +2110,7 @@
           </div>
 
           <div class="calc-campo" id="calcCampoIndexadorWrap" hidden>
-            <label for="calcIndexador">Indexador</label>
+            <label id="calcLabelIndexador" for="calcIndexador">Rentabilidade do CDB</label>
             <select id="calcIndexador">
               <option value="cdi">% do CDI</option>
               <option value="pre">Prefixado (a.a.)</option>
@@ -5745,6 +5745,7 @@
       const btnFechar = document.getElementById('calcFechar');
       const selTipo = document.getElementById('calcTipo');
       const campoIndexadorWrap = document.getElementById('calcCampoIndexadorWrap');
+      const labelIndexador = document.getElementById('calcLabelIndexador');
       const selIndexador = document.getElementById('calcIndexador');
       const inValorInicial = document.getElementById('calcValorInicial');
       const inAporte = document.getElementById('calcAporteMensal');
@@ -5862,6 +5863,9 @@
         const tipo = selTipo.value;
         const ehCdbOuLci = tipo === 'cdb' || tipo === 'lci';
         campoIndexadorWrap.hidden = !ehCdbOuLci;
+        if (ehCdbOuLci) {
+          labelIndexador.textContent = tipo === 'cdb' ? 'Rentabilidade do CDB' : 'Rentabilidade da LCI/LCA';
+        }
         const indexador = ehCdbOuLci ? selIndexador.value : null;
 
         if (ehCdbOuLci && indexador === 'cdi') {
