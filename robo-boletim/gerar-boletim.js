@@ -256,7 +256,7 @@ function montarDestaquesHtml(destaques) {
 }
 
 // ---------- Template do boletim (mesmo layout do original) ----------
-function montarHtml({ dataExtenso, dataFechamento, indicadoresHtml, destaquesHtml, tabelaFiisHtml, tabelaAcoesHtml, noticiasHtml, alertaTexto }) {
+function montarHtml({ dataExtenso, indicadoresHtml, destaquesHtml, tabelaFiisHtml, tabelaAcoesHtml, noticiasHtml, alertaTexto }) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -332,7 +332,6 @@ function montarHtml({ dataExtenso, dataFechamento, indicadoresHtml, destaquesHtm
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
   <div class="sub">Boletim de Mercado · ${dataExtenso}</div>
-  <div class="sub" style="margin-top:2px;opacity:0.8;">Dados referentes ao fechamento de ${dataFechamento}</div>
 </header>
 
 <h2 class="section">Indicadores Principais</h2>
@@ -457,11 +456,6 @@ function main() {
   const dataArquivo = formatarDataArquivo(agora); // DD-MM-AAAA
   const dataExtenso = formatarDataExtenso(agora);
 
-  // "Fechamento" = último dia útil antes de hoje — pula sábado/domingo
-  // automaticamente (ex: boletim de segunda usa o fechamento de sexta).
-  const fechamento = ultimoDiaUtilAntesDe(agora);
-  const dataFechamento = formatarDataArquivo(fechamento).replace(/-/g, '/');
-
   const indices = lerJsonSeExistir(path.join(RAIZ, 'indices.json'), []);
   const noticias = lerJsonSeExistir(path.join(RAIZ, 'noticias.json'), []);
   const ranking = lerJsonSeExistir(path.join(RAIZ, 'ranking.json'), {});
@@ -475,7 +469,6 @@ function main() {
 
   const html = montarHtml({
     dataExtenso,
-    dataFechamento,
     indicadoresHtml,
     destaquesHtml,
     tabelaFiisHtml,
