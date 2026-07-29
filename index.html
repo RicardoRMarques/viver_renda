@@ -124,6 +124,63 @@
     }
     .nav a:hover { color: var(--primary); }
 
+    /* Menu hambúrguer (só aparece no mobile) */
+    .mobile-menu-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .mobile-menu-btn svg { width: 19px; height: 19px; }
+    .mobile-menu-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .mobile-menu-panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 0;
+    }
+    .mobile-menu-panel[hidden] { display: none; }
+    .mobile-menu-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 12px 20px;
+      cursor: pointer;
+    }
+    .mobile-menu-item:last-child { border-bottom: none; }
+    .mobile-menu-item:hover { color: var(--primary); background: rgba(127,127,127,0.08); }
+    .mobile-menu-separador {
+      padding: 12px 20px 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    @media (max-width: 760px) {
+      .mobile-menu-btn { display: inline-flex; }
+      .nav > a { display: none; }
+      .nav-dropdown { display: none; }
+    }
+
     /* Carrossel de índices em tempo real, logo abaixo do header */
     .ticker-carrossel {
       width: 100%;
@@ -1564,6 +1621,9 @@
 
   <header>
     <div class="container topbar">
+      <button type="button" id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobileMenuPanel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
       <a class="brand" href="/" title="Ir para a página inicial">
         <img src="logo-header-96.png" srcset="logo-header-48.png 48w, logo-header-96.png 96w" sizes="34px" alt="" class="brand-logo" width="34" height="34" />
         DIVIDENDOS | VIVER DE RENDA
@@ -1602,6 +1662,24 @@
         </div>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
       </nav>
+    </div>
+
+    <!-- Menu mobile (hambúrguer): só aparece em telas pequenas, no lugar
+         de "Mercado / Educação / Simuladores" que somem da barra do topo. -->
+    <div id="mobileMenuPanel" class="mobile-menu-panel" hidden>
+      <a href="#noticias-secao" class="mobile-menu-item">Notícias</a>
+      <a href="#consultas" class="mobile-menu-item">Mercado</a>
+      <a href="#educacao" class="mobile-menu-item">Educação</a>
+      <div class="mobile-menu-separador">Simuladores</div>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirRendaPassiva">Aposentadoria Renda Passiva</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirAposentadoria">Calculadora Aposentadoria INSS</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirCalculadora">Calculadora Renda Fixa</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirJurosCompostos">Calculadora de Juros Compostos</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirEmprestimo">Calculadora de Empréstimo</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirFinanciamento">Calculadora Financiamento Imobiliário</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">Conversor de Moedas</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="fireBtnAbrir">Calculadora FIRE</button>
+      <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     </div>
   </header>
 
@@ -1734,7 +1812,7 @@
         </section>
 
         <!-- NOTÍCIAS (cards lado a lado) -->
-        <div class="coluna-noticias-horizontal">
+        <div class="coluna-noticias-horizontal" id="noticias-secao">
           <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
             <button type="button" class="cmp-btn-abrir" id="basBtnAbrir" style="font-size:0.76rem; padding:6px 14px;">
               🏦 Índice de Basileia dos Bancos
@@ -3575,6 +3653,44 @@
       }
     }
     carregarIndices();
+
+    // ============================================================
+    // MENU HAMBÚRGUER (mobile) — reaproveita os mesmos botões que já
+    // abrem cada modal (via data-mobile-alvo, mesmo padrão dos atalhos da
+    // home), então não duplica nenhuma lógica de abertura.
+    // ============================================================
+    (function () {
+      const btn = document.getElementById('mobileMenuBtn');
+      const painel = document.getElementById('mobileMenuPanel');
+      if (!btn || !painel) return;
+
+      function fechar() {
+        painel.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+      }
+      function abrir() {
+        painel.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+      }
+
+      btn.addEventListener('click', () => {
+        if (painel.hidden) abrir(); else fechar();
+      });
+
+      // Links de âncora (Notícias/Mercado/Educação) e botões de simulador
+      // fecham o menu ao serem clicados.
+      painel.querySelectorAll('.mobile-menu-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const alvo = item.getAttribute('data-mobile-alvo');
+          if (alvo) document.getElementById(alvo)?.click();
+          fechar();
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!painel.hidden && !painel.contains(e.target) && !btn.contains(e.target)) fechar();
+      });
+    })();
 
     // ============================================================
     // SIMULADOR VISUAL DE JUROS COMPOSTOS (sliders, antes de "Explore o
