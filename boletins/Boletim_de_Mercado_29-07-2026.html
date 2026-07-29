@@ -55,8 +55,8 @@
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
-  .lyket-linha{margin-top:24px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
-  .lyket-pergunta{font-size:13px;color:var(--muted);}
+  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .section-com-lyket [data-lyket-type]{font-size:12px;}
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
@@ -78,25 +78,28 @@
   <div class="sub">Boletim de Mercado · Quarta-feira, 29 de Julho de 2026</div>
 </header>
 
-<h2 class="section">Indicadores Principais</h2>
+<h2 class="section section-com-lyket">
+  <span>Indicadores Principais</span>
+  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-29-07-2026"></div>
+</h2>
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa</div><div class="value down">174.328,19 pts ▼ 1.27%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value down">R$ 5,11 ▼ 0.26%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,84 ▲ 0.01%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">US$ 64.351,25 ▲ 0.81%</div></div>
-  <div class="indicator"><div class="label">IPCA (12 meses)</div><div class="value">0,16%</div></div>
-  <div class="indicator"><div class="label">Dow Jones</div><div class="value down">52.002,52 pts ▼ 1.41%</div></div>
-  <div class="indicator"><div class="label">Nasdaq</div><div class="value up">24.879,24 pts ▲ 0.01%</div></div>
+  <div class="indicator"><div class="label">Ibovespa</div><div class="value down">173.325,00 pts ▼ 0.03%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value down">R$ 5,07 ▼ 0.31%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value down">R$ 5,78 ▼ 0.49%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">US$ 66.777,00 ▲ 3.80%</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses)</div><div class="value">4,64%</div></div>
+  <div class="indicator"><div class="label">Dow Jones</div><div class="value">—</div></div>
+  <div class="indicator"><div class="label">Nasdaq</div><div class="value">—</div></div>
   <div class="indicator"><div class="label">Petróleo Brent</div><div class="value">—</div></div>
   <div class="indicator"><div class="label">Selic</div><div class="value">14,25% a.a.</div></div>
-  <div class="indicator"><div class="label">IFIX</div><div class="value down">3.798,81 pts ▼ 0.22%</div></div>
+  <div class="indicator"><div class="label">IFIX</div><div class="value up">3.245,12 pts ▲ 0.12%</div></div>
 </div>
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/mercados/ibovespa-hoje-bolsa-de-valores-ao-vivo-29072026/" target="_blank" rel="noopener noreferrer" class="tk-link">Ibovespa Hoje Ao Vivo: Bolsa recua junto com exterior, aguardando coletiva do Fed</a></span><span class="pct">InfoMoney (geral)</span></div>
-  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/mercados/dolar-hoje-abertura-fechamento-comercial-turismo-29072026/" target="_blank" rel="noopener noreferrer" class="tk-link">Dólar hoje passa a ter leve baixa após decisão do Fed de manter os juros</a></span><span class="pct">InfoMoney (geral)</span></div>
-  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/politica/quem-e-marcelo-aro-aliado-de-zema-e-favorito-para-liderar-palanque-de-flavio-em-mg/" target="_blank" rel="noopener noreferrer" class="tk-link">Quem é Marcelo Aro, aliado de Zema e favorito para liderar palanque de Flávio em MG</a></span><span class="pct">InfoMoney (geral)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/noticia-exemplo-1" target="_blank" rel="noopener noreferrer" class="tk-link">Petróleo despenca após pausa dos EUA em ataques ao Irã</a></span><span class="pct">InfoMoney (geral)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/noticia-exemplo-2" target="_blank" rel="noopener noreferrer" class="tk-link">Futuros de NY operam mistos</a></span><span class="pct">InfoMoney (geral)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/noticia-exemplo-3" target="_blank" rel="noopener noreferrer" class="tk-link">Por que Tarcísio se tornou o ativo mais disputado</a></span><span class="pct">InfoMoney (geral)</span></div>
 </div>
 
 <h2 class="section">6 Melhores FIIs</h2>
@@ -105,39 +108,21 @@
   
   <tr>
     <td class="name">XPCA11</td>
-    <td>17.01%</td>
-    <td>R$ 7.70</td>
+    <td>17.12%</td>
+    <td>R$ 7.65</td>
     <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
     <td class="name">VGIR11</td>
-    <td>16.10%</td>
-    <td>R$ 9.44</td>
+    <td>16.26%</td>
+    <td>R$ 9.35</td>
     <td class="rationale">FII Valreiii</td>
   </tr>
   <tr>
     <td class="name">IRIM11</td>
-    <td>15.50%</td>
-    <td>R$ 65.09</td>
+    <td>15.43%</td>
+    <td>R$ 65.39</td>
     <td class="rationale">FII Irim</td>
-  </tr>
-  <tr>
-    <td class="name">CPTS11</td>
-    <td>14.30%</td>
-    <td>R$ 7.49</td>
-    <td class="rationale">FII Capi Sec</td>
-  </tr>
-  <tr>
-    <td class="name">KNCR11</td>
-    <td>13.52%</td>
-    <td>R$ 106.79</td>
-    <td class="rationale">FII Kinea Ri</td>
-  </tr>
-  <tr>
-    <td class="name">RECR11</td>
-    <td>13.41%</td>
-    <td>R$ 80.10</td>
-    <td class="rationale">FII Rec Rece</td>
   </tr>
 </table>
 
@@ -147,66 +132,37 @@
   
   <tr>
     <td class="name">SBSP3</td>
-    <td>12.51%</td>
-    <td>R$ 27.80</td>
+    <td>12.24%</td>
+    <td>R$ 28.40</td>
     <td class="rationale">Sabesp</td>
   </tr>
   <tr>
     <td class="name">CMIG4</td>
-    <td>11.54%</td>
-    <td>R$ 11.10</td>
+    <td>11.66%</td>
+    <td>R$ 10.99</td>
     <td class="rationale">CEMIG</td>
-  </tr>
-  <tr>
-    <td class="name">BBSE3</td>
-    <td>11.11%</td>
-    <td>R$ 40.93</td>
-    <td class="rationale">BB Seguridade</td>
-  </tr>
-  <tr>
-    <td class="name">ALOS3</td>
-    <td>11.02%</td>
-    <td>R$ 26.67</td>
-    <td class="rationale">ALLOS</td>
-  </tr>
-  <tr>
-    <td class="name">BBDC4</td>
-    <td>8.42%</td>
-    <td>R$ 18.46</td>
-    <td class="rationale">Banco Bradesco</td>
-  </tr>
-  <tr>
-    <td class="name">ITUB4</td>
-    <td>8.34%</td>
-    <td>R$ 42.28</td>
-    <td class="rationale">Banco Itaú Unibanco</td>
   </tr>
 </table>
 
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item">
-  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/ibovespa-hoje-bolsa-de-valores-ao-vivo-29072026/" target="_blank" rel="noopener noreferrer" class="n-link">1. Ibovespa Hoje Ao Vivo: Bolsa recua junto com exterior, aguardando coletiva do Fed</a></div>
+  <div class="n-title"><a href="https://www.infomoney.com.br/noticia-exemplo-1" target="_blank" rel="noopener noreferrer" class="n-link">1. Petróleo despenca após pausa dos EUA em ataques ao Irã</a></div>
   <div class="n-body">Fonte: InfoMoney (geral)</div>
 </div>
 
 <div class="news-item">
-  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/dolar-hoje-abertura-fechamento-comercial-turismo-29072026/" target="_blank" rel="noopener noreferrer" class="n-link">2. Dólar hoje passa a ter leve baixa após decisão do Fed de manter os juros</a></div>
+  <div class="n-title"><a href="https://www.infomoney.com.br/noticia-exemplo-2" target="_blank" rel="noopener noreferrer" class="n-link">2. Futuros de NY operam mistos</a></div>
   <div class="n-body">Fonte: InfoMoney (geral)</div>
 </div>
 
 <div class="news-item">
-  <div class="n-title"><a href="https://www.infomoney.com.br/politica/quem-e-marcelo-aro-aliado-de-zema-e-favorito-para-liderar-palanque-de-flavio-em-mg/" target="_blank" rel="noopener noreferrer" class="n-link">3. Quem é Marcelo Aro, aliado de Zema e favorito para liderar palanque de Flávio em MG</a></div>
+  <div class="n-title"><a href="https://www.infomoney.com.br/noticia-exemplo-3" target="_blank" rel="noopener noreferrer" class="n-link">3. Por que Tarcísio se tornou o ativo mais disputado</a></div>
   <div class="n-body">Fonte: InfoMoney (geral)</div>
 </div>
 
 <div class="alert">
   ⚠ <b>Alerta de Risco:</b> Este é um alerta padrão: mercados financeiros envolvem risco de perda. Diversifique, avalie seu perfil de investidor e evite posições alavancadas sem gestão de risco adequada. Acompanhe o calendário do Copom e os resultados corporativos da temporada para eventos que podem gerar volatilidade.
-</div>
-
-<div class="lyket-linha">
-  <span class="lyket-pergunta">Esse boletim foi útil pra você?</span>
-  <div data-lyket-type="clap" data-lyket-namespace="boletim" data-lyket-id="boletim-29-07-2026"></div>
 </div>
 
 <footer>
