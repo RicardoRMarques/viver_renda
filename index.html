@@ -175,6 +175,29 @@
       letter-spacing: 0.04em;
     }
 
+    /* Glossário de FIIs e Ações */
+    .glossario-modal { max-width: 720px; }
+    .glossario-busca {
+      width: 100%; background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; font-family: inherit; margin-bottom: 12px;
+    }
+    .glossario-az { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px; }
+    .glossario-az-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 6px; width: 26px; height: 26px; font-size: 0.72rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; flex-shrink: 0;
+    }
+    .glossario-az-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .glossario-az-btn.glossario-az-ativo { background: var(--primary); border-color: var(--primary); color: var(--btn-text); }
+    .glossario-az-btn[data-letra="todos"] { width: auto; padding: 0 10px; }
+    .glossario-az-btn:disabled { opacity: 0.3; cursor: default; }
+    .glossario-az-btn:disabled:hover { border-color: var(--border); color: var(--muted); }
+    .glossario-lista { max-height: 55vh; overflow-y: auto; }
+    .glossario-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .glossario-item:last-child { border-bottom: none; }
+    .glossario-termo { font-weight: 700; font-size: 0.92rem; color: var(--primary); margin-bottom: 4px; }
+    .glossario-definicao { font-size: 0.84rem; color: var(--text); line-height: 1.55; }
+
     @media (max-width: 760px) {
       .mobile-menu-btn { display: inline-flex; }
       .nav > a { display: none; }
@@ -1657,6 +1680,9 @@
             <button type="button" class="nav-dropdown-item" id="navAbrirConversor">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M7 10h11M7 10l3-3M7 10l3 3"></path><path d="M17 14H6M17 14l-3-3M17 14l-3 3"></path></svg>Conversor de Moedas
             </button>
+            <button type="button" class="nav-dropdown-item" id="navAbrirGlossario">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>Glossário de FIIs e Ações
+            </button>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
           </div>
         </div>
@@ -1679,6 +1705,7 @@
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirFinanciamento">Calculadora Financiamento Imobiliário</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">Conversor de Moedas</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="fireBtnAbrir">Calculadora FIRE</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário de FIIs e Ações</button>
       <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     </div>
   </header>
@@ -2783,6 +2810,26 @@
 
   </main>
 
+  <!-- Modal: Glossário de FIIs e Ações -->
+  <div id="glossarioOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="glossarioTitulo" hidden>
+    <div class="calc-modal glossario-modal">
+      <div class="calc-modal-topo">
+        <h3 id="glossarioTitulo">📖 Glossário de FIIs e Ações</h3>
+        <button id="glossarioFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+        <input type="text" id="glossarioBusca" class="glossario-busca" placeholder="Buscar um termo (ex: vacância, DY, CRI...)" autocomplete="off" />
+
+        <div class="glossario-az" id="glossarioAz">
+          <button type="button" class="glossario-az-btn glossario-az-ativo" data-letra="todos">Todos</button>
+        </div>
+
+        <div id="glossarioLista" class="glossario-lista"></div>
+        <p id="glossarioVazio" class="calc-ajuda" hidden>Nenhum termo encontrado para essa busca.</p>
+      </div>
+    </div>
+  </div>
+
   <footer>
     <div class="container">
       <p>Desenvolvido para investidores. Dados fornecidos via integração com a B3.</p>
@@ -3653,6 +3700,121 @@
       }
     }
     carregarIndices();
+
+    // ============================================================
+    // GLOSSÁRIO DE FIIs E AÇÕES — lista própria (conteúdo original,
+    // escrito para este site), com busca e filtro alfabético.
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('navAbrirGlossario');
+      const overlay = document.getElementById('glossarioOverlay');
+      const btnFechar = document.getElementById('glossarioFechar');
+      const buscaInput = document.getElementById('glossarioBusca');
+      const azContainer = document.getElementById('glossarioAz');
+      const listaEl = document.getElementById('glossarioLista');
+      const vazioEl = document.getElementById('glossarioVazio');
+      if (!btnAbrir || !overlay) return;
+
+      const TERMOS = [
+        { termo: 'ABL (Área Bruta Locável)', definicao: 'Parte de um imóvel comercial que pode ser efetivamente alugada — salas, lojas, boxes, quiosques. Não inclui áreas comuns como corredores, garagem e banheiros. É a base usada para calcular o percentual de vacância de um FII.' },
+        { termo: 'Amortização (FII)', definicao: 'Devolução de parte do capital que você investiu no fundo — diferente do rendimento normal, que é distribuição de lucro. Acontece, por exemplo, quando o fundo vende um imóvel e decide devolver o dinheiro aos cotistas em vez de reinvestir.' },
+        { termo: 'ANBIMA', definicao: 'Associação Brasileira das Entidades dos Mercados Financeiro e de Capitais. Cria regras de autorregulação para o mercado financeiro brasileiro e publica indicadores usados como referência, como curvas de juros e índices de renda fixa.' },
+        { termo: 'Assembleia Geral (AGO/AGE)', definicao: 'Reunião onde os cotistas votam decisões do fundo. A Ordinária (AGO) é obrigatória, uma vez por ano, para aprovar as contas do fundo. A Extraordinária (AGE) é convocada sempre que surge algo específico pra decidir, como uma nova emissão de cotas ou troca de gestor.' },
+        { termo: 'B3', definicao: 'A bolsa de valores oficial do Brasil, resultado da fusão entre a Bovespa e a BM&F. É onde ações, FIIs e outros ativos são negociados publicamente.' },
+        { termo: 'Built to Suit', definicao: 'Modelo em que um imóvel é construído sob medida para um inquilino específico, já definido antes mesmo da obra começar, geralmente com contrato de aluguel bem longo (10+ anos).' },
+        { termo: 'CDI', definicao: 'Certificado de Depósito Interbancário — taxa que os bancos usam para emprestar dinheiro entre si por um dia. Costuma ficar bem próxima da Selic e é a referência mais usada para comparar a rentabilidade de investimentos de renda fixa (ex: "rende 110% do CDI").' },
+        { termo: 'CRI (Certificado de Recebíveis Imobiliários)', definicao: 'Título de renda fixa lastreado em créditos do setor imobiliário (como parcelas de financiamentos). Fundos de papel investem principalmente nesse tipo de ativo, em vez de possuir imóveis físicos.' },
+        { termo: 'CVM', definicao: 'Comissão de Valores Mobiliários — órgão do governo que fiscaliza e regula o mercado de capitais brasileiro, incluindo ações, FIIs e outros valores mobiliários.' },
+        { termo: 'Dividend Yield (DY)', definicao: 'Percentual que mede quanto um ativo pagou em dividendos/rendimentos num período (geralmente 12 meses), em relação à sua cotação atual. Cálculo: dividendos pagos ÷ cotação atual × 100.' },
+        { termo: 'Fundo de Papel', definicao: 'FII que investe principalmente em títulos de crédito imobiliário (como CRI), em vez de possuir imóveis físicos. Costuma ter renda mais previsível, atrelada a índices como CDI ou IPCA.' },
+        { termo: 'Fundo de Tijolo', definicao: 'FII que possui imóveis físicos de verdade (galpões, shoppings, lajes corporativas) e gera renda alugando esses espaços. O rendimento tende a variar mais com a vacância e o ciclo do mercado imobiliário.' },
+        { termo: 'Fundo Imobiliário (FII)', definicao: 'Fundo de investimento que reúne o dinheiro de vários investidores para aplicar no mercado imobiliário — seja comprando imóveis físicos, seja investindo em títulos de crédito imobiliário. As cotas são negociadas na bolsa, como uma ação.' },
+        { termo: 'Gestão Ativa', definicao: 'Modelo em que o gestor do fundo tem liberdade para comprar e vender ativos sem precisar de aprovação prévia dos cotistas a cada operação, seguindo apenas os limites definidos no regulamento.' },
+        { termo: 'Gestão Passiva', definicao: 'Modelo em que os ativos do fundo já estão definidos no regulamento, e qualquer mudança relevante na carteira precisa passar por assembleia de cotistas.' },
+        { termo: 'IFIX', definicao: 'Índice que acompanha o desempenho médio dos fundos imobiliários mais negociados na B3 — funciona como um "termômetro" do mercado de FIIs, parecido com o que o Ibovespa faz para ações.' },
+        { termo: 'IOF', definicao: 'Imposto sobre Operações Financeiras. Incide, por exemplo, na compra de moeda estrangeira (câmbio) e em alguns investimentos de renda fixa resgatados antes de 30 dias.' },
+        { termo: 'IPCA', definicao: 'Índice de Preços ao Consumidor Amplo — o indicador oficial de inflação do Brasil, medido pelo IBGE. Usado como referência para o Copom decidir a Selic, e também como indexador de vários investimentos (Tesouro IPCA+, alguns CRIs).' },
+        { termo: 'Liquidez', definicao: 'Facilidade de comprar ou vender um ativo sem afetar muito o preço dele. Ativos com liquidez baixa podem levar tempo pra vender, ou exigir aceitar um preço pior.' },
+        { termo: 'Margem Bruta', definicao: 'Percentual da receita que sobra depois de descontar apenas o custo direto do produto/serviço vendido, antes de despesas administrativas e impostos. Cálculo: (receita − custo dos produtos vendidos) ÷ receita × 100.' },
+        { termo: 'Margem Líquida', definicao: 'Percentual da receita que sobra como lucro líquido, depois de todos os custos, despesas, juros e impostos. Cálculo: lucro líquido ÷ receita × 100.' },
+        { termo: 'P/L (Preço sobre Lucro)', definicao: 'Indica quantos anos de lucro atual seriam necessários para "pagar" o preço de uma ação, ou quanto o mercado paga por cada R$ 1 de lucro anual da empresa. Cálculo: preço da ação ÷ lucro por ação (LPA).' },
+        { termo: 'P/VP (Preço sobre Valor Patrimonial)', definicao: 'Indica quanto o mercado está disposto a pagar pelo patrimônio de uma empresa ou FII. Abaixo de 1, o ativo está sendo negociado por menos do que vale "no papel". Cálculo: preço atual ÷ valor patrimonial por ação/cota.' },
+        { termo: 'Pipeline', definicao: 'Lista de oportunidades (imóveis ou ativos) que um FII está avaliando comprar no futuro. Estar no pipeline não garante que a compra vai acontecer de fato.' },
+        { termo: 'Rendimento (FII)', definicao: 'Distribuição mensal de lucros aos cotistas — vem de aluguéis recebidos, juros de títulos que o fundo possui, ou ganhos com venda de ativos. Pessoa física costuma ser isenta de imposto de renda sobre esse rendimento, desde que algumas regras sejam cumpridas (ex: fundo com 50+ cotistas, negociado em bolsa).' },
+        { termo: 'ROE (Return on Equity)', definicao: 'Retorno sobre o Patrimônio Líquido — mede quanto uma empresa lucra para cada R$ 1 investido pelos acionistas. Cálculo: lucro líquido ÷ patrimônio líquido × 100.' },
+        { termo: 'Sale and Leaseback', definicao: 'Operação em que o dono de um imóvel vende o ativo (geralmente pro FII) e, no mesmo momento, aluga ele de volta, continuando a usar o espaço normalmente — só que agora como inquilino. Costuma ser usada por empresas que querem "destravar" capital imobilizado em imóveis próprios.' },
+        { termo: 'Selic', definicao: 'Taxa básica de juros da economia brasileira, definida pelo Copom (Banco Central). Serve de referência para praticamente todos os investimentos de renda fixa e para o custo do crédito no país.' },
+        { termo: 'SPE (Sociedade de Propósito Específico)', definicao: 'Empresa criada com um objetivo bem definido e limitado — comum em incorporações imobiliárias, onde investidores se juntam numa SPE só para construir e vender um empreendimento específico.' },
+        { termo: 'Taxa de Administração', definicao: 'Taxa cobrada pelo administrador de um fundo pelo serviço de gerir a estrutura do fundo. Costuma ser um percentual anual sobre o patrimônio do fundo, descontado direto do rendimento — por isso reduz o retorno líquido do cotista.' },
+        { termo: 'Taxa de Retirada', definicao: 'Percentual do patrimônio investido que uma pessoa saca por mês/ano para viver, na fase de usufruir dos investimentos. Se a taxa escolhida for maior que o rendimento gerado, o patrimônio começa a diminuir — e pode até se esgotar, dependendo do prazo.' },
+        { termo: 'Vacância', definicao: 'Percentual da área de um imóvel/FII que está desocupada (sem inquilino), em relação à área total disponível pra alugar (ABL). Vacância alta reduz a receita de aluguel do fundo.' },
+        { termo: 'Valor de Mercado', definicao: 'Valor total de uma empresa ou fundo negociado na bolsa. Cálculo: cotação atual × número de ações/cotas em circulação.' },
+        { termo: 'Valor Patrimonial', definicao: 'Soma de tudo que pertence ao fundo/empresa (imóveis, caixa, direitos), descontadas as dívidas. Representa o quanto o ativo "vale de verdade" nos livros contábeis, que pode ser diferente do preço negociado na bolsa.' },
+        { termo: 'VPA (Valor Patrimonial por Ação/Cota)', definicao: 'Quanto do patrimônio líquido total corresponde a cada ação ou cota. Cálculo: patrimônio líquido ÷ número de ações/cotas em circulação.' },
+      ].sort((a, b) => a.termo.localeCompare(b.termo, 'pt-BR'));
+
+      let letraAtiva = 'todos';
+
+      // Monta os botões A-Z, desabilitando letras sem nenhum termo.
+      const letrasComTermo = new Set(TERMOS.map(t => t.termo[0].toUpperCase()));
+      for (let i = 65; i <= 90; i++) {
+        const letra = String.fromCharCode(i);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'glossario-az-btn';
+        btn.textContent = letra;
+        btn.dataset.letra = letra;
+        if (!letrasComTermo.has(letra)) btn.disabled = true;
+        azContainer.appendChild(btn);
+      }
+
+      function renderizar() {
+        const termoBusca = buscaInput.value.trim().toLowerCase();
+        const filtrados = TERMOS.filter(t => {
+          const bateLetra = letraAtiva === 'todos' || t.termo[0].toUpperCase() === letraAtiva;
+          const bateBusca = !termoBusca || t.termo.toLowerCase().includes(termoBusca) || t.definicao.toLowerCase().includes(termoBusca);
+          return bateLetra && bateBusca;
+        });
+
+        if (filtrados.length === 0) {
+          listaEl.innerHTML = '';
+          vazioEl.hidden = false;
+          return;
+        }
+        vazioEl.hidden = true;
+        listaEl.innerHTML = filtrados.map(t => `
+          <div class="glossario-item">
+            <div class="glossario-termo">${t.termo}</div>
+            <div class="glossario-definicao">${t.definicao}</div>
+          </div>`).join('');
+      }
+
+      azContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('.glossario-az-btn');
+        if (!btn || btn.disabled) return;
+        azContainer.querySelectorAll('.glossario-az-btn').forEach(b => b.classList.remove('glossario-az-ativo'));
+        btn.classList.add('glossario-az-ativo');
+        letraAtiva = btn.dataset.letra;
+        renderizar();
+      });
+      buscaInput.addEventListener('input', renderizar);
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        renderizar();
+        setTimeout(() => buscaInput.focus(), 50);
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+    })();
 
     // ============================================================
     // MENU HAMBÚRGUER (mobile) — reaproveita os mesmos botões que já
