@@ -314,8 +314,8 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, 
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
-  .lyket-linha{margin-top:24px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
-  .lyket-pergunta{font-size:13px;color:var(--muted);}
+  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .section-com-lyket [data-lyket-type]{font-size:12px;}
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
@@ -337,7 +337,10 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, 
   <div class="sub">Boletim de Mercado · ${dataExtenso}</div>
 </header>
 
-<h2 class="section">Indicadores Principais</h2>
+<h2 class="section section-com-lyket">
+  <span>Indicadores Principais</span>
+  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-${dataArquivo}"></div>
+</h2>
 <div class="grid">
   ${indicadoresHtml}
 </div>
@@ -364,11 +367,6 @@ ${noticiasHtml}
 
 <div class="alert">
   ⚠ <b>Alerta de Risco:</b> ${alertaTexto}
-</div>
-
-<div class="lyket-linha">
-  <span class="lyket-pergunta">Esse boletim foi útil pra você?</span>
-  <div data-lyket-type="clap" data-lyket-namespace="boletim" data-lyket-id="boletim-${dataArquivo}"></div>
 </div>
 
 <footer>
