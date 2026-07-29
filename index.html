@@ -962,6 +962,19 @@
       font-family: inherit;
     }
     .calc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .calc-campo-sep {
+      margin: 14px 0 2px; padding-top: 12px; border-top: 1px dashed var(--border);
+      font-size: 0.72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em;
+    }
+    .calc-input-combo { display: flex; gap: 8px; }
+    .calc-input-combo input {
+      flex: 1 1 90px; min-width: 0; background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 9px 10px; font-size: 0.9rem; font-family: inherit;
+    }
+    .calc-input-combo select {
+      flex: 1 1 140px; min-width: 0; background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 9px 8px; font-size: 0.82rem; font-family: inherit; cursor: pointer;
+    }
     .calc-ajuda { font-size: 0.76rem; color: var(--muted); margin: 2px 0 0; }
 
     /* Campo com prefixo (R$, %, etc.) */
@@ -2122,6 +2135,34 @@
             <label id="calcLabelTaxa" for="calcTaxa">% do CDI</label>
             <input type="number" id="calcTaxa" min="0" step="0.01" value="100" />
             <p class="calc-ajuda" id="calcAjudaTaxa"></p>
+          </div>
+
+          <div class="calc-campo-sep">
+            <span>Para a tabela de comparação (abaixo do resultado)</span>
+          </div>
+
+          <div class="calc-campo calc-campo-combo">
+            <label for="calcCdbTaxaCompara">Rentabilidade do CDB</label>
+            <div class="calc-input-combo">
+              <input type="number" id="calcCdbTaxaCompara" min="0" step="0.01" value="100" />
+              <select id="calcCdbIndexadorCompara">
+                <option value="cdi">% do CDI</option>
+                <option value="pre">Prefixado (a.a.)</option>
+                <option value="ipca">IPCA+ (a.a.)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="calc-campo calc-campo-combo">
+            <label for="calcLciTaxaCompara">Rentabilidade da LCI/LCA</label>
+            <div class="calc-input-combo">
+              <input type="number" id="calcLciTaxaCompara" min="0" step="0.01" value="90" />
+              <select id="calcLciIndexadorCompara">
+                <option value="cdi">% do CDI</option>
+                <option value="pre">Prefixado (a.a.)</option>
+                <option value="ipca">IPCA+ (a.a.)</option>
+              </select>
+            </div>
           </div>
 
           <button class="hg-btn" id="calcBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
@@ -5809,15 +5850,36 @@
         return 4.5; // reserva, caso o robô ainda não tenha gerado esse campo
       }
 
+      // Converte uma taxa informada (com seu indexador) numa taxa anual
+      // efetiva — reaproveitado tanto pelo campo principal (Tipo de
+      // investimento) quanto pelos campos dedicados de CDB/LCI da
+      // comparação, que ficam sempre visíveis lado a lado.
+      function taxaEfetivaPorIndexador(taxaInformada, indexador) {
+        if (indexador === 'cdi') return cdiAnualPct() * (taxaInformada / 100);
+        if (indexador === 'pre') return taxaInformada;
+        if (indexador === 'ipca') return taxaInformada + ipcaAnualPct();
+        return taxaInformada;
+      }
+
       // Definição dos produtos comparáveis, cada um com sua regra de taxa
       // padrão (usada na tabela de comparação) e se é tributado/tem custódia.
       function produtosComparaveis() {
         const selic = selicAnualPct();
         const cdi = cdiAnualPct();
         const ipca = ipcaAnualPct();
+
+        // CDB e LCI/LCA usam as taxas realmente informadas nos campos
+        // dedicados (sempre visíveis), para a comparação ficar realista
+        // com a oferta que o usuário está de fato avaliando — em vez de
+        // um percentual genérico fixo.
+        const cdbTaxaInformada = parseFloat(document.getElementById('calcCdbTaxaCompara')?.value) || 0;
+        const cdbIndexador = document.getElementById('calcCdbIndexadorCompara')?.value || 'cdi';
+        const lciTaxaInformada = parseFloat(document.getElementById('calcLciTaxaCompara')?.value) || 0;
+        const lciIndexador = document.getElementById('calcLciIndexadorCompara')?.value || 'cdi';
+
         return [
-          { id: 'cdb', nome: 'CDB', tributado: true, custodia: false, taxaAnual: cdi * 1.00 },
-          { id: 'lci', nome: 'LCI/LCA', tributado: false, custodia: false, taxaAnual: cdi * 0.90 },
+          { id: 'cdb', nome: 'CDB', tributado: true, custodia: false, taxaAnual: taxaEfetivaPorIndexador(cdbTaxaInformada, cdbIndexador) },
+          { id: 'lci', nome: 'LCI/LCA', tributado: false, custodia: false, taxaAnual: taxaEfetivaPorIndexador(lciTaxaInformada, lciIndexador) },
           { id: 'tesouro_selic', nome: 'Tesouro Selic', tributado: true, custodia: true, taxaAnual: selic * 1.00 },
           { id: 'tesouro_pre', nome: 'Tesouro Prefixado', tributado: true, custodia: true, taxaAnual: selic + 0.5 },
           { id: 'tesouro_ipca', nome: 'Tesouro IPCA+', tributado: true, custodia: true, taxaAnual: TAXA_REAL_IPCA_PADRAO + ipca },
@@ -5862,25 +5924,19 @@
       function atualizarCampoTaxa() {
         const tipo = selTipo.value;
         const ehCdbOuLci = tipo === 'cdb' || tipo === 'lci';
-        campoIndexadorWrap.hidden = !ehCdbOuLci;
-        if (ehCdbOuLci) {
-          labelIndexador.textContent = tipo === 'cdb' ? 'Rentabilidade do CDB' : 'Rentabilidade da LCI/LCA';
-        }
-        const indexador = ehCdbOuLci ? selIndexador.value : null;
+        const campoTaxaWrap = document.getElementById('calcCampoTaxaWrap');
 
-        if (ehCdbOuLci && indexador === 'cdi') {
-          labelTaxa.textContent = '% do CDI';
-          inTaxa.value = tipo === 'lci' ? '90' : '100';
-          ajudaTaxa.textContent = `Percentual do CDI oferecido pelo banco/corretora (ex: 100% = rende igual ao CDI). Selic atual ≈ ${selicAnualPct().toFixed(2)}% a.a., com spread de -0,10 p.p. o CDI fica ≈ ${cdiAnualPct().toFixed(2)}% a.a.`;
-        } else if (ehCdbOuLci && indexador === 'pre') {
-          labelTaxa.textContent = 'Taxa prefixada (% ao ano)';
-          inTaxa.value = selicAnualPct().toFixed(2);
-          ajudaTaxa.textContent = 'Taxa fixa contratada no momento da aplicação, informada pelo banco/corretora.';
-        } else if (ehCdbOuLci && indexador === 'ipca') {
-          labelTaxa.textContent = 'Taxa real (% ao ano, acima da inflação)';
-          inTaxa.value = TAXA_REAL_IPCA_PADRAO.toFixed(2);
-          ajudaTaxa.textContent = `Rende essa taxa real + a inflação (IPCA). Estimamos IPCA em ${ipcaAnualPct().toFixed(2)}% a.a. Sugestão inicial de ${TAXA_REAL_IPCA_PADRAO.toFixed(2)}% real com base nas taxas atuais do mercado — ajuste conforme a oferta do seu banco/corretora.`;
-        } else if (tipo === 'tesouro_selic') {
+        // CDB e LCI/LCA agora usam só os campos dedicados (sempre
+        // visíveis, mais abaixo) — tanto pro resultado principal quanto
+        // pra tabela de comparação, pra nunca haver dois números
+        // diferentes pro mesmo produto na mesma tela.
+        campoIndexadorWrap.hidden = true;
+        campoTaxaWrap.hidden = ehCdbOuLci;
+        if (ehCdbOuLci) return;
+
+        const indexador = null;
+
+        if (tipo === 'tesouro_selic') {
           labelTaxa.textContent = '% da Selic';
           inTaxa.value = '100';
           ajudaTaxa.textContent = 'Tesouro Selic rende próximo de 100% da taxa Selic, menos a taxa de custódia da B3 (0,20% a.a.).';
@@ -5906,11 +5962,15 @@
         const tipo = selTipo.value;
         const taxaInformada = parseFloat(inTaxa.value) || 0;
 
-        if (tipo === 'cdb' || tipo === 'lci') {
-          const indexador = selIndexador.value;
-          if (indexador === 'cdi') return cdiAnualPct() * (taxaInformada / 100);
-          if (indexador === 'pre') return taxaInformada;
-          if (indexador === 'ipca') return taxaInformada + ipcaAnualPct();
+        if (tipo === 'cdb') {
+          const t = parseFloat(document.getElementById('calcCdbTaxaCompara')?.value) || 0;
+          const idx = document.getElementById('calcCdbIndexadorCompara')?.value || 'cdi';
+          return taxaEfetivaPorIndexador(t, idx);
+        }
+        if (tipo === 'lci') {
+          const t = parseFloat(document.getElementById('calcLciTaxaCompara')?.value) || 0;
+          const idx = document.getElementById('calcLciIndexadorCompara')?.value || 'cdi';
+          return taxaEfetivaPorIndexador(t, idx);
         }
         if (tipo === 'tesouro_selic') {
           return selicAnualPct() * (taxaInformada / 100);
@@ -5962,11 +6022,15 @@
           ? `<div class="calc-resultado-linha"><span>Taxa de custódia B3 (aprox. 0,20% a.a.)</span><strong>- ${hgFormatMoeda(resultadoPrincipal.custodiaValor)}</strong></div>`
           : '';
 
-        // Tabela comparativa: todos os produtos, mesmo valor/prazo/aportes,
-        // usando as taxas padrão de mercado (o produto escolhido usa a taxa
-        // que o usuário informou; os demais usam a taxa padrão estimada).
+        // Tabela comparativa: todos os produtos, mesmo valor/prazo/aportes.
+        // CDB e LCI/LCA sempre usam os campos dedicados (sempre visíveis),
+        // mesmo quando são o "Tipo de investimento" principal escolhido —
+        // assim a tabela nunca diverge do que está preenchido nos campos.
+        // Os demais produtos usam a taxa que o usuário informou quando são
+        // o tipo escolhido, ou a taxa padrão estimada quando não são.
         const produtos = produtosComparaveis().map(p => {
-          const taxaUsada = p.id === tipo ? taxaAnual : p.taxaAnual;
+          const ehPrincipalNaoCdbLci = p.id === tipo && p.id !== 'cdb' && p.id !== 'lci';
+          const taxaUsada = ehPrincipalNaoCdbLci ? taxaAnual : p.taxaAnual;
           const r = simularProduto({ taxaAnualPct: taxaUsada, tributado: p.tributado, custodia: p.custodia }, valorInicial, aporteMensal, prazoMeses);
           return { ...p, ...r };
         }).sort((a, b) => b.valorLiquido - a.valorLiquido);
@@ -6193,6 +6257,9 @@
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       selTipo.addEventListener('change', () => { atualizarCampoTaxa(); resetarAcoes(); });
       selIndexador.addEventListener('change', () => { atualizarCampoTaxa(); resetarAcoes(); });
+      ['calcCdbTaxaCompara', 'calcCdbIndexadorCompara', 'calcLciTaxaCompara', 'calcLciIndexadorCompara'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', () => resetarAcoes());
+      });
       btnCalcular.addEventListener('click', calcular);
       if (btnPdf) btnPdf.addEventListener('click', gerarPdf);
       if (btnCompartilhar) btnCompartilhar.addEventListener('click', (e) => compartilharResultado(e.currentTarget));
