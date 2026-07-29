@@ -56,6 +56,20 @@ function formatarDataArquivo(data) {
   return `${dd}-${mm}-${yyyy}`;
 }
 
+// Calcula o último dia útil ANTES da data informada, pulando sábado e
+// domingo — assim, numa segunda-feira, o "fechamento" aponta corretamente
+// para a sexta-feira anterior (a bolsa não funciona no fim de semana).
+// Não tem calendário de feriados (isso exigiria uma fonte de dados à
+// parte), mas já corrige o caso mais comum e mais visível: a virada do
+// fim de semana.
+function ultimoDiaUtilAntesDe(data) {
+  let candidato = new Date(data.getTime() - 24 * 60 * 60 * 1000);
+  while (candidato.getUTCDay() === 0 || candidato.getUTCDay() === 6) {
+    candidato = new Date(candidato.getTime() - 24 * 60 * 60 * 1000);
+  }
+  return candidato;
+}
+
 function formatarDataExtenso(data) {
   const dias = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
   const diaSemana = dias[data.getUTCDay()];
@@ -443,9 +457,9 @@ function main() {
   const dataArquivo = formatarDataArquivo(agora); // DD-MM-AAAA
   const dataExtenso = formatarDataExtenso(agora);
 
-  // "Fechamento" = dia anterior (o boletim de segunda usa o fechamento
-  // de sexta-feira automaticamente, pois soma -1 dia corrido).
-  const fechamento = new Date(agora.getTime() - 24 * 60 * 60 * 1000);
+  // "Fechamento" = último dia útil antes de hoje — pula sábado/domingo
+  // automaticamente (ex: boletim de segunda usa o fechamento de sexta).
+  const fechamento = ultimoDiaUtilAntesDe(agora);
   const dataFechamento = formatarDataArquivo(fechamento).replace(/-/g, '/');
 
   const indices = lerJsonSeExistir(path.join(RAIZ, 'indices.json'), []);
