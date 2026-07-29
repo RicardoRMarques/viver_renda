@@ -256,7 +256,7 @@ function montarDestaquesHtml(destaques) {
 }
 
 // ---------- Template do boletim (mesmo layout do original) ----------
-function montarHtml({ dataExtenso, indicadoresHtml, destaquesHtml, tabelaFiisHtml, tabelaAcoesHtml, noticiasHtml, alertaTexto }) {
+function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, tabelaFiisHtml, tabelaAcoesHtml, noticiasHtml, alertaTexto }) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -314,9 +314,12 @@ function montarHtml({ dataExtenso, indicadoresHtml, destaquesHtml, tabelaFiisHtm
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
+  .lyket-linha{margin-top:24px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;}
+  .lyket-pergunta{font-size:13px;color:var(--muted);}
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
+<script src="https://unpkg.com/@lyket/widget@latest/dist/lyket.js?apiKey=pt_d2c19f94733791f2b25c44987dd17e"></script>
 </head>
 <body>
 <div class="wrap">
@@ -361,6 +364,11 @@ ${noticiasHtml}
 
 <div class="alert">
   ⚠ <b>Alerta de Risco:</b> ${alertaTexto}
+</div>
+
+<div class="lyket-linha">
+  <span class="lyket-pergunta">Esse boletim foi útil pra você?</span>
+  <div data-lyket-type="clap" data-lyket-namespace="boletim" data-lyket-id="boletim-${dataArquivo}"></div>
 </div>
 
 <footer>
@@ -469,6 +477,7 @@ function main() {
 
   const html = montarHtml({
     dataExtenso,
+    dataArquivo,
     indicadoresHtml,
     destaquesHtml,
     tabelaFiisHtml,
