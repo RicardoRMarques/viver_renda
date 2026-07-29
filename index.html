@@ -5854,6 +5854,15 @@
       // efetiva — reaproveitado tanto pelo campo principal (Tipo de
       // investimento) quanto pelos campos dedicados de CDB/LCI da
       // comparação, que ficam sempre visíveis lado a lado.
+      // Formata a taxa informada de um jeito legível, conforme o indexador
+      // escolhido — usado no resumo e na tabela comparativa do PDF.
+      function rotuloTaxaIndexador(taxa, indexador) {
+        if (indexador === 'cdi') return `${taxa.toFixed(2)}% do CDI`;
+        if (indexador === 'pre') return `${taxa.toFixed(2)}% a.a. (prefixado)`;
+        if (indexador === 'ipca') return `IPCA + ${taxa.toFixed(2)}% a.a.`;
+        return `${taxa}%`;
+      }
+
       function taxaEfetivaPorIndexador(taxaInformada, indexador) {
         if (indexador === 'cdi') return cdiAnualPct() * (taxaInformada / 100);
         if (indexador === 'pre') return taxaInformada;
@@ -6035,12 +6044,22 @@
           return { ...p, ...r };
         }).sort((a, b) => b.valorLiquido - a.valorLiquido);
 
-        const linhasTabela = produtos.map(p => `
+        const cdbTaxaTela = parseFloat(document.getElementById('calcCdbTaxaCompara')?.value) || 0;
+        const cdbIndexadorTela = document.getElementById('calcCdbIndexadorCompara')?.value || 'cdi';
+        const lciTaxaTela = parseFloat(document.getElementById('calcLciTaxaCompara')?.value) || 0;
+        const lciIndexadorTela = document.getElementById('calcLciIndexadorCompara')?.value || 'cdi';
+
+        const linhasTabela = produtos.map(p => {
+          const rotulo = p.id === 'cdb' ? rotuloTaxaIndexador(cdbTaxaTela, cdbIndexadorTela)
+            : p.id === 'lci' ? rotuloTaxaIndexador(lciTaxaTela, lciIndexadorTela)
+            : null;
+          return `
           <tr class="${p.id === tipo ? 'calc-linha-selecionada' : ''}">
-            <td>${p.nome}${p.id === tipo ? ' ✓' : ''}</td>
+            <td>${p.nome}${p.id === tipo ? ' ✓' : ''}${rotulo ? `<br><small style="color:var(--muted); font-weight:400;">${rotulo}</small>` : ''}</td>
             <td>${hgFormatMoeda(p.valorLiquido)}</td>
             <td>${hgFormatMoeda(p.rendimentoLiquido)}</td>
-          </tr>`).join('');
+          </tr>`;
+        }).join('');
 
         resultadoEl.innerHTML = `
           <div class="calc-resultado-card">
@@ -6077,6 +6096,14 @@
           ? `${prazoInformado} ano${prazoInformado > 1 ? 's' : ''}`
           : `${prazoMeses} mes${prazoMeses > 1 ? 'es' : ''}`;
 
+        // Taxas de CDB e LCI/LCA informadas nos campos dedicados (sempre
+        // visíveis) — guardadas à parte para aparecerem no PDF/relatório,
+        // independente de qual for o "Tipo de investimento" escolhido.
+        const cdbTaxaInformadaPdf = parseFloat(document.getElementById('calcCdbTaxaCompara')?.value) || 0;
+        const cdbIndexadorPdf = document.getElementById('calcCdbIndexadorCompara')?.value || 'cdi';
+        const lciTaxaInformadaPdf = parseFloat(document.getElementById('calcLciTaxaCompara')?.value) || 0;
+        const lciIndexadorPdf = document.getElementById('calcLciIndexadorCompara')?.value || 'cdi';
+
         ultimoCalculo = {
           tipoNome: tipoInfo.nome,
           tipoTributado: tipoInfo.tributado,
@@ -6091,7 +6118,18 @@
           ir: resultadoPrincipal.ir,
           aliquotaIR: resultadoPrincipal.aliquota,
           valorLiquido: resultadoPrincipal.valorLiquido,
-          ranking: produtos.map(p => ({ nome: p.nome, escolhido: p.id === tipo, valorLiquido: p.valorLiquido, rendimentoLiquido: p.rendimentoLiquido })),
+          ranking: produtos.map(p => ({
+            nome: p.nome, escolhido: p.id === tipo, valorLiquido: p.valorLiquido, rendimentoLiquido: p.rendimentoLiquido,
+            rotuloTaxa: p.id === 'cdb' ? rotuloTaxaIndexador(cdbTaxaInformadaPdf, cdbIndexadorPdf)
+              : p.id === 'lci' ? rotuloTaxaIndexador(lciTaxaInformadaPdf, lciIndexadorPdf)
+              : null,
+          })),
+          cdbTaxaInformada: cdbTaxaInformadaPdf,
+          cdbIndexador: cdbIndexadorPdf,
+          cdbRotulo: rotuloTaxaIndexador(cdbTaxaInformadaPdf, cdbIndexadorPdf),
+          lciTaxaInformada: lciTaxaInformadaPdf,
+          lciIndexador: lciIndexadorPdf,
+          lciRotulo: rotuloTaxaIndexador(lciTaxaInformadaPdf, lciIndexadorPdf),
           selicUsada: selicAnualPct(),
           cdiUsado: cdiAnualPct(),
           ipcaUsado: ipcaAnualPct(),
@@ -6147,6 +6185,8 @@
           ...(c.tipoCustodia ? [['Taxa de custódia B3 (aprox.)', '- ' + hgFormatMoeda(c.custodiaValor)]] : []),
           [c.tipoTributado ? `IR (${(c.aliquotaIR * 100).toFixed(1)}% sobre o rendimento)` : 'Imposto de Renda', c.tipoTributado ? '- ' + hgFormatMoeda(c.ir) : 'Isento'],
           ['Valor líquido final', hgFormatMoeda(c.valorLiquido)],
+          ['Rentabilidade do CDB usada na comparação', c.cdbRotulo],
+          ['Rentabilidade da LCI/LCA usada na comparação', c.lciRotulo],
         ];
 
         doc.autoTable({
@@ -6167,7 +6207,11 @@
         doc.autoTable({
           startY: yTabela + 10,
           head: [['Produto', 'Valor líquido', 'Rendimento líquido']],
-          body: c.ranking.map(p => [p.nome + (p.escolhido ? ' (escolhido)' : ''), hgFormatMoeda(p.valorLiquido), hgFormatMoeda(p.rendimentoLiquido)]),
+          body: c.ranking.map(p => [
+            p.nome + (p.rotuloTaxa ? ` (${p.rotuloTaxa})` : '') + (p.escolhido ? ' — escolhido' : ''),
+            hgFormatMoeda(p.valorLiquido),
+            hgFormatMoeda(p.rendimentoLiquido),
+          ]),
           theme: 'striped',
           styles: { fontSize: 8.5, cellPadding: 5 },
           headStyles: { fillColor: [43, 43, 43], fontSize: 9 },
