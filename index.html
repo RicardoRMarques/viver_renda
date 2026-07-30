@@ -6549,12 +6549,28 @@
             linhas[linhas.length - 1].amortizacaoExtra = true;
             linhas[linhas.length - 1].saldoDevedor = saldo;
 
-            const parcelasRestantesOriginal = parcelas - m;
-            if (amortDaVez.modo === 'parcela' && parcelasRestantesOriginal > 0 && saldo > 0.005) {
+            // Prazo restante ESTIMADO NA TRAJETÓRIA ATUAL (não o prazo
+            // original menos meses corridos!) — importante porque, se já
+            // houve uma amortização anterior em modo "prazo" nesta mesma
+            // simulação, o financiamento já está com um ritmo mais curto
+            // do que o original. Usar "parcelas - m" aqui ignoraria isso e
+            // "desfaria" o encurtamento já conquistado, esticando o
+            // financiamento de volta perto do prazo original.
+            let parcelasRestantesAtual;
+            if (sistema === 'sac') {
+              parcelasRestantesAtual = Math.max(1, Math.round(saldo / amortizacaoConstante));
+            } else {
+              const jurosMensalSaldo = saldo * taxaMensal;
+              parcelasRestantesAtual = parcelaFixaPrice > jurosMensalSaldo
+                ? Math.max(1, Math.round(Math.log(parcelaFixaPrice / (parcelaFixaPrice - jurosMensalSaldo)) / Math.log(1 + taxaMensal)))
+                : (parcelas - m);
+            }
+
+            if (amortDaVez.modo === 'parcela' && parcelasRestantesAtual > 0 && saldo > 0.005) {
               if (sistema === 'sac') {
-                amortizacaoConstante = saldo / parcelasRestantesOriginal;
+                amortizacaoConstante = saldo / parcelasRestantesAtual;
               } else {
-                parcelaFixaPrice = calcularParcelaPrice(saldo, taxaMensal, parcelasRestantesOriginal);
+                parcelaFixaPrice = calcularParcelaPrice(saldo, taxaMensal, parcelasRestantesAtual);
               }
             } else if (amortDaVez.modo === 'prazo_parcela_fixa' && saldo > 0.005) {
               // Recalcula a amortização mensal (SAC) pra que a PRÓXIMA
