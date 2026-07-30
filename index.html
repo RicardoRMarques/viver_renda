@@ -6826,7 +6826,12 @@
           ['Total de taxas/seguros', hgFormatMoeda(0)],
           ['Correção', hgFormatMoeda(0)],
           ['Taxa de juros', `${hgFormatNumero(s.taxaPct)}% (${s.periodo === 'anual' ? 'a.a' : 'a.m'})`],
-          ['Quantidade de parcelas', String(s.parcelas)],
+          ['Quantidade de parcelas', (s.linhas.length - 1) !== s.parcelas
+            ? `${s.linhas.length - 1} de ${s.parcelas} (reduzida pela amortização)`
+            : String(s.parcelas)],
+          ...((s.linhas.length - 1) !== s.parcelas
+            ? [['Parcelas abatidas pela amortização', String(s.parcelas - (s.linhas.length - 1))]]
+            : []),
           ['Valor da primeira parcela', hgFormatMoeda(s.primeiraParcela)],
           ['Valor da última parcela', hgFormatMoeda(s.ultimaParcela)],
           ['Data da última parcela', s.dataUltimaParcela],
