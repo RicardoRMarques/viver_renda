@@ -3258,31 +3258,10 @@
             ],
           },
           {
-            titulo: 'Mercado',
-            campos: [
-              ['Abertura', hgFormatMoeda(m.open, moeda)],
-              ['Fech. anterior', hgFormatMoeda(m.previous_value, moeda)],
-              ['Máxima', hgFormatMoeda(m.high, moeda)],
-              ['Mínima', hgFormatMoeda(m.low, moeda)],
-              ['Fechamento', hgFormatMoeda(m.close, moeda)],
-              ['Volume', hgFormatCompacto(m.volume)],
-              ['Abertura do pregão', hgFormatData(m.open_time)],
-              ['Fechamento do pregão', hgFormatData(m.close_time)],
-              ['Sessão atualizada em', hgFormatData(m.updated_at)],
-            ],
-          },
-          {
             titulo: 'Dividendos',
             campos: [
               ['DY (12 meses)', typeof div.yield_12m_percent === 'number' ? `${hgFormatNumero(div.yield_12m_percent)}%` : null],
               ['Dividendos (12m, R$)', hgFormatMoeda(div.yield_12m_cash, moeda)],
-            ],
-          },
-          {
-            titulo: 'Fonte dos dados',
-            campos: [
-              ['Bolsa', src.full_name || src.name],
-              ['Fuso horário', src.location?.timezone],
             ],
           },
         ];
