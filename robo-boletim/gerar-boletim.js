@@ -315,7 +315,16 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, 
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
   .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .section-com-lyket [data-lyket-type]{font-size:12px;}
+  .section-com-lyket [data-lyket-type]{
+    font-size:12px;
+    background:#f2f2f2;
+    border-radius:20px;
+    padding:4px 10px;
+    display:inline-flex;
+    align-items:center;
+    box-shadow:0 1px 4px rgba(0,0,0,0.35);
+  }
+  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
