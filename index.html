@@ -4139,7 +4139,7 @@
         // (ex: WhatsApp) ignoram o "url" quando há arquivo anexado, então
         // o link também vai dentro do texto, por garantia.
         const textoComLink = `${texto}\n${url}`;
-        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
           try {
             await navigator.share({ title: 'Simulador de Juros Compostos', text: textoComLink, files: [arquivo] });
             return;
@@ -5259,7 +5259,7 @@
         const blob = doc.output('blob');
         const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
 
-        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
           try {
             await navigator.share({
               title: 'Comparação dos Indicadores',
@@ -6318,7 +6318,7 @@
         const blob = doc.output('blob');
         const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
 
-        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
           try {
             await navigator.share({
               title: 'Simulação — Calculadora de Renda Fixa',
@@ -6449,6 +6449,16 @@
       }
       function capitalizar(texto) {
         return texto.charAt(0).toUpperCase() + texto.slice(1);
+      }
+
+      // Detecta celular/tablet de verdade — usado pra só oferecer o menu
+      // nativo de compartilhamento (Web Share API) em dispositivos móveis.
+      // Em navegadores desktop modernos (Chrome/Edge), o navigator.share
+      // já existe e "funciona", mas abre o seletor de programas do sistema
+      // operacional em vez de simplesmente baixar o PDF — pior experiência
+      // do que só baixar direto, que é o que sempre fizemos no desktop.
+      function ehDispositivoMovel() {
+        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       }
 
       function formatMesAno(ano, mesIndex0) {
@@ -6978,7 +6988,7 @@
         const blob = doc.output('blob');
         const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
 
-        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
           try {
             await navigator.share({
               title: 'Simulação de Financiamento Imobiliário',
@@ -8064,7 +8074,7 @@
         const blob = doc.output('blob');
         const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
 
-        if (navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
           try {
             await navigator.share({ title: 'Simulação — Aposentadoria Renda Passiva', files: [arquivo] });
             return;
