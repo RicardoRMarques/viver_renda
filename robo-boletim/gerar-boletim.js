@@ -325,6 +325,15 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, 
     box-shadow:0 1px 4px rgba(0,0,0,0.35);
   }
   .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
+  .grupo-whatsapp-card{
+    display:flex;align-items:center;gap:12px;margin-top:12px;
+    background:var(--card);border:1px solid var(--card-border);border-radius:12px;
+    padding:10px 14px;text-decoration:none;
+  }
+  .grupo-whatsapp-card img{border-radius:6px;background:#fff;padding:3px;flex-shrink:0;}
+  .grupo-whatsapp-card span{display:flex;flex-direction:column;gap:2px;}
+  .grupo-whatsapp-card strong{color:var(--text);font-size:13.5px;}
+  .grupo-whatsapp-card small{color:var(--muted);font-size:11.5px;line-height:1.4;}
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
@@ -350,6 +359,15 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, 
   <span>Indicadores Principais</span>
   <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-${dataArquivo}"></div>
 </h2>
+
+<a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
+  <span>
+    <strong>Entre no grupo do WhatsApp</strong>
+    <small>Dividendos | Viver de Renda — aponte a câmera ou toque aqui</small>
+  </span>
+</a>
+
 <div class="grid">
   ${indicadoresHtml}
 </div>
