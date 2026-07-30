@@ -6378,7 +6378,7 @@
 
       const anoAtualFinanc = new Date().getFullYear();
       const anosFinanc = [];
-      for (let a = anoAtualFinanc - 2; a <= anoAtualFinanc + 10; a++) anosFinanc.push(a);
+      for (let a = 2010; a <= anoAtualFinanc + 10; a++) anosFinanc.push(a);
       selAnoInicio.innerHTML = anosFinanc.map(a => `<option value="${a}">${a}</option>`).join('');
 
       // Mantém o campo escondido (formato "AAAA-MM") sempre sincronizado
