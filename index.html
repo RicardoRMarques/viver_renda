@@ -2362,6 +2362,10 @@
               <input type="radio" name="amortModo" value="prazo" checked style="margin-right:6px;" />
               Amortizar por prazo <span id="amortDescPrazo" style="color:var(--muted); font-weight:400;">(reduz o nº de meses)</span>
             </label>
+            <label style="margin-bottom:6px;" id="amortLabelPrazoParcelaFixa">
+              <input type="radio" name="amortModo" value="prazo_parcela_fixa" style="margin-right:6px;" />
+              Amortizar por prazo, mantendo o valor da parcela <span style="color:var(--muted); font-weight:400;">(a parcela seguinte fica igual à de antes da amortização; o prazo encolhe pra compensar)</span>
+            </label>
             <label>
               <input type="radio" name="amortModo" value="parcela" style="margin-right:6px;" />
               Amortizar por parcela <span id="amortDescParcela" style="color:var(--muted); font-weight:400;">(mantém o prazo, reduz o valor da parcela)</span>
@@ -6436,6 +6440,17 @@
 
       const NOMES_MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
 
+      // Texto amigável pra cada modo de amortização, reaproveitado no
+      // histórico (modal + tela principal) e no PDF.
+      function rotuloModoAmort(modo) {
+        if (modo === 'parcela') return 'reduz a parcela';
+        if (modo === 'prazo_parcela_fixa') return 'reduz o prazo, mantendo o valor da parcela';
+        return 'reduz o prazo';
+      }
+      function capitalizar(texto) {
+        return texto.charAt(0).toUpperCase() + texto.slice(1);
+      }
+
       function formatMesAno(ano, mesIndex0) {
         return `${NOMES_MESES[mesIndex0]}/${ano}`;
       }
@@ -6511,6 +6526,8 @@
             amortizacaoExtra: false,
           });
 
+          const parcelaAntesDaAmortDeste = sistema === 'sac' ? amortizacao + juros : parcela;
+
           // Amortização extra específica desta parcela (cada uma com seu
           // próprio valor e modo — até 5 no total).
           const amortDaVez = amortPorPonto.get(m);
@@ -6525,6 +6542,21 @@
                 amortizacaoConstante = saldo / parcelasRestantesOriginal;
               } else {
                 parcelaFixaPrice = calcularParcelaPrice(saldo, taxaMensal, parcelasRestantesOriginal);
+              }
+            } else if (amortDaVez.modo === 'prazo_parcela_fixa' && saldo > 0.005) {
+              // Recalcula a amortização mensal (SAC) pra que a PRÓXIMA
+              // parcela fique igual à de antes desta amortização extra —
+              // o prazo encolhe sozinho porque a amortização mensal fica
+              // maior que a original (mesma lógica que os bancos usam na
+              // prática pra "reduzir prazo mantendo o valor da parcela").
+              // No Price a parcela já é fixa por definição, então esse modo
+              // se comporta igual ao modo "prazo" comum.
+              if (sistema === 'sac') {
+                const jurosProximaParcela = saldo * taxaMensal;
+                const novaAmortizacaoConstante = parcelaAntesDaAmortDeste - jurosProximaParcela;
+                if (novaAmortizacaoConstante > 0 && novaAmortizacaoConstante < saldo) {
+                  amortizacaoConstante = novaAmortizacaoConstante;
+                }
               }
             }
             // modo 'prazo': mantém os mesmos valores de amortização/parcela,
@@ -6682,7 +6714,7 @@
             <div class="amort-historico-lista">
               ${[...estadoAmortizacao.lista].sort((a, b) => a.ponto - b.ponto).map(item => `
                 <div class="amort-historico-item">
-                  <span>Após a parcela <strong>${item.ponto}</strong>: ${hgFormatMoeda(item.valor)} — ${item.modo === 'prazo' ? 'reduz o prazo' : 'reduz a parcela'}</span>
+                  <span>Após a parcela <strong>${item.ponto}</strong>: ${hgFormatMoeda(item.valor)} — ${rotuloModoAmort(item.modo)}</span>
                 </div>`).join('')}
             </div>
           </div>` : ''}
@@ -6824,7 +6856,7 @@
             body: s.amortizacao.lista.map(a => [
               String(a.ponto),
               hgFormatMoeda(a.valor),
-              a.modo === 'prazo' ? 'Reduz o prazo' : 'Reduz a parcela',
+              capitalizar(rotuloModoAmort(a.modo)),
             ]),
             theme: 'striped',
             styles: { fontSize: 8.5, cellPadding: 5 },
@@ -7027,7 +7059,7 @@
           .sort((a, b) => a.ponto - b.ponto)
           .map(item => `
             <div class="amort-historico-item">
-              <span>Após a parcela <strong>${item.ponto}</strong>: ${hgFormatMoeda(item.valor)} — ${item.modo === 'prazo' ? 'reduz o prazo' : 'reduz a parcela'}</span>
+              <span>Após a parcela <strong>${item.ponto}</strong>: ${hgFormatMoeda(item.valor)} — ${rotuloModoAmort(item.modo)}</span>
               <button type="button" class="amort-historico-remover" data-ponto="${item.ponto}" aria-label="Remover" title="Remover">✕</button>
             </div>`).join('');
 
@@ -7060,6 +7092,18 @@
           descPrazoEl.textContent = ultimaSimulacao.sistema === 'sac'
             ? '(mantém a amortização mensal igual; a parcela continua caindo mês a mês por causa dos juros, e o financiamento termina mais cedo)'
             : '(mantém a parcela igual até o fim, reduz o nº de meses)';
+        }
+
+        // "Amortizar por prazo, mantendo o valor da parcela" só faz sentido
+        // no SAC — no Price, o modo "prazo" comum já mantém a parcela fixa
+        // por definição, então esse modo extra ficaria redundante.
+        const labelPrazoParcelaFixa = document.getElementById('amortLabelPrazoParcelaFixa');
+        if (labelPrazoParcelaFixa) {
+          const ehSac = ultimaSimulacao.sistema === 'sac';
+          labelPrazoParcelaFixa.style.display = ehSac ? '' : 'none';
+          if (!ehSac && labelPrazoParcelaFixa.querySelector('input').checked) {
+            document.querySelector('input[name="amortModo"][value="prazo"]').checked = true;
+          }
         }
       }
       function fecharModalAmort() {
