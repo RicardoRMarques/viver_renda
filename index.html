@@ -7735,7 +7735,8 @@
           descricao: 'Faixa A · Conservador: risco muito baixo, ideal para proteger o dinheiro (ex: Tesouro Direto Selic).',
           retornoAA: 0.105,
           alocacao: [
-            { nome: 'Renda Fixa (Tesouro Selic)', pct: 90, cor: '#31c3ff' },
+            { nome: 'Renda Fixa (Tesouro Selic)', pct: 80, cor: '#31c3ff' },
+            { nome: 'Fundos Imobiliários', pct: 10, cor: '#4dd0e1' },
             { nome: 'Reserva / Caixa', pct: 10, cor: '#7cff92' },
           ],
         },
@@ -7744,8 +7745,9 @@
           descricao: 'Faixa B · Moderado: risco médio, com oscilações aceitáveis no curto prazo.',
           retornoAA: 0.11,
           alocacao: [
-            { nome: 'Renda Fixa', pct: 60, cor: '#31c3ff' },
-            { nome: 'Fundos Multimercado', pct: 25, cor: '#e0b84d' },
+            { nome: 'Renda Fixa', pct: 50, cor: '#31c3ff' },
+            { nome: 'Fundos Imobiliários', pct: 15, cor: '#4dd0e1' },
+            { nome: 'Fundos Multimercado', pct: 20, cor: '#e0b84d' },
             { nome: 'Ações', pct: 15, cor: '#ff6b6b' },
           ],
         },
@@ -7754,8 +7756,9 @@
           descricao: 'Faixa C · Moderado: risco médio, com oscilações aceitáveis no curto prazo.',
           retornoAA: 0.125,
           alocacao: [
-            { nome: 'Renda Fixa', pct: 45, cor: '#31c3ff' },
-            { nome: 'Fundos Multimercado', pct: 25, cor: '#e0b84d' },
+            { nome: 'Renda Fixa', pct: 35, cor: '#31c3ff' },
+            { nome: 'Fundos Imobiliários', pct: 15, cor: '#4dd0e1' },
+            { nome: 'Fundos Multimercado', pct: 20, cor: '#e0b84d' },
             { nome: 'Ações', pct: 30, cor: '#ff6b6b' },
           ],
         },
@@ -7764,8 +7767,9 @@
           descricao: 'Faixa D · Arrojado: risco alto de perdas ou oscilação forte, voltado para ações ou criptomoedas.',
           retornoAA: 0.145,
           alocacao: [
-            { nome: 'Renda Fixa', pct: 25, cor: '#31c3ff' },
-            { nome: 'Fundos Multimercado', pct: 15, cor: '#e0b84d' },
+            { nome: 'Renda Fixa', pct: 20, cor: '#31c3ff' },
+            { nome: 'Fundos Imobiliários', pct: 10, cor: '#4dd0e1' },
+            { nome: 'Fundos Multimercado', pct: 10, cor: '#e0b84d' },
             { nome: 'Ações', pct: 50, cor: '#ff6b6b' },
             { nome: 'Criptomoedas', pct: 10, cor: '#b26fe0' },
           ],
@@ -7775,8 +7779,9 @@
           descricao: 'Faixa E · Agressivo: risco alto de perdas ou oscilação forte, voltado para ações ou criptomoedas.',
           retornoAA: 0.17,
           alocacao: [
-            { nome: 'Renda Fixa', pct: 10, cor: '#31c3ff' },
-            { nome: 'Ações', pct: 60, cor: '#ff6b6b' },
+            { nome: 'Renda Fixa', pct: 5, cor: '#31c3ff' },
+            { nome: 'Fundos Imobiliários', pct: 10, cor: '#4dd0e1' },
+            { nome: 'Ações', pct: 55, cor: '#ff6b6b' },
             { nome: 'Criptomoedas', pct: 30, cor: '#b26fe0' },
           ],
         },
@@ -7784,6 +7789,18 @@
 
       let faixaSelecionada = null;
       let rpChartLinha = null;
+
+      // Explicações de cada classe de ativo, mostradas no "?" ao lado da
+      // legenda da alocação sugerida.
+      const AJUDA_CATEGORIA = {
+        'Renda Fixa': 'Investimentos que "prometem" uma remuneração previsível (Tesouro Direto, CDB, LCI/LCA). Risco baixo, mas o retorno costuma ser mais modesto no longo prazo.',
+        'Renda Fixa (Tesouro Selic)': 'Título público que rende atrelado à Selic. Considerado um dos investimentos mais seguros do Brasil, com liquidez diária.',
+        'Reserva / Caixa': 'Dinheiro deixado bem líquido (poupança, fundo DI, conta que rende) para emergências — não é pra gerar retorno alto, é pra estar disponível na hora que precisar.',
+        'Fundos Imobiliários': 'FIIs — fundos que investem em imóveis (galpões, shoppings, lajes) ou papéis do setor imobiliário, e distribuem renda mensal (geralmente isenta de IR pra pessoa física). Meio-termo entre renda fixa e ações.',
+        'Fundos Multimercado': 'Fundos geridos por profissionais que misturam várias estratégias (juros, câmbio, ações) buscando um retorno melhor que a renda fixa, com risco intermediário.',
+        'Ações': 'Participação em empresas negociadas na bolsa. Potencial de retorno maior no longo prazo, mas com bem mais oscilação de preço no curto prazo.',
+        'Criptomoedas': 'Ativos digitais (Bitcoin, Ethereum etc.), com o maior potencial de valorização da lista — e também a maior volatilidade e risco de perda.',
+      };
 
       hgAplicarMascaraMoeda(inMetaRenda);
       hgAplicarMascaraMoeda(inJaGuardado);
@@ -7938,6 +7955,7 @@
           <div class="rp-legenda-linha">
             <span class="rp-legenda-cor" style="background:${item.cor};"></span>
             <span class="rp-legenda-nome">${item.nome}</span>
+            ${AJUDA_CATEGORIA[item.nome] ? `<button type="button" class="hg-info-btn hg-info-vermelho" data-categoria="${item.nome}" aria-label="O que é ${item.nome}?" title="O que é ${item.nome}?">?</button>` : ''}
             <span class="rp-legenda-pct">${item.pct}%</span>
           </div>`).join('');
 
@@ -7968,6 +7986,7 @@
             resultados futuros. Não constitui recomendação de investimento.
           </p>`;
         layoutEl.classList.add('com-resultado');
+        ativarTooltipsCategoria();
 
         // Guarda as variáveis desta simulação para o "Baixar PDF" / "Compartilhar".
         ultimoCalculoRp = {
@@ -7983,6 +8002,59 @@
       window.addEventListener('hg-tema-mudou', () => {
         if (ultimoCalculoRp) montarGraficoRp(ultimoCalculoRp.PV, ultimoCalculoRp.PMT, ultimoCalculoRp.i, ultimoCalculoRp.n);
       });
+
+      // Tooltip próprio das categorias de investimento (mesmo padrão já
+      // usado no Comparador/Análise Fundamentalista): elemento único, fixo
+      // na tela, fora do fluxo normal — evita qualquer corte por overflow.
+      let rpTooltipEl = document.getElementById('rpTooltipGlobal');
+      if (!rpTooltipEl) {
+        rpTooltipEl = document.createElement('div');
+        rpTooltipEl.id = 'rpTooltipGlobal';
+        rpTooltipEl.className = 'cmp-info-balao';
+        document.body.appendChild(rpTooltipEl);
+      }
+      function rpFecharTooltip() {
+        rpTooltipEl.classList.remove('cmp-info-aberto');
+        rpTooltipEl.style.display = 'none';
+      }
+      function rpAbrirTooltip(botao, texto) {
+        rpTooltipEl.innerHTML = texto.replace(/\n/g, '<br>');
+        rpTooltipEl.style.display = 'block';
+        const rect = botao.getBoundingClientRect();
+        const largura = rpTooltipEl.offsetWidth;
+        let left = rect.left;
+        if (left + largura > window.innerWidth - 8) left = window.innerWidth - largura - 8;
+        if (left < 8) left = 8;
+        let top = rect.bottom + 6;
+        const altura = rpTooltipEl.offsetHeight;
+        if (top + altura > window.innerHeight - 8) top = rect.top - altura - 6;
+        rpTooltipEl.style.top = `${top}px`;
+        rpTooltipEl.style.left = `${left}px`;
+      }
+      function ativarTooltipsCategoria() {
+        resultadoEl.querySelectorAll('[data-categoria]').forEach(botao => {
+          const texto = AJUDA_CATEGORIA[botao.getAttribute('data-categoria')];
+          if (!texto) return;
+          botao.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const chave = botao.getAttribute('data-categoria');
+            const jaAbertoAqui = rpTooltipEl.classList.contains('cmp-info-aberto') && rpTooltipEl.dataset.origem === chave;
+            if (jaAbertoAqui) { rpFecharTooltip(); return; }
+            rpAbrirTooltip(botao, texto);
+            rpTooltipEl.classList.add('cmp-info-aberto');
+            rpTooltipEl.dataset.origem = chave;
+          });
+          botao.addEventListener('mouseenter', () => {
+            if (rpTooltipEl.classList.contains('cmp-info-aberto')) return;
+            rpAbrirTooltip(botao, texto);
+          });
+          botao.addEventListener('mouseleave', () => {
+            if (!rpTooltipEl.classList.contains('cmp-info-aberto')) rpFecharTooltip();
+          });
+        });
+        document.addEventListener('click', rpFecharTooltip);
+        window.addEventListener('scroll', rpFecharTooltip, { passive: true });
+      }
 
       function limparCampoMoeda(input) {
         input.value = '';
