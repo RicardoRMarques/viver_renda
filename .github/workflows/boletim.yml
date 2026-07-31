@@ -2,11 +2,11 @@ name: Gerar Boletim de Mercado Diário
 
 on:
   schedule:
-    # 6h00 de Brasília = 9h00 UTC (Brasil não tem horário de verão desde
-    # 2019, então esse horário é fixo o ano todo — não precisa ajustar
-    # depois).
-    # Roda de segunda (1) a sexta (5).
-    - cron: '0 9 * * 1-5'
+    # Com o suporte nativo a timezone do GitHub Actions (desde mar/2026),
+    # não precisa mais converter pra UTC na mão — escreve direto no
+    # horário de Brasília. Roda 6h00, de segunda (1) a sexta (5).
+    - cron: '0 6 * * 1-5'
+      timezone: 'America/Sao_Paulo'
   workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
 
 # Evita que duas execuções rodem ao mesmo tempo e briguem pelo commit
