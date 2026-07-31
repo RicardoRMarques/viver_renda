@@ -6244,7 +6244,7 @@
       // Monta o PDF da simulação de renda fixa com jsPDF: cabeçalho com
       // aviso do site + data/hora de geração, resumo do resultado e a
       // tabela comparativa entre os produtos.
-      function montarDocumentoPdf() {
+      async function montarDocumentoPdf() {
         if (!ultimoCalculo) return null;
         if (!window.jspdf) {
           alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
@@ -6255,6 +6255,13 @@
         const doc = new jsPDF({ unit: 'pt', format: 'a4' });
         const agora = new Date();
         const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        // Logo do site no canto superior direito do relatório.
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
 
         // Aviso do site + data/hora, sempre no topo do documento.
         doc.setFont('helvetica', 'bold');
@@ -6341,8 +6348,8 @@
         return 'calculodeinvestimento.pdf';
       }
 
-      function gerarPdf() {
-        const doc = montarDocumentoPdf();
+      async function gerarPdf() {
+        const doc = await montarDocumentoPdf();
         if (!doc) return;
         doc.save(nomeArquivoPdf());
       }
@@ -6351,7 +6358,7 @@
       // via Web Share API com anexo). Sem suporte a compartilhar arquivos
       // (comum no desktop), cai para baixar o PDF direto.
       async function compartilharResultado(botao) {
-        const doc = montarDocumentoPdf();
+        const doc = await montarDocumentoPdf();
         if (!doc) return;
 
         const nomeArquivo = nomeArquivoPdf();
@@ -6849,7 +6856,7 @@
       // Monta o PDF de verdade com jsPDF (não é mais via impressão do
       // navegador): cabeçalho + tabela-resumo + tabela completa de
       // parcelas. Retorna o documento jsPDF pronto para salvar/compartilhar.
-      function montarDocumentoPdf() {
+      async function montarDocumentoPdf() {
         if (!ultimaSimulacao) return null;
         if (!window.jspdf) {
           alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
@@ -6858,6 +6865,13 @@
         const s = ultimaSimulacao;
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+        // Logo do site no canto superior direito do relatório.
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(15);
@@ -7020,8 +7034,8 @@
         return `simulacao-financiamento-${s.sistema}-${hgDataYYYYMMDD(new Date())}.pdf`;
       }
 
-      function gerarPdf() {
-        const doc = montarDocumentoPdf();
+      async function gerarPdf() {
+        const doc = await montarDocumentoPdf();
         if (!doc) return;
         doc.save(nomeArquivoPdf());
       }
@@ -7030,7 +7044,7 @@
       // via Web Share API com anexo). Se o navegador/dispositivo não
       // suportar compartilhar arquivos, cai para baixar o PDF direto.
       async function compartilharSimulacao(botao) {
-        const doc = montarDocumentoPdf();
+        const doc = await montarDocumentoPdf();
         if (!doc) return;
 
         const nomeArquivo = nomeArquivoPdf();
@@ -8001,7 +8015,7 @@
       // Monta o PDF com o mesmo cabeçalho padrão dos demais relatórios do
       // site (título + "Dividendos | Viver de Renda" + data/hora + aviso),
       // seguido das variáveis informadas pelo usuário e do resultado.
-      function montarDocumentoPdfRp() {
+      async function montarDocumentoPdfRp() {
         if (!ultimoCalculoRp) {
           alert('Faça uma simulação primeiro, clicando em "Calcular".');
           return null;
@@ -8015,6 +8029,13 @@
         const doc = new jsPDF({ unit: 'pt', format: 'a4' });
         const agora = new Date();
         const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        // Logo do site no canto superior direito do relatório.
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(15);
@@ -8107,8 +8128,8 @@
         return doc;
       }
 
-      function gerarPdfRp() {
-        const doc = montarDocumentoPdfRp();
+      async function gerarPdfRp() {
+        const doc = await montarDocumentoPdfRp();
         if (!doc) return;
         doc.save(nomeArquivoPdfRp());
       }
@@ -8116,7 +8137,7 @@
       // Compartilha o PDF como arquivo de verdade (WhatsApp etc, via Web
       // Share API). Sem suporte a compartilhar arquivos, baixa direto.
       async function compartilharResultadoRp(botao) {
-        const doc = montarDocumentoPdfRp();
+        const doc = await montarDocumentoPdfRp();
         if (!doc) return;
 
         const nomeArquivo = nomeArquivoPdfRp();
