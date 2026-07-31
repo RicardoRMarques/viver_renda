@@ -3007,6 +3007,36 @@
     // widgets da página (busca rápida, índices/sparkline, análise fundamentalista).
     const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
 
+    // Detecta celular/tablet de verdade — usado em todas as calculadoras
+    // pra só oferecer o menu nativo de compartilhamento (Web Share API) em
+    // dispositivos móveis. Em navegadores desktop modernos (Chrome/Edge),
+    // o navigator.share já existe e "funciona", mas abre o seletor de
+    // programas do sistema operacional em vez de simplesmente baixar o
+    // PDF — pior experiência do que só baixar direto, que é o padrão do
+    // site no desktop.
+    function ehDispositivoMovel() {
+      return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    // Carrega o logo do site (mesmo arquivo usado no cabeçalho) como
+    // data URL base64, pra poder ser desenhado num PDF via jsPDF. Guarda
+    // em cache (mesma promise reaproveitada) pra não buscar de novo toda
+    // vez que um relatório for gerado.
+    let _logoSitePromise = null;
+    function carregarLogoSiteBase64() {
+      if (_logoSitePromise) return _logoSitePromise;
+      _logoSitePromise = fetch('logo-header-96.png')
+        .then(resp => resp.blob())
+        .then(blob => new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        }))
+        .catch(() => null); // se não conseguir, os relatórios seguem sem o logo (não trava a geração)
+      return _logoSitePromise;
+    }
+
     // Formatadores compartilhados por todos os widgets da página (busca
     // rápida, índices/sparkline, análise fundamentalista). Escopo global —
     // fora das IIFEs — para não repetir/perder acesso entre os blocos.
@@ -5202,7 +5232,7 @@
       // Monta o PDF da comparação com jsPDF: mesmo cabeçalho padrão usado
       // nos outros PDFs do site (título + aviso do site + data/hora), depois
       // a tabela comparativa dos indicadores.
-      function montarPdfComparador() {
+      async function montarPdfComparador() {
         if (!ultimaComparacao) return null;
         if (!window.jspdf) {
           alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
@@ -5213,6 +5243,13 @@
         const doc = new jsPDF({ unit: 'pt', format: 'a4' });
         const agora = new Date();
         const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        // Logo do site no canto superior direito do relatório.
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
 
         // Cabeçalho padrão: título + aviso do site + data/hora de geração.
         doc.setFont('helvetica', 'bold');
@@ -5246,8 +5283,8 @@
         return doc;
       }
 
-      function gerarPdfComparador() {
-        const doc = montarPdfComparador();
+      async function gerarPdfComparador() {
+        const doc = await montarPdfComparador();
         if (!doc) return;
         doc.save(nomeArquivoComparador());
       }
@@ -5255,7 +5292,7 @@
       // Compartilha o PDF como arquivo de verdade (WhatsApp, etc, via Web
       // Share API). Sem suporte a compartilhar arquivos, baixa o PDF direto.
       async function compartilharComparador(botao) {
-        const doc = montarPdfComparador();
+        const doc = await montarPdfComparador();
         if (!doc) return;
 
         const nomeArquivo = nomeArquivoComparador();
@@ -6454,15 +6491,8 @@
         return texto.charAt(0).toUpperCase() + texto.slice(1);
       }
 
-      // Detecta celular/tablet de verdade — usado pra só oferecer o menu
-      // nativo de compartilhamento (Web Share API) em dispositivos móveis.
-      // Em navegadores desktop modernos (Chrome/Edge), o navigator.share
-      // já existe e "funciona", mas abre o seletor de programas do sistema
-      // operacional em vez de simplesmente baixar o PDF — pior experiência
-      // do que só baixar direto, que é o que sempre fizemos no desktop.
-      function ehDispositivoMovel() {
-        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      }
+      // (ehDispositivoMovel foi movida pro escopo global, junto com as
+      // outras funções compartilhadas — usada por várias calculadoras)
 
       function formatMesAno(ano, mesIndex0) {
         return `${NOMES_MESES[mesIndex0]}/${ano}`;
