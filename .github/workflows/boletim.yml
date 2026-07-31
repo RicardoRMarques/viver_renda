@@ -2,12 +2,13 @@ name: Gerar Boletim de Mercado Diário
 
 on:
   schedule:
-    # 6h05 de Brasília = 9h05 UTC (Brasil não tem horário de verão desde
-    # 2019, então esse horário é fixo o ano todo — não precisa ajustar
-    # depois).
-    # Roda de segunda (1) a sexta (5).
-    #- cron: '5 9 * * 1-5'
-    - cron: '30 1 * * 2-6'   # 22h30 BRT (seg-sex) = 01h30 UTC (ter-sáb)
+    # TESTE: 22h45 de Brasília = 1h45 UTC do dia seguinte (Brasil não tem
+    # horário de verão desde 2019, offset fixo UTC-3 o ano todo). Como
+    # 22h45 BRT já "vira o dia" em UTC, e pra não depender de acertar o
+    # dia da semana em UTC, tirei a restrição de dias (roda todo dia)
+    # enquanto for só teste — lembre de voltar pra "1-5" (seg-sex) e pro
+    # horário definitivo depois de confirmar que funciona.
+    - cron: '45 1 * * *'
   workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
 
 # Evita que duas execuções rodem ao mesmo tempo e briguem pelo commit
