@@ -377,13 +377,13 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, 
   ${destaquesHtml}
 </div>
 
-<h2 class="section">6 Melhores FIIs</h2>
+<h2 class="section">FIIs - Maiores Dividend Yield</h2>
 <table>
   <tr><th>Ticker</th><th>DY (12m)</th><th>Preço</th><th>Nome</th></tr>
   ${tabelaFiisHtml}
 </table>
 
-<h2 class="section">6 Melhores Ações de Dividendos</h2>
+<h2 class="section">Ações - Maiores Dividend Yield</h2>
 <table>
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   ${tabelaAcoesHtml}
