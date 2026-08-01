@@ -478,17 +478,10 @@
 
     /* Preço + gráfico lado a lado (empilha no mobile) */
     .hg-preco-grafico {
-      display: grid;
-      grid-template-columns: 1fr 1.6fr;
-      gap: 20px;
-      align-items: start;
       margin-bottom: 18px;
       padding-bottom: 18px;
       border-bottom: 1px solid var(--border);
     }
-    .hg-preco-linha { display: flex; flex-direction: column; gap: 6px; }
-    .hg-preco { font-size: 2.1rem; font-weight: 700; font-family: "Courier New", monospace; }
-    .hg-variacao { font-size: 1rem; font-weight: 700; font-family: "Courier New", monospace; }
     .hg-mercado-tag {
       display: inline-block;
       width: fit-content;
@@ -500,8 +493,39 @@
     }
     .hg-mercado-tag.aberto { color: var(--accent); border-color: rgba(124,255,146,0.4); }
 
+    /* Cards de indicadores (Cotação, DY, P/VP, Liquidez, Valor de mercado) */
+    .hg-indicadores-cards {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .hg-indicador-card {
+      background: var(--deep); border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; min-width: 0;
+    }
+    .hg-indicador-card span { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; }
+    .hg-indicador-card strong { font-size: 1rem; font-weight: 800; font-family: "Courier New", monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hg-indicador-card small { font-size: 0.72rem; font-weight: 700; font-family: "Courier New", monospace; }
+    @media (max-width: 900px) {
+      .hg-indicadores-cards { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .hg-indicadores-cards { grid-template-columns: repeat(2, 1fr); }
+    }
+
     .hg-grafico-box { min-width: 0; position: relative; }
-    .hg-grafico-titulo { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .hg-grafico-topo { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .hg-grafico-titulo { font-size: 0.78rem; color: var(--text); font-weight: 700; }
+    .hg-grafico-titulo span { color: var(--primary); font-weight: 700; }
+    .hg-periodo-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+    .hg-periodo-tab {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 6px; padding: 4px 9px; font-size: 0.72rem; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+    }
+    .hg-periodo-tab:hover { border-color: var(--primary); color: var(--primary); }
+    .hg-periodo-tab.hg-periodo-ativo { background: var(--primary); border-color: var(--primary); color: var(--btn-text); }
     .hg-grafico-periodo-valor { font-family: "Courier New", monospace; font-size: 0.72rem; }
     .hg-grafico-box svg { width: 100%; height: auto; display: block; overflow: visible; }
     .hg-grafico-eixo-label { font-size: 8.5px; fill: var(--muted); font-family: "Courier New", monospace; }
@@ -510,6 +534,21 @@
     .hg-grafico-tooltip-caixa { fill: var(--card); stroke: var(--border); stroke-width: 1; }
     .hg-grafico-tooltip-texto { font-size: 9px; font-family: "Courier New", monospace; fill: var(--text); }
     .hg-grafico-overlay { fill: transparent; cursor: crosshair; }
+
+    /* "Se você tivesse investido..." */
+    .hg-investido-card {
+      background: var(--deep); border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 16px; margin: 18px 0; 
+    }
+    .hg-investido-topo { font-weight: 700; font-size: 0.85rem; margin-bottom: 10px; }
+    .hg-investido-linha { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .hg-investido-texto { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+    .hg-investido-select {
+      background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 8px 8px; font-size: 0.8rem; font-family: inherit; cursor: pointer;
+    }
+    .hg-investido-resultado { font-size: 1rem; font-weight: 800; color: var(--primary); font-family: "Courier New", monospace; }
+    .hg-investido-resultado small { font-size: 0.72rem; font-weight: 700; margin-left: 4px; }
 
     .hg-grid-dados {
       display: grid;
@@ -3285,7 +3324,6 @@
 
         statusEl.textContent = '';
         hgRenderizarAtivo(ativo);
-        hgCarregarGrafico(ativo.ticker || ticker);
       }
 
       // Monta o grid de "todas as variáveis" retornadas pela API, agrupadas
@@ -3366,21 +3404,68 @@
               </button>
             </div>
 
-            <div class="hg-preco-grafico">
-              <div class="hg-preco-linha">
-                <div class="hg-preco">${hgFormatMoeda(q.value, a.currency) ?? '—'}</div>
-                <div class="hg-variacao ${emAlta ? 'val-up' : 'val-down'}">
-                  ${emAlta ? '▲' : '▼'} ${hgFormatMoeda(Math.abs(q.change_value || 0), a.currency) ?? '—'} (${hgFormatNumero(Math.abs(q.change_percent || 0))}%)
-                </div>
-                <span class="hg-mercado-tag ${a.market?.is_open ? 'aberto' : ''}">${a.market?.is_open ? 'Mercado aberto' : 'Mercado fechado'}</span>
+            <div class="hg-indicadores-cards">
+              <div class="hg-indicador-card">
+                <span>Cotação</span>
+                <strong>${hgFormatMoeda(q.value, a.currency) ?? '—'}</strong>
+                <small class="${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${hgFormatNumero(Math.abs(q.change_percent || 0))}%</small>
               </div>
+              <div class="hg-indicador-card">
+                <span>DY (12M)</span>
+                <strong id="hgIndDy">${typeof a.dividends?.yield_12m_percent === 'number' ? `${hgFormatNumero(a.dividends.yield_12m_percent)}%` : '—'}</strong>
+              </div>
+              <div class="hg-indicador-card">
+                <span>P/VP</span>
+                <strong id="hgIndPvp">…</strong>
+              </div>
+              <div class="hg-indicador-card">
+                <span>Liquidez diária</span>
+                <strong>${hgFormatCompacto(a.market?.volume) ?? '—'}</strong>
+              </div>
+              <div class="hg-indicador-card">
+                <span>Valor de mercado</span>
+                <strong>${hgFormatCompacto(q.market_cap) ?? '—'}</strong>
+              </div>
+            </div>
 
+            <div class="hg-preco-grafico">
               <div class="hg-grafico-box">
-                <div class="hg-grafico-titulo">Últimos 30 dias</div>
+                <div class="hg-grafico-topo">
+                  <div class="hg-grafico-titulo">Cotação — <span id="hgGraficoPeriodoLabel">30 dias</span></div>
+                  <div class="hg-periodo-tabs" id="hgPeriodoTabs">
+                    <button type="button" class="hg-periodo-tab" data-periodo="1D">1D</button>
+                    <button type="button" class="hg-periodo-tab" data-periodo="7D">7D</button>
+                    <button type="button" class="hg-periodo-tab hg-periodo-ativo" data-periodo="30D">30D</button>
+                    <button type="button" class="hg-periodo-tab" data-periodo="6M">6M</button>
+                    <button type="button" class="hg-periodo-tab" data-periodo="YTD">YTD</button>
+                    <button type="button" class="hg-periodo-tab" data-periodo="1A">1A</button>
+                  </div>
+                </div>
                 <div id="hgGrafico">
-                  <svg viewBox="0 0 300 90" preserveAspectRatio="none"><text x="10" y="45" fill="var(--muted)" font-size="10">Carregando gráfico...</text></svg>
+                  <svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Carregando gráfico...</text></svg>
                 </div>
               </div>
+            </div>
+
+            <div class="hg-investido-card">
+              <div class="hg-investido-topo">💰 Se você tivesse investido</div>
+              <div class="hg-investido-linha">
+                <div class="calc-input-prefixado" style="flex:1 1 140px;">
+                  <span class="calc-prefixo">R$</span>
+                  <input type="text" id="hgInvestidoValor" inputmode="numeric" value="1.000,00" />
+                </div>
+                <span class="hg-investido-texto">há</span>
+                <select id="hgInvestidoPeriodo" class="hg-investido-select">
+                  <option value="7D">7 dias</option>
+                  <option value="30D" selected>30 dias</option>
+                  <option value="6M">6 meses</option>
+                  <option value="YTD">este ano (YTD)</option>
+                  <option value="1A">1 ano</option>
+                </select>
+                <span class="hg-investido-texto">hoje você teria</span>
+                <strong id="hgInvestidoResultado" class="hg-investido-resultado">—</strong>
+              </div>
+              <p class="calc-ajuda" style="margin:8px 0 0;">Considera só a variação da cotação (sem reinvestimento de dividendos). Estimativa educativa.</p>
             </div>
 
             <div class="hg-grid-dados">
@@ -3436,7 +3521,14 @@
             `);
             hgCarregarValuation(a.symbol, a.currency);
           }
+        } else {
+          const elIndPvp = document.getElementById('hgIndPvp');
+          if (elIndPvp) elIndPvp.textContent = '—';
         }
+
+        hgCarregarGrafico(a.ticker || a.symbol, '30D');
+        hgInicializarPeriodoTabs(a);
+        hgInicializarInvestido();
       }
 
       // Busca o P/VP e VPA (campo "financials") no endpoint /finance/stock_price
@@ -3445,6 +3537,7 @@
       async function hgCarregarValuation(symbol, moeda) {
         const elPvp = document.getElementById('hgPvpValor');
         const elVpa = document.getElementById('hgVpaValor');
+        const elIndPvp = document.getElementById('hgIndPvp');
         if (!elPvp || !elVpa) return;
 
         try {
@@ -3461,42 +3554,140 @@
           elPvp.title = elPvp.textContent;
           elVpa.textContent = typeof vpa === 'number' ? (hgFormatMoeda(vpa, moeda) ?? '—') : 'Indisponível';
           elVpa.title = elVpa.textContent;
+          if (elIndPvp) elIndPvp.textContent = typeof pvp === 'number' ? hgFormatNumero(pvp) : '—';
         } catch (e) {
           elPvp.textContent = 'Indisponível';
           elVpa.textContent = 'Indisponível';
+          if (elIndPvp) elIndPvp.textContent = '—';
           console.error('Erro ao buscar P/VP na HG Brasil (stock_price):', e);
         }
       }
 
-      // Gera um link para esta consulta específica (ex: .../?ticker=PETR4)
-      // e usa o compartilhamento nativo do celular (se disponível) ou copia
-      // o link para a área de transferência.
-      // Busca o histórico diário dos últimos 30 dias e desenha um gráfico
-      // de linha simples em SVG (sem bibliotecas externas).
-      async function hgCarregarGrafico(ticker) {
-        const container = document.getElementById('hgGrafico');
-        if (!container) return;
+      // Cache das últimas amostras carregadas (ticker + período), reaproveitado
+      // pelo simulador "se você tivesse investido" — evita buscar de novo o
+      // mesmo histórico que o gráfico acabou de carregar.
+      let hgUltimoTickerGrafico = null;
+      const hgCacheHistorico = {}; // periodo -> amostras
 
+      // Calcula start_date/sample_by pra cada período disponível. Só vai até
+      // 1 ano — a HG Brasil não tem profundidade histórica confiável de
+      // vários anos (5A/10A/15A), então não oferecemos esses períodos pra
+      // não mostrar um gráfico vazio/quebrado.
+      function hgParametrosPeriodo(periodo) {
         const hoje = new Date();
         const inicio = new Date();
-        inicio.setDate(hoje.getDate() - 30);
+        switch (periodo) {
+          case '1D': inicio.setDate(hoje.getDate() - 1); return { inicio, sampleBy: '15m' };
+          case '7D': inicio.setDate(hoje.getDate() - 7); return { inicio, sampleBy: '1h' };
+          case '30D': inicio.setDate(hoje.getDate() - 30); return { inicio, sampleBy: '1d' };
+          case '6M': inicio.setDate(hoje.getDate() - 182); return { inicio, sampleBy: '1d' };
+          case 'YTD': return { inicio: new Date(hoje.getFullYear(), 0, 1), sampleBy: '1d' };
+          case '1A': inicio.setDate(hoje.getDate() - 365); return { inicio, sampleBy: '1d' };
+          default: inicio.setDate(hoje.getDate() - 30); return { inicio, sampleBy: '1d' };
+        }
+      }
+
+      async function hgCarregarGrafico(ticker, periodo) {
+        const container = document.getElementById('hgGrafico');
+        if (!container) return;
+        hgUltimoTickerGrafico = ticker;
+
+        const { inicio, sampleBy } = hgParametrosPeriodo(periodo);
+        const hoje = new Date();
 
         try {
-          const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent(ticker)}&sample_by=1d&start_date=${hgDataYYYYMMDD(inicio)}&end_date=${hgDataYYYYMMDD(hoje)}&key=${encodeURIComponent(CHAVE_HG)}`;
+          const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent(ticker)}&sample_by=${sampleBy}&start_date=${hgDataYYYYMMDD(inicio)}&end_date=${hgDataYYYYMMDD(hoje)}&key=${encodeURIComponent(CHAVE_HG)}`;
           const resp = await fetch(url);
           const data = await resp.json();
 
           const amostras = data?.results?.[0]?.samples;
           if (!Array.isArray(amostras) || amostras.length < 2) {
-            container.innerHTML = '<svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Sem histórico suficiente para o gráfico</text></svg>';
+            container.innerHTML = '<svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Sem histórico suficiente para este período</text></svg>';
+            hgCacheHistorico[periodo] = null;
             return;
           }
 
+          hgCacheHistorico[periodo] = amostras;
           hgDesenharGrafico(container, amostras);
+          hgAtualizarInvestido();
         } catch (e) {
           container.innerHTML = '<svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Gráfico indisponível agora</text></svg>';
+          hgCacheHistorico[periodo] = null;
           console.error('Erro ao carregar histórico HG Brasil:', e);
         }
+      }
+
+      // Abas de período (1D/7D/30D/6M/YTD/1A) acima do gráfico.
+      function hgInicializarPeriodoTabs(a) {
+        const container = document.getElementById('hgPeriodoTabs');
+        const labelEl = document.getElementById('hgGraficoPeriodoLabel');
+        if (!container) return;
+
+        const NOMES_PERIODO = { '1D': '1 dia', '7D': '7 dias', '30D': '30 dias', '6M': '6 meses', 'YTD': 'este ano', '1A': '1 ano' };
+
+        container.querySelectorAll('.hg-periodo-tab').forEach(btn => {
+          btn.addEventListener('click', () => {
+            container.querySelectorAll('.hg-periodo-tab').forEach(b => b.classList.remove('hg-periodo-ativo'));
+            btn.classList.add('hg-periodo-ativo');
+            const periodo = btn.getAttribute('data-periodo');
+            if (labelEl) labelEl.textContent = NOMES_PERIODO[periodo] || periodo;
+            hgCarregarGrafico(a.ticker || a.symbol, periodo);
+          });
+        });
+      }
+
+      // Simulador "Se você tivesse investido R$X há Y tempo...". Usa a
+      // primeira e a última amostra do período já carregado no gráfico
+      // (busca esse período específico se ainda não tiver em cache).
+      function hgInicializarInvestido() {
+        const inValor = document.getElementById('hgInvestidoValor');
+        const selPeriodo = document.getElementById('hgInvestidoPeriodo');
+        if (!inValor || !selPeriodo) return;
+
+        hgAplicarMascaraMoeda(inValor, 1000);
+        inValor.addEventListener('input', hgAtualizarInvestido);
+        selPeriodo.addEventListener('change', hgAtualizarInvestido);
+        hgAtualizarInvestido();
+      }
+
+      async function hgAtualizarInvestido() {
+        const inValor = document.getElementById('hgInvestidoValor');
+        const selPeriodo = document.getElementById('hgInvestidoPeriodo');
+        const resultadoElInvestido = document.getElementById('hgInvestidoResultado');
+        if (!inValor || !selPeriodo || !resultadoElInvestido || !hgUltimoTickerGrafico) return;
+
+        const periodo = selPeriodo.value;
+        let amostras = hgCacheHistorico[periodo];
+
+        if (amostras === undefined) {
+          resultadoElInvestido.textContent = 'calculando...';
+          const { inicio, sampleBy } = hgParametrosPeriodo(periodo);
+          const hoje = new Date();
+          try {
+            const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent(hgUltimoTickerGrafico)}&sample_by=${sampleBy}&start_date=${hgDataYYYYMMDD(inicio)}&end_date=${hgDataYYYYMMDD(hoje)}&key=${encodeURIComponent(CHAVE_HG)}`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            amostras = data?.results?.[0]?.samples || null;
+          } catch (e) {
+            amostras = null;
+          }
+          hgCacheHistorico[periodo] = amostras;
+        }
+
+        const valorInvestido = hgValorMascarado(inValor);
+        if (!amostras || amostras.length < 2 || valorInvestido <= 0) {
+          resultadoElInvestido.textContent = '—';
+          return;
+        }
+
+        const validas = amostras.filter(s => typeof s.close === 'number');
+        const precoInicial = validas[0].close;
+        const precoFinal = validas[validas.length - 1].close;
+        if (!precoInicial) { resultadoElInvestido.textContent = '—'; return; }
+
+        const resultado = valorInvestido * (precoFinal / precoInicial);
+        const variacao = ((precoFinal / precoInicial) - 1) * 100;
+        resultadoElInvestido.innerHTML = `${hgFormatMoeda(resultado) ?? '—'} <small class="${variacao >= 0 ? 'val-up' : 'val-down'}">(${variacao >= 0 ? '+' : ''}${hgFormatNumero(variacao)}%)</small>`;
       }
 
       // Converte uma lista de pontos {x,y} numa string de path SVG suavizada
