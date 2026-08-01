@@ -177,13 +177,6 @@
 
     /* Glossário de FIIs e Ações */
     .glossario-modal { max-width: 720px; }
-    .consultaav-modal { max-width: 820px; }
-    .consultaav-filtros { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 4px; }
-    @media (max-width: 640px) {
-      .consultaav-filtros { grid-template-columns: 1fr; }
-    }
-    .consultaav-tabela td.consultaav-nome-cel { display: flex; flex-direction: column; }
-    .consultaav-tabela .consultaav-sub { font-size: 0.68rem; color: var(--muted); }
     .glossario-busca {
       width: 100%; background: var(--deep); border: 1px solid var(--border); color: var(--text);
       border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; font-family: inherit; margin-bottom: 12px;
@@ -1764,9 +1757,6 @@
             <button type="button" class="nav-dropdown-item" id="navAbrirGlossario">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>Glossário de FIIs e Ações
             </button>
-            <button type="button" class="nav-dropdown-item" id="navAbrirConsultaAvancada">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="14" y2="12"></line><line x1="4" y1="18" x2="10" y2="18"></line><circle cx="18" cy="17" r="3"></circle><line x1="20.5" y1="19.5" x2="23" y2="22"></line></svg>Consulta Avançada de Ativos
-            </button>
             <button type="button" class="nav-dropdown-item" id="basBtnAbrir">
               🏦 Índice de Basileia dos Bancos
             </button>
@@ -1787,7 +1777,6 @@
       <div class="mobile-menu-separador">Simuladores</div>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário de FIIs e Ações</button>
-      <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConsultaAvancada">🔍 Consulta Avançada de Ativos</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
       <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     </div>
@@ -2971,50 +2960,6 @@
     </div>
   </div>
 
-  <!-- Modal: Consulta Avançada de Ativos (filtro combinado, sem IA) -->
-  <div id="consultaAvOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="consultaAvTitulo" hidden>
-    <div class="calc-modal consultaav-modal">
-      <div class="calc-modal-topo">
-        <h3 id="consultaAvTitulo">🔍 Consulta Avançada de Ativos</h3>
-        <button id="consultaAvFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
-      </div>
-      <div class="calc-corpo">
-        <p class="calc-ajuda" style="margin-top:0;">
-          Filtra Ações e FIIs ao mesmo tempo, combinando os critérios abaixo. Os dados vêm ao vivo da mesma fonte
-          usada no resto do site.
-        </p>
-
-        <div class="consultaav-filtros">
-          <div class="calc-campo">
-            <label for="consultaAvTipo">Tipo</label>
-            <select id="consultaAvTipo">
-              <option value="todos">Ações + FIIs</option>
-              <option value="acoes">Só Ações</option>
-              <option value="fiis">Só FIIs</option>
-            </select>
-          </div>
-          <div class="calc-campo">
-            <label for="consultaAvSegmento">Segmento / Setor (opcional)</label>
-            <input type="text" id="consultaAvSegmento" placeholder="ex: logística, bancos, papel..." autocomplete="off" />
-          </div>
-          <div class="calc-campo">
-            <label for="consultaAvDyMin">DY mínimo (12m, %)</label>
-            <input type="text" inputmode="decimal" id="consultaAvDyMin" placeholder="ex: 8" />
-          </div>
-          <div class="calc-campo">
-            <label for="consultaAvPvpMax">P/VP máximo</label>
-            <input type="text" inputmode="decimal" id="consultaAvPvpMax" placeholder="ex: 1,10" />
-          </div>
-        </div>
-
-        <button class="hg-btn" id="consultaAvBtnBuscar" style="width:100%; margin-top:4px;">Buscar</button>
-
-        <div id="consultaAvStatus" class="hg-status"></div>
-        <div class="cmp-tabela-wrap"><table class="cmp-tabela consultaav-tabela" id="consultaAvTabela"></table></div>
-      </div>
-    </div>
-  </div>
-
   <footer>
     <div class="container">
       <p>Desenvolvido para investidores. Dados fornecidos via integração com a B3.</p>
@@ -3894,160 +3839,6 @@
       }
     }
     carregarIndices();
-
-    // ============================================================
-    // CONSULTA AVANÇADA DE ATIVOS — filtro combinado (Tipo, Segmento,
-    // DY mínimo, P/VP máximo) sobre Ações + FIIs, sem IA. Usa como
-    // "universo de busca" os mesmos tickers que já aparecem nos rankings
-    // do site (ranking.json), enriquecidos ao vivo com DY/P/VP/segmento
-    // via a mesma API (HG Brasil) já usada no resto do site.
-    // ============================================================
-    (function () {
-      const btnAbrir = document.getElementById('navAbrirConsultaAvancada');
-      const overlay = document.getElementById('consultaAvOverlay');
-      const btnFechar = document.getElementById('consultaAvFechar');
-      const btnBuscar = document.getElementById('consultaAvBtnBuscar');
-      const selTipo = document.getElementById('consultaAvTipo');
-      const inSegmento = document.getElementById('consultaAvSegmento');
-      const inDyMin = document.getElementById('consultaAvDyMin');
-      const inPvpMax = document.getElementById('consultaAvPvpMax');
-      const statusEl = document.getElementById('consultaAvStatus');
-      const tabelaEl = document.getElementById('consultaAvTabela');
-      if (!btnAbrir || !overlay) return;
-
-      function abrirModal() {
-        overlay.hidden = false;
-        document.body.style.overflow = 'hidden';
-      }
-      function fecharModal() {
-        overlay.hidden = true;
-        document.body.style.overflow = '';
-      }
-      btnAbrir.addEventListener('click', abrirModal);
-      btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
-
-      // Monta a lista de tickers candidatos a partir do ranking.json (une
-      // as 3 listas de cada categoria, sem repetir ticker).
-      function montarUniversoBusca(ranking, tipo) {
-        const candidatos = new Map(); // ticker -> { ticker, nome, categoria }
-
-        function adicionarLista(lista, categoria) {
-          (lista || []).forEach(item => {
-            if (item?.ticker && !candidatos.has(item.ticker)) {
-              candidatos.set(item.ticker, { ticker: item.ticker, nome: item.nome || '', categoria });
-            }
-          });
-        }
-
-        if (tipo !== 'fiis') {
-          adicionarLista(ranking?.acoes?.dividend_yield, 'Ação');
-          adicionarLista(ranking?.acoes?.valor_mercado, 'Ação');
-          adicionarLista(ranking?.acoes?.receita, 'Ação');
-        }
-        if (tipo !== 'acoes') {
-          adicionarLista(ranking?.fiis?.valor_patrimonial, 'FII');
-          adicionarLista(ranking?.fiis?.dividend_yield, 'FII');
-          adicionarLista(ranking?.fiis?.mais_negociados, 'FII');
-        }
-
-        return Array.from(candidatos.values());
-      }
-
-      // Busca os dados ao vivo de um ticker (DY, P/VP, segmento, cotação),
-      // mesmo padrão já usado no Comparador de Ativos.
-      async function enriquecerTicker(candidato) {
-        try {
-          const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + candidato.ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
-          const resp = await fetch(url);
-          const data = await resp.json();
-          const ativo = data?.results?.[0];
-          if (!ativo) return null;
-
-          const urlValuation = `https://api.hgbrasil.com/finance/stock_price?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&symbol=${encodeURIComponent(ativo.symbol)}`;
-          const respValuation = await fetch(urlValuation);
-          const dataValuation = await respValuation.json();
-          const fin = dataValuation?.results?.[ativo.symbol]?.financials;
-
-          return {
-            ...candidato,
-            nome: candidato.nome || ativo.name || ativo.symbol,
-            cotacao: ativo.quote?.value ?? null,
-            moeda: ativo.currency || 'BRL',
-            segmento: ativo.classification?.sector || ativo.classification?.segment || '—',
-            dy: typeof ativo.dividends?.yield_12m_percent === 'number' ? ativo.dividends.yield_12m_percent : null,
-            pvp: typeof fin?.price_to_book_ratio === 'number' ? fin.price_to_book_ratio : null,
-          };
-        } catch (e) {
-          return null;
-        }
-      }
-
-      async function buscar() {
-        const tipo = selTipo.value;
-        const segmentoBusca = inSegmento.value.trim().toLowerCase();
-        const dyMin = parseFloat((inDyMin.value || '').replace(',', '.'));
-        const pvpMax = parseFloat((inPvpMax.value || '').replace(',', '.'));
-
-        statusEl.className = 'hg-status';
-        statusEl.textContent = 'Carregando ranking.json...';
-        tabelaEl.innerHTML = '';
-        btnBuscar.disabled = true;
-
-        try {
-          const respRanking = await fetch('ranking.json', { cache: 'no-store' });
-          const ranking = await respRanking.json();
-          const candidatos = montarUniversoBusca(ranking, tipo);
-
-          if (candidatos.length === 0) {
-            statusEl.className = 'hg-status erro';
-            statusEl.textContent = 'Ranking ainda não disponível — aguarde o robô rodar.';
-            btnBuscar.disabled = false;
-            return;
-          }
-
-          statusEl.textContent = `Consultando ${candidatos.length} ativo(s)...`;
-          const resultados = (await Promise.all(candidatos.map(enriquecerTicker))).filter(Boolean);
-
-          const filtrados = resultados.filter(r => {
-            if (segmentoBusca && !r.segmento.toLowerCase().includes(segmentoBusca)) return false;
-            if (!isNaN(dyMin) && (r.dy === null || r.dy < dyMin)) return false;
-            if (!isNaN(pvpMax) && (r.pvp === null || r.pvp > pvpMax)) return false;
-            return true;
-          }).sort((a, b) => (b.dy ?? -1) - (a.dy ?? -1));
-
-          if (filtrados.length === 0) {
-            statusEl.className = 'hg-status erro';
-            statusEl.textContent = 'Nenhum ativo encontrado com esses critérios. Tente afrouxar algum filtro.';
-            btnBuscar.disabled = false;
-            return;
-          }
-
-          statusEl.className = 'hg-status';
-          statusEl.textContent = `${filtrados.length} ativo(s) encontrado(s), de ${candidatos.length} consultados.`;
-
-          tabelaEl.innerHTML = `
-            <thead><tr><th>Ticker</th><th>Tipo</th><th>Segmento</th><th>Cotação</th><th>DY (12m)</th><th>P/VP</th></tr></thead>
-            <tbody>${filtrados.map(r => `
-              <tr>
-                <td class="consultaav-nome-cel"><strong>${r.ticker}</strong><span class="consultaav-sub">${r.nome}</span></td>
-                <td>${r.categoria}</td>
-                <td>${r.segmento}</td>
-                <td>${hgFormatMoeda(r.cotacao, r.moeda) ?? '—'}</td>
-                <td>${r.dy !== null ? `${hgFormatNumero(r.dy)}%` : '—'}</td>
-                <td>${r.pvp !== null ? hgFormatNumero(r.pvp) : '—'}</td>
-              </tr>`).join('')}</tbody>`;
-        } catch (e) {
-          statusEl.className = 'hg-status erro';
-          statusEl.textContent = 'Não foi possível buscar os dados agora. Tente novamente em instantes.';
-        } finally {
-          btnBuscar.disabled = false;
-        }
-      }
-
-      btnBuscar.addEventListener('click', buscar);
-    })();
 
     // ============================================================
     // GLOSSÁRIO DE FIIs E AÇÕES — lista própria (conteúdo original,
