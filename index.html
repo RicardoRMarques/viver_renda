@@ -1915,22 +1915,22 @@
 
         <div class="sim-visual-controles">
           <div class="sim-visual-controle">
-            <div class="sim-visual-controle-topo"><span>Aporte mensal</span><strong id="svAporteOut">R$ 700</strong></div>
+            <div class="sim-visual-controle-topo"><span>Aporte mensal <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="sv-aporte-mensal" aria-label="O que é isso?" title="O que é isso?">?</button></span><strong id="svAporteOut">R$ 700</strong></div>
             <input type="range" id="svAporte" min="100" max="20000" step="50" value="700" class="sim-visual-slider" />
             <div class="sim-visual-extremos"><span>R$ 100</span><span>R$ 20.000</span></div>
           </div>
           <div class="sim-visual-controle">
-            <div class="sim-visual-controle-topo"><span>Taxa de juros anual</span><strong id="svTaxaOut">11,5%</strong></div>
+            <div class="sim-visual-controle-topo"><span>Taxa de juros anual <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="sv-taxa-juros" aria-label="O que é isso?" title="O que é isso?">?</button></span><strong id="svTaxaOut">11,5%</strong></div>
             <input type="range" id="svTaxa" min="4" max="16" step="0.5" value="11.5" class="sim-visual-slider" />
             <div class="sim-visual-extremos"><span>4%</span><span>16%</span></div>
           </div>
           <div class="sim-visual-controle">
-            <div class="sim-visual-controle-topo"><span>Anos de aporte</span><strong id="svAnosAporteOut">20 anos</strong></div>
+            <div class="sim-visual-controle-topo"><span>Anos de aporte <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="sv-anos-aporte" aria-label="O que é isso?" title="O que é isso?">?</button></span><strong id="svAnosAporteOut">20 anos</strong></div>
             <input type="range" id="svAnosAporte" min="1" max="40" step="1" value="20" class="sim-visual-slider" />
             <div class="sim-visual-extremos"><span>1 ano</span><span>40 anos</span></div>
           </div>
           <div class="sim-visual-controle">
-            <div class="sim-visual-controle-topo"><span>Anos de retirada</span><strong id="svAnosRetiradaOut">10 anos</strong></div>
+            <div class="sim-visual-controle-topo"><span>Anos de retirada <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="sv-anos-retirada" aria-label="O que é isso?" title="O que é isso?">?</button></span><strong id="svAnosRetiradaOut">10 anos</strong></div>
             <input type="range" id="svAnosRetirada" min="1" max="40" step="1" value="10" class="sim-visual-slider" />
             <div class="sim-visual-extremos"><span>1 ano</span><span>40 anos</span></div>
           </div>
@@ -4958,6 +4958,10 @@
         'dy-fii': 'Dividend Yield (DY) = quanto o fundo imobiliário pagou de rendimentos aos cotistas nos últimos 12 meses, em relação à cotação atual da cota.\n\nCálculo: rendimentos pagos em 12 meses / cotação atual × 100',
         'mais-negociados': '"Mais Negociados" = fundos imobiliários com maior liquidez diária (volume financeiro médio negociado por dia), o que facilita comprar e vender cotas sem grandes variações de preço.',
         'taxa-retirada-sv': 'Taxa de retirada mensal = percentual do saldo atual que você saca todo mês, na fase de retirada.\n\nSe essa taxa for menor que o rendimento do mês, o patrimônio continua crescendo mesmo sacando. Se for maior, o patrimônio cai — e pode se esgotar antes do fim do período, se a retirada for grande demais ou o prazo for muito longo.\n\nReferência comum: 0,3% a.m. (≈ 4% a.a., a "regra dos 4%") costuma ser considerada uma taxa conservadora, que o patrimônio aguenta por décadas. Taxas acima de 1% a.m. são bem mais agressivas e arriscam esgotar o patrimônio mais rápido.',
+        'sv-aporte-mensal': 'Quanto você deposita todo mês, do próprio bolso (salário, poupança mensal), durante a fase de aportes. Esse valor entra na conta somado aos juros compostos — quanto maior o aporte, maior o efeito acumulado ao longo dos anos.',
+        'sv-taxa-juros': 'Retorno anual esperado dos seus investimentos, em % ao ano. É a taxa usada pra calcular o crescimento composto mês a mês (ex: 11,5% a.a. equivalem a cerca de 0,91% ao mês, compostos).\n\nUse uma taxa realista pro tipo de investimento que você pretende usar — renda fixa costuma render menos que uma carteira com ações/FIIs, por exemplo.',
+        'sv-anos-aporte': 'Por quantos anos você pretende continuar depositando o aporte mensal antes de parar de contribuir e passar a viver do patrimônio acumulado (fase de retirada).',
+        'sv-anos-retirada': 'Por quantos anos, depois que os aportes pararem, você pretende sacar uma renda do patrimônio acumulado — é o período mostrado em laranja no gráfico.',
         'taxa-retirada-fire': 'Taxa de retirada = percentual do patrimônio que você saca por ano, na teoria sem nunca "zerar" o patrimônio no longo prazo (o rendimento repõe o que foi retirado).\n\n4% ao ano é a referência mais usada (conhecida como "regra dos 4%", baseada no estudo Trinity). Taxas menores (ex: 3%) são mais conservadoras — o patrimônio necessário fica maior, mas o risco de ficar sem dinheiro é menor.',
       };
 
