@@ -123,6 +123,9 @@
       font-weight: bold;
     }
     .nav a:hover { color: var(--primary); }
+    .nav-icone-lupa { display: inline-flex; align-items: center; gap: 6px; color: var(--text); }
+    .nav-icone-lupa svg { width: 17px; height: 17px; flex-shrink: 0; }
+    .nav-icone-lupa:hover { color: var(--primary); }
 
     /* Menu hambúrguer (só aparece no mobile) */
     .mobile-menu-btn {
@@ -1762,7 +1765,10 @@
         DIVIDENDOS | VIVER DE RENDA
       </a>
       <nav class="nav">
-        <a href="#consultas">Mercado</a>
+        <a href="#consulta-rapida" class="nav-icone-lupa" title="Consultar Ações e FIIs" aria-label="Consultar Ações e FIIs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          Consultar Ações e FIIs
+        </a>
         <a href="#educacao">Educação</a>
         <div class="nav-dropdown">
           <button type="button" class="nav-dropdown-btn" id="navRendaFixaBtn" aria-haspopup="true" aria-expanded="false">
