@@ -974,6 +974,24 @@
     }
 
     /* Calculadora de Investimentos (modal) */
+    .calc-educativo {
+      background: var(--deep); border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px 14px; margin: 4px 0 14px;
+    }
+    .calc-educativo summary {
+      cursor: pointer; font-weight: 700; font-size: 0.85rem; color: var(--text);
+      list-style: none; display: flex; align-items: center; justify-content: space-between;
+    }
+    .calc-educativo summary::-webkit-details-marker { display: none; }
+    .calc-educativo summary::after {
+      content: '▾'; color: var(--muted); transition: transform 0.15s ease; margin-left: 8px;
+    }
+    .calc-educativo[open] summary::after { transform: rotate(180deg); }
+    .calc-educativo-corpo { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+    .calc-educativo-item { margin-bottom: 12px; }
+    .calc-educativo-item:last-child { margin-bottom: 0; }
+    .calc-educativo-item strong { display: block; font-size: 0.82rem; color: var(--primary); margin-bottom: 3px; }
+    .calc-educativo-item p { font-size: 0.8rem; color: var(--muted); line-height: 1.55; margin: 0; }
     .calc-overlay {
       position: fixed;
       inset: 0;
@@ -2282,6 +2300,27 @@
               </select>
             </div>
           </div>
+
+          <details class="calc-educativo">
+            <summary>💡 Quando cada indexador faz mais sentido?</summary>
+            <div class="calc-educativo-corpo">
+              <div class="calc-educativo-item">
+                <strong>% do CDI (pós-fixado)</strong>
+                <p>Acompanha o juro que o mercado está pagando agora, mês a mês — se a Selic subir, seu rendimento sobe junto. Faz mais sentido quando a Selic está <strong>em alta ou incerta</strong>, ou quando você pode precisar resgatar antes do vencimento (o risco de "perder dinheiro" ao vender antes da hora é baixo comparado ao prefixado).</p>
+              </div>
+              <div class="calc-educativo-item">
+                <strong>Prefixado</strong>
+                <p>Trava uma taxa fixa, sabida desde o início. Faz mais sentido quando você <strong>acredita que a Selic vai cair</strong> nos próximos meses/anos — assim você "guarda" a taxa mais alta de hoje, antes da queda. O risco: se resgatar antes do vencimento num momento de juros em alta, pode vender por menos do que investiu.</p>
+              </div>
+              <div class="calc-educativo-item">
+                <strong>IPCA+ (híbrido)</strong>
+                <p>Rende a inflação (IPCA) + uma taxa fixa acima dela. Faz mais sentido pra <strong>objetivos de longo prazo</strong> (aposentadoria, muitos anos à frente) — garante que seu dinheiro sempre cresce em termos reais, não importa o que aconteça com a inflação no meio do caminho.</p>
+              </div>
+              <p class="calc-ajuda" style="margin:10px 0 0;">
+                Não existe indexador "melhor" — a escolha certa depende do seu prazo, da sua necessidade de liquidez e da sua leitura de cenário (Selic subindo ou caindo). Em dúvida, muita gente diversifica entre os três.
+              </p>
+            </div>
+          </details>
 
           <button class="hg-btn" id="calcBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
 
