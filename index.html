@@ -497,7 +497,7 @@
     /* Cards de indicadores (Cotação, DY, P/VP, Liquidez, Valor de mercado) */
     .hg-indicadores-cards {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
       gap: 10px;
       margin-bottom: 18px;
     }
@@ -506,15 +506,10 @@
       padding: 11px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0;
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
+    .hg-indicador-card .hg-indicador-label { display: flex; align-items: center; gap: 4px; }
     .hg-indicador-card span { font-size: 0.68rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
-    .hg-indicador-card strong { font-size: 1.08rem; font-weight: 800; color: var(--text); font-family: "Courier New", monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hg-indicador-card strong { font-size: 1.02rem; font-weight: 800; color: var(--text); font-family: "Courier New", monospace; overflow-wrap: break-word; line-height: 1.25; }
     .hg-indicador-card small { font-size: 0.74rem; font-weight: 700; font-family: "Courier New", monospace; }
-    @media (max-width: 900px) {
-      .hg-indicadores-cards { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 560px) {
-      .hg-indicadores-cards { grid-template-columns: repeat(2, 1fr); }
-    }
 
     .hg-grafico-box { min-width: 0; position: relative; }
     .hg-grafico-topo { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -3384,6 +3379,67 @@
           .filter(g => g.campos.length > 0);
       }
 
+      // Explicações dos 5 cards de indicadores (Cotação, DY, P/VP,
+      // Liquidez, Valor de mercado), mostradas no "?" de cada um.
+      const AJUDA_INDICADOR = {
+        cotacao: 'Preço atual de negociação do ativo na bolsa, com a variação percentual do dia (comparado ao fechamento anterior).',
+        dy: 'Dividend Yield dos últimos 12 meses: quanto o ativo pagou em dividendos/rendimentos nesse período, em relação à cotação atual. Cálculo: dividendos pagos ÷ cotação × 100.',
+        pvp: 'Preço sobre Valor Patrimonial: indica se o ativo está sendo negociado acima (P/VP > 1) ou abaixo (P/VP < 1) do valor "no papel" do seu patrimônio.',
+        liquidez: 'Volume financeiro médio negociado por dia. Quanto maior, mais fácil comprar/vender o ativo sem afetar muito o preço.',
+        valormercado: 'Valor total do ativo negociado em bolsa. Cálculo: cotação atual × número de ações/cotas em circulação.',
+      };
+
+      let hgIndicadorTooltipEl = null;
+      function hgAtivarTooltipsIndicadores() {
+        if (!hgIndicadorTooltipEl) {
+          hgIndicadorTooltipEl = document.createElement('div');
+          hgIndicadorTooltipEl.className = 'cmp-info-balao';
+          document.body.appendChild(hgIndicadorTooltipEl);
+        }
+        function fechar() {
+          hgIndicadorTooltipEl.classList.remove('cmp-info-aberto');
+          hgIndicadorTooltipEl.style.display = 'none';
+        }
+        function abrir(botao, texto) {
+          hgIndicadorTooltipEl.textContent = texto;
+          hgIndicadorTooltipEl.style.display = 'block';
+          const rect = botao.getBoundingClientRect();
+          const largura = hgIndicadorTooltipEl.offsetWidth;
+          let left = rect.left;
+          if (left + largura > window.innerWidth - 8) left = window.innerWidth - largura - 8;
+          if (left < 8) left = 8;
+          let top = rect.bottom + 6;
+          const altura = hgIndicadorTooltipEl.offsetHeight;
+          if (top + altura > window.innerHeight - 8) top = rect.top - altura - 6;
+          hgIndicadorTooltipEl.style.top = `${top}px`;
+          hgIndicadorTooltipEl.style.left = `${left}px`;
+        }
+        resultadoEl.querySelectorAll('[data-indicador]').forEach(botao => {
+          const texto = AJUDA_INDICADOR[botao.getAttribute('data-indicador')];
+          if (!texto) return;
+          botao.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const chave = botao.getAttribute('data-indicador');
+            if (hgIndicadorTooltipEl.classList.contains('cmp-info-aberto') && hgIndicadorTooltipEl.dataset.origem === chave) {
+              fechar();
+              return;
+            }
+            abrir(botao, texto);
+            hgIndicadorTooltipEl.classList.add('cmp-info-aberto');
+            hgIndicadorTooltipEl.dataset.origem = chave;
+          });
+          botao.addEventListener('mouseenter', () => {
+            if (hgIndicadorTooltipEl.classList.contains('cmp-info-aberto')) return;
+            abrir(botao, texto);
+          });
+          botao.addEventListener('mouseleave', () => {
+            if (!hgIndicadorTooltipEl.classList.contains('cmp-info-aberto')) fechar();
+          });
+        });
+        document.addEventListener('click', fechar);
+        window.addEventListener('scroll', fechar, { passive: true });
+      }
+
       function hgRenderizarAtivo(a) {
         const q = a.quote || {};
         const logo = a.logos?.square_large || a.logos?.square_small;
@@ -3412,24 +3468,24 @@
 
             <div class="hg-indicadores-cards">
               <div class="hg-indicador-card">
-                <span>Cotação</span>
+                <div class="hg-indicador-label"><span>Cotação</span><button type="button" class="hg-info-btn hg-info-vermelho" data-indicador="cotacao" aria-label="O que é isso?" title="O que é isso?">?</button></div>
                 <strong>${hgFormatMoeda(q.value, a.currency) ?? '—'}</strong>
                 <small class="${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${hgFormatNumero(Math.abs(q.change_percent || 0))}%</small>
               </div>
               <div class="hg-indicador-card">
-                <span>DY (12M)</span>
+                <div class="hg-indicador-label"><span>DY (12M)</span><button type="button" class="hg-info-btn hg-info-vermelho" data-indicador="dy" aria-label="O que é isso?" title="O que é isso?">?</button></div>
                 <strong id="hgIndDy">${typeof a.dividends?.yield_12m_percent === 'number' ? `${hgFormatNumero(a.dividends.yield_12m_percent)}%` : '—'}</strong>
               </div>
               <div class="hg-indicador-card">
-                <span>P/VP</span>
+                <div class="hg-indicador-label"><span>P/VP</span><button type="button" class="hg-info-btn hg-info-vermelho" data-indicador="pvp" aria-label="O que é isso?" title="O que é isso?">?</button></div>
                 <strong id="hgIndPvp">…</strong>
               </div>
               <div class="hg-indicador-card">
-                <span>Liquidez diária</span>
+                <div class="hg-indicador-label"><span>Liquidez diária</span><button type="button" class="hg-info-btn hg-info-vermelho" data-indicador="liquidez" aria-label="O que é isso?" title="O que é isso?">?</button></div>
                 <strong>${hgFormatCompacto(a.market?.volume) ?? '—'}</strong>
               </div>
               <div class="hg-indicador-card">
-                <span>Valor de mercado</span>
+                <div class="hg-indicador-label"><span>Valor de mercado</span><button type="button" class="hg-info-btn hg-info-vermelho" data-indicador="valormercado" aria-label="O que é isso?" title="O que é isso?">?</button></div>
                 <strong>${hgFormatCompacto(q.market_cap) ?? '—'}</strong>
               </div>
             </div>
@@ -3501,6 +3557,8 @@
             hgBuscarAtivo();
           });
         });
+
+        hgAtivarTooltipsIndicadores();
 
         const btnCompartilhar = document.getElementById('hgBtnCompartilhar');
         if (btnCompartilhar) {
