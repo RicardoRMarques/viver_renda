@@ -4037,6 +4037,32 @@
     }
     carregarIndices();
 
+    // Clique na lupa "Consultar Ações e FIIs" do topo: rola até a seção
+    // considerando a altura do cabeçalho fixo (senão o topo do card fica
+    // escondido atrás dele) e já foca o campo de busca, pronto pra digitar.
+    (function () {
+      const linkLupa = document.querySelector('.nav-icone-lupa');
+      const alvo = document.getElementById('consulta-rapida');
+      const inputBusca = document.getElementById('hgTickerInput');
+      if (!linkLupa || !alvo) return;
+
+      linkLupa.addEventListener('click', (e) => {
+        e.preventDefault();
+        const cabecalho = document.querySelector('header');
+        const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 70;
+        const posicaoAlvo = alvo.getBoundingClientRect().top + window.scrollY - alturaCabecalho - 12;
+
+        window.scrollTo({ top: posicaoAlvo, behavior: 'smooth' });
+
+        // Foca o campo só depois da rolagem terminar (senão o navegador
+        // pode "puxar" a tela de volta pro campo focado antes da hora).
+        clearTimeout(window._focoBuscaTimeout);
+        window._focoBuscaTimeout = setTimeout(() => {
+          if (inputBusca) inputBusca.focus({ preventScroll: true });
+        }, 500);
+      });
+    })();
+
     // ============================================================
     // GLOSSÁRIO DE FIIs E AÇÕES — lista própria (conteúdo original,
     // escrito para este site), com busca e filtro alfabético.
