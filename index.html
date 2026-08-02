@@ -1013,6 +1013,14 @@
     .calc-educativo-item:last-child { margin-bottom: 0; }
     .calc-educativo-item strong { display: block; font-size: 0.82rem; color: var(--primary); margin-bottom: 3px; }
     .calc-educativo-item p { font-size: 0.8rem; color: var(--muted); line-height: 1.55; margin: 0; }
+    .ir-tabela-regras { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .ir-tabela-regras th {
+      text-align: left; color: var(--muted); font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.02em; font-size: 0.68rem; padding: 6px 8px; border-bottom: 1px solid var(--border);
+    }
+    .ir-tabela-regras td { padding: 7px 8px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .ir-tabela-regras tr:last-child td { border-bottom: none; }
+    .ir-tabela-regras td:last-child { font-family: "Courier New", monospace; font-weight: 700; color: var(--primary); }
     .calc-overlay {
       position: fixed;
       inset: 0;
@@ -2765,6 +2773,38 @@
               Foi day-trade (compra e venda no mesmo dia)?
             </label>
           </div>
+
+          <details class="calc-educativo" open>
+            <summary>📋 Tabela de regras de IR por tipo de investimento</summary>
+            <div class="calc-educativo-corpo">
+              <table class="ir-tabela-regras">
+                <thead>
+                  <tr><th>Investimento</th><th>IR</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>CDB</td><td>22,5% → 15% (regressivo)</td></tr>
+                  <tr><td>Tesouro Selic</td><td>22,5% → 15% (regressivo)</td></tr>
+                  <tr><td>Tesouro IPCA+</td><td>22,5% → 15% (regressivo)</td></tr>
+                  <tr><td>Tesouro Prefixado</td><td>22,5% → 15% (regressivo)</td></tr>
+                  <tr><td>Ações (comum)</td><td>15% sobre o lucro (isento até R$ 20 mil vendidos/mês)</td></tr>
+                  <tr><td>Ações (day-trade)</td><td>20% sobre o lucro, sem isenção</td></tr>
+                  <tr><td>FIIs (rendimentos mensais)</td><td>Isento*</td></tr>
+                  <tr><td>FIIs (venda de cotas c/ lucro)</td><td>20%, sem faixa de isenção</td></tr>
+                  <tr><td>LCI</td><td>Isento</td></tr>
+                  <tr><td>LCA</td><td>Isento</td></tr>
+                </tbody>
+              </table>
+              <p class="calc-ajuda" style="margin:10px 0 0;">
+                <strong>CDB e Tesouro Direto seguem exatamente a mesma tabela regressiva</strong> — por isso a calculadora
+                abaixo trata os dois juntos como "renda fixa tributada", bastando informar as datas de aplicação e resgate.
+              </p>
+              <p class="calc-ajuda" style="margin:6px 0 0;">
+                *Rendimento mensal distribuído pelo FII costuma ser isento de IR pra pessoa física, desde que o fundo
+                cumpra os requisitos legais (negociado em bolsa, mínimo de 50 cotistas etc.) — essa isenção não é
+                calculada aqui, que trata apenas do IR sobre a venda de cotas com lucro.
+              </p>
+            </div>
+          </details>
 
           <button class="hg-btn" id="irBtnCalcular" style="width:100%; margin-top:10px;">Calcular</button>
 
