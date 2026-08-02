@@ -4298,12 +4298,34 @@
         if (painel.hidden) abrir(); else fechar();
       });
 
-      // Links de âncora (Notícias/Mercado/Educação) e botões de simulador
-      // fecham o menu ao serem clicados.
+      // Links de âncora (Notícias/Boletim/Educação/Consultar Ações e FIIs
+      // etc.) e botões de simulador fecham o menu ao serem clicados. Pros
+      // links de âncora, rolamos manualmente descontando a altura do
+      // cabeçalho fixo — senão o topo da seção fica escondido atrás dele.
       painel.querySelectorAll('.mobile-menu-item').forEach(item => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (e) => {
           const alvo = item.getAttribute('data-mobile-alvo');
-          if (alvo) document.getElementById(alvo)?.click();
+          if (alvo) {
+            document.getElementById(alvo)?.click();
+            fechar();
+            return;
+          }
+
+          const href = item.getAttribute('href') || '';
+          if (href.startsWith('#')) {
+            const destino = document.getElementById(href.slice(1));
+            if (destino) {
+              e.preventDefault();
+              fechar();
+              setTimeout(() => {
+                const cabecalho = document.querySelector('header');
+                const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 60;
+                const posicao = destino.getBoundingClientRect().top + window.scrollY - alturaCabecalho - 12;
+                window.scrollTo({ top: posicao, behavior: 'smooth' });
+              }, 50); // pequena espera pro menu já ter fechado (a página muda de altura)
+              return;
+            }
+          }
           fechar();
         });
       });
