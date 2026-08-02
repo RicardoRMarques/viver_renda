@@ -415,11 +415,13 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       max-width: 1100px;
-      align-items: start;
+      align-items: stretch;
       gap: 14px;
     }
+    .consultas-grid-2x2 > section.hg-busca { display: flex; flex-direction: column; }
     @media (max-width: 900px) {
       .consultas-grid-2x2 { grid-template-columns: 1fr; max-width: 720px; }
+      .consultas-grid-2x2 > section.hg-busca { display: block; }
     }
 
     /* Notícias lado a lado, largura toda, abaixo das consultas */
@@ -451,6 +453,25 @@
     }
     .hg-card-topo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
     .hg-card-topo-info { display: flex; align-items: center; gap: 14px; flex: 1 1 auto; }
+    .hg-card-topo-acoes { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .hg-btn-secundario-pequeno {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.15s ease, border-color 0.15s ease;
+      white-space: nowrap;
+    }
+    .hg-btn-secundario-pequeno:hover { color: var(--primary); border-color: var(--primary); }
+    .hg-btn-secundario-pequeno.copiado { color: var(--accent); border-color: var(--accent); }
+    .hg-btn-secundario-pequeno svg { width: 13px; height: 13px; flex-shrink: 0; }
     .hg-btn-compartilhar {
       display: inline-flex;
       align-items: center;
@@ -2636,13 +2657,6 @@
 
             <div class="hg-status" id="hgStatus"></div>
             <div id="hgResultado"></div>
-
-            <div class="cmp-btn-linha">
-              <button type="button" class="cmp-btn-abrir" id="cmpBtnAbrir">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-                Comparador de Ativos
-              </button>
-            </div>
           </div>
         </section>
 
@@ -3499,10 +3513,16 @@
                   <div class="hg-setor">${a.classification?.sector || a.full_name || ''}</div>
                 </div>
               </div>
-              <button type="button" class="hg-btn-compartilhar" id="hgBtnCompartilhar" title="Copiar link desta consulta">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                <span class="hg-btn-compartilhar-texto" id="hgBtnCompartilharTexto">Compartilhar</span>
-              </button>
+              <div class="hg-card-topo-acoes">
+                <button type="button" class="hg-btn-secundario-pequeno" id="hgBtnAbrirComparador" title="Comparar ${a.symbol} com outros ativos">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                  Comparar
+                </button>
+                <button type="button" class="hg-btn-secundario-pequeno" id="hgBtnCompartilhar" title="Copiar link desta consulta">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                  <span id="hgBtnCompartilharTexto" class="hg-btn-compartilhar-texto">Compartilhar</span>
+                </button>
+              </div>
             </div>
 
             <div class="hg-indicadores-cards">
@@ -3602,6 +3622,15 @@
         const btnCompartilhar = document.getElementById('hgBtnCompartilhar');
         if (btnCompartilhar) {
           btnCompartilhar.addEventListener('click', () => hgCompartilharAtivo(a, btnCompartilhar));
+        }
+
+        const btnAbrirComparador = document.getElementById('hgBtnAbrirComparador');
+        if (btnAbrirComparador) {
+          btnAbrirComparador.addEventListener('click', () => {
+            if (typeof window.hgAbrirComparadorCom === 'function') {
+              window.hgAbrirComparadorCom(a.symbol);
+            }
+          });
         }
 
         // P/VP e VPA (equity_per_share) só vêm no endpoint mais antigo da HG
@@ -5330,7 +5359,6 @@
     (function () {
       const overlaySelecao = document.getElementById('cmpOverlaySelecao');
       const overlayTabela = document.getElementById('cmpOverlayTabela');
-      const btnAbrir = document.getElementById('cmpBtnAbrir');
       const btnFecharSelecao = document.getElementById('cmpFecharSelecao');
       const btnFecharTabela = document.getElementById('cmpFecharTabela');
       const buscaInput = document.getElementById('cmpBuscaInput');
@@ -5342,7 +5370,7 @@
       const tabelaStatus = document.getElementById('cmpTabelaStatus');
       const tabelaEl = document.getElementById('cmpTabela');
 
-      if (!overlaySelecao || !btnAbrir) return;
+      if (!overlaySelecao) return;
 
       const MAX_ATIVOS = 5;
       let selecionados = []; // array de tickers (sem "B3:")
@@ -5664,7 +5692,22 @@
         setTimeout(() => { botao.innerHTML = textoOriginal; }, 2500);
       }
 
-      btnAbrir.addEventListener('click', abrirSelecao);
+      // O antigo botão fixo "Comparador de Ativos" saiu daqui — agora ele só
+      // aparece dentro do resultado de uma consulta (Consultar Ações e
+      // FIIs), já com o ativo pesquisado pré-preenchido. Por isso não
+      // dependemos mais de um botão estático pra abrir o modal: expomos
+      // uma função global que qualquer botão dinâmico pode chamar.
+      window.hgAbrirComparadorCom = function (tickerInicial) {
+        abrirSelecao();
+        if (tickerInicial) {
+          const t = tickerInicial.toUpperCase();
+          if (!selecionados.includes(t) && selecionados.length < MAX_ATIVOS) {
+            selecionados.push(t);
+            renderizarPills();
+          }
+        }
+      };
+
       btnFecharSelecao.addEventListener('click', fecharSelecao);
       btnFecharTabela.addEventListener('click', fecharTabela);
       overlaySelecao.addEventListener('click', e => { if (e.target === overlaySelecao) fecharSelecao(); });
