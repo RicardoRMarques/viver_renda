@@ -181,6 +181,30 @@
 
     /* Glossário de FIIs e Ações */
     .glossario-modal { max-width: 720px; }
+    .consultaav-modal { max-width: 720px; }
+
+    /* Quiz de Perfil de Investidor */
+    .quiz-pergunta { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px dashed var(--border); }
+    .quiz-pergunta:last-of-type { border-bottom: none; }
+    .quiz-pergunta-texto { font-size: 0.86rem; font-weight: 700; color: var(--text); margin: 0 0 10px; }
+    .quiz-opcao {
+      display: flex; align-items: center; gap: 9px; padding: 9px 12px; margin-bottom: 6px;
+      background: var(--deep); border: 1px solid var(--border); border-radius: 9px;
+      font-size: 0.82rem; color: var(--muted); cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .quiz-opcao:hover { border-color: var(--primary); color: var(--text); }
+    .quiz-opcao input { width: auto; margin: 0; accent-color: var(--primary); flex-shrink: 0; }
+    .quiz-opcao:has(input:checked) { border-color: var(--primary); color: var(--text); background: rgba(49,195,255,0.07); }
+    .quiz-resultado-card {
+      background: var(--deep); border: 1.5px solid var(--primary); border-radius: 14px;
+      padding: 18px; margin-top: 16px; text-align: center;
+    }
+    .quiz-resultado-card .quiz-perfil-nome { font-size: 1.3rem; font-weight: 800; color: var(--primary); margin: 4px 0 10px; }
+    .quiz-resultado-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin: 0 0 10px; text-align: left; }
+    .quiz-resultado-alocacao { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin: 12px 0; }
+    .quiz-resultado-alocacao div { text-align: center; }
+    .quiz-resultado-alocacao strong { display: block; font-size: 1.05rem; color: var(--text); }
+    .quiz-resultado-alocacao span { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; }
     .glossario-busca {
       width: 100%; background: var(--deep); border: 1px solid var(--border); color: var(--text);
       border-radius: 10px; padding: 10px 12px; font-size: 0.9rem; font-family: inherit; margin-bottom: 12px;
@@ -1826,6 +1850,9 @@
             <button type="button" class="nav-dropdown-item" id="basBtnAbrir">
               🏦 Índice de Basileia dos Bancos
             </button>
+            <button type="button" class="nav-dropdown-item" id="quizBtnAbrir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 3.5"></path><line x1="12" y1="16.5" x2="12" y2="16.5"></line></svg>Descubra seu Perfil de Investidor
+            </button>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
           </div>
         </div>
@@ -1845,6 +1872,7 @@
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário de FIIs e Ações</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="quizBtnAbrir">🧠 Descubra seu Perfil de Investidor</button>
       <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     </div>
   </header>
@@ -2697,7 +2725,9 @@
     <div id="irOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="irTitulo" hidden>
       <div class="calc-modal fire-modal">
         <div class="calc-modal-topo">
-          <h3 id="irTitulo">🧾 Calculadora de Imposto de Renda</h3>
+          <h3 id="irTitulo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M6 2h9l3 3v17H6z"></path><path d="M15 2v3h3"></path><line x1="9" y1="10" x2="15" y2="10"></line><line x1="9" y1="14" x2="15" y2="14"></line><line x1="9" y1="18" x2="12" y2="18"></line></svg>Calculadora de Imposto de Renda
+          </h3>
           <button id="irFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
         </div>
         <div class="calc-corpo">
@@ -3066,6 +3096,78 @@
     </div>
 
   </main>
+
+  <!-- Modal: Descubra seu Perfil de Investidor (quiz de suitability) -->
+  <div id="quizOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="quizTitulo" hidden>
+    <div class="calc-modal consultaav-modal">
+      <div class="calc-modal-topo">
+        <h3 id="quizTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 3.5"></path><line x1="12" y1="16.5" x2="12" y2="16.5"></line></svg>Descubra seu Perfil de Investidor
+        </h3>
+        <button id="quizFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo" id="quizCorpo">
+
+        <p class="calc-ajuda" style="margin-top:0;">
+          6 perguntas rápidas pra te dar uma ideia do seu perfil de investidor (Conservador, Moderado ou Arrojado) —
+          o mesmo tipo de teste que corretoras e bancos aplicam antes de recomendar produtos.
+        </p>
+
+        <form id="quizForm">
+          <div class="quiz-pergunta">
+            <p class="quiz-pergunta-texto">1. Qual é o seu principal objetivo com os investimentos?</p>
+            <label class="quiz-opcao"><input type="radio" name="q1" value="1" required /> Preservar o capital, mesmo com retorno baixo</label>
+            <label class="quiz-opcao"><input type="radio" name="q1" value="2" /> Equilíbrio entre segurança e rentabilidade</label>
+            <label class="quiz-opcao"><input type="radio" name="q1" value="3" /> Buscar o maior retorno possível, aceitando mais risco</label>
+          </div>
+
+          <div class="quiz-pergunta">
+            <p class="quiz-pergunta-texto">2. Por quanto tempo pretende deixar esse dinheiro investido, sem precisar resgatar?</p>
+            <label class="quiz-opcao"><input type="radio" name="q2" value="1" required /> Menos de 1 ano</label>
+            <label class="quiz-opcao"><input type="radio" name="q2" value="2" /> De 1 a 5 anos</label>
+            <label class="quiz-opcao"><input type="radio" name="q2" value="3" /> Mais de 5 anos</label>
+          </div>
+
+          <div class="quiz-pergunta">
+            <p class="quiz-pergunta-texto">3. Se seus investimentos caíssem 15% num único mês, o que você faria?</p>
+            <label class="quiz-opcao"><input type="radio" name="q3" value="1" required /> Venderia tudo pra evitar mais perdas</label>
+            <label class="quiz-opcao"><input type="radio" name="q3" value="2" /> Ficaria preocupado, mas esperaria melhorar</label>
+            <label class="quiz-opcao"><input type="radio" name="q3" value="3" /> Aproveitaria pra comprar mais, na baixa</label>
+          </div>
+
+          <div class="quiz-pergunta">
+            <p class="quiz-pergunta-texto">4. Como você classificaria seu conhecimento sobre investimentos?</p>
+            <label class="quiz-opcao"><input type="radio" name="q4" value="1" required /> Iniciante, prefiro produtos simples de entender</label>
+            <label class="quiz-opcao"><input type="radio" name="q4" value="2" /> Intermediário, já invisto em alguns produtos</label>
+            <label class="quiz-opcao"><input type="radio" name="q4" value="3" /> Avançado, acompanho o mercado de perto</label>
+          </div>
+
+          <div class="quiz-pergunta">
+            <p class="quiz-pergunta-texto">5. Como está sua reserva de emergência hoje?</p>
+            <label class="quiz-opcao"><input type="radio" name="q5" value="1" required /> Ainda não tenho, ou é bem pequena</label>
+            <label class="quiz-opcao"><input type="radio" name="q5" value="2" /> Tenho uma reserva razoável formada</label>
+            <label class="quiz-opcao"><input type="radio" name="q5" value="3" /> Minha reserva está bem estabelecida</label>
+          </div>
+
+          <div class="quiz-pergunta">
+            <p class="quiz-pergunta-texto">6. Já teve experiência com investimentos de maior risco (ações, FIIs, cripto)?</p>
+            <label class="quiz-opcao"><input type="radio" name="q6" value="1" required /> Nunca investi nesse tipo de ativo</label>
+            <label class="quiz-opcao"><input type="radio" name="q6" value="2" /> Já investi um pouco</label>
+            <label class="quiz-opcao"><input type="radio" name="q6" value="3" /> Invisto com frequência</label>
+          </div>
+
+          <button type="submit" class="hg-btn" style="width:100%; margin-top:6px;">Ver meu resultado</button>
+        </form>
+
+        <div id="quizResultado"></div>
+
+        <p class="calc-ajuda" style="margin-top:16px;">
+          Teste simplificado e educativo — não substitui a Análise de Perfil do Investidor (API) oficial exigida por
+          corretoras e bancos antes de qualquer recomendação real de investimento.
+        </p>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal: Glossário de FIIs e Ações -->
   <div id="glossarioOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="glossarioTitulo" hidden>
@@ -4221,6 +4323,94 @@
           if (inputBusca) inputBusca.focus({ preventScroll: true });
         }, 500);
       });
+    })();
+
+    // ============================================================
+    // QUIZ "DESCUBRA SEU PERFIL DE INVESTIDOR" — 6 perguntas, soma de
+    // pontos (1 a 3 cada), classifica em Conservador/Moderado/Arrojado.
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('quizBtnAbrir');
+      const overlay = document.getElementById('quizOverlay');
+      const btnFechar = document.getElementById('quizFechar');
+      const form = document.getElementById('quizForm');
+      const corpo = document.getElementById('quizCorpo');
+      const resultadoEl = document.getElementById('quizResultado');
+      if (!btnAbrir || !overlay) return;
+
+      const PERFIS = {
+        conservador: {
+          nome: 'Conservador',
+          cor: '#1de9a0',
+          descricao: 'Você prioriza segurança e previsibilidade acima de tudo. Prefere evitar oscilações fortes, mesmo que isso signifique um retorno mais modesto no longo prazo. Renda fixa costuma ser a base natural da sua carteira.',
+          alocacao: [['Renda Fixa', '70-80%'], ['FIIs', '10-15%'], ['Ações', '5-10%']],
+        },
+        moderado: {
+          nome: 'Moderado',
+          cor: '#e0b84d',
+          descricao: 'Você topa assumir algum risco em troca de um retorno melhor, mas sem exagerar — busca um equilíbrio entre segurança e crescimento do patrimônio. Uma carteira diversificada, com uma base sólida de renda fixa e uma fatia bem calculada de ativos de maior risco, tende a combinar com o seu perfil.',
+          alocacao: [['Renda Fixa', '40-50%'], ['FIIs', '15-20%'], ['Multimercado', '15-20%'], ['Ações', '15-20%']],
+        },
+        arrojado: {
+          nome: 'Arrojado',
+          cor: '#ff6b6b',
+          descricao: 'Você está confortável com oscilações fortes no curto prazo, em troca de buscar o maior retorno possível no longo prazo. Ações, FIIs e até criptomoedas podem ocupar uma fatia maior da sua carteira — desde que você já tenha uma reserva de emergência sólida por trás.',
+          alocacao: [['Ações', '40-50%'], ['FIIs', '15-20%'], ['Renda Fixa', '15-20%'], ['Criptomoedas', '10-15%']],
+        },
+      };
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function classificar(pontos) {
+        // 6 perguntas, cada uma vale de 1 a 3 pontos → total de 6 a 18.
+        if (pontos <= 9) return 'conservador';
+        if (pontos <= 14) return 'moderado';
+        return 'arrojado';
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const dados = new FormData(form);
+        let pontos = 0;
+        for (let i = 1; i <= 6; i++) {
+          pontos += Number(dados.get(`q${i}`)) || 0;
+        }
+
+        const chavePerfil = classificar(pontos);
+        const perfil = PERFIS[chavePerfil];
+
+        form.hidden = true;
+        resultadoEl.innerHTML = `
+          <div class="quiz-resultado-card" style="border-color:${perfil.cor};">
+            <span style="font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;">Seu perfil é</span>
+            <div class="quiz-perfil-nome" style="color:${perfil.cor};">${perfil.nome}</div>
+            <p>${perfil.descricao}</p>
+            <div class="quiz-resultado-alocacao">
+              ${perfil.alocacao.map(([nome, pct]) => `<div><strong>${pct}</strong><span>${nome}</span></div>`).join('')}
+            </div>
+            <p style="text-align:center; font-size:0.72rem; margin-top:12px;">Alocação sugerida de forma geral e educativa — não é uma recomendação personalizada.</p>
+            <button type="button" class="hg-btn" id="quizBtnRefazer" style="width:100%; margin-top:8px; background:var(--deep); color:var(--text); border:1px solid var(--border);">Refazer o teste</button>
+          </div>
+        `;
+
+        document.getElementById('quizBtnRefazer').addEventListener('click', () => {
+          form.reset();
+          form.hidden = false;
+          resultadoEl.innerHTML = '';
+        });
+      });
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
     })();
 
     // ============================================================
