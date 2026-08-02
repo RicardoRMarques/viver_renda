@@ -2743,11 +2743,11 @@
           <div class="fire-form-grid" id="irCampoDatasWrap">
             <div class="calc-campo">
               <label for="irDataAplicacao">Data da aplicação</label>
-              <input type="date" id="irDataAplicacao" />
+              <input type="text" inputmode="numeric" id="irDataAplicacao" placeholder="DD/MM/AAAA" maxlength="10" />
             </div>
             <div class="calc-campo">
               <label for="irDataResgate">Data do resgate</label>
-              <input type="date" id="irDataResgate" />
+              <input type="text" inputmode="numeric" id="irDataResgate" placeholder="DD/MM/AAAA" maxlength="10" />
             </div>
           </div>
 
@@ -4649,6 +4649,8 @@
       hgAplicarMascaraMoeda(inCompra, 10000);
       hgAplicarMascaraMoeda(inVenda, 11200);
       hgAplicarMascaraMoeda(inTotalVendidoMes, 0);
+      hgAplicarMascaraData(inDataAplicacao);
+      hgAplicarMascaraData(inDataResgate);
 
       function abrirModal() {
         overlay.hidden = false;
@@ -4696,12 +4698,12 @@
           aliquota = 0;
           motivo = 'LCI e LCA são isentas de Imposto de Renda para pessoa física, qualquer que seja o prazo.';
         } else if (tipo === 'cdb_tesouro') {
-          if (!inDataAplicacao.value || !inDataResgate.value) {
-            resultadoEl.innerHTML = '<p class="hg-status erro">Informe a data de aplicação e a data de resgate.</p>';
+          const dataApl = hgParseDataBr(inDataAplicacao.value);
+          const dataRes = hgParseDataBr(inDataResgate.value);
+          if (!dataApl || !dataRes) {
+            resultadoEl.innerHTML = '<p class="hg-status erro">Informe a data de aplicação e a data de resgate, no formato DD/MM/AAAA.</p>';
             return;
           }
-          const dataApl = new Date(inDataAplicacao.value + 'T00:00:00');
-          const dataRes = new Date(inDataResgate.value + 'T00:00:00');
           diasAplicado = Math.max(0, Math.round((dataRes - dataApl) / (1000 * 60 * 60 * 24)));
           if (diasAplicado <= 0) {
             resultadoEl.innerHTML = '<p class="hg-status erro">A data de resgate precisa ser depois da data de aplicação.</p>';
