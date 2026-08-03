@@ -183,6 +183,35 @@
     .glossario-modal { max-width: 720px; }
     .consultaav-modal { max-width: 720px; }
 
+    /* Simulador de Renda Mensal (Carteira de Proventos) */
+    .carteira-modal { max-width: 920px; }
+    .carteira-add-linha { display: flex; gap: 8px; flex-wrap: wrap; }
+    .carteira-add-linha input[type="text"] {
+      flex: 2 1 200px; background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 10px 12px; font-size: 0.88rem; font-family: inherit;
+    }
+    .carteira-add-linha input[type="number"] {
+      flex: 0 1 90px; background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 10px 12px; font-size: 0.88rem; font-family: inherit; text-align: center;
+    }
+    .carteira-resumo-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 14px 0; }
+    .carteira-resumo-card {
+      background: var(--card); border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 11px 12px; display: flex; flex-direction: column; gap: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .carteira-resumo-card span { font-size: 0.68rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+    .carteira-resumo-card strong { font-size: 1.05rem; font-weight: 800; color: var(--text); font-family: "Courier New", monospace; }
+    .carteira-resumo-destaque { border-color: var(--primary); }
+    .carteira-resumo-destaque strong { color: var(--primary); }
+    .carteira-secao-titulo { font-size: 0.85rem; font-weight: 700; color: var(--text); margin: 18px 0 8px; }
+    .carteira-tabela td.cmp-label { display: flex; flex-direction: column; }
+    .carteira-remover {
+      background: transparent; border: none; color: var(--muted); cursor: pointer;
+      font-size: 1rem; line-height: 1; padding: 2px 6px;
+    }
+    .carteira-remover:hover { color: #e05555; }
+
     /* Quiz de Perfil de Investidor */
     .quiz-pergunta { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px dashed var(--border); }
     .quiz-pergunta:last-of-type { border-bottom: none; }
@@ -1853,6 +1882,9 @@
             <button type="button" class="nav-dropdown-item" id="quizBtnAbrir">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 3.5"></path><line x1="12" y1="16.5" x2="12" y2="16.5"></line></svg>Descubra seu Perfil de Investidor
             </button>
+            <button type="button" class="nav-dropdown-item" id="carteiraBtnAbrir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>Simulador de Renda Mensal
+            </button>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
           </div>
         </div>
@@ -1873,6 +1905,7 @@
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário de FIIs e Ações</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="quizBtnAbrir">🧠 Descubra seu Perfil de Investidor</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="carteiraBtnAbrir">💰 Simulador de Renda Mensal</button>
       <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     </div>
   </header>
@@ -3169,6 +3202,95 @@
     </div>
   </div>
 
+  <!-- Modal: Simulador de Renda Mensal (Carteira de Proventos) -->
+  <div id="carteiraOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="carteiraTitulo" hidden>
+    <div class="calc-modal carteira-modal">
+      <div class="calc-modal-topo">
+        <h3 id="carteiraTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>Simulador de Renda Mensal
+        </h3>
+        <button id="carteiraFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Monte sua carteira de ações e FIIs, informe a quantidade de cada um, e veja o total estimado de proventos
+          por mês — com dados reais de cotação e dividendos, ao vivo.
+        </p>
+
+        <div class="carteira-add-linha">
+          <input type="text" id="carteiraTickerInput" placeholder="Ex: HGLG11, PETR4..." autocomplete="off" />
+          <input type="number" id="carteiraQtdInput" placeholder="Qtd." min="1" value="10" />
+          <button type="button" class="hg-btn" id="carteiraBtnAdicionar" style="flex:0 0 auto;">+ Adicionar</button>
+        </div>
+        <div class="hg-chips" style="margin-top:8px;">
+          <span class="hg-chip" data-ticker="PETR4">PETR4</span>
+          <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
+          <span class="hg-chip" data-ticker="BBAS3">BBAS3</span>
+          <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
+          <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
+          <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
+        </div>
+
+        <div id="carteiraStatus" class="hg-status"></div>
+
+        <div class="carteira-resumo-cards">
+          <div class="carteira-resumo-card">
+            <span>Total investido</span>
+            <strong id="carteiraTotalInvestido">R$ 0,00</strong>
+          </div>
+          <div class="carteira-resumo-card carteira-resumo-destaque">
+            <span>Proventos / mês (estimado)</span>
+            <strong id="carteiraTotalProventos">R$ 0,00</strong>
+          </div>
+          <div class="carteira-resumo-card">
+            <span>Yield médio da carteira</span>
+            <strong id="carteiraYieldMedio">—</strong>
+          </div>
+        </div>
+
+        <div class="carteira-secao-titulo" id="carteiraTituloAcoes" hidden>📈 Ações</div>
+        <div class="cmp-tabela-wrap" id="carteiraWrapAcoes" hidden>
+          <table class="cmp-tabela carteira-tabela">
+            <thead>
+              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento/cota/mês (méd.)</th><th>Qtd.</th><th>Proventos/mês</th><th></th></tr>
+            </thead>
+            <tbody id="carteiraTbodyAcoes"></tbody>
+          </table>
+        </div>
+
+        <div class="carteira-secao-titulo" id="carteiraTituloFiis" hidden>🏢 Fundos Imobiliários</div>
+        <div class="cmp-tabela-wrap" id="carteiraWrapFiis" hidden>
+          <table class="cmp-tabela carteira-tabela">
+            <thead>
+              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento/cota/mês (méd.)</th><th>Qtd.</th><th>Proventos/mês</th><th></th></tr>
+            </thead>
+            <tbody id="carteiraTbodyFiis"></tbody>
+          </table>
+        </div>
+
+        <div id="carteiraVazio" class="calc-ajuda" style="text-align:center; padding:20px 0;">
+          Sua carteira está vazia — adicione um ativo acima pra começar.
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+          <button type="button" class="hg-btn" id="carteiraBtnPdf" style="flex:1 1 140px;">📄 Baixar PDF</button>
+          <button type="button" class="hg-btn-compartilhar" id="carteiraBtnCompartilhar" style="flex:1 1 140px; justify-content:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+        </div>
+
+        <p class="calc-ajuda" style="margin-top:14px;">
+          <strong>Como calculamos o "Provento/cota/mês":</strong> pegamos o total de dividendos pagos pelo ativo nos
+          últimos 12 meses e dividimos por 12 — isso dá uma média mensal mesmo pra ativos que pagam trimestral ou
+          semestralmente (como muitas ações), em vez de assumir que todo ativo paga todo mês.
+          Simulação educativa com base em dados históricos; dividendos futuros não são garantidos e podem variar
+          (pra mais ou pra menos) em relação à média dos últimos 12 meses.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Glossário de FIIs e Ações -->
   <div id="glossarioOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="glossarioTitulo" hidden>
     <div class="calc-modal glossario-modal">
@@ -4323,6 +4445,302 @@
           if (inputBusca) inputBusca.focus({ preventScroll: true });
         }, 500);
       });
+    })();
+
+    // ============================================================
+    // ============================================================
+    // SIMULADOR DE RENDA MENSAL (Carteira de Proventos) — busca cada
+    // ativo ao vivo na HG Brasil (mesma API do resto do site) e estima
+    // o provento mensal médio a partir do total pago nos últimos 12
+    // meses, dividido por 12 (funciona tanto pra quem paga mensal quanto
+    // trimestral/semestral, sem precisar adivinhar a frequência).
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('carteiraBtnAbrir');
+      const overlay = document.getElementById('carteiraOverlay');
+      const btnFechar = document.getElementById('carteiraFechar');
+      const tickerInput = document.getElementById('carteiraTickerInput');
+      const qtdInput = document.getElementById('carteiraQtdInput');
+      const btnAdicionar = document.getElementById('carteiraBtnAdicionar');
+      const statusEl = document.getElementById('carteiraStatus');
+      const vazioEl = document.getElementById('carteiraVazio');
+      const tituloAcoes = document.getElementById('carteiraTituloAcoes');
+      const wrapAcoes = document.getElementById('carteiraWrapAcoes');
+      const tbodyAcoes = document.getElementById('carteiraTbodyAcoes');
+      const tituloFiis = document.getElementById('carteiraTituloFiis');
+      const wrapFiis = document.getElementById('carteiraWrapFiis');
+      const tbodyFiis = document.getElementById('carteiraTbodyFiis');
+      const elTotalInvestido = document.getElementById('carteiraTotalInvestido');
+      const elTotalProventos = document.getElementById('carteiraTotalProventos');
+      const elYieldMedio = document.getElementById('carteiraYieldMedio');
+      if (!btnAbrir || !overlay) return;
+
+      let carteira = []; // { ticker, kind, nome, preco, moeda, dyPercent, proventoMes, qtd }
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      async function buscarEAdicionar(tickerBruto, qtd) {
+        const ticker = tickerBruto.trim().toUpperCase();
+        if (!ticker) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Informe um ticker (ex: PETR4, HGLG11).';
+          return;
+        }
+        if (!qtd || qtd <= 0) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Informe uma quantidade válida.';
+          return;
+        }
+
+        statusEl.className = 'hg-status';
+        statusEl.textContent = `Buscando ${ticker}...`;
+        btnAdicionar.disabled = true;
+
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const a = data?.results?.[0];
+
+          if (!a || (a.kind !== 'stock' && a.kind !== 'fii')) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Não encontrei "${ticker}" como ação ou FII. Confira o ticker digitado.`;
+            return;
+          }
+
+          const preco = a.quote?.value ?? null;
+          const yield12mCash = a.dividends?.yield_12m_cash;
+          const proventoMes = typeof yield12mCash === 'number' ? yield12mCash / 12 : null;
+
+          const existente = carteira.find(l => l.ticker === ticker);
+          if (existente) {
+            existente.qtd += qtd;
+          } else {
+            carteira.push({
+              ticker,
+              kind: a.kind,
+              nome: a.name || ticker,
+              preco,
+              moeda: a.currency || 'BRL',
+              dyPercent: typeof a.dividends?.yield_12m_percent === 'number' ? a.dividends.yield_12m_percent : null,
+              proventoMes,
+              qtd,
+            });
+          }
+
+          statusEl.textContent = '';
+          tickerInput.value = '';
+          renderizar();
+        } catch (e) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Não foi possível buscar esse ativo agora. Tente novamente.';
+        } finally {
+          btnAdicionar.disabled = false;
+        }
+      }
+
+      function linhaHtml(item, idx) {
+        const investimento = (item.preco || 0) * item.qtd;
+        const proventoTotal = (item.proventoMes || 0) * item.qtd;
+        return `
+          <tr>
+            <td class="cmp-label"><strong>${item.ticker}</strong><span style="font-size:0.7rem; color:var(--muted); font-weight:400;">${item.nome}</span></td>
+            <td>${item.preco !== null ? hgFormatMoeda(item.preco, item.moeda) : '—'}</td>
+            <td>${item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—'}</td>
+            <td>${item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—'}</td>
+            <td><input type="number" class="qtd-input-carteira" min="1" value="${item.qtd}" data-idx="${idx}" style="width:70px; background:var(--deep); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:5px 6px; text-align:center; font-family:inherit;" /></td>
+            <td><strong>${hgFormatMoeda(proventoTotal, item.moeda)}</strong></td>
+            <td><button type="button" class="carteira-remover" data-idx="${idx}" title="Remover">✕</button></td>
+          </tr>`;
+      }
+
+      function renderizar() {
+        const acoes = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'stock');
+        const fiis = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'fii');
+
+        vazioEl.hidden = carteira.length > 0;
+
+        tituloAcoes.hidden = wrapAcoes.hidden = acoes.length === 0;
+        if (acoes.length > 0) tbodyAcoes.innerHTML = acoes.map(x => linhaHtml(x.item, x.idx)).join('');
+
+        tituloFiis.hidden = wrapFiis.hidden = fiis.length === 0;
+        if (fiis.length > 0) tbodyFiis.innerHTML = fiis.map(x => linhaHtml(x.item, x.idx)).join('');
+
+        let totalInvestido = 0;
+        let totalProventos = 0;
+        carteira.forEach(item => {
+          totalInvestido += (item.preco || 0) * item.qtd;
+          totalProventos += (item.proventoMes || 0) * item.qtd;
+        });
+
+        elTotalInvestido.textContent = hgFormatMoeda(totalInvestido) ?? 'R$ 0,00';
+        elTotalProventos.textContent = hgFormatMoeda(totalProventos) ?? 'R$ 0,00';
+        elYieldMedio.textContent = totalInvestido > 0
+          ? `${hgFormatNumero((totalProventos * 12 / totalInvestido) * 100)}%`
+          : '—';
+
+        // Reconecta os inputs de quantidade e os botões de remover (o HTML
+        // foi recriado do zero a cada render).
+        document.querySelectorAll('.qtd-input-carteira').forEach(input => {
+          input.addEventListener('change', () => {
+            const idx = Number(input.getAttribute('data-idx'));
+            const novaQtd = parseInt(input.value, 10) || 1;
+            carteira[idx].qtd = novaQtd;
+            renderizar();
+          });
+        });
+        document.querySelectorAll('.carteira-remover').forEach(botao => {
+          botao.addEventListener('click', () => {
+            const idx = Number(botao.getAttribute('data-idx'));
+            carteira.splice(idx, 1);
+            renderizar();
+          });
+        });
+      }
+
+      btnAdicionar.addEventListener('click', () => {
+        buscarEAdicionar(tickerInput.value, parseInt(qtdInput.value, 10) || 0);
+      });
+      tickerInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); buscarEAdicionar(tickerInput.value, parseInt(qtdInput.value, 10) || 0); }
+      });
+      overlay.querySelectorAll('.hg-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          buscarEAdicionar(chip.getAttribute('data-ticker'), parseInt(qtdInput.value, 10) || 10);
+        });
+      });
+
+      // --- PDF / Compartilhar ---
+      async function montarPdfCarteira() {
+        if (carteira.length === 0) return null;
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Simulador de Renda Mensal — Carteira de Proventos', 40, 40);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
+        doc.setFontSize(8);
+        doc.text('Aviso: simulação educativa com base em dados históricos (12 meses). Dividendos futuros não são garantidos.', 40, 70);
+        doc.setTextColor(0);
+
+        let totalInvestido = 0, totalProventos = 0;
+        carteira.forEach(item => {
+          totalInvestido += (item.preco || 0) * item.qtd;
+          totalProventos += (item.proventoMes || 0) * item.qtd;
+        });
+
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Valores']],
+          body: [
+            ['Total investido', hgFormatMoeda(totalInvestido)],
+            ['Proventos/mês (estimado)', hgFormatMoeda(totalProventos)],
+            ['Yield médio da carteira', totalInvestido > 0 ? `${hgFormatNumero((totalProventos * 12 / totalInvestido) * 100)}%` : '—'],
+          ],
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 20,
+          head: [['Ativo', 'Tipo', 'Preço', 'DY 12m', 'Provento/cota/mês', 'Qtd.', 'Proventos/mês']],
+          body: carteira.map(item => [
+            item.ticker,
+            item.kind === 'fii' ? 'FII' : 'Ação',
+            hgFormatMoeda(item.preco, item.moeda) ?? '—',
+            item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—',
+            item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—',
+            String(item.qtd),
+            hgFormatMoeda((item.proventoMes || 0) * item.qtd, item.moeda),
+          ]),
+          theme: 'striped',
+          styles: { fontSize: 8.5, cellPadding: 5 },
+          headStyles: { fillColor: [43, 43, 43], fontSize: 9 },
+        });
+
+        return doc;
+      }
+
+      function nomeArquivoCarteira() {
+        const agora = new Date();
+        return `Carteira-Proventos_${String(agora.getDate()).padStart(2, '0')}-${String(agora.getMonth() + 1).padStart(2, '0')}-${agora.getFullYear()}.pdf`;
+      }
+
+      const btnPdf = document.getElementById('carteiraBtnPdf');
+      if (btnPdf) {
+        btnPdf.addEventListener('click', async () => {
+          if (carteira.length === 0) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = 'Adicione ao menos um ativo antes de baixar o PDF.';
+            return;
+          }
+          const doc = await montarPdfCarteira();
+          if (!doc) return;
+          doc.save(nomeArquivoCarteira());
+        });
+      }
+
+      const btnCompartilhar = document.getElementById('carteiraBtnCompartilhar');
+      if (btnCompartilhar) {
+        btnCompartilhar.addEventListener('click', async () => {
+          if (carteira.length === 0) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = 'Adicione ao menos um ativo antes de compartilhar.';
+            return;
+          }
+          const doc = await montarPdfCarteira();
+          if (!doc) return;
+          const nomeArquivo = nomeArquivoCarteira();
+
+          const blob = doc.output('blob');
+          const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+          if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+            try {
+              await navigator.share({ title: 'Minha Carteira de Proventos', files: [arquivo] });
+              return;
+            } catch (e) {
+              if (e?.name === 'AbortError') return;
+            }
+          }
+
+          doc.save(nomeArquivo);
+          const textoSpan = btnCompartilhar.querySelector('.hg-btn-compartilhar-texto');
+          const textoOriginal = textoSpan ? textoSpan.textContent : null;
+          if (textoSpan) textoSpan.textContent = 'PDF baixado!';
+          setTimeout(() => { if (textoSpan && textoOriginal) textoSpan.textContent = textoOriginal; }, 2500);
+        });
+      }
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
     })();
 
     // ============================================================
