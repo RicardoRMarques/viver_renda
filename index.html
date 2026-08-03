@@ -6606,7 +6606,10 @@
         if (Array.isArray(dados)) {
           noticias = dados;
         } else {
-          const combinadas = [...(dados.destaques || []), ...(dados.top3 || [])];
+          // "Últimas Notícias" da home usa o InfoMoney/Money Times (top3)
+          // como fonte principal — o Investing.com (destaques) fica
+          // reservado só pro "Destaques da Bolsa" do boletim diário.
+          const combinadas = [...(dados.top3 || []), ...(dados.destaques || [])];
           const linksVistos = new Set();
           noticias = combinadas.filter(n => {
             if (linksVistos.has(n.link)) return false;

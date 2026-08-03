@@ -201,13 +201,24 @@ def coletar_noticias():
     nunca fica faltando notícia por causa de 1 fonte fora do ar."""
     links_ja_usados = set()
 
-    def _coletar_grupo(fontes, qtd_alvo):
+    def _coletar_grupo(fontes, qtd_alvo, qtd_por_fonte=None):
+        """qtd_por_fonte limita quantos itens aceitar de CADA fonte, numa
+        única passada. Isso é essencial pro grupo "misto" (Investing.com):
+        sem esse limite, a primeira fonte que respondesse bem já preenchia
+        sozinha as 3 vagas, e as outras 2 categorias nunca chegavam a ser
+        consultadas (bug corrigido aqui — antes pedia até 5 itens da 1ª
+        fonte, satisfazendo tudo antes de tentar as demais).
+        Quando qtd_por_fonte é None, cada fonte pode preencher a cota
+        inteira sozinha (comportamento de "cadeia de fallback", usado nos
+        feeds antigos do InfoMoney/Money Times — onde só queremos VARIAR
+        de fonte se a anterior falhar, não misturar por mistura)."""
         grupo = []
         for nome_fonte, url in fontes:
             if len(grupo) >= qtd_alvo:
                 break
+            limite_desta_fonte = qtd_por_fonte if qtd_por_fonte is not None else (qtd_alvo - len(grupo))
             try:
-                itens = _buscar_feed(nome_fonte, url, qtd_maxima=qtd_alvo - len(grupo) + 2)
+                itens = _buscar_feed(nome_fonte, url, qtd_maxima=limite_desta_fonte)
                 for item in itens:
                     if len(grupo) >= qtd_alvo:
                         break
@@ -222,7 +233,9 @@ def coletar_noticias():
                 print(f"AVISO: falha ao buscar notícias de {nome_fonte} ({url}): {exc}", file=sys.stderr)
         return grupo
 
-    destaques = _coletar_grupo(NOTICIAS_FONTES_MISTAS, NOTICIAS_QTD)
+    # "destaques": 1 item de cada categoria (força diversidade de fonte).
+    # "top3": cadeia de fallback normal (cada fonte pode preencher tudo).
+    destaques = _coletar_grupo(NOTICIAS_FONTES_MISTAS, NOTICIAS_QTD, qtd_por_fonte=1)
     top3 = _coletar_grupo(NOTICIAS_FEEDS, NOTICIAS_QTD)
 
     # Reforço cruzado: se um grupo ficou incompleto, tenta completar com as
@@ -235,7 +248,7 @@ def coletar_noticias():
     if len(top3) < NOTICIAS_QTD:
         faltam = NOTICIAS_QTD - len(top3)
         print(f"INFO: 'top3' incompleto ({len(top3)}/{NOTICIAS_QTD}) — reforçando com feeds do outro grupo.")
-        top3.extend(_coletar_grupo(NOTICIAS_FONTES_MISTAS, faltam))
+        top3.extend(_coletar_grupo(NOTICIAS_FONTES_MISTAS, faltam, qtd_por_fonte=1))
 
     return {
         "destaques": destaques[:NOTICIAS_QTD],
