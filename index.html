@@ -6595,7 +6595,26 @@
       try {
         const resp = await fetch('noticias.json', { cache: 'no-store' });
         if (!resp.ok) throw new Error('arquivo não encontrado');
-        const noticias = await resp.json();
+        const dados = await resp.json();
+
+        // O noticias.json passou a vir em dois grupos separados
+        // ({ destaques, top3 }, gerados de fontes diferentes pelo robô) em
+        // vez de uma lista única — combinamos os dois aqui pra "Últimas
+        // notícias" da home. Mantém compatibilidade com o formato antigo
+        // (lista simples), caso o arquivo ainda não tenha sido regerado.
+        let noticias;
+        if (Array.isArray(dados)) {
+          noticias = dados;
+        } else {
+          const combinadas = [...(dados.destaques || []), ...(dados.top3 || [])];
+          const linksVistos = new Set();
+          noticias = combinadas.filter(n => {
+            if (linksVistos.has(n.link)) return false;
+            linksVistos.add(n.link);
+            return true;
+          });
+        }
+
         if (!Array.isArray(noticias) || noticias.length === 0) throw new Error('vazio');
 
         listEl.innerHTML = noticias.slice(0, 3).map(n => `
