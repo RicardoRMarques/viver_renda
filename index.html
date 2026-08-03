@@ -184,9 +184,9 @@
     .calc-modal.consultaav-modal { max-width: 720px; }
 
     /* Simulador de Renda Mensal (Carteira de Proventos) */
-    .calc-modal.carteira-modal { max-width: 1080px; }
-    .carteira-tabela { font-size: 0.8rem; }
-    .carteira-tabela th, .carteira-tabela td { padding: 8px 10px; }
+    .calc-modal.carteira-modal { max-width: 1260px; }
+    .carteira-tabela { font-size: 0.76rem; }
+    .carteira-tabela th, .carteira-tabela td { padding: 7px 8px; }
     /* Mesmo padrão já usado com sucesso no Comparador de Ativos: o
        wrapper (.cmp-tabela-wrap) só ativa rolagem horizontal se
        realmente precisar, sem caixa/borda própria "aninhada" — o modal
@@ -195,8 +195,8 @@
        ao de Juros Compostos e todos os outros do site. */
     @media (min-width: 900px) and (max-width: 1500px) {
       .calc-modal.carteira-modal { max-width: 96vw; }
-      .carteira-tabela { font-size: 0.76rem; }
-      .carteira-tabela th, .carteira-tabela td { padding: 7px 8px; }
+      .carteira-tabela { font-size: 0.72rem; }
+      .carteira-tabela th, .carteira-tabela td { padding: 6px 6px; }
     }
     .carteira-add-linha { display: flex; gap: 8px; flex-wrap: wrap; }
     .carteira-add-linha input[type="text"] {
@@ -3265,7 +3265,7 @@
         <div class="cmp-tabela-wrap" id="carteiraWrapAcoes" hidden>
           <table class="cmp-tabela carteira-tabela">
             <thead>
-              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Proventos/mês</th><th></th></tr>
+              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
             </thead>
             <tbody id="carteiraTbodyAcoes"></tbody>
           </table>
@@ -3275,7 +3275,7 @@
         <div class="cmp-tabela-wrap" id="carteiraWrapFiis" hidden>
           <table class="cmp-tabela carteira-tabela">
             <thead>
-              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Proventos/mês</th><th></th></tr>
+              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
             </thead>
             <tbody id="carteiraTbodyFiis"></tbody>
           </table>
@@ -4559,9 +4559,10 @@
         }
       }
 
-      function linhaHtml(item, idx) {
+      function linhaHtml(item, idx, totalInvestidoCarteira) {
         const investimento = (item.preco || 0) * item.qtd;
         const proventoTotal = (item.proventoMes || 0) * item.qtd;
+        const pctCarteira = totalInvestidoCarteira > 0 ? (investimento / totalInvestidoCarteira) * 100 : 0;
         return `
           <tr>
             <td class="cmp-label" data-label="Ativo"><strong>${item.ticker}</strong><span style="font-size:0.7rem; color:var(--muted); font-weight:400;">${item.nome}</span></td>
@@ -4569,6 +4570,8 @@
             <td data-label="DY (12m)">${item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—'}</td>
             <td data-label="Provento méd./mês">${item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—'}</td>
             <td data-label="Qtd."><input type="number" class="qtd-input-carteira" min="1" value="${item.qtd}" data-idx="${idx}" style="width:70px; background:var(--deep); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:5px 6px; text-align:center; font-family:inherit;" /></td>
+            <td data-label="Valor investido">${hgFormatMoeda(investimento, item.moeda)}</td>
+            <td data-label="% da carteira">${hgFormatNumero(pctCarteira)}%</td>
             <td data-label="Proventos/mês"><strong>${hgFormatMoeda(proventoTotal, item.moeda)}</strong></td>
             <td data-label=""><button type="button" class="carteira-remover" data-idx="${idx}" title="Remover">✕</button></td>
           </tr>`;
@@ -4580,18 +4583,18 @@
 
         vazioEl.hidden = carteira.length > 0;
 
-        tituloAcoes.hidden = wrapAcoes.hidden = acoes.length === 0;
-        if (acoes.length > 0) tbodyAcoes.innerHTML = acoes.map(x => linhaHtml(x.item, x.idx)).join('');
-
-        tituloFiis.hidden = wrapFiis.hidden = fiis.length === 0;
-        if (fiis.length > 0) tbodyFiis.innerHTML = fiis.map(x => linhaHtml(x.item, x.idx)).join('');
-
         let totalInvestido = 0;
         let totalProventos = 0;
         carteira.forEach(item => {
           totalInvestido += (item.preco || 0) * item.qtd;
           totalProventos += (item.proventoMes || 0) * item.qtd;
         });
+
+        tituloAcoes.hidden = wrapAcoes.hidden = acoes.length === 0;
+        if (acoes.length > 0) tbodyAcoes.innerHTML = acoes.map(x => linhaHtml(x.item, x.idx, totalInvestido)).join('');
+
+        tituloFiis.hidden = wrapFiis.hidden = fiis.length === 0;
+        if (fiis.length > 0) tbodyFiis.innerHTML = fiis.map(x => linhaHtml(x.item, x.idx, totalInvestido)).join('');
 
         elTotalInvestido.textContent = hgFormatMoeda(totalInvestido) ?? 'R$ 0,00';
         elTotalProventos.textContent = hgFormatMoeda(totalProventos) ?? 'R$ 0,00';
@@ -4681,19 +4684,25 @@
 
         doc.autoTable({
           startY: doc.lastAutoTable.finalY + 20,
-          head: [['Ativo', 'Tipo', 'Preço', 'DY 12m', 'Provento/cota/mês', 'Qtd.', 'Proventos/mês']],
-          body: carteira.map(item => [
-            item.ticker,
-            item.kind === 'fii' ? 'FII' : 'Ação',
-            hgFormatMoeda(item.preco, item.moeda) ?? '—',
-            item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—',
-            item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—',
-            String(item.qtd),
-            hgFormatMoeda((item.proventoMes || 0) * item.qtd, item.moeda),
-          ]),
+          head: [['Ativo', 'Tipo', 'Preço', 'DY 12m', 'Provento/cota/mês', 'Qtd.', 'Valor investido', '% carteira', 'Proventos/mês']],
+          body: carteira.map(item => {
+            const investimento = (item.preco || 0) * item.qtd;
+            const pctCarteira = totalInvestido > 0 ? (investimento / totalInvestido) * 100 : 0;
+            return [
+              item.ticker,
+              item.kind === 'fii' ? 'FII' : 'Ação',
+              hgFormatMoeda(item.preco, item.moeda) ?? '—',
+              item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—',
+              item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—',
+              String(item.qtd),
+              hgFormatMoeda(investimento, item.moeda),
+              `${hgFormatNumero(pctCarteira)}%`,
+              hgFormatMoeda((item.proventoMes || 0) * item.qtd, item.moeda),
+            ];
+          }),
           theme: 'striped',
-          styles: { fontSize: 8.5, cellPadding: 5 },
-          headStyles: { fillColor: [43, 43, 43], fontSize: 9 },
+          styles: { fontSize: 8, cellPadding: 4 },
+          headStyles: { fillColor: [43, 43, 43], fontSize: 8 },
         });
 
         return doc;
