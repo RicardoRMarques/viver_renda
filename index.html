@@ -191,16 +191,16 @@
       .carteira-tabela th, .carteira-tabela td { padding: 7px 8px; }
     }
     @media (max-width: 899px) {
-      .carteira-tabela { min-width: 0; }
-      .carteira-tabela thead { display: none; }
+      .carteira-tabela { min-width: 0 !important; }
+      .carteira-tabela thead { display: none !important; }
       .carteira-tabela, .carteira-tabela tbody, .carteira-tabela tr, .carteira-tabela td {
-        display: block; width: 100%;
+        display: block !important; width: 100% !important;
       }
       .carteira-tabela tr {
         border-bottom: 1px solid var(--border); padding: 10px 4px; margin-bottom: 4px;
       }
       .carteira-tabela td {
-        display: flex; justify-content: space-between; align-items: center;
+        display: flex !important; justify-content: space-between; align-items: center;
         padding: 5px 4px; border-bottom: none; text-align: right;
       }
       .carteira-tabela td[data-label]::before {
@@ -209,8 +209,9 @@
         text-transform: uppercase; letter-spacing: 0.02em; text-align: left; flex-shrink: 0; margin-right: 10px;
       }
       .carteira-tabela td[data-label=""]::before { content: none; }
-      .carteira-tabela td.cmp-label { flex-direction: row; text-align: right; }
+      .carteira-tabela td.cmp-label { flex-direction: row !important; text-align: right; }
       .carteira-tabela td.cmp-label > div, .carteira-tabela td.cmp-label strong { text-align: right; }
+      .cmp-tabela-wrap { overflow-x: visible !important; }
     }
     .carteira-add-linha { display: flex; gap: 8px; flex-wrap: wrap; }
     .carteira-add-linha input[type="text"] {
