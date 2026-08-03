@@ -6,7 +6,10 @@
  * existentes do site produzem no repositório:
  *
  *   - indices.json   → Ibovespa, Dólar, Euro, Bitcoin, Selic, IPCA...
- *   - noticias.json   → últimas notícias de mercado
+ *   - noticias.json   → { destaques: [...], top3: [...] } — dois grupos
+ *     separados (Investing.com por categoria FIIs/Ações/Economia, e
+ *     InfoMoney/Money Times), pra "Destaques da Bolsa" e "Top 3 Notícias"
+ *     não mostrarem sempre as mesmas 3 manchetes repetidas.
  *   - ranking.json    → rankings de ações e FIIs (DY, valor de mercado...)
  *
  * Esses 3 arquivos são lidos diretamente da raiz do repositório — este
@@ -221,8 +224,10 @@ function montarNoticiasHtml(noticias) {
 }
 
 // ---------- Bloco editorial (Destaques da Bolsa + Alerta de Risco) ----------
-// Usa boletim-editorial.json se existir; senão gera um fallback automático.
-function carregarEditorial(noticias) {
+// Usa boletim-editorial.json se existir; senão gera um fallback automático
+// a partir do grupo "destaques" do noticias.json (Investing.com: FIIs +
+// Ações + Economia — já vem pronto, sem precisar recortar aqui).
+function carregarEditorial(noticiasDestaques) {
   const editorial = lerJsonSeExistir(path.join(RAIZ, 'boletim-editorial.json'), null);
   if (editorial && (editorial.destaques || editorial.alerta)) {
     return {
@@ -231,10 +236,7 @@ function carregarEditorial(noticias) {
     };
   }
 
-  // Fallback automático: usa as manchetes das notícias como "destaques"
-  // (com link pra matéria, quando existir) e um aviso genérico de risco
-  // (sempre válido, nunca trava a geração).
-  const destaquesFallback = (Array.isArray(noticias) ? noticias.slice(0, 4) : [])
+  const destaquesFallback = (Array.isArray(noticiasDestaques) ? noticiasDestaques.slice(0, 4) : [])
     .map(n => ({ titulo: n.titulo, obs: n.fonte || '', link: n.link || null }));
 
   return {
@@ -490,14 +492,23 @@ function main() {
   const dataExtenso = formatarDataExtenso(agora);
 
   const indices = lerJsonSeExistir(path.join(RAIZ, 'indices.json'), []);
-  const noticias = lerJsonSeExistir(path.join(RAIZ, 'noticias.json'), []);
+  const noticiasRaw = lerJsonSeExistir(path.join(RAIZ, 'noticias.json'), { destaques: [], top3: [] });
   const ranking = lerJsonSeExistir(path.join(RAIZ, 'ranking.json'), {});
+
+  // Compatibilidade: o coletor de notícias passou a gerar dois grupos
+  // separados ({ destaques, top3 }) em vez de uma lista única — mas se por
+  // algum motivo o noticias.json ainda estiver no formato antigo (lista
+  // simples, de antes dessa mudança, ou de uma execução anterior do robô
+  // que ainda não rodou com a versão nova), usamos a mesma lista pros dois
+  // blocos, em vez de quebrar a geração do boletim.
+  const noticiasDestaques = Array.isArray(noticiasRaw) ? noticiasRaw : (noticiasRaw.destaques || []);
+  const noticiasTop3 = Array.isArray(noticiasRaw) ? noticiasRaw : (noticiasRaw.top3 || []);
 
   const indicadoresHtml = montarIndicadoresHtml(indices);
   const tabelaFiisHtml = montarTabelaFiis(ranking);
   const tabelaAcoesHtml = montarTabelaAcoes(ranking);
-  const noticiasHtml = montarNoticiasHtml(noticias);
-  const { destaques, alerta } = carregarEditorial(noticias);
+  const noticiasHtml = montarNoticiasHtml(noticiasTop3);
+  const { destaques, alerta } = carregarEditorial(noticiasDestaques);
   const destaquesHtml = montarDestaquesHtml(destaques);
 
   const html = montarHtml({
