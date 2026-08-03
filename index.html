@@ -200,8 +200,9 @@
         border-bottom: 1px solid var(--border); padding: 10px 4px; margin-bottom: 4px;
       }
       .carteira-tabela td {
-        display: flex !important; justify-content: space-between; align-items: center;
-        padding: 5px 4px; border-bottom: none; text-align: right;
+        display: flex !important; justify-content: space-between !important; align-items: center !important;
+        padding: 5px 4px; border-bottom: none !important; text-align: right; width: 100% !important;
+        box-sizing: border-box !important;
       }
       .carteira-tabela td[data-label]::before {
         content: attr(data-label);
