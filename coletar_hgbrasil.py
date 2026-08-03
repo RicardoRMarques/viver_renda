@@ -56,6 +56,18 @@ NOTICIAS_FEEDS = [
     ("InfoMoney (geral)", "https://www.infomoney.com.br/feed/"),
     ("Money Times", "https://www.moneytimes.com.br/feed/"),
 ]
+
+# Feeds RSS OFICIAIS do Investing.com Brasil (documentados em
+# br.investing.com/webmaster-tools/rss), usados pra montar um "Top 3" mais
+# variado — em vez de 3 manchetes da mesma fonte, tentamos 1 de cada
+# categoria abaixo. O feed de FIIs é um diferencial: não é comum achar uma
+# fonte só de fundos imobiliários com RSS aberto, e encaixa direto no foco
+# do site (Viver de Renda).
+NOTICIAS_FONTES_MISTAS = [
+    ("Investing.com (FIIs)", "https://br.investing.com/rss/news_450.rss"),
+    ("Investing.com (Ações)", "https://br.investing.com/rss/news_25.rss"),
+    ("Investing.com (Economia)", "https://br.investing.com/rss/news_14.rss"),
+]
 NOTICIAS_QTD = 3
 TIMEOUT = 20
 
@@ -145,14 +157,14 @@ def _extrair_imagem_do_item(item):
     return None
 
 
-def _buscar_feed(nome_fonte, url):
+def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD):
     """Busca e faz parse de um feed RSS específico. Retorna lista de notícias
     (pode ser vazia) ou lança exceção em caso de falha de rede/parse."""
     resp = requests.get(url, timeout=TIMEOUT, headers=HEADERS_NAVEGADOR)
     resp.raise_for_status()
     raiz = ET.fromstring(resp.content)
 
-    itens = raiz.findall("./channel/item")[:NOTICIAS_QTD]
+    itens = raiz.findall("./channel/item")[:qtd_maxima]
     noticias = []
 
     for item in itens:
@@ -176,19 +188,53 @@ def _buscar_feed(nome_fonte, url):
 
 
 def coletar_noticias():
-    """Tenta cada feed configurado em NOTICIAS_FEEDS, na ordem, até conseguir
-    pelo menos uma notícia. Retorna lista de dicts prontos para o boletim."""
-    for nome_fonte, url in NOTICIAS_FEEDS:
+    """Monta um "Top 3" mais variado: tenta pegar 1 notícia de cada categoria
+    do Investing.com (FIIs, Ações, Economia). Se alguma categoria falhar (ou
+    vier vazia), completa o que faltar com os feeds antigos (InfoMoney/Money
+    Times), na ordem configurada em NOTICIAS_FEEDS — sem nunca duplicar
+    link, e sem deixar o boletim sem notícia por causa de 1 fonte fora do
+    ar."""
+    combinadas = []
+    links_ja_usados = set()
+
+    def _adicionar(lista):
+        for item in lista:
+            if item["link"] not in links_ja_usados:
+                combinadas.append(item)
+                links_ja_usados.add(item["link"])
+
+    # 1ª tentativa: 1 notícia de cada categoria (FIIs, Ações, Economia).
+    for nome_fonte, url in NOTICIAS_FONTES_MISTAS:
         try:
-            noticias = _buscar_feed(nome_fonte, url)
-            if noticias:
-                print(f"OK: {len(noticias)} notícias obtidas de {nome_fonte}.")
-                return noticias
-            print(f"AVISO: feed de {nome_fonte} respondeu, mas sem itens úteis.", file=sys.stderr)
+            itens = _buscar_feed(nome_fonte, url, qtd_maxima=1)
+            if itens:
+                _adicionar(itens)
+                print(f"OK: notícia obtida de {nome_fonte}.")
+            else:
+                print(f"AVISO: feed de {nome_fonte} respondeu, mas sem itens úteis.", file=sys.stderr)
         except (requests.RequestException, ET.ParseError) as exc:
             print(f"AVISO: falha ao buscar notícias de {nome_fonte} ({url}): {exc}", file=sys.stderr)
 
-    return []
+    # Reforço: se alguma categoria falhou (ou o link já tinha sido usado),
+    # completa o que faltar com os feeds antigos, até bater NOTICIAS_QTD.
+    if len(combinadas) < NOTICIAS_QTD:
+        faltam = NOTICIAS_QTD - len(combinadas)
+        print(f"INFO: só {len(combinadas)}/{NOTICIAS_QTD} notícia(s) das categorias mistas — "
+              f"completando com os feeds de reforço.")
+        for nome_fonte, url in NOTICIAS_FEEDS:
+            if len(combinadas) >= NOTICIAS_QTD:
+                break
+            try:
+                itens = _buscar_feed(nome_fonte, url, qtd_maxima=faltam)
+                antes = len(combinadas)
+                _adicionar(itens)
+                if len(combinadas) > antes:
+                    print(f"OK: {len(combinadas) - antes} notícia(s) de reforço obtida(s) de {nome_fonte}.")
+                faltam = NOTICIAS_QTD - len(combinadas)
+            except (requests.RequestException, ET.ParseError) as exc:
+                print(f"AVISO: falha ao buscar notícias de reforço de {nome_fonte} ({url}): {exc}", file=sys.stderr)
+
+    return combinadas[:NOTICIAS_QTD]
 
 
 def _data_bcb(data_iso):
