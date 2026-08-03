@@ -180,11 +180,11 @@
     }
 
     /* Glossário de FIIs e Ações */
-    .glossario-modal { max-width: 720px; }
-    .consultaav-modal { max-width: 720px; }
+    .calc-modal.glossario-modal { max-width: 720px; }
+    .calc-modal.consultaav-modal { max-width: 720px; }
 
     /* Simulador de Renda Mensal (Carteira de Proventos) */
-    .carteira-modal { max-width: 1080px; }
+    .calc-modal.carteira-modal { max-width: 1080px; }
     .carteira-tabela { font-size: 0.8rem; }
     .carteira-tabela th, .carteira-tabela td { padding: 8px 10px; }
     /* Mesmo padrão já usado com sucesso no Comparador de Ativos: o
@@ -194,7 +194,7 @@
        .calc-modal como um todo (max-height:90vh + overflow-y:auto), igual
        ao de Juros Compostos e todos os outros do site. */
     @media (min-width: 900px) and (max-width: 1500px) {
-      .carteira-modal { max-width: 96vw; }
+      .calc-modal.carteira-modal { max-width: 96vw; }
       .carteira-tabela { font-size: 0.76rem; }
       .carteira-tabela th, .carteira-tabela td { padding: 7px 8px; }
     }
