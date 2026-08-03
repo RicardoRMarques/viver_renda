@@ -190,6 +190,28 @@
       .carteira-tabela { font-size: 0.76rem; }
       .carteira-tabela th, .carteira-tabela td { padding: 7px 8px; }
     }
+    @media (max-width: 899px) {
+      .carteira-tabela { min-width: 0; }
+      .carteira-tabela thead { display: none; }
+      .carteira-tabela, .carteira-tabela tbody, .carteira-tabela tr, .carteira-tabela td {
+        display: block; width: 100%;
+      }
+      .carteira-tabela tr {
+        border-bottom: 1px solid var(--border); padding: 10px 4px; margin-bottom: 4px;
+      }
+      .carteira-tabela td {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 5px 4px; border-bottom: none; text-align: right;
+      }
+      .carteira-tabela td[data-label]::before {
+        content: attr(data-label);
+        font-size: 0.68rem; font-weight: 700; color: var(--muted);
+        text-transform: uppercase; letter-spacing: 0.02em; text-align: left; flex-shrink: 0; margin-right: 10px;
+      }
+      .carteira-tabela td[data-label=""]::before { content: none; }
+      .carteira-tabela td.cmp-label { flex-direction: row; text-align: right; }
+      .carteira-tabela td.cmp-label > div, .carteira-tabela td.cmp-label strong { text-align: right; }
+    }
     .carteira-add-linha { display: flex; gap: 8px; flex-wrap: wrap; }
     .carteira-add-linha input[type="text"] {
       flex: 2 1 200px; background: var(--deep); border: 1px solid var(--border); color: var(--text);
@@ -4556,13 +4578,13 @@
         const proventoTotal = (item.proventoMes || 0) * item.qtd;
         return `
           <tr>
-            <td class="cmp-label"><strong>${item.ticker}</strong><span style="font-size:0.7rem; color:var(--muted); font-weight:400;">${item.nome}</span></td>
-            <td>${item.preco !== null ? hgFormatMoeda(item.preco, item.moeda) : '—'}</td>
-            <td>${item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—'}</td>
-            <td>${item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—'}</td>
-            <td><input type="number" class="qtd-input-carteira" min="1" value="${item.qtd}" data-idx="${idx}" style="width:70px; background:var(--deep); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:5px 6px; text-align:center; font-family:inherit;" /></td>
-            <td><strong>${hgFormatMoeda(proventoTotal, item.moeda)}</strong></td>
-            <td><button type="button" class="carteira-remover" data-idx="${idx}" title="Remover">✕</button></td>
+            <td class="cmp-label" data-label="Ativo"><strong>${item.ticker}</strong><span style="font-size:0.7rem; color:var(--muted); font-weight:400;">${item.nome}</span></td>
+            <td data-label="Preço">${item.preco !== null ? hgFormatMoeda(item.preco, item.moeda) : '—'}</td>
+            <td data-label="DY (12m)">${item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—'}</td>
+            <td data-label="Provento méd./mês">${item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—'}</td>
+            <td data-label="Qtd."><input type="number" class="qtd-input-carteira" min="1" value="${item.qtd}" data-idx="${idx}" style="width:70px; background:var(--deep); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:5px 6px; text-align:center; font-family:inherit;" /></td>
+            <td data-label="Proventos/mês"><strong>${hgFormatMoeda(proventoTotal, item.moeda)}</strong></td>
+            <td data-label=""><button type="button" class="carteira-remover" data-idx="${idx}" title="Remover">✕</button></td>
           </tr>`;
       }
 
