@@ -187,17 +187,12 @@
     .carteira-modal { max-width: 1080px; }
     .carteira-tabela { font-size: 0.8rem; }
     .carteira-tabela th, .carteira-tabela td { padding: 8px 10px; }
-    /* Mesma técnica já usada (e comprovadamente funcionando) na tabela de
-       parcelas do Financiamento Imobiliário: uma caixa própria, com
-       rolagem horizontal E vertical contida dentro dela — em vez de
-       tentar converter a tabela em "cards" via CSS, que entrava em
-       conflito com outras regras compartilhadas (.cmp-tabela) e não
-       renderizava de forma confiável em todas as telas. */
-    .carteira-tabela-scroll {
-      max-height: 420px; overflow-y: auto; overflow-x: auto;
-      margin-top: 8px; border: 1px solid var(--border); border-radius: 10px;
-    }
-    .carteira-tabela-scroll .carteira-tabela { min-width: 560px; }
+    /* Mesmo padrão já usado com sucesso no Comparador de Ativos: o
+       wrapper (.cmp-tabela-wrap) só ativa rolagem horizontal se
+       realmente precisar, sem caixa/borda própria "aninhada" — o modal
+       inteiro cresce naturalmente e quem rola verticalmente é o
+       .calc-modal como um todo (max-height:90vh + overflow-y:auto), igual
+       ao de Juros Compostos e todos os outros do site. */
     @media (min-width: 900px) and (max-width: 1500px) {
       .carteira-modal { max-width: 96vw; }
       .carteira-tabela { font-size: 0.76rem; }
@@ -3267,7 +3262,7 @@
         </div>
 
         <div class="carteira-secao-titulo" id="carteiraTituloAcoes" hidden>📈 Ações</div>
-        <div class="carteira-tabela-scroll" id="carteiraWrapAcoes" hidden>
+        <div class="cmp-tabela-wrap" id="carteiraWrapAcoes" hidden>
           <table class="cmp-tabela carteira-tabela">
             <thead>
               <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Proventos/mês</th><th></th></tr>
@@ -3277,7 +3272,7 @@
         </div>
 
         <div class="carteira-secao-titulo" id="carteiraTituloFiis" hidden>🏢 Fundos Imobiliários</div>
-        <div class="carteira-tabela-scroll" id="carteiraWrapFiis" hidden>
+        <div class="cmp-tabela-wrap" id="carteiraWrapFiis" hidden>
           <table class="cmp-tabela carteira-tabela">
             <thead>
               <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Proventos/mês</th><th></th></tr>
