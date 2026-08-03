@@ -188,53 +188,59 @@ def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD):
 
 
 def coletar_noticias():
-    """Monta um "Top 3" mais variado: tenta pegar 1 notícia de cada categoria
-    do Investing.com (FIIs, Ações, Economia). Se alguma categoria falhar (ou
-    vier vazia), completa o que faltar com os feeds antigos (InfoMoney/Money
-    Times), na ordem configurada em NOTICIAS_FEEDS — sem nunca duplicar
-    link, e sem deixar o boletim sem notícia por causa de 1 fonte fora do
-    ar."""
-    combinadas = []
+    """Monta DOIS grupos de notícias separados, pra não repetir a mesma
+    manchete em 'Destaques da Bolsa' e em 'Top 3 Notícias' no boletim:
+
+    - "destaques": 1 notícia de cada categoria do Investing.com (FIIs,
+      Ações, Economia) — até 3 no total.
+    - "top3": até 3 notícias do InfoMoney/Money Times (os feeds antigos),
+      sem repetir nenhum link que já tenha entrado em "destaques".
+
+    Se alguma fonte falhar, cada grupo tenta se completar sozinho com as
+    fontes do OUTRO grupo como reforço, na ordem em que aparecem — assim
+    nunca fica faltando notícia por causa de 1 fonte fora do ar."""
     links_ja_usados = set()
 
-    def _adicionar(lista):
-        for item in lista:
-            if item["link"] not in links_ja_usados:
-                combinadas.append(item)
-                links_ja_usados.add(item["link"])
-
-    # 1ª tentativa: 1 notícia de cada categoria (FIIs, Ações, Economia).
-    for nome_fonte, url in NOTICIAS_FONTES_MISTAS:
-        try:
-            itens = _buscar_feed(nome_fonte, url, qtd_maxima=1)
-            if itens:
-                _adicionar(itens)
-                print(f"OK: notícia obtida de {nome_fonte}.")
-            else:
-                print(f"AVISO: feed de {nome_fonte} respondeu, mas sem itens úteis.", file=sys.stderr)
-        except (requests.RequestException, ET.ParseError) as exc:
-            print(f"AVISO: falha ao buscar notícias de {nome_fonte} ({url}): {exc}", file=sys.stderr)
-
-    # Reforço: se alguma categoria falhou (ou o link já tinha sido usado),
-    # completa o que faltar com os feeds antigos, até bater NOTICIAS_QTD.
-    if len(combinadas) < NOTICIAS_QTD:
-        faltam = NOTICIAS_QTD - len(combinadas)
-        print(f"INFO: só {len(combinadas)}/{NOTICIAS_QTD} notícia(s) das categorias mistas — "
-              f"completando com os feeds de reforço.")
-        for nome_fonte, url in NOTICIAS_FEEDS:
-            if len(combinadas) >= NOTICIAS_QTD:
+    def _coletar_grupo(fontes, qtd_alvo):
+        grupo = []
+        for nome_fonte, url in fontes:
+            if len(grupo) >= qtd_alvo:
                 break
             try:
-                itens = _buscar_feed(nome_fonte, url, qtd_maxima=faltam)
-                antes = len(combinadas)
-                _adicionar(itens)
-                if len(combinadas) > antes:
-                    print(f"OK: {len(combinadas) - antes} notícia(s) de reforço obtida(s) de {nome_fonte}.")
-                faltam = NOTICIAS_QTD - len(combinadas)
+                itens = _buscar_feed(nome_fonte, url, qtd_maxima=qtd_alvo - len(grupo) + 2)
+                for item in itens:
+                    if len(grupo) >= qtd_alvo:
+                        break
+                    if item["link"] not in links_ja_usados:
+                        grupo.append(item)
+                        links_ja_usados.add(item["link"])
+                if itens:
+                    print(f"OK: {len(itens)} notícia(s) obtida(s) de {nome_fonte}.")
+                else:
+                    print(f"AVISO: feed de {nome_fonte} respondeu, mas sem itens úteis.", file=sys.stderr)
             except (requests.RequestException, ET.ParseError) as exc:
-                print(f"AVISO: falha ao buscar notícias de reforço de {nome_fonte} ({url}): {exc}", file=sys.stderr)
+                print(f"AVISO: falha ao buscar notícias de {nome_fonte} ({url}): {exc}", file=sys.stderr)
+        return grupo
 
-    return combinadas[:NOTICIAS_QTD]
+    destaques = _coletar_grupo(NOTICIAS_FONTES_MISTAS, NOTICIAS_QTD)
+    top3 = _coletar_grupo(NOTICIAS_FEEDS, NOTICIAS_QTD)
+
+    # Reforço cruzado: se um grupo ficou incompleto, tenta completar com as
+    # fontes do outro grupo (ainda respeitando os links já usados).
+    if len(destaques) < NOTICIAS_QTD:
+        faltam = NOTICIAS_QTD - len(destaques)
+        print(f"INFO: 'destaques' incompleto ({len(destaques)}/{NOTICIAS_QTD}) — reforçando com feeds do outro grupo.")
+        destaques.extend(_coletar_grupo(NOTICIAS_FEEDS, faltam))
+
+    if len(top3) < NOTICIAS_QTD:
+        faltam = NOTICIAS_QTD - len(top3)
+        print(f"INFO: 'top3' incompleto ({len(top3)}/{NOTICIAS_QTD}) — reforçando com feeds do outro grupo.")
+        top3.extend(_coletar_grupo(NOTICIAS_FONTES_MISTAS, faltam))
+
+    return {
+        "destaques": destaques[:NOTICIAS_QTD],
+        "top3": top3[:NOTICIAS_QTD],
+    }
 
 
 def _data_bcb(data_iso):
@@ -709,14 +715,15 @@ def main():
         print("INFO: coleta de rankings (Ações/FIIs) pulada nesta execução "
               "(roda só 1x/dia — use --com-ranking para forçar).")
 
-    if not noticias:
+    if not noticias.get("destaques") and not noticias.get("top3"):
         print("ERRO: nenhum dos feeds configurados retornou notícias. Mantendo arquivo anterior, se existir.", file=sys.stderr)
         sys.exit(1)
 
     with open(NOTICIAS_OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(noticias, f, ensure_ascii=False, indent=2)
 
-    print(f"OK: {len(noticias)} notícias salvas em {NOTICIAS_OUTPUT_FILE}.")
+    print(f"OK: {len(noticias.get('destaques', []))} notícia(s) em 'destaques' e "
+          f"{len(noticias.get('top3', []))} notícia(s) em 'top3' salvas em {NOTICIAS_OUTPUT_FILE}.")
 
 
 if __name__ == "__main__":
