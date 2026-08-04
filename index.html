@@ -1659,6 +1659,8 @@
     .calc-resultado-linha strong { font-family: "Courier New", monospace; }
     .calc-destaque { color: var(--primary); font-size: 1.15rem !important; }
     .calc-tabela-comp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.82rem; }
+    .calc-tabela-comp-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .calc-tabela-comp-wrap .calc-tabela-comp { min-width: 420px; }
     .calc-tabela-comp th, .calc-tabela-comp td { text-align: right; padding: 6px 8px; border-top: 1px solid var(--border); }
     .calc-tabela-comp th:first-child, .calc-tabela-comp td:first-child { text-align: left; }
     .calc-tabela-comp tr.calc-linha-selecionada td { color: var(--primary); font-weight: 700; }
@@ -7567,12 +7569,14 @@
             </div>
           </div>
 
-          <table class="calc-tabela-comp">
-            <thead>
-              <tr><th>Produto</th><th>Valor líquido</th><th>Rendimento líquido</th></tr>
-            </thead>
-            <tbody>${linhasTabela}</tbody>
-          </table>
+          <div class="calc-tabela-comp-wrap">
+            <table class="calc-tabela-comp">
+              <thead>
+                <tr><th>Produto</th><th>Valor líquido</th><th>Rendimento líquido</th></tr>
+              </thead>
+              <tbody>${linhasTabela}</tbody>
+            </table>
+          </div>
           <p class="calc-ajuda" style="margin-top:10px;">
             Simulação aproximada (capitalização mensal composta), com base em Selic ≈ ${selicAnualPct().toFixed(2)}% a.a.,
             CDI ≈ ${cdiAnualPct().toFixed(2)}% a.a. (Selic − 0,10 p.p. de spread) e IPCA anualizado ≈ ${ipcaAnualPct().toFixed(2)}% a.a.
