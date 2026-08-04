@@ -978,6 +978,76 @@
       color: var(--muted);
     }
 
+    /* Seção "Notícias do Mercado Econômico" — logo abaixo das calculadoras */
+    .section-noticias-mercado {
+      max-width: 1100px;
+      margin: 8px auto 32px;
+      padding: 0 20px;
+    }
+    .section-noticias-mercado .hg-titulo { margin-bottom: 4px; }
+    .noticias-mercado-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0 0 18px;
+    }
+    .noticias-grid-mercado {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .noticias-grid-mercado { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .noticias-grid-mercado { grid-template-columns: 1fr; }
+      .section-noticias-mercado { padding: 0 16px; }
+    }
+    .noticias-grid-mercado .noticia-card { margin-bottom: 0; display: flex; flex-direction: column; }
+    .noticias-grid-mercado .noticia-thumb { height: 150px; }
+    .noticias-grid-mercado .noticia-body { display: flex; flex-direction: column; flex: 1; }
+    .noticias-grid-mercado .noticia-titulo {
+      font-size: 0.95rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .noticias-grid-mercado .noticia-meta {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .noticia-card.noticia-skeleton {
+      height: 220px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    .noticias-mercado-rodape {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .noticias-mercado-atualizado {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .noticias-mercado-btn-atualizar {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+    }
+    .noticias-mercado-btn-atualizar:hover { border-color: var(--primary); }
+
     /* Seção de Apresentação e Curso */
     .presentation-section {
       padding: 60px 0;
@@ -1908,7 +1978,7 @@
     <!-- Menu mobile (hambúrguer): só aparece em telas pequenas, no lugar
          de "Mercado / Educação / Simuladores" que somem da barra do topo. -->
     <div id="mobileMenuPanel" class="mobile-menu-panel" hidden>
-      <a href="#noticias-secao" class="mobile-menu-item">📰 Notícias</a>
+      <a href="#noticias-mercado" class="mobile-menu-item">📰 Notícias</a>
       <a href="#boletim-indices-secao" class="mobile-menu-item">🗞️ Boletim de Mercado</a>
       <a href="#simuladorVisual" class="mobile-menu-item">📈 Veja o poder dos juros compostos</a>
       <a href="#educacao" class="mobile-menu-item">🎓 Educação</a>
@@ -2000,6 +2070,26 @@
         });
       });
     </script>
+
+    <!-- NOTÍCIAS DO MERCADO ECONÔMICO — logo abaixo das calculadoras.
+         Alimentada por noticias.json, gerado pelo robô (GitHub Actions) a
+         partir de feeds RSS públicos (Investing.com / InfoMoney). -->
+    <section class="section-noticias-mercado" id="noticias-mercado">
+      <h2 class="hg-titulo">📰 Notícias do Mercado Econômico</h2>
+      <p class="noticias-mercado-sub">As últimas notícias de mercado, direto das fontes, atualizadas automaticamente.</p>
+      <div id="noticiasMercadoGrid" class="noticias-grid-mercado">
+        <div class="noticia-card noticia-skeleton"></div>
+        <div class="noticia-card noticia-skeleton"></div>
+        <div class="noticia-card noticia-skeleton"></div>
+        <div class="noticia-card noticia-skeleton"></div>
+        <div class="noticia-card noticia-skeleton"></div>
+        <div class="noticia-card noticia-skeleton"></div>
+      </div>
+      <div class="noticias-mercado-rodape">
+        <span class="noticias-mercado-atualizado" id="noticiasMercadoAtualizado"></span>
+        <button type="button" class="noticias-mercado-btn-atualizar" id="noticiasMercadoBtnAtualizar">↻ Atualizar notícias</button>
+      </div>
+    </section>
 
     <div class="consultas-boletim-grid">
       <div class="coluna-consultas" id="simuladorVisual">
@@ -2745,14 +2835,6 @@
             <div id="hgFundResultado"></div>
           </div>
         </section>
-
-        <!-- NOTÍCIAS (cards lado a lado) -->
-        <div class="coluna-noticias-horizontal" id="noticias-secao">
-          <div class="boletim-noticias-title">Últimas notícias</div>
-          <div id="noticiasList" class="noticias-lista-horizontal">
-            <div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Carregando notícias...</div></div></div>
-          </div>
-        </div>
 
         <!-- BOLETIM DE MERCADO DIÁRIO (últimos 7 dias, gerados pelo robô) -->
         <section class="hg-busca hg-busca-compacta" id="boletins-semana">
@@ -6590,50 +6672,97 @@
       }
     })();
 
-    async function carregarNoticias() {
-      const listEl = document.getElementById('noticiasList');
-      try {
-        const resp = await fetch('noticias.json', { cache: 'no-store' });
-        if (!resp.ok) throw new Error('arquivo não encontrado');
-        const dados = await resp.json();
+    // ============================================================
+    // NOTÍCIAS DO MERCADO ECONÔMICO — seção logo abaixo das
+    // calculadoras. Consome noticias.json, gerado pelo robô (GitHub
+    // Actions) a partir de feeds RSS públicos (Investing.com /
+    // InfoMoney). Recarrega sozinha a cada 5 min (o arquivo em si é
+    // regerado pelo robô a cada ~15 min) e tem botão de atualizar manual.
+    // ============================================================
+    (function () {
+      const gridEl = document.getElementById('noticiasMercadoGrid');
+      const atualizadoEl = document.getElementById('noticiasMercadoAtualizado');
+      const btnAtualizar = document.getElementById('noticiasMercadoBtnAtualizar');
+      if (!gridEl) return;
 
-        // O noticias.json passou a vir em dois grupos separados
-        // ({ destaques, top3 }, gerados de fontes diferentes pelo robô) em
-        // vez de uma lista única — combinamos os dois aqui pra "Últimas
-        // notícias" da home. Mantém compatibilidade com o formato antigo
-        // (lista simples), caso o arquivo ainda não tenha sido regerado.
-        let noticias;
-        if (Array.isArray(dados)) {
-          noticias = dados;
-        } else {
-          // "Últimas Notícias" da home usa o InfoMoney/Money Times (top3)
-          // como fonte principal — o Investing.com (destaques) fica
-          // reservado só pro "Destaques da Bolsa" do boletim diário.
-          const combinadas = [...(dados.top3 || []), ...(dados.destaques || [])];
-          const linksVistos = new Set();
-          noticias = combinadas.filter(n => {
-            if (linksVistos.has(n.link)) return false;
-            linksVistos.add(n.link);
-            return true;
-          });
-        }
+      const MAX_NOTICIAS = 9;
 
-        if (!Array.isArray(noticias) || noticias.length === 0) throw new Error('vazio');
-
-        listEl.innerHTML = noticias.slice(0, 3).map(n => `
-          <a class="noticia-card" href="${n.link}" target="_blank" rel="noopener noreferrer">
-            ${n.imagem ? `<img class="noticia-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.remove()">` : ''}
-            <div class="noticia-body">
-              <div class="noticia-titulo">${n.titulo}</div>
-              <div class="noticia-meta">${n.fonte || 'Mercado financeiro'}</div>
-            </div>
-          </a>
-        `).join('');
-      } catch (e) {
-        listEl.innerHTML = '<div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Notícias ainda não geradas — aguarde o robô rodar.</div></div></div>';
+      function tempoRelativo(dataStr) {
+        if (!dataStr) return '';
+        const data = new Date(dataStr.replace(' ', 'T'));
+        if (isNaN(data.getTime())) return '';
+        const diffMin = Math.round((Date.now() - data.getTime()) / 60000);
+        if (diffMin < 1) return 'agora mesmo';
+        if (diffMin < 60) return `há ${diffMin} min`;
+        const diffH = Math.round(diffMin / 60);
+        if (diffH < 24) return `há ${diffH}h`;
+        const diffD = Math.round(diffH / 24);
+        return `há ${diffD}d`;
       }
-    }
-    carregarNoticias();
+
+      function skeletons() {
+        return Array.from({ length: 6 }).map(() => '<div class="noticia-card noticia-skeleton"></div>').join('');
+      }
+
+      async function carregarNoticias(mostrarSkeleton) {
+        if (mostrarSkeleton) gridEl.innerHTML = skeletons();
+        if (btnAtualizar) btnAtualizar.disabled = true;
+        try {
+          const resp = await fetch('noticias.json', { cache: 'no-store' });
+          if (!resp.ok) throw new Error('arquivo não encontrado');
+          const dados = await resp.json();
+
+          // O noticias.json vem em dois grupos separados ({ destaques,
+          // top3 }, gerados de fontes RSS diferentes pelo robô) — junta os
+          // dois aqui, removendo duplicados por link. Mantém
+          // compatibilidade com o formato antigo (lista simples).
+          let noticias;
+          if (Array.isArray(dados)) {
+            noticias = dados;
+          } else {
+            const combinadas = [...(dados.top3 || []), ...(dados.destaques || [])];
+            const linksVistos = new Set();
+            noticias = combinadas.filter(n => {
+              if (linksVistos.has(n.link)) return false;
+              linksVistos.add(n.link);
+              return true;
+            });
+          }
+
+          if (!Array.isArray(noticias) || noticias.length === 0) throw new Error('vazio');
+
+          // Mais recentes primeiro
+          noticias.sort((a, b) => new Date(b.publicado_em?.replace(' ', 'T') || 0) - new Date(a.publicado_em?.replace(' ', 'T') || 0));
+
+          gridEl.innerHTML = noticias.slice(0, MAX_NOTICIAS).map(n => `
+            <a class="noticia-card" href="${n.link}" target="_blank" rel="noopener noreferrer">
+              ${n.imagem ? `<img class="noticia-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+              <div class="noticia-body">
+                <div class="noticia-titulo">${n.titulo}</div>
+                <div class="noticia-meta">
+                  <span>${n.fonte || 'Mercado financeiro'}</span>
+                  <span>${tempoRelativo(n.publicado_em)}</span>
+                </div>
+              </div>
+            </a>
+          `).join('');
+
+          if (atualizadoEl) {
+            const agora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            atualizadoEl.textContent = `Atualizado às ${agora}`;
+          }
+        } catch (e) {
+          gridEl.innerHTML = '<div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Notícias ainda não geradas — aguarde o robô rodar.</div></div></div>';
+        } finally {
+          if (btnAtualizar) btnAtualizar.disabled = false;
+        }
+      }
+
+      carregarNoticias(true);
+      // Recarrega sozinha a cada 5 min, sem precisar dar F5
+      setInterval(() => carregarNoticias(false), 5 * 60 * 1000);
+      btnAtualizar?.addEventListener('click', () => carregarNoticias(false));
+    })();
 
     // ============================================================
     // BOLETIM DE MERCADO DIÁRIO — lista dos últimos boletins gerados
