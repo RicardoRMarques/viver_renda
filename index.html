@@ -3832,9 +3832,16 @@
                     <button type="button" class="hg-periodo-tab" data-periodo="YTD">YTD</button>
                     <button type="button" class="hg-periodo-tab" data-periodo="1A">1A</button>
                   </div>
+                  <button type="button" class="hg-btn-secundario-pequeno" id="hgBtnGraficoAvancado">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="19" x2="20" y2="19"></line><polyline points="4 15 9 9 13 13 20 5"></polyline></svg>
+                    Ver Gráfico Avançado
+                  </button>
                 </div>
                 <div id="hgGrafico">
                   <svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Carregando gráfico...</text></svg>
+                </div>
+                <div id="hgGraficoAvancadoWrap" hidden>
+                  <div id="hgGraficoAvancadoContainer" style="min-height:480px;"></div>
                 </div>
               </div>
             </div>
@@ -3931,6 +3938,7 @@
 
         hgCarregarGrafico(a.ticker || a.symbol, '30D');
         hgInicializarPeriodoTabs(a);
+        hgInicializarGraficoAvancado(a);
         hgInicializarInvestido();
       }
 
@@ -4036,6 +4044,79 @@
             if (labelEl) labelEl.textContent = NOMES_PERIODO[periodo] || periodo;
             hgCarregarGrafico(a.ticker || a.symbol, periodo);
           });
+        });
+      }
+
+      // "Ver Gráfico Avançado" — alterna do gráfico simples (feito com dados
+      // da HG Brasil) para o widget oficial do TradingView (Advanced Chart),
+      // com indicadores técnicos, desenho na tela etc. Widget gratuito, sem
+      // chave de API — mas precisa injetar o <script> de novo a cada troca
+      // de ativo, porque ele só roda uma vez, na hora que é inserido no DOM.
+      function hgInicializarGraficoAvancado(a) {
+        const btn = document.getElementById('hgBtnGraficoAvancado');
+        const wrapSimples = document.getElementById('hgGrafico');
+        const tabsEl = document.getElementById('hgPeriodoTabs');
+        const wrapAvancado = document.getElementById('hgGraficoAvancadoWrap');
+        const containerAvancado = document.getElementById('hgGraficoAvancadoContainer');
+        if (!btn || !wrapAvancado || !containerAvancado) return;
+
+        let carregado = false;
+
+        function carregarWidgetTradingView() {
+          const ticker = (a.ticker || a.symbol || '').replace('B3:', '').toUpperCase();
+          const simboloTv = `BMFBOVESPA:${ticker}`;
+          const temaEscuro = document.documentElement.getAttribute('data-theme') !== 'light';
+
+          containerAvancado.innerHTML = '';
+          const widgetContainer = document.createElement('div');
+          widgetContainer.className = 'tradingview-widget-container';
+          widgetContainer.style.height = '480px';
+          widgetContainer.style.width = '100%';
+
+          const widgetInner = document.createElement('div');
+          widgetInner.className = 'tradingview-widget-container__widget';
+          widgetInner.style.height = 'calc(100% - 32px)';
+          widgetInner.style.width = '100%';
+          widgetContainer.appendChild(widgetInner);
+
+          const script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+          script.async = true;
+          script.text = JSON.stringify({
+            autosize: true,
+            symbol: simboloTv,
+            interval: 'D',
+            timezone: 'America/Sao_Paulo',
+            theme: temaEscuro ? 'dark' : 'light',
+            style: '1',
+            locale: 'br',
+            allow_symbol_change: true,
+            calendar: false,
+            support_host: 'https://www.tradingview.com',
+          });
+          widgetContainer.appendChild(script);
+
+          containerAvancado.appendChild(widgetContainer);
+          carregado = true;
+        }
+
+        btn.addEventListener('click', () => {
+          const estaAvancado = !wrapAvancado.hidden;
+          if (estaAvancado) {
+            // Volta pro gráfico simples.
+            wrapAvancado.hidden = true;
+            wrapSimples.hidden = false;
+            if (tabsEl) tabsEl.style.display = '';
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="19" x2="20" y2="19"></line><polyline points="4 15 9 9 13 13 20 5"></polyline></svg>Ver Gráfico Avançado';
+          } else {
+            // Vai pro gráfico avançado (TradingView).
+            if (!carregado) carregarWidgetTradingView();
+            wrapAvancado.hidden = false;
+            wrapSimples.hidden = true;
+            if (tabsEl) tabsEl.style.display = 'none';
+            btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"></path></svg>Ver Gráfico Simples';
+          }
         });
       }
 
