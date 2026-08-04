@@ -255,6 +255,7 @@ def _buscar_noticia_fii():
 
 
 
+def coletar_noticias():
     """Monta DOIS grupos de notícias separados, pra não repetir a mesma
     manchete em 'Destaques da Bolsa' e em 'Top 3 Notícias' no boletim:
 
