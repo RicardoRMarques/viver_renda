@@ -3,7 +3,11 @@ name: Atualizar Boletim (Notícias, Índices e Ranking)
 on:
   schedule:
     # Índices e notícias: todos os dias, a cada 15 minutos, o dia inteiro.
-    - cron: "*/15 * * * *"
+    # Importante: NÃO usar minutos "redondos" (0/15/30/45) — são os mais
+    # concorridos de toda a plataforma do GitHub Actions, então a execução
+    # entra na fila atrás de milhares de outros workflows do mundo inteiro
+    # e pode atrasar ou até ser pulada. Por isso o offset de 4 min.
+    - cron: "4,19,34,49 * * * *"
     # Rankings de Ações/FIIs: só 1x por dia, às 12h UTC (9h em Brasília).
     # Consome bem mais requisições (vários lotes de tickers + endpoint
     # Beta de receita), por isso roda separado do restante.
