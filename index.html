@@ -467,6 +467,53 @@
     .hg-busca-compacta .hg-painel { padding: 10px 12px; border-radius: 14px; }
     .hg-busca-compacta .hg-titulo { font-size: 0.84rem; margin-bottom: 3px; }
     .hg-busca-compacta .hg-linha-busca { gap: 6px; }
+
+    .hg-btn-secundario-pequeno[id="hgBtnFavoritar"] {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .hg-btn-secundario-pequeno[id="hgBtnFavoritar"]:hover { border-color: var(--primary); color: var(--primary); }
+    .hg-btn-secundario-pequeno[id="hgBtnFavoritar"].favoritado { border-color: var(--primary); color: var(--primary); background: rgba(127,127,127,0.08); }
+
+    .hg-favoritos-wrap { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .hg-favoritos-label { font-size: 0.75rem; color: var(--muted); }
+    .hg-favoritos-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .hg-favorito-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(127,127,127,0.08);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px 6px 3px 10px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .hg-favorito-chip button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      padding: 2px 4px;
+    }
+    .hg-favorito-chip button:hover { color: #ff5a5a; }
+
+    @media (max-width: 640px) {
+      .hg-busca-compacta .hg-linha-busca.hg-linha-busca-favoritavel { flex-wrap: wrap; }
+      .hg-linha-busca-favoritavel input { flex: 1 1 100%; }
+      .hg-linha-busca-favoritavel #hgBtnBuscar,
+      .hg-linha-busca-favoritavel #hgBtnFavoritar { flex: 1 1 auto; }
+    }
     .hg-busca-compacta .hg-linha-busca input { padding: 7px 10px; font-size: 0.78rem; border-radius: 9px; }
     .hg-busca-compacta .hg-btn { padding: 0 12px; font-size: 0.78rem; border-radius: 9px; }
     .hg-busca-compacta .hg-chips { margin-top: 8px; gap: 5px; }
@@ -2809,9 +2856,15 @@
           <h2 class="hg-titulo">🔎 Consultar Ações e FIIs</h2>
 
           <div class="hg-painel">
-            <div class="hg-linha-busca">
+            <div class="hg-linha-busca hg-linha-busca-favoritavel">
               <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" />
               <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
+              <button class="hg-btn-secundario-pequeno" id="hgBtnFavoritar" type="button" title="Acompanhar este ativo no carrossel do topo">☆ Favoritar</button>
+            </div>
+
+            <div class="hg-favoritos-wrap" id="hgFavoritosWrap" style="display:none;">
+              <span class="hg-favoritos-label">No carrossel:</span>
+              <div id="hgFavoritosList" class="hg-favoritos-list"></div>
             </div>
 
             <div class="hg-chips">
@@ -3867,6 +3920,9 @@
         const logo = a.logos?.square_large || a.logos?.square_small;
         const emAlta = (q.change_percent || 0) >= 0;
         const grupos = hgMontarGrupos(a);
+
+        hgUltimoAtivoConsultado = { symbol: (a.symbol || '').replace('B3:', '').toUpperCase() };
+        atualizarBotaoFavoritarEstado();
 
         const relacionados = (a.related || []).map(t =>
           `<span class="hg-chip" data-ticker="${t}">${t.replace('B3:', '')}</span>`
@@ -6009,6 +6065,118 @@
       anoSelect.addEventListener('change', carregarDados);
     })();
 
+    // ============================================================
+    // FAVORITOS DO CARROSSEL — o usuário digita um ticker na "Consulta
+    // Rápida", clica em "☆ Favoritar" e ele passa a aparecer fixo no
+    // carrossel do topo (além de Ibovespa/IFIX/Dólar/Euro/Bitcoin/Selic).
+    // Guardado no localStorage do navegador (por pessoa, não é global do
+    // site) — até 5 ativos, cotação buscada direto na HG Brasil.
+    // ============================================================
+    const FAVORITOS_CARROSSEL_KEY = 'vrCarrosselFavoritos';
+    const FAVORITOS_CARROSSEL_MAX = 5;
+    let hgUltimoAtivoConsultado = null; // { symbol } do último ativo pesquisado em "Consulta Rápida"
+    let tickerFavoritosCache = []; // cotações já buscadas dos favoritos, pra não refazer fetch a cada render
+
+    function obterFavoritosCarrossel() {
+      try {
+        const lista = JSON.parse(localStorage.getItem(FAVORITOS_CARROSSEL_KEY));
+        return Array.isArray(lista) ? lista : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    function salvarFavoritosCarrossel(lista) {
+      try { localStorage.setItem(FAVORITOS_CARROSSEL_KEY, JSON.stringify(lista)); } catch (e) { /* localStorage indisponível — segue sem persistir */ }
+    }
+
+    async function buscarQuotesFavoritosCarrossel(favoritos) {
+      if (!favoritos.length) return [];
+      const tickers = favoritos.map(t => (t.startsWith('B3:') ? t : `B3:${t}`)).join(',');
+      try {
+        const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent(tickers)}&key=${encodeURIComponent(CHAVE_HG)}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        return (data?.results || [])
+          .map(a => ({
+            symbol: (a.symbol || '').replace('B3:', ''),
+            valor: a.quote?.value,
+            variacao: a.quote?.change_percent,
+            moeda: a.currency,
+          }))
+          .filter(f => typeof f.valor === 'number');
+      } catch (e) {
+        console.error('Erro ao buscar cotações dos favoritos do carrossel:', e);
+        return [];
+      }
+    }
+
+    function montarItemFavoritoCarrossel(f) {
+      const emAlta = (f.variacao || 0) >= 0;
+      const valorFormatado = hgFormatMoeda ? (hgFormatMoeda(f.valor, f.moeda) ?? f.valor) : f.valor;
+      return `
+        <span class="ticker-item ticker-item-favorito" title="Ativo favoritado por você">
+          <span class="ticker-nome">★ ${f.symbol}</span>
+          <span class="ticker-valor">${valorFormatado}</span>
+          <span class="ticker-var ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(f.variacao || 0).toFixed(2)}%</span>
+        </span>`;
+    }
+
+    async function atualizarCarrosselComFavoritos() {
+      tickerFavoritosCache = await buscarQuotesFavoritosCarrossel(obterFavoritosCarrossel());
+      renderizarTickerCarrossel(window.hgIndicesCache);
+    }
+
+    function atualizarBotaoFavoritarEstado() {
+      const btn = document.getElementById('hgBtnFavoritar');
+      if (!btn || !hgUltimoAtivoConsultado) return;
+      const jaFavoritado = obterFavoritosCarrossel().includes(hgUltimoAtivoConsultado.symbol);
+      btn.classList.toggle('favoritado', jaFavoritado);
+      btn.textContent = jaFavoritado ? '★ Favoritado' : '☆ Favoritar';
+    }
+
+    function renderizarChipsFavoritosCarrossel() {
+      const wrap = document.getElementById('hgFavoritosWrap');
+      const lista = document.getElementById('hgFavoritosList');
+      if (!wrap || !lista) return;
+      const favoritos = obterFavoritosCarrossel();
+      wrap.style.display = favoritos.length ? 'flex' : 'none';
+      lista.innerHTML = favoritos.map(t => `
+        <span class="hg-favorito-chip">★ ${t}<button type="button" data-remover="${t}" aria-label="Remover ${t} do carrossel">✕</button></span>
+      `).join('');
+      lista.querySelectorAll('button[data-remover]').forEach(botao => {
+        botao.addEventListener('click', () => {
+          const ticker = botao.getAttribute('data-remover');
+          salvarFavoritosCarrossel(obterFavoritosCarrossel().filter(t => t !== ticker));
+          renderizarChipsFavoritosCarrossel();
+          atualizarBotaoFavoritarEstado();
+          atualizarCarrosselComFavoritos();
+        });
+      });
+    }
+
+    document.getElementById('hgBtnFavoritar')?.addEventListener('click', () => {
+      const ticker = (hgUltimoAtivoConsultado?.symbol || document.getElementById('hgTickerInput').value.trim().toUpperCase());
+      if (!ticker) return;
+      let favoritos = obterFavoritosCarrossel();
+      if (favoritos.includes(ticker)) {
+        favoritos = favoritos.filter(t => t !== ticker);
+      } else {
+        if (favoritos.length >= FAVORITOS_CARROSSEL_MAX) {
+          alert(`Você pode favoritar até ${FAVORITOS_CARROSSEL_MAX} ativos no carrossel. Remova algum antes de adicionar outro.`);
+          return;
+        }
+        favoritos.push(ticker);
+      }
+      salvarFavoritosCarrossel(favoritos);
+      renderizarChipsFavoritosCarrossel();
+      atualizarBotaoFavoritarEstado();
+      atualizarCarrosselComFavoritos();
+    });
+
+    // Estado inicial ao carregar a página
+    renderizarChipsFavoritosCarrossel();
+    atualizarCarrosselComFavoritos();
+
     // Carrossel de índices (Ibovespa, IFIX, Dólar, Euro, Bitcoin) logo abaixo
     // do header, usando os mesmos dados do boletim diário (indices.json) —
     // sem chamada extra de API. Duplica os itens para o loop ficar contínuo.
@@ -6041,7 +6209,7 @@
         .map(({ nome, aliases }) => ({ nome, item: encontrarItem(nome, aliases) }))
         .filter(({ item }) => item);
 
-      if (itens.length === 0) {
+      if (itens.length === 0 && tickerFavoritosCache.length === 0) {
         track.innerHTML = '<span class="ticker-item">Índices indisponíveis no momento.</span>';
         return;
       }
@@ -6080,7 +6248,11 @@
       };
 
       // Duplica a sequência para permitir o scroll infinito sem "salto" visível.
-      track.innerHTML = itens.map(montarItem).join('') + itens.map(montarItem).join('');
+      // Favoritos (do usuário) sempre aparecem primeiro, com estrela ★, antes
+      // dos índices gerais.
+      const itensFavoritosHtml = tickerFavoritosCache.map(montarItemFavoritoCarrossel);
+      const todosOsItens = [...itensFavoritosHtml, ...itens.map(montarItem)];
+      track.innerHTML = todosOsItens.join('') + todosOsItens.join('');
     }
 
     // ============================================================
