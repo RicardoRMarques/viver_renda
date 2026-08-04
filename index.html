@@ -6734,7 +6734,12 @@
           if (Array.isArray(dados)) {
             noticias = dados;
           } else {
-            const combinadas = [...(dados.top3 || []), ...(dados.destaques || [])];
+            const combinadas = [...(dados.top3 || []), ...(dados.destaques || [])]
+              // "Investing.com (Economia)" fica de fora dessa seção — a
+              // ideia aqui é mercado/FIIs/ações, e esse card costumava
+              // trazer notícia genérica demais (ex: política de outro país),
+              // fora do fit da seção.
+              .filter(n => n.fonte !== 'Investing.com (Economia)');
             const linksVistos = new Set();
             noticias = combinadas.filter(n => {
               if (linksVistos.has(n.link)) return false;
