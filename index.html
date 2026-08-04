@@ -1018,6 +1018,20 @@
       justify-content: space-between;
       gap: 8px;
     }
+    .noticia-card-fii { border-color: var(--primary); }
+    .noticia-badge-fii {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: var(--primary);
+      color: var(--deep);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      z-index: 1;
+    }
     .noticia-card.noticia-skeleton {
       height: 220px;
       background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
@@ -6734,9 +6748,19 @@
           // Mais recentes primeiro
           noticias.sort((a, b) => new Date(b.publicado_em?.replace(' ', 'T') || 0) - new Date(a.publicado_em?.replace(' ', 'T') || 0));
 
-          gridEl.innerHTML = noticias.slice(0, MAX_NOTICIAS).map(n => `
-            <a class="noticia-card" href="${n.link}" target="_blank" rel="noopener noreferrer">
+          // A notícia de FIIs (fiis.com.br, sem RSS — coletada via scraping
+          // pelo robô) sempre aparece fixada em 1º lugar, com uma etiqueta
+          // "FIIs" — é o diferencial do site (foco em Viver de Renda),
+          // então não some no meio das outras por ordem de data.
+          const fii = dados.fii || null;
+          const vagas = fii ? MAX_NOTICIAS - 1 : MAX_NOTICIAS;
+          const restantes = noticias.filter(n => n.link !== fii?.link).slice(0, vagas);
+          const noticiasParaExibir = fii ? [fii, ...restantes] : restantes;
+
+          gridEl.innerHTML = noticiasParaExibir.map(n => `
+            <a class="noticia-card${n === fii ? ' noticia-card-fii' : ''}" href="${n.link}" target="_blank" rel="noopener noreferrer">
               ${n.imagem ? `<img class="noticia-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+              ${n === fii ? '<span class="noticia-badge-fii">FIIs</span>' : ''}
               <div class="noticia-body">
                 <div class="noticia-titulo">${n.titulo}</div>
                 <div class="noticia-meta">

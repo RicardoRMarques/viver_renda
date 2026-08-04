@@ -35,7 +35,7 @@ import os
 import re
 import sys
 import xml.etree.ElementTree as ET
-from datetime import date
+from datetime import date, datetime, timezone
 
 import requests
 
@@ -70,6 +70,13 @@ NOTICIAS_FONTES_MISTAS = [
 ]
 NOTICIAS_QTD = 3
 TIMEOUT = 20
+
+# fiis.com.br não tem feed RSS público — a única forma de puxar notícia de
+# lá é fazendo scraping da própria página de notícias (pega só o destaque
+# mais recente, 1 item). Fica fora do esquema de fallback dos outros feeds
+# porque é fonte única: se falhar, o boletim segue sem esse item (nunca
+# quebra o resto da coleta).
+FIIS_NOTICIAS_URL = "https://fiis.com.br/noticias/"
 
 HEADERS_NAVEGADOR = {
     "User-Agent": (
@@ -187,7 +194,67 @@ def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD):
     return noticias
 
 
-def coletar_noticias():
+def _buscar_noticia_fii():
+    """Faz scraping da 1ª notícia em destaque de https://fiis.com.br/noticias/
+    (o site não tem feed RSS público). Estrutura esperada (tema WordPress):
+    um link de miniatura envolvendo <img alt="TÍTULO" src="IMAGEM">, seguido
+    de um link igual dentro de um heading (<h3>/<h2>) com o texto do título.
+
+    Retorna um dict no mesmo formato dos outros itens de notícia, ou None se
+    não conseguir extrair nada (nunca lança exceção pra fora — scraping de
+    HTML de terceiros é frágil e não pode derrubar o resto da coleta)."""
+    try:
+        resp = requests.get(FIIS_NOTICIAS_URL, timeout=TIMEOUT, headers=HEADERS_NAVEGADOR)
+        resp.raise_for_status()
+        html = resp.text
+
+        # 1) Link de miniatura: <a href="https://fiis.com.br/noticias/SLUG/">
+        #    ... <img ... src="IMG" ... alt="TÍTULO" ...> ... </a>
+        padrao_thumb = re.compile(
+            r'<a[^>]+href="(https://fiis\.com\.br/noticias/[^"?#]+/)"[^>]*>\s*'
+            r'<img[^>]+src="([^"]+)"[^>]*alt="([^"]*)"',
+            re.IGNORECASE | re.DOTALL,
+        )
+        match = padrao_thumb.search(html)
+        if not match:
+            print("AVISO: scraping do fiis.com.br não achou o padrão esperado (site pode ter mudado o layout).", file=sys.stderr)
+            return None
+
+        link, imagem, titulo = match.group(1), match.group(2), match.group(3).strip()
+
+        # O "alt" da miniatura às vezes vem vazio ou genérico — nesse caso,
+        # busca o título de verdade no heading que repete o mesmo link logo
+        # depois (padrão: <h3><a href="MESMO_LINK">TÍTULO REAL</a></h3>).
+        if not titulo:
+            padrao_titulo = re.compile(
+                r'<a[^>]+href="' + re.escape(link) + r'"[^>]*>([^<]+)</a>',
+                re.IGNORECASE,
+            )
+            achou_titulo = padrao_titulo.search(html, match.end())
+            if achou_titulo:
+                titulo = achou_titulo.group(1).strip()
+
+        if not titulo or not link:
+            return None
+
+        # A listagem só mostra hora relativa ("Hoje às 12:50"), sem data
+        # em formato utilizável — como o item é sempre o mais recente da
+        # página, usamos o horário de coleta como aproximação razoável.
+        publicado_em = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+
+        return {
+            "titulo": titulo,
+            "link": link,
+            "imagem": imagem,
+            "fonte": "FIIs.com.br",
+            "publicado_em": publicado_em,
+        }
+    except requests.RequestException as exc:
+        print(f"AVISO: falha ao buscar notícia de FIIs em {FIIS_NOTICIAS_URL}: {exc}", file=sys.stderr)
+        return None
+
+
+
     """Monta DOIS grupos de notícias separados, pra não repetir a mesma
     manchete em 'Destaques da Bolsa' e em 'Top 3 Notícias' no boletim:
 
@@ -250,10 +317,19 @@ def coletar_noticias():
         print(f"INFO: 'top3' incompleto ({len(top3)}/{NOTICIAS_QTD}) — reforçando com feeds do outro grupo.")
         top3.extend(_coletar_grupo(NOTICIAS_FONTES_MISTAS, faltam, qtd_por_fonte=1))
 
-    return {
+    resultado = {
         "destaques": destaques[:NOTICIAS_QTD],
         "top3": top3[:NOTICIAS_QTD],
     }
+
+    fii = _buscar_noticia_fii()
+    if fii:
+        resultado["fii"] = fii
+        print(f"OK: notícia de FIIs obtida de FIIs.com.br.")
+    else:
+        print("AVISO: sem notícia de FIIs nesta execução (fica sem o campo 'fii' — front-end já trata isso).", file=sys.stderr)
+
+    return resultado
 
 
 def _data_bcb(data_iso):
@@ -735,8 +811,9 @@ def main():
     with open(NOTICIAS_OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(noticias, f, ensure_ascii=False, indent=2)
 
-    print(f"OK: {len(noticias.get('destaques', []))} notícia(s) em 'destaques' e "
-          f"{len(noticias.get('top3', []))} notícia(s) em 'top3' salvas em {NOTICIAS_OUTPUT_FILE}.")
+    print(f"OK: {len(noticias.get('destaques', []))} notícia(s) em 'destaques', "
+          f"{len(noticias.get('top3', []))} notícia(s) em 'top3' e "
+          f"{'1' if noticias.get('fii') else '0'} notícia de FIIs salvas em {NOTICIAS_OUTPUT_FILE}.")
 
 
 if __name__ == "__main__":
