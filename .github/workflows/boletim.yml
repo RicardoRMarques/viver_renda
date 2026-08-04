@@ -5,7 +5,7 @@ on:
     # Com o suporte nativo a timezone do GitHub Actions (desde mar/2026),
     # não precisa mais converter pra UTC na mão — escreve direto no
     # horário de Brasília. Roda 6h00, de segunda (1) a sexta (5).
-    - cron: '0 6 * * 1-5'
+    - cron: '0 4 * * 1-5'
       timezone: 'America/Sao_Paulo'
   workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
 
