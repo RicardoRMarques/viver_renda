@@ -9892,6 +9892,38 @@
        para gerar a planilha .xlsx da tabela de parcelas. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 
+  <!-- Supabase: base de dados para futuras implementações (histórico de
+       índices, favoritos sincronizados, etc). Por enquanto só testando a
+       conexão — nada é exibido na tela ainda. A "publishable key" é
+       segura para expor no front-end (a segurança de verdade vem das
+       políticas de RLS configuradas no painel do Supabase). -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (typeof supabase === 'undefined') {
+        console.error('Supabase: biblioteca não carregou.');
+        return;
+      }
+      const SUPABASE_URL = 'https://mzknjnupizprfatfmxqg.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_vulGjNaqQEyuJy4roQBgmQ_Zf0wyLWh';
+      window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // Teste de conexão: busca os 5 registros mais recentes da tabela
+      // historico_indices. Só aparece no console (F12) — não afeta o site.
+      const { data, error } = await window.supabaseClient
+        .from('historico_indices')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) {
+        console.error('Supabase: falha ao conectar/ler historico_indices.', error.message);
+      } else {
+        console.log(`Supabase conectado! ${data.length} registro(s) encontrado(s) em historico_indices:`, data);
+      }
+    });
+  </script>
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       // ⚠️ IMPORTANTE: troque pela URL do SEU Cloudflare Worker depois de
