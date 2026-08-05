@@ -8167,6 +8167,7 @@
 
           <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
             <button type="button" class="hg-btn" id="financBtnPdf" style="flex:1 1 140px;">📄 Baixar PDF</button>
+            <button type="button" class="hg-btn" id="financBtnExcel" style="flex:1 1 140px; background:var(--deep); color:var(--text); border:1px solid var(--border);">📊 Baixar Excel</button>
             <button type="button" class="hg-btn" id="financBtnAmortizar" style="flex:1 1 140px; background:var(--deep); color:var(--text); border:1px solid var(--border);">🔧 Amortizar</button>
             <button type="button" class="hg-btn-compartilhar" id="financBtnCompartilhar" style="flex:1 1 140px; justify-content:center;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
@@ -8238,6 +8239,7 @@
         };
 
         document.getElementById('financBtnPdf').addEventListener('click', gerarPdf);
+        document.getElementById('financBtnExcel').addEventListener('click', gerarExcel);
         document.getElementById('financBtnAmortizar').addEventListener('click', abrirModalAmort);
         document.getElementById('financBtnCompartilhar').addEventListener('click', (e) => {
           compartilharSimulacao(e.currentTarget);
@@ -8427,6 +8429,74 @@
         );
 
         return doc;
+      }
+
+      function nomeArquivoExcel() {
+        const s = ultimaSimulacao;
+        return `simulacao-financiamento-${s.sistema}-${hgDataYYYYMMDD(new Date())}.xlsx`;
+      }
+
+      function gerarExcel() {
+        const s = ultimaSimulacao;
+        if (!s || typeof XLSX === 'undefined') return;
+
+        // Aba 1: Resumo — mesmos dados mostrados no topo do PDF.
+        const linhasResumoExcel = [
+          ['Simulação de Financiamento Imobiliário', ''],
+          ['Gerado em', `${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`],
+          [],
+          ['Valor financiado', s.valor],
+          ['Total a ser pago', s.totalPago],
+          ['Total de juros', s.totalJuros],
+          ['Taxa de juros', `${hgFormatNumero(s.taxaPct)}% (${s.periodo === 'anual' ? 'a.a' : 'a.m'})`],
+          ['Quantidade de parcelas', (s.linhas.length - 1) !== s.parcelas
+            ? `${s.linhas.length - 1} de ${s.parcelas} (reduzida pela amortização)`
+            : s.parcelas],
+          ['Valor da primeira parcela', s.primeiraParcela],
+          ['Valor da última parcela', s.ultimaParcela],
+          ['Data da última parcela', s.dataUltimaParcela],
+          ['Sistema de amortização', s.sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'],
+        ];
+        const abaResumo = XLSX.utils.aoa_to_sheet(linhasResumoExcel);
+        abaResumo['!cols'] = [{ wch: 28 }, { wch: 24 }];
+
+        const livro = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(livro, abaResumo, 'Resumo');
+
+        // Aba 2: histórico de amortizações extras (só entra se existir).
+        if (s.amortizacao?.lista?.length > 0) {
+          const linhasAmort = [
+            ['Após a parcela', 'Valor amortizado', 'Modo'],
+            ...s.amortizacao.lista.map(a => [a.ponto, a.valor, capitalizar(rotuloModoAmort(a.modo))]),
+          ];
+          const abaAmort = XLSX.utils.aoa_to_sheet(linhasAmort);
+          abaAmort['!cols'] = [{ wch: 16 }, { wch: 18 }, { wch: 22 }];
+          XLSX.utils.book_append_sheet(livro, abaAmort, 'Amortizações');
+        }
+
+        // Aba 3: tabela completa de parcelas — valores como número (não
+        // texto formatado), pra dar pra somar/filtrar direto na planilha.
+        const linhasParcelas = [
+          ['Mês', 'Data', 'Dívida', 'Juros', 'Amortização', 'Parcela', 'Saldo devedor', 'Amortização extra'],
+          ...s.linhas.map(l => {
+            const amortDessaLinha = s.amortizacao?.lista?.find(a => a.ponto === l.mes);
+            return [
+              l.mes,
+              l.rotuloData,
+              l.divida,
+              l.juros,
+              l.amortizacao,
+              l.parcela,
+              l.saldoDevedor,
+              l.amortizacaoExtra ? (amortDessaLinha?.valor ?? 0) : '',
+            ];
+          }),
+        ];
+        const abaParcelas = XLSX.utils.aoa_to_sheet(linhasParcelas);
+        abaParcelas['!cols'] = [{ wch: 8 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
+        XLSX.utils.book_append_sheet(livro, abaParcelas, 'Parcelas');
+
+        XLSX.writeFile(livro, nomeArquivoExcel());
       }
 
       function nomeArquivoPdf() {
@@ -9818,6 +9888,9 @@
        gerar o PDF de verdade (baixar e compartilhar como arquivo). -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
+  <!-- SheetJS (xlsx): usada só pelo Simulador de Financiamento Imobiliário,
+       para gerar a planilha .xlsx da tabela de parcelas. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
