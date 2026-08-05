@@ -55,9 +55,30 @@
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
+  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .section-com-lyket [data-lyket-type]{
+    font-size:12px;
+    background:#f2f2f2;
+    border-radius:20px;
+    padding:4px 10px;
+    display:inline-flex;
+    align-items:center;
+    box-shadow:0 1px 4px rgba(0,0,0,0.35);
+  }
+  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
+  .grupo-whatsapp-card{
+    display:flex;align-items:center;gap:12px;margin-top:12px;
+    background:var(--card);border:1px solid var(--card-border);border-radius:12px;
+    padding:10px 14px;text-decoration:none;
+  }
+  .grupo-whatsapp-card img{border-radius:6px;background:#fff;padding:3px;flex-shrink:0;}
+  .grupo-whatsapp-card span{display:flex;flex-direction:column;gap:2px;}
+  .grupo-whatsapp-card strong{color:var(--text);font-size:13.5px;}
+  .grupo-whatsapp-card small{color:var(--muted);font-size:11.5px;line-height:1.4;}
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
+<script src="https://unpkg.com/@lyket/widget@latest/dist/lyket.js?apiKey=pt_d2c19f94733791f2b25c44987dd17e"></script>
 </head>
 <body>
 <div class="wrap">
@@ -72,111 +93,122 @@
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
-  <div class="sub">Boletim de Mercado · Terça-feira, 28 de Julho de 2026</div>
-  <div class="sub" style="margin-top:2px;opacity:0.8;">Dados referentes ao fechamento de 27/07/2026</div>
+  <div class="sub">Boletim de Mercado · Quarta-feira, 05 de Agosto de 2026</div>
 </header>
 
-<h2 class="section">Indicadores Principais</h2>
+<h2 class="section section-com-lyket">
+  <span>Indicadores Principais</span>
+  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-05-08-2026"></div>
+</h2>
+
+<a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
+  <span>
+    <strong>Entre no grupo do WhatsApp</strong>
+    <small>Dividendos | Viver de Renda — aponte a câmera ou toque aqui</small>
+  </span>
+</a>
+
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa</div><div class="value up">175.334,45 pts ▲ 0.74%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,12 ▲ 0.10%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,82 ▲ 0.06%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 63.338,90 ▼ 2.25%</div></div>
+  <div class="indicator"><div class="label">Ibovespa</div><div class="value down">177.894,97 pts ▼ 0.06%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value down">R$ 5,13 ▼ 0.02%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,91 ▲ 0.02%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 64.092,39 ▼ 0.20%</div></div>
   <div class="indicator"><div class="label">IPCA (12 meses)</div><div class="value">0,16%</div></div>
-  <div class="indicator"><div class="label">Dow Jones</div><div class="value up">52.210,08 pts ▲ 0.51%</div></div>
-  <div class="indicator"><div class="label">Nasdaq</div><div class="value down">24.932,08 pts ▼ 0.18%</div></div>
+  <div class="indicator"><div class="label">Dow Jones</div><div class="value up">54.085,88 pts ▲ 1.71%</div></div>
+  <div class="indicator"><div class="label">Nasdaq</div><div class="value up">26.584,99 pts ▲ 2.59%</div></div>
   <div class="indicator"><div class="label">Petróleo Brent</div><div class="value">—</div></div>
   <div class="indicator"><div class="label">Selic</div><div class="value">14,25% a.a.</div></div>
-  <div class="indicator"><div class="label">IFIX</div><div class="value down">3.798,06 pts ▼ 0.18%</div></div>
+  <div class="indicator"><div class="label">IFIX</div><div class="value down">3.784,38 pts ▼ 0.03%</div></div>
 </div>
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/business/saude-mental-e-fertilidade-viram-ativos-estrategicos-e-novas-frentes-de-negocios/" target="_blank" rel="noopener noreferrer" class="tk-link">Saúde mental e fertilidade viram ativos estratégicos e novas frentes de negócios</a></span><span class="pct">InfoMoney (geral)</span></div>
-  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/mercados/futuros-de-ny-operam-mistos-com-pressao-sobre-acoes-de-semicondutores/" target="_blank" rel="noopener noreferrer" class="tk-link">Futuros de NY operam mistos com pressão sobre ações de semicondutores</a></span><span class="pct">InfoMoney (geral)</span></div>
-  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/politica/por-que-tarcisio-se-tornou-o-ativo-mais-disputado-pelos-concorrentes-a-presidencia/" target="_blank" rel="noopener noreferrer" class="tk-link">Por que Tarcísio se tornou o ativo mais disputado pelos concorrentes à Presidência</a></span><span class="pct">InfoMoney (geral)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/investidores-deveriam-comecar-a-acumular-este-etf-diz-bca-2025235" target="_blank" rel="noopener noreferrer" class="tk-link">Investidores deveriam começar a acumular este ETF, diz BCA</a></span><span class="pct">Investing.com (FIIs)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/novo-relatorio-alerta-que-proibicao-de-transceivers-chineses-prejudicaria-gigantes-de-ia-dos-eua-2026858" target="_blank" rel="noopener noreferrer" class="tk-link">Novo relatório alerta que proibição de transceivers chineses prejudicaria gigantes de IA dos EUA</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://br.investing.com/news/economy-news/esperancas-de-acordo-no-oriente-medio-e-resultados-de-spacex-e-amd-em-foco-2026767" target="_blank" rel="noopener noreferrer" class="tk-link">Esperanças de acordo no Oriente Médio; resultados da SpaceX e AMD em foco</a></span><span class="pct">Investing.com (Economia)</span></div>
 </div>
 
-<h2 class="section">6 Melhores FIIs</h2>
+<h2 class="section">FIIs - Maiores Dividend Yield</h2>
 <table>
   <tr><th>Ticker</th><th>DY (12m)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
     <td class="name">XPCA11</td>
-    <td>17.24%</td>
-    <td>R$ 7.60</td>
+    <td>17.45%</td>
+    <td>R$ 7.45</td>
     <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
     <td class="name">VGIR11</td>
-    <td>16.19%</td>
-    <td>R$ 9.39</td>
+    <td>15.98%</td>
+    <td>R$ 9.51</td>
     <td class="rationale">FII Valreiii</td>
   </tr>
   <tr>
     <td class="name">IRIM11</td>
     <td>15.40%</td>
-    <td>R$ 65.52</td>
+    <td>R$ 65.53</td>
     <td class="rationale">FII Irim</td>
   </tr>
   <tr>
     <td class="name">CPTS11</td>
-    <td>14.39%</td>
-    <td>R$ 7.44</td>
+    <td>14.30%</td>
+    <td>R$ 7.49</td>
     <td class="rationale">FII Capi Sec</td>
   </tr>
   <tr>
-    <td class="name">KNCR11</td>
-    <td>13.55%</td>
-    <td>R$ 106.56</td>
-    <td class="rationale">FII Kinea Ri</td>
+    <td class="name">RECR11</td>
+    <td>13.45%</td>
+    <td>R$ 79.85</td>
+    <td class="rationale">FII Rec Rece</td>
   </tr>
   <tr>
-    <td class="name">RECR11</td>
-    <td>13.41%</td>
-    <td>R$ 80.12</td>
-    <td class="rationale">FII Rec Rece</td>
+    <td class="name">KNCR11</td>
+    <td>13.42%</td>
+    <td>R$ 106.88</td>
+    <td class="rationale">FII Kinea Ri</td>
   </tr>
 </table>
 
-<h2 class="section">6 Melhores Ações de Dividendos</h2>
+<h2 class="section">Ações - Maiores Dividend Yield</h2>
 <table>
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
     <td class="name">SBSP3</td>
-    <td>12.10%</td>
-    <td>R$ 28.73</td>
+    <td>12.44%</td>
+    <td>R$ 27.95</td>
     <td class="rationale">Sabesp</td>
   </tr>
   <tr>
     <td class="name">CMIG4</td>
-    <td>11.52%</td>
-    <td>R$ 11.12</td>
+    <td>11.40%</td>
+    <td>R$ 11.24</td>
     <td class="rationale">CEMIG</td>
   </tr>
   <tr>
     <td class="name">BBSE3</td>
-    <td>11.20%</td>
-    <td>R$ 40.63</td>
+    <td>10.86%</td>
+    <td>R$ 41.90</td>
     <td class="rationale">BB Seguridade</td>
   </tr>
   <tr>
     <td class="name">ALOS3</td>
-    <td>11.03%</td>
-    <td>R$ 26.65</td>
+    <td>10.66%</td>
+    <td>R$ 27.57</td>
     <td class="rationale">ALLOS</td>
   </tr>
   <tr>
     <td class="name">BBDC4</td>
-    <td>8.32%</td>
-    <td>R$ 18.69</td>
+    <td>8.59%</td>
+    <td>R$ 18.11</td>
     <td class="rationale">Banco Bradesco</td>
   </tr>
   <tr>
     <td class="name">ITUB4</td>
-    <td>8.30%</td>
-    <td>R$ 42.52</td>
+    <td>8.37%</td>
+    <td>R$ 42.14</td>
     <td class="rationale">Banco Itaú Unibanco</td>
   </tr>
 </table>
@@ -184,17 +216,17 @@
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item">
-  <div class="n-title"><a href="https://www.infomoney.com.br/business/saude-mental-e-fertilidade-viram-ativos-estrategicos-e-novas-frentes-de-negocios/" target="_blank" rel="noopener noreferrer" class="n-link">1. Saúde mental e fertilidade viram ativos estratégicos e novas frentes de negócios</a></div>
+  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/copom-emprego-eua-balanco-bradesco-destaques-05082026/" target="_blank" rel="noopener noreferrer" class="n-link">1. Copom, emprego nos EUA, balanço do Bradesco e mais destaques desta quarta</a></div>
   <div class="n-body">Fonte: InfoMoney (geral)</div>
 </div>
 
 <div class="news-item">
-  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/futuros-de-ny-operam-mistos-com-pressao-sobre-acoes-de-semicondutores/" target="_blank" rel="noopener noreferrer" class="n-link">2. Futuros de NY operam mistos com pressão sobre ações de semicondutores</a></div>
+  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/dow-jones-futuro-sobe-com-esperanca-de-acordo-entre-eua-e-ira-e-otimismo-com-ia/" target="_blank" rel="noopener noreferrer" class="n-link">2. Dow Jones Futuro sobe com esperança de acordo entre EUA e Irã e otimismo com IA</a></div>
   <div class="n-body">Fonte: InfoMoney (geral)</div>
 </div>
 
 <div class="news-item">
-  <div class="n-title"><a href="https://www.infomoney.com.br/politica/por-que-tarcisio-se-tornou-o-ativo-mais-disputado-pelos-concorrentes-a-presidencia/" target="_blank" rel="noopener noreferrer" class="n-link">3. Por que Tarcísio se tornou o ativo mais disputado pelos concorrentes à Presidência</a></div>
+  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/como-o-mercado-deve-reagir-a-decisao-do-copom-desta-4a/" target="_blank" rel="noopener noreferrer" class="n-link">3. Como o mercado deve reagir à decisão do Copom desta 4ª?</a></div>
   <div class="n-body">Fonte: InfoMoney (geral)</div>
 </div>
 
