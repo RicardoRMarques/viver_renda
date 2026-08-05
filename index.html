@@ -86,6 +86,16 @@
     .val-up { color: var(--accent); font-weight: 800; }
     .val-down { color: var(--danger); font-weight: 800; }
 
+    /* Ao clicar num link do menu (#âncora), a seção alvo pousa abaixo do
+       header fixo, em vez de ficar escondida atrás dele. */
+    #noticias-mercado,
+    #simuladorVisual,
+    #boletim-indices-secao,
+    #consulta-rapida,
+    #boletins-semana,
+    #educacao {
+      scroll-margin-top: 100px;
+    }
     /* Header */
     header {
       padding: 12px 0 0;
