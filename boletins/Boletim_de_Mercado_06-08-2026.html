@@ -56,7 +56,25 @@
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
   .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .section-com-lyket [data-lyket-type]{font-size:12px;}
+  .section-com-lyket [data-lyket-type]{
+    font-size:12px;
+    background:#f2f2f2;
+    border-radius:20px;
+    padding:4px 10px;
+    display:inline-flex;
+    align-items:center;
+    box-shadow:0 1px 4px rgba(0,0,0,0.35);
+  }
+  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
+  .grupo-whatsapp-card{
+    display:flex;align-items:center;gap:12px;margin-top:12px;
+    background:var(--card);border:1px solid var(--card-border);border-radius:12px;
+    padding:10px 14px;text-decoration:none;
+  }
+  .grupo-whatsapp-card img{border-radius:6px;background:#fff;padding:3px;flex-shrink:0;}
+  .grupo-whatsapp-card span{display:flex;flex-direction:column;gap:2px;}
+  .grupo-whatsapp-card strong{color:var(--text);font-size:13.5px;}
+  .grupo-whatsapp-card small{color:var(--muted);font-size:11.5px;line-height:1.4;}
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
@@ -75,113 +93,122 @@
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
-  <div class="sub">Boletim de Mercado · Quarta-feira, 29 de Julho de 2026</div>
+  <div class="sub">Boletim de Mercado · Quinta-feira, 06 de Agosto de 2026</div>
 </header>
 
 <h2 class="section section-com-lyket">
   <span>Indicadores Principais</span>
-  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-29-07-2026"></div>
+  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-06-08-2026"></div>
 </h2>
+
+<a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
+  <span>
+    <strong>Entre no grupo do WhatsApp</strong>
+    <small>Dividendos | Viver de Renda — aponte a câmera ou toque aqui</small>
+  </span>
+</a>
+
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa</div><div class="value down">173.885,34 pts ▼ 1.52%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value down">R$ 5,12 ▼ 0.16%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,87 ▲ 0.52%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 63.404,60 ▼ 0.67%</div></div>
+  <div class="indicator"><div class="label">Ibovespa</div><div class="value down">177.726,17 pts ▼ 0.09%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,12 ▲ 0.05%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,92 ▲ 0.01%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">US$ 64.819,87 ▲ 0.30%</div></div>
   <div class="indicator"><div class="label">IPCA (12 meses)</div><div class="value">0,16%</div></div>
-  <div class="indicator"><div class="label">Dow Jones</div><div class="value down">51.594,14 pts ▼ 2.19%</div></div>
-  <div class="indicator"><div class="label">Nasdaq</div><div class="value down">24.442,94 pts ▼ 1.74%</div></div>
+  <div class="indicator"><div class="label">Dow Jones</div><div class="value up">54.349,12 pts ▲ 0.49%</div></div>
+  <div class="indicator"><div class="label">Nasdaq</div><div class="value down">26.363,44 pts ▼ 0.83%</div></div>
   <div class="indicator"><div class="label">Petróleo Brent</div><div class="value">—</div></div>
   <div class="indicator"><div class="label">Selic</div><div class="value">14,25% a.a.</div></div>
-  <div class="indicator"><div class="label">IFIX</div><div class="value down">3.797,33 pts ▼ 0.26%</div></div>
+  <div class="indicator"><div class="label">IFIX</div><div class="value down">3.781,99 pts ▼ 0.06%</div></div>
 </div>
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/brasil/ventos-de-mais-de-90-km-h-atingem-o-rio-e-provocam-queda-de-luz-em-varios-bairros/" target="_blank" rel="noopener noreferrer" class="tk-link">Ventos fortes atingem o Rio, com metrô, trem e barcas parados</a></span><span class="pct">InfoMoney (geral)</span></div>
-  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/mercados/taxas-dos-dis-perdem-forca-sob-influencia-do-fed-mas-fecham-com-altas-leves/" target="_blank" rel="noopener noreferrer" class="tk-link">Taxas dos DIs perdem força sob influência do Fed, mas fecham com altas leves</a></span><span class="pct">InfoMoney (geral)</span></div>
-  <div class="mover-row"><span class="tk"><a href="https://www.infomoney.com.br/mercados/santander-brasil-sanb11-frustra-2t26-com-mais-provisoes-e-receitas-fracas-mas-ha-boa-noticia-desempenho-acoes/" target="_blank" rel="noopener noreferrer" class="tk-link">Santander Brasil: menor lucro desde 2023, mas o que mais fez ação desabar 7% após 2T?</a></span><span class="pct">InfoMoney (geral)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://br.investing.com/news/markets/gavea-investimentos-de-arminio-fraga-fecha-fundos-multimercados-2027297" target="_blank" rel="noopener noreferrer" class="tk-link">Gávea Investimentos, de Armínio Fraga, fecha fundos multimercados</a></span><span class="pct">Investing.com (FIIs)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-sunrun-estao-caindo-hoje-93CH-2028928" target="_blank" rel="noopener noreferrer" class="tk-link">Por que as ações da Sunrun estão caindo hoje?</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://br.investing.com/news/economy-news/negociacoes-com-o-ira-em-foco-resultados-de-sandisk-e-block-2028866" target="_blank" rel="noopener noreferrer" class="tk-link">Negociações com o Irã em foco; resultados de Sandisk e Block</a></span><span class="pct">Investing.com (Economia)</span></div>
 </div>
 
-<h2 class="section">6 Melhores FIIs</h2>
+<h2 class="section">FIIs - Maiores Dividend Yield</h2>
 <table>
   <tr><th>Ticker</th><th>DY (12m)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
     <td class="name">XPCA11</td>
-    <td>17.01%</td>
-    <td>R$ 7.70</td>
+    <td>17.57%</td>
+    <td>R$ 7.40</td>
     <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
     <td class="name">VGIR11</td>
-    <td>16.10%</td>
-    <td>R$ 9.44</td>
+    <td>15.88%</td>
+    <td>R$ 9.57</td>
     <td class="rationale">FII Valreiii</td>
   </tr>
   <tr>
     <td class="name">IRIM11</td>
-    <td>15.50%</td>
-    <td>R$ 65.09</td>
+    <td>15.48%</td>
+    <td>R$ 65.17</td>
     <td class="rationale">FII Irim</td>
   </tr>
   <tr>
     <td class="name">CPTS11</td>
-    <td>14.30%</td>
-    <td>R$ 7.49</td>
+    <td>14.36%</td>
+    <td>R$ 7.46</td>
     <td class="rationale">FII Capi Sec</td>
   </tr>
   <tr>
-    <td class="name">KNCR11</td>
-    <td>13.52%</td>
-    <td>R$ 106.79</td>
-    <td class="rationale">FII Kinea Ri</td>
+    <td class="name">RECR11</td>
+    <td>13.61%</td>
+    <td>R$ 78.93</td>
+    <td class="rationale">FII Rec Rece</td>
   </tr>
   <tr>
-    <td class="name">RECR11</td>
-    <td>13.41%</td>
-    <td>R$ 80.10</td>
-    <td class="rationale">FII Rec Rece</td>
+    <td class="name">KNCR11</td>
+    <td>13.43%</td>
+    <td>R$ 106.78</td>
+    <td class="rationale">FII Kinea Ri</td>
   </tr>
 </table>
 
-<h2 class="section">6 Melhores Ações de Dividendos</h2>
+<h2 class="section">Ações - Maiores Dividend Yield</h2>
 <table>
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
     <td class="name">SBSP3</td>
-    <td>12.51%</td>
-    <td>R$ 27.80</td>
+    <td>12.53%</td>
+    <td>R$ 27.75</td>
     <td class="rationale">Sabesp</td>
   </tr>
   <tr>
     <td class="name">CMIG4</td>
-    <td>11.54%</td>
-    <td>R$ 11.10</td>
+    <td>11.39%</td>
+    <td>R$ 11.25</td>
     <td class="rationale">CEMIG</td>
   </tr>
   <tr>
     <td class="name">BBSE3</td>
-    <td>11.11%</td>
-    <td>R$ 40.93</td>
+    <td>10.94%</td>
+    <td>R$ 41.59</td>
     <td class="rationale">BB Seguridade</td>
   </tr>
   <tr>
     <td class="name">ALOS3</td>
-    <td>11.02%</td>
-    <td>R$ 26.67</td>
+    <td>10.69%</td>
+    <td>R$ 27.49</td>
     <td class="rationale">ALLOS</td>
   </tr>
   <tr>
     <td class="name">BBDC4</td>
-    <td>8.42%</td>
-    <td>R$ 18.46</td>
+    <td>8.61%</td>
+    <td>R$ 18.07</td>
     <td class="rationale">Banco Bradesco</td>
   </tr>
   <tr>
     <td class="name">ITUB4</td>
-    <td>8.34%</td>
-    <td>R$ 42.28</td>
+    <td>8.32%</td>
+    <td>R$ 42.42</td>
     <td class="rationale">Banco Itaú Unibanco</td>
   </tr>
 </table>
@@ -189,17 +216,17 @@
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item">
-  <div class="n-title"><a href="https://www.infomoney.com.br/brasil/ventos-de-mais-de-90-km-h-atingem-o-rio-e-provocam-queda-de-luz-em-varios-bairros/" target="_blank" rel="noopener noreferrer" class="n-link">1. Ventos fortes atingem o Rio, com metrô, trem e barcas parados</a></div>
+  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/petrobras-petr4-divulga-seu-balanco-nesta-quinta-6-o-que-esperar/" target="_blank" rel="noopener noreferrer" class="n-link">1. Petrobras (PETR4) divulga seu balanço nesta quinta (6): o que esperar?</a></div>
   <div class="n-body">Fonte: InfoMoney (geral)</div>
 </div>
 
 <div class="news-item">
-  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/taxas-dos-dis-perdem-forca-sob-influencia-do-fed-mas-fecham-com-altas-leves/" target="_blank" rel="noopener noreferrer" class="n-link">2. Taxas dos DIs perdem força sob influência do Fed, mas fecham com altas leves</a></div>
+  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/futuros-de-ny-operam-mistos-a-espera-de-acordo-entre-eua-e-ira-e-do-payroll/" target="_blank" rel="noopener noreferrer" class="n-link">2. Futuros de NY operam mistos à espera de acordo entre EUA e Irã e do payroll</a></div>
   <div class="n-body">Fonte: InfoMoney (geral)</div>
 </div>
 
 <div class="news-item">
-  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/santander-brasil-sanb11-frustra-2t26-com-mais-provisoes-e-receitas-fracas-mas-ha-boa-noticia-desempenho-acoes/" target="_blank" rel="noopener noreferrer" class="n-link">3. Santander Brasil: menor lucro desde 2023, mas o que mais fez ação desabar 7% após 2T?</a></div>
+  <div class="n-title"><a href="https://www.infomoney.com.br/mercados/como-os-mercados-vao-receber-a-decisao-do-copom-nesta-5a/" target="_blank" rel="noopener noreferrer" class="n-link">3. Como os mercados vão receber a decisão do Copom nesta 5ª?</a></div>
   <div class="n-body">Fonte: InfoMoney (geral)</div>
 </div>
 
