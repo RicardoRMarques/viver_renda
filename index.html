@@ -180,6 +180,26 @@
     }
     .mobile-menu-item:last-child { border-bottom: none; }
     .mobile-menu-item:hover { color: var(--primary); background: rgba(127,127,127,0.08); }
+
+    .auth-btn-entrar {
+      background: var(--primary);
+      color: var(--deep);
+      border: none;
+      border-radius: 999px;
+      padding: 7px 16px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s ease;
+    }
+    .auth-btn-entrar:hover { opacity: 0.85; }
+    .auth-btn-entrar.auth-logado {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .mobile-menu-item-entrar { font-weight: 700; color: var(--primary); }
     .mobile-menu-separador {
       padding: 12px 20px 4px;
       font-size: 0.68rem;
@@ -2054,12 +2074,14 @@
           </div>
         </div>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
+        <button id="authBtnAbrir" class="auth-btn-entrar" type="button">Entrar</button>
       </nav>
     </div>
 
     <!-- Menu mobile (hambúrguer): só aparece em telas pequenas, no lugar
          de "Mercado / Educação / Simuladores" que somem da barra do topo. -->
     <div id="mobileMenuPanel" class="mobile-menu-panel" hidden>
+      <button type="button" id="authBtnAbrirMobile" class="mobile-menu-item mobile-menu-item-entrar">👤 <span id="authMobileLabel">Entrar</span></button>
       <a href="#noticias-mercado" class="mobile-menu-item">📰 Notícias</a>
       <a href="#boletim-indices-secao" class="mobile-menu-item">🗞️ Boletim de Mercado</a>
       <a href="#boletins-semana" class="mobile-menu-item">🗞️ Boletim de Mercado Diário</a>
@@ -2075,6 +2097,36 @@
       <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     </div>
   </header>
+
+  <!-- LOGIN / PERFIL — Magic Link via Supabase Auth. Sem senha: a pessoa
+       digita o e-mail, recebe um link, clica e já está logada. -->
+  <div class="calc-overlay" id="authOverlay" hidden>
+    <div class="calc-modal" style="max-width:380px;">
+      <div class="calc-modal-topo">
+        <h3>👤 Entrar</h3>
+        <button type="button" class="calc-fechar" id="authBtnFechar" aria-label="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+        <!-- Estado: deslogado -->
+        <div id="authEstadoDeslogado">
+          <p class="calc-ajuda" style="margin:0 0 14px;">Entre para sincronizar seus ativos favoritos do carrossel em qualquer aparelho. Sem senha — só um link no seu e-mail.</p>
+          <label for="authEmailInput" style="font-weight:700; font-size:0.85rem;">Seu e-mail</label>
+          <input type="email" id="authEmailInput" placeholder="voce@email.com" autocomplete="email" style="width:100%; margin-top:6px;" />
+          <button type="button" class="hg-btn" id="authBtnEnviarLink" style="width:100%; margin-top:14px;">Enviar link mágico</button>
+          <p id="authMensagem" class="calc-ajuda" style="margin-top:12px;"></p>
+        </div>
+        <!-- Estado: logado -->
+        <div id="authEstadoLogado" hidden>
+          <p class="calc-ajuda" style="margin:0 0 4px;">Logado como:</p>
+          <p style="font-weight:700; word-break:break-all;" id="authEmailLogado"></p>
+          <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+            <p class="calc-ajuda" style="margin:0 0 10px;">★ Seus ativos favoritos ficam sincronizados automaticamente aqui — o mesmo favoritar que você já usa na Consulta Rápida.</p>
+          </div>
+          <button type="button" class="hg-btn-secundario-pequeno" id="authBtnSair" style="width:100%; margin-top:14px; padding:10px;">Sair da conta</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="ticker-carrossel" id="tickerCarrossel" aria-label="Índices do mercado em tempo real">
     <div class="ticker-track" id="tickerTrack">
@@ -6154,6 +6206,58 @@
       btn.textContent = jaFavoritado ? '★ Favoritado' : '☆ Favoritar';
     }
 
+    // Se a pessoa estiver logada, espelha a alteração na nuvem (tabela
+    // favoritos_carrossel do Supabase) — silencioso se falhar (ex: tabela
+    // ainda não criada, ou usuário deslogado): o localStorage continua
+    // funcionando normalmente de qualquer forma.
+    async function espelharFavoritoNaNuvem(ticker, adicionando) {
+      if (!window.supabaseClient) return;
+      try {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        if (!session?.user) return;
+        if (adicionando) {
+          await window.supabaseClient.from('favoritos_carrossel').upsert({ user_id: session.user.id, ticker });
+        } else {
+          await window.supabaseClient.from('favoritos_carrossel').delete().eq('user_id', session.user.id).eq('ticker', ticker);
+        }
+      } catch (e) {
+        console.warn('Supabase: não sincronizou favorito na nuvem (tabela existe?).', e);
+      }
+    }
+
+    // Traz os favoritos salvos na nuvem e funde com os do localStorage —
+    // chamado assim que a pessoa loga (ver bloco de Auth mais abaixo).
+    async function sincronizarFavoritosComSupabase(sessao) {
+      if (!window.supabaseClient || !sessao?.user) return;
+      try {
+        const { data, error } = await window.supabaseClient
+          .from('favoritos_carrossel')
+          .select('ticker')
+          .eq('user_id', sessao.user.id);
+        if (error) {
+          console.warn('Supabase: não foi possível ler favoritos_carrossel (tabela existe?).', error.message);
+          return;
+        }
+        const favoritosNaNuvem = (data || []).map(r => r.ticker);
+        const favoritosLocais = obterFavoritosCarrossel();
+        const uniao = Array.from(new Set([...favoritosNaNuvem, ...favoritosLocais])).slice(0, FAVORITOS_CARROSSEL_MAX);
+
+        const novosParaSubir = favoritosLocais.filter(t => !favoritosNaNuvem.includes(t));
+        if (novosParaSubir.length > 0) {
+          await window.supabaseClient.from('favoritos_carrossel').upsert(
+            novosParaSubir.map(ticker => ({ user_id: sessao.user.id, ticker }))
+          );
+        }
+
+        salvarFavoritosCarrossel(uniao);
+        renderizarChipsFavoritosCarrossel();
+        atualizarBotaoFavoritarEstado();
+        atualizarCarrosselComFavoritos();
+      } catch (e) {
+        console.warn('Supabase: erro ao sincronizar favoritos.', e);
+      }
+    }
+
     function renderizarChipsFavoritosCarrossel() {
       const wrap = document.getElementById('hgFavoritosWrap');
       const lista = document.getElementById('hgFavoritosList');
@@ -6167,6 +6271,7 @@
         botao.addEventListener('click', () => {
           const ticker = botao.getAttribute('data-remover');
           salvarFavoritosCarrossel(obterFavoritosCarrossel().filter(t => t !== ticker));
+          espelharFavoritoNaNuvem(ticker, false);
           renderizarChipsFavoritosCarrossel();
           atualizarBotaoFavoritarEstado();
           atualizarCarrosselComFavoritos();
@@ -6178,8 +6283,10 @@
       const ticker = (hgUltimoAtivoConsultado?.symbol || document.getElementById('hgTickerInput').value.trim().toUpperCase());
       if (!ticker) return;
       let favoritos = obterFavoritosCarrossel();
+      let adicionando = true;
       if (favoritos.includes(ticker)) {
         favoritos = favoritos.filter(t => t !== ticker);
+        adicionando = false;
       } else {
         if (favoritos.length >= FAVORITOS_CARROSSEL_MAX) {
           alert(`Você pode favoritar até ${FAVORITOS_CARROSSEL_MAX} ativos no carrossel. Remova algum antes de adicionar outro.`);
@@ -6188,6 +6295,7 @@
         favoritos.push(ticker);
       }
       salvarFavoritosCarrossel(favoritos);
+      espelharFavoritoNaNuvem(ticker, adicionando);
       renderizarChipsFavoritosCarrossel();
       atualizarBotaoFavoritarEstado();
       atualizarCarrosselComFavoritos();
@@ -6196,6 +6304,78 @@
     // Estado inicial ao carregar a página
     renderizarChipsFavoritosCarrossel();
     atualizarCarrosselComFavoritos();
+
+    // ============================================================
+    // LOGIN / PERFIL — Magic Link via Supabase Auth (sem senha).
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      const overlay = document.getElementById('authOverlay');
+      if (!overlay) return;
+      const btnAbrir = document.getElementById('authBtnAbrir');
+      const btnAbrirMobile = document.getElementById('authBtnAbrirMobile');
+      const btnFechar = document.getElementById('authBtnFechar');
+      const estadoDeslogado = document.getElementById('authEstadoDeslogado');
+      const estadoLogado = document.getElementById('authEstadoLogado');
+      const emailInput = document.getElementById('authEmailInput');
+      const btnEnviar = document.getElementById('authBtnEnviarLink');
+      const mensagemEl = document.getElementById('authMensagem');
+      const emailLogadoEl = document.getElementById('authEmailLogado');
+      const btnSair = document.getElementById('authBtnSair');
+      const labelMobile = document.getElementById('authMobileLabel');
+
+      function abrirModalAuth() { overlay.hidden = false; }
+      function fecharModalAuth() { overlay.hidden = true; mensagemEl.textContent = ''; }
+
+      btnAbrir?.addEventListener('click', abrirModalAuth);
+      btnAbrirMobile?.addEventListener('click', abrirModalAuth);
+      btnFechar?.addEventListener('click', fecharModalAuth);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModalAuth(); });
+
+      function atualizarUIAuth(session) {
+        const logado = !!session?.user;
+        if (estadoDeslogado) estadoDeslogado.hidden = logado;
+        if (estadoLogado) estadoLogado.hidden = !logado;
+        const apelido = logado ? session.user.email.split('@')[0] : 'Entrar';
+        if (logado && emailLogadoEl) emailLogadoEl.textContent = session.user.email;
+        if (btnAbrir) { btnAbrir.textContent = apelido; btnAbrir.classList.toggle('auth-logado', logado); }
+        if (labelMobile) labelMobile.textContent = apelido;
+      }
+
+      btnEnviar?.addEventListener('click', async () => {
+        const email = emailInput.value.trim();
+        if (!email || !email.includes('@')) {
+          mensagemEl.textContent = 'Digite um e-mail válido.';
+          return;
+        }
+        if (!window.supabaseClient) {
+          mensagemEl.textContent = 'Login indisponível no momento — tente recarregar a página.';
+          return;
+        }
+        btnEnviar.disabled = true;
+        mensagemEl.textContent = 'Enviando link...';
+        const { error } = await window.supabaseClient.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: window.location.href },
+        });
+        btnEnviar.disabled = false;
+        mensagemEl.textContent = error
+          ? `Não deu pra enviar: ${error.message}`
+          : 'Link enviado! Confira seu e-mail (e a caixa de spam).';
+      });
+
+      btnSair?.addEventListener('click', async () => {
+        await window.supabaseClient?.auth.signOut();
+        fecharModalAuth();
+      });
+
+      if (window.supabaseClient) {
+        window.supabaseClient.auth.onAuthStateChange((_evento, session) => {
+          atualizarUIAuth(session);
+          sincronizarFavoritosComSupabase(session);
+        });
+        window.supabaseClient.auth.getSession().then(({ data }) => atualizarUIAuth(data.session));
+      }
+    });
 
     // Carrossel de índices (Ibovespa, IFIX, Dólar, Euro, Bitcoin) logo abaixo
     // do header, usando os mesmos dados do boletim diário (indices.json) —
