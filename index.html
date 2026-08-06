@@ -6373,7 +6373,10 @@
           atualizarUIAuth(session);
           sincronizarFavoritosComSupabase(session);
         });
-        window.supabaseClient.auth.getSession().then(({ data }) => atualizarUIAuth(data.session));
+        window.supabaseClient.auth.getSession().then(({ data }) => {
+          atualizarUIAuth(data.session);
+          sincronizarFavoritosComSupabase(data.session);
+        });
       }
     });
 
