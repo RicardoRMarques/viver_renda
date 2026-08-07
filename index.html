@@ -2931,7 +2931,7 @@
 
           <div class="hg-painel">
             <div class="hg-linha-busca hg-linha-busca-favoritavel">
-              <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" />
+              <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" list="sugestoesTickersB3" />
               <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
               <button class="hg-btn-secundario-pequeno" id="hgBtnFavoritar" type="button" title="Acompanhar este ativo no carrossel do topo">☆ Favoritar</button>
             </div>
@@ -2961,7 +2961,7 @@
 
           <div class="hg-painel">
             <div class="hg-linha-busca">
-              <input type="text" id="hgFundTickerInput" placeholder="Ex: PETR4, VALE3, KLBN11..." autocomplete="off" />
+              <input type="text" id="hgFundTickerInput" placeholder="Ex: PETR4, VALE3, KLBN11..." autocomplete="off" list="sugestoesTickersB3" />
               <button class="hg-btn" id="hgFundBtnBuscar">Consultar</button>
             </div>
 
@@ -3456,8 +3456,8 @@
         </p>
 
         <div class="carteira-add-linha">
-          <input type="text" id="carteiraTickerInput" placeholder="Ex: HGLG11, PETR4..." autocomplete="off" list="carteiraTickersSugeridos" />
-          <datalist id="carteiraTickersSugeridos"></datalist>
+          <input type="text" id="carteiraTickerInput" placeholder="Ex: HGLG11, PETR4..." autocomplete="off" list="sugestoesTickersB3" />
+          <datalist id="sugestoesTickersB3"></datalist>
           <input type="number" id="carteiraQtdInput" placeholder="Qtd." min="1" value="10" />
           <button type="button" class="hg-btn" id="carteiraBtnAdicionar" style="flex:0 0 auto;">+ Adicionar</button>
         </div>
@@ -4763,12 +4763,13 @@
       ];
 
       function carteiraPopularSugestoes() {
-        const datalist = document.getElementById('carteiraTickersSugeridos');
+        const datalist = document.getElementById('sugestoesTickersB3');
         if (!datalist || datalist.children.length > 0) return; // já populado
         datalist.innerHTML = CARTEIRA_TICKERS_SUGERIDOS
           .map(t => `<option value="${t}"></option>`)
           .join('');
       }
+      carteiraPopularSugestoes(); // já popula na hora, pois "Consulta Rápida" e "Análise Fundamentalista" ficam visíveis assim que a página carrega (não só dentro do modal da Carteira)
 
       // Busca um ticker na API e empilha (ou soma quantidade, se já
       // existir) no array `carteira` em memória — SEM mexer no status/UI
