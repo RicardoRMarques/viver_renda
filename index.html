@@ -6339,6 +6339,12 @@
         if (logado && emailLogadoEl) emailLogadoEl.textContent = session.user.email;
         if (btnAbrir) { btnAbrir.textContent = apelido; btnAbrir.classList.toggle('auth-logado', logado); }
         if (labelMobile) labelMobile.textContent = apelido;
+        // Limpa qualquer #access_token=... (ou # sobrando) da barra de
+        // endereço depois de processar o login — evita que um "#" fique
+        // pendurado e vire "##" da próxima vez que alguém pedir um link.
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
       }
 
       btnEnviar?.addEventListener('click', async () => {
@@ -6355,7 +6361,7 @@
         mensagemEl.textContent = 'Enviando link...';
         const { error } = await window.supabaseClient.auth.signInWithOtp({
           email,
-          options: { emailRedirectTo: window.location.href },
+          options: { emailRedirectTo: window.location.origin + window.location.pathname },
         });
         btnEnviar.disabled = false;
         mensagemEl.textContent = error
