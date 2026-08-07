@@ -119,6 +119,12 @@ BCB_IPCA_12M_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ulti
 # CPI (EUA): índice de preços ao consumidor, via API pública do BLS
 BLS_CPI_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/CUUR0000SA0"
 
+# Selic (meta definida pelo Copom): via API pública do Banco Central (série
+# SGS 432) em vez do campo "taxes" da HG Brasil — a HG Brasil demora demais
+# para atualizar esse dado específico depois de reuniões do Copom (dias,
+# às vezes mais), enquanto o BCB publica no mesmo dia da decisão.
+BCB_SELIC_META_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/5?formato=json"
+
 # Pool fixo de ações e FIIs líquidos, usado como universo para os rankings
 # (Dividend Yield, Valor de Mercado, Receita e "mais negociados"). Ajuste
 # essas listas à vontade para incluir/trocar ativos específicos.
@@ -419,6 +425,27 @@ def coletar_indices_hgbrasil(token):
     return indices
 
 
+def coletar_selic_bcb():
+    """Meta da Selic definida pelo Copom, via API pública do Banco Central
+    (série SGS 432) — atualiza no mesmo dia da decisão, diferente do campo
+    'taxes' da HG Brasil, que pode demorar bem mais para refletir um corte
+    ou alta recém-anunciados. Pega os últimos 5 valores e usa o mais
+    recente (a Selic só muda em dias de reunião do Copom, então o
+    'último' costume ficar vários dias/semanas parado, é esperado)."""
+    try:
+        resp = requests.get(BCB_SELIC_META_URL, timeout=TIMEOUT)
+        resp.raise_for_status()
+        dados = resp.json()
+        if not dados:
+            return None
+        item = dados[-1]
+        valor = float(item["valor"].replace(",", "."))
+        return {"label": "Selic (meta)", "valor_pct": valor, "referencia": item.get("data")}
+    except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
+        print(f"AVISO: falha ao buscar Selic no Banco Central: {exc}", file=sys.stderr)
+        return None
+
+
 def coletar_ipca():
     """Variação mensal do IPCA, via API pública do Banco Central (série SGS 433)."""
     try:
@@ -515,10 +542,21 @@ def coletar_indices(token):
             print(f"AVISO: falha ao buscar índices na HG Brasil: {exc}", file=sys.stderr)
             indices = []
 
+    # Selic: troca a que veio da HG Brasil (se veio) pela do Banco Central —
+    # fonte oficial, atualiza no mesmo dia da decisão do Copom. Se o BCB
+    # falhar por algum motivo, mantém a da HG Brasil como fallback (mesmo
+    # sabendo que pode estar desatualizada) em vez de ficar sem o dado.
+    indices = [item for item in indices if item.get("label") != "Selic (meta)"]
+    selic = coletar_selic_bcb()
+    if not selic and token:
+        print("AVISO: Selic do Banco Central falhou — tentando reaproveitar da HG Brasil como fallback.", file=sys.stderr)
+        try:
+            selic = next((item for item in coletar_indices_hgbrasil(token) if item.get("label") == "Selic (meta)"), None)
+        except (requests.RequestException, ValueError, KeyError):
+            selic = None
+
     # Reordena a Selic para logo depois do Ibovespa, se ambos existirem.
-    selic = next((item for item in indices if item.get("label") == "Selic (meta)"), None)
     if selic:
-        indices.remove(selic)
         posicao_ibovespa = next(
             (i for i, item in enumerate(indices) if item.get("label") == "Ibovespa"), None
         )
