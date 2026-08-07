@@ -124,6 +124,7 @@
     }
     .brand:hover { opacity: 0.85; }
     .brand-logo { display: block; border-radius: 50%; flex-shrink: 0; }
+    .brand-quebra-mobile { display: none; }
     .nav {
       display: flex;
       align-items: center;
@@ -364,6 +365,7 @@
       .topbar { gap: 8px; flex-wrap: nowrap; }
       .brand { font-size: 0.74rem; gap: 6px; line-height: 1.15; }
       .brand-logo { width: 26px; height: 26px; }
+      .brand-quebra-mobile { display: inline; }
       .nav { gap: 10px; font-size: 0.72rem; }
       .nav-dropdown-btn { font-size: 0.72rem; }
       .theme-toggle { width: 24px; height: 24px; font-size: 0.75rem; flex-shrink: 0; }
@@ -2041,7 +2043,7 @@
       </button>
       <a class="brand" href="/" title="Ir para a página inicial">
         <img src="logo-header-96.png" srcset="logo-header-48.png 48w, logo-header-96.png 96w" sizes="34px" alt="" class="brand-logo" width="34" height="34" />
-        DIVIDENDOS | VIVER DE RENDA
+        <span class="brand-texto">DIVIDENDOS |<br class="brand-quebra-mobile"> VIVER DE RENDA</span>
       </a>
       <nav class="nav">
         <a href="#consulta-rapida" class="nav-icone-lupa" title="Consultar Ações e FIIs" aria-label="Consultar Ações e FIIs">
