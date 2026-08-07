@@ -4733,6 +4733,134 @@
       if (!btnAbrir || !overlay) return;
 
       let carteira = []; // { ticker, kind, nome, preco, moeda, dyPercent, proventoMes, qtd }
+      const CARTEIRA_LOCAL_KEY = 'vrCarteiraDividendos';
+      let carteiraJaCarregada = false; // evita recarregar/duplicar toda vez que o modal reabre
+
+      // Busca um ticker na API e empilha (ou soma quantidade, se já
+      // existir) no array `carteira` em memória — SEM mexer no status/UI
+      // de digitação, pra poder ser reaproveitado tanto pelo botão
+      // "Adicionar" quanto pelo carregamento automático da carteira salva.
+      // Retorna true se achou o ativo, false se não achou.
+      async function buscarEEmpilhar(ticker, qtd, kindEsperado) {
+        const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        const a = data?.results?.[0];
+
+        if (!a || (a.kind !== 'stock' && a.kind !== 'fii')) return false;
+
+        const preco = a.quote?.value ?? null;
+        const yield12mCash = a.dividends?.yield_12m_cash;
+        const proventoMes = typeof yield12mCash === 'number' ? yield12mCash / 12 : null;
+
+        const existente = carteira.find(l => l.ticker === ticker);
+        if (existente) {
+          existente.qtd = qtd; // ao restaurar, usa a quantidade salva (não soma)
+        } else {
+          carteira.push({
+            ticker,
+            kind: a.kind,
+            nome: a.name || ticker,
+            preco,
+            moeda: a.currency || 'BRL',
+            dyPercent: typeof a.dividends?.yield_12m_percent === 'number' ? a.dividends.yield_12m_percent : null,
+            proventoMes,
+            qtd,
+          });
+        }
+        return true;
+      }
+
+      // --- Persistência local (localStorage) — funciona pra qualquer
+      // visitante, mesmo sem login. Guarda só ticker/kind/qtd; preço e
+      // provento são sempre buscados de novo ao vivo (não faz sentido
+      // guardar cotação velha). ---
+      function carteiraSalvarLocal() {
+        try {
+          const resumo = carteira.map(l => ({ ticker: l.ticker, kind: l.kind, qtd: l.qtd }));
+          localStorage.setItem(CARTEIRA_LOCAL_KEY, JSON.stringify(resumo));
+        } catch (e) { /* localStorage indisponível — segue sem persistir */ }
+      }
+      function carteiraCarregarLocal() {
+        try {
+          const lista = JSON.parse(localStorage.getItem(CARTEIRA_LOCAL_KEY));
+          return Array.isArray(lista) ? lista : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      // --- Persistência na nuvem (Supabase) — só entra em ação se a
+      // pessoa estiver logada; silenciosa e sem quebrar nada se a tabela
+      // ainda não existir ou se estiver deslogado. ---
+      async function carteiraEspelharNaNuvem(ticker) {
+        const cliente = obterSupabaseClient();
+        if (!cliente) return;
+        try {
+          const { data: { session } } = await cliente.auth.getSession();
+          if (!session?.user) return;
+          const item = carteira.find(l => l.ticker === ticker);
+          if (!item) return;
+          await cliente.from('carteira_dividendos').upsert({
+            user_id: session.user.id, ticker: item.ticker, kind: item.kind, qtd: item.qtd,
+          });
+        } catch (e) {
+          console.warn('Supabase: não sincronizou a carteira na nuvem (tabela existe?).', e);
+        }
+      }
+      async function carteiraRemoverDaNuvem(ticker) {
+        const cliente = obterSupabaseClient();
+        if (!cliente) return;
+        try {
+          const { data: { session } } = await cliente.auth.getSession();
+          if (!session?.user) return;
+          await cliente.from('carteira_dividendos').delete().eq('user_id', session.user.id).eq('ticker', ticker);
+        } catch (e) {
+          console.warn('Supabase: não removeu da carteira na nuvem.', e);
+        }
+      }
+
+      // Carrega a carteira salva (local + nuvem, se logado) e busca a
+      // cotação ao vivo de cada ativo. Chamado 1x, na primeira vez que o
+      // modal é aberto (sem sentido gastar requisições antes disso).
+      async function carteiraCarregarSalva() {
+        if (carteiraJaCarregada) return;
+        carteiraJaCarregada = true;
+
+        let salvos = carteiraCarregarLocal();
+
+        const cliente = obterSupabaseClient();
+        if (cliente) {
+          try {
+            const { data: { session } } = await cliente.auth.getSession();
+            if (session?.user) {
+              const { data, error } = await cliente
+                .from('carteira_dividendos')
+                .select('ticker, kind, qtd')
+                .eq('user_id', session.user.id);
+              if (!error && data) {
+                // Funde: nuvem tem prioridade sobre o que já existia só
+                // localmente (mais provável de estar atualizado).
+                const tickersNuvem = new Set(data.map(d => d.ticker));
+                salvos = [...data, ...salvos.filter(s => !tickersNuvem.has(s.ticker))];
+              }
+            }
+          } catch (e) {
+            console.warn('Supabase: não sincronizou a carteira salva.', e);
+          }
+        }
+
+        if (salvos.length === 0) return;
+
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Carregando sua carteira salva...';
+        for (const item of salvos) {
+          try { await buscarEEmpilhar(item.ticker, item.qtd, item.kind); } catch (e) { /* ignora um ativo que falhar, segue os outros */ }
+        }
+        statusEl.textContent = '';
+        renderizar();
+        carteiraSalvarLocal(); // já garante que o localStorage também reflete o que veio da nuvem
+      }
 
       function abrirModal() {
         overlay.hidden = false;
@@ -4761,40 +4889,17 @@
         btnAdicionar.disabled = true;
 
         try {
-          const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
-          const resp = await fetch(url);
-          const data = await resp.json();
-          const a = data?.results?.[0];
-
-          if (!a || (a.kind !== 'stock' && a.kind !== 'fii')) {
+          const ok = await buscarEEmpilhar(ticker, qtd);
+          if (!ok) {
             statusEl.className = 'hg-status erro';
             statusEl.textContent = `Não encontrei "${ticker}" como ação ou FII. Confira o ticker digitado.`;
             return;
           }
-
-          const preco = a.quote?.value ?? null;
-          const yield12mCash = a.dividends?.yield_12m_cash;
-          const proventoMes = typeof yield12mCash === 'number' ? yield12mCash / 12 : null;
-
-          const existente = carteira.find(l => l.ticker === ticker);
-          if (existente) {
-            existente.qtd += qtd;
-          } else {
-            carteira.push({
-              ticker,
-              kind: a.kind,
-              nome: a.name || ticker,
-              preco,
-              moeda: a.currency || 'BRL',
-              dyPercent: typeof a.dividends?.yield_12m_percent === 'number' ? a.dividends.yield_12m_percent : null,
-              proventoMes,
-              qtd,
-            });
-          }
-
           statusEl.textContent = '';
           tickerInput.value = '';
           renderizar();
+          carteiraSalvarLocal();
+          carteiraEspelharNaNuvem(ticker);
         } catch (e) {
           statusEl.className = 'hg-status erro';
           statusEl.textContent = 'Não foi possível buscar esse ativo agora. Tente novamente.';
@@ -4854,13 +4959,18 @@
             const novaQtd = parseInt(input.value, 10) || 1;
             carteira[idx].qtd = novaQtd;
             renderizar();
+            carteiraSalvarLocal();
+            carteiraEspelharNaNuvem(carteira[idx].ticker);
           });
         });
         document.querySelectorAll('.carteira-remover').forEach(botao => {
           botao.addEventListener('click', () => {
             const idx = Number(botao.getAttribute('data-idx'));
+            const ticker = carteira[idx].ticker;
             carteira.splice(idx, 1);
             renderizar();
+            carteiraSalvarLocal();
+            carteiraRemoverDaNuvem(ticker);
           });
         });
       }
@@ -5003,7 +5113,7 @@
         });
       }
 
-      btnAbrir.addEventListener('click', abrirModal);
+      btnAbrir.addEventListener('click', () => { abrirModal(); carteiraCarregarSalva(); });
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
