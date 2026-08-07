@@ -10088,7 +10088,15 @@
        políticas de RLS configuradas no painel do Supabase). -->
   <script src="vendor/supabase.min.js" defer></script>
   <script defer>
-    document.addEventListener('DOMContentLoaded', async () => {
+    // IMPORTANTE: este script já é "defer", então roda sozinho na hora
+    // certa (depois do HTML pronto, antes do evento DOMContentLoaded).
+    // NÃO envolver isso num addEventListener('DOMContentLoaded', ...) —
+    // isso causava uma corrida: o bloco de Login (mais acima no arquivo)
+    // também espera o DOMContentLoaded pra checar se window.supabaseClient
+    // existe, e como os dois escutavam o mesmo evento, às vezes o Login
+    // rodava ANTES desse bloco terminar de criar o cliente — resultado:
+    // o login nunca era detectado, mesmo com o link correto.
+    (async () => {
       if (typeof supabase === 'undefined') {
         console.error('Supabase: biblioteca não carregou.');
         return;
@@ -10110,7 +10118,7 @@
       } else {
         console.log(`Supabase conectado! ${data.length} registro(s) encontrado(s) em historico_indices:`, data);
       }
-    });
+    })();
   </script>
 
   <script>
