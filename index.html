@@ -3456,7 +3456,8 @@
         </p>
 
         <div class="carteira-add-linha">
-          <input type="text" id="carteiraTickerInput" placeholder="Ex: HGLG11, PETR4..." autocomplete="off" />
+          <input type="text" id="carteiraTickerInput" placeholder="Ex: HGLG11, PETR4..." autocomplete="off" list="carteiraTickersSugeridos" />
+          <datalist id="carteiraTickersSugeridos"></datalist>
           <input type="number" id="carteiraQtdInput" placeholder="Qtd." min="1" value="10" />
           <button type="button" class="hg-btn" id="carteiraBtnAdicionar" style="flex:0 0 auto;">+ Adicionar</button>
         </div>
@@ -4736,6 +4737,39 @@
       const CARTEIRA_LOCAL_KEY = 'vrCarteiraDividendos';
       let carteiraJaCarregada = false; // evita recarregar/duplicar toda vez que o modal reabre
 
+      // Lista curada de tickers comuns (Ações, FIIs e Fiagros/FI-Infra) só
+      // para dar sugestão de autocomplete ao digitar — não é a fonte de
+      // verdade dos dados (isso sempre vem da API na hora de adicionar).
+      // Pode crescer com o tempo; se faltar algum ticker aqui, a pessoa
+      // ainda consegue digitar ele inteiro na mão normalmente.
+      const CARTEIRA_TICKERS_SUGERIDOS = [
+        // Ações (blue chips / mais negociadas)
+        'PETR4', 'PETR3', 'VALE3', 'ITUB4', 'ITUB3', 'BBDC4', 'BBDC3', 'BBAS3', 'ABEV3', 'WEGE3',
+        'RENT3', 'RADL3', 'RAIL3', 'SUZB3', 'JBSS3', 'GGBR4', 'CSNA3', 'USIM5', 'CSAN3', 'ELET3',
+        'ELET6', 'EQTL3', 'CPLE6', 'SBSP3', 'VIVT3', 'TIMS3', 'BRFS3', 'MRFG3', 'AZUL4', 'GOLL4',
+        'EMBR3', 'CCRO3', 'CYRE3', 'MRVE3', 'EZTC3', 'LREN3', 'MGLU3', 'PCAR3', 'CIEL3', 'B3SA3',
+        'ITSA4', 'BBSE3', 'PSSA3', 'SANB11', 'KLBN11', 'HYPE3', 'RDOR3', 'HAPV3', 'FLRY3', 'ENEV3',
+        'PRIO3', 'CMIG4', 'TAEE11', 'TRPL4', 'EGIE3', 'UGPA3', 'RAIZ4', 'ASAI3', 'CRFB3', 'COGN3',
+        'YDUQ3', 'ARZZ3', 'ALPA4', 'NTCO3', 'BEEF3', 'SLCE3', 'SMTO3', 'JHSF3', 'MULT3', 'VBBR3',
+        'DXCO3', 'BRAP4', 'BPAC11', 'IRBR3', 'TOTS3', 'LWSA3', 'CASH3', 'VAMO3',
+        // Fundos Imobiliários (FIIs)
+        'HGLG11', 'MXRF11', 'KNCR11', 'KNRI11', 'XPLG11', 'XPML11', 'VISC11', 'HGRE11', 'HGRU11',
+        'BTLG11', 'VILG11', 'RECT11', 'BCFF11', 'IRDM11', 'RBRR11', 'RBRF11', 'CPTS11', 'VRTA11',
+        'HGCR11', 'MFII11', 'KNIP11', 'VGIR11', 'VGHF11', 'BRCO11', 'HFOF11', 'ALZR11', 'RECR11',
+        'GGRC11', 'TGAR11', 'TRXF11', 'HSML11', 'VINO11', 'PVBI11', 'JSRE11', 'RBRP11', 'XPPR11',
+        'BBPO11', 'AFHI11', 'DEVA11',
+        // Fiagros e FI-Infra
+        'KNCA11', 'RZAG11', 'VGIA11', 'AGRX11', 'SNAG11', 'JGPX11', 'FGAA11', 'RURA11',
+      ];
+
+      function carteiraPopularSugestoes() {
+        const datalist = document.getElementById('carteiraTickersSugeridos');
+        if (!datalist || datalist.children.length > 0) return; // já populado
+        datalist.innerHTML = CARTEIRA_TICKERS_SUGERIDOS
+          .map(t => `<option value="${t}"></option>`)
+          .join('');
+      }
+
       // Busca um ticker na API e empilha (ou soma quantidade, se já
       // existir) no array `carteira` em memória — SEM mexer no status/UI
       // de digitação, pra poder ser reaproveitado tanto pelo botão
@@ -5113,7 +5147,7 @@
         });
       }
 
-      btnAbrir.addEventListener('click', () => { abrirModal(); carteiraCarregarSalva(); });
+      btnAbrir.addEventListener('click', () => { abrirModal(); carteiraCarregarSalva(); carteiraPopularSugestoes(); });
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
