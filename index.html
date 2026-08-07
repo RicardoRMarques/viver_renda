@@ -3594,6 +3594,22 @@
     // widgets da página (busca rápida, índices/sparkline, análise fundamentalista).
     const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
 
+    // ============================================================
+    // Cliente do Supabase — criado sob demanda (lazy), não na hora que a
+    // página carrega. Isso evita depender da ordem de execução entre
+    // scripts (frágil e já causou bug de login não funcionar às vezes).
+    // Qualquer trecho do site que precisar do Supabase deve chamar
+    // obterSupabaseClient() em vez de usar window.supabaseClient direto.
+    // ============================================================
+    const SUPABASE_URL = 'https://mzknjnupizprfatfmxqg.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_vulGjNaqQEyuJy4roQBgmQ_Zf0wyLWh';
+    function obterSupabaseClient() {
+      if (window.supabaseClient) return window.supabaseClient;
+      if (typeof supabase === 'undefined') return null; // biblioteca ainda não carregou
+      window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      return window.supabaseClient;
+    }
+
     // Detecta celular/tablet de verdade — usado em todas as calculadoras
     // pra só oferecer o menu nativo de compartilhamento (Web Share API) em
     // dispositivos móveis. Em navegadores desktop modernos (Chrome/Edge),
@@ -6211,14 +6227,15 @@
     // ainda não criada, ou usuário deslogado): o localStorage continua
     // funcionando normalmente de qualquer forma.
     async function espelharFavoritoNaNuvem(ticker, adicionando) {
-      if (!window.supabaseClient) return;
+      const cliente = obterSupabaseClient();
+      if (!cliente) return;
       try {
-        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        const { data: { session } } = await cliente.auth.getSession();
         if (!session?.user) return;
         if (adicionando) {
-          await window.supabaseClient.from('favoritos_carrossel').upsert({ user_id: session.user.id, ticker });
+          await cliente.from('favoritos_carrossel').upsert({ user_id: session.user.id, ticker });
         } else {
-          await window.supabaseClient.from('favoritos_carrossel').delete().eq('user_id', session.user.id).eq('ticker', ticker);
+          await cliente.from('favoritos_carrossel').delete().eq('user_id', session.user.id).eq('ticker', ticker);
         }
       } catch (e) {
         console.warn('Supabase: não sincronizou favorito na nuvem (tabela existe?).', e);
@@ -6228,9 +6245,10 @@
     // Traz os favoritos salvos na nuvem e funde com os do localStorage —
     // chamado assim que a pessoa loga (ver bloco de Auth mais abaixo).
     async function sincronizarFavoritosComSupabase(sessao) {
-      if (!window.supabaseClient || !sessao?.user) return;
+      const cliente = obterSupabaseClient();
+      if (!cliente || !sessao?.user) return;
       try {
-        const { data, error } = await window.supabaseClient
+        const { data, error } = await cliente
           .from('favoritos_carrossel')
           .select('ticker')
           .eq('user_id', sessao.user.id);
@@ -6244,7 +6262,7 @@
 
         const novosParaSubir = favoritosLocais.filter(t => !favoritosNaNuvem.includes(t));
         if (novosParaSubir.length > 0) {
-          await window.supabaseClient.from('favoritos_carrossel').upsert(
+          await cliente.from('favoritos_carrossel').upsert(
             novosParaSubir.map(ticker => ({ user_id: sessao.user.id, ticker }))
           );
         }
@@ -6353,13 +6371,14 @@
           mensagemEl.textContent = 'Digite um e-mail válido.';
           return;
         }
-        if (!window.supabaseClient) {
+        const cliente = obterSupabaseClient();
+        if (!cliente) {
           mensagemEl.textContent = 'Login indisponível no momento — tente recarregar a página.';
           return;
         }
         btnEnviar.disabled = true;
         mensagemEl.textContent = 'Enviando link...';
-        const { error } = await window.supabaseClient.auth.signInWithOtp({
+        const { error } = await cliente.auth.signInWithOtp({
           email,
           options: { emailRedirectTo: window.location.origin + window.location.pathname },
         });
@@ -6370,19 +6389,35 @@
       });
 
       btnSair?.addEventListener('click', async () => {
-        await window.supabaseClient?.auth.signOut();
+        await obterSupabaseClient()?.auth.signOut();
         fecharModalAuth();
       });
 
-      if (window.supabaseClient) {
-        window.supabaseClient.auth.onAuthStateChange((_evento, session) => {
+      const clienteAuth = obterSupabaseClient();
+      if (clienteAuth) {
+        clienteAuth.auth.onAuthStateChange((_evento, session) => {
           atualizarUIAuth(session);
           sincronizarFavoritosComSupabase(session);
         });
-        window.supabaseClient.auth.getSession().then(({ data }) => {
+        clienteAuth.auth.getSession().then(({ data }) => {
           atualizarUIAuth(data.session);
           sincronizarFavoritosComSupabase(data.session);
         });
+      } else {
+        // Biblioteca ainda não tinha carregado nesse instante (raro, mas
+        // pode acontecer em conexões lentas) — tenta de novo em 1s.
+        setTimeout(() => {
+          const cliente2 = obterSupabaseClient();
+          if (!cliente2) return;
+          cliente2.auth.onAuthStateChange((_evento, session) => {
+            atualizarUIAuth(session);
+            sincronizarFavoritosComSupabase(session);
+          });
+          cliente2.auth.getSession().then(({ data }) => {
+            atualizarUIAuth(data.session);
+            sincronizarFavoritosComSupabase(data.session);
+          });
+        }, 1000);
       }
     });
 
@@ -10088,26 +10123,20 @@
        políticas de RLS configuradas no painel do Supabase). -->
   <script src="vendor/supabase.min.js" defer></script>
   <script defer>
-    // IMPORTANTE: este script já é "defer", então roda sozinho na hora
-    // certa (depois do HTML pronto, antes do evento DOMContentLoaded).
-    // NÃO envolver isso num addEventListener('DOMContentLoaded', ...) —
-    // isso causava uma corrida: o bloco de Login (mais acima no arquivo)
-    // também espera o DOMContentLoaded pra checar se window.supabaseClient
-    // existe, e como os dois escutavam o mesmo evento, às vezes o Login
-    // rodava ANTES desse bloco terminar de criar o cliente — resultado:
-    // o login nunca era detectado, mesmo com o link correto.
+    // A criação do cliente em si agora mora em obterSupabaseClient() (lá
+    // no início do script principal) — cada trecho do site que precisa do
+    // Supabase chama essa função, que cria o cliente na hora se ainda não
+    // existir. Isso evita depender de ordem entre scripts.
     (async () => {
-      if (typeof supabase === 'undefined') {
+      const cliente = obterSupabaseClient();
+      if (!cliente) {
         console.error('Supabase: biblioteca não carregou.');
         return;
       }
-      const SUPABASE_URL = 'https://mzknjnupizprfatfmxqg.supabase.co';
-      const SUPABASE_KEY = 'sb_publishable_vulGjNaqQEyuJy4roQBgmQ_Zf0wyLWh';
-      window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
       // Teste de conexão: busca os 5 registros mais recentes da tabela
       // historico_indices. Só aparece no console (F12) — não afeta o site.
-      const { data, error } = await window.supabaseClient
+      const { data, error } = await cliente
         .from('historico_indices')
         .select('*')
         .order('created_at', { ascending: false })
