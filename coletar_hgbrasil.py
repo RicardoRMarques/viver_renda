@@ -30,6 +30,7 @@ Uso local (opcional, para testar):
     python coletar_hgbrasil.py --com-ranking    # também atualiza os rankings
 """
 
+import html
 import json
 import os
 import re
@@ -149,8 +150,12 @@ RANKING_ACOES_QTD = 6
 
 def _extrair_imagem_do_item(item):
     """Tenta achar uma imagem para a notícia em diferentes formatos de RSS:
-    <enclosure>, <media:content>/<media:thumbnail> ou <img> dentro da descrição."""
+    <enclosure>, <media:content>/<media:thumbnail>, <img> dentro de
+    <content:encoded> (comum em feeds WordPress, como o da Money Times) ou
+    dentro de <description> — inclusive quando o HTML vem "escapado"
+    (&lt;img ...&gt;) em vez de tags de verdade."""
     ns_media = "{http://search.yahoo.com/mrss/}"
+    ns_content = "{http://purl.org/rss/1.0/modules/content/}"
 
     enclosure = item.find("enclosure")
     if enclosure is not None and enclosure.get("url"):
@@ -164,8 +169,24 @@ def _extrair_imagem_do_item(item):
     if media_thumb is not None and media_thumb.get("url"):
         return media_thumb.get("url")
 
+    # content:encoded costuma trazer o HTML completo do post (incluindo a
+    # imagem de destaque) em feeds WordPress — a Money Times é um caso
+    # onde a <description> sozinha não tem a imagem, mas essa tag tem.
+    conteudo_completo = item.findtext(f"{ns_content}encoded") or ""
+    match = re.search(r'<img[^>]+src="([^"]+)"', conteudo_completo)
+    if match:
+        return match.group(1)
+
     descricao = item.findtext("description") or ""
     match = re.search(r'<img[^>]+src="([^"]+)"', descricao)
+    if match:
+        return match.group(1)
+
+    # Alguns feeds "escapam" o HTML dentro da description (vira texto puro
+    # com &lt;img ...&gt; em vez de tag de verdade) — tenta de novo depois
+    # de desescapar as entidades HTML.
+    descricao_desescapada = html.unescape(descricao)
+    match = re.search(r'<img[^>]+src="([^"]+)"', descricao_desescapada)
     if match:
         return match.group(1)
 
@@ -327,8 +348,18 @@ def coletar_noticias():
 
     if len(top3) < NOTICIAS_QTD_TOP3:
         faltam = NOTICIAS_QTD_TOP3 - len(top3)
-        print(f"INFO: 'top3' incompleto ({len(top3)}/{NOTICIAS_QTD_TOP3}) — reforçando com feeds do outro grupo.")
-        top3.extend(_coletar_grupo(NOTICIAS_FONTES_MISTAS, faltam, qtd_por_fonte=1))
+        print(f"INFO: 'top3' incompleto ({len(top3)}/{NOTICIAS_QTD_TOP3}) — tentando mais 1 das fontes que já funcionaram antes de recorrer ao outro grupo.")
+        # 1ª tentativa: pede mais itens das MESMAS fontes (até 3 de cada,
+        # não só 1) — se buscasse só 1, ia sempre cair na notícia mais
+        # recente de cada fonte, que já foi usada na 1ª passada e seria
+        # descartada por duplicidade sem nunca chegar na 2ª notícia de
+        # verdade. Com até 3, sobra margem pra achar algo novo.
+        top3.extend(_coletar_grupo(NOTICIAS_FEEDS, faltam, qtd_por_fonte=3))
+        # Se AINDA faltar (ex: todas as fontes empataram em 1 item cada),
+        # aí sim recorre ao grupo do Investing.com como último recurso.
+        if len(top3) < NOTICIAS_QTD_TOP3:
+            faltam = NOTICIAS_QTD_TOP3 - len(top3)
+            top3.extend(_coletar_grupo(NOTICIAS_FONTES_MISTAS, faltam, qtd_por_fonte=1))
 
     resultado = {
         "destaques": destaques[:NOTICIAS_QTD],
