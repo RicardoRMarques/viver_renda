@@ -550,7 +550,18 @@
     .hg-favorito-chip button:hover { color: #ff5a5a; }
 
     .alertas-form-linha { display: flex; gap: 8px; margin-bottom: 8px; }
-    .alertas-form-linha input { flex: 1; min-width: 0; }
+    .alertas-form-linha input {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--deep);
+      color: var(--text);
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .alertas-form-linha input:focus { border-color: var(--primary); }
     .alertas-condicao { gap: 6px; }
     .alertas-condicao-btn {
       flex: 1;
