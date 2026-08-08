@@ -54,6 +54,7 @@ RANKING_OUTPUT_FILE = "ranking.json"
 NOTICIAS_FEEDS = [
     ("InfoMoney", "https://www.infomoney.com.br/mercados/feed/"),
     ("InfoMoney (geral)", "https://www.infomoney.com.br/feed/"),
+    ("Money Times (Mercados)", "https://www.moneytimes.com.br/mercados/feed/"),
     ("Money Times", "https://www.moneytimes.com.br/feed/"),
 ]
 
@@ -309,9 +310,13 @@ def coletar_noticias():
         return grupo
 
     # "destaques": 1 item de cada categoria (força diversidade de fonte).
-    # "top3": cadeia de fallback normal (cada fonte pode preencher tudo).
+    # "top3": agora TAMBÉM força 1 item de cada fonte (qtd_por_fonte=1) —
+    # antes, se a 1ª fonte (InfoMoney) respondesse bem, ela sozinha
+    # preenchia a cota inteira e a Money Times nunca chegava a ser
+    # consultada. Com 4 fontes em NOTICIAS_FEEDS e cota de 4, dá 1 de
+    # cada — garante variedade sem depender só do InfoMoney.
     destaques = _coletar_grupo(NOTICIAS_FONTES_MISTAS, NOTICIAS_QTD, qtd_por_fonte=1)
-    top3 = _coletar_grupo(NOTICIAS_FEEDS, NOTICIAS_QTD_TOP3)
+    top3 = _coletar_grupo(NOTICIAS_FEEDS, NOTICIAS_QTD_TOP3, qtd_por_fonte=1)
 
     # Reforço cruzado: se um grupo ficou incompleto, tenta completar com as
     # fontes do outro grupo (ainda respeitando os links já usados).
