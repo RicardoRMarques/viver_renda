@@ -69,6 +69,7 @@ NOTICIAS_FONTES_MISTAS = [
     ("Investing.com (Economia)", "https://br.investing.com/rss/news_14.rss"),
 ]
 NOTICIAS_QTD = 3
+NOTICIAS_QTD_TOP3 = 4  # InfoMoney/Money Times — o site mostra até 4 dessas, só 1 do Investing.com
 TIMEOUT = 20
 
 # fiis.com.br não tem feed RSS público — a única forma de puxar notícia de
@@ -310,7 +311,7 @@ def coletar_noticias():
     # "destaques": 1 item de cada categoria (força diversidade de fonte).
     # "top3": cadeia de fallback normal (cada fonte pode preencher tudo).
     destaques = _coletar_grupo(NOTICIAS_FONTES_MISTAS, NOTICIAS_QTD, qtd_por_fonte=1)
-    top3 = _coletar_grupo(NOTICIAS_FEEDS, NOTICIAS_QTD)
+    top3 = _coletar_grupo(NOTICIAS_FEEDS, NOTICIAS_QTD_TOP3)
 
     # Reforço cruzado: se um grupo ficou incompleto, tenta completar com as
     # fontes do outro grupo (ainda respeitando os links já usados).
@@ -319,14 +320,14 @@ def coletar_noticias():
         print(f"INFO: 'destaques' incompleto ({len(destaques)}/{NOTICIAS_QTD}) — reforçando com feeds do outro grupo.")
         destaques.extend(_coletar_grupo(NOTICIAS_FEEDS, faltam))
 
-    if len(top3) < NOTICIAS_QTD:
-        faltam = NOTICIAS_QTD - len(top3)
-        print(f"INFO: 'top3' incompleto ({len(top3)}/{NOTICIAS_QTD}) — reforçando com feeds do outro grupo.")
+    if len(top3) < NOTICIAS_QTD_TOP3:
+        faltam = NOTICIAS_QTD_TOP3 - len(top3)
+        print(f"INFO: 'top3' incompleto ({len(top3)}/{NOTICIAS_QTD_TOP3}) — reforçando com feeds do outro grupo.")
         top3.extend(_coletar_grupo(NOTICIAS_FONTES_MISTAS, faltam, qtd_por_fonte=1))
 
     resultado = {
         "destaques": destaques[:NOTICIAS_QTD],
-        "top3": top3[:NOTICIAS_QTD],
+        "top3": top3[:NOTICIAS_QTD_TOP3],
     }
 
     fii = _buscar_noticia_fii()
