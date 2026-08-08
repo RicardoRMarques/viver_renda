@@ -801,6 +801,121 @@ def coletar_ranking(token):
     return resultado
 
 
+# ============================================================
+# ALERTAS DE PREÇO — checa a cada execução do robô (a cada 15 min) se
+# algum alerta cadastrado no site bateu a condição, e manda e-mail via
+# Resend. Usa a service_role key do Supabase (NUNCA a publishable key —
+# essa aqui ignora RLS de propósito, pra conseguir ler os alertas de
+# todo mundo, não só de um usuário). Tudo opcional: se as credenciais não
+# estiverem configuradas nos Secrets do GitHub, essa etapa é pulada sem
+# quebrar o resto da coleta.
+# ============================================================
+SUPABASE_URL = "https://mzknjnupizprfatfmxqg.supabase.co"
+
+
+def _obter_alertas_pendentes(service_role_key):
+    """Busca todos os alertas cadastrados, já com o e-mail do dono (via a
+    view alertas_com_email — ver sql/criar-tabela-alertas-preco.sql)."""
+    url = f"{SUPABASE_URL}/rest/v1/alertas_com_email?select=*"
+    headers = {
+        "apikey": service_role_key,
+        "Authorization": f"Bearer {service_role_key}",
+    }
+    resp = requests.get(url, headers=headers, timeout=TIMEOUT)
+    resp.raise_for_status()
+    return resp.json()
+
+
+def _remover_alerta(service_role_key, alerta_id):
+    url = f"{SUPABASE_URL}/rest/v1/alertas_preco?id=eq.{alerta_id}"
+    headers = {
+        "apikey": service_role_key,
+        "Authorization": f"Bearer {service_role_key}",
+    }
+    requests.delete(url, headers=headers, timeout=TIMEOUT)
+
+
+def _enviar_email_alerta(resend_key, destinatario, ticker, condicao, valor_alvo, valor_atual):
+    direcao = "caiu abaixo de" if condicao == "abaixo" else "subiu acima de"
+    assunto = f"{ticker} {direcao} R$ {valor_alvo:.2f} — Dividendos | Viver de Renda"
+    corpo_html = (
+        f"<h2>Seu alerta de {ticker} foi disparado!</h2>"
+        f"<p><strong>{ticker}</strong> {direcao} <strong>R$ {valor_alvo:.2f}</strong> "
+        f"que você configurou.</p>"
+        f"<p>Valor atual: <strong>R$ {valor_atual:.2f}</strong></p>"
+        f"<p>Esse alerta já foi removido automaticamente — se quiser continuar "
+        f"acompanhando, crie um novo em "
+        f"<a href='https://viverderenda.dev.br/'>viverderenda.dev.br</a>.</p>"
+    )
+    resp = requests.post(
+        "https://api.resend.com/emails",
+        headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
+        json={
+            "from": "Dividendos | Viver de Renda <alertas@mail.viverderenda.dev.br>",
+            "to": [destinatario],
+            "subject": assunto,
+            "html": corpo_html,
+        },
+        timeout=TIMEOUT,
+    )
+    resp.raise_for_status()
+
+
+def verificar_e_disparar_alertas(token):
+    service_role_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    resend_key = os.environ.get("RESEND_API_KEY", "").strip()
+
+    if not service_role_key or not resend_key:
+        print("INFO: Alertas de preço pulados (SUPABASE_SERVICE_ROLE_KEY e/ou RESEND_API_KEY não configurados nos Secrets).")
+        return
+
+    try:
+        alertas = _obter_alertas_pendentes(service_role_key)
+    except requests.RequestException as exc:
+        print(f"AVISO: falha ao buscar alertas de preço: {exc}", file=sys.stderr)
+        return
+
+    if not alertas:
+        return
+
+    tickers_unicos = sorted({a["ticker"] for a in alertas})
+    tickers_query = ",".join(f"B3:{t}" for t in tickers_unicos)
+    try:
+        url = f"https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers={tickers_query}&key={token}"
+        resp = requests.get(url, timeout=TIMEOUT)
+        resp.raise_for_status()
+        resultados = resp.json().get("results", [])
+        precos = {r["symbol"].replace("B3:", ""): r.get("quote", {}).get("value") for r in resultados}
+    except (requests.RequestException, ValueError, KeyError) as exc:
+        print(f"AVISO: falha ao buscar cotações para os alertas: {exc}", file=sys.stderr)
+        return
+
+    disparados = 0
+    for alerta in alertas:
+        preco_atual = precos.get(alerta["ticker"])
+        if preco_atual is None:
+            continue
+
+        valor_alvo = float(alerta["valor_alvo"])
+        bateu = (
+            (alerta["condicao"] == "abaixo" and preco_atual <= valor_alvo)
+            or (alerta["condicao"] == "acima" and preco_atual >= valor_alvo)
+        )
+        if not bateu:
+            continue
+
+        try:
+            _enviar_email_alerta(
+                resend_key, alerta["email"], alerta["ticker"], alerta["condicao"], valor_alvo, preco_atual
+            )
+            _remover_alerta(service_role_key, alerta["id"])
+            disparados += 1
+        except requests.RequestException as exc:
+            print(f"AVISO: falha ao enviar e-mail de alerta para {alerta.get('email')}: {exc}", file=sys.stderr)
+
+    print(f"OK: {disparados} alerta(s) de preço disparado(s) e removido(s) (de {len(alertas)} verificado(s)).")
+
+
 def main():
     # Coleta de rankings (Ações/FIIs) é mais pesada em requisições à API
     # (vários lotes de tickers, mais o endpoint Beta de receita) do que
@@ -853,6 +968,8 @@ def main():
     print(f"OK: {len(noticias.get('destaques', []))} notícia(s) em 'destaques', "
           f"{len(noticias.get('top3', []))} notícia(s) em 'top3' e "
           f"{'1' if noticias.get('fii') else '0'} notícia de FIIs salvas em {NOTICIAS_OUTPUT_FILE}.")
+
+    verificar_e_disparar_alertas(token)
 
 
 if __name__ == "__main__":
