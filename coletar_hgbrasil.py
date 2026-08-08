@@ -210,25 +210,58 @@ def _buscar_imagem_og(link):
         return None
 
 
-def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD):
+# Palavras que indicam que a notícia NÃO é de mercado/finanças — usado só
+# pra filtrar o feed "geral" do InfoMoney, que mistura esporte, novela,
+# receita etc junto com finanças (diferente do feed /mercados/, que já é
+# focado sozinho). Lista propositalmente conservadora: melhor deixar
+# passar alguma coisa duvidosa do que cortar notícia financeira de
+# verdade por engano.
+PALAVRAS_FORA_DE_TEMA = [
+    "tênis", "tenis", "futebol", "vôlei", "volei", "basquete", "nba", "nfl",
+    "fórmula 1", "formula 1", "gp de", "olimpíadas", "olimpiadas",
+    "copa do mundo", "seleção brasileira", "campeonato brasileiro", "ufc",
+    "wimbledon", "roland garros", "masters de", "atp ", "wta ",
+    "novela", "bbb ", "reality show", "horóscopo", "horoscopo",
+    "receita de", "dieta", "look do dia", "moda ", "onde assistir",
+]
+
+
+def _e_noticia_de_mercado(titulo):
+    """True se o título não bater com nenhuma palavra de PALAVRAS_FORA_DE_TEMA."""
+    titulo_lower = titulo.lower()
+    return not any(palavra in titulo_lower for palavra in PALAVRAS_FORA_DE_TEMA)
+
+
+def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD, filtrar_tema=False):
     """Busca e faz parse de um feed RSS específico. Retorna lista de notícias
-    (pode ser vazia) ou lança exceção em caso de falha de rede/parse."""
+    (pode ser vazia) ou lança exceção em caso de falha de rede/parse.
+
+    filtrar_tema=True busca um "pool" maior de itens brutos (não só
+    qtd_maxima) e descarta os fora do tema mercado/finanças ANTES de
+    cortar pra qtd_maxima — senão, se as primeiras posições do feed
+    fossem esporte/lifestyle, a gente perderia vaga à toa."""
     resp = requests.get(url, timeout=TIMEOUT, headers=HEADERS_NAVEGADOR)
     resp.raise_for_status()
     raiz = ET.fromstring(resp.content)
 
-    itens = raiz.findall("./channel/item")[:qtd_maxima]
+    pool = qtd_maxima * 4 if filtrar_tema else qtd_maxima
+    itens_brutos = raiz.findall("./channel/item")[:pool]
     noticias = []
 
-    for item in itens:
+    for item in itens_brutos:
+        if len(noticias) >= qtd_maxima:
+            break
+
         titulo = (item.findtext("title") or "").strip()
         link = (item.findtext("link") or "").strip()
         data_pub = (item.findtext("pubDate") or "").strip()
-        imagem = _extrair_imagem_do_item(item)
 
         if not titulo or not link:
             continue
+        if filtrar_tema and not _e_noticia_de_mercado(titulo):
+            continue
 
+        imagem = _extrair_imagem_do_item(item)
         if not imagem and link:
             imagem = _buscar_imagem_og(link)
 
@@ -335,7 +368,10 @@ def coletar_noticias():
                 break
             limite_desta_fonte = qtd_por_fonte if qtd_por_fonte is not None else (qtd_alvo - len(grupo))
             try:
-                itens = _buscar_feed(nome_fonte, url, qtd_maxima=limite_desta_fonte)
+                itens = _buscar_feed(
+                    nome_fonte, url, qtd_maxima=limite_desta_fonte,
+                    filtrar_tema="(geral)" in nome_fonte,
+                )
                 for item in itens:
                     if len(grupo) >= qtd_alvo:
                         break
@@ -351,13 +387,13 @@ def coletar_noticias():
         return grupo
 
     # "destaques": 1 item de cada categoria (força diversidade de fonte).
-    # "top3": agora TAMBÉM força 1 item de cada fonte (qtd_por_fonte=1) —
-    # antes, se a 1ª fonte (InfoMoney) respondesse bem, ela sozinha
-    # preenchia a cota inteira e a Money Times nunca chegava a ser
-    # consultada. Com 4 fontes em NOTICIAS_FEEDS e cota de 4, dá 1 de
-    # cada — garante variedade sem depender só do InfoMoney.
+    # "top3": voltou a ser cadeia de fallback normal (cada fonte pode
+    # preencher a cota inteira sozinha) — a trava de "1 por fonte" só fazia
+    # sentido enquanto tinha Money Times misturado aqui, forçando espaço
+    # pra ela; sem ela, só sobrou InfoMoney, e a trava estava limitando à
+    # toa quantas notícias conseguíamos puxar de lá.
     destaques = _coletar_grupo(NOTICIAS_FONTES_MISTAS, NOTICIAS_QTD, qtd_por_fonte=1)
-    top3 = _coletar_grupo(NOTICIAS_FEEDS, NOTICIAS_QTD_TOP3, qtd_por_fonte=1)
+    top3 = _coletar_grupo(NOTICIAS_FEEDS, NOTICIAS_QTD_TOP3)
 
     # Reforço cruzado: se um grupo ficou incompleto, tenta completar com as
     # fontes do outro grupo (ainda respeitando os links já usados).
