@@ -1136,39 +1136,91 @@
       font-size: 0.9rem;
       margin: 0 0 18px;
     }
-    .noticias-grid-mercado {
+    /* Layout editorial: destaque grande à esquerda + lista compacta à
+       direita (miniatura pequena + título + fonte/hora). */
+    .noticias-editorial {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 24px;
+      align-items: start;
     }
-    @media (max-width: 900px) {
-      .noticias-grid-mercado { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 800px) {
+      .noticias-editorial { grid-template-columns: 1fr; }
     }
     @media (max-width: 600px) {
-      .noticias-grid-mercado { grid-template-columns: 1fr; }
       .section-noticias-mercado { padding: 0 16px; }
     }
-    .noticias-grid-mercado .noticia-card { margin-bottom: 0; display: flex; flex-direction: column; }
-    .noticias-grid-mercado .noticia-thumb { height: 150px; }
-    .noticias-grid-mercado .noticia-body { display: flex; flex-direction: column; flex: 1; }
-    .noticias-grid-mercado .noticia-titulo {
-      font-size: 0.95rem;
+
+    .noticia-destaque {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+    .noticia-destaque-imagem-wrap {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      height: 260px;
+      background: var(--deep);
+    }
+    .noticia-destaque-imagem-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .noticia-destaque-titulo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin: 14px 0 6px;
+    }
+    .noticia-destaque-meta { font-size: 0.8rem; color: var(--muted); }
+    .noticia-destaque.noticia-skeleton {
+      height: 340px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+
+    .noticias-lista-editorial { display: flex; flex-direction: column; }
+    .noticia-item-editorial {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+    }
+    .noticias-lista-editorial a.noticia-item-editorial:first-child { padding-top: 0; }
+    .noticias-lista-editorial a.noticia-item-editorial:last-child { border-bottom: none; padding-bottom: 0; }
+    .noticia-item-editorial-thumb {
+      width: 76px;
+      height: 76px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--deep);
+    }
+    .noticia-item-editorial-corpo { min-width: 0; }
+    .noticia-item-editorial-titulo {
+      font-size: 0.88rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin: 0 0 6px;
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    .noticias-grid-mercado .noticia-meta {
-      margin-top: auto;
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
+    .noticia-item-editorial-meta { font-size: 0.72rem; color: var(--muted); }
+    .noticia-item-editorial.noticia-skeleton {
+      height: 76px;
+      border-radius: 10px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      margin-bottom: 12px;
+      border-bottom: none;
     }
-    .noticia-card-fii { border-color: var(--primary); }
     .noticia-badge-fii {
-      position: absolute;
-      top: 10px;
-      left: 10px;
+      display: inline-block;
       background: var(--primary);
       color: var(--deep);
       font-size: 0.7rem;
@@ -1176,13 +1228,7 @@
       letter-spacing: 0.3px;
       padding: 3px 9px;
       border-radius: 999px;
-      z-index: 1;
-    }
-    .noticia-card.noticia-skeleton {
-      height: 220px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.08), rgba(255,255,255,0.03));
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
+      margin-bottom: 10px;
     }
     .noticias-mercado-rodape {
       display: flex;
@@ -2278,13 +2324,13 @@
     <section class="section-noticias-mercado" id="noticias-mercado">
       <h2 class="hg-titulo">📰 Notícias do Mercado Econômico</h2>
       <p class="noticias-mercado-sub">As últimas notícias de mercado, direto das fontes, atualizadas automaticamente.</p>
-      <div id="noticiasMercadoGrid" class="noticias-grid-mercado">
-        <div class="noticia-card noticia-skeleton"></div>
-        <div class="noticia-card noticia-skeleton"></div>
-        <div class="noticia-card noticia-skeleton"></div>
-        <div class="noticia-card noticia-skeleton"></div>
-        <div class="noticia-card noticia-skeleton"></div>
-        <div class="noticia-card noticia-skeleton"></div>
+      <div id="noticiasMercadoGrid" class="noticias-editorial">
+        <div class="noticia-destaque noticia-skeleton"></div>
+        <div class="noticias-lista-editorial">
+          <div class="noticia-item-editorial noticia-skeleton"></div>
+          <div class="noticia-item-editorial noticia-skeleton"></div>
+          <div class="noticia-item-editorial noticia-skeleton"></div>
+        </div>
       </div>
       <div class="noticias-mercado-rodape">
         <span class="noticias-mercado-atualizado" id="noticiasMercadoAtualizado"></span>
@@ -7698,31 +7744,42 @@
           // pelo robô) sempre aparece fixada em 1º lugar, com uma etiqueta
           // "FIIs" — é o diferencial do site (foco em Viver de Renda),
           // então não some no meio das outras por ordem de data.
+          // Notícia em destaque: a fixa de FIIs se existir; senão, a mais
+          // recente do restante. As outras viram a lista compacta ao lado.
           const fii = dados.fii || null;
-          const vagas = fii ? MAX_NOTICIAS - 1 : MAX_NOTICIAS;
-          const restantes = noticias.filter(n => n.link !== fii?.link).slice(0, vagas);
-          const noticiasParaExibir = fii ? [fii, ...restantes] : restantes;
+          const destaque = fii || noticias[0] || null;
+          const listaItens = noticias.filter(n => n.link !== destaque?.link).slice(0, 5);
 
-          gridEl.innerHTML = noticiasParaExibir.map(n => `
-            <a class="noticia-card${n === fii ? ' noticia-card-fii' : ''}" href="${n.link}" target="_blank" rel="noopener noreferrer">
-              ${n.imagem ? `<img class="noticia-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.remove()">` : ''}
-              ${n === fii ? '<span class="noticia-badge-fii">FIIs</span>' : ''}
-              <div class="noticia-body">
-                <div class="noticia-titulo">${n.titulo}</div>
-                <div class="noticia-meta">
-                  <span>${n.fonte || 'Mercado financeiro'}</span>
-                  <span>${tempoRelativo(n.publicado_em)}</span>
-                </div>
+          if (!destaque) throw new Error('vazio');
+
+          const isFii = destaque === fii;
+          gridEl.innerHTML = `
+            <a class="noticia-destaque" href="${destaque.link}" target="_blank" rel="noopener noreferrer">
+              <div class="noticia-destaque-imagem-wrap">
+                ${destaque.imagem ? `<img src="${destaque.imagem}" alt="" loading="lazy" onerror="this.parentElement.remove()">` : ''}
               </div>
+              ${isFii ? '<span class="noticia-badge-fii">FIIs</span>' : ''}
+              <div class="noticia-destaque-titulo">${destaque.titulo}</div>
+              <div class="noticia-destaque-meta">${destaque.fonte || 'Mercado financeiro'} · ${tempoRelativo(destaque.publicado_em)}</div>
             </a>
-          `).join('');
+            <div class="noticias-lista-editorial">
+              ${listaItens.map(n => `
+                <a class="noticia-item-editorial" href="${n.link}" target="_blank" rel="noopener noreferrer">
+                  ${n.imagem ? `<img class="noticia-item-editorial-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+                  <div class="noticia-item-editorial-corpo">
+                    <div class="noticia-item-editorial-titulo">${n.titulo}</div>
+                    <div class="noticia-item-editorial-meta">${n.fonte || 'Mercado financeiro'} · ${tempoRelativo(n.publicado_em)}</div>
+                  </div>
+                </a>
+              `).join('')}
+            </div>`;
 
           if (atualizadoEl) {
             const agora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             atualizadoEl.textContent = `Atualizado às ${agora}`;
           }
         } catch (e) {
-          gridEl.innerHTML = '<div class="noticia-card"><div class="noticia-body"><div class="noticia-titulo">Notícias ainda não geradas — aguarde o robô rodar.</div></div></div>';
+          gridEl.innerHTML = '<p class="calc-ajuda">Notícias ainda não geradas — aguarde o robô rodar.</p>';
         } finally {
           if (btnAtualizar) btnAtualizar.disabled = false;
         }
