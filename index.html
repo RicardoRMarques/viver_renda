@@ -7665,6 +7665,18 @@
 
           if (!Array.isArray(noticias) || noticias.length === 0) throw new Error('vazio');
 
+          // Notícia velha demais (ex: feed sem nada mais novo há dias)
+          // não combina com uma seção de "mercado agora" — filtra fora
+          // qualquer coisa com mais de 48h antes de exibir.
+          const LIMITE_IDADE_MS = 48 * 60 * 60 * 1000;
+          const agora = Date.now();
+          noticias = noticias.filter(n => {
+            const data = new Date(n.publicado_em?.replace(' ', 'T') || 0);
+            return !isNaN(data.getTime()) && (agora - data.getTime()) <= LIMITE_IDADE_MS;
+          });
+
+          if (noticias.length === 0) throw new Error('vazio');
+
           // Mais recentes primeiro
           noticias.sort((a, b) => new Date(b.publicado_em?.replace(' ', 'T') || 0) - new Date(a.publicado_em?.replace(' ', 'T') || 0));
 
