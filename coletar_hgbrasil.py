@@ -210,26 +210,41 @@ def _buscar_imagem_og(link):
         return None
 
 
-# Palavras que indicam que a notícia NÃO é de mercado/finanças — usado só
-# pra filtrar o feed "geral" do InfoMoney, que mistura esporte, novela,
-# receita etc junto com finanças (diferente do feed /mercados/, que já é
-# focado sozinho). Lista propositalmente conservadora: melhor deixar
-# passar alguma coisa duvidosa do que cortar notícia financeira de
-# verdade por engano.
-PALAVRAS_FORA_DE_TEMA = [
-    "tênis", "tenis", "futebol", "vôlei", "volei", "basquete", "nba", "nfl",
-    "fórmula 1", "formula 1", "gp de", "olimpíadas", "olimpiadas",
-    "copa do mundo", "seleção brasileira", "campeonato brasileiro", "ufc",
-    "wimbledon", "roland garros", "masters de", "atp ", "wta ",
-    "novela", "bbb ", "reality show", "horóscopo", "horoscopo",
-    "receita de", "dieta", "look do dia", "moda ", "onde assistir",
+# Trocado de "lista de bloqueio" pra "lista de permissão": em vez de tentar
+# adivinhar toda palavra fora de tema possível (esporte, geopolítica,
+# acidente, saúde... a lista nunca teria fim), só deixa passar notícia do
+# feed "geral" do InfoMoney se o título bater com alguma palavra de
+# mercado/finanças/tecnologia/IA. Mais confiável — não depende de prever
+# cada categoria nova que possa aparecer misturada no feed.
+PALAVRAS_MERCADO_TECH = [
+    # Mercado / bolsa / ativos
+    "ação", "ações", "bolsa", "ibovespa", "ibov", "b3", "fii", "fiis", "fiagro",
+    "dividendo", "mercado", "investidor", "investimento", "renda fixa",
+    "renda variável", "tesouro direto", "cdb", "lci", "lca", "debênture",
+    "ipo", "follow-on", "ação da", "ações da", "papel da", "papéis da",
+    # Macroeconomia
+    "juros", "selic", "copom", "inflação", "ipca", "pib", "dólar", "dolar",
+    "câmbio", "cambio", "commodities", "petróleo", "petroleo", "banco central",
+    "fed ", "federal reserve", "economia", "fiscal", "déficit", "superávit",
+    "tarifa", "tarifaço", "exportação", "importação",
+    # Mercados internacionais
+    "wall street", "nasdaq", "nyse", "s&p", "dow jones", "bitcoin",
+    "criptomoeda", "cripto",
+    # Empresas / resultados
+    "balanço", "lucro líquido", "receita líquida", "faturamento", "fusão",
+    "aquisição", "resultado do", "resultado da", "trimestre",
+    # Tecnologia / IA
+    "tecnologia", "inteligência artificial", " ia ", "startup", "chip",
+    "semicondutor", "big tech", "nvidia", "openai", "google", "microsoft",
+    "apple", "amazon", "tesla",
 ]
 
 
 def _e_noticia_de_mercado(titulo):
-    """True se o título não bater com nenhuma palavra de PALAVRAS_FORA_DE_TEMA."""
-    titulo_lower = titulo.lower()
-    return not any(palavra in titulo_lower for palavra in PALAVRAS_FORA_DE_TEMA)
+    """True se o título bater com alguma palavra de PALAVRAS_MERCADO_TECH."""
+    titulo_lower = f" {titulo.lower()} "
+    return any(palavra in titulo_lower for palavra in PALAVRAS_MERCADO_TECH)
+
 
 
 def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD, filtrar_tema=False):
@@ -244,7 +259,7 @@ def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD, filtrar_tema=False):
     resp.raise_for_status()
     raiz = ET.fromstring(resp.content)
 
-    pool = qtd_maxima * 4 if filtrar_tema else qtd_maxima
+    pool = qtd_maxima * 8 if filtrar_tema else qtd_maxima
     itens_brutos = raiz.findall("./channel/item")[:pool]
     noticias = []
 

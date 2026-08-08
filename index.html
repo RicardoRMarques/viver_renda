@@ -1164,6 +1164,15 @@
       background: var(--deep);
     }
     .noticia-destaque-imagem-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .noticia-destaque-imagem-vazia {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      opacity: 0.5;
+    }
     .noticia-destaque-titulo {
       font-size: 1.2rem;
       font-weight: 700;
@@ -1197,6 +1206,14 @@
       object-fit: cover;
       flex-shrink: 0;
       background: var(--deep);
+    }
+    .noticia-item-editorial-thumb-vazia {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      border: 1px solid var(--border);
+      opacity: 0.5;
     }
     .noticia-item-editorial-corpo { min-width: 0; }
     .noticia-item-editorial-titulo {
@@ -7756,7 +7773,9 @@
           gridEl.innerHTML = `
             <a class="noticia-destaque" href="${destaque.link}" target="_blank" rel="noopener noreferrer">
               <div class="noticia-destaque-imagem-wrap">
-                ${destaque.imagem ? `<img src="${destaque.imagem}" alt="" loading="lazy" onerror="this.parentElement.remove()">` : ''}
+                ${destaque.imagem
+                  ? `<img src="${destaque.imagem}" alt="" loading="lazy" onerror="this.outerHTML='<div class=&quot;noticia-destaque-imagem-vazia&quot;>📰</div>'">`
+                  : '<div class="noticia-destaque-imagem-vazia">📰</div>'}
               </div>
               ${isFii ? '<span class="noticia-badge-fii">FIIs</span>' : ''}
               <div class="noticia-destaque-titulo">${destaque.titulo}</div>
@@ -7765,7 +7784,9 @@
             <div class="noticias-lista-editorial">
               ${listaItens.map(n => `
                 <a class="noticia-item-editorial" href="${n.link}" target="_blank" rel="noopener noreferrer">
-                  ${n.imagem ? `<img class="noticia-item-editorial-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+                  ${n.imagem
+                    ? `<img class="noticia-item-editorial-thumb" src="${n.imagem}" alt="" loading="lazy" onerror="this.outerHTML='<div class=&quot;noticia-item-editorial-thumb noticia-item-editorial-thumb-vazia&quot;>📰</div>'">`
+                    : '<div class="noticia-item-editorial-thumb noticia-item-editorial-thumb-vazia">📰</div>'}
                   <div class="noticia-item-editorial-corpo">
                     <div class="noticia-item-editorial-titulo">${n.titulo}</div>
                     <div class="noticia-item-editorial-meta">${n.fonte || 'Mercado financeiro'} · ${tempoRelativo(n.publicado_em)}</div>
