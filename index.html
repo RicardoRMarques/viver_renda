@@ -7616,10 +7616,24 @@
 
       const MAX_NOTICIAS = 9;
 
+      // O robô entrega datas em dois formatos diferentes, dependendo da
+      // fonte: "2026-08-07 16:57:00" (scraping/HG, sem timezone — precisa
+      // virar ISO com "T" pro navegador entender) e formato RFC 2822 tipo
+      // "Tue, 04 Aug 2026 11:47:44 +0000" (RSS do InfoMoney — esse já é
+      // nativamente entendido pelo Date(), NÃO pode levar o .replace(' ',
+      // 'T') senão quebra a string e vira "Invalid Date"). Esse parser
+      // detecta qual formato é antes de decidir o que fazer.
+      function parseDataNoticia(dataStr) {
+        if (!dataStr) return null;
+        const data = /^\d{4}-\d{2}-\d{2}/.test(dataStr)
+          ? new Date(dataStr.replace(' ', 'T'))
+          : new Date(dataStr);
+        return isNaN(data.getTime()) ? null : data;
+      }
+
       function tempoRelativo(dataStr) {
-        if (!dataStr) return '';
-        const data = new Date(dataStr.replace(' ', 'T'));
-        if (isNaN(data.getTime())) return '';
+        const data = parseDataNoticia(dataStr);
+        if (!data) return '';
         const diffMin = Math.round((Date.now() - data.getTime()) / 60000);
         if (diffMin < 1) return 'agora mesmo';
         if (diffMin < 60) return `há ${diffMin} min`;
@@ -7641,22 +7655,33 @@
           if (!resp.ok) throw new Error('arquivo não encontrado');
           const dados = await resp.json();
 
-          // O noticias.json vem em dois grupos separados ({ destaques,
-          // top3 }, gerados de fontes RSS diferentes pelo robô) — junta os
-          // dois aqui, removendo duplicados por link. Mantém
-          // compatibilidade com o formato antigo (lista simples).
+          const LIMITE_IDADE_MS = 48 * 60 * 60 * 1000;
+          const agora = Date.now();
+          function aindaFresca(n) {
+            const data = parseDataNoticia(n.publicado_em);
+            return data && (agora - data.getTime()) <= LIMITE_IDADE_MS;
+          }
+          function maisRecentePrimeiro(a, b) {
+            return (parseDataNoticia(b.publicado_em)?.getTime() || 0) - (parseDataNoticia(a.publicado_em)?.getTime() || 0);
+          }
+
           let noticias;
           if (Array.isArray(dados)) {
-            noticias = dados;
+            // Formato antigo (lista simples) — mantido por compatibilidade.
+            noticias = dados.filter(aindaFresca).sort(maisRecentePrimeiro);
           } else {
-            const combinadas = [...(dados.top3 || []), ...(dados.destaques || [])]
-              // "Investing.com (Economia)" fica de fora dessa seção — a
-              // ideia aqui é mercado/FIIs/ações, e esse card costumava
-              // trazer notícia genérica demais (ex: política de outro país),
-              // fora do fit da seção.
-              .filter(n => n.fonte !== 'Investing.com (Economia)');
+            // Mistura pedida: até 4 do InfoMoney/Money Times (top3) + só 1
+            // do Investing.com (destaques) — nunca da categoria Economia,
+            // que trazia notícia genérica demais pra essa seção.
+            const infomoney = (dados.top3 || []).filter(aindaFresca).sort(maisRecentePrimeiro).slice(0, 4);
+            const investing = (dados.destaques || [])
+              .filter(n => n.fonte !== 'Investing.com (Economia)')
+              .filter(aindaFresca)
+              .sort(maisRecentePrimeiro)
+              .slice(0, 1);
+
             const linksVistos = new Set();
-            noticias = combinadas.filter(n => {
+            noticias = [...infomoney, ...investing].filter(n => {
               if (linksVistos.has(n.link)) return false;
               linksVistos.add(n.link);
               return true;
@@ -7664,21 +7689,6 @@
           }
 
           if (!Array.isArray(noticias) || noticias.length === 0) throw new Error('vazio');
-
-          // Notícia velha demais (ex: feed sem nada mais novo há dias)
-          // não combina com uma seção de "mercado agora" — filtra fora
-          // qualquer coisa com mais de 48h antes de exibir.
-          const LIMITE_IDADE_MS = 48 * 60 * 60 * 1000;
-          const agora = Date.now();
-          noticias = noticias.filter(n => {
-            const data = new Date(n.publicado_em?.replace(' ', 'T') || 0);
-            return !isNaN(data.getTime()) && (agora - data.getTime()) <= LIMITE_IDADE_MS;
-          });
-
-          if (noticias.length === 0) throw new Error('vazio');
-
-          // Mais recentes primeiro
-          noticias.sort((a, b) => new Date(b.publicado_em?.replace(' ', 'T') || 0) - new Date(a.publicado_em?.replace(' ', 'T') || 0));
 
           // A notícia de FIIs (fiis.com.br, sem RSS — coletada via scraping
           // pelo robô) sempre aparece fixada em 1º lugar, com uma etiqueta
