@@ -55,8 +55,6 @@ RANKING_OUTPUT_FILE = "ranking.json"
 NOTICIAS_FEEDS = [
     ("InfoMoney", "https://www.infomoney.com.br/mercados/feed/"),
     ("InfoMoney (geral)", "https://www.infomoney.com.br/feed/"),
-    ("Money Times (Mercados)", "https://www.moneytimes.com.br/mercados/feed/"),
-    ("Money Times", "https://www.moneytimes.com.br/feed/"),
 ]
 
 # Feeds RSS OFICIAIS do Investing.com Brasil (documentados em
@@ -193,6 +191,25 @@ def _extrair_imagem_do_item(item):
     return None
 
 
+def _buscar_imagem_og(link):
+    """Fallback pra quando o RSS não traz imagem nenhuma (é o caso da
+    Money Times): busca a própria página da notícia e extrai a tag
+    og:image do HTML — toda página feita pra ser compartilhada em
+    WhatsApp/redes sociais tem essa tag, então é uma fonte confiável.
+    Timeout curto de propósito (não pode atrasar a coleta toda por causa
+    de 1 imagem) e nunca lança exceção — se falhar, só fica sem imagem."""
+    try:
+        resp = requests.get(link, timeout=8, headers=HEADERS_NAVEGADOR)
+        resp.raise_for_status()
+        match = re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', resp.text)
+        if not match:
+            # A ordem dos atributos pode vir invertida (content antes de property)
+            match = re.search(r'<meta[^>]+content="([^"]+)"[^>]+property="og:image"', resp.text)
+        return match.group(1) if match else None
+    except requests.RequestException:
+        return None
+
+
 def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD):
     """Busca e faz parse de um feed RSS específico. Retorna lista de notícias
     (pode ser vazia) ou lança exceção em caso de falha de rede/parse."""
@@ -211,6 +228,9 @@ def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD):
 
         if not titulo or not link:
             continue
+
+        if not imagem and link:
+            imagem = _buscar_imagem_og(link)
 
         noticias.append({
             "titulo": titulo,
