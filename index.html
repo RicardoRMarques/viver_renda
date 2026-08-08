@@ -547,6 +547,52 @@
     }
     .hg-favorito-chip button:hover { color: #ff5a5a; }
 
+    .alertas-form-linha { display: flex; gap: 8px; margin-bottom: 8px; }
+    .alertas-form-linha input { flex: 1; min-width: 0; }
+    .alertas-condicao { gap: 6px; }
+    .alertas-condicao-btn {
+      flex: 1;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 6px;
+      font-size: 0.76rem;
+      cursor: pointer;
+      transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .alertas-condicao-btn.selecionada { border-color: var(--primary); color: var(--primary); background: rgba(127,127,127,0.08); }
+    .alertas-prefixo-moeda {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: var(--deep);
+    }
+    .alertas-lista { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .alertas-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+    }
+    .alertas-item button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 2px 4px;
+    }
+    .alertas-item button:hover { color: #ff5a5a; }
+
     @media (max-width: 640px) {
       .hg-busca-compacta .hg-linha-busca.hg-linha-busca-favoritavel { flex-wrap: wrap; }
       .hg-linha-busca-favoritavel input { flex: 1 1 100%; }
@@ -2986,6 +3032,34 @@
             <p class="calc-ajuda" style="margin:0 0 10px;">Boletins gerados automaticamente de segunda a sexta. Abra ou compartilhe direto no WhatsApp.</p>
             <div id="boletinsLista" class="boletins-lista">
               <div class="boletim-item boletim-skeleton"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ALERTAS DE PREÇO: só funciona logado (o robô manda o e-mail
+             pro cadastro da conta). Limite de 5 alertas por pessoa. -->
+        <section class="hg-busca hg-busca-compacta" id="alertas-preco">
+          <h2 class="hg-titulo">🔔 Meus Alertas</h2>
+          <div class="hg-painel">
+            <div id="alertasDeslogado">
+              <p class="calc-ajuda" style="margin:0;">Entre na sua conta para criar alertas de preço — a gente avisa por e-mail quando o ativo bater o valor.</p>
+              <button type="button" class="hg-btn" id="alertasBtnEntrar" style="width:100%; margin-top:10px;">Entrar</button>
+            </div>
+            <div id="alertasLogado" hidden>
+              <div class="alertas-form-linha">
+                <input type="text" id="alertasTickerInput" placeholder="Ticker (ex: PETR4)" autocomplete="off" list="sugestoesTickersB3" />
+              </div>
+              <div class="alertas-form-linha alertas-condicao">
+                <button type="button" class="alertas-condicao-btn selecionada" data-condicao="abaixo">Cair abaixo de</button>
+                <button type="button" class="alertas-condicao-btn" data-condicao="acima">Subir acima de</button>
+              </div>
+              <div class="alertas-form-linha">
+                <span class="alertas-prefixo-moeda">R$</span>
+                <input type="text" id="alertasValorInput" placeholder="0,00" inputmode="decimal" />
+              </div>
+              <button type="button" class="hg-btn" id="alertasBtnCriar" style="width:100%; margin-top:8px;">Criar alerta</button>
+              <p id="alertasStatus" class="hg-status" style="margin-top:8px;"></p>
+              <div id="alertasLista" class="alertas-lista"></div>
             </div>
           </div>
         </section>
@@ -6471,6 +6545,182 @@
     // Estado inicial ao carregar a página
     renderizarChipsFavoritosCarrossel();
     atualizarCarrosselComFavoritos();
+
+    // ============================================================
+    // ALERTAS DE PREÇO — só funciona logado (o robô manda e-mail pro
+    // cadastro da conta quando o preço bate a condição). Limite de 5
+    // alertas por pessoa, verificado aqui no front-end antes de criar.
+    // ============================================================
+    (function () {
+      const ALERTAS_MAX = 5;
+      let alertasCondicaoSelecionada = 'abaixo';
+
+      const painelDeslogado = document.getElementById('alertasDeslogado');
+      const painelLogado = document.getElementById('alertasLogado');
+      const btnEntrar = document.getElementById('alertasBtnEntrar');
+      const tickerInput = document.getElementById('alertasTickerInput');
+      const valorInput = document.getElementById('alertasValorInput');
+      const btnCriar = document.getElementById('alertasBtnCriar');
+      const statusEl = document.getElementById('alertasStatus');
+      const listaEl = document.getElementById('alertasLista');
+      const botoesCondicao = document.querySelectorAll('.alertas-condicao-btn');
+
+      if (!painelDeslogado) return; // seção não está nessa página
+
+      botoesCondicao.forEach(btn => {
+        btn.addEventListener('click', () => {
+          alertasCondicaoSelecionada = btn.getAttribute('data-condicao');
+          botoesCondicao.forEach(b => b.classList.toggle('selecionada', b === btn));
+        });
+      });
+
+      btnEntrar?.addEventListener('click', () => {
+        document.getElementById('authBtnAbrir')?.click();
+      });
+
+      async function alertasCarregarLista(userId) {
+        const cliente = obterSupabaseClient();
+        if (!cliente) return [];
+        const { data, error } = await cliente
+          .from('alertas_preco')
+          .select('id, ticker, condicao, valor_alvo')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+        if (error) {
+          console.warn('Supabase: não foi possível ler alertas_preco (tabela existe?).', error.message);
+          return [];
+        }
+        return data || [];
+      }
+
+      function alertasRenderizarLista(lista) {
+        if (!lista.length) {
+          listaEl.innerHTML = '<p class="calc-ajuda" style="margin:4px 0 0;">Nenhum alerta criado ainda.</p>';
+          return;
+        }
+        listaEl.innerHTML = lista.map(a => `
+          <div class="alertas-item">
+            <span><strong>${a.ticker}</strong> ${a.condicao === 'abaixo' ? 'cair abaixo de' : 'subir acima de'} R$ ${Number(a.valor_alvo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <button type="button" data-id="${a.id}" aria-label="Remover alerta de ${a.ticker}">✕</button>
+          </div>
+        `).join('');
+        listaEl.querySelectorAll('button[data-id]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const cliente = obterSupabaseClient();
+            if (!cliente) return;
+            btn.disabled = true;
+            await cliente.from('alertas_preco').delete().eq('id', btn.getAttribute('data-id'));
+            await alertasAtualizarTudo();
+          });
+        });
+      }
+
+      async function alertasAtualizarTudo() {
+        const cliente = obterSupabaseClient();
+        if (!cliente) return;
+        const { data: { session } } = await cliente.auth.getSession();
+        if (!session?.user) return;
+        const lista = await alertasCarregarLista(session.user.id);
+        alertasRenderizarLista(lista);
+        return lista;
+      }
+
+      btnCriar?.addEventListener('click', async () => {
+        const cliente = obterSupabaseClient();
+        if (!cliente) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Indisponível no momento — tente recarregar a página.';
+          return;
+        }
+        const { data: { session } } = await cliente.auth.getSession();
+        if (!session?.user) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Sua sessão expirou — entre de novo.';
+          return;
+        }
+
+        const ticker = tickerInput.value.trim().toUpperCase();
+        const valorTexto = valorInput.value.trim().replace(/\./g, '').replace(',', '.');
+        const valor = parseFloat(valorTexto);
+
+        if (!ticker) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Informe o ticker do ativo.';
+          return;
+        }
+        if (!valor || valor <= 0) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Informe um valor válido.';
+          return;
+        }
+
+        btnCriar.disabled = true;
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Verificando ativo...';
+
+        try {
+          const listaAtual = await alertasCarregarLista(session.user.id);
+          if (listaAtual.length >= ALERTAS_MAX) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Você já tem ${ALERTAS_MAX} alertas ativos (o máximo). Remova algum antes de criar outro.`;
+            return;
+          }
+
+          // Confirma que o ticker existe antes de salvar o alerta.
+          const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
+          const resp = await fetch(url);
+          const dados = await resp.json();
+          const ativo = dados?.results?.[0];
+          if (!ativo || !['stock', 'fii', 'fiagro'].includes(ativo.kind)) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII ou Fiagro.`;
+            return;
+          }
+
+          const { error } = await cliente.from('alertas_preco').insert({
+            user_id: session.user.id,
+            ticker,
+            kind: ativo.kind,
+            condicao: alertasCondicaoSelecionada,
+            valor_alvo: valor,
+          });
+          if (error) throw error;
+
+          statusEl.textContent = 'Alerta criado!';
+          tickerInput.value = '';
+          valorInput.value = '';
+          await alertasAtualizarTudo();
+        } catch (e) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Não foi possível criar o alerta agora. Tente de novo.';
+          console.error(e);
+        } finally {
+          btnCriar.disabled = false;
+        }
+      });
+
+      // Alterna entre painel "entre para usar" e o formulário conforme o
+      // estado de login — reaproveita o mesmo evento do bloco de Auth.
+      async function alertasAtualizarVisibilidade(session) {
+        const logado = !!session?.user;
+        painelDeslogado.hidden = logado;
+        painelLogado.hidden = !logado;
+        if (logado) await alertasAtualizarTudo();
+      }
+
+      const clienteAlertas = obterSupabaseClient();
+      if (clienteAlertas) {
+        clienteAlertas.auth.onAuthStateChange((_evento, session) => alertasAtualizarVisibilidade(session));
+        clienteAlertas.auth.getSession().then(({ data }) => alertasAtualizarVisibilidade(data.session));
+      } else {
+        setTimeout(() => {
+          const c2 = obterSupabaseClient();
+          if (!c2) return;
+          c2.auth.onAuthStateChange((_evento, session) => alertasAtualizarVisibilidade(session));
+          c2.auth.getSession().then(({ data }) => alertasAtualizarVisibilidade(data.session));
+        }, 1000);
+      }
+    })();
 
     // ============================================================
     // LOGIN / PERFIL — Magic Link via Supabase Auth (sem senha).
