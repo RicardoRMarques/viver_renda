@@ -697,6 +697,18 @@
     }
     .hg-card-topo h3 { font-size: 1.2rem; }
     .hg-card-topo .hg-setor { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+    .hg-badge-fonte {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(127,127,127,0.12);
+      color: var(--muted);
+      vertical-align: middle;
+      margin-left: 4px;
+    }
 
     /* Preço + gráfico lado a lado (empilha no mobile) */
     .hg-preco-grafico {
@@ -2975,11 +2987,11 @@
 
         <!-- CONSULTA RÁPIDA: Ações e FIIs (HG Brasil) -->
         <section class="hg-busca hg-busca-compacta" id="consulta-rapida">
-          <h2 class="hg-titulo">🔎 Consultar Ações e FIIs</h2>
+          <h2 class="hg-titulo">🔎 Consulta Ações, FIIs, Stocks e ETFs</h2>
 
           <div class="hg-painel">
             <div class="hg-linha-busca hg-linha-busca-favoritavel">
-              <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, VALE3, HGLG11..." autocomplete="off" list="sugestoesTickersB3" />
+              <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, HGLG11, AAPL, SPY..." autocomplete="off" list="sugestoesTickersB3" />
               <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
               <button class="hg-btn-secundario-pequeno" id="hgBtnFavoritar" type="button" title="Acompanhar este ativo no carrossel do topo">☆ Favoritar</button>
             </div>
@@ -3672,6 +3684,7 @@
     // Escopo global (fora das IIFEs abaixo) para ser usada por todos os
     // widgets da página (busca rápida, índices/sparkline, análise fundamentalista).
     const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
+    const CHAVE_TWELVEDATA = '034d1589162e413d9a1e9608860cb06a'; // fallback p/ Stocks/ETFs internacionais quando não é ticker da B3 — plano free (800 req/dia, 8/min)
 
     // ============================================================
     // Cliente do Supabase — criado sob demanda (lazy), não na hora que a
@@ -3960,13 +3973,96 @@
 
         const ativo = data?.results?.[0];
         if (!ativo) {
-          statusEl.className = 'hg-status erro';
-          statusEl.textContent = `Ticker "${digitado}" não encontrado.`;
+          // Não é ticker da B3 — tenta como Stock/ETF internacional via
+          // TwelveData antes de desistir de vez.
+          const achouTwelveData = await hgBuscarTwelveData(digitado);
+          if (!achouTwelveData) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Ticker "${digitado}" não encontrado (nem na B3, nem como Stock/ETF).`;
+          }
           return;
         }
 
         statusEl.textContent = '';
         hgRenderizarAtivo(ativo);
+      }
+
+      // Fallback pra Stocks/ETFs internacionais (ex: AAPL, SPY, QQQ) via
+      // TwelveData, usado só quando o ticker não é encontrado na B3.
+      // Retorna true se achou e já renderizou, false se não achou nada.
+      async function hgBuscarTwelveData(ticker) {
+        statusEl.textContent = `Não achei "${ticker}" na B3 — tentando como Stock/ETF...`;
+        try {
+          const urlQuote = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(CHAVE_TWELVEDATA)}`;
+          const respQuote = await fetch(urlQuote);
+          const dadosQuote = await respQuote.json();
+
+          if (!respQuote.ok || dadosQuote.status === 'error' || !dadosQuote.symbol) {
+            return false;
+          }
+
+          // Dividend yield é um "extra" — tenta buscar, mas nunca deixa
+          // travar a exibição do resto se o plano free não tiver acesso
+          // (endpoint pago, rate limit, etc). Falha silenciosa de propósito.
+          let dividendYield = null;
+          try {
+            const urlStats = `https://api.twelvedata.com/statistics?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(CHAVE_TWELVEDATA)}`;
+            const respStats = await fetch(urlStats);
+            const dadosStats = await respStats.json();
+            const dy = dadosStats?.statistics?.stock_statistics?.dividend_yield ?? dadosStats?.statistics?.dividends_and_splits?.dividend_yield;
+            if (typeof dy === 'number') dividendYield = dy;
+          } catch (e) { /* segue sem o dado */ }
+
+          statusEl.textContent = '';
+          hgRenderizarAtivoTwelveData(dadosQuote, dividendYield);
+          return true;
+        } catch (e) {
+          console.error('Erro na consulta TwelveData:', e);
+          return false;
+        }
+      }
+
+      // Card simplificado pra Stocks/ETFs (dados bem mais enxutos que o
+      // payload da HG Brasil — sem fundamentos completos no plano free).
+      function hgRenderizarAtivoTwelveData(a, dividendYield) {
+        const emAlta = parseFloat(a.percent_change) >= 0;
+        const moeda = a.currency || 'USD';
+        resultadoEl.innerHTML = `
+          <div class="hg-card">
+            <div class="hg-card-topo">
+              <div class="hg-card-topo-info">
+                <div>
+                  <h3>${a.name || a.symbol} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span> <span class="hg-badge-fonte">Stock/ETF · TwelveData</span></h3>
+                  <div class="hg-setor">${a.exchange || '—'}</div>
+                </div>
+              </div>
+            </div>
+            <div class="hg-grid-dados">
+              <div class="hg-grupo-titulo">Cotação</div>
+              <div>
+                <span>Preço</span>
+                <strong>${hgFormatMoeda(parseFloat(a.close), moeda) ?? '—'}</strong>
+              </div>
+              <div>
+                <span>Variação (dia)</span>
+                <strong class="${emAlta ? 'val-up' : 'val-down'}">${a.percent_change ? `${emAlta ? '▲' : '▼'} ${Math.abs(parseFloat(a.percent_change)).toFixed(2)}%` : '—'}</strong>
+              </div>
+              <div>
+                <span>Abertura</span>
+                <strong>${hgFormatMoeda(parseFloat(a.open), moeda) ?? '—'}</strong>
+              </div>
+              <div>
+                <span>Máxima / Mínima (dia)</span>
+                <strong>${hgFormatMoeda(parseFloat(a.high), moeda) ?? '—'} / ${hgFormatMoeda(parseFloat(a.low), moeda) ?? '—'}</strong>
+              </div>
+              ${dividendYield !== null ? `
+              <div>
+                <span>Dividend Yield</span>
+                <strong>${hgFormatNumero(dividendYield)}%</strong>
+              </div>` : ''}
+            </div>
+            <p class="calc-ajuda" style="margin-top:14px;">Dados de mercado internacional via TwelveData — cobertura de fundamentos mais limitada que os ativos da B3 no plano gratuito.</p>
+          </div>`;
       }
 
       // Monta o grid de "todas as variáveis" retornadas pela API, agrupadas
