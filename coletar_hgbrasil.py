@@ -920,6 +920,15 @@ def coletar_ranking(token):
 # ============================================================
 SUPABASE_URL = "https://mzknjnupizprfatfmxqg.supabase.co"
 
+# Mesma chave "uso exposto" (plano free) já usada no fallback de Stocks/ETFs
+# internacionais do index.html — não é segredo, só limitada por domínio/plano.
+CHAVE_TWELVEDATA = "034d1589162e413d9a1e9608860cb06a"
+
+# Kinds gravados pelo front-end quando o alerta é de ação/FII/Fiagro da B3
+# (ver botão "Criar alerta" no index.html). Qualquer outro kind (ex:
+# "internacional") é tratado aqui como Stock/ETF americano via TwelveData.
+KINDS_B3 = ("stock", "fii", "fiagro")
+
 
 def _obter_alertas_pendentes(service_role_key):
     """Busca todos os alertas cadastrados, já com o e-mail do dono (via a
@@ -969,6 +978,35 @@ def _enviar_email_alerta(resend_key, destinatario, ticker, condicao, valor_alvo,
     resp.raise_for_status()
 
 
+def _obter_precos_twelvedata(tickers):
+    """Cotação atual de tickers fora da B3 (Stocks/ETFs americanos, ex:
+    KBWD, AAPL), usados pelos alertas de preço com kind != stock/fii/fiagro."""
+    if not tickers:
+        return {}
+    try:
+        url = f"https://api.twelvedata.com/price?symbol={','.join(tickers)}&apikey={CHAVE_TWELVEDATA}"
+        resp = requests.get(url, timeout=TIMEOUT)
+        resp.raise_for_status()
+        dados = resp.json()
+        # Com 1 símbolo só, a API responde {"price": "..."} direto (sem
+        # aninhar pelo símbolo); com vários, responde {"TICKER": {"price": ...}, ...}.
+        if len(tickers) == 1:
+            dados = {tickers[0]: dados}
+        precos = {}
+        for ticker, info in dados.items():
+            preco = info.get("price") if isinstance(info, dict) else None
+            if preco is None:
+                continue
+            try:
+                precos[ticker] = float(preco)
+            except (TypeError, ValueError):
+                continue
+        return precos
+    except (requests.RequestException, ValueError, KeyError) as exc:
+        print(f"AVISO: falha ao buscar cotações internacionais (TwelveData) para os alertas: {exc}", file=sys.stderr)
+        return {}
+
+
 def verificar_e_disparar_alertas(token):
     service_role_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
     resend_key = os.environ.get("RESEND_API_KEY", "").strip()
@@ -986,17 +1024,23 @@ def verificar_e_disparar_alertas(token):
     if not alertas:
         return
 
-    tickers_unicos = sorted({a["ticker"] for a in alertas})
-    tickers_query = ",".join(f"B3:{t}" for t in tickers_unicos)
-    try:
-        url = f"https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers={tickers_query}&key={token}"
-        resp = requests.get(url, timeout=TIMEOUT)
-        resp.raise_for_status()
-        resultados = resp.json().get("results", [])
-        precos = {r["symbol"].replace("B3:", ""): r.get("quote", {}).get("value") for r in resultados}
-    except (requests.RequestException, ValueError, KeyError) as exc:
-        print(f"AVISO: falha ao buscar cotações para os alertas: {exc}", file=sys.stderr)
-        return
+    tickers_b3 = sorted({a["ticker"] for a in alertas if a.get("kind") in KINDS_B3})
+    tickers_intl = sorted({a["ticker"] for a in alertas if a.get("kind") not in KINDS_B3})
+
+    precos = {}
+    if tickers_b3:
+        tickers_query = ",".join(f"B3:{t}" for t in tickers_b3)
+        try:
+            url = f"https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers={tickers_query}&key={token}"
+            resp = requests.get(url, timeout=TIMEOUT)
+            resp.raise_for_status()
+            resultados = resp.json().get("results", [])
+            precos.update({r["symbol"].replace("B3:", ""): r.get("quote", {}).get("value") for r in resultados})
+        except (requests.RequestException, ValueError, KeyError) as exc:
+            print(f"AVISO: falha ao buscar cotações da B3 para os alertas: {exc}", file=sys.stderr)
+
+    if tickers_intl:
+        precos.update(_obter_precos_twelvedata(tickers_intl))
 
     disparados = 0
     for alerta in alertas:

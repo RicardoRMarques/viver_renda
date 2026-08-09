@@ -586,6 +586,16 @@
       color: var(--muted);
       background: var(--deep);
     }
+    #alertasBtnCriar.alertas-btn-criar {
+      -webkit-appearance: none;
+      appearance: none;
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      padding: 9px 12px;
+      font-size: 0.8rem;
+      border-radius: 10px;
+    }
     .alertas-lista { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
     .alertas-item {
       display: flex;
@@ -3150,17 +3160,17 @@
             </div>
             <div id="alertasLogado" hidden>
               <div class="alertas-form-linha">
-                <input type="text" id="alertasTickerInput" placeholder="Ticker (ex: PETR4)" autocomplete="off" list="sugestoesTickersB3" />
+                <input type="text" id="alertasTickerInput" placeholder="Ticker (ex: PETR4, KBWD)" autocomplete="off" list="sugestoesTickersB3" />
               </div>
               <div class="alertas-form-linha alertas-condicao">
                 <button type="button" class="alertas-condicao-btn selecionada" data-condicao="abaixo">Cair abaixo de</button>
                 <button type="button" class="alertas-condicao-btn" data-condicao="acima">Subir acima de</button>
               </div>
               <div class="alertas-form-linha">
-                <span class="alertas-prefixo-moeda">R$</span>
+                <span class="alertas-prefixo-moeda" id="alertasPrefixoMoeda">R$</span>
                 <input type="text" id="alertasValorInput" placeholder="0,00" inputmode="decimal" />
               </div>
-              <button type="button" class="hg-btn" id="alertasBtnCriar" style="width:100%; margin-top:8px;">Criar alerta</button>
+              <button type="button" class="hg-btn alertas-btn-criar" id="alertasBtnCriar">Criar alerta</button>
               <p id="alertasStatus" class="hg-status" style="margin-top:8px;"></p>
               <div id="alertasLista" class="alertas-lista"></div>
             </div>
@@ -6771,7 +6781,7 @@
         if (!cliente) return [];
         const { data, error } = await cliente
           .from('alertas_preco')
-          .select('id, ticker, condicao, valor_alvo')
+          .select('id, ticker, kind, condicao, valor_alvo')
           .eq('user_id', userId)
           .order('created_at', { ascending: false });
         if (error) {
@@ -6786,12 +6796,15 @@
           listaEl.innerHTML = '<p class="calc-ajuda" style="margin:4px 0 0;">Nenhum alerta criado ainda.</p>';
           return;
         }
-        listaEl.innerHTML = lista.map(a => `
+        listaEl.innerHTML = lista.map(a => {
+          const simboloMoeda = ['stock', 'fii', 'fiagro'].includes(a.kind) ? 'R$' : 'US$';
+          return `
           <div class="alertas-item">
-            <span><strong>${a.ticker}</strong> ${a.condicao === 'abaixo' ? 'cair abaixo de' : 'subir acima de'} R$ ${Number(a.valor_alvo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span><strong>${a.ticker}</strong> ${a.condicao === 'abaixo' ? 'cair abaixo de' : 'subir acima de'} ${simboloMoeda} ${Number(a.valor_alvo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
             <button type="button" data-id="${a.id}" aria-label="Remover alerta de ${a.ticker}">✕</button>
           </div>
-        `).join('');
+        `;
+        }).join('');
         listaEl.querySelectorAll('button[data-id]').forEach(btn => {
           btn.addEventListener('click', async () => {
             const cliente = obterSupabaseClient();
@@ -6812,6 +6825,33 @@
         alertasRenderizarLista(lista);
         return lista;
       }
+
+      // Confere se o ticker existe na TwelveData (Stocks/ETFs fora da B3,
+      // ex: KBWD, AAPL, SPY). Retorna o "kind" a gravar ou null se não achar.
+      async function alertasVerificarTwelveData(ticker) {
+        try {
+          const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(CHAVE_TWELVEDATA)}`;
+          const resp = await fetch(url);
+          const dados = await resp.json();
+          if (!resp.ok || dados.status === 'error' || !dados.symbol) return null;
+          return 'internacional';
+        } catch (e) {
+          console.error('Erro na consulta TwelveData (alertas):', e);
+          return null;
+        }
+      }
+
+      // Enquanto a pessoa digita o ticker, já troca o prefixo R$/US$ pelo
+      // padrão de nomenclatura (tickers da B3 sempre terminam em número, ex:
+      // PETR4, HGLG11 — Stocks/ETFs americanos são só letras, ex: KBWD, AAPL).
+      // É só uma dica visual; a validação de verdade acontece ao criar.
+      const prefixoMoedaEl = document.getElementById('alertasPrefixoMoeda');
+      function alertasAtualizarPrefixoMoeda() {
+        if (!prefixoMoedaEl) return;
+        const ticker = tickerInput.value.trim().toUpperCase();
+        prefixoMoedaEl.textContent = (!ticker || /\d$/.test(ticker)) ? 'R$' : 'US$';
+      }
+      tickerInput?.addEventListener('input', alertasAtualizarPrefixoMoeda);
 
       btnCriar?.addEventListener('click', async () => {
         const cliente = obterSupabaseClient();
@@ -6854,21 +6894,29 @@
             return;
           }
 
-          // Confirma que o ticker existe antes de salvar o alerta.
+          // Confirma que o ticker existe antes de salvar o alerta — primeiro
+          // tenta como ação/FII/Fiagro da B3, depois como Stock/ETF
+          // internacional (via TwelveData, mesmo fallback da consulta rápida).
           const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
           const resp = await fetch(url);
           const dados = await resp.json();
           const ativo = dados?.results?.[0];
-          if (!ativo || !['stock', 'fii', 'fiagro'].includes(ativo.kind)) {
+
+          let kind = (ativo && ['stock', 'fii', 'fiagro'].includes(ativo.kind)) ? ativo.kind : null;
+          if (!kind) {
+            statusEl.textContent = `Não achei "${ticker}" na B3 — tentando como Stock/ETF americano...`;
+            kind = await alertasVerificarTwelveData(ticker);
+          }
+          if (!kind) {
             statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII ou Fiagro.`;
+            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro ou Stock/ETF americano.`;
             return;
           }
 
           const { error } = await cliente.from('alertas_preco').insert({
             user_id: session.user.id,
             ticker,
-            kind: ativo.kind,
+            kind,
             condicao: alertasCondicaoSelecionada,
             valor_alvo: valor,
           });
