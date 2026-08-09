@@ -69,7 +69,7 @@ NOTICIAS_FONTES_MISTAS = [
     ("Investing.com (Economia)", "https://br.investing.com/rss/news_14.rss"),
 ]
 NOTICIAS_QTD = 3
-NOTICIAS_QTD_TOP3 = 4  # InfoMoney/Money Times — o site mostra até 4 dessas, só 1 do Investing.com
+NOTICIAS_QTD_TOP3 = 5  # InfoMoney/Money Times — o site mostra até 5 dessas, só 1 do Investing.com
 TIMEOUT = 20
 
 # fiis.com.br não tem feed RSS público — a única forma de puxar notícia de

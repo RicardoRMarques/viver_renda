@@ -7763,7 +7763,7 @@
             // Mistura pedida: até 4 do InfoMoney/Money Times (top3) + só 1
             // do Investing.com (destaques) — nunca da categoria Economia,
             // que trazia notícia genérica demais pra essa seção.
-            const infomoney = (dados.top3 || []).filter(aindaFresca).sort(maisRecentePrimeiro).slice(0, 4);
+            const infomoney = (dados.top3 || []).filter(aindaFresca).sort(maisRecentePrimeiro).slice(0, 5);
             const investing = (dados.destaques || [])
               .filter(n => n.fonte !== 'Investing.com (Economia)')
               .filter(aindaFresca)
@@ -7788,7 +7788,7 @@
           // recente do restante. As outras viram a lista compacta ao lado.
           const fii = dados.fii || null;
           const destaque = fii || noticias[0] || null;
-          const listaItens = noticias.filter(n => n.link !== destaque?.link).slice(0, 5);
+          const listaItens = noticias.filter(n => n.link !== destaque?.link).slice(0, 6);
 
           if (!destaque) throw new Error('vazio');
 
