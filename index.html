@@ -1210,6 +1210,10 @@
     @media (max-width: 600px) {
       .section-grafico-consulta { padding: 0 16px; }
       .grafico-consulta-container { height: 380px; }
+      .grafico-consulta-busca { flex-wrap: wrap; }
+      .grafico-consulta-input { flex: 1 1 100%; }
+      .grafico-consulta-busca .hg-btn,
+      .grafico-consulta-busca .hg-btn-compartilhar { flex: 1 1 auto; justify-content: center; }
     }
 
     .noticia-destaque {
@@ -2399,6 +2403,10 @@
       <div class="grafico-consulta-busca">
         <input type="text" id="graficoConsultaInput" class="grafico-consulta-input" placeholder="Ex: TRXF11, PETR4, AAPL, QQQ" autocomplete="off" autocapitalize="characters" />
         <button type="button" class="hg-btn" id="graficoConsultaBtn" style="flex-shrink:0;">Consultar</button>
+        <button type="button" class="hg-btn-compartilhar" id="graficoConsultaBtnCompartilhar" style="flex-shrink:0;" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-3px; margin-right:6px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+        </button>
       </div>
       <p class="grafico-consulta-erro" id="graficoConsultaErro" hidden>Digite um ticker válido para consultar.</p>
       <div class="grafico-consulta-container" id="graficoConsultaContainer" hidden>
@@ -2411,19 +2419,26 @@
       (function () {
         const input = document.getElementById('graficoConsultaInput');
         const btn = document.getElementById('graficoConsultaBtn');
+        const btnCompartilhar = document.getElementById('graficoConsultaBtnCompartilhar');
         const erroEl = document.getElementById('graficoConsultaErro');
         const containerEl = document.getElementById('graficoConsultaContainer');
         if (!input || !btn) return;
+
+        let ultimoTickerPesquisado = null;
 
         function consultarTicker() {
           const ticker = (input.value || '').trim().toUpperCase();
           if (!ticker) {
             erroEl.hidden = false;
             containerEl.hidden = true;
+            btnCompartilhar.hidden = true;
+            ultimoTickerPesquisado = null;
             return;
           }
           erroEl.hidden = true;
           containerEl.hidden = false;
+          btnCompartilhar.hidden = false;
+          ultimoTickerPesquisado = ticker;
           containerEl.innerHTML = '<div id="graficoConsultaChart" style="height:100%;width:100%;"></div>';
 
           function detectarSimbolo(t) {
@@ -2458,6 +2473,10 @@
         btn.addEventListener('click', consultarTicker);
         input.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') consultarTicker();
+        });
+        btnCompartilhar.addEventListener('click', () => {
+          if (!ultimoTickerPesquisado) return;
+          hgCompartilharAtivo({ symbol: ultimoTickerPesquisado, name: ultimoTickerPesquisado }, btnCompartilhar, { grafico: 1 });
         });
       })();
     </script>
