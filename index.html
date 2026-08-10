@@ -2402,7 +2402,7 @@
       <h2 class="hg-titulo">📈 Consultar gráfico de um ativo</h2>
       <p class="calc-ajuda" style="margin:0 0 14px;">Digite o ticker (ex: TRXF11, PETR4, VALE3) e veja o gráfico interativo.</p>
       <div class="grafico-consulta-busca">
-        <input type="text" id="graficoConsultaInput" class="grafico-consulta-input" placeholder="Ex: TRXF11, PETR4, AAPL, QQQ" autocomplete="off" autocapitalize="characters" />
+        <input type="text" id="graficoConsultaInput" class="grafico-consulta-input" placeholder="Ex: TRXF11, PETR4, AAPL, QQQ" autocomplete="off" autocapitalize="characters" list="sugestoesTickersB3" />
         <button type="button" class="hg-btn" id="graficoConsultaBtn" style="flex-shrink:0;">Consultar</button>
         <button type="button" class="hg-btn-compartilhar" id="graficoConsultaBtnCompartilhar" style="flex-shrink:0;" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-3px; margin-right:6px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
@@ -2504,6 +2504,12 @@
           } else {
             window.addEventListener('load', executarAutoLoad, { once: true });
           }
+        } else {
+          // Sem ticker vindo de link compartilhado: carrega PETR4 como
+          // padrão, já pronto assim que a página abre — sem rolar a tela
+          // (diferente do caso acima, que veio de um link específico).
+          input.value = 'PETR4';
+          consultarTicker();
         }
       })();
     </script>
