@@ -2478,6 +2478,17 @@
           if (!ultimoTickerPesquisado) return;
           hgCompartilharAtivo({ symbol: ultimoTickerPesquisado, name: ultimoTickerPesquisado }, btnCompartilhar, { grafico: 1 });
         });
+
+        // Auto-carrega se o link tiver ?ticker=XXX&grafico=1 (vindo de um
+        // compartilhamento desta seção) — rola até aqui e já consulta.
+        const parametrosUrlGrafico = new URLSearchParams(window.location.search);
+        const tickerDaUrlGrafico = parametrosUrlGrafico.get('ticker');
+        const veioDoGrafico = parametrosUrlGrafico.get('grafico') === '1';
+        if (tickerDaUrlGrafico && veioDoGrafico) {
+          input.value = tickerDaUrlGrafico.toUpperCase();
+          document.getElementById('grafico-consulta')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          consultarTicker();
+        }
       })();
     </script>
 
@@ -4871,7 +4882,8 @@
       const parametrosUrl = new URLSearchParams(window.location.search);
       const tickerDaUrl = parametrosUrl.get('ticker');
       const veioDaFundamentalista = parametrosUrl.get('view') === 'fundamentos';
-      if (tickerDaUrl && !veioDaFundamentalista) {
+      const veioDoGrafico = parametrosUrl.get('grafico') === '1';
+      if (tickerDaUrl && !veioDaFundamentalista && !veioDoGrafico) {
         inputTicker.value = tickerDaUrl.toUpperCase();
         document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         hgBuscarAtivo();
