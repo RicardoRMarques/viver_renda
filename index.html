@@ -1173,6 +1173,45 @@
       .section-noticias-mercado { padding: 0 16px; }
     }
 
+    /* Seção "Consultar gráfico de um ativo" — busca de ticker + widget TradingView */
+    .section-grafico-consulta {
+      max-width: 1100px;
+      margin: 8px auto 32px;
+      padding: 0 20px;
+    }
+    .grafico-consulta-busca {
+      display: flex;
+      gap: 10px;
+    }
+    .grafico-consulta-input {
+      flex: 1;
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+      border-radius: var(--radius, 8px);
+      border: 1px solid var(--border);
+      background: var(--deep);
+      color: var(--text);
+      font-size: 0.95rem;
+      text-transform: uppercase;
+    }
+    .grafico-consulta-erro {
+      color: #ff5a5a;
+      font-size: 0.85rem;
+      margin: 8px 0 0;
+    }
+    .grafico-consulta-container {
+      margin-top: 16px;
+      height: 480px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    @media (max-width: 600px) {
+      .section-grafico-consulta { padding: 0 16px; }
+      .grafico-consulta-container { height: 380px; }
+    }
+
     .noticia-destaque {
       display: block;
       text-decoration: none;
@@ -2351,6 +2390,69 @@
         <button type="button" class="noticias-mercado-btn-atualizar" id="noticiasMercadoBtnAtualizar">↻ Atualizar notícias</button>
       </div>
     </section>
+
+    <!-- CONSULTA DE GRÁFICO — campo para o usuário digitar um ticker (ação ou FII)
+         e visualizar o gráfico interativo via widget do TradingView. -->
+    <section class="section-grafico-consulta" id="grafico-consulta">
+      <h2 class="hg-titulo">📈 Consultar gráfico de um ativo</h2>
+      <p class="calc-ajuda" style="margin:0 0 14px;">Digite o ticker (ex: TRXF11, PETR4, VALE3) e veja o gráfico interativo.</p>
+      <div class="grafico-consulta-busca">
+        <input type="text" id="graficoConsultaInput" class="grafico-consulta-input" placeholder="Ex: TRXF11" autocomplete="off" autocapitalize="characters" />
+        <button type="button" class="hg-btn" id="graficoConsultaBtn" style="flex-shrink:0;">Consultar</button>
+      </div>
+      <p class="grafico-consulta-erro" id="graficoConsultaErro" hidden>Digite um ticker válido para consultar.</p>
+      <div class="grafico-consulta-container" id="graficoConsultaContainer" hidden>
+        <div id="graficoConsultaChart" style="height:100%;width:100%;"></div>
+      </div>
+    </section>
+
+    <script src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+      (function () {
+        const input = document.getElementById('graficoConsultaInput');
+        const btn = document.getElementById('graficoConsultaBtn');
+        const erroEl = document.getElementById('graficoConsultaErro');
+        const containerEl = document.getElementById('graficoConsultaContainer');
+        if (!input || !btn) return;
+
+        function consultarTicker() {
+          const ticker = (input.value || '').trim().toUpperCase();
+          if (!ticker) {
+            erroEl.hidden = false;
+            containerEl.hidden = true;
+            return;
+          }
+          erroEl.hidden = true;
+          containerEl.hidden = false;
+          containerEl.innerHTML = '<div id="graficoConsultaChart" style="height:100%;width:100%;"></div>';
+
+          function montarWidget() {
+            if (typeof TradingView === 'undefined') { setTimeout(montarWidget, 200); return; }
+            new TradingView.widget({
+              autosize: true,
+              symbol: 'BMFBOVESPA:' + ticker,
+              interval: 'D',
+              timezone: 'America/Sao_Paulo',
+              theme: document.body.classList.contains('tema-claro') ? 'light' : 'dark',
+              style: '1',
+              locale: 'br',
+              toolbar_bg: 'transparent',
+              enable_publishing: false,
+              hide_top_toolbar: false,
+              hide_legend: false,
+              save_image: false,
+              container_id: 'graficoConsultaChart'
+            });
+          }
+          montarWidget();
+        }
+
+        btn.addEventListener('click', consultarTicker);
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') consultarTicker();
+        });
+      })();
+    </script>
 
     <div class="consultas-boletim-grid">
       <div class="coluna-consultas" id="simuladorVisual">
