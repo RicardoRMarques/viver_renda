@@ -19,9 +19,23 @@ on:
 permissions:
   contents: write
 
+# Evita que execuções se empilhem: se uma nova disparar (a cada 15 min)
+# enquanto a anterior ainda está rodando/na fila, cancela a mais antiga em
+# vez de deixar as duas competindo pelos mesmos runners do plano grátis —
+# é justamente isso que causava execuções demorando 40+ min. Como cada
+# execução é uma coleta "do zero" (idempotente), cancelar uma execução
+# velha em favor de uma mais nova não perde nada.
+concurrency:
+  group: coletar-boletim
+  cancel-in-progress: true
+
 jobs:
   coletar:
     runs-on: ubuntu-latest
+    # Trava de segurança: se por algum motivo o script travar de vez (rede
+    # pendurada, etc), o GitHub mata o job sozinho depois de 10 min, em vez
+    # de ficar preso e atrasando a fila pras próximas execuções.
+    timeout-minutes: 10
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v5
