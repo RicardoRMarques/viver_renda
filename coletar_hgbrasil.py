@@ -33,6 +33,7 @@ Uso local (opcional, para testar):
 import html
 import json
 import os
+import random
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -73,11 +74,14 @@ NOTICIAS_QTD_TOP3 = 5  # InfoMoney/Money Times — o site mostra até 5 dessas, 
 TIMEOUT = 20
 
 # fiis.com.br não tem feed RSS público — a única forma de puxar notícia de
-# lá é fazendo scraping da própria página de notícias (pega só o destaque
-# mais recente, 1 item). Fica fora do esquema de fallback dos outros feeds
-# porque é fonte única: se falhar, o boletim segue sem esse item (nunca
-# quebra o resto da coleta).
+# lá é fazendo scraping da própria página de notícias. Pega as
+# FIIS_NOTICIAS_QTD_TOPO primeiras da listagem e sorteia uma a cada coleta
+# (em vez de sempre a 1ª), pra não ficar "travado" mostrando o mesmo
+# destaque por dias quando o site demora a publicar algo novo. Fica fora do
+# esquema de fallback dos outros feeds porque é fonte única: se falhar, o
+# boletim segue sem esse item (nunca quebra o resto da coleta).
 FIIS_NOTICIAS_URL = "https://fiis.com.br/noticias/"
+FIIS_NOTICIAS_QTD_TOPO = 4
 
 HEADERS_NAVEGADOR = {
     "User-Agent": (
@@ -292,10 +296,15 @@ def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD, filtrar_tema=False):
 
 
 def _buscar_noticia_fii():
-    """Faz scraping da 1ª notícia em destaque de https://fiis.com.br/noticias/
+    """Faz scraping das notícias em destaque de https://fiis.com.br/noticias/
     (o site não tem feed RSS público). Estrutura esperada (tema WordPress):
     um link de miniatura envolvendo <img alt="TÍTULO" src="IMAGEM">, seguido
     de um link igual dentro de um heading (<h3>/<h2>) com o texto do título.
+
+    Pega as até FIIS_NOTICIAS_QTD_TOPO primeiras notícias da listagem e
+    sorteia uma delas — em vez de sempre devolver a 1ª. Isso evita ficar
+    "travado" mostrando a mesma notícia por dias quando o site fonte demora
+    a publicar algo novo (a home dele muda de ordem/destaque bem devagar).
 
     Retorna um dict no mesmo formato dos outros itens de notícia, ou None se
     não conseguir extrair nada (nunca lança exceção pra fora — scraping de
@@ -303,46 +312,58 @@ def _buscar_noticia_fii():
     try:
         resp = requests.get(FIIS_NOTICIAS_URL, timeout=TIMEOUT, headers=HEADERS_NAVEGADOR)
         resp.raise_for_status()
-        html = resp.text
+        html_pagina = resp.text
 
-        # 1) Link de miniatura: <a href="https://fiis.com.br/noticias/SLUG/">
+        # 1) Links de miniatura: <a href="https://fiis.com.br/noticias/SLUG/">
         #    ... <img ... src="IMG" ... alt="TÍTULO" ...> ... </a>
         padrao_thumb = re.compile(
             r'<a[^>]+href="(https://fiis\.com\.br/noticias/[^"?#]+/)"[^>]*>\s*'
             r'<img[^>]+src="([^"]+)"[^>]*alt="([^"]*)"',
             re.IGNORECASE | re.DOTALL,
         )
-        match = padrao_thumb.search(html)
-        if not match:
+        candidatos = []
+        links_vistos = set()
+        for match in padrao_thumb.finditer(html_pagina):
+            link, imagem, titulo = match.group(1), match.group(2), match.group(3).strip()
+            if link in links_vistos:
+                continue  # a mesma notícia pode aparecer 2x na página (destaque + lista)
+            links_vistos.add(link)
+
+            # O "alt" da miniatura às vezes vem vazio ou genérico — nesse caso,
+            # busca o título de verdade no heading que repete o mesmo link logo
+            # depois (padrão: <h3><a href="MESMO_LINK">TÍTULO REAL</a></h3>).
+            if not titulo:
+                padrao_titulo = re.compile(
+                    r'<a[^>]+href="' + re.escape(link) + r'"[^>]*>([^<]+)</a>',
+                    re.IGNORECASE,
+                )
+                achou_titulo = padrao_titulo.search(html_pagina, match.end())
+                if achou_titulo:
+                    titulo = achou_titulo.group(1).strip()
+
+            if not titulo or not link:
+                continue
+
+            candidatos.append({"titulo": titulo, "link": link, "imagem": imagem})
+            if len(candidatos) >= FIIS_NOTICIAS_QTD_TOPO:
+                break
+
+        if not candidatos:
             print("AVISO: scraping do fiis.com.br não achou o padrão esperado (site pode ter mudado o layout).", file=sys.stderr)
             return None
 
-        link, imagem, titulo = match.group(1), match.group(2), match.group(3).strip()
-
-        # O "alt" da miniatura às vezes vem vazio ou genérico — nesse caso,
-        # busca o título de verdade no heading que repete o mesmo link logo
-        # depois (padrão: <h3><a href="MESMO_LINK">TÍTULO REAL</a></h3>).
-        if not titulo:
-            padrao_titulo = re.compile(
-                r'<a[^>]+href="' + re.escape(link) + r'"[^>]*>([^<]+)</a>',
-                re.IGNORECASE,
-            )
-            achou_titulo = padrao_titulo.search(html, match.end())
-            if achou_titulo:
-                titulo = achou_titulo.group(1).strip()
-
-        if not titulo or not link:
-            return None
+        escolhida = random.choice(candidatos)
 
         # A listagem só mostra hora relativa ("Hoje às 12:50"), sem data
-        # em formato utilizável — como o item é sempre o mais recente da
-        # página, usamos o horário de coleta como aproximação razoável.
+        # em formato utilizável — como não sabemos a hora real de publicação
+        # de cada uma das candidatas, usamos o horário de coleta como
+        # aproximação razoável.
         publicado_em = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
         return {
-            "titulo": titulo,
-            "link": link,
-            "imagem": imagem,
+            "titulo": escolhida["titulo"],
+            "link": escolhida["link"],
+            "imagem": escolhida["imagem"],
             "fonte": "FIIs.com.br",
             "publicado_em": publicado_em,
         }
