@@ -7702,31 +7702,40 @@
 
       // Linhas da tabela: [rótulo, grupo, campo, formato]
       // formato: 'num' (2 casas), 'pct' (percentual), 'moeda'
+      // Agora vem da bolsai (via Worker), não mais da HG Brasil — campos
+      // são "achatados" (sem grupo/statement), direto no objeto do período.
       const LINHAS_FUND = [
-        ['P/L',               'valuation',     'price_to_earnings_ratio', 'num'],
-        ['P/VP',               'valuation',     'price_to_book_ratio',     'num'],
-        ['PEG',                'valuation',     'peg_ratio',               'num'],
-        ['P/Receita',          'valuation',     'price_to_sales_ratio',    'num'],
-        ['P/EBIT',             'valuation',     'price_to_ebit',           'num'],
-        ['P/EBITDA',           'valuation',     'price_to_ebitda',         'num'],
-        ['EV/EBITDA',          'valuation',     'ev_to_ebitda',            'num'],
-        ['EV/EBIT',            'valuation',     'ev_to_ebit',              'num'],
-        ['VPA',                'valuation',     'book_value_per_share',    'moeda'],
-        ['LPA',                'valuation',     'earnings_per_share',      'moeda'],
-        ['Margem bruta',       'margins',       'gross_profit_margin',     'pct'],
-        ['Margem EBITDA',      'margins',       'ebitda_margin',           'pct'],
-        ['Margem EBIT',        'margins',       'ebit_margin',             'pct'],
-        ['Margem líquida',     'margins',       'net_profit_margin',       'pct'],
-        ['ROE',                'profitability', 'return_on_equity',        'pct'],
-        ['ROA',                'profitability', 'return_on_assets',        'pct'],
-        ['ROIC',               'profitability', 'return_on_invested_capital', 'pct'],
-        ['ROCE',               'profitability', 'return_on_capital_employed', 'pct'],
-        ['Liquidez corrente',  'leverage',      'current_ratio',           'num'],
-        ['Dív.Líq/PL',         'leverage',      'debt_to_equity_ratio',    'num'],
-        ['Dív.Líq/EBITDA',     'leverage',      'net_debt_to_ebitda_ratio','num'],
-        ['PL/Ativos',          'leverage',      'equity_to_asset_ratio',   'num'],
-        ['Dividend Yield',     'dividends',     'yield_percent',           'pct'],
+        ['P/L',               'pl',                'num'],
+        ['P/VP',               'pvp',               'num'],
+        ['P/Receita',          'p_sr',              'num'],
+        ['P/EBIT',             'p_ebit',            'num'],
+        ['P/EBITDA',           'p_ebitda',          'num'],
+        ['EV/EBITDA',          'ev_ebitda',         'num'],
+        ['EV/EBIT',            'ev_ebit',           'num'],
+        ['VPA',                'vpa',               'moeda'],
+        ['LPA',                'lpa',               'moeda'],
+        ['Margem bruta',       'gross_margin',      'pct'],
+        ['Margem EBITDA',      'ebitda_margin',     'pct'],
+        ['Margem EBIT',        'ebit_margin',       'pct'],
+        ['Margem líquida',     'net_margin',        'pct'],
+        ['ROE',                'roe',               'pct'],
+        ['ROA',                'roa',               'pct'],
+        ['ROIC',               'roic',              'pct'],
+        ['Liquidez corrente',  'current_ratio',     'num'],
+        ['Dívida/Patrimônio',  'debt_equity',        'num'],
+        ['Dív.Líq/PL',         'net_debt_equity',   'num'],
+        ['Dív.Líq/EBITDA',     'net_debt_ebitda',   'num'],
+        ['CAGR Receita (5a)',  'cagr_revenue_5y',   'pct'],
+        ['CAGR Lucro (5a)',    'cagr_earnings_5y',  'pct'],
       ];
+
+      function fmtDataBr(dataIso) {
+        if (!dataIso) return '—';
+        const partes = String(dataIso).split('-');
+        if (partes.length !== 3) return dataIso;
+        const [ano, mes, dia] = partes;
+        return `${dia}/${mes}/${ano}`;
+      }
 
       function fmtCelula(valor, formato) {
         if (typeof valor !== 'number') return '–';
@@ -7803,7 +7812,6 @@
       async function buscarFundamentos() {
         const digitado = inputFund.value.trim().toUpperCase();
         if (!digitado) return;
-        const ticker = digitado.startsWith('B3:') ? digitado : `B3:${digitado}`;
         const simbolo = digitado.replace(/^B3:/, '');
 
         statusFund.className = 'hg-status';
@@ -7811,20 +7819,25 @@
         resultadoFund.innerHTML = '';
 
         try {
-          const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent(ticker)}&period=annual`;
+          const url = `${WORKER_BOLSAI_ENDPOINT}/?ticker=${encodeURIComponent(simbolo)}&mode=history`;
           const resp = await fetch(url);
           const data = await resp.json();
 
-          if (data?.metadata?.key_status && data.metadata.key_status !== 'valid') {
-            throw new Error('Chave da HG Brasil inválida ou sem plano compatível com dados fundamentalistas.');
+          if (!resp.ok) {
+            throw new Error(data?.error || `Não encontramos dados fundamentalistas para "${simbolo}". Verifique o ticker ou tente outra ação.`);
           }
 
-          const info = data?.results?.[0];
-          if (!info || !Array.isArray(info.statements) || info.statements.length === 0) {
+          const historico = Array.isArray(data?.history) ? data.history : [];
+          if (historico.length === 0) {
             throw new Error(`Não encontramos dados fundamentalistas para "${simbolo}". Verifique o ticker ou tente outra ação.`);
           }
 
-          renderizarFundamentos(info);
+          renderizarFundamentos({
+            symbol: simbolo,
+            name: historico[0]?.corporate_name || simbolo,
+            classification: null,
+            statements: historico,
+          });
           statusFund.textContent = '';
         } catch (e) {
           statusFund.className = 'hg-status erro';
@@ -7836,15 +7849,17 @@
       function renderizarFundamentos(info) {
         const statements = info.statements;
 
-        // Cabeçalho de cada coluna: TTM primeiro (se houver), depois anos em ordem decrescente
-        const colunas = statements.map(s => ({
-          rotulo: s.period_type === 'ttm' ? 'TTM' : String(s.fiscal_year ?? s.fiscal_period ?? '—'),
+        // Cabeçalho de cada coluna: cada item já vem com TTM calculado até
+        // aquela data de referência (histórico trimestral da bolsai) —
+        // mostra só os 5 mais recentes pra não ficar tabela demais.
+        const colunas = statements.slice(0, 5).map((s, i) => ({
+          rotulo: i === 0 ? 'Atual (TTM)' : fmtDataBr(s.reference_date),
           statement: s,
         }));
 
-        const linhasHtml = LINHAS_FUND.map(([rotulo, grupo, campo, formato]) => {
+        const linhasHtml = LINHAS_FUND.map(([rotulo, campo, formato]) => {
           const celulas = colunas.map(col => {
-            const valor = col.statement?.[grupo]?.[campo];
+            const valor = col.statement?.[campo];
             return `<td>${fmtCelula(valor, formato)}</td>`;
           }).join('');
           const botaoInfo = AJUDA_FUND[rotulo]
@@ -7873,8 +7888,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                 <span class="hg-btn-compartilhar-texto">Compartilhar</span>
               </button>
-              <button type="button" class="hg-btn-secundario-pequeno" id="hgFundBtnAvancados" title="Buscar indicadores extras (P/L, ROE, ROIC, margens...) via bolsai">
-                📊 Indicadores Avançados
+              <button type="button" class="hg-btn-secundario-pequeno" id="hgFundBtnAvancados" title="Ver números do balanço (receita, lucro, dívida, caixa...) via bolsai">
+                💰 Números do Balanço
               </button>
             </div>
             <div class="hg-tabela-scroll" style="overflow-x:auto;">
@@ -7891,7 +7906,7 @@
               </table>
             </div>
             <p style="margin-top:12px; font-size:0.78rem; color:var(--muted);">
-              Fonte: HG Brasil · Período: anual (TTM = últimos 12 meses acumulados).
+              Fonte: bolsai (B3/CVM) · Cada coluna já vem com TTM (últimos 12 meses) calculado até aquela data.
             </p>
             <div id="hgFundAvancados"></div>
           </div>`;
@@ -7910,29 +7925,25 @@
         ativarTooltipsFundamentos();
       }
 
-      // Mapeia os campos técnicos da bolsai pra rótulos legíveis, com o
-      // formato certo pra cada um (% ou número puro).
+      // Números "brutos" do balanço — complementares à tabela de cima
+      // (que já tem os índices/percentuais), pra não duplicar informação.
       const CAMPOS_BOLSAI = [
-        ['pl', 'P/L', 'num'],
-        ['pvp', 'P/VP', 'num'],
-        ['ev_ebitda', 'EV/EBITDA', 'num'],
-        ['ev_ebit', 'EV/EBIT', 'num'],
-        ['roe', 'ROE', 'pct'],
-        ['roa', 'ROA', 'pct'],
-        ['roic', 'ROIC', 'pct'],
-        ['gross_margin', 'Margem Bruta', 'pct'],
-        ['ebitda_margin', 'Margem EBITDA', 'pct'],
-        ['net_margin', 'Margem Líquida', 'pct'],
-        ['debt_equity', 'Dívida/Patrimônio', 'num'],
-        ['net_debt_ebitda', 'Dívida Líq./EBITDA', 'num'],
-        ['current_ratio', 'Liquidez Corrente', 'num'],
-        ['cagr_revenue_5y', 'CAGR Receita (5a)', 'pct'],
-        ['cagr_earnings_5y', 'CAGR Lucro (5a)', 'pct'],
+        ['market_cap', 'Valor de Mercado', 'moeda_compacta'],
+        ['net_revenue', 'Receita Líquida (TTM)', 'moeda_compacta'],
+        ['net_income', 'Lucro Líquido (TTM)', 'moeda_compacta'],
+        ['ebitda', 'EBITDA (TTM)', 'moeda_compacta'],
+        ['equity', 'Patrimônio Líquido', 'moeda_compacta'],
+        ['total_assets', 'Ativos Totais', 'moeda_compacta'],
+        ['total_debt', 'Dívida Total', 'moeda_compacta'],
+        ['cash', 'Caixa e Equivalentes', 'moeda_compacta'],
+        ['shares_outstanding', 'Ações em Circulação', 'inteiro'],
       ];
 
       function fmtBolsai(valor, formato) {
         if (typeof valor !== 'number') return '—';
         if (formato === 'pct') return `${hgFormatNumero(valor)}%`;
+        if (formato === 'moeda_compacta') return hgFormatMoeda(valor) ? `R$ ${hgFormatCompacto(valor)}` : '—';
+        if (formato === 'inteiro') return valor.toLocaleString('pt-BR');
         return hgFormatNumero(valor);
       }
 
@@ -7962,7 +7973,7 @@
 
           container.innerHTML = `
             <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
-              <div class="hg-grupo-titulo" style="margin-top:0;">📊 Indicadores Avançados (bolsai)</div>
+              <div class="hg-grupo-titulo" style="margin-top:0;">💰 Números do Balanço (bolsai)</div>
               <div class="hg-grid-dados">${linhasHtml}</div>
               <p style="margin-top:10px; font-size:0.74rem; color:var(--muted);">
                 Fonte: bolsai (B3/CVM) · Referência: ${dados.reference_date || '—'}.
