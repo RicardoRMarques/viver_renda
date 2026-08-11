@@ -418,6 +418,130 @@ ${noticiasHtml}
 `;
 }
 
+// ---------- Notificação por e-mail (opt-in) ----------
+// Depois de gerar o boletim, avisa por e-mail quem marcou "quero receber"
+// no site (tabela assinantes_boletim, opt-in — ver
+// sql/criar-tabela-assinantes-boletim.sql). Usa as MESMAS credenciais já
+// configuradas nos Secrets do robô Python pros Alertas de Preço
+// (SUPABASE_SERVICE_ROLE_KEY e RESEND_API_KEY) — não precisa configurar
+// nada novo. Se essas variáveis não estiverem definidas, essa etapa é
+// pulada silenciosamente, sem quebrar a geração do boletim.
+const SUPABASE_URL = 'https://mzknjnupizprfatfmxqg.supabase.co';
+const REMETENTE_BOLETIM = 'Dividendos | Viver de Renda <boletim@mail.viverderenda.dev.br>';
+
+// Resumo curto (só os índices mais relevantes) pro corpo do e-mail — não
+// é o boletim inteiro, só um gancho pra pessoa clicar e ver o resto.
+function montarResumoIndicesEmail(indices) {
+  const definicoesResumo = [
+    { chaves: ['IBOVESPA'], label: 'Ibovespa' },
+    { chaves: ['SELIC'], label: 'Selic' },
+    { chaves: ['DÓLAR', 'DOLAR', 'USD/BRL'], label: 'Dólar' },
+    { chaves: ['IFIX'], label: 'IFIX' },
+  ];
+  const linhas = definicoesResumo.map(({ chaves, label }) => {
+    const item = buscarIndicador(indices, ...chaves);
+    if (!item) return null;
+    if (typeof item.valor === 'number') {
+      const variacao = fmtVariacao(item);
+      return `<tr><td style="padding:4px 12px 4px 0;color:#666;">${label}</td><td style="padding:4px 0;font-weight:700;">${fmtValorIndicador(item)}<span style="color:${variacao.classe === 'up' ? '#1a9c4d' : '#c0392b'};"> ${variacao.texto}</span></td></tr>`;
+    }
+    if (typeof item.valor_pct === 'number') {
+      const sufixo = label === 'Selic' ? '% a.a.' : '%';
+      return `<tr><td style="padding:4px 12px 4px 0;color:#666;">${label}</td><td style="padding:4px 0;font-weight:700;">${item.valor_pct.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${sufixo}</td></tr>`;
+    }
+    return null;
+  }).filter(Boolean);
+  return linhas.length > 0
+    ? `<table style="border-collapse:collapse;">${linhas.join('')}</table>`
+    : '<p>Confira os índices completos no link abaixo.</p>';
+}
+
+// Busca todos os assinantes ativos via a view assinantes_boletim_com_email
+// (usa a service_role key, que ignora RLS de propósito — é um script de
+// backend confiável, não o navegador de ninguém).
+async function buscarAssinantesBoletim(serviceRoleKey) {
+  const url = `${SUPABASE_URL}/rest/v1/assinantes_boletim_com_email?select=email`;
+  const resp = await fetch(url, {
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+    },
+  });
+  if (!resp.ok) throw new Error(`Supabase respondeu ${resp.status} ao buscar assinantes`);
+  const linhas = await resp.json();
+  return linhas.map(l => l.email).filter(Boolean);
+}
+
+async function enviarEmailBoletim(resendKey, destinatario, dataExtenso, resumoHtml, urlBoletim) {
+  const corpoHtml = `
+    <h2>Boletim de Mercado — ${dataExtenso}</h2>
+    <p>Resumo de hoje:</p>
+    ${resumoHtml}
+    <p style="margin-top:20px;">
+      <a href="${urlBoletim}" style="background:#1a73e8;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;display:inline-block;">Ver boletim completo</a>
+    </p>
+    <p style="margin-top:24px;font-size:12px;color:#888;">
+      Você recebeu este e-mail porque marcou "Quero receber o Boletim de Mercado por e-mail" na sua conta em
+      <a href="https://viverderenda.dev.br/">viverderenda.dev.br</a>.
+      Pra parar de receber, entre na sua conta (botão "Entrar" no topo do site) e desmarque essa opção.
+    </p>`;
+
+  const resp = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${resendKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: REMETENTE_BOLETIM,
+      to: [destinatario],
+      subject: `Boletim de Mercado — ${dataExtenso}`,
+      html: corpoHtml,
+    }),
+  });
+  if (!resp.ok) {
+    const corpoErro = await resp.text().catch(() => '');
+    throw new Error(`Resend respondeu ${resp.status}: ${corpoErro}`);
+  }
+}
+
+async function notificarAssinantes({ dataExtenso, nomeArquivo, indices }) {
+  const serviceRoleKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+  const resendKey = (process.env.RESEND_API_KEY || '').trim();
+
+  if (!serviceRoleKey || !resendKey) {
+    console.log('[boletim] Notificação por e-mail pulada (SUPABASE_SERVICE_ROLE_KEY e/ou RESEND_API_KEY não configurados nos Secrets).');
+    return;
+  }
+
+  let emails;
+  try {
+    emails = await buscarAssinantesBoletim(serviceRoleKey);
+  } catch (e) {
+    console.warn(`[boletim] Aviso: falha ao buscar assinantes do boletim: ${e.message}`);
+    return;
+  }
+
+  if (emails.length === 0) {
+    console.log('[boletim] Nenhum assinante do boletim por e-mail no momento.');
+    return;
+  }
+
+  const resumoHtml = montarResumoIndicesEmail(indices);
+  const urlBoletim = `https://viverderenda.dev.br/boletins/${nomeArquivo}`;
+
+  let enviados = 0;
+  for (const email of emails) {
+    try {
+      await enviarEmailBoletim(resendKey, email, dataExtenso, resumoHtml, urlBoletim);
+      enviados++;
+    } catch (e) {
+      console.warn(`[boletim] Aviso: falha ao enviar e-mail do boletim para ${email}: ${e.message}`);
+    }
+  }
+  console.log(`[boletim] E-mail enviado para ${enviados}/${emails.length} assinante(s).`);
+}
+
 // ---------- Retenção: apaga boletins com mais de 7 dias ----------
 // Reconciliação (parte 2): o caminho inverso do de cima — se um arquivo
 // foi apagado manualmente da pasta (ex: durante um teste), a entrada dele
@@ -484,7 +608,7 @@ function reconciliarComPasta(indiceAtual) {
 }
 
 // ---------- Execução principal ----------
-function main() {
+async function main() {
   fs.mkdirSync(PASTA_BOLETINS, { recursive: true });
 
   const agora = agoraSaoPaulo();
@@ -547,6 +671,11 @@ function main() {
 
   fs.writeFileSync(caminhoIndice, JSON.stringify(indiceAtual, null, 2), 'utf-8');
   console.log(`[boletim] Índice atualizado: boletins/index.json (${indiceAtual.length} boletim(ns) na semana)`);
+
+  await notificarAssinantes({ dataExtenso, nomeArquivo, indices });
 }
 
-main();
+main().catch(erro => {
+  console.error('[boletim] Erro fatal:', erro);
+  process.exit(1);
+});
