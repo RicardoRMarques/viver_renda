@@ -4912,9 +4912,22 @@
       const veioDaFundamentalista = parametrosUrl.get('view') === 'fundamentos';
       const veioDoGrafico = parametrosUrl.get('grafico') === '1';
       if (tickerDaUrl && !veioDaFundamentalista && !veioDoGrafico) {
-        inputTicker.value = tickerDaUrl.toUpperCase();
-        document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        hgBuscarAtivo();
+        // Espera a página terminar de carregar de verdade (imagens acima,
+        // como notícias e gráficos, ainda empurram o layout se a gente
+        // rolar cedo demais) — mesmo ajuste já usado na seção "Consultar
+        // gráfico de um ativo", que tinha esse mesmo problema.
+        const executarAutoLoadConsulta = () => {
+          inputTicker.value = tickerDaUrl.toUpperCase();
+          setTimeout(() => {
+            document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            hgBuscarAtivo();
+          }, 150);
+        };
+        if (document.readyState === 'complete') {
+          executarAutoLoadConsulta();
+        } else {
+          window.addEventListener('load', executarAutoLoadConsulta, { once: true });
+        }
       }
     })();
 
@@ -7844,9 +7857,18 @@
       const tickerDaUrlFund = parametrosUrlFund.get('ticker');
       const veioDaFundamentalista = parametrosUrlFund.get('view') === 'fundamentos';
       if (tickerDaUrlFund && veioDaFundamentalista) {
-        inputFund.value = tickerDaUrlFund.toUpperCase();
-        document.getElementById('analise-fundamentalista')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        buscarFundamentos();
+        const executarAutoLoadFund = () => {
+          inputFund.value = tickerDaUrlFund.toUpperCase();
+          setTimeout(() => {
+            document.getElementById('analise-fundamentalista')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            buscarFundamentos();
+          }, 150);
+        };
+        if (document.readyState === 'complete') {
+          executarAutoLoadFund();
+        } else {
+          window.addEventListener('load', executarAutoLoadFund, { once: true });
+        }
       }
     })();
 
