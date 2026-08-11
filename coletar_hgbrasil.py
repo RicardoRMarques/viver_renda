@@ -560,19 +560,28 @@ def coletar_selic_bcb():
     'taxes' da HG Brasil, que pode demorar bem mais para refletir um corte
     ou alta recém-anunciados. Pega os últimos 5 valores e usa o mais
     recente (a Selic só muda em dias de reunião do Copom, então o
-    'último' costume ficar vários dias/semanas parado, é esperado)."""
-    try:
-        resp = requests.get(BCB_SELIC_META_URL, timeout=TIMEOUT)
-        resp.raise_for_status()
-        dados = resp.json()
-        if not dados:
-            return None
-        item = dados[-1]
-        valor = float(item["valor"].replace(",", "."))
-        return {"label": "Selic (meta)", "valor_pct": valor, "referencia": item.get("data")}
-    except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
-        print(f"AVISO: falha ao buscar Selic no Banco Central: {exc}", file=sys.stderr)
-        return None
+    'último' costuma ficar vários dias/semanas parado, é esperado).
+
+    Tenta 2 vezes antes de desistir — evita cair no fallback (HG Brasil,
+    mais lento pra atualizar) só por causa de uma falha de rede passageira."""
+    ultimo_erro = None
+    for tentativa in range(1, 3):
+        try:
+            resp = requests.get(BCB_SELIC_META_URL, timeout=TIMEOUT)
+            resp.raise_for_status()
+            dados = resp.json()
+            if not dados:
+                return None
+            item = dados[-1]
+            valor = float(item["valor"].replace(",", "."))
+            print(f"OK: Selic obtida do Banco Central (SGS 432): {valor}% (referência: {item.get('data')}).")
+            return {"label": "Selic (meta)", "valor_pct": valor, "referencia": item.get("data")}
+        except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
+            ultimo_erro = exc
+            if tentativa < 2:
+                print(f"AVISO: tentativa {tentativa} de buscar Selic no Banco Central falhou ({exc}); tentando de novo...", file=sys.stderr)
+    print(f"AVISO: falha ao buscar Selic no Banco Central após 2 tentativas: {ultimo_erro}", file=sys.stderr)
+    return None
 
 
 def coletar_ipca():
@@ -678,9 +687,11 @@ def coletar_indices(token):
     indices = [item for item in indices if item.get("label") != "Selic (meta)"]
     selic = coletar_selic_bcb()
     if not selic and token:
-        print("AVISO: Selic do Banco Central falhou — tentando reaproveitar da HG Brasil como fallback.", file=sys.stderr)
+        print("AVISO: Selic do Banco Central falhou — tentando reaproveitar da HG Brasil como fallback (pode estar desatualizada).", file=sys.stderr)
         try:
             selic = next((item for item in coletar_indices_hgbrasil(token) if item.get("label") == "Selic (meta)"), None)
+            if selic:
+                print(f"AVISO: Selic usada foi a da HG Brasil (fallback): {selic.get('valor_pct')}% — confira se está desatualizada.", file=sys.stderr)
         except (requests.RequestException, ValueError, KeyError):
             selic = None
 
