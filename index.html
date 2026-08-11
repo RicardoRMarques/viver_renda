@@ -3899,6 +3899,7 @@
     // Escopo global (fora das IIFEs abaixo) para ser usada por todos os
     // widgets da página (busca rápida, índices/sparkline, análise fundamentalista).
     const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
+    const WORKER_BOLSAI_ENDPOINT = 'https://viverderenda-bolsai.marquesr.workers.dev'; // Worker que esconde a chave da bolsai (indicadores avançados)
     const CHAVE_TWELVEDATA = '034d1589162e413d9a1e9608860cb06a'; // fallback p/ Stocks/ETFs internacionais quando não é ticker da B3 — plano free (800 req/dia, 8/min)
 
     // ============================================================
@@ -11082,7 +11083,6 @@
       // te mandei junto). Sem isso configurado, o chat mostra um aviso em
       // vez de travar/quebrar.
       const CHAT_IA_ENDPOINT = 'https://viverderenda-chat.marquesr.workers.dev'; // Worker gratuito (Workers AI da Cloudflare)
-    const WORKER_BOLSAI_ENDPOINT = 'https://viverderenda-bolsai.marquesr.workers.dev'; // Worker que esconde a chave da bolsai (indicadores avançados)
 
       const botao = document.getElementById('chatIaBotao');
       const painel = document.getElementById('chatIaPainel');
