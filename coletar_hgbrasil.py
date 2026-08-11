@@ -554,49 +554,55 @@ def coletar_indices_hgbrasil(token):
     return indices
 
 
+def _requisitar_bcb_com_retry(url, tentativas=2):
+    """GET genérico com retry pras APIs do Banco Central (SGS) — usado por
+    Selic, IPCA e IPCA 12m. O BCB às vezes cai/retorna 502 por alguns
+    minutos (instabilidade deles, não do nosso lado); 2 tentativas cobrem
+    bem esse tipo de falha passageira sem exigir mudar cada função."""
+    ultimo_erro = None
+    for tentativa in range(1, tentativas + 1):
+        try:
+            resp = requests.get(url, timeout=TIMEOUT)
+            resp.raise_for_status()
+            return resp.json()
+        except (requests.RequestException, ValueError) as exc:
+            ultimo_erro = exc
+            if tentativa < tentativas:
+                print(f"AVISO: tentativa {tentativa} de acessar o Banco Central falhou ({exc}); tentando de novo...", file=sys.stderr)
+    raise ultimo_erro
+
+
 def coletar_selic_bcb():
     """Meta da Selic definida pelo Copom, via API pública do Banco Central
     (série SGS 432) — atualiza no mesmo dia da decisão, diferente do campo
     'taxes' da HG Brasil, que pode demorar bem mais para refletir um corte
     ou alta recém-anunciados. Pega os últimos 5 valores e usa o mais
     recente (a Selic só muda em dias de reunião do Copom, então o
-    'último' costuma ficar vários dias/semanas parado, é esperado).
-
-    Tenta 2 vezes antes de desistir — evita cair no fallback (HG Brasil,
-    mais lento pra atualizar) só por causa de uma falha de rede passageira."""
-    ultimo_erro = None
-    for tentativa in range(1, 3):
-        try:
-            resp = requests.get(BCB_SELIC_META_URL, timeout=TIMEOUT)
-            resp.raise_for_status()
-            dados = resp.json()
-            if not dados:
-                return None
-            item = dados[-1]
-            valor = float(item["valor"].replace(",", "."))
-            print(f"OK: Selic obtida do Banco Central (SGS 432): {valor}% (referência: {item.get('data')}).")
-            return {"label": "Selic (meta)", "valor_pct": valor, "referencia": item.get("data")}
-        except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
-            ultimo_erro = exc
-            if tentativa < 2:
-                print(f"AVISO: tentativa {tentativa} de buscar Selic no Banco Central falhou ({exc}); tentando de novo...", file=sys.stderr)
-    print(f"AVISO: falha ao buscar Selic no Banco Central após 2 tentativas: {ultimo_erro}", file=sys.stderr)
-    return None
+    'último' costuma ficar vários dias/semanas parado, é esperado)."""
+    try:
+        dados = _requisitar_bcb_com_retry(BCB_SELIC_META_URL)
+        if not dados:
+            return None
+        item = dados[-1]
+        valor = float(item["valor"].replace(",", "."))
+        print(f"OK: Selic obtida do Banco Central (SGS 432): {valor}% (referência: {item.get('data')}).")
+        return {"label": "Selic (meta)", "valor_pct": valor, "referencia": item.get("data")}
+    except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
+        print(f"AVISO: falha ao buscar Selic no Banco Central após tentativas: {exc}", file=sys.stderr)
+        return None
 
 
 def coletar_ipca():
     """Variação mensal do IPCA, via API pública do Banco Central (série SGS 433)."""
     try:
-        resp = requests.get(BCB_IPCA_URL, timeout=TIMEOUT)
-        resp.raise_for_status()
-        dados = resp.json()
+        dados = _requisitar_bcb_com_retry(BCB_IPCA_URL)
         if not dados:
             return None
         item = dados[-1]
         valor = float(item["valor"].replace(",", "."))
         return {"label": "IPCA (mensal)", "valor_pct": valor, "referencia": item.get("data")}
     except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
-        print(f"AVISO: falha ao buscar IPCA no Banco Central: {exc}", file=sys.stderr)
+        print(f"AVISO: falha ao buscar IPCA no Banco Central após tentativas: {exc}", file=sys.stderr)
         return None
 
 
@@ -607,9 +613,7 @@ def coletar_ipca_12_meses():
     do acumulado desde janeiro do ano corrente, que só reflete o ano
     calendário e distorce muito se anualizado no meio do ano."""
     try:
-        resp = requests.get(BCB_IPCA_12M_URL, timeout=TIMEOUT)
-        resp.raise_for_status()
-        dados = resp.json()
+        dados = _requisitar_bcb_com_retry(BCB_IPCA_12M_URL)
         if not dados:
             return None
 
