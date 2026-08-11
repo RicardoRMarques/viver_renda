@@ -93,6 +93,7 @@
     #grafico-consulta,
     #boletim-indices-secao,
     #consulta-rapida,
+    #analise-fundamentalista,
     #boletins-semana,
     #alertas-preco,
     #educacao {
@@ -2253,8 +2254,10 @@
       <a href="#alertas-preco" class="mobile-menu-item">🔔 Meus Alertas de Preço</a>
       <a href="#simuladorVisual" class="mobile-menu-item">📈 Veja o poder dos juros compostos</a>
       <a href="#educacao" class="mobile-menu-item">🎓 Educação</a>
-      <div class="mobile-menu-separador">Simuladores</div>
+      <div class="mobile-menu-separador">Consultas</div>
       <a href="#consulta-rapida" class="mobile-menu-item">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
+      <a href="#analise-fundamentalista" class="mobile-menu-item">📊 Consulta Ações — Análise Fundamentalista</a>
+      <div class="mobile-menu-separador">Simuladores</div>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário de FIIs e Ações</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
@@ -7865,7 +7868,7 @@
           const botaoInfo = AJUDA_FUND[rotulo]
             ? ` <button type="button" class="hg-info-btn" data-indicador="${rotulo}" aria-label="O que é ${rotulo}?" title="O que é ${rotulo}?">?</button>`
             : '';
-          return `<tr><th scope="row">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
+          return `<tr><th scope="row" style="text-align:left; padding:6px 10px; font-family:inherit; font-weight:700; white-space:nowrap; border-top:1px solid var(--border); position:sticky; left:0; background:var(--deep); z-index:1;">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
         }).join('');
 
         const cabecalhoHtml = colunas.map(c => `<th>${c.rotulo}</th>`).join('');
@@ -7893,7 +7896,7 @@
               </button>
             </div>
             <div class="hg-tabela-scroll" style="overflow-x:auto;">
-              <table class="hg-tabela-fundamentos" style="width:100%; border-collapse:collapse; font-family:'Courier New', monospace; font-size:0.85rem;">
+              <table class="hg-tabela-fundamentos" style="width:100%; min-width:560px; border-collapse:collapse; font-family:'Courier New', monospace; font-size:0.85rem;">
                 <thead>
                   <tr>
                     <th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit; position:sticky; left:0; background:var(--deep); z-index:2;">Indicador</th>
@@ -7901,7 +7904,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  ${linhasHtml.replace(/<th scope="row">/g, '<th scope="row" style="text-align:left; padding:6px 10px; font-family:inherit; font-weight:700; white-space:nowrap; border-top:1px solid var(--border); position:sticky; left:0; background:var(--deep); z-index:1;">').replace(/<td>/g, '<td style="text-align:right; padding:6px 10px; border-top:1px solid var(--border);">')}
+                  ${linhasHtml.replace(/<td>/g, '<td style="text-align:right; padding:6px 10px; border-top:1px solid var(--border);">')}
                 </tbody>
               </table>
             </div>
