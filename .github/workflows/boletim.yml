@@ -44,6 +44,12 @@ jobs:
       # aqui os passos que geram esses 3 arquivos antes de continuar.
       # -----------------------------------------------------------------
       - name: Gerar o boletim do dia
+        env:
+          # Notificação por e-mail dos assinantes do boletim (opt-in) —
+          # mesmas credenciais já usadas pelo robô de Alertas de Preço.
+          # Se não estiverem configuradas, o script pula essa etapa sozinho.
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: node robo-boletim/gerar-boletim.js
 
       - name: Commitar e enviar o boletim gerado
