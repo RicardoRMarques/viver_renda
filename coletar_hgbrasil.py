@@ -36,6 +36,7 @@ import os
 import random
 import re
 import sys
+import time
 import xml.etree.ElementTree as ET
 from datetime import date, datetime, timezone
 
@@ -554,21 +555,33 @@ def coletar_indices_hgbrasil(token):
     return indices
 
 
-def _requisitar_bcb_com_retry(url, tentativas=2):
+def _requisitar_bcb_com_retry(url, tentativas=3):
     """GET genérico com retry pras APIs do Banco Central (SGS) — usado por
     Selic, IPCA e IPCA 12m. O BCB às vezes cai/retorna 502 por alguns
-    minutos (instabilidade deles, não do nosso lado); 2 tentativas cobrem
-    bem esse tipo de falha passageira sem exigir mudar cada função."""
+    minutos (instabilidade deles, não do nosso lado); múltiplas tentativas
+    com uma pequena pausa entre elas cobrem bem esse tipo de falha
+    passageira sem exigir mudar cada função.
+
+    Manda um User-Agent de navegador (igual já fazemos com os feeds RSS) —
+    é possível que requisições sem esse cabeçalho, vindas de um datacenter
+    como o do GitHub Actions, sejam tratadas como tráfego suspeito por
+    algum proxy/CDN na frente da API do BCB e recebam 502 por causa disso."""
+    headers_bcb = {
+        "User-Agent": HEADERS_NAVEGADOR["User-Agent"],
+        "Accept": "application/json",
+        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+    }
     ultimo_erro = None
     for tentativa in range(1, tentativas + 1):
         try:
-            resp = requests.get(url, timeout=TIMEOUT)
+            resp = requests.get(url, timeout=TIMEOUT, headers=headers_bcb)
             resp.raise_for_status()
             return resp.json()
         except (requests.RequestException, ValueError) as exc:
             ultimo_erro = exc
             if tentativa < tentativas:
-                print(f"AVISO: tentativa {tentativa} de acessar o Banco Central falhou ({exc}); tentando de novo...", file=sys.stderr)
+                print(f"AVISO: tentativa {tentativa} de acessar o Banco Central falhou ({exc}); tentando de novo em 2s...", file=sys.stderr)
+                time.sleep(2)
     raise ultimo_erro
 
 
