@@ -7872,6 +7872,9 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                 <span class="hg-btn-compartilhar-texto">Compartilhar</span>
               </button>
+              <button type="button" class="hg-btn-secundario-pequeno" id="hgFundBtnAvancados" title="Buscar indicadores extras (P/L, ROE, ROIC, margens...) via bolsai">
+                📊 Indicadores Avançados
+              </button>
             </div>
             <div class="hg-tabela-scroll" style="overflow-x:auto;">
               <table class="hg-tabela-fundamentos" style="width:100%; border-collapse:collapse; font-family:'Courier New', monospace; font-size:0.85rem;">
@@ -7889,7 +7892,13 @@
             <p style="margin-top:12px; font-size:0.78rem; color:var(--muted);">
               Fonte: HG Brasil · Período: anual (TTM = últimos 12 meses acumulados).
             </p>
+            <div id="hgFundAvancados"></div>
           </div>`;
+
+        const btnAvancados = document.getElementById('hgFundBtnAvancados');
+        if (btnAvancados) {
+          btnAvancados.addEventListener('click', () => buscarIndicadoresAvancados(info.symbol, btnAvancados));
+        }
 
         const btnCompartilharFund = document.getElementById('hgFundBtnCompartilhar');
         if (btnCompartilharFund) {
@@ -7898,6 +7907,73 @@
           );
         }
         ativarTooltipsFundamentos();
+      }
+
+      // Mapeia os campos técnicos da bolsai pra rótulos legíveis, com o
+      // formato certo pra cada um (% ou número puro).
+      const CAMPOS_BOLSAI = [
+        ['pl', 'P/L', 'num'],
+        ['pvp', 'P/VP', 'num'],
+        ['ev_ebitda', 'EV/EBITDA', 'num'],
+        ['ev_ebit', 'EV/EBIT', 'num'],
+        ['roe', 'ROE', 'pct'],
+        ['roa', 'ROA', 'pct'],
+        ['roic', 'ROIC', 'pct'],
+        ['gross_margin', 'Margem Bruta', 'pct'],
+        ['ebitda_margin', 'Margem EBITDA', 'pct'],
+        ['net_margin', 'Margem Líquida', 'pct'],
+        ['debt_equity', 'Dívida/Patrimônio', 'num'],
+        ['net_debt_ebitda', 'Dívida Líq./EBITDA', 'num'],
+        ['current_ratio', 'Liquidez Corrente', 'num'],
+        ['cagr_revenue_5y', 'CAGR Receita (5a)', 'pct'],
+        ['cagr_earnings_5y', 'CAGR Lucro (5a)', 'pct'],
+      ];
+
+      function fmtBolsai(valor, formato) {
+        if (typeof valor !== 'number') return '—';
+        if (formato === 'pct') return `${hgFormatNumero(valor)}%`;
+        return hgFormatNumero(valor);
+      }
+
+      async function buscarIndicadoresAvancados(ticker, botao) {
+        const container = document.getElementById('hgFundAvancados');
+        if (!container) return;
+
+        botao.disabled = true;
+        const textoOriginal = botao.textContent;
+        botao.textContent = 'Buscando...';
+        container.innerHTML = '<p class="hg-status" style="margin-top:14px;">Buscando indicadores avançados...</p>';
+
+        try {
+          const url = `${WORKER_BOLSAI_ENDPOINT}/?ticker=${encodeURIComponent(ticker)}`;
+          const resp = await fetch(url);
+          const dados = await resp.json();
+
+          if (!resp.ok) {
+            throw new Error(dados?.error || 'Não foi possível buscar os indicadores avançados agora.');
+          }
+
+          const linhasHtml = CAMPOS_BOLSAI.map(([campo, rotulo, formato]) => `
+            <div>
+              <span>${rotulo}</span>
+              <strong>${fmtBolsai(dados[campo], formato)}</strong>
+            </div>`).join('');
+
+          container.innerHTML = `
+            <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+              <div class="hg-grupo-titulo" style="margin-top:0;">📊 Indicadores Avançados (bolsai)</div>
+              <div class="hg-grid-dados">${linhasHtml}</div>
+              <p style="margin-top:10px; font-size:0.74rem; color:var(--muted);">
+                Fonte: bolsai (B3/CVM) · Referência: ${dados.reference_date || '—'}.
+              </p>
+            </div>`;
+        } catch (e) {
+          container.innerHTML = `<p class="hg-status erro" style="margin-top:14px;">${e.message || 'Erro ao buscar indicadores avançados.'}</p>`;
+          console.error('Erro nos indicadores avançados (bolsai):', e);
+        } finally {
+          botao.disabled = false;
+          botao.textContent = textoOriginal;
+        }
       }
 
       btnFund.addEventListener('click', buscarFundamentos);
@@ -11006,6 +11082,7 @@
       // te mandei junto). Sem isso configurado, o chat mostra um aviso em
       // vez de travar/quebrar.
       const CHAT_IA_ENDPOINT = 'https://viverderenda-chat.marquesr.workers.dev'; // Worker gratuito (Workers AI da Cloudflare)
+    const WORKER_BOLSAI_ENDPOINT = 'https://viverderenda-bolsai.marquesr.workers.dev'; // Worker que esconde a chave da bolsai (indicadores avançados)
 
       const botao = document.getElementById('chatIaBotao');
       const painel = document.getElementById('chatIaPainel');
