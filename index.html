@@ -494,15 +494,14 @@
       display: grid;
       grid-template-columns: 1fr 420px;
       gap: 24px;
-      align-items: stretch;
+      align-items: start;
       max-width: 1100px;
       margin: 0 auto;
     }
     .coluna-consultas { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-    .coluna-boletim-canto { min-width: 0; position: sticky; top: 90px; }
+    .coluna-boletim-canto { min-width: 0; }
     @media (max-width: 900px) {
       .consultas-boletim-grid { grid-template-columns: 1fr; }
-      .coluna-boletim-canto { position: static; }
     }
 
     /* Versão compacta das consultas, usada quando ficam ao lado do boletim */
@@ -1056,8 +1055,8 @@
     .boletim-panel {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 28px;
+      border-radius: 20px;
+      padding: 20px;
       box-shadow: var(--shadow);
       height: 100%;
     }
@@ -2582,7 +2581,7 @@
           <span><span class="hg-grafico-legenda-cor" style="background:#31c3ff;"></span>Fase de aportes</span>
           <span><span class="hg-grafico-legenda-cor" style="background:#ffb84d;"></span>Fase de retirada</span>
         </div>
-        <div class="hg-grafico-wrap" style="height:280px;">
+        <div class="hg-grafico-wrap" style="height:220px;">
           <canvas id="svChart" role="img" aria-label="Gráfico de área mostrando o patrimônio crescendo na fase de aportes e depois subindo, estabilizando ou caindo na fase de retirada, dependendo da taxa de retirada escolhida em relação ao rendimento">Gráfico de evolução do patrimônio com aportes e depois retirada mensal.</canvas>
         </div>
         <p class="hg-status erro" id="svAvisoEsgotamento" style="margin-top:10px;" hidden></p>
