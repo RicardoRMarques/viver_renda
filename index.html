@@ -1166,7 +1166,7 @@
       display: grid;
       grid-template-columns: 1.3fr 1fr;
       gap: 24px;
-      align-items: start;
+      align-items: stretch;
     }
     @media (max-width: 800px) {
       .noticias-editorial { grid-template-columns: 1fr; }
@@ -1219,7 +1219,9 @@
     }
 
     .noticia-destaque {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
       text-decoration: none;
       color: inherit;
     }
@@ -1227,7 +1229,8 @@
       position: relative;
       border-radius: 12px;
       overflow: hidden;
-      height: 260px;
+      flex: 1 1 auto;
+      min-height: 260px;
       background: var(--deep);
     }
     .noticia-destaque-imagem-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
