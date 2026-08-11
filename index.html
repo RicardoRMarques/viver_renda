@@ -2288,6 +2288,13 @@
           <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
             <p class="calc-ajuda" style="margin:0 0 10px;">★ Seus ativos favoritos ficam sincronizados automaticamente aqui — o mesmo favoritar que você já usa na Consulta Rápida.</p>
           </div>
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.85rem;">
+              <input type="checkbox" id="authAssinarBoletim" style="width:auto; flex-shrink:0;" />
+              📩 Quero receber o Boletim de Mercado por e-mail (seg. a sex., de manhã)
+            </label>
+            <p id="authAssinarBoletimStatus" class="calc-ajuda" style="margin-top:6px;"></p>
+          </div>
           <button type="button" class="hg-btn-secundario-pequeno" id="authBtnSair" style="width:100%; margin-top:14px; padding:10px;">Sair da conta</button>
         </div>
       </div>
@@ -7103,6 +7110,8 @@
       const emailLogadoEl = document.getElementById('authEmailLogado');
       const btnSair = document.getElementById('authBtnSair');
       const labelMobile = document.getElementById('authMobileLabel');
+      const checkboxBoletim = document.getElementById('authAssinarBoletim');
+      const statusBoletim = document.getElementById('authAssinarBoletimStatus');
 
       function abrirModalAuth() { overlay.hidden = false; }
       function fecharModalAuth() { overlay.hidden = true; mensagemEl.textContent = ''; }
@@ -7112,6 +7121,52 @@
       btnFechar?.addEventListener('click', fecharModalAuth);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModalAuth(); });
 
+      // Busca se o usuário logado já é assinante do boletim por e-mail, e
+      // marca/desmarca o checkbox de acordo (silencioso se a tabela ainda
+      // não existir — trata como "não assinante" sem quebrar nada).
+      async function carregarAssinaturaBoletim(userId) {
+        if (!checkboxBoletim) return;
+        const cliente = obterSupabaseClient();
+        if (!cliente) return;
+        try {
+          const { data, error } = await cliente
+            .from('assinantes_boletim')
+            .select('ativo')
+            .eq('user_id', userId)
+            .maybeSingle();
+          if (error) throw error;
+          checkboxBoletim.checked = !!data?.ativo;
+        } catch (e) {
+          console.warn('Supabase: não foi possível checar a assinatura do boletim (tabela existe?).', e);
+          checkboxBoletim.checked = false;
+        }
+      }
+
+      checkboxBoletim?.addEventListener('change', async () => {
+        const cliente = obterSupabaseClient();
+        if (!cliente) return;
+        const { data: { session } } = await cliente.auth.getSession();
+        if (!session?.user) return;
+
+        checkboxBoletim.disabled = true;
+        statusBoletim.textContent = 'Salvando...';
+        try {
+          const { error } = await cliente
+            .from('assinantes_boletim')
+            .upsert({ user_id: session.user.id, ativo: checkboxBoletim.checked });
+          if (error) throw error;
+          statusBoletim.textContent = checkboxBoletim.checked
+            ? 'Pronto! Você vai receber o boletim por e-mail.'
+            : 'Ok, você não vai mais receber o boletim por e-mail.';
+        } catch (e) {
+          statusBoletim.textContent = 'Não foi possível salvar agora. Tente de novo.';
+          checkboxBoletim.checked = !checkboxBoletim.checked; // desfaz visualmente
+          console.error(e);
+        } finally {
+          checkboxBoletim.disabled = false;
+        }
+      });
+
       function atualizarUIAuth(session) {
         const logado = !!session?.user;
         if (estadoDeslogado) estadoDeslogado.hidden = logado;
@@ -7120,6 +7175,7 @@
         if (logado && emailLogadoEl) emailLogadoEl.textContent = session.user.email;
         if (btnAbrir) { btnAbrir.textContent = apelido; btnAbrir.classList.toggle('auth-logado', logado); }
         if (labelMobile) labelMobile.textContent = apelido;
+        if (logado) carregarAssinaturaBoletim(session.user.id);
         // Limpa qualquer #access_token=... (ou # sobrando) da barra de
         // endereço depois de processar o login — evita que um "#" fique
         // pendurado e vire "##" da próxima vez que alguém pedir um link.
