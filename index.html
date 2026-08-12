@@ -4484,12 +4484,11 @@
                 <div class="hg-grafico-topo">
                   <div class="hg-grafico-titulo">Cotação — <span id="hgGraficoPeriodoLabel">30 dias</span></div>
                   <div class="hg-periodo-tabs" id="hgPeriodoTabs">
-                    <button type="button" class="hg-periodo-tab" data-periodo="1D">1D</button>
-                    <button type="button" class="hg-periodo-tab" data-periodo="7D">7D</button>
                     <button type="button" class="hg-periodo-tab hg-periodo-ativo" data-periodo="30D">30D</button>
                     <button type="button" class="hg-periodo-tab" data-periodo="6M">6M</button>
                     <button type="button" class="hg-periodo-tab" data-periodo="YTD">YTD</button>
                     <button type="button" class="hg-periodo-tab" data-periodo="1A">1A</button>
+                    <button type="button" class="hg-periodo-tab" data-periodo="5A">5A</button>
                   </div>
                 </div>
                 <div id="hgGrafico">
@@ -4507,11 +4506,11 @@
                 </div>
                 <span class="hg-investido-texto">há</span>
                 <select id="hgInvestidoPeriodo" class="hg-investido-select">
-                  <option value="7D">7 dias</option>
                   <option value="30D" selected>30 dias</option>
                   <option value="6M">6 meses</option>
                   <option value="YTD">este ano (YTD)</option>
                   <option value="1A">1 ano</option>
+                  <option value="5A">5 anos</option>
                 </select>
                 <span class="hg-investido-texto">hoje você teria</span>
                 <strong id="hgInvestidoResultado" class="hg-investido-resultado">—</strong>
@@ -4631,22 +4630,49 @@
       let hgUltimoTickerGrafico = null;
       const hgCacheHistorico = {}; // periodo -> amostras
 
-      // Calcula start_date/sample_by pra cada período disponível. Só vai até
-      // 1 ano — a HG Brasil não tem profundidade histórica confiável de
-      // vários anos (5A/10A/15A), então não oferecemos esses períodos pra
-      // não mostrar um gráfico vazio/quebrado.
+      // Calcula a data de início de cada período. A bolsai entrega histórico
+      // DIÁRIO (um registro por pregão), então não há mais sample_by nem
+      // períodos intradiários (1D/7D foram removidos por isso).
+      // O limit é dimensionado em pregões (~21 por mês) com folga.
       function hgParametrosPeriodo(periodo) {
         const hoje = new Date();
         const inicio = new Date();
         switch (periodo) {
-          case '1D': inicio.setDate(hoje.getDate() - 1); return { inicio, sampleBy: '15m' };
-          case '7D': inicio.setDate(hoje.getDate() - 7); return { inicio, sampleBy: '1h' };
-          case '30D': inicio.setDate(hoje.getDate() - 30); return { inicio, sampleBy: '1d' };
-          case '6M': inicio.setDate(hoje.getDate() - 182); return { inicio, sampleBy: '1d' };
-          case 'YTD': return { inicio: new Date(hoje.getFullYear(), 0, 1), sampleBy: '1d' };
-          case '1A': inicio.setDate(hoje.getDate() - 365); return { inicio, sampleBy: '1d' };
-          default: inicio.setDate(hoje.getDate() - 30); return { inicio, sampleBy: '1d' };
+          case '30D': inicio.setDate(hoje.getDate() - 30); return { inicio, limit: 40 };
+          case '6M': inicio.setDate(hoje.getDate() - 182); return { inicio, limit: 140 };
+          case 'YTD': return { inicio: new Date(hoje.getFullYear(), 0, 1), limit: 260 };
+          case '1A': inicio.setDate(hoje.getDate() - 365); return { inicio, limit: 260 };
+          case '5A': inicio.setDate(hoje.getDate() - 365 * 5); return { inicio, limit: 1300 };
+          default: inicio.setDate(hoje.getDate() - 30); return { inicio, limit: 40 };
         }
+      }
+
+      // Busca o histórico de preços na bolsai (via Worker, que esconde a
+      // chave). A bolsai retorna do mais recente pro mais antigo, e usa
+      // `trade_date`/`adjusted_close` — aqui normalizamos para o mesmo
+      // formato {date, close} que o resto do código já esperava, em ordem
+      // cronológica crescente. Prefere o preço ajustado (split/bonificação/
+      // dividendo) quando disponível, com fallback pro close bruto.
+      async function hgBuscarHistoricoPrecos(ticker, periodo) {
+        const { inicio, limit } = hgParametrosPeriodo(periodo);
+        const hoje = new Date();
+        const simbolo = String(ticker || '').replace(/^B3:/i, '').toUpperCase();
+
+        const url = `${WORKER_BOLSAI_ENDPOINT}/?ticker=${encodeURIComponent(simbolo)}&mode=prices`
+          + `&start=${hgDataYYYYMMDD(inicio)}&end=${hgDataYYYYMMDD(hoje)}&limit=${limit}`;
+
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data?.error || `HTTP ${resp.status}`);
+
+        const precos = Array.isArray(data?.prices) ? data.prices : [];
+        return precos
+          .map(p => ({
+            date: p.trade_date,
+            close: typeof p.adjusted_close === 'number' ? p.adjusted_close : p.close,
+          }))
+          .filter(p => typeof p.close === 'number' && p.date)
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
       }
 
       async function hgCarregarGrafico(ticker, periodo) {
@@ -4654,15 +4680,9 @@
         if (!container) return;
         hgUltimoTickerGrafico = ticker;
 
-        const { inicio, sampleBy } = hgParametrosPeriodo(periodo);
-        const hoje = new Date();
-
         try {
-          const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent(ticker)}&sample_by=${sampleBy}&start_date=${hgDataYYYYMMDD(inicio)}&end_date=${hgDataYYYYMMDD(hoje)}&key=${encodeURIComponent(CHAVE_HG)}`;
-          const resp = await fetch(url);
-          const data = await resp.json();
+          const amostras = await hgBuscarHistoricoPrecos(ticker, periodo);
 
-          const amostras = data?.results?.[0]?.samples;
           if (!Array.isArray(amostras) || amostras.length < 2) {
             container.innerHTML = '<svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Sem histórico suficiente para este período</text></svg>';
             hgCacheHistorico[periodo] = null;
@@ -4670,12 +4690,12 @@
           }
 
           hgCacheHistorico[periodo] = amostras;
-          hgDesenharGrafico(container, amostras);
+          hgDesenharGrafico(container, amostras, periodo);
           hgAtualizarInvestido();
         } catch (e) {
           container.innerHTML = '<svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Gráfico indisponível agora</text></svg>';
           hgCacheHistorico[periodo] = null;
-          console.error('Erro ao carregar histórico HG Brasil:', e);
+          console.error('Erro ao carregar histórico de preços (bolsai):', e);
         }
       }
 
@@ -4685,7 +4705,7 @@
         const labelEl = document.getElementById('hgGraficoPeriodoLabel');
         if (!container) return;
 
-        const NOMES_PERIODO = { '1D': '1 dia', '7D': '7 dias', '30D': '30 dias', '6M': '6 meses', 'YTD': 'este ano', '1A': '1 ano' };
+        const NOMES_PERIODO = { '30D': '30 dias', '6M': '6 meses', 'YTD': 'este ano', '1A': '1 ano', '5A': '5 anos' };
 
         container.querySelectorAll('.hg-periodo-tab').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -4723,13 +4743,8 @@
 
         if (amostras === undefined) {
           resultadoElInvestido.textContent = 'calculando...';
-          const { inicio, sampleBy } = hgParametrosPeriodo(periodo);
-          const hoje = new Date();
           try {
-            const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent(hgUltimoTickerGrafico)}&sample_by=${sampleBy}&start_date=${hgDataYYYYMMDD(inicio)}&end_date=${hgDataYYYYMMDD(hoje)}&key=${encodeURIComponent(CHAVE_HG)}`;
-            const resp = await fetch(url);
-            const data = await resp.json();
-            amostras = data?.results?.[0]?.samples || null;
+            amostras = await hgBuscarHistoricoPrecos(hgUltimoTickerGrafico, periodo);
           } catch (e) {
             amostras = null;
           }
@@ -4774,14 +4789,20 @@
         return d;
       }
 
-      function hgFormatDataCurta(valor) {
+      function hgFormatDataCurta(valor, periodo) {
         if (!valor) return '';
         const d = new Date(valor);
         if (isNaN(d.getTime())) return '';
+        if (periodo === '5A') {
+          return d.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+        }
+        if (periodo === '1A' || periodo === '6M') {
+          return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        }
         return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
       }
 
-      function hgDesenharGrafico(container, amostras) {
+      function hgDesenharGrafico(container, amostras, periodo) {
         const larguraTotal = 640;
         const alturaTotal = 260;
         const margemEsq = 58;
@@ -4817,8 +4838,8 @@
         const pathLinha = hgSuavizarLinha(pontos);
         const pathArea = `${pathLinha} L ${pontos[pontos.length - 1].x.toFixed(2)},${margemTop + altura} L ${pontos[0].x.toFixed(2)},${margemTop + altura} Z`;
 
-        // Grade horizontal (4 níveis) com rótulo de preço em cada linha
-        const niveisGrade = 4;
+        // Grade horizontal (5 níveis) com rótulo de preço em cada linha.
+        const niveisGrade = 5;
         let gradeSvg = '';
         for (let i = 0; i <= niveisGrade; i++) {
           const valorNivel = minimo + (amplitude * i / niveisGrade);
@@ -4828,15 +4849,25 @@
             <text x="${margemEsq - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" class="hg-grafico-eixo-label">${hgFormatCompacto(valorNivel)}</text>`;
         }
 
-        // Rótulos de data: início, meio e fim do período
-        const idxMeio = Math.floor((fechamentos.length - 1) / 2);
-        const datasLabel = [0, idxMeio, fechamentos.length - 1].map(i => ({
-          x: paraX(i),
-          texto: hgFormatDataCurta(validas[i]?.data) || (i === fechamentos.length - 1 ? 'Hoje' : ''),
-        }));
-        const datasSvg = datasLabel.map(d => d.texto ? `
-          <text x="${d.x.toFixed(1)}" y="${alturaTotal - 8}" text-anchor="middle" class="hg-grafico-eixo-label">${d.texto}</text>
-        ` : '').join('');
+        // Rótulos de data/hora no eixo X: até 5 marcações bem espaçadas
+        // (menos quando há poucas amostras, pra não repetir/sobrepor).
+        // Formato se adapta ao período: hora no 1D, dia da semana no 7D,
+        // DD/MM nos períodos médios, DD/MM/AA no 1A.
+        const qtdAmostras = fechamentos.length;
+        const qtdLabels = Math.min(5, qtdAmostras);
+        const indicesLabel = qtdLabels <= 1
+          ? [0]
+          : Array.from({ length: qtdLabels }, (_, k) => Math.round((k / (qtdLabels - 1)) * (qtdAmostras - 1)));
+        const indicesUnicos = [...new Set(indicesLabel)];
+        const datasSvg = indicesUnicos.map((i, posicao) => {
+          const texto = hgFormatDataCurta(validas[i]?.data, periodo) || (i === qtdAmostras - 1 ? 'Hoje' : '');
+          if (!texto) return '';
+          const ehPrimeiro = posicao === 0;
+          const ehUltimo = posicao === indicesUnicos.length - 1;
+          const anchor = ehPrimeiro ? 'start' : (ehUltimo ? 'end' : 'middle');
+          const offsetX = ehPrimeiro ? -2 : (ehUltimo ? 2 : 0);
+          return `<text x="${(paraX(i) + offsetX).toFixed(1)}" y="${alturaTotal - 8}" text-anchor="${anchor}" class="hg-grafico-eixo-label">${texto}</text>`;
+        }).join('');
 
         const ultimoPonto = pontos[pontos.length - 1];
 
@@ -4907,7 +4938,7 @@
           textoData.setAttribute('y', (caixaY + 14).toFixed(2));
           textoPreco.setAttribute('x', (caixaX + 8).toFixed(2));
           textoPreco.setAttribute('y', (caixaY + 27).toFixed(2));
-          textoData.textContent = hgFormatDataCurta(validas[i]?.data) || `Dia ${i + 1}`;
+          textoData.textContent = hgFormatDataCurta(validas[i]?.data, periodo) || `Dia ${i + 1}`;
           textoPreco.textContent = `R$ ${formatMoeda(fechamentos[i])}`;
 
           grupoLinha.style.opacity = '1';
