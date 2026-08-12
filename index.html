@@ -63,6 +63,17 @@
       padding: 0;
     }
 
+    /* Trava o scroll horizontal da PÁGINA (body/html). Sem isso, ao arrastar
+       pra rolar a tabela da Análise Fundamentalista de lado, o gesto acaba
+       rolando a página inteira em vez de só a div.hg-tabela-scroll — e como
+       a coluna "Indicador" é sticky em relação a essa div (não à página),
+       ela perde a referência e "sticky" some junto com o resto do conteúdo.
+       overflow-x:auto continua funcionando normalmente dentro das divs que
+       precisam de scroll lateral (como .hg-tabela-scroll), só a página como
+       um todo é que não pode mais rolar de lado. */
+    html {
+      overflow-x: hidden;
+    }
     body {
       font-family: Arial, Helvetica, sans-serif;
       background:
@@ -71,6 +82,8 @@
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
+      overflow-x: hidden;
+      width: 100%;
     }
 
     a {
@@ -7904,7 +7917,7 @@
                 💰 Números do Balanço
               </button>
             </div>
-            <div class="hg-tabela-scroll" style="overflow-x:auto;">
+            <div class="hg-tabela-scroll" style="overflow-x:auto; max-width:100%; -webkit-overflow-scrolling:touch;">
               <table class="hg-tabela-fundamentos" style="width:100%; min-width:560px; border-collapse:separate; border-spacing:0; font-family:'Courier New', monospace; font-size:0.85rem;">
                 <thead>
                   <tr>
