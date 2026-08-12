@@ -7,7 +7,7 @@ diretamente no navegador do visitante), publicando os seguintes arquivos
 na raiz do repositório:
 
 - noticias.json : últimas notícias do mercado (feed RSS, sem token)
-- indices.json  : Ibovespa, IFIX, Dólar, Euro, Bitcoin, Selic (HG Brasil) +
+- indices.json  : Ibovespa, IFIX (brapi), Dólar, Euro, Bitcoin (AwesomeAPI) +
                    IPCA mensal/acumulado no ano (Banco Central) + CPI EUA (BLS)
 - ranking.json  : 6 melhores ações e 6 melhores FIIs do momento (HG Brasil)
 
@@ -124,25 +124,35 @@ BOLSAI_BASE_URL = "https://api.usebolsai.com/api/v1"
 BOLSAI_PAUSA_ENTRE_CHAMADAS = 0.15  # segundos, para não saturar a API
 
 # ------------------------------------------------------------------
-# brapi (brapi.dev) — usada nos índices de mercado do boletim
-# (Ibovespa, IFIX, Dólar, Euro e Bitcoin), substituindo a HG Brasil.
-# Fontes: B3 para índices, BCB/forex para câmbio, provedores crypto
-# para Bitcoin.
+# brapi (brapi.dev) — usada só para os índices da B3 (Ibovespa e IFIX).
+# São 2 requisições por execução (o plano gratuito limita a 1 ticker por
+# chamada em /stocks/quote), ~5,8 mil/mês — folgado no limite de 15 mil.
 #
-# Consumo: 4 requisições por execução do robô. Moedas e cripto aceitam
-# vários itens numa chamada só, mas o plano gratuito limita a 1 ticker
-# por requisição em /stocks/quote — por isso Ibovespa e IFIX vão
-# separados. A 15 min o dia inteiro dá ~384/dia (~11,5 mil/mês), dentro
-# do limite de 15 mil/mês do plano gratuito.
+# Câmbio e cripto NÃO vêm da brapi: os endpoints /v2/currency e
+# /v2/crypto respondem 403 FEATURE_NOT_AVAILABLE no plano gratuito.
+# Ficam na AwesomeAPI (abaixo).
 #
 # Dow Jones e Nasdaq foram removidos do boletim: a brapi cobre só o
-# mercado brasileiro. CPI (EUA) continua vindo do BLS, e Selic/IPCA do
-# Banco Central — todas fontes oficiais e gratuitas.
+# mercado brasileiro. CPI (EUA) vem do BLS, Selic/IPCA do Banco Central.
 # ------------------------------------------------------------------
 BRAPI_BASE_URL = "https://brapi.dev/api"
 BRAPI_INDICES = [("^BVSP", "Ibovespa"), ("IFIX", "IFIX")]
-BRAPI_PARES_MOEDA = "USD-BRL,EUR-BRL"
-BRAPI_NOME_MOEDA = {"USD": "Dólar", "EUR": "Euro"}
+
+# ------------------------------------------------------------------
+# AwesomeAPI — Dólar, Euro e Bitcoin numa ÚNICA requisição, de graça e
+# sem chave de API. Substitui os endpoints pagos da brapi.
+# Campos usados: "bid" (cotação de compra) e "pctChange" (variação % do
+# dia), ambos devolvidos como string.
+# Observação: requisições sem chave são cacheadas por 1 minuto do lado
+# deles — irrelevante aqui, já que o robô roda de 15 em 15 minutos.
+# ------------------------------------------------------------------
+AWESOMEAPI_URL = "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL"
+AWESOMEAPI_MOEDAS = [
+    # (chave na resposta, rótulo no boletim, prefixo exibido)
+    ("USDBRL", "Dólar", "R$ "),
+    ("EURBRL", "Euro", "R$ "),
+    ("BTCBRL", "Bitcoin", "R$ "),
+]
 
 BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
 
@@ -537,11 +547,15 @@ def _para_float(valor):
 
 
 def coletar_indices_brapi(token):
-    """Busca na brapi os índices de mercado do boletim: Ibovespa, IFIX,
-    Dólar, Euro e Bitcoin (em USD). São 4 requisições no total.
+    """Monta os índices de mercado do boletim.
 
-    Cada bloco é independente: se um endpoint falhar, os outros índices
-    ainda entram no boletim."""
+    Ibovespa e IFIX vêm da brapi (2 requisições — o plano gratuito aceita
+    1 ticker por chamada). Dólar, Euro e Bitcoin vêm da AwesomeAPI numa
+    única requisição, de graça e sem chave, já que os endpoints de câmbio
+    e cripto da brapi são pagos.
+
+    Cada bloco é independente: se uma das fontes falhar, os índices da
+    outra ainda entram no boletim."""
     indices = []
 
     # --- Índices da B3 (1 requisição cada: o plano gratuito limita a 1
@@ -565,33 +579,29 @@ def coletar_indices_brapi(token):
             "variacao_pct": _para_float(dados.get("regularMarketChangePercent")),
         })
 
-    # --- Câmbio: Dólar e Euro numa única requisição ---
-    data = _brapi_get("/v2/currency", token, {"currency": BRAPI_PARES_MOEDA})
-    for moeda in (data or {}).get("currency") or []:
-        rotulo = BRAPI_NOME_MOEDA.get(moeda.get("fromCurrency"))
-        valor = _para_float(moeda.get("bidPrice"))
-        if not rotulo or valor is None:
+    # --- Câmbio e Bitcoin: uma única requisição à AwesomeAPI (grátis, sem
+    # chave). Os endpoints equivalentes da brapi são pagos. ---
+    try:
+        resp = requests.get(AWESOMEAPI_URL, timeout=TIMEOUT)
+        resp.raise_for_status()
+        cotacoes = resp.json()
+    except (requests.RequestException, ValueError) as exc:
+        print(f"AVISO: falha ao buscar câmbio/cripto na AwesomeAPI: {exc}", file=sys.stderr)
+        cotacoes = {}
+
+    for chave, rotulo, prefixo in AWESOMEAPI_MOEDAS:
+        item = cotacoes.get(chave) or {}
+        valor = _para_float(item.get("bid"))
+        if valor is None:
+            if cotacoes:
+                print(f"AVISO: AwesomeAPI não retornou '{chave}' ({rotulo}).", file=sys.stderr)
             continue
         indices.append({
             "label": rotulo,
-            "prefixo": "R$ ",
+            "prefixo": prefixo,
             "valor": valor,
-            "variacao_pct": _para_float(moeda.get("percentageChange")),
+            "variacao_pct": _para_float(item.get("pctChange")),
         })
-
-    # --- Bitcoin, cotado em USD (o boletim exibe em dólar) ---
-    data = _brapi_get("/v2/crypto", token, {"coin": "BTC", "currency": "USD"})
-    moedas_cripto = (data or {}).get("coins") or []
-    if moedas_cripto:
-        btc = moedas_cripto[0]
-        valor = _para_float(btc.get("regularMarketPrice"))
-        if valor is not None:
-            indices.append({
-                "label": "Bitcoin (USD)",
-                "prefixo": "US$ ",
-                "valor": valor,
-                "variacao_pct": _para_float(btc.get("regularMarketChangePercent")),
-            })
 
     return indices
 
