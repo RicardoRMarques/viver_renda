@@ -652,10 +652,19 @@
       align-items: start;
       gap: 14px;
     }
-    .consultas-grid-2x2 > section.hg-busca { display: flex; flex-direction: column; }
+    /* Grid items (como as sections dentro de .consultas-grid-2x2) têm
+       min-width:auto por padrão — isso deixa o item "recusar" encolher
+       abaixo do conteúdo mais largo dele (aqui, a tabela da Análise
+       Fundamentalista, que tem min-width:560px). Resultado: em vez da
+       tabela ficar contida e rolável dentro de .hg-tabela-scroll, é o
+       item do grid inteiro (e a página) que fica mais largo que a tela
+       no celular — e é por isso que a coluna sticky "Indicador" nunca
+       tinha contra o que ficar fixa (a div de scroll nunca chegava a
+       ter overflow, pois ela mesma já tinha crescido junto). */
+    .consultas-grid-2x2 > section.hg-busca { display: flex; flex-direction: column; min-width: 0; }
     @media (max-width: 900px) {
       .consultas-grid-2x2 { grid-template-columns: 1fr; max-width: 720px; }
-      .consultas-grid-2x2 > section.hg-busca { display: block; }
+      .consultas-grid-2x2 > section.hg-busca { display: block; min-width: 0; }
     }
 
     /* Notícias lado a lado, largura toda, abaixo das consultas */
