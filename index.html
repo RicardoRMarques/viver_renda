@@ -1110,10 +1110,6 @@
     .indice-label { font-weight: 700; color: var(--text); font-size: 0.92rem; white-space: nowrap; }
     .indice-value { font-family: "Courier New", monospace; color: var(--muted); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .indice-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .indice-sparkline { display: block; width: 70px; height: 30px; flex-shrink: 0; }
-    .indice-sparkline .spark-linha { fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-    .indice-sparkline .spark-referencia { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.5; }
-    .indice-sparkline .spark-area { opacity: 0.12; }
     .indice-change {
       font-family: "Courier New", monospace;
       font-weight: 800;
@@ -3918,7 +3914,7 @@
     // Só funciona quando a página é servida exatamente por esse domínio —
     // testar via file://, localhost ou outro domínio será bloqueado pela API.
     // Escopo global (fora das IIFEs abaixo) para ser usada por todos os
-    // widgets da página (busca rápida, índices/sparkline, análise fundamentalista).
+    // widgets da página (busca rápida, índices, análise fundamentalista).
     const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
     const WORKER_BOLSAI_ENDPOINT = 'https://viverderenda-bolsai.marquesr.workers.dev'; // Worker que esconde a chave da bolsai (indicadores avançados)
     const CHAVE_TWELVEDATA = '034d1589162e413d9a1e9608860cb06a'; // fallback p/ Stocks/ETFs internacionais quando não é ticker da B3 — plano free (800 req/dia, 8/min)
@@ -3970,7 +3966,7 @@
     }
 
     // Formatadores compartilhados por todos os widgets da página (busca
-    // rápida, índices/sparkline, análise fundamentalista). Escopo global —
+    // rápida, índices, análise fundamentalista). Escopo global —
     // fora das IIFEs — para não repetir/perder acesso entre os blocos.
     function hgFormatMoeda(valor, moeda = 'BRL') {
       if (typeof valor !== 'number') return null;
@@ -4995,87 +4991,6 @@
     })();
 
 
-    // Mapeia o rótulo exibido no boletim para o símbolo usado no endpoint
-    // histórico intradiário da HG Brasil (/v2/finance/historical). Índices
-    // fora dessa lista (IPCA, CPI EUA, Selic etc.) não têm sparkline, pois
-    // são séries mensais/de baixa frequência — não fazem sentido como
-    // gráfico intradiário.
-    const HG_SPARK_SIMBOLOS = {
-      'IBOVESPA': 'BVSP',
-      'IBOV': 'BVSP',
-      'DÓLAR': 'USDBRL',
-      'DOLAR': 'USDBRL',
-      'USD/BRL': 'USDBRL',
-      'EURO': 'EURBRL',
-      'EUR/BRL': 'EURBRL',
-      'BITCOIN': 'BTCBRL',
-      'DOW JONES': 'DJI',
-      'DOW': 'DJI',
-      'NASDAQ': 'IXIC',
-    };
-
-    function hgSimboloSparkline(label) {
-      if (!label) return null;
-      const chave = label.trim().toUpperCase();
-      return HG_SPARK_SIMBOLOS[chave] || null;
-    }
-
-    // Desenha um sparkline SVG (linha + área leve + linha tracejada de
-    // referência no valor inicial), no mesmo espírito do widget de
-    // "Mercados" do Bing/MSN: verde subindo, vermelho caindo.
-    function hgDesenharSparkline(valores) {
-      if (!Array.isArray(valores) || valores.length < 2) return '';
-      const largura = 70, altura = 30, margem = 3;
-      const min = Math.min(...valores);
-      const max = Math.max(...valores);
-      const alcance = (max - min) || 1;
-      const emAlta = valores[valores.length - 1] >= valores[0];
-      const cor = emAlta ? '#3ddc73' : '#ff5a5a';
-
-      const x = (i) => margem + (i / (valores.length - 1)) * (largura - margem * 2);
-      const y = (v) => altura - margem - ((v - min) / alcance) * (altura - margem * 2);
-
-      const pontos = valores.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
-      const linha = 'M' + pontos.join(' L');
-      const areaBase = altura - margem;
-      const area = `M${x(0).toFixed(1)},${areaBase} L${pontos.join(' L')} L${x(valores.length - 1).toFixed(1)},${areaBase} Z`;
-      const yReferencia = y(valores[0]).toFixed(1);
-
-      return `
-        <svg class="indice-sparkline" viewBox="0 0 ${largura} ${altura}" preserveAspectRatio="none" aria-hidden="true">
-          <line class="spark-referencia" x1="${margem}" y1="${yReferencia}" x2="${largura - margem}" y2="${yReferencia}" />
-          <path class="spark-area" d="${area}" fill="${cor}" />
-          <path class="spark-linha" d="${linha}" stroke="${cor}" />
-        </svg>`;
-    }
-
-    // Busca o histórico intradiário (amostrado de 15 em 15 min) de um índice
-    // na HG Brasil e injeta o sparkline já renderizado no lugar do
-    // placeholder. Chamado de forma independente por item, sem travar a
-    // renderização do restante do boletim.
-    async function hgCarregarSparkline(simbolo, elId) {
-      const el = document.getElementById(elId);
-      if (!el) return;
-      try {
-        const url = `https://api.hgbrasil.com/v2/finance/historical?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&symbols=${encodeURIComponent(simbolo)}&days_ago=1&sample_by=15m`;
-        const resp = await fetch(url);
-        const data = await resp.json();
-        const serie = data?.results?.[simbolo] || data?.results?.[simbolo.toLowerCase()] || data?.results?.[simbolo.toUpperCase()];
-        const pontos = Array.isArray(serie) ? serie : (Array.isArray(serie?.history) ? serie.history : null);
-        const valores = pontos
-          ?.map(p => (typeof p === 'number' ? p : (p?.close ?? p?.value ?? p?.price)))
-          .filter(v => typeof v === 'number');
-
-        if (valores && valores.length >= 2) {
-          el.innerHTML = hgDesenharSparkline(valores);
-        } else {
-          el.remove();
-        }
-      } catch (e) {
-        el.remove();
-        console.error(`Erro ao buscar sparkline de ${simbolo}:`, e);
-      }
-    }
 
     window.hgIndicesCache = null;
     async function carregarIndices() {
@@ -5087,14 +5002,7 @@
         window.hgIndicesCache = indices;
         if (!Array.isArray(indices) || indices.length === 0) throw new Error('vazio');
 
-        const sparksParaCarregar = [];
-
-        rowsEl.innerHTML = indices.map((item, i) => {
-          const simboloSpark = hgSimboloSparkline(item.label);
-          const sparkId = `hgSpark${i}`;
-          if (simboloSpark) sparksParaCarregar.push({ simbolo: simboloSpark, elId: sparkId });
-          const sparkHtml = simboloSpark ? `<span class="indice-sparkline" id="${sparkId}"></span>` : '';
-
+        rowsEl.innerHTML = indices.map((item) => {
           if (typeof item.valor === 'number') {
             const variacao = typeof item.variacao_pct === 'number' ? item.variacao_pct : 0;
             const emAlta = variacao >= 0;
@@ -5108,7 +5016,6 @@
                   <span class="indice-value">${prefixo}${valorFormatado}${item.prefixo === 'pontos' ? ' pts' : ''}</span>
                 </div>
                 <div class="indice-right">
-                  ${sparkHtml}
                   <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
                 </div>
               </div>`;
@@ -5122,13 +5029,11 @@
                 <span class="indice-value">—</span>
               </div>
               <div class="indice-right">
-                ${sparkHtml}
                 <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
               </div>
             </div>`;
         }).join('');
 
-        sparksParaCarregar.forEach(({ simbolo, elId }) => hgCarregarSparkline(simbolo, elId));
         renderizarTickerCarrossel(indices);
       } catch (e) {
         rowsEl.innerHTML = '<div class="indice-row"><span class="indice-label">Índices ainda não gerados — aguarde o robô rodar.</span></div>';
