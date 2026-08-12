@@ -4,75 +4,75 @@
       {
         "ticker": "BBSE3",
         "nome": "BB Seguridade",
-        "preco": 37.16,
-        "valor": 17.578
+        "preco": 37.45,
+        "valor": 17.442
       },
       {
         "ticker": "SBSP3",
         "nome": "Sabesp",
-        "preco": 26.0,
-        "valor": 13.373
+        "preco": 26.08,
+        "valor": 13.332
       },
       {
         "ticker": "CMIG4",
         "nome": "CEMIG",
-        "preco": 10.43,
-        "valor": 12.282
+        "preco": 10.41,
+        "valor": 12.305
       },
       {
         "ticker": "ALOS3",
         "nome": "ALLOS",
-        "preco": 26.09,
-        "valor": 11.265
+        "preco": 26.08,
+        "valor": 11.269
       },
       {
         "ticker": "BBDC4",
         "nome": "Banco Bradesco",
-        "preco": 16.79,
-        "valor": 9.261
+        "preco": 16.84,
+        "valor": 9.234
       },
       {
         "ticker": "ITUB4",
         "nome": "Banco Itaú Unibanco",
-        "preco": 38.94,
-        "valor": 9.06
+        "preco": 38.79,
+        "valor": 9.095
       }
     ],
     "valor_mercado": [
       {
         "ticker": "PETR4",
         "nome": "Petrobras",
-        "preco": 41.63,
+        "preco": 41.27,
         "valor": 567178000000.0
       },
       {
         "ticker": "ITUB4",
         "nome": "Banco Itaú Unibanco",
-        "preco": 38.94,
+        "preco": 38.79,
         "valor": 485548000000.0
       },
       {
         "ticker": "VALE3",
         "nome": "Vale",
-        "preco": 74.39,
+        "preco": 73.09,
         "valor": 336000000000.0
       },
       {
         "ticker": "ABEV3",
         "nome": "Ambev",
-        "preco": 14.93,
+        "preco": 14.85,
         "valor": 250012000000.0
       },
       {
         "ticker": "WEGE3",
         "nome": "WEG",
-        "preco": 47.18,
+        "preco": 48.06,
         "valor": 194756000000.0
       },
       {
         "ticker": "BBDC4",
         "nome": "Banco Bradesco",
-        "preco": 16.79,
+        "preco": 16.84,
         "valor": 185342000000.0
       }
     ],
@@ -80,13 +80,13 @@
       {
         "ticker": "PETR4",
         "nome": "Petrobras",
-        "preco": 41.63,
+        "preco": 41.27,
         "valor": 498091000000
       },
       {
         "ticker": "ITUB4",
         "nome": "Banco Itaú Unibanco",
-        "preco": 38.94,
+        "preco": 38.79,
         "valor": 388673000000
       },
       {
@@ -98,19 +98,19 @@
       {
         "ticker": "BBDC4",
         "nome": "Banco Bradesco",
-        "preco": 16.79,
+        "preco": 16.84,
         "valor": 288161422000
       },
       {
         "ticker": "VALE3",
         "nome": "Vale",
-        "preco": 74.39,
+        "preco": 73.09,
         "valor": 214864000000
       },
       {
         "ticker": "ABEV3",
         "nome": "Ambev",
-        "preco": 14.93,
+        "preco": 14.85,
         "valor": 88209569000
       }
     ]
@@ -119,133 +119,133 @@
     "valor_patrimonial": [
       {
         "ticker": "KNCR11",
-        "nome": "FII Kinea Ri",
-        "preco": 105.65,
-        "variacao_pct": -0.3114,
-        "valor": 11314018564.3
-      },
-      {
-        "ticker": "BTLG11",
-        "nome": "FII Btlg",
-        "preco": 100.38,
-        "variacao_pct": -0.0995,
-        "valor": 6965332866.24
-      },
-      {
-        "ticker": "XPML11",
-        "nome": "FII XP Malls",
-        "preco": 103.6,
-        "variacao_pct": -0.0193,
-        "valor": 6662314498.0
+        "nome": "KINEA RENDIMENTOS IMOBILIARIOS FII RESPONSABILIDADE LIMITADA",
+        "preco": 105.6,
+        "variacao_pct": -0.3585582185318075,
+        "valor": 10974808568.74
       },
       {
         "ticker": "HGLG11",
-        "nome": "FII HGLG Pax",
-        "preco": 145.51,
-        "variacao_pct": -0.472,
-        "valor": 6635530140.84
+        "nome": "PÁTRIA LOG - FUNDO DE INVESTIMENTO IMOBILIÁRIO",
+        "preco": 145.55,
+        "variacao_pct": -0.44459644322843866,
+        "valor": 7597392215.14
+      },
+      {
+        "ticker": "BTLG11",
+        "nome": "BTGP LOGISTICA FII",
+        "preco": 100.38,
+        "variacao_pct": -0.09952229299363904,
+        "valor": 7427406877.13
+      },
+      {
+        "ticker": "XPML11",
+        "nome": "XP MALLS FII",
+        "preco": 103.61,
+        "variacao_pct": -0.009650646593326689,
+        "valor": 7081112753.36
       },
       {
         "ticker": "TRXF11",
-        "nome": "FII Trx Real",
-        "preco": 82.0,
-        "variacao_pct": -0.6663,
-        "valor": 5119317564.0
+        "nome": "TRX REAL ESTATE FUNDO DE INVESTIMENTO IMOBILIÁRIO - FII",
+        "preco": 81.91,
+        "variacao_pct": -0.7752877044215634,
+        "valor": 5977791877.24
       },
       {
         "ticker": "XPLG11",
-        "nome": "FII XP Log",
-        "preco": 90.1,
-        "variacao_pct": -0.989,
-        "valor": 4630247829.8
+        "nome": "XP LOG FII RL",
+        "preco": 89.91,
+        "variacao_pct": -1.1978021978022015,
+        "valor": 5397457621.0
       }
     ],
     "dividend_yield": [
       {
+        "ticker": "KNCR11",
+        "nome": "KINEA RENDIMENTOS IMOBILIARIOS FII RESPONSABILIDADE LIMITADA",
+        "preco": 105.6,
+        "variacao_pct": -0.3585582185318075,
+        "valor": 12.69
+      },
+      {
         "ticker": "XPCA11",
-        "nome": "Fiagro XP Ca",
-        "preco": 7.15,
-        "variacao_pct": -2.1888,
-        "valor": 18.182
+        "nome": "XP CRÉDITO AGRÍCOLA-FUNDO DE INVESTIMENTO NAS CADEIAS PROD",
+        "preco": 7.12,
+        "variacao_pct": -2.599179206566341,
+        "valor": 12.3
       },
       {
-        "ticker": "IRIM11",
-        "nome": "FII Irim",
-        "preco": 63.35,
-        "variacao_pct": -1.1546,
-        "valor": 15.927
+        "ticker": "KNSC11",
+        "nome": "KINEA SECURITIES FII RESPONSABILIDADE LIMITADA",
+        "preco": 8.96,
+        "variacao_pct": -0.3337041156840863,
+        "valor": 11.84
       },
       {
-        "ticker": "VGIR11",
-        "nome": "FII Valreiii",
-        "preco": 9.57,
-        "variacao_pct": -0.3125,
-        "valor": 15.883
-      },
-      {
-        "ticker": "RECR11",
-        "nome": "FII Rec Rece",
-        "preco": 75.08,
-        "variacao_pct": -1.1975,
-        "valor": 14.502
-      },
-      {
-        "ticker": "CPTS11",
-        "nome": "FII Capi Sec",
-        "preco": 7.44,
-        "variacao_pct": -0.8,
-        "valor": 14.395
+        "ticker": "MXRF11",
+        "nome": "FII MAXI RENDA RL",
+        "preco": 9.35,
+        "variacao_pct": -0.953389830508473,
+        "valor": 11.51
       },
       {
         "ticker": "TRXF11",
-        "nome": "FII Trx Real",
-        "preco": 82.0,
-        "variacao_pct": -0.6663,
-        "valor": 14.39
+        "nome": "TRX REAL ESTATE FUNDO DE INVESTIMENTO IMOBILIÁRIO - FII",
+        "preco": 81.91,
+        "variacao_pct": -0.7752877044215634,
+        "valor": 11.5
+      },
+      {
+        "ticker": "CPTS11",
+        "nome": "CAPITANIA SEC II FII",
+        "preco": 7.44,
+        "variacao_pct": -0.7999999999999948,
+        "valor": 11.02
       }
     ],
     "mais_negociados": [
       {
         "ticker": "MXRF11",
-        "nome": "FII Maxi Ren",
+        "nome": "FII MAXI RENDA RL",
         "preco": 9.35,
-        "variacao_pct": -0.9534,
-        "valor": 1420760
+        "variacao_pct": -0.953389830508473,
+        "valor": 1496606
       },
       {
         "ticker": "GARE11",
-        "nome": "FII Guardian",
+        "nome": "FII GUARDIAL LOGISTICA",
         "preco": 8.16,
-        "variacao_pct": -0.1224,
-        "valor": 1062804
+        "variacao_pct": -0.12239902080783092,
+        "valor": 1096676
       },
       {
         "ticker": "CPTS11",
-        "nome": "FII Capi Sec",
+        "nome": "CAPITANIA SEC II FII",
         "preco": 7.44,
-        "variacao_pct": -0.8,
-        "valor": 875296
+        "variacao_pct": -0.7999999999999948,
+        "valor": 883922
       },
       {
         "ticker": "KNSC11",
-        "nome": "FII Kinea Sc",
-        "preco": 8.97,
-        "variacao_pct": -0.2225,
-        "valor": 524980
+        "nome": "KINEA SECURITIES FII RESPONSABILIDADE LIMITADA",
+        "preco": 8.96,
+        "variacao_pct": -0.3337041156840863,
+        "valor": 530845
       },
       {
         "ticker": "BTHF11",
-        "nome": "FII BTHF",
-        "preco": 8.71,
-        "variacao_pct": -0.4571,
-        "valor": 429929
+        "nome": "BTGP HEDGE FUND FII",
+        "preco": 8.7,
+        "variacao_pct": -0.5714285714285796,
+        "valor": 431930
       },
       {
         "ticker": "VGIR11",
-        "nome": "FII Valreiii",
-        "preco": 9.57,
-        "variacao_pct": -0.3125,
-        "valor": 386304
+        "nome": "VALORA CRI CDI FII",
+        "preco": 9.56,
+        "variacao_pct": -0.4166666666666578,
+        "valor": 388071
       }
     ]
   }
