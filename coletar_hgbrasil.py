@@ -7,7 +7,7 @@ diretamente no navegador do visitante), publicando os seguintes arquivos
 na raiz do repositório:
 
 - noticias.json : últimas notícias do mercado (feed RSS, sem token)
-- indices.json  : Ibovespa, IFIX (brapi), Dólar, Euro, Bitcoin (AwesomeAPI) +
+- indices.json  : Ibovespa, IFIX (brapi), Dólar/Euro (BCB), Bitcoin (CoinGecko) +
                    IPCA mensal/acumulado no ano (Banco Central) + CPI EUA (BLS)
 - ranking.json  : 6 melhores ações e 6 melhores FIIs do momento (HG Brasil)
 
@@ -130,7 +130,7 @@ BOLSAI_PAUSA_ENTRE_CHAMADAS = 0.15  # segundos, para não saturar a API
 #
 # Câmbio e cripto NÃO vêm da brapi: os endpoints /v2/currency e
 # /v2/crypto respondem 403 FEATURE_NOT_AVAILABLE no plano gratuito.
-# Ficam na AwesomeAPI (abaixo).
+# Ficam no Banco Central e na CoinGecko (abaixo).
 #
 # Dow Jones e Nasdaq foram removidos do boletim: a brapi cobre só o
 # mercado brasileiro. CPI (EUA) vem do BLS, Selic/IPCA do Banco Central.
@@ -139,20 +139,30 @@ BRAPI_BASE_URL = "https://brapi.dev/api"
 BRAPI_INDICES = [("^BVSP", "Ibovespa"), ("IFIX", "IFIX")]
 
 # ------------------------------------------------------------------
-# AwesomeAPI — Dólar, Euro e Bitcoin numa ÚNICA requisição, de graça e
-# sem chave de API. Substitui os endpoints pagos da brapi.
-# Campos usados: "bid" (cotação de compra) e "pctChange" (variação % do
-# dia), ambos devolvidos como string.
-# Observação: requisições sem chave são cacheadas por 1 minuto do lado
-# deles — irrelevante aqui, já que o robô roda de 15 em 15 minutos.
+# Câmbio: Banco Central (SGS), mesma fonte já usada para Selic e IPCA.
+# Oficial, gratuita, sem chave e sem limite de requisições — resolve os
+# 429 que a AwesomeAPI dava por cota compartilhada de IP no Actions.
+#
+# Série 1     = Dólar americano (venda, PTAX)
+# Série 21619 = Euro (venda, PTAX)
+#
+# Buscamos as 2 últimas observações de cada série: a mais recente é o
+# valor exibido, e a anterior serve para calcular a variação %. É PTAX
+# (fechamento do dia), então durante o pregão o valor fica no fechamento
+# anterior — e em fins de semana/feriados o BCB não publica, caso em que
+# a última cotação disponível é reaproveitada.
 # ------------------------------------------------------------------
-AWESOMEAPI_URL = "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL"
-AWESOMEAPI_MOEDAS = [
-    # (chave na resposta, rótulo no boletim, prefixo exibido)
-    ("USDBRL", "Dólar", "R$ "),
-    ("EURBRL", "Euro", "R$ "),
-    ("BTCBRL", "Bitcoin", "R$ "),
+BCB_CAMBIO_SERIES = [
+    # (número da série SGS, rótulo no boletim)
+    (1, "Dólar"),
+    (21619, "Euro"),
 ]
+
+# ------------------------------------------------------------------
+# Bitcoin: CoinGecko — gratuita, sem chave. Devolve preço em BRL e a
+# variação de 24h numa única requisição.
+# ------------------------------------------------------------------
+COINGECKO_URL = "https://api.coingecko.com/api/v3/simple/price"
 
 BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
 
@@ -546,13 +556,97 @@ def _para_float(valor):
         return None
 
 
+def coletar_cambio_bcb():
+    """Dólar e Euro pelas séries SGS do Banco Central (PTAX de venda).
+
+    Pede as 2 últimas observações de cada série: a mais recente vira o
+    valor exibido e a anterior serve para calcular a variação %. Se só
+    houver uma observação disponível, o índice entra sem variação em vez
+    de ficar de fora.
+
+    Cada moeda é independente — se uma série falhar, a outra ainda entra.
+    """
+    indices = []
+    for serie, rotulo in BCB_CAMBIO_SERIES:
+        url = (
+            f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{serie}"
+            "/dados/ultimos/2?formato=json"
+        )
+        try:
+            dados = _requisitar_bcb_com_retry(url)
+        except (requests.RequestException, ValueError) as exc:
+            print(f"AVISO: falha ao buscar {rotulo} no Banco Central (série {serie}): {exc}", file=sys.stderr)
+            continue
+
+        if not isinstance(dados, list) or not dados:
+            print(f"AVISO: Banco Central não retornou dados para {rotulo} (série {serie}).", file=sys.stderr)
+            continue
+
+        # O SGS devolve em ordem cronológica: o último item é o mais recente.
+        atual = _para_float((dados[-1] or {}).get("valor"))
+        if atual is None:
+            print(f"AVISO: valor inválido para {rotulo} na série {serie} do BCB.", file=sys.stderr)
+            continue
+
+        variacao = None
+        if len(dados) >= 2:
+            anterior = _para_float((dados[-2] or {}).get("valor"))
+            if anterior:
+                variacao = ((atual - anterior) / anterior) * 100
+
+        indices.append({
+            "label": rotulo,
+            "prefixo": "R$ ",
+            "valor": atual,
+            "variacao_pct": variacao,
+            "referencia": (dados[-1] or {}).get("data"),
+        })
+
+    return indices
+
+
+def coletar_bitcoin_coingecko():
+    """Bitcoin em reais pela CoinGecko (gratuita, sem chave), com a
+    variação das últimas 24h. Retorna None se falhar, para o boletim sair
+    sem o Bitcoin em vez de quebrar."""
+    try:
+        resp = requests.get(
+            COINGECKO_URL,
+            params={
+                "ids": "bitcoin",
+                "vs_currencies": "brl",
+                "include_24hr_change": "true",
+            },
+            headers={"User-Agent": HEADERS_NAVEGADOR["User-Agent"], "Accept": "application/json"},
+            timeout=TIMEOUT,
+        )
+        resp.raise_for_status()
+        dados = resp.json()
+    except (requests.RequestException, ValueError) as exc:
+        print(f"AVISO: falha ao buscar Bitcoin na CoinGecko: {exc}", file=sys.stderr)
+        return None
+
+    btc = (dados or {}).get("bitcoin") or {}
+    valor = _para_float(btc.get("brl"))
+    if valor is None:
+        print(f"AVISO: CoinGecko respondeu sem o preço do Bitcoin: {str(dados)[:200]}", file=sys.stderr)
+        return None
+
+    return {
+        "label": "Bitcoin",
+        "prefixo": "R$ ",
+        "valor": valor,
+        "variacao_pct": _para_float(btc.get("brl_24h_change")),
+    }
+
+
 def coletar_indices_brapi(token):
     """Monta os índices de mercado do boletim.
 
     Ibovespa e IFIX vêm da brapi (2 requisições — o plano gratuito aceita
-    1 ticker por chamada). Dólar, Euro e Bitcoin vêm da AwesomeAPI numa
-    única requisição, de graça e sem chave, já que os endpoints de câmbio
-    e cripto da brapi são pagos.
+    1 ticker por chamada). Dólar e Euro vêm do Banco Central (séries SGS,
+    oficiais e sem limite) e o Bitcoin da CoinGecko (gratuita, sem chave)
+    — os endpoints de câmbio e cripto da brapi são pagos.
 
     Cada bloco é independente: se uma das fontes falhar, os índices da
     outra ainda entram no boletim."""
@@ -579,29 +673,12 @@ def coletar_indices_brapi(token):
             "variacao_pct": _para_float(dados.get("regularMarketChangePercent")),
         })
 
-    # --- Câmbio e Bitcoin: uma única requisição à AwesomeAPI (grátis, sem
-    # chave). Os endpoints equivalentes da brapi são pagos. ---
-    try:
-        resp = requests.get(AWESOMEAPI_URL, timeout=TIMEOUT)
-        resp.raise_for_status()
-        cotacoes = resp.json()
-    except (requests.RequestException, ValueError) as exc:
-        print(f"AVISO: falha ao buscar câmbio/cripto na AwesomeAPI: {exc}", file=sys.stderr)
-        cotacoes = {}
+    # --- Câmbio (Banco Central) e Bitcoin (CoinGecko) ---
+    indices.extend(coletar_cambio_bcb())
 
-    for chave, rotulo, prefixo in AWESOMEAPI_MOEDAS:
-        item = cotacoes.get(chave) or {}
-        valor = _para_float(item.get("bid"))
-        if valor is None:
-            if cotacoes:
-                print(f"AVISO: AwesomeAPI não retornou '{chave}' ({rotulo}).", file=sys.stderr)
-            continue
-        indices.append({
-            "label": rotulo,
-            "prefixo": prefixo,
-            "valor": valor,
-            "variacao_pct": _para_float(item.get("pctChange")),
-        })
+    bitcoin = coletar_bitcoin_coingecko()
+    if bitcoin:
+        indices.append(bitcoin)
 
     return indices
 
