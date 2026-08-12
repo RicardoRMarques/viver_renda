@@ -51,6 +51,12 @@ jobs:
       - name: Rodar coleta de notícias, índices e (às vezes) ranking
         env:
           HGBRASIL_TOKEN: ${{ secrets.HGBRASIL_TOKEN }}
+          # Chave da brapi — usada nos índices de mercado do boletim
+          # (Ibovespa, IFIX, Dólar, Euro e Bitcoin). São 4 requisições por
+          # execução; a 15 min o dia inteiro dá ~11,5 mil/mês, dentro do
+          # limite de 15 mil do plano gratuito. Se faltar, o boletim sai
+          # só com Selic/IPCA (BCB) e CPI (BLS).
+          VIVERDERENDA_BRAPI: ${{ secrets.VIVERDERENDA_BRAPI }}
           # Chave da bolsai — usada só nos rankings de FIIs (patrimônio
           # líquido real, DY 12m e volume). É uma chave separada da que está
           # no Cloudflare Worker: lá ela atende o navegador, aqui roda no
