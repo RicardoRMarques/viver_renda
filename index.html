@@ -81,12 +81,6 @@
     .container {
       width: min(1200px, 94%);
       margin: 0 auto;
-      /* Contém qualquer elemento filho que tente ficar mais largo que a tela
-         (ex: a tabela da Análise Fundamentalista, que tem min-width:560px)
-         SEM travar overflow-x no <html>/<body> — travar na raiz do documento
-         quebra o reconhecimento de gesto de arraste horizontal em divs
-         internas com overflow-x:auto em vários navegadores mobile. */
-      overflow-x: hidden;
     }
 
     .val-up { color: var(--accent); font-weight: 800; }
@@ -7883,7 +7877,7 @@
           const botaoInfo = AJUDA_FUND[rotulo]
             ? ` <button type="button" class="hg-info-btn" data-indicador="${rotulo}" aria-label="O que é ${rotulo}?" title="O que é ${rotulo}?">?</button>`
             : '';
-          return `<tr><th scope="row" style="text-align:left; padding:6px 10px; font-family:inherit; font-weight:700; white-space:nowrap; border-top:1px solid var(--border); position:sticky; left:0; background:var(--deep); z-index:1;">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
+          return `<tr><th scope="row" style="text-align:left; padding:6px 10px; font-family:inherit; font-weight:700; white-space:nowrap; border-top:1px solid var(--border); position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1; isolation:isolate;">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
         }).join('');
 
         const cabecalhoHtml = colunas.map(c => `<th>${c.rotulo}</th>`).join('');
@@ -7914,7 +7908,7 @@
               <table class="hg-tabela-fundamentos" style="width:100%; min-width:560px; border-collapse:separate; border-spacing:0; font-family:'Courier New', monospace; font-size:0.85rem;">
                 <thead>
                   <tr>
-                    <th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit; position:sticky; left:0; background:var(--deep); z-index:2;">Indicador</th>
+                    <th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:2; isolation:isolate;">Indicador</th>
                     ${cabecalhoHtml.replace(/<th>/g, '<th style="text-align:right; padding:8px 10px; color:var(--muted); font-family:inherit; white-space:nowrap;">')}
                   </tr>
                 </thead>
