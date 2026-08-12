@@ -2,8 +2,8 @@
   {
     "label": "Ibovespa",
     "prefixo": "pontos",
-    "valor": 167925.62,
-    "variacao_pct": 0.03
+    "valor": 167810.02,
+    "variacao_pct": -0.04
   },
   {
     "label": "Selic (meta)",
@@ -13,8 +13,28 @@
   {
     "label": "IFIX",
     "prefixo": "pontos",
-    "valor": 3714.91,
-    "variacao_pct": -0.19
+    "valor": 3715.45,
+    "variacao_pct": -0.17
+  },
+  {
+    "label": "Dólar",
+    "prefixo": "R$ ",
+    "valor": 5.1639,
+    "variacao_pct": 0.6902603100321751,
+    "referencia": "12/08/2026"
+  },
+  {
+    "label": "Euro",
+    "prefixo": "R$ ",
+    "valor": 5.9597,
+    "variacao_pct": 0.6553057812156964,
+    "referencia": "12/08/2026"
+  },
+  {
+    "label": "Bitcoin",
+    "prefixo": "R$ ",
+    "valor": 328361.0,
+    "variacao_pct": -0.16319326717697413
   },
   {
     "label": "IPCA (mensal)",
