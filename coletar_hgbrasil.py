@@ -97,11 +97,6 @@ HEADERS_NAVEGADOR = {
 # HG Brasil — mesma chave/token usado em todo o projeto (site e robô)
 # ---------------------------------------------------------------------------
 
-# Endpoint "default": em UM único request devolve câmbio (USD/EUR), Bitcoin
-# (nas principais corretoras, já em USD), Ibovespa, IFIX e Selic/CDI.
-# Substitui as antigas chamadas ao Yahoo Finance + Selic no Banco Central.
-HGBRASIL_INDICES_URL = "https://api.hgbrasil.com/finance"
-
 # Endpoint v2 de cotações (ações/FIIs), aceita múltiplos tickers separados
 # por vírgula no formato "B3:PETR4,B3:VALE3" e parâmetro `sort` (volume,
 # value ou change_percent). Não existe "listar o mercado todo": por isso
@@ -127,6 +122,27 @@ BOLSAI_BASE_URL = "https://api.usebolsai.com/api/v1"
 # Volume não vem no /fiis/{ticker}; é lido do histórico de preços, que
 # também permite calcular a variação % do dia (últimos 2 fechamentos).
 BOLSAI_PAUSA_ENTRE_CHAMADAS = 0.15  # segundos, para não saturar a API
+
+# ------------------------------------------------------------------
+# brapi (brapi.dev) — usada nos índices de mercado do boletim
+# (Ibovespa, IFIX, Dólar, Euro e Bitcoin), substituindo a HG Brasil.
+# Fontes: B3 para índices, BCB/forex para câmbio, provedores crypto
+# para Bitcoin.
+#
+# Consumo: 4 requisições por execução do robô. Moedas e cripto aceitam
+# vários itens numa chamada só, mas o plano gratuito limita a 1 ticker
+# por requisição em /stocks/quote — por isso Ibovespa e IFIX vão
+# separados. A 15 min o dia inteiro dá ~384/dia (~11,5 mil/mês), dentro
+# do limite de 15 mil/mês do plano gratuito.
+#
+# Dow Jones e Nasdaq foram removidos do boletim: a brapi cobre só o
+# mercado brasileiro. CPI (EUA) continua vindo do BLS, e Selic/IPCA do
+# Banco Central — todas fontes oficiais e gratuitas.
+# ------------------------------------------------------------------
+BRAPI_BASE_URL = "https://brapi.dev/api"
+BRAPI_INDICES = [("^BVSP", "Ibovespa"), ("IFIX", "IFIX")]
+BRAPI_PARES_MOEDA = "USD-BRL,EUR-BRL"
+BRAPI_NOME_MOEDA = {"USD": "Dólar", "EUR": "Euro"}
 
 BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
 
@@ -483,87 +499,98 @@ def coletar_noticias():
     return resultado
 
 
-def _data_bcb(data_iso):
-    """Converte 'AAAA-MM-DD' (formato da HG Brasil) para 'DD/MM/AAAA' (mesmo
-    padrão usado pelas séries do Banco Central no restante do boletim)."""
+def _brapi_get(caminho, token, params=None):
+    """GET autenticado na brapi. Retorna o JSON, ou None se falhar — assim
+    um endpoint fora do ar não derruba os outros índices."""
     try:
-        ano, mes, dia = data_iso.split("-")
-        return f"{dia}/{mes}/{ano}"
-    except (AttributeError, ValueError):
-        return data_iso
-
-
-def coletar_indices_hgbrasil(token):
-    """Busca, num único request à HG Brasil, Ibovespa, IFIX, Dólar, Euro,
-    Bitcoin (USD) e Selic — mesma fonte/token usados no widget do site."""
-    resp = requests.get(HGBRASIL_INDICES_URL, params={"key": token}, timeout=TIMEOUT)
-    resp.raise_for_status()
-    data = resp.json()
-
-    # A HG Brasil pode responder HTTP 200 mesmo com chave recusada (ex: chave
-    # restrita a um domínio, sendo usada aqui no servidor/GitHub Actions, que
-    # não tem domínio/referer de navegador). Nesse caso "results" pode vir
-    # vazio silenciosamente. Detectamos isso explicitamente para não mascarar
-    # o problema.
-    valida = data.get("valid_key")
-    if valida is False:
-        raise ValueError(f"Chave HG Brasil recusada no endpoint 'finance' (server-side). Resposta: {json.dumps(data, ensure_ascii=False)[:500]}")
-
-    resultados = data.get("results")
-    if not isinstance(resultados, dict) or not resultados:
-        print(
-            "AVISO: resposta da HG Brasil ('finance') veio sem 'results' utilizável. "
-            f"Resposta bruta: {json.dumps(data, ensure_ascii=False)[:500]}",
-            file=sys.stderr,
+        resp = requests.get(
+            f"{BRAPI_BASE_URL}{caminho}",
+            params=params or {},
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=TIMEOUT,
         )
-        resultados = {}
+        data = resp.json()
+        # A brapi sinaliza erro no corpo (error/message/code), inclusive em
+        # alguns casos com HTTP 200 — checamos os dois.
+        if resp.status_code != 200 or data.get("error"):
+            print(
+                f"AVISO: brapi {caminho} respondeu {resp.status_code}: "
+                f"{data.get('code') or ''} {data.get('message') or str(data)[:200]}",
+                file=sys.stderr,
+            )
+            return None
+        return data
+    except (requests.RequestException, ValueError) as exc:
+        print(f"AVISO: falha ao chamar brapi {caminho}: {exc}", file=sys.stderr)
+        return None
 
+
+def _para_float(valor):
+    """A brapi devolve os campos de câmbio como string ('5.2159'); os de
+    índices e cripto vêm como número. Normaliza os dois casos."""
+    if isinstance(valor, (int, float)):
+        return float(valor)
+    try:
+        return float(str(valor).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def coletar_indices_brapi(token):
+    """Busca na brapi os índices de mercado do boletim: Ibovespa, IFIX,
+    Dólar, Euro e Bitcoin (em USD). São 4 requisições no total.
+
+    Cada bloco é independente: se um endpoint falhar, os outros índices
+    ainda entram no boletim."""
     indices = []
 
-    moedas = resultados.get("currencies") or {}
-    usd = moedas.get("USD") or {}
-    eur = moedas.get("EUR") or {}
-    if usd.get("buy") is not None:
-        indices.append({"label": "Dólar", "prefixo": "R$ ", "valor": usd.get("buy"),
-                         "variacao_pct": usd.get("variation")})
-    if eur.get("buy") is not None:
-        indices.append({"label": "Euro", "prefixo": "R$ ", "valor": eur.get("buy"),
-                         "variacao_pct": eur.get("variation")})
+    # --- Índices da B3 (1 requisição cada: o plano gratuito limita a 1
+    # ticker por chamada em /stocks/quote) ---
+    for ticker, rotulo in BRAPI_INDICES:
+        data = _brapi_get("/v2/stocks/quote", token, {"symbols": ticker})
+        resultados = (data or {}).get("results") or []
+        if not resultados:
+            continue
+        # v2 aninha os campos em "data"; aceitamos o formato plano também,
+        # para não quebrar caso a resposta mude.
+        item = resultados[0]
+        dados = item.get("data") or item
+        valor = _para_float(dados.get("regularMarketPrice"))
+        if valor is None:
+            continue
+        indices.append({
+            "label": rotulo,
+            "prefixo": "pontos",
+            "valor": valor,
+            "variacao_pct": _para_float(dados.get("regularMarketChangePercent")),
+        })
 
-    mercados = resultados.get("stocks") or {}
-    ibov = mercados.get("IBOVESPA") or {}
-    ifix = mercados.get("IFIX") or {}
-    nasdaq = mercados.get("NASDAQ") or {}
-    dow = mercados.get("DOWJONES") or {}
-    if ibov.get("points") is not None:
-        indices.insert(0, {"label": "Ibovespa", "prefixo": "pontos", "valor": ibov.get("points"),
-                            "variacao_pct": ibov.get("variation")})
-    if ifix.get("points") is not None:
-        indices.append({"label": "IFIX", "prefixo": "pontos", "valor": ifix.get("points"),
-                         "variacao_pct": ifix.get("variation")})
-    if dow.get("points") is not None:
-        indices.append({"label": "Dow Jones", "prefixo": "pontos", "valor": dow.get("points"),
-                         "variacao_pct": dow.get("variation")})
-    if nasdaq.get("points") is not None:
-        indices.append({"label": "Nasdaq", "prefixo": "pontos", "valor": nasdaq.get("points"),
-                         "variacao_pct": nasdaq.get("variation")})
+    # --- Câmbio: Dólar e Euro numa única requisição ---
+    data = _brapi_get("/v2/currency", token, {"currency": BRAPI_PARES_MOEDA})
+    for moeda in (data or {}).get("currency") or []:
+        rotulo = BRAPI_NOME_MOEDA.get(moeda.get("fromCurrency"))
+        valor = _para_float(moeda.get("bidPrice"))
+        if not rotulo or valor is None:
+            continue
+        indices.append({
+            "label": rotulo,
+            "prefixo": "R$ ",
+            "valor": valor,
+            "variacao_pct": _para_float(moeda.get("percentageChange")),
+        })
 
-    # Bitcoin: usamos uma corretora cotada em USD (a HG cota BTC/BRL por
-    # padrão em "currencies", mas o boletim exibe em dólar).
-    bitcoin = resultados.get("bitcoin") or {}
-    btc_usd = bitcoin.get("bitstamp") or bitcoin.get("blockchain_info") or {}
-    if btc_usd.get("last") is not None:
-        indices.append({"label": "Bitcoin (USD)", "prefixo": "US$ ", "valor": btc_usd.get("last"),
-                         "variacao_pct": btc_usd.get("variation")})
-
-    taxas = resultados.get("taxes") or []
-    if taxas:
-        ultima_taxa = taxas[-1]
-        if ultima_taxa.get("selic") is not None:
+    # --- Bitcoin, cotado em USD (o boletim exibe em dólar) ---
+    data = _brapi_get("/v2/crypto", token, {"coin": "BTC", "currency": "USD"})
+    moedas_cripto = (data or {}).get("coins") or []
+    if moedas_cripto:
+        btc = moedas_cripto[0]
+        valor = _para_float(btc.get("regularMarketPrice"))
+        if valor is not None:
             indices.append({
-                "label": "Selic (meta)",
-                "valor_pct": ultima_taxa.get("selic"),
-                "referencia": _data_bcb(ultima_taxa.get("date")),
+                "label": "Bitcoin (USD)",
+                "prefixo": "US$ ",
+                "valor": valor,
+                "variacao_pct": _para_float(btc.get("regularMarketChangePercent")),
             })
 
     return indices
@@ -688,43 +715,34 @@ def coletar_cpi_eua():
         return None
 
 
-def coletar_indices(token):
-    """Monta a lista completa de índices do boletim: mercado + Selic (HG
-    Brasil, num único request) + macro (BCB/BLS). A Selic é reposicionada
-    logo após o Ibovespa, na posição tradicional do boletim."""
-    if not token:
-        print("AVISO: HGBRASIL_TOKEN não configurado — pulando índices de mercado (Ibovespa, IFIX, Dólar, Euro, Bitcoin, Selic).", file=sys.stderr)
+def coletar_indices(token_brapi):
+    """Monta a lista completa de índices do boletim: mercado (brapi) +
+    Selic/IPCA (Banco Central) + CPI (BLS). A Selic é posicionada logo
+    após o Ibovespa, na posição tradicional do boletim."""
+    if not token_brapi:
+        print("AVISO: VIVERDERENDA_BRAPI não configurado — pulando índices de mercado (Ibovespa, IFIX, Dólar, Euro, Bitcoin).", file=sys.stderr)
         indices = []
     else:
         try:
-            indices = coletar_indices_hgbrasil(token)
+            indices = coletar_indices_brapi(token_brapi)
             if not indices:
                 print(
-                    "AVISO: nenhum índice de mercado (Ibovespa/Dólar/Euro/Bitcoin/Selic) "
-                    "veio da HG Brasil — provavelmente a chave não tem acesso ao endpoint "
-                    "'finance' nesse contexto (server-side). Confira em console.hgbrasil.com "
-                    "se a chave usada em HGBRASIL_TOKEN é do tipo servidor/sem restrição de "
-                    "domínio (diferente da chave 'uso exposto' embutida no index.html).",
+                    "AVISO: nenhum índice de mercado veio da brapi. Confira se o token "
+                    "em VIVERDERENDA_BRAPI é válido e se a cota mensal do plano "
+                    "(15 mil requisições no gratuito) não foi esgotada.",
                     file=sys.stderr,
                 )
         except (requests.RequestException, ValueError, KeyError) as exc:
-            print(f"AVISO: falha ao buscar índices na HG Brasil: {exc}", file=sys.stderr)
+            print(f"AVISO: falha ao buscar índices na brapi: {exc}", file=sys.stderr)
             indices = []
 
-    # Selic: troca a que veio da HG Brasil (se veio) pela do Banco Central —
-    # fonte oficial, atualiza no mesmo dia da decisão do Copom. Se o BCB
-    # falhar por algum motivo, mantém a da HG Brasil como fallback (mesmo
-    # sabendo que pode estar desatualizada) em vez de ficar sem o dado.
-    indices = [item for item in indices if item.get("label") != "Selic (meta)"]
+    # Selic: fonte oficial é o Banco Central (série SGS 432), que atualiza
+    # no mesmo dia da decisão do Copom. Não há mais fallback pela HG Brasil
+    # — ela chegou a ser usada aqui, mas mostrava valor desatualizado após
+    # as reuniões, então o BCB é a única fonte.
     selic = coletar_selic_bcb()
-    if not selic and token:
-        print("AVISO: Selic do Banco Central falhou — tentando reaproveitar da HG Brasil como fallback (pode estar desatualizada).", file=sys.stderr)
-        try:
-            selic = next((item for item in coletar_indices_hgbrasil(token) if item.get("label") == "Selic (meta)"), None)
-            if selic:
-                print(f"AVISO: Selic usada foi a da HG Brasil (fallback): {selic.get('valor_pct')}% — confira se está desatualizada.", file=sys.stderr)
-        except (requests.RequestException, ValueError, KeyError):
-            selic = None
+    if not selic:
+        print("AVISO: Selic do Banco Central falhou — o boletim sai sem ela nesta execução.", file=sys.stderr)
 
     # Reordena a Selic para logo depois do Ibovespa, se ambos existirem.
     if selic:
@@ -753,6 +771,12 @@ def obter_token_hgbrasil():
     do GitHub Actions). Mesmo provedor usado no widget de busca do site — só
     usado aqui no servidor, nunca fica no HTML."""
     return os.environ.get("HGBRASIL_TOKEN", "").strip()
+
+
+def obter_token_brapi():
+    """Token da brapi, lido da variável de ambiente VIVERDERENDA_BRAPI
+    (secret do GitHub Actions). Usado nos índices de mercado do boletim."""
+    return os.environ.get("VIVERDERENDA_BRAPI", "").strip()
 
 
 def obter_token_bolsai():
@@ -1206,7 +1230,7 @@ def main():
     token = obter_token_hgbrasil()
     noticias = coletar_noticias()
 
-    indices = coletar_indices(token)
+    indices = coletar_indices(obter_token_brapi())
     if indices:
         with open(INDICES_OUTPUT_FILE, "w", encoding="utf-8") as f:
             json.dump(indices, f, ensure_ascii=False, indent=2)
