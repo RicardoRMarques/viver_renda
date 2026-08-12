@@ -455,6 +455,15 @@
       box-shadow: var(--shadow);
     }
     .hg-linha-busca { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* backdrop-filter (o efeito "vidro fosco" do .hg-painel) quebra
+       position: sticky em elementos dentro dele, em vários navegadores —
+       desliga só aqui, onde a tabela precisa da coluna "Indicador" fixa
+       ao rolar de lado. */
+    #analise-fundamentalista .hg-painel {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
     .hg-linha-busca input {
       flex: 1 1 200px;
       padding: 14px 16px;
