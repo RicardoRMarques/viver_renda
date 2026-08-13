@@ -79,6 +79,7 @@ jobs:
           git add noticias.json
           if [ -f indices.json ]; then git add indices.json; fi
           if [ -f ranking.json ]; then git add ranking.json; fi
+          if [ -f tesouro.json ]; then git add tesouro.json; fi
           # Memória de quais notícias já foram publicadas. Precisa ser
           # commitada: o runner do Actions é descartado no fim do job, e
           # sem persistir o arquivo o robô "esqueceria" tudo a cada
