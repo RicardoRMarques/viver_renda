@@ -3941,7 +3941,6 @@
     // Escopo global (fora das IIFEs abaixo) para ser usada por todos os
     // widgets da página (busca rápida, índices, análise fundamentalista).
     const CHAVE_HG = '850310af'; // TODO: mover para um proxy e remover daqui
-    const WORKER_BOLSAI_ENDPOINT = 'https://viverderenda-bolsai.marquesr.workers.dev'; // Worker que esconde a chave da bolsai (indicadores avançados)
     const CHAVE_TWELVEDATA = '034d1589162e413d9a1e9608860cb06a'; // fallback p/ Stocks/ETFs internacionais quando não é ticker da B3 — plano free (800 req/dia, 8/min)
 
     // ============================================================
@@ -4651,9 +4650,6 @@
       let hgUltimoTickerGrafico = null;
       const hgCacheHistorico = {}; // periodo -> amostras
 
-      // Calcula a data de início de cada período. A bolsai entrega histórico
-      // DIÁRIO (um registro por pregão), então não há mais sample_by nem
-      // períodos intradiários (1D/7D foram removidos por isso).
       // Calcula start_date/sample_by pra cada período. Vai só até 1 ano —
       // a HG Brasil não tem profundidade histórica confiável de vários
       // anos (5A/10A), então não oferecemos esses períodos pra não
@@ -4717,7 +4713,7 @@
         } catch (e) {
           container.innerHTML = '<svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Gráfico indisponível agora</text></svg>';
           hgCacheHistorico[periodo] = null;
-          console.error('Erro ao carregar histórico de preços (bolsai):', e);
+          console.error('Erro ao carregar histórico de preços (HG Brasil):', e);
         }
       }
 
@@ -7926,8 +7922,8 @@
       function renderizarFundamentos(info) {
         const statements = info.statements;
 
-        // Cabeçalho de cada coluna: cada item já vem com TTM calculado até
-        // aquela data de referência (histórico trimestral da bolsai) —
+        // Cabeçalho de cada coluna: cada item já vem mapeado dos campos
+        // aninhados da HG (histórico trimestral, até 2 anos) —
         // mostra só os 5 mais recentes pra não ficar tabela demais.
         const colunas = statements.slice(0, 5).map((s, i) => ({
           rotulo: i === 0 ? 'Atual (TTM)' : fmtDataBr(s.reference_date),
