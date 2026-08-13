@@ -181,34 +181,6 @@ NOTICIAS_HISTORICO_ARQUIVO = "noticias-historico.json"
 NOTICIAS_HISTORICO_DIAS = 10      # por quanto tempo um link é considerado "já usado"
 NOTICIAS_POOL_POR_FONTE = 12      # quantos itens olhar em cada feed procurando algo novo
 
-# ------------------------------------------------------------------
-# Tesouro Direto — CSV oficial do Tesouro Transparente (portal CKAN do
-# Tesouro Nacional), dataset "Taxas dos Títulos Ofertados pelo Tesouro
-# Direto". Gratuito, sem chave, atualizado todo dia útil.
-#
-# O endpoint JSON antigo (tesourodireto.com.br/.../treasurybondsinfo.json)
-# foi DESCONTINUADO — responde 410 Gone. Este CSV é a fonte oficial que
-# o restava, e é de onde os agregadores de mercado tiram os dados.
-#
-# O arquivo traz o histórico desde 2004, então é grande (centenas de MB).
-# Por isso: (a) lemos em streaming, linha a linha, guardando só as da
-# data mais recente; (b) a coleta roda 1x/dia junto com os rankings —
-# baixar isso a cada 15 min seria desperdício, e o Tesouro publica as
-# taxas uma vez por dia útil de qualquer forma.
-#
-# Formato (separador ";", decimais com vírgula):
-#   Tipo Titulo;Data Vencimento;Data Base;Taxa Compra Manha;
-#   Taxa Venda Manha;PU Compra Manha;PU Venda Manha;PU Base Manha
-# ------------------------------------------------------------------
-TESOURO_CSV_URL = ("https://www.tesourotransparente.gov.br/ckan/dataset/"
-                   "df56aa42-484a-4a59-8184-7676580c81e3/resource/"
-                   "796d2059-14e9-44e3-80c9-2d9e30b405c1/download/"
-                   "precotaxatesourodireto.csv")
-TESOURO_ARQUIVO = "tesouro.json"
-TESOURO_TIMEOUT = 180          # o arquivo é grande; o timeout padrão não basta
-# O Tesouro vende frações de 1% do título, então o mínimo é 1% do PU.
-TESOURO_FRACAO_MINIMA = 0.01
-
 BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
 
 # IPCA acumulado em 12 meses (janela móvel, não calendário): compomos os
@@ -657,152 +629,6 @@ def coletar_noticias():
 
     salvar_historico_noticias(historico, publicados)
     return resultado
-
-
-def _tipo_do_titulo(nome, indexador):
-    """Classifica o título em Selic / Prefixado / IPCA+ a partir do nome e
-    do indexador, para o site conseguir agrupar."""
-    texto = f"{nome or ''} {indexador or ''}".upper()
-    if "SELIC" in texto:
-        return "Tesouro Selic"
-    if "IPCA" in texto:
-        return "Tesouro IPCA+"
-    if "PREFIXADO" in texto or "PRE" == (indexador or "").upper():
-        return "Tesouro Prefixado"
-    if "RENDA+" in texto or "EDUCA" in texto:
-        return "Tesouro IPCA+"
-    return "Outros"
-
-
-def _num_br(texto):
-    """Converte número em formato brasileiro ('13,42' / '1.234,56') para
-    float. O CSV do Tesouro usa vírgula decimal e ponto de milhar."""
-    if texto is None:
-        return None
-    limpo = str(texto).strip().replace(".", "").replace(",", ".")
-    if not limpo:
-        return None
-    try:
-        return float(limpo)
-    except ValueError:
-        return None
-
-
-def _data_br_para_iso(texto):
-    """'01/03/2029' -> '2029-03-01'. Devolve None se não bater o formato."""
-    partes = str(texto or "").strip().split("/")
-    if len(partes) != 3:
-        return None
-    dia, mes, ano = partes
-    if len(ano) != 4:
-        return None
-    return f"{ano}-{mes.zfill(2)}-{dia.zfill(2)}"
-
-
-def coletar_tesouro_direto():
-    """Lê o CSV oficial do Tesouro Transparente em streaming e devolve os
-    títulos da data-base mais recente.
-
-    O arquivo tem o histórico inteiro desde 2004, então nunca é carregado
-    de uma vez: percorremos linha a linha guardando apenas as da maior
-    data-base vista. Retorna None se falhar — o chamador preserva o
-    tesouro.json anterior.
-    """
-    campos_por_data = {}
-    maior_data = ""
-    linhas_lidas = 0
-
-    try:
-        with requests.get(
-            TESOURO_CSV_URL,
-            headers={"User-Agent": HEADERS_NAVEGADOR["User-Agent"]},
-            timeout=TESOURO_TIMEOUT,
-            stream=True,
-        ) as resp:
-            resp.raise_for_status()
-            resp.encoding = resp.encoding or "latin-1"
-
-            cabecalho = None
-            for linha in resp.iter_lines(decode_unicode=True):
-                if not linha:
-                    continue
-                colunas = linha.split(";")
-                if cabecalho is None:
-                    cabecalho = [c.strip().lower() for c in colunas]
-                    continue
-
-                linhas_lidas += 1
-                if len(colunas) < 6:
-                    continue
-
-                data_base = _data_br_para_iso(colunas[2])
-                if not data_base:
-                    continue
-
-                # Só guardamos a data mais recente; ao encontrar uma data
-                # maior, descartamos o que havia acumulado antes.
-                if data_base > maior_data:
-                    maior_data = data_base
-                    campos_por_data = {}
-                if data_base != maior_data:
-                    continue
-
-                nome = (colunas[0] or "").strip()
-                vencimento = _data_br_para_iso(colunas[1])
-                taxa_compra = _num_br(colunas[3])
-                if not nome or not vencimento or taxa_compra is None:
-                    continue
-
-                pu_compra = _num_br(colunas[5]) if len(colunas) > 5 else None
-                # Chave por título+vencimento evita duplicata na mesma data.
-                campos_por_data[f"{nome}|{vencimento}"] = {
-                    "nome": f"{nome} {vencimento[:4]}",
-                    "tipo": _tipo_do_titulo(nome, nome),
-                    "indexador": nome,
-                    "vencimento": vencimento,
-                    "taxa_compra": round(taxa_compra, 4),
-                    "taxa_resgate": (lambda t: round(t, 4) if t is not None else None)(
-                        _num_br(colunas[4]) if len(colunas) > 4 else None),
-                    "preco_unitario": pu_compra,
-                    "investimento_minimo": round(pu_compra * TESOURO_FRACAO_MINIMA, 2)
-                        if pu_compra is not None else None,
-                }
-    except (requests.RequestException, ValueError) as exc:
-        print(f"AVISO: falha ao ler o CSV do Tesouro Transparente ({exc}). "
-              "O tesouro.json anterior será mantido.", file=sys.stderr)
-        return None
-
-    titulos = list(campos_por_data.values())
-    if not titulos:
-        print(f"AVISO: CSV do Tesouro lido ({linhas_lidas} linhas), mas nenhum título válido "
-              "na data mais recente. O formato do arquivo pode ter mudado.", file=sys.stderr)
-        return None
-
-    titulos.sort(key=lambda t: (t["tipo"], t["vencimento"]))
-    print(f"OK: {len(titulos)} título(s) do Tesouro Direto na data-base {maior_data} "
-          f"({linhas_lidas} linhas lidas).")
-
-    return {
-        "atualizado_em": datetime.now(timezone.utc).isoformat(),
-        "data_base": maior_data,
-        "titulos": titulos,
-    }
-
-
-def salvar_tesouro(dados):
-    """Grava o tesouro.json. Se a coleta falhou (dados=None), NÃO mexe no
-    arquivo — o site continua mostrando as taxas da última coleta boa,
-    com a data de atualização visível para o leitor perceber."""
-    if dados is None:
-        print("INFO: tesouro.json mantido como estava (coleta falhou nesta execução).", file=sys.stderr)
-        return
-    caminho = os.path.join(os.path.dirname(os.path.abspath(__file__)), TESOURO_ARQUIVO)
-    try:
-        with open(caminho, "w", encoding="utf-8") as arq:
-            json.dump(dados, arq, ensure_ascii=False, indent=2)
-        print(f"OK: {len(dados['titulos'])} título(s) salvos em {TESOURO_ARQUIVO}.")
-    except OSError as exc:
-        print(f"AVISO: não foi possível salvar {TESOURO_ARQUIVO}: {exc}", file=sys.stderr)
 
 
 def _brapi_get(caminho, token, params=None):
@@ -1614,12 +1440,6 @@ def main():
         print("AVISO: nenhum índice coletado. Mantendo arquivo anterior, se existir.", file=sys.stderr)
 
     if coletar_rankings_agora:
-        # O CSV do Tesouro tem o histórico desde 2004 (centenas de MB), e
-        # as taxas mudam só uma vez por dia útil. Por isso a coleta anda
-        # junto com os rankings, 1x/dia — a cada 15 min seria desperdício
-        # de banda e tempo de runner, sem nenhum dado novo em troca.
-        salvar_tesouro(coletar_tesouro_direto())
-
         ranking = coletar_ranking(token, obter_token_bolsai())
         acoes_r = ranking.get("acoes", {})
         total_acoes = len(acoes_r.get("dividend_yield", [])) + len(acoes_r.get("valor_mercado", [])) + len(acoes_r.get("receita", []))
