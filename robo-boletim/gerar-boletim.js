@@ -111,10 +111,20 @@ function fmtVariacao(item) {
   return { texto: ` ${seta} ${Math.abs(variacao).toFixed(2)}%`, classe };
 }
 
+// Casa o rótulo do indices.json com os nomes procurados. Por padrão aceita
+// prefixo ("DÓLAR" casa com "Dólar (USD/BRL)"), o que é prático — mas
+// perigoso quando um rótulo é prefixo de outro. É o caso de "IPCA
+// (mensal)" e "IPCA (12 meses)": buscar por "IPCA" devolveria o primeiro
+// da lista. Para esses, use exato=true.
 function buscarIndicador(indices, ...nomesPossiveis) {
+  let exato = false;
+  if (typeof nomesPossiveis[nomesPossiveis.length - 1] === 'boolean') {
+    exato = nomesPossiveis.pop();
+  }
   const alvo = nomesPossiveis.map(n => n.toUpperCase());
   return (indices || []).find(i => {
     const label = (i.label || '').trim().toUpperCase();
+    if (exato) return alvo.some(a => label === a);
     return alvo.some(a => label === a || label.startsWith(a + ' ') || label.startsWith(a + '('));
   }) || null;
 }
@@ -134,19 +144,21 @@ function fmtCompacto(valor) {
 function montarIndicadoresHtml(indices) {
   const definicoes = [
     { chaves: ['IBOVESPA'], label: 'Ibovespa' },
+    { chaves: ['IFIX'], label: 'IFIX' },
     { chaves: ['DÓLAR', 'DOLAR', 'USD/BRL'], label: 'Dólar (USD/BRL)' },
     { chaves: ['EURO', 'EUR/BRL'], label: 'Euro (EUR/BRL)' },
     { chaves: ['BITCOIN', 'BTC'], label: 'Bitcoin' },
-    { chaves: ['IPCA'], label: 'IPCA (12 meses)' },
-    { chaves: ['DOW JONES', 'DOW'], label: 'Dow Jones' },
-    { chaves: ['NASDAQ'], label: 'Nasdaq' },
-    { chaves: ['PETRÓLEO', 'PETROLEO', 'BRENT'], label: 'Petróleo Brent' },
+    { chaves: ['ETHEREUM', 'ETH'], label: 'Ethereum' },
     { chaves: ['SELIC'], label: 'Selic' },
-    { chaves: ['IFIX'], label: 'IFIX' },
+    // ATENÇÃO: precisa ser o rótulo COMPLETO. O indices.json tem
+    // "IPCA (mensal)" e "IPCA (12 meses)", e buscarIndicador casa por
+    // prefixo devolvendo o primeiro — usar só 'IPCA' aqui pegava o
+    // mensal e exibia com o rótulo de 12 meses (valor errado).
+    { chaves: ['IPCA (12 MESES)'], label: 'IPCA (12 meses)', exato: true },
   ];
 
-  return definicoes.map(({ chaves, label }) => {
-    const item = buscarIndicador(indices, ...chaves);
+  return definicoes.map(({ chaves, label, exato }) => {
+    const item = buscarIndicador(indices, ...chaves, Boolean(exato));
     if (!item) return `<div class="indicator"><div class="label">${label}</div><div class="value">—</div></div>`;
 
     // Caso 1: item de cotação (tem "valor" numérico) → valor + variação do dia
