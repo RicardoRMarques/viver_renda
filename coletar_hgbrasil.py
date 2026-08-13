@@ -181,6 +181,21 @@ NOTICIAS_HISTORICO_ARQUIVO = "noticias-historico.json"
 NOTICIAS_HISTORICO_DIAS = 10      # por quanto tempo um link é considerado "já usado"
 NOTICIAS_POOL_POR_FONTE = 12      # quantos itens olhar em cada feed procurando algo novo
 
+# ------------------------------------------------------------------
+# Tesouro Direto — API pública oficial (B3/Tesouro Nacional), gratuita e
+# sem chave. Traz todos os títulos à venda com taxa de compra, taxa de
+# resgate, preço unitário, valor mínimo e vencimento.
+#
+# ATENÇÃO: esse endpoint tem histórico de indisponibilidade (já ficou
+# dias respondendo 404). Por isso usamos retry e, se falhar, o robô
+# PRESERVA o tesouro.json anterior em vez de gravar um arquivo vazio —
+# taxa de ontem é muito melhor que seção quebrada.
+# ------------------------------------------------------------------
+TESOURO_URL = ("https://www.tesourodireto.com.br/json/br/com/b3/"
+               "tesourodireto/service/api/treasurybondsinfo.json")
+TESOURO_ARQUIVO = "tesouro.json"
+TESOURO_TENTATIVAS = 3
+
 BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
 
 # IPCA acumulado em 12 meses (janela móvel, não calendário): compomos os
@@ -629,6 +644,121 @@ def coletar_noticias():
 
     salvar_historico_noticias(historico, publicados)
     return resultado
+
+
+def _normalizar_taxa(valor):
+    """Converte a taxa para float, sem reinterpretar a escala.
+
+    CUIDADO: é tentador achar que um valor abaixo de 1 seria fração
+    (0.1475 = 14,75%) e multiplicar por 100. Isso quebra o Tesouro Selic,
+    cujo spread real É menor que 1% ao ano — normalmente algo como
+    "Selic + 0,0426%". Multiplicar transformaria isso em 4,26% e o site
+    mostraria o título rendendo cem vezes mais do que rende. A API
+    devolve percentual, então usamos o valor como veio."""
+    return _para_float(valor)
+
+
+def _tipo_do_titulo(nome, indexador):
+    """Classifica o título em Selic / Prefixado / IPCA+ a partir do nome e
+    do indexador, para o site conseguir agrupar."""
+    texto = f"{nome or ''} {indexador or ''}".upper()
+    if "SELIC" in texto:
+        return "Tesouro Selic"
+    if "IPCA" in texto:
+        return "Tesouro IPCA+"
+    if "PREFIXADO" in texto or "PRE" == (indexador or "").upper():
+        return "Tesouro Prefixado"
+    if "RENDA+" in texto or "EDUCA" in texto:
+        return "Tesouro IPCA+"
+    return "Outros"
+
+
+def coletar_tesouro_direto():
+    """Busca os títulos do Tesouro Direto disponíveis para compra.
+
+    Retorna dict pronto pro front-end, ou None se falhar em todas as
+    tentativas — nesse caso o chamador preserva o arquivo anterior.
+    """
+    dados = None
+    for tentativa in range(1, TESOURO_TENTATIVAS + 1):
+        try:
+            resp = requests.get(
+                TESOURO_URL,
+                headers={"User-Agent": HEADERS_NAVEGADOR["User-Agent"], "Accept": "application/json"},
+                timeout=TIMEOUT,
+            )
+            resp.raise_for_status()
+            dados = resp.json()
+            break
+        except (requests.RequestException, ValueError) as exc:
+            if tentativa < TESOURO_TENTATIVAS:
+                espera = 3 * tentativa
+                print(f"AVISO: tentativa {tentativa} no Tesouro Direto falhou ({exc}); "
+                      f"nova tentativa em {espera}s...", file=sys.stderr)
+                time.sleep(espera)
+            else:
+                print(f"AVISO: Tesouro Direto indisponível após {TESOURO_TENTATIVAS} tentativas ({exc}). "
+                      "O endpoint oficial costuma oscilar — o tesouro.json anterior será mantido.",
+                      file=sys.stderr)
+                return None
+
+    lista = ((dados or {}).get("response") or {}).get("TrsrBdTradgList") or []
+    if not lista:
+        print("AVISO: Tesouro Direto respondeu, mas sem títulos na lista.", file=sys.stderr)
+        return None
+
+    titulos = []
+    for entrada in lista:
+        td = (entrada or {}).get("TrsrBd") or {}
+        nome = td.get("nm")
+        taxa_compra = _normalizar_taxa(td.get("anulInvstmtRate"))
+        # Sem nome ou sem taxa de compra o título não serve para exibição.
+        if not nome or taxa_compra is None:
+            continue
+        indexador = ((td.get("FinIndxs") or {}).get("nm")) or ""
+        vencimento = (td.get("mtrtyDt") or "")[:10]
+        titulos.append({
+            "nome": nome,
+            "tipo": _tipo_do_titulo(nome, indexador),
+            "indexador": indexador,
+            "vencimento": vencimento,
+            "taxa_compra": round(taxa_compra, 4),
+            "taxa_resgate": (lambda t: round(t, 4) if t is not None else None)(_normalizar_taxa(td.get("anulRedRate"))),
+            "preco_unitario": _para_float(td.get("untrInvstmtVal")),
+            "investimento_minimo": _para_float(td.get("minInvstmtAmt")),
+        })
+
+    if not titulos:
+        print("AVISO: Tesouro Direto respondeu, mas nenhum título tinha nome e taxa válidos.", file=sys.stderr)
+        return None
+
+    # Mais curtos primeiro: é a ordem que faz sentido para quem compara.
+    titulos.sort(key=lambda t: (t["tipo"], t["vencimento"]))
+
+    mercado = ((dados or {}).get("response") or {}).get("TrsrBdMkt") or {}
+    resultado = {
+        "atualizado_em": datetime.now(timezone.utc).isoformat(),
+        "mercado_aberto": mercado.get("stsCd") == 1 if mercado.get("stsCd") is not None else None,
+        "titulos": titulos,
+    }
+    print(f"OK: {len(titulos)} título(s) do Tesouro Direto coletado(s).")
+    return resultado
+
+
+def salvar_tesouro(dados):
+    """Grava o tesouro.json. Se a coleta falhou (dados=None), NÃO mexe no
+    arquivo — o site continua mostrando as taxas da última coleta boa,
+    com a data de atualização visível para o leitor perceber."""
+    if dados is None:
+        print("INFO: tesouro.json mantido como estava (coleta falhou nesta execução).", file=sys.stderr)
+        return
+    caminho = os.path.join(os.path.dirname(os.path.abspath(__file__)), TESOURO_ARQUIVO)
+    try:
+        with open(caminho, "w", encoding="utf-8") as arq:
+            json.dump(dados, arq, ensure_ascii=False, indent=2)
+        print(f"OK: {len(dados['titulos'])} título(s) salvos em {TESOURO_ARQUIVO}.")
+    except OSError as exc:
+        print(f"AVISO: não foi possível salvar {TESOURO_ARQUIVO}: {exc}", file=sys.stderr)
 
 
 def _brapi_get(caminho, token, params=None):
@@ -1438,6 +1568,11 @@ def main():
         print(f"OK: {len(indices)} índices salvos em {INDICES_OUTPUT_FILE}.")
     else:
         print("AVISO: nenhum índice coletado. Mantendo arquivo anterior, se existir.", file=sys.stderr)
+
+    # Tesouro Direto: fonte oficial, gratuita e sem chave. Se o endpoint
+    # estiver fora (acontece com alguma frequência), salvar_tesouro
+    # preserva o arquivo da última coleta boa.
+    salvar_tesouro(coletar_tesouro_direto())
 
     if coletar_rankings_agora:
         ranking = coletar_ranking(token, obter_token_bolsai())

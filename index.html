@@ -96,9 +96,81 @@
     #analise-fundamentalista,
     #boletins-semana,
     #alertas-preco,
+    #renda-fixa,
     #educacao {
       scroll-margin-top: 100px;
     }
+    /* ---------- Renda Fixa: Tesouro Direto + comparador ---------- */
+    .rf-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 14px; }
+    .rf-atualizado { display: block; font-size: 0.8rem; margin-top: 2px; }
+    .rf-filtros { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .rf-filtro {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 999px; padding: 6px 16px; font-size: 0.82rem; cursor: pointer;
+      font-family: 'Courier New', monospace;
+    }
+    .rf-filtro:hover { border-color: var(--primary); color: var(--primary); }
+    .rf-filtro.rf-ativo {
+      background: var(--primary); color: var(--btn-text);
+      border-color: var(--primary); font-weight: 700;
+    }
+    .rf-lista { display: grid; gap: 10px; }
+    .rf-titulo-card {
+      display: grid; gap: 4px 14px; align-items: center;
+      grid-template-columns: 1fr auto;
+      background: var(--deep); border: 1px solid var(--border);
+      border-radius: 12px; padding: 13px 16px;
+    }
+    .rf-nome { font-weight: 700; font-size: 0.95rem; }
+    .rf-meta { color: var(--muted); font-size: 0.8rem; }
+    .rf-taxa { text-align: right; font-family: 'Courier New', monospace; }
+    .rf-taxa strong { display: block; font-size: 1.15rem; color: var(--accent); }
+    .rf-taxa span { font-size: 0.75rem; color: var(--muted); }
+    .rf-vazio { color: var(--muted); font-size: 0.88rem; padding: 26px 0; text-align: center; }
+    .rf-nota { color: var(--muted); font-size: 0.78rem; margin-top: 14px; line-height: 1.5; }
+
+    .rf-comparador { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--border); }
+    .rf-comp-titulo { font-size: 1rem; margin-bottom: 4px; }
+    .rf-comp-grid {
+      display: grid; gap: 12px; margin: 14px 0 18px;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    }
+    .rf-comp-campo label {
+      display: block; font-size: 0.78rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;
+    }
+    .rf-input-linha { display: flex; align-items: center; gap: 8px; }
+    .rf-input-linha span { color: var(--muted); font-size: 0.82rem; white-space: nowrap; }
+    .rf-comp-campo input, .rf-comp-campo select {
+      width: 100%; min-width: 0; background: var(--deep); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px;
+      font-size: 0.92rem; font-family: 'Courier New', monospace;
+    }
+    .rf-comp-campo select { font-family: Arial, sans-serif; }
+    .rf-comp-campo input:focus, .rf-comp-campo select:focus {
+      outline: none; border-color: var(--primary);
+    }
+    .rf-resultado { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+    .rf-res-card {
+      background: var(--deep); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .rf-res-card .rf-res-nome {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--muted); display: block; margin-bottom: 3px;
+    }
+    .rf-res-card .rf-res-valor {
+      font-size: 1.3rem; font-weight: 800; font-family: 'Courier New', monospace;
+    }
+    .rf-res-card .rf-res-obs { font-size: 0.76rem; color: var(--muted); display: block; margin-top: 3px; }
+    .rf-res-destaque { border-color: var(--accent); }
+    .rf-res-destaque .rf-res-valor { color: var(--accent); }
+
+    @media (max-width: 520px) {
+      .rf-titulo-card { grid-template-columns: 1fr; }
+      .rf-taxa { text-align: left; }
+    }
+
     /* Header */
     header {
       padding: 12px 0 0;
@@ -2266,6 +2338,7 @@
       <a href="#boletim-indices-secao" class="mobile-menu-item">📊 Índices e Taxas</a>
       <a href="#boletins-semana" class="mobile-menu-item">🗞️ Boletim de Mercado Diário</a>
       <a href="#alertas-preco" class="mobile-menu-item">🔔 Meus Alertas de Preço</a>
+      <a href="#renda-fixa" class="mobile-menu-item">🏦 Renda Fixa — Tesouro Direto</a>
       <a href="#simuladorVisual" class="mobile-menu-item">📈 Veja o poder dos juros compostos</a>
       <a href="#educacao" class="mobile-menu-item">🎓 Educação</a>
       <div class="mobile-menu-separador">Consultas</div>
@@ -3474,6 +3547,81 @@
         </div>
       </div>
 
+    </section>
+
+    <!-- RENDA FIXA: TESOURO DIRETO + COMPARADOR EDUCATIVO -->
+    <section class="hg-busca" id="renda-fixa">
+      <h2 class="hg-titulo">🏦 Renda Fixa — Tesouro Direto</h2>
+      <p class="rf-sub">
+        Títulos públicos disponíveis para compra, com a rentabilidade de cada um.
+        Dados oficiais do Tesouro Nacional.
+        <span id="rfAtualizado" class="rf-atualizado"></span>
+      </p>
+
+      <div class="rf-filtros" id="rfFiltros">
+        <button type="button" class="rf-filtro rf-ativo" data-tipo="todos">Todos</button>
+        <button type="button" class="rf-filtro" data-tipo="Tesouro Selic">Selic</button>
+        <button type="button" class="rf-filtro" data-tipo="Tesouro Prefixado">Prefixado</button>
+        <button type="button" class="rf-filtro" data-tipo="Tesouro IPCA+">IPCA+</button>
+      </div>
+
+      <div class="rf-lista" id="rfLista">
+        <div class="rf-vazio">Carregando títulos...</div>
+      </div>
+
+      <p class="rf-nota">
+        A taxa mostrada é a de compra, válida se você levar o título até o vencimento.
+        Vendendo antes, o valor depende do preço de mercado no dia (marcação a mercado),
+        que pode ser maior ou menor. Não é recomendação de investimento.
+      </p>
+
+      <!-- Comparador educativo: traduz "% do CDI" em rentabilidade anual
+           usando a Selic vigente, e mostra a equivalência entre CDB (com
+           IR) e LCI/LCA (isenta). Não usa taxa real de banco nenhum —
+           não existe fonte pública confiável para isso. -->
+      <div class="rf-comparador">
+        <h3 class="rf-comp-titulo">Quanto rende hoje?</h3>
+        <p class="rf-sub">
+          Simulação educativa com a Selic vigente
+          (<strong id="rfSelicAtual" class="num">—</strong> ao ano).
+          Informe quanto o título paga e veja o retorno anual estimado.
+        </p>
+
+        <div class="rf-comp-grid">
+          <div class="rf-comp-campo">
+            <label for="rfPctCdi">CDB / RDB</label>
+            <div class="rf-input-linha">
+              <input type="number" id="rfPctCdi" value="100" min="1" max="300" step="1" />
+              <span>% do CDI</span>
+            </div>
+          </div>
+          <div class="rf-comp-campo">
+            <label for="rfPctLci">LCI / LCA</label>
+            <div class="rf-input-linha">
+              <input type="number" id="rfPctLci" value="90" min="1" max="300" step="1" />
+              <span>% do CDI</span>
+            </div>
+          </div>
+          <div class="rf-comp-campo">
+            <label for="rfPrazo">Prazo do investimento</label>
+            <select id="rfPrazo">
+              <option value="180">Até 6 meses (IR 22,5%)</option>
+              <option value="360">6 a 12 meses (IR 20%)</option>
+              <option value="540">1 a 2 anos (IR 17,5%)</option>
+              <option value="800" selected>Acima de 2 anos (IR 15%)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="rf-resultado" id="rfResultado"></div>
+
+        <p class="rf-nota">
+          O CDI costuma ficar levemente abaixo da Selic; aqui a Selic é usada como
+          aproximação. LCI e LCA são isentas de Imposto de Renda para pessoa física,
+          por isso rendem mais que um CDB de mesmo percentual. Não considera IOF
+          (resgates em menos de 30 dias) nem taxas de corretora.
+        </p>
+      </div>
     </section>
 
     <!-- ÁREA SECUNDÁRIA: EDUCAÇÃO E VENDA -->
@@ -8350,6 +8498,181 @@
       }
     }
     carregarRanking();
+
+    /* ================= Renda Fixa: Tesouro Direto + comparador =================
+       Os títulos vêm do tesouro.json, gerado pelo robô a partir da API
+       oficial do Tesouro Nacional. O comparador ao lado é educativo: NÃO
+       usa taxa real de banco (não existe fonte pública confiável de CDB/
+       LCI), apenas traduz "% do CDI" em rentabilidade anual usando a
+       Selic que já coletamos do Banco Central. */
+    (function rendaFixa() {
+      const listaEl = document.getElementById('rfLista');
+      if (!listaEl) return;
+
+      let titulos = [];
+      let filtroAtual = 'todos';
+      let selicAnual = null;
+
+      const fmtPct = v => {
+        if (typeof v !== 'number' || !isFinite(v)) return '—';
+        // O spread do Tesouro Selic é minúsculo (algo como 0,0426% ao ano).
+        // Com 2 casas viraria "0,04%" ou até "0,00%", perdendo o sentido —
+        // por isso taxas abaixo de 1% ganham mais casas decimais.
+        const casas = Math.abs(v) < 1 ? 4 : 2;
+        return v.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas }) + '%';
+      };
+      const fmtReal = v => (typeof v === 'number' && isFinite(v))
+        ? 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—';
+
+      function dataCurta(iso) {
+        if (!iso) return '';
+        const d = new Date(iso.length === 10 ? iso + 'T12:00:00' : iso);
+        return isNaN(d) ? '' : d.toLocaleDateString('pt-BR');
+      }
+
+      // "Tesouro IPCA+ 2035" paga IPCA + taxa; os demais pagam a taxa cheia.
+      // Deixar isso explícito evita o leitor comparar 7% de IPCA+ com 14%
+      // de prefixado achando que o segundo é sempre melhor.
+      function rotuloTaxa(t) {
+        if (t.tipo === 'Tesouro IPCA+') return 'IPCA + ' + fmtPct(t.taxa_compra);
+        if (t.tipo === 'Tesouro Selic') return 'Selic + ' + fmtPct(t.taxa_compra);
+        return fmtPct(t.taxa_compra) + ' ao ano';
+      }
+
+      function renderizar() {
+        const visiveis = filtroAtual === 'todos'
+          ? titulos : titulos.filter(t => t.tipo === filtroAtual);
+
+        if (!visiveis.length) {
+          listaEl.innerHTML = '<div class="rf-vazio">Nenhum título disponível neste filtro.</div>';
+          return;
+        }
+
+        listaEl.innerHTML = visiveis.map(t => `
+          <div class="rf-titulo-card">
+            <div>
+              <div class="rf-nome">${t.nome}</div>
+              <div class="rf-meta">
+                Vence em ${dataCurta(t.vencimento)}
+                ${typeof t.investimento_minimo === 'number'
+                  ? ' &middot; mínimo ' + fmtReal(t.investimento_minimo) : ''}
+              </div>
+            </div>
+            <div class="rf-taxa">
+              <strong>${rotuloTaxa(t)}</strong>
+              <span>${typeof t.preco_unitario === 'number'
+                ? 'título de ' + fmtReal(t.preco_unitario) : ''}</span>
+            </div>
+          </div>`).join('');
+      }
+
+      // A Selic já está no indices.json (série 432 do Banco Central), então
+      // o comparador não precisa de nenhuma chamada extra de API.
+      function lerSelicDosIndices() {
+        const indices = window.hgIndicesCache;
+        if (!Array.isArray(indices)) return null;
+        const item = indices.find(i => (i.label || '').toUpperCase().startsWith('SELIC'));
+        const v = item && (typeof item.valor_pct === 'number' ? item.valor_pct : item.valor);
+        return (typeof v === 'number' && isFinite(v)) ? v : null;
+      }
+
+      function calcularComparador() {
+        const alvo = document.getElementById('rfResultado');
+        if (!alvo) return;
+        if (selicAnual === null) {
+          alvo.innerHTML = '<div class="rf-vazio">Aguardando a taxa Selic para calcular...</div>';
+          return;
+        }
+
+        const pctCdb = parseFloat(document.getElementById('rfPctCdi').value) || 0;
+        const pctLci = parseFloat(document.getElementById('rfPctLci').value) || 0;
+        const dias = parseInt(document.getElementById('rfPrazo').value, 10) || 800;
+
+        // Tabela regressiva de IR da renda fixa.
+        const aliquota = dias <= 180 ? 0.225 : dias <= 360 ? 0.20 : dias <= 720 ? 0.175 : 0.15;
+
+        const brutoCdb = selicAnual * (pctCdb / 100);
+        const liquidoCdb = brutoCdb * (1 - aliquota);
+        const lci = selicAnual * (pctLci / 100);   // isenta de IR
+
+        // Quanto o CDB precisaria pagar para empatar com a LCI informada.
+        const cdbEquivalente = (1 - aliquota) > 0
+          ? (pctLci / (1 - aliquota)) : null;
+
+        const melhorLci = lci > liquidoCdb;
+
+        alvo.innerHTML = `
+          <div class="rf-res-card${melhorLci ? '' : ' rf-res-destaque'}">
+            <span class="rf-res-nome">CDB a ${pctCdb}% do CDI</span>
+            <span class="rf-res-valor">${fmtPct(liquidoCdb)}</span>
+            <span class="rf-res-obs">líquido &middot; ${fmtPct(brutoCdb)} bruto, IR de ${(aliquota * 100).toFixed(1).replace('.', ',')}%</span>
+          </div>
+          <div class="rf-res-card${melhorLci ? ' rf-res-destaque' : ''}">
+            <span class="rf-res-nome">LCI/LCA a ${pctLci}% do CDI</span>
+            <span class="rf-res-valor">${fmtPct(lci)}</span>
+            <span class="rf-res-obs">líquido &middot; isento de IR</span>
+          </div>
+          <div class="rf-res-card">
+            <span class="rf-res-nome">Para empatar com a LCI</span>
+            <span class="rf-res-valor">${cdbEquivalente ? cdbEquivalente.toFixed(0) + '%' : '—'}</span>
+            <span class="rf-res-obs">é o quanto do CDI o CDB precisaria pagar</span>
+          </div>`;
+      }
+
+      async function carregar() {
+        try {
+          const resp = await fetch('tesouro.json', { cache: 'no-store' });
+          if (!resp.ok) throw new Error('arquivo não encontrado');
+          const dados = await resp.json();
+          titulos = Array.isArray(dados.titulos) ? dados.titulos : [];
+          if (!titulos.length) throw new Error('vazio');
+
+          const infoEl = document.getElementById('rfAtualizado');
+          if (infoEl && dados.atualizado_em) {
+            const d = new Date(dados.atualizado_em);
+            if (!isNaN(d)) {
+              infoEl.textContent = 'Taxas atualizadas em ' + d.toLocaleDateString('pt-BR')
+                + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.';
+            }
+          }
+          renderizar();
+        } catch (e) {
+          listaEl.innerHTML = '<div class="rf-vazio">Títulos ainda não gerados — aguarde o robô rodar.</div>';
+        }
+      }
+
+      // A Selic chega junto com o indices.json, que é carregado por outro
+      // bloco. Aguardamos ela aparecer em vez de assumir a ordem de carga.
+      function aguardarSelic(tentativas) {
+        selicAnual = lerSelicDosIndices();
+        const elSelic = document.getElementById('rfSelicAtual');
+        if (selicAnual !== null) {
+          if (elSelic) elSelic.textContent = fmtPct(selicAnual);
+          calcularComparador();
+          return;
+        }
+        if (tentativas > 0) return setTimeout(() => aguardarSelic(tentativas - 1), 700);
+        if (elSelic) elSelic.textContent = 'indisponível';
+        calcularComparador();
+      }
+
+      document.getElementById('rfFiltros')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.rf-filtro');
+        if (!btn) return;
+        filtroAtual = btn.dataset.tipo;
+        document.querySelectorAll('.rf-filtro').forEach(b =>
+          b.classList.toggle('rf-ativo', b === btn));
+        renderizar();
+      });
+
+      ['rfPctCdi', 'rfPctLci', 'rfPrazo'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', calcularComparador);
+        document.getElementById(id)?.addEventListener('change', calcularComparador);
+      });
+
+      carregar();
+      aguardarSelic(12);
+    })();
 
     (function () {
       const botao = document.getElementById('themeToggle');
