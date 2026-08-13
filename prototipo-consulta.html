@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Protótipo — Consulta de Ativo | Viver de Renda</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --card: #111b2e;
+    --deep: #04101a;
+    --grad-a: #07101c;
+    --grad-b: #0b1220;
+    --text: #e8eefc;
+    --muted: #a9b6d3;
+    --primary: #31c3ff;
+    --primary-dark: #16a0d8;
+    --accent: #7cff92;
+    --gold: #e0b84d;
+    --danger: #ff6b6b;
+    --border: rgba(255,255,255,0.08);
+    --shadow: 0 16px 40px rgba(0,0,0,0.28);
+    --btn-text: #04101a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+      radial-gradient(circle at top, rgba(49,195,255,0.15), transparent 40%),
+      linear-gradient(180deg, var(--grad-a) 0%, var(--grad-b) 100%);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { width: min(1180px, 94%); margin: 0 auto; }
+  /* Números em monoespaçada: é a assinatura visual que o site já usa
+     nas tabelas e cards, e o que faz os valores alinharem na vertical. */
+  .num { font-family: 'Courier New', Courier, monospace; }
+
+  /* ---------- HERO DE BUSCA ---------- */
+  .hero { padding: 54px 0 30px; text-align: center; }
+  .hero h1 {
+    font-size: clamp(1.5rem, 3.4vw, 2.3rem);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .hero h1 em { font-style: normal; color: var(--primary); }
+  .hero p { color: var(--muted); margin-bottom: 24px; font-size: 0.98rem; }
+  .busca {
+    display: flex; gap: 10px; max-width: 660px; margin: 0 auto;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 999px; padding: 7px 7px 7px 22px;
+    box-shadow: var(--shadow);
+  }
+  .busca:focus-within { border-color: var(--primary); }
+  .busca input {
+    flex: 1; min-width: 0; background: transparent; border: 0;
+    color: var(--text); font-size: 1rem; outline: none;
+    font-family: 'Courier New', Courier, monospace; letter-spacing: 0.06em;
+  }
+  .busca input::placeholder { color: var(--muted); letter-spacing: normal; font-family: Arial, sans-serif; }
+  .busca button {
+    border: 0; border-radius: 999px; padding: 11px 26px;
+    background: var(--primary); color: var(--btn-text);
+    font-weight: 800; font-size: 0.9rem; cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  .busca button:hover { background: var(--primary-dark); }
+  .sugestoes { margin-top: 16px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; align-items: center; }
+  .sugestoes span { color: var(--muted); font-size: 0.82rem; }
+  .chip {
+    background: var(--card); border: 1px solid var(--border); color: var(--text);
+    border-radius: 999px; padding: 5px 14px; font-size: 0.82rem; cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  .chip:hover { border-color: var(--primary); color: var(--primary); }
+
+  /* ---------- ESTADOS ---------- */
+  .aviso {
+    max-width: 660px; margin: 26px auto 0; text-align: center;
+    color: var(--muted); font-size: 0.92rem;
+  }
+  .aviso.erro { color: var(--danger); }
+
+  /* ---------- FICHA DO ATIVO ---------- */
+  #ficha { display: none; padding-bottom: 60px; }
+  #ficha.visivel { display: block; }
+
+  .ficha-topo {
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 18px;
+    padding: 26px 0 18px; border-bottom: 1px solid var(--border);
+  }
+  .ficha-ticker { font-size: 2rem; font-weight: 800; letter-spacing: -0.01em; }
+  .ficha-nome { color: var(--muted); font-size: 0.95rem; flex: 1 1 240px; min-width: 0; }
+  .selo {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+    border: 1px solid var(--border); border-radius: 999px; padding: 3px 11px;
+    color: var(--muted);
+  }
+  .ficha-preco { text-align: right; }
+  .ficha-preco .valor { font-size: 1.9rem; font-weight: 800; }
+  .ficha-preco .ref { display: block; font-size: 0.76rem; color: var(--muted); }
+  .up { color: var(--accent); } .down { color: var(--danger); }
+
+  /* Cards de destaque */
+  .destaques {
+    display: grid; gap: 12px; margin-top: 22px;
+    grid-template-columns: repeat(6, 1fr);
+  }
+  @media (max-width: 900px) { .destaques { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 520px) { .destaques { grid-template-columns: repeat(2, 1fr); } }
+  .destaque {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; min-width: 0;
+  }
+  .destaque .rotulo {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--muted); display: block; margin-bottom: 4px;
+  }
+  .destaque .dado { font-size: 1.32rem; font-weight: 700; }
+
+  /* Seções */
+  .secao { margin-top: 38px; }
+  .secao > h2 {
+    font-size: 1.05rem; margin-bottom: 14px; display: flex;
+    align-items: center; gap: 10px;
+  }
+  .secao > h2::before {
+    content: ''; width: 4px; height: 17px; border-radius: 2px;
+    background: var(--primary); flex-shrink: 0;
+  }
+  .painel {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px;
+  }
+
+  /* Gráfico */
+  .periodos { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .periodos button {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    border-radius: 999px; padding: 5px 15px; font-size: 0.8rem; cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+  }
+  .periodos button[aria-pressed="true"] {
+    background: var(--primary); color: var(--btn-text); border-color: var(--primary); font-weight: 700;
+  }
+  #grafico svg { width: 100%; height: auto; display: block; }
+  .g-grid { stroke: var(--border); }
+  .g-label { fill: var(--muted); font-size: 10px; font-family: 'Courier New', monospace; }
+
+  /* Tabela de indicadores por grupo */
+  .grupos { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+  .grupo h3 {
+    font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--primary); margin-bottom: 8px; font-weight: 700;
+  }
+  .linha {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 7px 0; border-top: 1px solid var(--border); font-size: 0.9rem;
+  }
+  .linha:first-of-type { border-top: 0; }
+  .linha dt { color: var(--muted); }
+  .linha dd { font-weight: 700; white-space: nowrap; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.8rem; padding: 30px 0 40px; }
+
+  @media (max-width: 620px) {
+    .ficha-topo { align-items: flex-start; }
+    .ficha-preco { text-align: left; width: 100%; }
+    .busca { border-radius: 16px; flex-direction: column; padding: 14px; }
+    .busca input { text-align: center; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<main class="container">
+
+  <section class="hero">
+    <h1>Consulte um ativo e veja <em>cotação, fundamentos e gráfico</em></h1>
+    <p>Ações e FIIs da B3, com dados da bolsai (B3/CVM).</p>
+
+    <div class="busca">
+      <input id="entrada" type="text" placeholder="Digite o código do ativo (ex: BBSE3)"
+             autocomplete="off" spellcheck="false" aria-label="Código do ativo" />
+      <button id="btn" type="button">Consultar</button>
+    </div>
+
+    <div class="sugestoes">
+      <span>Mais buscados:</span>
+      <button class="chip" type="button">BBSE3</button>
+      <button class="chip" type="button">PETR4</button>
+      <button class="chip" type="button">VALE3</button>
+      <button class="chip" type="button">ITUB4</button>
+      <button class="chip" type="button">WEGE3</button>
+    </div>
+
+    <p class="aviso" id="aviso"></p>
+  </section>
+
+  <section id="ficha" aria-live="polite">
+    <header class="ficha-topo">
+      <div class="ficha-ticker num" id="fTicker"></div>
+      <div class="ficha-nome" id="fNome"></div>
+      <span class="selo" id="fSetor"></span>
+      <div class="ficha-preco">
+        <span class="valor num" id="fPreco"></span>
+        <span class="ref" id="fRef"></span>
+      </div>
+    </header>
+
+    <div class="destaques" id="fDestaques"></div>
+
+    <div class="secao">
+      <h2>Cotação</h2>
+      <div class="painel">
+        <div class="periodos" id="fPeriodos">
+          <button type="button" data-p="30D" aria-pressed="true">30D</button>
+          <button type="button" data-p="6M" aria-pressed="false">6M</button>
+          <button type="button" data-p="1A" aria-pressed="false">1A</button>
+          <button type="button" data-p="5A" aria-pressed="false">5A</button>
+        </div>
+        <div id="grafico"></div>
+      </div>
+    </div>
+
+    <div class="secao">
+      <h2>Indicadores</h2>
+      <div class="painel grupos" id="fGrupos"></div>
+    </div>
+
+    <div class="secao">
+      <h2>Demonstrações (último balanço)</h2>
+      <div class="painel grupos" id="fBalanco"></div>
+    </div>
+  </section>
+
+  <footer>Protótipo para avaliação — dados da bolsai (B3/CVM). Não é recomendação de investimento.</footer>
+</main>
+
+<script>
+const WORKER = 'https://viverderenda-bolsai.marquesr.workers.dev';
+
+const $ = id => document.getElementById(id);
+const avisoEl = $('aviso');
+let tickerAtual = null;
+let cacheGrafico = {};
+
+/* ---------- formatação ---------- */
+const nf = (v, d = 2) => (typeof v === 'number' && isFinite(v))
+  ? v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
+const money = v => (typeof v === 'number' && isFinite(v)) ? 'R$ ' + nf(v) : '—';
+const pct = v => (typeof v === 'number' && isFinite(v)) ? nf(v) + '%' : '—';
+function compacto(v) {
+  if (typeof v !== 'number' || !isFinite(v)) return '—';
+  const abs = Math.abs(v);
+  if (abs >= 1e12) return 'R$ ' + nf(v / 1e12, 1) + ' tri';
+  if (abs >= 1e9)  return 'R$ ' + nf(v / 1e9, 1) + ' bi';
+  if (abs >= 1e6)  return 'R$ ' + nf(v / 1e6, 1) + ' mi';
+  if (abs >= 1e3)  return 'R$ ' + nf(v / 1e3, 1) + ' mil';
+  return money(v);
+}
+const dataBR = s => {
+  if (!s) return '';
+  const d = new Date(s + (s.length === 10 ? 'T12:00:00' : ''));
+  return isNaN(d) ? '' : d.toLocaleDateString('pt-BR');
+};
+
+/* ---------- busca ---------- */
+async function consultar(ticker) {
+  ticker = (ticker || '').trim().toUpperCase();
+  if (!ticker) { avisoEl.textContent = 'Digite o código de um ativo para consultar.'; return; }
+
+  tickerAtual = ticker;
+  cacheGrafico = {};
+  avisoEl.className = 'aviso';
+  avisoEl.textContent = 'Buscando ' + ticker + '...';
+  $('ficha').classList.remove('visivel');
+
+  try {
+    const resp = await fetch(`${WORKER}/?ticker=${encodeURIComponent(ticker)}`);
+    const dados = await resp.json();
+    if (!resp.ok || !dados || dados.error || !dados.ticker) {
+      throw new Error(dados?.error || 'não encontrado');
+    }
+    avisoEl.textContent = '';
+    montarFicha(dados);
+    $('ficha').classList.add('visivel');
+    carregarGrafico('30D');
+    $('ficha').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    avisoEl.className = 'aviso erro';
+    avisoEl.textContent = `Não encontramos "${ticker}". Confira o código e tente de novo.`;
+  }
+}
+
+/* ---------- ficha ---------- */
+function montarFicha(d) {
+  $('fTicker').textContent = d.ticker || '';
+  $('fNome').textContent = d.corporate_name || '';
+  $('fSetor').textContent = d.sector || 'B3';
+  $('fPreco').textContent = money(d.close_price);
+  $('fRef').textContent = d.reference_date ? 'Balanço de ' + dataBR(d.reference_date) : '';
+
+  // Nota: /fundamentals não devolve dividend_yield (só o /screener tem).
+  // Por isso o destaque aqui é ROIC — se quiser DY na ficha, precisaria
+  // de uma chamada extra a /dividends/{ticker} (novo modo no Worker).
+  const destaques = [
+    ['P/L', nf(d.pl)], ['P/VP', nf(d.pvp)], ['ROE', pct(d.roe)],
+    ['ROIC', pct(d.roic)], ['VPA', money(d.vpa)],
+    ['Valor de mercado', compacto(d.market_cap)],
+  ];
+  $('fDestaques').innerHTML = destaques.map(([r, v]) => `
+    <div class="destaque">
+      <span class="rotulo">${r}</span>
+      <span class="dado num">${v}</span>
+    </div>`).join('');
+
+  $('fGrupos').innerHTML = [
+    ['Valuation', [['P/L', nf(d.pl)], ['P/VP', nf(d.pvp)], ['P/Receita', nf(d.p_sr)],
+      ['EV/EBITDA', nf(d.ev_ebitda)], ['EV/EBIT', nf(d.ev_ebit)], ['P/Ativos', nf(d.p_assets)]]],
+    ['Rentabilidade', [['ROE', pct(d.roe)], ['ROA', pct(d.roa)], ['ROIC', pct(d.roic)],
+      ['Margem bruta', pct(d.gross_margin)], ['Margem EBITDA', pct(d.ebitda_margin)],
+      ['Margem líquida', pct(d.net_margin)]]],
+    ['Endividamento', [['Dívida/Patrimônio', nf(d.debt_equity)],
+      ['Dív. líq./Patrimônio', nf(d.net_debt_equity)], ['Dív. líq./EBITDA', nf(d.net_debt_ebitda)],
+      ['Liquidez corrente', nf(d.current_ratio)]]],
+    ['Crescimento', [['Receita (CAGR 5a)', pct(d.cagr_revenue_5y)],
+      ['Lucro (CAGR 5a)', pct(d.cagr_earnings_5y)], ['Giro do ativo', nf(d.asset_turnover)],
+      ['Ações em circulação', d.shares_outstanding ? nf(d.shares_outstanding, 0) : '—']]],
+  ].map(bloco).join('');
+
+  $('fBalanco').innerHTML = [
+    ['Resultado', [['Receita líquida', compacto(d.net_revenue)], ['EBITDA', compacto(d.ebitda)],
+      ['EBIT', compacto(d.ebit)], ['Lucro líquido', compacto(d.net_income)]]],
+    ['Patrimônio', [['Patrimônio líquido', compacto(d.equity)], ['Ativo total', compacto(d.total_assets)],
+      ['Ativo circulante', compacto(d.current_assets)], ['Passivo circulante', compacto(d.current_liabilities)]]],
+    ['Caixa e dívida', [['Caixa', compacto(d.cash)], ['Dívida total', compacto(d.total_debt)],
+      ['Dívida líquida', compacto(d.net_debt)]]],
+  ].map(bloco).join('');
+}
+
+const bloco = ([titulo, linhas]) => `
+  <div class="grupo">
+    <h3>${titulo}</h3>
+    <dl>${linhas.map(([r, v]) => `
+      <div class="linha"><dt>${r}</dt><dd class="num">${v}</dd></div>`).join('')}
+    </dl>
+  </div>`;
+
+/* ---------- gráfico ---------- */
+const JANELAS = { '30D': [30, 40], '6M': [182, 140], '1A': [365, 260], '5A': [1825, 1300] };
+
+async function carregarGrafico(periodo) {
+  const alvo = $('grafico');
+  document.querySelectorAll('#fPeriodos button').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.p === periodo)));
+
+  if (cacheGrafico[periodo]) return desenhar(cacheGrafico[periodo]);
+  alvo.innerHTML = '<p style="color:var(--muted);font-size:.85rem;padding:40px 0">Carregando cotações...</p>';
+
+  const [dias, limite] = JANELAS[periodo];
+  const fim = new Date();
+  const ini = new Date(); ini.setDate(fim.getDate() - dias);
+  const iso = d => d.toISOString().slice(0, 10);
+
+  try {
+    const url = `${WORKER}/?ticker=${encodeURIComponent(tickerAtual)}&mode=prices`
+              + `&start=${iso(ini)}&end=${iso(fim)}&limit=${limite}`;
+    const r = await fetch(url);
+    const j = await r.json();
+    const pts = (j.prices || [])
+      .map(p => ({ d: p.trade_date, v: typeof p.adjusted_close === 'number' ? p.adjusted_close : p.close }))
+      .filter(p => typeof p.v === 'number' && p.d)
+      .sort((a, b) => new Date(a.d) - new Date(b.d));
+    if (pts.length < 2) throw new Error('poucos pontos');
+    cacheGrafico[periodo] = pts;
+    desenhar(pts);
+  } catch (e) {
+    alvo.innerHTML = '<p style="color:var(--muted);font-size:.85rem;padding:40px 0">Sem cotações para este período.</p>';
+  }
+}
+
+function desenhar(pts) {
+  const L = 900, A = 300, mE = 62, mD = 16, mT = 14, mB = 30;
+  const larg = L - mE - mD, alt = A - mT - mB;
+  const vals = pts.map(p => p.v);
+  const lo0 = Math.min(...vals), hi0 = Math.max(...vals);
+  const folga = ((hi0 - lo0) || hi0 * 0.02) * 0.12;
+  const lo = lo0 - folga, hi = hi0 + folga, amp = (hi - lo) || 1;
+  const X = i => mE + (i / (pts.length - 1)) * larg;
+  const Y = v => mT + alt - ((v - lo) / amp) * alt;
+
+  const alta = vals[vals.length - 1] >= vals[0];
+  const cor = alta ? 'var(--accent)' : 'var(--danger)';
+  const id = 'g' + Date.now();
+
+  const linha = pts.map((p, i) => `${i ? 'L' : 'M'} ${X(i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ');
+  const area = `${linha} L ${X(pts.length - 1).toFixed(1)},${mT + alt} L ${X(0).toFixed(1)},${mT + alt} Z`;
+
+  let grade = '';
+  for (let i = 0; i <= 4; i++) {
+    const v = lo + amp * i / 4, y = Y(v);
+    grade += `<line class="g-grid" x1="${mE}" y1="${y.toFixed(1)}" x2="${L - mD}" y2="${y.toFixed(1)}"
+                stroke-dasharray="${i ? '2,4' : '0'}"/>
+              <text class="g-label" x="${mE - 8}" y="${(y + 3).toFixed(1)}" text-anchor="end">${nf(v)}</text>`;
+  }
+
+  const n = Math.min(5, pts.length);
+  const idx = [...new Set(Array.from({ length: n }, (_, k) =>
+    Math.round(k / (n - 1) * (pts.length - 1))))];
+  const datas = idx.map((i, pos) => {
+    const anchor = pos === 0 ? 'start' : (pos === idx.length - 1 ? 'end' : 'middle');
+    return `<text class="g-label" x="${X(i).toFixed(1)}" y="${A - 8}" text-anchor="${anchor}">${dataBR(pts[i].d)}</text>`;
+  }).join('');
+
+  $('grafico').innerHTML = `
+    <svg viewBox="0 0 ${L} ${A}" role="img" aria-label="Gráfico de cotação">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${cor}" stop-opacity="0.28"/>
+        <stop offset="100%" stop-color="${cor}" stop-opacity="0"/>
+      </linearGradient></defs>
+      ${grade}
+      <path d="${area}" fill="url(#${id})"/>
+      <path d="${linha}" fill="none" stroke="${cor}" stroke-width="2"
+            stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="${X(pts.length - 1).toFixed(1)}" cy="${Y(vals[vals.length - 1]).toFixed(1)}" r="4" fill="${cor}"/>
+      ${datas}
+    </svg>`;
+}
+
+/* ---------- eventos ---------- */
+$('btn').addEventListener('click', () => consultar($('entrada').value));
+$('entrada').addEventListener('keydown', e => { if (e.key === 'Enter') consultar($('entrada').value); });
+document.querySelectorAll('.chip').forEach(c =>
+  c.addEventListener('click', () => { $('entrada').value = c.textContent; consultar(c.textContent); }));
+$('fPeriodos').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (b) carregarGrafico(b.dataset.p);
+});
+</script>
+</body>
+</html>
