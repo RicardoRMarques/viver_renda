@@ -217,6 +217,21 @@ function montarTabelaAcoes(ranking) {
 // existe um campo de resumo/descrição na fonte, por isso mostramos só a
 // fonte da notícia como texto de apoio. O título agora é um link clicável
 // pra matéria original, quando o campo "link" existe.
+// Miniatura da notícia. Só entra se a URL for absoluta http(s) — links
+// relativos vindos de RSS quebrariam, já que o boletim é servido de outro
+// domínio. Se a imagem falhar no carregamento (link expirado, hotlink
+// bloqueado), o onerror remove o elemento e o texto ocupa o espaço todo,
+// em vez de deixar um ícone de imagem quebrada no boletim.
+function montarMiniaturaHtml(url, alt, classe) {
+  if (typeof url !== 'string') return '';
+  const limpa = url.trim();
+  if (!/^https?:\/\//i.test(limpa)) return '';
+  const seguro = limpa.replace(/"/g, '&quot;');
+  const altSeguro = String(alt || 'Imagem da notícia').replace(/"/g, '&quot;');
+  return `<img src="${seguro}" alt="${altSeguro}" class="${classe}" loading="lazy" `
+    + `referrerpolicy="no-referrer" onerror="this.remove()">`;
+}
+
 function montarNoticiasHtml(noticias) {
   const lista = Array.isArray(noticias) ? noticias.slice(0, 3) : [];
   if (lista.length === 0) {
@@ -227,10 +242,14 @@ function montarNoticiasHtml(noticias) {
     const tituloHtml = n.link
       ? `<a href="${n.link}" target="_blank" rel="noopener noreferrer" class="n-link">${i + 1}. ${titulo}</a>`
       : `${i + 1}. ${titulo}`;
+    const thumb = montarMiniaturaHtml(n.imagem, titulo, 'n-thumb');
     return `
-<div class="news-item">
-  <div class="n-title">${tituloHtml}</div>
-  ${n.fonte ? `<div class="n-body">Fonte: ${n.fonte}</div>` : ''}
+<div class="news-item${thumb ? ' com-thumb' : ''}">
+  ${thumb}
+  <div class="n-conteudo">
+    <div class="n-title">${tituloHtml}</div>
+    ${n.fonte ? `<div class="n-body">Fonte: ${n.fonte}</div>` : ''}
+  </div>
 </div>`;
   }).join('\n');
 }
@@ -249,7 +268,7 @@ function carregarEditorial(noticiasDestaques) {
   }
 
   const destaquesFallback = (Array.isArray(noticiasDestaques) ? noticiasDestaques.slice(0, 4) : [])
-    .map(n => ({ titulo: n.titulo, obs: n.fonte || '', link: n.link || null }));
+    .map(n => ({ titulo: n.titulo, obs: n.fonte || '', link: n.link || null, imagem: n.imagem || null }));
 
   return {
     destaques: destaquesFallback,
@@ -265,7 +284,10 @@ function montarDestaquesHtml(destaques) {
     const tituloHtml = d.link
       ? `<a href="${d.link}" target="_blank" rel="noopener noreferrer" class="tk-link">${d.titulo}</a>`
       : d.titulo;
-    return `<div class="mover-row"><span class="tk">${tituloHtml}</span>${d.obs ? `<span class="pct">${d.obs}</span>` : ''}</div>`;
+    const thumb = montarMiniaturaHtml(d.imagem, d.titulo, 'tk-thumb');
+    return `<div class="mover-row${thumb ? ' com-thumb' : ''}">${thumb}`
+      + `<span class="tk">${tituloHtml}</span>`
+      + `${d.obs ? `<span class="pct">${d.obs}</span>` : ''}</div>`;
   }).join('\n  ');
 }
 
@@ -322,7 +344,19 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, 
   .mover-row{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:9px 12px;}
   .mover-row .tk{font-weight:600;font-size:13px;}
   .mover-row .pct{font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  /* Miniaturas. A regra .com-thumb só entra quando existe imagem, então
+     linhas sem foto continuam com o layout original, sem buraco. O "tk"
+     vira flex:1 para o título ocupar o espaço restante e a fonte ficar
+     encostada à direita, como já era. */
+  .mover-row.com-thumb{gap:10px;}
+  .mover-row.com-thumb .tk{flex:1;min-width:0;}
+  .tk-thumb{width:44px;height:44px;flex-shrink:0;border-radius:6px;object-fit:cover;
+    background:var(--card-border);display:block;}
   .news-item{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+  .news-item.com-thumb{display:flex;gap:12px;align-items:flex-start;}
+  .news-item.com-thumb .n-conteudo{flex:1;min-width:0;}
+  .n-thumb{width:64px;height:64px;flex-shrink:0;border-radius:8px;object-fit:cover;
+    background:var(--card-border);display:block;}
   .news-item .n-title{font-weight:600;font-size:13.5px;margin-bottom:4px;}
   .n-title a.n-link, .tk a.tk-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--gold); }
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
