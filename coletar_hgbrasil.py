@@ -110,20 +110,6 @@ HGBRASIL_INCOME_URL = "https://api.hgbrasil.com/v2/finance/income-statements"
 
 # IPCA: variação mensal, via API pública do Banco Central (série SGS 433)
 # ------------------------------------------------------------------
-# bolsai (usebolsai.com) — usada nos rankings de FIIs. Fonte B3/CVM, com
-# endpoint dedicado /fiis/{ticker} que traz P/VP, DY 12m e o patrimônio
-# líquido REAL do fundo (net_asset_value). Isso é melhor que a HG Brasil
-# nesse ponto específico: lá o patrimônio não vinha de forma confiável e
-# o código caía para market_cap (valor de mercado) como aproximação.
-# Diferente do resto do site, aqui a chave fica no servidor (secret do
-# GitHub Actions), então não precisa passar pelo Cloudflare Worker.
-# ------------------------------------------------------------------
-BOLSAI_BASE_URL = "https://api.usebolsai.com/api/v1"
-# Volume não vem no /fiis/{ticker}; é lido do histórico de preços, que
-# também permite calcular a variação % do dia (últimos 2 fechamentos).
-BOLSAI_PAUSA_ENTRE_CHAMADAS = 0.15  # segundos, para não saturar a API
-
-# ------------------------------------------------------------------
 # brapi (brapi.dev) — usada só para os índices da B3 (Ibovespa e IFIX).
 # São 2 requisições por execução (o plano gratuito limita a 1 ticker por
 # chamada em /stocks/quote), ~5,8 mil/mês — folgado no limite de 15 mil.
@@ -980,20 +966,6 @@ def obter_token_brapi():
     return os.environ.get("VIVERDERENDA_BRAPI", "").strip()
 
 
-def obter_token_bolsai():
-    """Chave da bolsai, lida da variável de ambiente VIVERDERENDA_BOLSAI_RANKING
-    (secret do GitHub Actions). Usada só nos rankings de FIIs.
-
-    Aceita também o nome antigo VIVERDERENDA_BOLSAI como fallback, para não
-    quebrar caso o secret volte a ser criado com aquele nome. Essa chave é
-    independente da que está no Cloudflare Worker (BOLSAI_API_KEY): lá ela
-    serve o navegador, aqui roda no servidor do GitHub Actions."""
-    return (
-        os.environ.get("VIVERDERENDA_BOLSAI_RANKING", "").strip()
-        or os.environ.get("VIVERDERENDA_BOLSAI", "").strip()
-    )
-
-
 def _tickers_b3(simbolos):
     """Formata uma lista de símbolos ('PETR4') no padrão exigido pela HG
     Brasil ('B3:PETR4'), separados por vírgula."""
@@ -1028,104 +1000,58 @@ def _buscar_quotes_em_lotes(pool, token, tamanho_lote=HGBRASIL_MAX_TICKERS_POR_R
     return resultados
 
 
-def _bolsai_get(caminho, chave, params=None):
-    """GET autenticado na bolsai. Retorna o JSON, ou None se falhar (para
-    que um FII problemático não derrube o ranking inteiro)."""
-    url = f"{BOLSAI_BASE_URL}{caminho}"
-    try:
-        resp = requests.get(
-            url,
-            params=params or {},
-            headers={"X-API-Key": chave},
-            timeout=TIMEOUT,
-        )
-        if resp.status_code != 200:
-            print(
-                f"AVISO: bolsai {caminho} respondeu {resp.status_code}: {resp.text[:200]}",
-                file=sys.stderr,
-            )
-            return None
-        return resp.json()
-    except (requests.RequestException, ValueError) as exc:
-        print(f"AVISO: falha ao chamar bolsai {caminho}: {exc}", file=sys.stderr)
-        return None
+def _buscar_fundamentos_fiis_hg(pool, token):
+    """Busca, em lotes, preço, variação, Dividend Yield (12m), valor de
+    mercado e volume de todo o pool de FIIs via /v2/finance/quotes — a
+    mesma chamada em lote já usada para ações, então cobre o pool inteiro
+    numa passada só (a bolsai precisava de 2 requisições POR FII: uma
+    para fundamentos, outra para volume).
 
+    ATENÇÃO — aproximação conhecida: a HG não tem patrimônio líquido de
+    FII (net_asset_value). Usamos market_cap (valor de MERCADO) como
+    aproximação de patrimônio, por decisão explícita — ciente de que os
+    dois números são conceitualmente diferentes (mercado reflete o preço
+    da cota × cotas emitidas; patrimônio é o valor contábil apurado por
+    laudo). Quando o fundo negocia com ágio ou deságio relevante sobre o
+    valor patrimonial (P/VP ≠ 1), o ranking por este campo reflete o
+    valor de mercado, não o patrimonial de fato."""
+    resultados_brutos = _buscar_quotes_em_lotes(pool, token)
 
-def _buscar_fundamentos_fiis_bolsai(pool, chave):
-    """Busca, um ticker por vez, os dados de cada FII do pool na bolsai.
+    if not resultados_brutos:
+        print("DEBUG: /v2/finance/quotes (FIIs) não retornou nenhum resultado em nenhum lote.", file=sys.stderr)
 
-    Faz 2 chamadas por FII:
-      1. /fiis/{ticker}          -> nome, cotação, P/VP, DY 12m e o
-                                    patrimônio líquido real (net_asset_value)
-      2. /stocks/{ticker}/history -> volume do último pregão e variação %
-                                    do dia (calculada dos 2 últimos closes)
-
-    Com 20 FIIs no pool são ~40 requisições por execução. Como o ranking
-    roda 1x por dia (--com-ranking), isso é irrelevante frente ao limite
-    de 10.000/dia do plano Pro.
-    """
     fundamentos = {}
-
-    for ticker in pool:
-        dados = _bolsai_get(f"/fiis/{ticker}", chave)
-        if not dados:
+    for ativo in resultados_brutos:
+        symbol = ativo.get("symbol")
+        if not symbol:
             continue
-
-        # Volume e variação vêm do histórico de preços (2 últimos pregões).
-        historico = _bolsai_get(
-            f"/stocks/{ticker}/history", chave, params={"limit": 2}
-        )
-        volume = None
-        variacao_pct = None
-        precos = (historico or {}).get("prices") or []
-        if precos:
-            # A bolsai devolve do mais recente para o mais antigo.
-            volume = precos[0].get("volume")
-            if len(precos) >= 2:
-                atual = precos[0].get("close")
-                anterior = precos[1].get("close")
-                if isinstance(atual, (int, float)) and isinstance(anterior, (int, float)) and anterior:
-                    variacao_pct = ((atual - anterior) / anterior) * 100
-
-        fundamentos[ticker] = {
-            "ticker": dados.get("ticker") or ticker,
-            "nome": dados.get("name") or "",
-            "preco": dados.get("close_price"),
-            "variacao_pct": variacao_pct,
-            "volume": volume,
-            "dividend_yield_pct": dados.get("dividend_yield_ttm"),
-            # net_asset_value é o patrimônio líquido de fato, apurado por
-            # laudo e informado à CVM — não uma aproximação por market_cap.
-            "patrimonio": dados.get("net_asset_value"),
+        quote = ativo.get("quote") or {}
+        mercado = ativo.get("market") or {}
+        dividendos = ativo.get("dividends") or {}
+        fundamentos[symbol] = {
+            "ticker": symbol,
+            "nome": ativo.get("name") or "",
+            "preco": quote.get("value"),
+            "variacao_pct": quote.get("change_percent"),
+            "dividend_yield_pct": dividendos.get("yield_12m_percent"),
+            # Aproximação deliberada — ver docstring da função.
+            "patrimonio": quote.get("market_cap"),
+            "volume": mercado.get("volume"),
         }
-
-        time.sleep(BOLSAI_PAUSA_ENTRE_CHAMADAS)
-
-    if fundamentos:
-        exemplo = next(iter(fundamentos.values()))
-        print(
-            f"DEBUG: exemplo de FII coletado da bolsai: "
-            f"{json.dumps(exemplo, ensure_ascii=False)[:400]}",
-            file=sys.stderr,
-        )
-    else:
-        print("DEBUG: bolsai não retornou nenhum FII do pool.", file=sys.stderr)
-
     return fundamentos
 
 
-def coletar_rankings_fiis(chave_bolsai, pool=None, qtd=RANKING_FIIS_QTD):
+def coletar_rankings_fiis(token, pool=None, qtd=RANKING_FIIS_QTD):
     """Monta os 3 rankings de FIIs exibidos lado a lado no site: Maiores
-    Valor Patrimonial, Maiores Dividend Yield e Mais Negociados (volume do
-    dia) — equivalente ao 'Mais Buscados' do Investidor10, mas usando um
-    dado de mercado real (volume) em vez de popularidade de site, que não
-    dá para obter via API de forma automática e confiável.
+    Valor Patrimonial (na verdade valor de MERCADO — ver ressalva abaixo),
+    Maiores Dividend Yield e Mais Negociados (volume do dia).
 
-    Migrado da HG Brasil para a bolsai: o patrimônio agora é o valor
-    patrimonial real do fundo (net_asset_value), e não mais uma
-    aproximação por valor de mercado."""
+    Usa a HG Brasil (1 chamada em lote para o pool inteiro). O rótulo
+    "valor_patrimonial" no JSON de saída é mantido por compatibilidade com
+    o front-end existente, mas o valor de fato é market_cap — ver a
+    ressalva em _buscar_fundamentos_fiis_hg."""
     pool = pool or POOL_FIIS
-    fundamentos = _buscar_fundamentos_fiis_bolsai(pool, chave_bolsai)
+    fundamentos = _buscar_fundamentos_fiis_hg(pool, token)
     candidatos = list(fundamentos.values())
 
     def _top(campo):
@@ -1225,33 +1151,29 @@ def coletar_rankings_acoes(token, pool=None, qtd=RANKING_ACOES_QTD):
     }
 
 
-def coletar_ranking(token, chave_bolsai=None):
+def coletar_ranking(token):
     """Monta o ranking completo do boletim: 3 rankings de ações (DY, valor de
-    mercado, receita) e 3 rankings de FIIs (valor patrimonial, dividend
-    yield, mais negociados) — 6 itens cada.
-
-    Ações ainda usam a HG Brasil; FIIs usam a bolsai. As duas metades são
-    independentes: se uma chave faltar ou uma API falhar, a outra continua
-    funcionando e o front-end mantém a parte anterior do ranking."""
+    mercado, receita) e 3 rankings de FIIs (valor de mercado — usado como
+    aproximação de patrimonial, dividend yield, mais negociados) — 6 itens
+    cada. Ambas as metades usam a HG Brasil (1 chamada em lote cada); se o
+    token faltar, o robô pula as duas e mantém o ranking.json anterior."""
     vazio_acoes = {"dividend_yield": [], "valor_mercado": [], "receita": []}
     vazio_fiis = {"valor_patrimonial": [], "dividend_yield": [], "mais_negociados": []}
     resultado = {"acoes": dict(vazio_acoes), "fiis": dict(vazio_fiis)}
 
-    if token:
-        try:
-            resultado["acoes"] = coletar_rankings_acoes(token)
-        except (requests.RequestException, ValueError, KeyError) as exc:
-            print(f"AVISO: falha ao montar rankings de ações: {exc}", file=sys.stderr)
-    else:
-        print("AVISO: HGBRASIL_TOKEN não configurado — pulando rankings de ações.", file=sys.stderr)
+    if not token:
+        print("AVISO: HGBRASIL_TOKEN não configurado — pulando rankings de ações e FIIs.", file=sys.stderr)
+        return resultado
 
-    if chave_bolsai:
-        try:
-            resultado["fiis"] = coletar_rankings_fiis(chave_bolsai)
-        except (requests.RequestException, ValueError, KeyError) as exc:
-            print(f"AVISO: falha ao montar rankings de FIIs: {exc}", file=sys.stderr)
-    else:
-        print("AVISO: VIVERDERENDA_BOLSAI_RANKING não configurado — pulando rankings de FIIs.", file=sys.stderr)
+    try:
+        resultado["acoes"] = coletar_rankings_acoes(token)
+    except (requests.RequestException, ValueError, KeyError) as exc:
+        print(f"AVISO: falha ao montar rankings de ações: {exc}", file=sys.stderr)
+
+    try:
+        resultado["fiis"] = coletar_rankings_fiis(token)
+    except (requests.RequestException, ValueError, KeyError) as exc:
+        print(f"AVISO: falha ao montar rankings de FIIs: {exc}", file=sys.stderr)
 
     return resultado
 
@@ -1440,7 +1362,7 @@ def main():
         print("AVISO: nenhum índice coletado. Mantendo arquivo anterior, se existir.", file=sys.stderr)
 
     if coletar_rankings_agora:
-        ranking = coletar_ranking(token, obter_token_bolsai())
+        ranking = coletar_ranking(token)
         acoes_r = ranking.get("acoes", {})
         total_acoes = len(acoes_r.get("dividend_yield", [])) + len(acoes_r.get("valor_mercado", [])) + len(acoes_r.get("receita", []))
         fiis_r = ranking.get("fiis", {})

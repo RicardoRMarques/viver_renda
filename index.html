@@ -741,6 +741,31 @@
     }
     .hg-card-topo h3 { font-size: 1.2rem; }
     .hg-card-topo .hg-setor { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+    /* Resumo de FII na Análise Fundamentalista (só cotação atual — a HG
+       não tem série histórica trimestral para fundos, diferente de ações). */
+    .hg-badge {
+      display: inline-block; font-size: 0.72rem; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 999px; padding: 3px 11px;
+    }
+    .hg-aviso-suave {
+      color: var(--muted); font-size: 0.82rem; line-height: 1.5;
+      margin: 10px 0 16px; padding: 10px 12px;
+      background: rgba(255,255,255,0.03); border-radius: 10px;
+      border-left: 3px solid var(--primary);
+    }
+    .hg-mini-grid {
+      display: grid; gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    .hg-mini-item {
+      background: var(--deep); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+    }
+    .hg-mini-rotulo {
+      display: block; font-size: 0.72rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px;
+    }
+    .hg-mini-valor { font-size: 1.05rem; font-weight: 700; font-family: 'Courier New', monospace; }
     .hg-badge-fonte {
       display: inline-block;
       font-size: 0.65rem;
@@ -4479,11 +4504,12 @@
                 <div class="hg-grafico-topo">
                   <div class="hg-grafico-titulo">Cotação — <span id="hgGraficoPeriodoLabel">30 dias</span></div>
                   <div class="hg-periodo-tabs" id="hgPeriodoTabs">
+                    <button type="button" class="hg-periodo-tab" data-periodo="1D">1D</button>
+                    <button type="button" class="hg-periodo-tab" data-periodo="7D">7D</button>
                     <button type="button" class="hg-periodo-tab hg-periodo-ativo" data-periodo="30D">30D</button>
                     <button type="button" class="hg-periodo-tab" data-periodo="6M">6M</button>
                     <button type="button" class="hg-periodo-tab" data-periodo="YTD">YTD</button>
                     <button type="button" class="hg-periodo-tab" data-periodo="1A">1A</button>
-                    <button type="button" class="hg-periodo-tab" data-periodo="5A">5A</button>
                   </div>
                 </div>
                 <div id="hgGrafico">
@@ -4501,11 +4527,11 @@
                 </div>
                 <span class="hg-investido-texto">há</span>
                 <select id="hgInvestidoPeriodo" class="hg-investido-select">
+                  <option value="7D">7 dias</option>
                   <option value="30D" selected>30 dias</option>
                   <option value="6M">6 meses</option>
                   <option value="YTD">este ano (YTD)</option>
                   <option value="1A">1 ano</option>
-                  <option value="5A">5 anos</option>
                 </select>
                 <span class="hg-investido-texto">hoje você teria</span>
                 <strong id="hgInvestidoResultado" class="hg-investido-resultado">—</strong>
@@ -4628,43 +4654,44 @@
       // Calcula a data de início de cada período. A bolsai entrega histórico
       // DIÁRIO (um registro por pregão), então não há mais sample_by nem
       // períodos intradiários (1D/7D foram removidos por isso).
-      // O limit é dimensionado em pregões (~21 por mês) com folga.
+      // Calcula start_date/sample_by pra cada período. Vai só até 1 ano —
+      // a HG Brasil não tem profundidade histórica confiável de vários
+      // anos (5A/10A), então não oferecemos esses períodos pra não
+      // mostrar um gráfico vazio/quebrado.
       function hgParametrosPeriodo(periodo) {
         const hoje = new Date();
         const inicio = new Date();
         switch (periodo) {
-          case '30D': inicio.setDate(hoje.getDate() - 30); return { inicio, limit: 40 };
-          case '6M': inicio.setDate(hoje.getDate() - 182); return { inicio, limit: 140 };
-          case 'YTD': return { inicio: new Date(hoje.getFullYear(), 0, 1), limit: 260 };
-          case '1A': inicio.setDate(hoje.getDate() - 365); return { inicio, limit: 260 };
-          case '5A': inicio.setDate(hoje.getDate() - 365 * 5); return { inicio, limit: 1300 };
-          default: inicio.setDate(hoje.getDate() - 30); return { inicio, limit: 40 };
+          case '1D': inicio.setDate(hoje.getDate() - 1); return { inicio, sampleBy: '15m' };
+          case '7D': inicio.setDate(hoje.getDate() - 7); return { inicio, sampleBy: '1h' };
+          case '30D': inicio.setDate(hoje.getDate() - 30); return { inicio, sampleBy: '1d' };
+          case '6M': inicio.setDate(hoje.getDate() - 182); return { inicio, sampleBy: '1d' };
+          case 'YTD': return { inicio: new Date(hoje.getFullYear(), 0, 1), sampleBy: '1d' };
+          case '1A': inicio.setDate(hoje.getDate() - 365); return { inicio, sampleBy: '1d' };
+          default: inicio.setDate(hoje.getDate() - 30); return { inicio, sampleBy: '1d' };
         }
       }
 
-      // Busca o histórico de preços na bolsai (via Worker, que esconde a
-      // chave). A bolsai retorna do mais recente pro mais antigo, e usa
-      // `trade_date`/`adjusted_close` — aqui normalizamos para o mesmo
-      // formato {date, close} que o resto do código já esperava, em ordem
-      // cronológica crescente. Prefere o preço ajustado (split/bonificação/
-      // dividendo) quando disponível, com fallback pro close bruto.
+      // Busca o histórico de preços direto na HG Brasil. Ela retorna do
+      // mais antigo pro mais recente (ordem já correta), com o campo
+      // "close" — normalizamos pro mesmo formato {date, close} que o
+      // resto do código já esperava.
       async function hgBuscarHistoricoPrecos(ticker, periodo) {
-        const { inicio, limit } = hgParametrosPeriodo(periodo);
+        const { inicio, sampleBy } = hgParametrosPeriodo(periodo);
         const hoje = new Date();
         const simbolo = String(ticker || '').replace(/^B3:/i, '').toUpperCase();
 
-        const url = `${WORKER_BOLSAI_ENDPOINT}/?ticker=${encodeURIComponent(simbolo)}&mode=prices`
-          + `&start=${hgDataYYYYMMDD(inicio)}&end=${hgDataYYYYMMDD(hoje)}&limit=${limit}`;
+        const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent('B3:' + simbolo)}&sample_by=${sampleBy}&start_date=${hgDataYYYYMMDD(inicio)}&end_date=${hgDataYYYYMMDD(hoje)}&key=${CHAVE_HG}`;
 
         const resp = await fetch(url);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data?.error || `HTTP ${resp.status}`);
 
-        const precos = Array.isArray(data?.prices) ? data.prices : [];
-        return precos
+        const amostras = data?.results?.[0]?.samples;
+        return (Array.isArray(amostras) ? amostras : [])
           .map(p => ({
-            date: p.trade_date,
-            close: typeof p.adjusted_close === 'number' ? p.adjusted_close : p.close,
+            date: p.date,
+            close: typeof p.close === 'number' ? p.close : p.value,
           }))
           .filter(p => typeof p.close === 'number' && p.date)
           .sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -4700,7 +4727,7 @@
         const labelEl = document.getElementById('hgGraficoPeriodoLabel');
         if (!container) return;
 
-        const NOMES_PERIODO = { '30D': '30 dias', '6M': '6 meses', 'YTD': 'este ano', '1A': '1 ano', '5A': '5 anos' };
+        const NOMES_PERIODO = { '1D': '1 dia', '7D': '7 dias', '30D': '30 dias', '6M': '6 meses', 'YTD': 'este ano', '1A': '1 ano' };
 
         container.querySelectorAll('.hg-periodo-tab').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -4788,10 +4815,14 @@
         if (!valor) return '';
         const d = new Date(valor);
         if (isNaN(d.getTime())) return '';
-        if (periodo === '5A') {
-          return d.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+        if (periodo === '1D') {
+          return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
-        if (periodo === '1A' || periodo === '6M') {
+        if (periodo === '7D') {
+          const diaSemana = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+          return `${diaSemana} ${d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}`;
+        }
+        if (periodo === '1A') {
           return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
         }
         return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
@@ -7656,10 +7687,14 @@
       const resultadoFund = document.getElementById('hgFundResultado');
       const chipsFund = document.querySelectorAll('#analise-fundamentalista .hg-chip');
 
-      // Linhas da tabela: [rótulo, grupo, campo, formato]
+      // Linhas da tabela: [rótulo, campo, formato]
       // formato: 'num' (2 casas), 'pct' (percentual), 'moeda'
-      // Agora vem da bolsai (via Worker), não mais da HG Brasil — campos
-      // são "achatados" (sem grupo/statement), direto no objeto do período.
+      // Fonte: HG Brasil (/v2/finance/fundamentals?period=quarterly).
+      // Os campos aninhados da HG (valuation/leverage/margins/profitability)
+      // são achatados por mapearEstatementoHG() pros mesmos nomes que esta
+      // tabela já usava. CAGR Receita/Lucro (5a) foi removido: a HG não
+      // devolve receita/lucro em valor absoluto nesse endpoint, só índices
+      // — sem os valores brutos não dá pra calcular o crescimento.
       const LINHAS_FUND = [
         ['P/L',               'pl',                'num'],
         ['P/VP',               'pvp',               'num'],
@@ -7681,9 +7716,45 @@
         ['Dívida/Patrimônio',  'debt_equity',        'num'],
         ['Dív.Líq/PL',         'net_debt_equity',   'num'],
         ['Dív.Líq/EBITDA',     'net_debt_ebitda',   'num'],
-        ['CAGR Receita (5a)',  'cagr_revenue_5y',   'pct'],
-        ['CAGR Lucro (5a)',    'cagr_earnings_5y',  'pct'],
+        ['Dividend Yield (trim.)', 'dividend_yield_trimestre', 'pct'],
       ];
+
+      // Achata o retorno aninhado da HG (statements[i].valuation.*,
+      // .leverage.*, .margins.*, .profitability.*, .dividends.*) pros
+      // mesmos nomes de campo "planos" que LINHAS_FUND espera — assim o
+      // resto do código (fmtCelula, renderizarFundamentos) não precisa
+      // saber de onde veio o dado.
+      function mapearEstatementoHG(s) {
+        const v = s.valuation || {};
+        const l = s.leverage || {};
+        const m = s.margins || {};
+        const p = s.profitability || {};
+        const d = s.dividends || {};
+        return {
+          reference_date: s.end_date,
+          pl: v.price_to_earnings_ratio,
+          pvp: v.price_to_book_ratio,
+          p_sr: v.price_to_sales_ratio,
+          p_ebit: v.price_to_ebit,
+          p_ebitda: v.price_to_ebitda,
+          ev_ebitda: v.ev_to_ebitda,
+          ev_ebit: v.ev_to_ebit,
+          vpa: v.book_value_per_share,
+          lpa: v.earnings_per_share,
+          gross_margin: m.gross_profit_margin,
+          ebitda_margin: m.ebitda_margin,
+          ebit_margin: m.ebit_margin,
+          net_margin: m.net_profit_margin,
+          roe: p.return_on_equity,
+          roa: p.return_on_assets,
+          roic: p.return_on_invested_capital,
+          current_ratio: l.current_ratio,
+          debt_equity: l.debt_to_equity_ratio,
+          net_debt_equity: l.net_debt_to_equity_ratio,
+          net_debt_ebitda: l.net_debt_to_ebitda_ratio,
+          dividend_yield_trimestre: d.yield_percent,
+        };
+      }
 
       function fmtDataBr(dataIso) {
         if (!dataIso) return '—';
@@ -7769,37 +7840,87 @@
         const digitado = inputFund.value.trim().toUpperCase();
         if (!digitado) return;
         const simbolo = digitado.replace(/^B3:/, '');
+        const pareceFII = /11$/.test(simbolo);
 
         statusFund.className = 'hg-status';
         statusFund.textContent = `Carregando análise fundamentalista de ${simbolo}...`;
         resultadoFund.innerHTML = '';
 
         try {
-          const url = `${WORKER_BOLSAI_ENDPOINT}/?ticker=${encodeURIComponent(simbolo)}&mode=history`;
-          const resp = await fetch(url);
-          const data = await resp.json();
+          if (pareceFII) {
+            // A HG não tem histórico trimestral para FIIs (isso só existe
+            // pra ações no /fundamentals). O melhor disponível é a cotação
+            // atual com dividend yield 12m — por isso o FII renderiza como
+            // 1 coluna só, não como tabela histórica.
+            const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + simbolo)}&key=${CHAVE_HG}`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            const ativo = data?.results?.[0];
+            if (!resp.ok || !ativo || ativo.kind !== 'fii') {
+              throw new Error(`Não encontramos dados de FII para "${simbolo}". Verifique o ticker.`);
+            }
+            renderizarFundamentosFII(ativo);
+          } else {
+            const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&tickers=${encodeURIComponent('B3:' + simbolo)}&period=quarterly&key=${CHAVE_HG}`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            const ativo = data?.results?.[0];
+            const statements = Array.isArray(ativo?.statements) ? ativo.statements : [];
 
-          if (!resp.ok) {
-            throw new Error(data?.error || `Não encontramos dados fundamentalistas para "${simbolo}". Verifique o ticker ou tente outra ação.`);
+            if (!resp.ok || !ativo || statements.length === 0) {
+              throw new Error(`Não encontramos dados fundamentalistas para "${simbolo}". Verifique o ticker ou tente outra ação.`);
+            }
+
+            renderizarFundamentos({
+              symbol: ativo.symbol || simbolo,
+              name: ativo.name || ativo.full_name || simbolo,
+              classification: ativo.classification || null,
+              statements: statements.map(mapearEstatementoHG),
+            });
           }
-
-          const historico = Array.isArray(data?.history) ? data.history : [];
-          if (historico.length === 0) {
-            throw new Error(`Não encontramos dados fundamentalistas para "${simbolo}". Verifique o ticker ou tente outra ação.`);
-          }
-
-          renderizarFundamentos({
-            symbol: simbolo,
-            name: historico[0]?.corporate_name || simbolo,
-            classification: null,
-            statements: historico,
-          });
           statusFund.textContent = '';
         } catch (e) {
           statusFund.className = 'hg-status erro';
           statusFund.textContent = e.message || 'Erro ao consultar a análise fundamentalista. Tente novamente.';
           console.error('Erro na análise fundamentalista:', e);
         }
+      }
+
+      // FII na HG: só cotação atual, sem série histórica. Renderiza um
+      // resumo simples em vez da tabela de múltiplas colunas — tentar
+      // forçar o mesmo layout da tabela de ações, com 1 coluna só,
+      // ficaria estranho e sugeriria uma profundidade de dado que não
+      // existe.
+      function renderizarFundamentosFII(ativo) {
+        const q = ativo.quote || {};
+        const div = ativo.dividends || {};
+        const nome = ativo.name || ativo.full_name || ativo.symbol || '';
+        const setor = ativo.classification?.sector;
+        const linhas = [
+          ['Cotação atual', fmtCelula(q.value, 'moeda')],
+          ['Variação (dia)', fmtCelula(q.change_percent, 'pct')],
+          ['Valor de mercado', q.market_cap ? hgFormatCompacto(q.market_cap) : '—'],
+          ['Dividend Yield (12m)', fmtCelula(div.yield_12m_percent, 'pct')],
+          ['Dividendos (12m, R$)', div.yield_12m_cash != null ? fmtCelula(div.yield_12m_cash, 'moeda') : '—'],
+        ];
+        resultadoFund.innerHTML = `
+          <div class="hg-card">
+            <div class="hg-card-topo">
+              <h3>${nome} (${ativo.symbol})</h3>
+              ${setor ? `<span class="hg-badge">${setor}</span>` : ''}
+            </div>
+            <p class="hg-aviso-suave">
+              Para FIIs, a HG Brasil traz só a cotação atual — sem série histórica trimestral
+              nem dados de patrimônio, vacância ou composição da carteira do fundo.
+            </p>
+            <div class="hg-mini-grid">
+              ${linhas.map(([r, v]) => `
+                <div class="hg-mini-item">
+                  <span class="hg-mini-rotulo">${r}</span>
+                  <span class="hg-mini-valor">${v}</span>
+                </div>`).join('')}
+            </div>
+          </div>`;
       }
 
       function renderizarFundamentos(info) {
@@ -7844,9 +7965,6 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                 <span class="hg-btn-compartilhar-texto">Compartilhar</span>
               </button>
-              <button type="button" class="hg-btn-secundario-pequeno" id="hgFundBtnAvancados" title="Ver números do balanço (receita, lucro, dívida, caixa...) via bolsai">
-                💰 Números do Balanço
-              </button>
             </div>
             <div class="hg-tabela-scroll" style="overflow-x:auto; max-width:100%; -webkit-overflow-scrolling:touch;">
               <table class="hg-tabela-fundamentos" style="width:100%; min-width:560px; border-collapse:separate; border-spacing:0; font-family:'Courier New', monospace; font-size:0.85rem;">
@@ -7862,15 +7980,9 @@
               </table>
             </div>
             <p style="margin-top:12px; font-size:0.78rem; color:var(--muted);">
-              Fonte: bolsai (B3/CVM) · Cada coluna já vem com TTM (últimos 12 meses) calculado até aquela data.
+              Fonte: HG Brasil · Indicadores trimestrais dos últimos 2 anos.
             </p>
-            <div id="hgFundAvancados"></div>
           </div>`;
-
-        const btnAvancados = document.getElementById('hgFundBtnAvancados');
-        if (btnAvancados) {
-          btnAvancados.addEventListener('click', () => buscarIndicadoresAvancados(info.symbol, btnAvancados));
-        }
 
         const btnCompartilharFund = document.getElementById('hgFundBtnCompartilhar');
         if (btnCompartilharFund) {
@@ -7879,69 +7991,6 @@
           );
         }
         ativarTooltipsFundamentos();
-      }
-
-      // Números "brutos" do balanço — complementares à tabela de cima
-      // (que já tem os índices/percentuais), pra não duplicar informação.
-      const CAMPOS_BOLSAI = [
-        ['market_cap', 'Valor de Mercado', 'moeda_compacta'],
-        ['net_revenue', 'Receita Líquida (TTM)', 'moeda_compacta'],
-        ['net_income', 'Lucro Líquido (TTM)', 'moeda_compacta'],
-        ['ebitda', 'EBITDA (TTM)', 'moeda_compacta'],
-        ['equity', 'Patrimônio Líquido', 'moeda_compacta'],
-        ['total_assets', 'Ativos Totais', 'moeda_compacta'],
-        ['total_debt', 'Dívida Total', 'moeda_compacta'],
-        ['cash', 'Caixa e Equivalentes', 'moeda_compacta'],
-        ['shares_outstanding', 'Ações em Circulação', 'inteiro'],
-      ];
-
-      function fmtBolsai(valor, formato) {
-        if (typeof valor !== 'number') return '—';
-        if (formato === 'pct') return `${hgFormatNumero(valor)}%`;
-        if (formato === 'moeda_compacta') return hgFormatMoeda(valor) ? `R$ ${hgFormatCompacto(valor)}` : '—';
-        if (formato === 'inteiro') return valor.toLocaleString('pt-BR');
-        return hgFormatNumero(valor);
-      }
-
-      async function buscarIndicadoresAvancados(ticker, botao) {
-        const container = document.getElementById('hgFundAvancados');
-        if (!container) return;
-
-        botao.disabled = true;
-        const textoOriginal = botao.textContent;
-        botao.textContent = 'Buscando...';
-        container.innerHTML = '<p class="hg-status" style="margin-top:14px;">Buscando indicadores avançados...</p>';
-
-        try {
-          const url = `${WORKER_BOLSAI_ENDPOINT}/?ticker=${encodeURIComponent(ticker)}`;
-          const resp = await fetch(url);
-          const dados = await resp.json();
-
-          if (!resp.ok) {
-            throw new Error(dados?.error || 'Não foi possível buscar os indicadores avançados agora.');
-          }
-
-          const linhasHtml = CAMPOS_BOLSAI.map(([campo, rotulo, formato]) => `
-            <div>
-              <span>${rotulo}</span>
-              <strong>${fmtBolsai(dados[campo], formato)}</strong>
-            </div>`).join('');
-
-          container.innerHTML = `
-            <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
-              <div class="hg-grupo-titulo" style="margin-top:0;">💰 Números do Balanço (bolsai)</div>
-              <div class="hg-grid-dados">${linhasHtml}</div>
-              <p style="margin-top:10px; font-size:0.74rem; color:var(--muted);">
-                Fonte: bolsai (B3/CVM) · Referência: ${dados.reference_date || '—'}.
-              </p>
-            </div>`;
-        } catch (e) {
-          container.innerHTML = `<p class="hg-status erro" style="margin-top:14px;">${e.message || 'Erro ao buscar indicadores avançados.'}</p>`;
-          console.error('Erro nos indicadores avançados (bolsai):', e);
-        } finally {
-          botao.disabled = false;
-          botao.textContent = textoOriginal;
-        }
       }
 
       btnFund.addEventListener('click', buscarFundamentos);
