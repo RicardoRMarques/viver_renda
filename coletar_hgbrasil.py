@@ -38,7 +38,7 @@ import re
 import sys
 import time
 import xml.etree.ElementTree as ET
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import requests
 
@@ -159,10 +159,27 @@ BCB_CAMBIO_SERIES = [
 ]
 
 # ------------------------------------------------------------------
-# Bitcoin: CoinGecko — gratuita, sem chave. Devolve preço em BRL e a
-# variação de 24h numa única requisição.
+# Cripto: CoinGecko — gratuita, sem chave. Devolve preço em BRL e a
+# variação de 24h. Vários ativos vêm na MESMA requisição, então incluir
+# o Ethereum ao lado do Bitcoin não custa chamada extra.
 # ------------------------------------------------------------------
 COINGECKO_URL = "https://api.coingecko.com/api/v3/simple/price"
+COINGECKO_MOEDAS = [
+    # (id na CoinGecko, rótulo no boletim)
+    ("bitcoin", "Bitcoin"),
+    ("ethereum", "Ethereum"),
+]
+
+# ------------------------------------------------------------------
+# Memória de notícias já publicadas. Sem isso, o robô sempre pegava o
+# item do TOPO de cada feed — e feeds de baixo volume (como o de FIIs do
+# Investing.com) ficam dias com a mesma manchete no topo, fazendo o
+# boletim repetir a notícia. Guardamos os links usados nos últimos dias
+# e descemos no feed até achar algo inédito.
+# ------------------------------------------------------------------
+NOTICIAS_HISTORICO_ARQUIVO = "noticias-historico.json"
+NOTICIAS_HISTORICO_DIAS = 10      # por quanto tempo um link é considerado "já usado"
+NOTICIAS_POOL_POR_FONTE = 12      # quantos itens olhar em cada feed procurando algo novo
 
 BCB_IPCA_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/1?formato=json"
 
@@ -302,6 +319,47 @@ def _e_noticia_de_mercado(titulo):
 
 
 
+def carregar_historico_noticias():
+    """Lê os links já publicados, descartando os mais antigos que
+    NOTICIAS_HISTORICO_DIAS. Retorna (set_de_links, dict_link_para_data).
+
+    Se o arquivo não existir (primeira execução) ou estiver corrompido,
+    devolve vazio — o robô segue normalmente e cria o arquivo no fim."""
+    caminho = os.path.join(os.path.dirname(os.path.abspath(__file__)), NOTICIAS_HISTORICO_ARQUIVO)
+    try:
+        with open(caminho, "r", encoding="utf-8") as arq:
+            dados = json.load(arq)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return set(), {}
+
+    limite = datetime.now(timezone.utc) - timedelta(days=NOTICIAS_HISTORICO_DIAS)
+    recentes = {}
+    for link, quando in (dados.get("links") or {}).items():
+        try:
+            if datetime.fromisoformat(quando) >= limite:
+                recentes[link] = quando
+        except (ValueError, TypeError):
+            continue
+    return set(recentes), recentes
+
+
+def salvar_historico_noticias(historico, links_novos):
+    """Grava o histórico com os links usados nesta execução carimbados
+    com a data de hoje. Falha de escrita não derruba o robô — no pior
+    caso a próxima execução pode repetir uma notícia."""
+    agora = datetime.now(timezone.utc).isoformat()
+    for link in links_novos:
+        historico[link] = agora
+
+    caminho = os.path.join(os.path.dirname(os.path.abspath(__file__)), NOTICIAS_HISTORICO_ARQUIVO)
+    try:
+        with open(caminho, "w", encoding="utf-8") as arq:
+            json.dump({"links": historico}, arq, ensure_ascii=False, indent=2)
+        print(f"OK: histórico de notícias salvo ({len(historico)} link(s) dos últimos {NOTICIAS_HISTORICO_DIAS} dias).")
+    except OSError as exc:
+        print(f"AVISO: não foi possível salvar o histórico de notícias: {exc}", file=sys.stderr)
+
+
 def _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_QTD, filtrar_tema=False):
     """Busca e faz parse de um feed RSS específico. Retorna lista de notícias
     (pode ser vazia) ou lança exceção em caso de falha de rede/parse.
@@ -436,37 +494,50 @@ def coletar_noticias():
     Se alguma fonte falhar, cada grupo tenta se completar sozinho com as
     fontes do OUTRO grupo como reforço, na ordem em que aparecem — assim
     nunca fica faltando notícia por causa de 1 fonte fora do ar."""
-    links_ja_usados = set()
+    # Começa já sabendo o que saiu nos últimos dias, para não repetir.
+    historico_links, historico = carregar_historico_noticias()
+    links_ja_usados = set(historico_links)
+    if historico_links:
+        print(f"INFO: {len(historico_links)} link(s) dos últimos {NOTICIAS_HISTORICO_DIAS} dias serão evitados.")
 
     def _coletar_grupo(fontes, qtd_alvo, qtd_por_fonte=None):
-        """qtd_por_fonte limita quantos itens aceitar de CADA fonte, numa
+        """qtd_por_fonte limita quantos itens ACEITAR de cada fonte, numa
         única passada. Isso é essencial pro grupo "misto" (Investing.com):
         sem esse limite, a primeira fonte que respondesse bem já preenchia
         sozinha as 3 vagas, e as outras 2 categorias nunca chegavam a ser
-        consultadas (bug corrigido aqui — antes pedia até 5 itens da 1ª
-        fonte, satisfazendo tudo antes de tentar as demais).
+        consultadas.
         Quando qtd_por_fonte é None, cada fonte pode preencher a cota
         inteira sozinha (comportamento de "cadeia de fallback", usado nos
         feeds antigos do InfoMoney/Money Times — onde só queremos VARIAR
-        de fonte se a anterior falhar, não misturar por mistura)."""
+        de fonte se a anterior falhar, não misturar por mistura).
+
+        Importante: o quanto LEMOS de cada feed (NOTICIAS_POOL_POR_FONTE)
+        é maior que o quanto aceitamos. É isso que permite pular manchetes
+        já publicadas em dias anteriores e descer até achar uma inédita —
+        antes só olhávamos o topo, que em feeds de baixo volume fica dias
+        sem mudar e fazia o boletim repetir a mesma notícia."""
         grupo = []
         for nome_fonte, url in fontes:
             if len(grupo) >= qtd_alvo:
                 break
-            limite_desta_fonte = qtd_por_fonte if qtd_por_fonte is not None else (qtd_alvo - len(grupo))
+            aceitar_desta_fonte = qtd_por_fonte if qtd_por_fonte is not None else (qtd_alvo - len(grupo))
             try:
                 itens = _buscar_feed(
-                    nome_fonte, url, qtd_maxima=limite_desta_fonte,
+                    nome_fonte, url, qtd_maxima=NOTICIAS_POOL_POR_FONTE,
                     filtrar_tema="(geral)" in nome_fonte,
                 )
+                aceitos = 0
                 for item in itens:
-                    if len(grupo) >= qtd_alvo:
+                    if len(grupo) >= qtd_alvo or aceitos >= aceitar_desta_fonte:
                         break
                     if item["link"] not in links_ja_usados:
                         grupo.append(item)
                         links_ja_usados.add(item["link"])
-                if itens:
-                    print(f"OK: {len(itens)} notícia(s) obtida(s) de {nome_fonte}.")
+                        aceitos += 1
+                if aceitos:
+                    print(f"OK: {aceitos} notícia(s) inédita(s) de {nome_fonte} (de {len(itens)} lidas).")
+                elif itens:
+                    print(f"AVISO: {nome_fonte} respondeu, mas todas as {len(itens)} notícias já foram publicadas antes.", file=sys.stderr)
                 else:
                     print(f"AVISO: feed de {nome_fonte} respondeu, mas sem itens úteis.", file=sys.stderr)
             except (requests.RequestException, ET.ParseError) as exc:
@@ -504,18 +575,59 @@ def coletar_noticias():
             faltam = NOTICIAS_QTD_TOP3 - len(top3)
             top3.extend(_coletar_grupo(NOTICIAS_FONTES_MISTAS, faltam, qtd_por_fonte=1))
 
+    # Último recurso: se mesmo assim faltou notícia, é porque tudo que os
+    # feeds têm hoje já foi publicado antes. Nesse caso, repetir é melhor
+    # que mandar um boletim vazio — então liberamos o histórico e
+    # completamos com o que houver (preferindo o mais antigo, que é o que
+    # o leitor tem menos chance de lembrar).
+    def _completar_repetindo(grupo, fontes, qtd_alvo, rotulo):
+        if len(grupo) >= qtd_alvo:
+            return grupo
+        print(f"AVISO: '{rotulo}' segue incompleto ({len(grupo)}/{qtd_alvo}) — nenhuma notícia inédita "
+              f"nos feeds. Reaproveitando publicadas anteriormente para o boletim não sair vazio.",
+              file=sys.stderr)
+        usados_agora = {n["link"] for n in grupo}
+        candidatos = []
+        for nome_fonte, url in fontes:
+            try:
+                for item in _buscar_feed(nome_fonte, url, qtd_maxima=NOTICIAS_POOL_POR_FONTE,
+                                         filtrar_tema="(geral)" in nome_fonte):
+                    if item["link"] not in usados_agora:
+                        candidatos.append(item)
+            except (requests.RequestException, ET.ParseError):
+                continue
+        # Mais antigo primeiro: quem saiu há mais tempo volta antes.
+        candidatos.sort(key=lambda i: historico.get(i["link"], ""))
+        for item in candidatos:
+            if len(grupo) >= qtd_alvo:
+                break
+            grupo.append(item)
+            usados_agora.add(item["link"])
+        return grupo
+
+    destaques = _completar_repetindo(destaques, NOTICIAS_FONTES_MISTAS, NOTICIAS_QTD, "destaques")
+    top3 = _completar_repetindo(top3, NOTICIAS_FEEDS, NOTICIAS_QTD_TOP3, "top3")
+
     resultado = {
         "destaques": destaques[:NOTICIAS_QTD],
         "top3": top3[:NOTICIAS_QTD_TOP3],
     }
 
+    # Só marcamos como "já publicado" o que de fato entrou no resultado.
+    # Itens que foram coletados mas cortados pelo [:N] continuam livres
+    # para aparecer numa próxima execução.
+    publicados = {n["link"] for n in resultado["destaques"] + resultado["top3"] if n.get("link")}
+
     fii = _buscar_noticia_fii()
     if fii:
         resultado["fii"] = fii
+        if fii.get("link"):
+            publicados.add(fii["link"])
         print(f"OK: notícia de FIIs obtida de FIIs.com.br.")
     else:
         print("AVISO: sem notícia de FIIs nesta execução (fica sem o campo 'fii' — front-end já trata isso).", file=sys.stderr)
 
+    salvar_historico_noticias(historico, publicados)
     return resultado
 
 
@@ -605,15 +717,18 @@ def coletar_cambio_bcb():
     return indices
 
 
-def coletar_bitcoin_coingecko():
-    """Bitcoin em reais pela CoinGecko (gratuita, sem chave), com a
-    variação das últimas 24h. Retorna None se falhar, para o boletim sair
-    sem o Bitcoin em vez de quebrar."""
+def coletar_cripto_coingecko():
+    """Bitcoin e Ethereum em reais pela CoinGecko (gratuita, sem chave),
+    com a variação das últimas 24h. Os dois vêm na mesma requisição.
+
+    Retorna lista vazia se falhar — o boletim sai sem cripto em vez de
+    quebrar. Se só um dos ativos vier, o outro ainda entra."""
+    ids = ",".join(m[0] for m in COINGECKO_MOEDAS)
     try:
         resp = requests.get(
             COINGECKO_URL,
             params={
-                "ids": "bitcoin",
+                "ids": ids,
                 "vs_currencies": "brl",
                 "include_24hr_change": "true",
             },
@@ -623,21 +738,23 @@ def coletar_bitcoin_coingecko():
         resp.raise_for_status()
         dados = resp.json()
     except (requests.RequestException, ValueError) as exc:
-        print(f"AVISO: falha ao buscar Bitcoin na CoinGecko: {exc}", file=sys.stderr)
-        return None
+        print(f"AVISO: falha ao buscar cripto na CoinGecko: {exc}", file=sys.stderr)
+        return []
 
-    btc = (dados or {}).get("bitcoin") or {}
-    valor = _para_float(btc.get("brl"))
-    if valor is None:
-        print(f"AVISO: CoinGecko respondeu sem o preço do Bitcoin: {str(dados)[:200]}", file=sys.stderr)
-        return None
-
-    return {
-        "label": "Bitcoin",
-        "prefixo": "R$ ",
-        "valor": valor,
-        "variacao_pct": _para_float(btc.get("brl_24h_change")),
-    }
+    indices = []
+    for cripto_id, rotulo in COINGECKO_MOEDAS:
+        item = (dados or {}).get(cripto_id) or {}
+        valor = _para_float(item.get("brl"))
+        if valor is None:
+            print(f"AVISO: CoinGecko não retornou o preço de {rotulo} ({cripto_id}).", file=sys.stderr)
+            continue
+        indices.append({
+            "label": rotulo,
+            "prefixo": "R$ ",
+            "valor": valor,
+            "variacao_pct": _para_float(item.get("brl_24h_change")),
+        })
+    return indices
 
 
 def coletar_indices_brapi(token):
@@ -673,12 +790,9 @@ def coletar_indices_brapi(token):
             "variacao_pct": _para_float(dados.get("regularMarketChangePercent")),
         })
 
-    # --- Câmbio (Banco Central) e Bitcoin (CoinGecko) ---
+    # --- Câmbio (Banco Central) e cripto (CoinGecko) ---
     indices.extend(coletar_cambio_bcb())
-
-    bitcoin = coletar_bitcoin_coingecko()
-    if bitcoin:
-        indices.append(bitcoin)
+    indices.extend(coletar_cripto_coingecko())
 
     return indices
 
