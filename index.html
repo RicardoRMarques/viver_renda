@@ -8544,7 +8544,12 @@
           ? titulos : titulos.filter(t => t.tipo === filtroAtual);
 
         if (!visiveis.length) {
-          listaEl.innerHTML = '<div class="rf-vazio">Nenhum título disponível neste filtro.</div>';
+          // Distinguir os dois casos evita a mensagem enganosa que aparecia
+          // quando o tesouro.json ainda não existia: o leitor via "nenhum
+          // título neste filtro" achando que era problema do filtro.
+          listaEl.innerHTML = titulos.length
+            ? '<div class="rf-vazio">Nenhum título deste tipo está sendo ofertado hoje.</div>'
+            : '<div class="rf-vazio">Títulos ainda não gerados — aguarde o robô rodar.</div>';
           return;
         }
 
@@ -8628,12 +8633,13 @@
           if (!titulos.length) throw new Error('vazio');
 
           const infoEl = document.getElementById('rfAtualizado');
-          if (infoEl && dados.atualizado_em) {
-            const d = new Date(dados.atualizado_em);
-            if (!isNaN(d)) {
-              infoEl.textContent = 'Taxas atualizadas em ' + d.toLocaleDateString('pt-BR')
-                + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.';
-            }
+          if (infoEl) {
+            // data_base é o dia em que o Tesouro apurou as taxas; é mais
+            // relevante para o leitor que a hora em que o robô rodou.
+            const base = dados.data_base ? dataCurta(dados.data_base) : null;
+            infoEl.textContent = base
+              ? 'Taxas apuradas pelo Tesouro Nacional em ' + base + '.'
+              : '';
           }
           renderizar();
         } catch (e) {
