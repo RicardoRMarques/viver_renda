@@ -79,6 +79,11 @@ jobs:
           git add noticias.json
           if [ -f indices.json ]; then git add indices.json; fi
           if [ -f ranking.json ]; then git add ranking.json; fi
+          # Memória de quais notícias já foram publicadas. Precisa ser
+          # commitada: o runner do Actions é descartado no fim do job, e
+          # sem persistir o arquivo o robô "esqueceria" tudo a cada
+          # execução e voltaria a repetir a mesma manchete.
+          if [ -f noticias-historico.json ]; then git add noticias-historico.json; fi
           if git diff --cached --quiet; then
             echo "Sem alterações no boletim, nada para commitar."
           else
