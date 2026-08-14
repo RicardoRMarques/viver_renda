@@ -11,6 +11,11 @@
     "referencia": "16/09/2026"
   },
   {
+    "label": "CDI",
+    "valor_pct": 13.9,
+    "referencia": "06/08/2026"
+  },
+  {
     "label": "IFIX",
     "prefixo": "pontos",
     "valor": 3692.65,
@@ -33,14 +38,14 @@
   {
     "label": "Bitcoin",
     "prefixo": "R$ ",
-    "valor": 329616.0,
-    "variacao_pct": 0.10041907118330125
+    "valor": 330080.0,
+    "variacao_pct": 0.08718917362456581
   },
   {
     "label": "Ethereum",
     "prefixo": "R$ ",
-    "valor": 9799.76,
-    "variacao_pct": 0.4718673489280262
+    "valor": 9813.18,
+    "variacao_pct": 0.5812591252485433
   },
   {
     "label": "IPCA (mensal)",
@@ -52,6 +57,11 @@
     "valor_pct": 4.44302461783459,
     "referencia": "01/07/2026",
     "meses": 12
+  },
+  {
+    "label": "IGP-M (mensal)",
+    "valor_pct": -1.16,
+    "referencia": "01/07/2026"
   },
   {
     "label": "CPI (EUA, mensal)",
