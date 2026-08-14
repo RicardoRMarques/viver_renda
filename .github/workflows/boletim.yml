@@ -4,10 +4,10 @@ on:
   schedule:
     # Com o suporte nativo a timezone do GitHub Actions (desde mar/2026),
     # não precisa mais converter pra UTC na mão — escreve direto no
-    # horário de Brasília. Roda 6h05 (de propósito, minuto não-redondo —
+    # horário de Brasília. Roda 5h05 (de propósito, minuto não-redondo —
     # evita a fila pesada que o GitHub Actions tem em horários "redondos"
-    # como 6h00), de segunda (1) a sexta (5).
-    - cron: '5 6 * * 1-5'
+    # como 5h00), de segunda (1) a sexta (5).
+    - cron: '5 5 * * 1-5'
       timezone: 'America/Sao_Paulo'
   workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
 
@@ -39,9 +39,10 @@ jobs:
       # -----------------------------------------------------------------
       # IMPORTANTE: este passo assume que indices.json, noticias.json e
       # ranking.json já foram atualizados hoje (por outro workflow/robô já
-      # existente no repositório). Se esse(s) robô(s) rodar(em) depois das
-      # 6h, ajuste o cron acima para um horário depois deles, ou adicione
-      # aqui os passos que geram esses 3 arquivos antes de continuar.
+      # existente no repositório). O robô de índices/notícias roda a cada
+      # 15 min o dia inteiro (sem pausa), então isso vale em qualquer
+      # horário — se um dia ele passar a ter uma janela de silêncio,
+      # ajuste o cron acima para um horário depois dela.
       # -----------------------------------------------------------------
       - name: Gerar o boletim do dia
         env:
