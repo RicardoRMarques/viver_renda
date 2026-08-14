@@ -381,8 +381,12 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, 
     content:attr(data-tip);
     position:absolute;z-index:20;top:100%;left:0;margin-top:6px;
     width:max-content;max-width:230px;
-    background:#0e0e0e;border:1px solid var(--card-border);border-radius:8px;
-    padding:9px 11px;font-size:11.5px;line-height:1.5;color:var(--text);
+    /* Cores FIXAS, não var(--text)/var(--card-border): o balão é sempre
+       escuro nos dois temas. No modo claro, --text vira azul-marinho
+       escuro (pensado pra fundo claro) — usá-lo aqui deixava texto
+       escuro sobre fundo escuro, ilegível. */
+    background:#0e0e0e;border:1px solid rgba(255,255,255,0.14);border-radius:8px;
+    padding:9px 11px;font-size:11.5px;line-height:1.5;color:#f1f3f8;
     font-family:'Inter',sans-serif;font-weight:400;text-transform:none;letter-spacing:normal;
     box-shadow:0 8px 24px rgba(0,0,0,0.4);white-space:normal;
   }
