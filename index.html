@@ -4711,32 +4711,88 @@
         return `${dia}/${mes}/${ano}`;
       }
 
+      // O endpoint de dividendos recusa intervalos maiores que ~1 ano por
+      // requisição ("Data máxima do histórico deve estar dentro do
+      // limite"). Pra oferecer 3/5 anos mesmo assim, quebramos o período
+      // pedido em janelas de até 364 dias e buscamos todas em paralelo,
+      // depois juntamos. Pra 1 ano, isso gera só 1 requisição — igual a
+      // antes, sem mudança de comportamento nesse caso.
+      function hgJanelasDividendos(anos) {
+        const JANELA_MAX_DIAS = 365;
+        const hoje = new Date();
+        const inicioTotal = new Date(hoje);
+        inicioTotal.setFullYear(hoje.getFullYear() - anos);
+
+        const totalDias = (hoje - inicioTotal) / 86400000;
+        const numJanelas = Math.max(1, Math.ceil(totalDias / JANELA_MAX_DIAS));
+        const diasPorJanela = Math.ceil(totalDias / numJanelas);
+
+        const janelas = [];
+        let cursor = new Date(inicioTotal);
+        for (let i = 0; i < numJanelas; i++) {
+          const fim = new Date(cursor);
+          fim.setDate(fim.getDate() + diasPorJanela);
+          if (i === numJanelas - 1 || fim > hoje) fim.setTime(hoje.getTime());
+          janelas.push({ inicio: new Date(cursor), fim: new Date(fim) });
+          cursor = new Date(fim);
+          cursor.setDate(cursor.getDate() + 1);
+        }
+        return janelas;
+      }
+
       async function hgCarregarDividendos(symbol, moeda, anos) {
         const container = document.getElementById('hgDividendosConteudo');
         if (!container) return;
         container.innerHTML = '<p class="hg-status">Carregando histórico de dividendos...</p>';
 
-        const hoje = new Date();
-        const inicio = new Date();
-        inicio.setFullYear(hoje.getFullYear() - anos);
         const iso = d => d.toISOString().slice(0, 10);
+        const janelas = hgJanelasDividendos(anos);
 
         try {
-          const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + symbol)}&start_date=${iso(inicio)}&end_date=${iso(hoje)}`;
-          const resp = await fetch(url);
-          const data = await resp.json();
+          const respostas = await Promise.all(janelas.map(async ({ inicio, fim }) => {
+            const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + symbol)}&start_date=${iso(inicio)}&end_date=${iso(fim)}`;
+            try {
+              const resp = await fetch(url);
+              const data = await resp.json();
+              const mensagemErro = data?.errors?.[0]?.message || data?.error?.message
+                || (typeof data?.error === 'string' ? data.error : null)
+                || data?.results?.[0]?.error?.message;
+              if (mensagemErro) {
+                console.error(`Erro da API de dividendos (janela ${iso(inicio)} a ${iso(fim)}):`, mensagemErro);
+                return { ok: false, erro: mensagemErro };
+              }
+              const ativo = Array.isArray(data?.results) ? data.results[0] : data?.results;
+              return { ok: true, serie: Array.isArray(ativo?.series) ? ativo.series : [] };
+            } catch (e) {
+              console.error(`Falha de rede na janela ${iso(inicio)} a ${iso(fim)}:`, e);
+              return { ok: false, erro: e.message };
+            }
+          }));
 
-          const mensagemErro = data?.errors?.[0]?.message || data?.error?.message
-            || (typeof data?.error === 'string' ? data.error : null)
-            || data?.results?.[0]?.error?.message;
-          if (mensagemErro) {
-            container.innerHTML = `<p class="hg-status erro">Não foi possível carregar (API: "${mensagemErro}").</p>`;
-            console.error('Erro da API de dividendos (HG Brasil):', mensagemErro);
+          const janelasOk = respostas.filter(r => r.ok);
+          const janelasComErro = respostas.filter(r => !r.ok);
+
+          // Só falha de vez se NENHUMA janela deu certo — parcial ainda
+          // é melhor que nada (ex.: se 1 dos 5 anos falhar por algum
+          // motivo pontual, os outros 4 continuam aparecendo).
+          if (janelasOk.length === 0) {
+            const erroExemplo = janelasComErro[0]?.erro || 'motivo desconhecido';
+            container.innerHTML = `<p class="hg-status erro">Não foi possível carregar (API: "${erroExemplo}").</p>`;
             return;
           }
 
-          const ativo = Array.isArray(data?.results) ? data.results[0] : data?.results;
-          const serie = Array.isArray(ativo?.series) ? ativo.series : [];
+          // Junta as séries de todas as janelas que funcionaram. As
+          // janelas não se sobrepõem por construção, mas o dedupe por
+          // chave composta é uma proteção barata contra qualquer
+          // duplicata na borda entre janelas.
+          const vistos = new Set();
+          const serie = [];
+          janelasOk.forEach(r => r.serie.forEach(ev => {
+            const chave = `${ev.type}|${ev.payment_date}|${ev.amount}|${ev.com_date || ''}`;
+            if (vistos.has(chave)) return;
+            vistos.add(chave);
+            serie.push(ev);
+          }));
 
           // Só proventos em dinheiro (category "cash") entram na tabela e
           // no gráfico — bonificação em ações (category "stock") tem
@@ -4795,6 +4851,7 @@
             </div>
             <p style="margin-top:10px; font-size:0.74rem; color:var(--muted);">
               Fonte: HG Brasil. ${anosOrdenados.length === 0 ? 'Só há pagamentos previstos (ainda não realizados) neste período.' : ''}
+              ${janelasComErro.length > 0 ? `<br>Atenção: uma parte deste período (${janelasComErro.length} de ${respostas.length} intervalo${respostas.length > 1 ? 's' : ''} consultados) não pôde ser carregada — o histórico mostrado pode estar incompleto.` : ''}
             </p>
           `;
         } catch (e) {
