@@ -4673,14 +4673,34 @@
       }
 
       // Histórico de dividendos via HG Brasil (/v2/finance/dividends).
-      // Cobre ações e BDRs. Cada item de "events" traz "type" e "amount"
-      // confirmados na documentação — o campo de DATA de cada evento não
-      // veio explícito na doc que consultei, então testamos os nomes mais
-      // prováveis (payment_date, ex_date, date, base_date) e usamos o
-      // primeiro que existir. Se nenhum vier, ainda mostra o valor sem
-      // data em vez de esconder o dado.
-      function hgDataEventoDividendo(evento) {
-        return evento.payment_date || evento.ex_date || evento.date || evento.base_date || null;
+      // Formato confirmado testando a API de verdade (não estava na doc
+      // pública com esse nível de detalhe):
+      //   results[0].series[]  — NÃO "events" (erro que eu tinha cometido
+      //     antes: procurava um campo que nunca existiu, então a seção
+      //     sempre caía em "sem histórico" mesmo quando havia dado).
+      //   cada item: { type, category, amount, payment_date, status, ... }
+      //
+      // type vem em código, não em texto pronto — mapeado abaixo.
+      // category "stock" (bonificação em ações) tem amount em PROPORÇÃO
+      // de ações, não em R$ — não pode ser somado/exibido junto com os
+      // valores em dinheiro (category "cash"), senão distorce o gráfico.
+      // status "approved" = já aprovado mas ainda não pago (data futura);
+      // "paid" = já pago de fato. Só "paid" entra na soma por ano do
+      // gráfico; "approved" aparece na tabela marcado como previsto.
+      const HG_TIPO_DIVIDENDO = {
+        dividend: 'Dividendo',
+        interest_on_equity: 'JCP',
+        bonus_issue: 'Bonificação em ações',
+        stock_split: 'Desdobramento',
+        reverse_split: 'Grupamento',
+      };
+
+      function hgRotuloTipoDividendo(tipo) {
+        if (HG_TIPO_DIVIDENDO[tipo]) return HG_TIPO_DIVIDENDO[tipo];
+        if (!tipo) return '—';
+        // Tipo não mapeado: formata "algo_assim" -> "Algo assim" em vez
+        // de mostrar o código cru.
+        return tipo.charAt(0).toUpperCase() + tipo.slice(1).replace(/_/g, ' ');
       }
 
       function hgFormatDataDividendo(iso) {
@@ -4705,43 +4725,59 @@
           const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + symbol)}&start_date=${iso(inicio)}&end_date=${iso(hoje)}`;
           const resp = await fetch(url);
           const data = await resp.json();
-          const ativo = data?.results?.[0];
-          const eventos = Array.isArray(ativo?.events) ? ativo.events : [];
 
-          if (eventos.length === 0) {
+          const mensagemErro = data?.errors?.[0]?.message || data?.error?.message
+            || (typeof data?.error === 'string' ? data.error : null)
+            || data?.results?.[0]?.error?.message;
+          if (mensagemErro) {
+            container.innerHTML = `<p class="hg-status erro">Não foi possível carregar (API: "${mensagemErro}").</p>`;
+            console.error('Erro da API de dividendos (HG Brasil):', mensagemErro);
+            return;
+          }
+
+          const ativo = Array.isArray(data?.results) ? data.results[0] : data?.results;
+          const serie = Array.isArray(ativo?.series) ? ativo.series : [];
+
+          // Só proventos em dinheiro (category "cash") entram na tabela e
+          // no gráfico — bonificação em ações (category "stock") tem
+          // amount em proporção de ações, não em R$, e misturar os dois
+          // deixaria a soma sem sentido.
+          const emDinheiro = serie.filter(ev => ev.category === 'cash' && typeof ev.amount === 'number');
+
+          if (emDinheiro.length === 0) {
             container.innerHTML = `<p class="hg-status">Sem histórico de dividendos para ${symbol} nos últimos ${anos} ano${anos > 1 ? 's' : ''}.</p>`;
             return;
           }
 
-          // Mais recente primeiro na tabela (leitura natural); mas o
-          // agrupamento por ano usa a ordem cronológica pra não inverter
-          // a soma.
-          const comData = eventos
-            .map(ev => ({ ...ev, _data: hgDataEventoDividendo(ev) }))
-            .filter(ev => typeof ev.amount === 'number');
-          comData.sort((x, y) => new Date(y._data || 0) - new Date(x._data || 0));
+          // Mais recente primeiro na tabela.
+          const ordenados = [...emDinheiro].sort((x, y) =>
+            new Date(y.payment_date || 0) - new Date(x.payment_date || 0));
 
-          // Soma por ano, pro gráfico de barras — só entra ano com data
-          // válida (eventos sem data reconhecida ficam de fora do gráfico,
-          // mas continuam aparecendo na tabela).
+          // Soma por ano SÓ dos já pagos — um "approved" com pagamento
+          // futuro ainda não é histórico de fato, e contá-lo infla o ano
+          // corrente com algo que pode ainda mudar de valor/data.
           const porAno = {};
-          comData.forEach(ev => {
-            if (!ev._data) return;
-            const ano = ev._data.slice(0, 4);
-            porAno[ano] = (porAno[ano] || 0) + ev.amount;
-          });
+          ordenados
+            .filter(ev => ev.status === 'paid' && ev.payment_date)
+            .forEach(ev => {
+              const ano = ev.payment_date.slice(0, 4);
+              porAno[ano] = (porAno[ano] || 0) + ev.amount;
+            });
           const anosOrdenados = Object.keys(porAno).sort();
 
           const graficoHtml = anosOrdenados.length
             ? hgDesenharBarrasDividendos(anosOrdenados.map(a => ({ rotulo: a, valor: porAno[a] })))
             : '';
 
-          const linhasTabela = comData.map(ev => `
-            <tr>
-              <td>${hgFormatDataDividendo(ev._data)}</td>
-              <td>${ev.type || '—'}</td>
+          const linhasTabela = ordenados.map(ev => {
+            const previsto = ev.status && ev.status !== 'paid';
+            return `
+            <tr${previsto ? ' style="opacity:0.75;"' : ''}>
+              <td>${hgFormatDataDividendo(ev.payment_date)}${previsto ? ' <span style="color:var(--primary); font-size:0.75em;">(previsto)</span>' : ''}</td>
+              <td>${hgRotuloTipoDividendo(ev.type)}</td>
               <td class="num" style="text-align:right;">${hgFormatMoeda(ev.amount, moeda) ?? ev.amount}</td>
-            </tr>`).join('');
+            </tr>`;
+          }).join('');
 
           container.innerHTML = `
             ${graficoHtml}
@@ -4757,7 +4793,9 @@
                 <tbody>${linhasTabela}</tbody>
               </table>
             </div>
-            <p style="margin-top:10px; font-size:0.74rem; color:var(--muted);">Fonte: HG Brasil.</p>
+            <p style="margin-top:10px; font-size:0.74rem; color:var(--muted);">
+              Fonte: HG Brasil. ${anosOrdenados.length === 0 ? 'Só há pagamentos previstos (ainda não realizados) neste período.' : ''}
+            </p>
           `;
         } catch (e) {
           container.innerHTML = `<p class="hg-status erro">Histórico de dividendos indisponível agora para ${symbol}.</p>`;
