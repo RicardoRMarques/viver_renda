@@ -464,6 +464,14 @@
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
     }
+    /* Em destaque no topo (fora da grade estreita), o painel de Consulta
+       Rápida reservava um espaço vazio grande embaixo dos chips só pra
+       acomodar o #hgStatus/#hgResultado quando ainda estão vazios — no
+       estado ocioso isso sobrava como área em branco sem função. Aperta
+       aqui; quando o resultado chega, o próprio .hg-card (margin-top e
+       padding próprios) garante respiro visual, independente disso. */
+    #consulta-rapida .hg-painel { padding-bottom: 10px; }
+    #consulta-rapida .hg-status:empty { margin: 6px 0 0; min-height: 0; }
     .hg-linha-busca input {
       flex: 1 1 200px;
       padding: 14px 16px;
