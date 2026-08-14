@@ -4711,33 +4711,31 @@
         return `${dia}/${mes}/${ano}`;
       }
 
-      // O endpoint de dividendos recusa intervalos maiores que ~1 ano por
-      // requisição ("Data máxima do histórico deve estar dentro do
-      // limite"). Pra oferecer 3/5 anos mesmo assim, quebramos o período
-      // pedido em janelas de até 364 dias e buscamos todas em paralelo,
-      // depois juntamos. Pra 1 ano, isso gera só 1 requisição — igual a
-      // antes, sem mudança de comportamento nesse caso.
-      function hgJanelasDividendos(anos) {
-        const JANELA_MAX_DIAS = 365;
-        const hoje = new Date();
-        const inicioTotal = new Date(hoje);
-        inicioTotal.setFullYear(hoje.getFullYear() - anos);
-
-        const totalDias = (hoje - inicioTotal) / 86400000;
-        const numJanelas = Math.max(1, Math.ceil(totalDias / JANELA_MAX_DIAS));
-        const diasPorJanela = Math.ceil(totalDias / numJanelas);
-
-        const janelas = [];
-        let cursor = new Date(inicioTotal);
-        for (let i = 0; i < numJanelas; i++) {
-          const fim = new Date(cursor);
-          fim.setDate(fim.getDate() + diasPorJanela);
-          if (i === numJanelas - 1 || fim > hoje) fim.setTime(hoje.getTime());
-          janelas.push({ inicio: new Date(cursor), fim: new Date(fim) });
-          cursor = new Date(fim);
-          cursor.setDate(cursor.getDate() + 1);
+      // O plano recusa histórico "antigo demais" ("Data máxima do
+      // histórico deve estar dentro do limite"). Isso é um CORTE ÚNICO de
+      // data (tudo depois dele funciona, tudo antes falha) — não pedaços
+      // aleatórios abertos/fechados. Por isso o jeito certo de descobrir
+      // até onde dá pra puxar é BUSCA BINÁRIA pela fronteira, não dividir
+      // cegamente toda janela que falhar: minha primeira tentativa fazia
+      // isso e gerava quase 900 requisições numa única consulta quando a
+      // maior parte do período pedido não estava disponível. Busca
+      // binária converge com ~10-12 chamadas no total, não importa se o
+      // período pedido é 1, 3 ou 5 anos.
+      async function hgTestarIntervaloDividendos(symbol, inicio, fim) {
+        const iso = d => d.toISOString().slice(0, 10);
+        const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + symbol)}&start_date=${iso(inicio)}&end_date=${iso(fim)}`;
+        try {
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const mensagemErro = data?.errors?.[0]?.message || data?.error?.message
+            || (typeof data?.error === 'string' ? data.error : null)
+            || data?.results?.[0]?.error?.message;
+          if (mensagemErro) return { ok: false, erro: mensagemErro };
+          const ativo = Array.isArray(data?.results) ? data.results[0] : data?.results;
+          return { ok: true, serie: Array.isArray(ativo?.series) ? ativo.series : [] };
+        } catch (e) {
+          return { ok: false, erro: e.message };
         }
-        return janelas;
       }
 
       async function hgCarregarDividendos(symbol, moeda, anos) {
@@ -4745,54 +4743,58 @@
         if (!container) return;
         container.innerHTML = '<p class="hg-status">Carregando histórico de dividendos...</p>';
 
-        const iso = d => d.toISOString().slice(0, 10);
-        const janelas = hgJanelasDividendos(anos);
+        const hoje = new Date();
+        const inicioDesejado = new Date(hoje);
+        inicioDesejado.setFullYear(hoje.getFullYear() - anos);
 
         try {
-          const respostas = await Promise.all(janelas.map(async ({ inicio, fim }) => {
-            const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + symbol)}&start_date=${iso(inicio)}&end_date=${iso(fim)}`;
-            try {
-              const resp = await fetch(url);
-              const data = await resp.json();
-              const mensagemErro = data?.errors?.[0]?.message || data?.error?.message
-                || (typeof data?.error === 'string' ? data.error : null)
-                || data?.results?.[0]?.error?.message;
-              if (mensagemErro) {
-                console.error(`Erro da API de dividendos (janela ${iso(inicio)} a ${iso(fim)}):`, mensagemErro);
-                return { ok: false, erro: mensagemErro };
-              }
-              const ativo = Array.isArray(data?.results) ? data.results[0] : data?.results;
-              return { ok: true, serie: Array.isArray(ativo?.series) ? ativo.series : [] };
-            } catch (e) {
-              console.error(`Falha de rede na janela ${iso(inicio)} a ${iso(fim)}:`, e);
-              return { ok: false, erro: e.message };
+          // 1) tenta o período inteiro de uma vez — no caso comum (dentro
+          // do que o plano permite) isso é só 1 requisição, sem busca.
+          let resultado = await hgTestarIntervaloDividendos(symbol, inicioDesejado, hoje);
+          let inicioEfetivo = inicioDesejado;
+          let truncado = false;
+
+          if (!resultado.ok) {
+            const ehLimiteDeData = /limite|máxima|maximo/i.test(resultado.erro || '');
+            if (!ehLimiteDeData) {
+              container.innerHTML = `<p class="hg-status erro">Não foi possível carregar (API: "${resultado.erro}").</p>`;
+              return;
             }
-          }));
 
-          const janelasOk = respostas.filter(r => r.ok);
-          const janelasComErro = respostas.filter(r => !r.ok);
+            // 2) busca binária: acha a data mais antiga (mantendo fim =
+            // hoje) que ainda funciona. baixo = sabidamente falha,
+            // alto = sabidamente funciona (ou pelo menos, ponto de
+            // partida — só "hoje sozinho" é assumido como base segura).
+            let baixo = inicioDesejado.getTime();
+            let alto = hoje.getTime();
+            let melhorInicio = null;
+            let melhorSerie = [];
 
-          // Só falha de vez se NENHUMA janela deu certo — parcial ainda
-          // é melhor que nada (ex.: se 1 dos 5 anos falhar por algum
-          // motivo pontual, os outros 4 continuam aparecendo).
-          if (janelasOk.length === 0) {
-            const erroExemplo = janelasComErro[0]?.erro || 'motivo desconhecido';
-            container.innerHTML = `<p class="hg-status erro">Não foi possível carregar (API: "${erroExemplo}").</p>`;
-            return;
+            for (let i = 0; i < 12 && (alto - baixo) > 86400000; i++) {
+              const meio = new Date(Math.floor((baixo + alto) / 2));
+              const r = await hgTestarIntervaloDividendos(symbol, meio, hoje);
+              if (r.ok) {
+                alto = meio.getTime();
+                melhorInicio = meio;
+                melhorSerie = r.serie;
+              } else {
+                baixo = meio.getTime();
+              }
+            }
+
+            if (!melhorInicio) {
+              // Nem o menor intervalo testado funcionou — não é limite de
+              // profundidade, é outra coisa (ticker sem cobertura, etc.).
+              container.innerHTML = `<p class="hg-status erro">Não foi possível carregar (API: "${resultado.erro}").</p>`;
+              return;
+            }
+
+            inicioEfetivo = melhorInicio;
+            resultado = { ok: true, serie: melhorSerie };
+            truncado = true;
           }
 
-          // Junta as séries de todas as janelas que funcionaram. As
-          // janelas não se sobrepõem por construção, mas o dedupe por
-          // chave composta é uma proteção barata contra qualquer
-          // duplicata na borda entre janelas.
-          const vistos = new Set();
-          const serie = [];
-          janelasOk.forEach(r => r.serie.forEach(ev => {
-            const chave = `${ev.type}|${ev.payment_date}|${ev.amount}|${ev.com_date || ''}`;
-            if (vistos.has(chave)) return;
-            vistos.add(chave);
-            serie.push(ev);
-          }));
+          const serie = resultado.serie || [];
 
           // Só proventos em dinheiro (category "cash") entram na tabela e
           // no gráfico — bonificação em ações (category "stock") tem
@@ -4851,7 +4853,7 @@
             </div>
             <p style="margin-top:10px; font-size:0.74rem; color:var(--muted);">
               Fonte: HG Brasil. ${anosOrdenados.length === 0 ? 'Só há pagamentos previstos (ainda não realizados) neste período.' : ''}
-              ${janelasComErro.length > 0 ? `<br>Atenção: uma parte deste período (${janelasComErro.length} de ${respostas.length} intervalo${respostas.length > 1 ? 's' : ''} consultados) não pôde ser carregada — o histórico mostrado pode estar incompleto.` : ''}
+              ${truncado ? `<br>Seu plano permite consultar dividendos a partir de ${hgFormatDataDividendo(inicioEfetivo.toISOString().slice(0, 10))} — mostrando o que está disponível desde essa data.` : ''}
             </p>
           `;
         } catch (e) {
@@ -4863,7 +4865,7 @@
       // Barras simples por ano, no mesmo espírito visual do resto do site
       // (SVG leve, sem biblioteca de gráfico).
       function hgDesenharBarrasDividendos(dados) {
-        const L = 640, A = 180, mE = 46, mD = 14, mT = 16, mB = 26;
+        const L = 640, A = 190, mE = 54, mD = 14, mT = 18, mB = 30;
         const larg = L - mE - mD, alt = A - mT - mB;
         const max = Math.max(...dados.map(d => d.valor || 0)) || 1;
         const passo = larg / dados.length;
@@ -4874,7 +4876,7 @@
           const v = max * i / 3;
           const y = mT + alt - (v / max) * alt;
           grade += `<line x1="${mE}" y1="${y.toFixed(1)}" x2="${L - mD}" y2="${y.toFixed(1)}" stroke="var(--border)" stroke-dasharray="${i ? '2,3' : '0'}"/>
-            <text x="${mE - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="'Courier New',monospace">${hgFormatNumero(v)}</text>`;
+            <text x="${mE - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" class="hg-grafico-eixo-label">${hgFormatNumero(v)}</text>`;
         }
 
         const barras = dados.map((d, i) => {
@@ -4882,8 +4884,8 @@
           const x = mE + passo * i + (passo - w) / 2;
           const y = mT + alt - h;
           return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(h, 1).toFixed(1)}" rx="3" fill="var(--primary)" opacity="0.85"/>
-            <text x="${(x + w / 2).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="'Courier New',monospace">${hgFormatNumero(d.valor)}</text>
-            <text x="${(x + w / 2).toFixed(1)}" y="${A - 8}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="'Courier New',monospace">${d.rotulo}</text>`;
+            <text x="${(x + w / 2).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="middle" class="hg-grafico-eixo-label">${hgFormatNumero(d.valor)}</text>
+            <text x="${(x + w / 2).toFixed(1)}" y="${A - 8}" text-anchor="middle" class="hg-grafico-eixo-label">${d.rotulo}</text>`;
         }).join('');
 
         return `<svg viewBox="0 0 ${L} ${A}" role="img" aria-label="Dividendos por ano">${grade}${barras}</svg>`;
