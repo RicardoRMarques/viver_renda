@@ -4533,13 +4533,15 @@
               <div class="hg-grafico-box">
                 <div class="hg-grafico-topo">
                   <div class="hg-grafico-titulo">Histórico de Dividendos</div>
-                  <div class="hg-periodo-tabs" id="hgDividendosPeriodoTabs">
-                    <button type="button" class="hg-periodo-tab" data-anos="1">1 ano</button>
-                    <button type="button" class="hg-periodo-tab hg-periodo-ativo" data-anos="3">3 anos</button>
+                  <div class="hg-periodo-tabs" id="hgDividendosPeriodoTabs" style="display:none;">
+                    <button type="button" class="hg-periodo-tab hg-periodo-ativo" data-anos="1">1 ano</button>
+                    <button type="button" class="hg-periodo-tab" data-anos="3">3 anos</button>
                   </div>
                 </div>
                 <div id="hgDividendosConteudo">
-                  <p class="hg-status">Carregando histórico de dividendos...</p>
+                  <button type="button" class="hg-btn-secundario-pequeno" id="hgDividendosBtnVer">
+                    Ver histórico de dividendos
+                  </button>
                 </div>
               </div>
             </div>` : ''}
@@ -4639,8 +4641,22 @@
         hgInicializarInvestido();
 
         if (['stock', 'bdr'].includes(a.kind)) {
-          hgCarregarDividendos(a.symbol, a.currency, 3);
-          document.getElementById('hgDividendosPeriodoTabs')?.addEventListener('click', (e) => {
+          const tabsEl = document.getElementById('hgDividendosPeriodoTabs');
+          const btnVer = document.getElementById('hgDividendosBtnVer');
+
+          // Só busca quando a pessoa pedir — o histórico de dividendos
+          // não é algo que todo mundo consulta toda vez, e essa consulta
+          // sozinha já podia chegar a ~12 requisições (busca binária pelo
+          // limite do plano). Sob demanda evita gastar isso à toa em
+          // quem só queria ver a cotação.
+          if (btnVer) {
+            btnVer.addEventListener('click', () => {
+              tabsEl.style.display = '';
+              hgCarregarDividendos(a.symbol, a.currency, 1); // padrão: 1 ano
+            }, { once: true });
+          }
+
+          tabsEl?.addEventListener('click', (e) => {
             const btn = e.target.closest('.hg-periodo-tab');
             if (!btn) return;
             document.querySelectorAll('#hgDividendosPeriodoTabs .hg-periodo-tab').forEach(b =>
@@ -4874,11 +4890,16 @@
       // Barras simples por ano, no mesmo espírito visual do resto do site
       // (SVG leve, sem biblioteca de gráfico).
       function hgDesenharBarrasDividendos(dados) {
-        const L = 640, A = 190, mE = 54, mD = 14, mT = 18, mB = 30;
+        const L = 640, A = 200, mE = 54, mD = 14, mT = 22, mB = 32;
         const larg = L - mE - mD, alt = A - mT - mB;
         const max = Math.max(...dados.map(d => d.valor || 0)) || 1;
         const passo = larg / dados.length;
-        const w = Math.min(60, passo * 0.55);
+        const w = Math.min(64, passo * 0.55);
+        const raio = Math.min(7, w / 2);
+        const gradId = `hgDivGrad${Date.now()}`;
+        // Resolve a cor de verdade (não confia em var() cru dentro de
+        // atributo SVG) — mesmo padrão já validado no gráfico de cotação.
+        const corPrimaria = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#31c3ff';
 
         let grade = '';
         for (let i = 0; i <= 3; i++) {
@@ -4888,16 +4909,40 @@
             <text x="${mE - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" class="hg-grafico-eixo-label">${hgFormatNumero(v)}</text>`;
         }
 
+        // Barra com o topo arredondado (só em cima) via path, em vez de
+        // rect com rx uniforme — fica com cara mais "de dashboard" e
+        // evita o efeito de pílula em barras baixas.
+        const pathBarraArredondada = (x, yTopo, largura, altura, r) => {
+          const raioReal = Math.min(r, altura, largura / 2);
+          return `M${x},${yTopo + altura}
+            L${x},${yTopo + raioReal}
+            Q${x},${yTopo} ${x + raioReal},${yTopo}
+            L${x + largura - raioReal},${yTopo}
+            Q${x + largura},${yTopo} ${x + largura},${yTopo + raioReal}
+            L${x + largura},${yTopo + altura} Z`;
+        };
+
         const barras = dados.map((d, i) => {
-          const h = ((d.valor || 0) / max) * alt;
+          const h = Math.max(((d.valor || 0) / max) * alt, 2);
           const x = mE + passo * i + (passo - w) / 2;
           const y = mT + alt - h;
-          return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(h, 1).toFixed(1)}" rx="3" fill="var(--primary)" opacity="0.85"/>
-            <text x="${(x + w / 2).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="middle" class="hg-grafico-eixo-label">${hgFormatNumero(d.valor)}</text>
-            <text x="${(x + w / 2).toFixed(1)}" y="${A - 8}" text-anchor="middle" class="hg-grafico-eixo-label">${d.rotulo}</text>`;
+          const valorExato = hgFormatMoeda(d.valor, 'BRL') ?? hgFormatNumero(d.valor);
+          return `<path d="${pathBarraArredondada(x, y, w, h, raio)}" fill="url(#${gradId})">
+              <title>${d.rotulo}: ${valorExato} por ação</title>
+            </path>
+            <text x="${(x + w / 2).toFixed(1)}" y="${(y - 7).toFixed(1)}" text-anchor="middle" class="hg-grafico-eixo-label">${hgFormatNumero(d.valor)}</text>
+            <text x="${(x + w / 2).toFixed(1)}" y="${A - 10}" text-anchor="middle" class="hg-grafico-eixo-label">${d.rotulo}</text>`;
         }).join('');
 
-        return `<svg viewBox="0 0 ${L} ${A}" role="img" aria-label="Dividendos por ano">${grade}${barras}</svg>`;
+        return `<svg viewBox="0 0 ${L} ${A}" role="img" aria-label="Dividendos por ano">
+          <defs>
+            <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${corPrimaria}" stop-opacity="1"/>
+              <stop offset="100%" stop-color="${corPrimaria}" stop-opacity="0.55"/>
+            </linearGradient>
+          </defs>
+          ${grade}${barras}
+        </svg>`;
       }
 
       // Cache das últimas amostras carregadas (ticker + período), reaproveitado
