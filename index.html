@@ -444,6 +444,13 @@
     /* ---------- Consulta rápida: Ações e FIIs (HG Brasil) ---------- */
     .hg-busca { padding-top: 32px; }
     .hg-titulo { font-size: 1.3rem; margin-bottom: 6px; }
+    .hg-titulo-icone {
+      width: 0.86em; height: 0.86em;
+      vertical-align: -0.08em;
+      margin-right: 8px;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
     .hg-subtitulo { color: var(--muted); font-size: 0.92rem; margin-bottom: 18px; }
 
     .hg-painel {
@@ -652,7 +659,7 @@
     /* "Consultar Ações e FIIs" / Análise Fundamentalista quando ficam
        soltos (largura cheia da página), em vez de encostados no Boletim
        de Mercado — dá um respiro de largura confortável, centralizado. */
-    .coluna-consultas-solta { max-width: 720px; margin: 24px auto 0; gap: 14px; }
+    .coluna-consultas-solta { max-width: 1200px; margin: 24px auto 0; gap: 14px; }
     .consultas-grid-2x2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -2443,7 +2450,7 @@
          pra quando trouxer o resultado ele ocupar bastante espaço em vez
          de ficar espremido na grade estreita de antes. -->
     <section class="hg-busca" id="consulta-rapida" style="padding-top: 8px;">
-      <h2 class="hg-titulo">🔎 Consulta Ações, FIIs, Stocks e ETFs</h2>
+      <h2 class="hg-titulo"><svg class="hg-titulo-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>Consulta Ações, FIIs, Stocks e ETFs</h2>
 
       <div class="hg-painel">
         <div class="hg-linha-busca hg-linha-busca-favoritavel">
