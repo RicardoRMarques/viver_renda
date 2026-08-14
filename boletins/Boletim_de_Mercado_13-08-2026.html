@@ -37,9 +37,39 @@
   h2.section{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--gold-soft);margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--card-border);}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .indicator{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:12px 14px;}
-  .indicator .label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;}
+  .indicator .label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;display:flex;align-items:center;gap:5px;}
   .indicator .value{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:500;margin-top:4px;}
   .up{color:var(--green);} .down{color:var(--red);}
+  /* "?" de explicação nos indicadores. Aberto/fechado por clique (via
+     JS inline abaixo) — assim funciona em toque de celular, não só hover
+     de mouse. title="" fica como reforço de acessibilidade (leitor de
+     tela e navegadores que não rodam o JS por algum motivo). */
+  .info-btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:14px;height:14px;border-radius:50%;border:1px solid var(--muted);
+    color:var(--muted);font-size:9.5px;line-height:1;font-family:'Inter',sans-serif;
+    text-transform:none;letter-spacing:normal;cursor:pointer;background:transparent;
+    flex-shrink:0;padding:0;
+  }
+  .info-btn:hover,.info-btn:focus-visible{border-color:var(--gold-soft);color:var(--gold-soft);}
+  .info-btn:hover::after,.info-btn.aberto::after{
+    content:attr(data-tip);
+    position:absolute;z-index:20;top:100%;left:0;margin-top:6px;
+    width:max-content;max-width:230px;
+    background:#0e0e0e;border:1px solid var(--card-border);border-radius:8px;
+    padding:9px 11px;font-size:11.5px;line-height:1.5;color:var(--text);
+    font-family:'Inter',sans-serif;font-weight:400;text-transform:none;letter-spacing:normal;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);white-space:normal;
+  }
+  .indicator{position:relative;}
+  /* Nos cards da coluna DIREITA da grade (2 colunas), abrir o balão
+     alinhado à esquerda do botão empurra o texto pra fora da tela em
+     viewports estreitos. Nesses, abre alinhado à direita do botão
+     (cresce pra esquerda) em vez de vazar. */
+  .grid .indicator:nth-child(even) .info-btn:hover::after,
+  .grid .indicator:nth-child(even) .info-btn.aberto::after{
+    left:auto;right:0;
+  }
   table{width:100%;border-collapse:collapse;font-size:13px;}
   th{text-align:left;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;padding:6px 4px;border-bottom:1px solid var(--card-border);}
   td{padding:8px 4px;border-bottom:1px solid #1c1c1c;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
@@ -122,16 +152,16 @@
 </a>
 
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa</div><div class="value down">167.100,95 pts ▼ 0.23%</div></div>
-  <div class="indicator"><div class="label">IFIX</div><div class="value down">3.692,65 pts ▼ 0.60%</div></div>
+  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" title="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa?">?</button></div><div class="value down">167.100,95 pts ▼ 0.23%</div></div>
+  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" title="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX?">?</button></div><div class="value down">3.692,65 pts ▼ 0.60%</div></div>
   <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,19 ▲ 0.43%</div></div>
   <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,98 ▲ 0.34%</div></div>
   <div class="indicator"><div class="label">Bitcoin</div><div class="value up">R$ 330.080,00 ▲ 0.09%</div></div>
   <div class="indicator"><div class="label">Ethereum</div><div class="value up">R$ 9.813,18 ▲ 0.58%</div></div>
-  <div class="indicator"><div class="label">Selic</div><div class="value">14,00% a.a.</div></div>
-  <div class="indicator"><div class="label">CDI</div><div class="value">13,90% a.a.</div></div>
-  <div class="indicator"><div class="label">IPCA (12 meses)</div><div class="value">4,44%</div></div>
-  <div class="indicator"><div class="label">IGP-M (mensal)</div><div class="value">-1,16%</div></div>
+  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" title="Taxa básica de juros da economia, definida pelo Copom (Banco Central) a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." data-tip="Taxa básica de juros da economia, definida pelo Copom (Banco Central) a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic?">?</button></div><div class="value">14,00% a.a.</div></div>
+  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" title="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI?">?</button></div><div class="value">13,90% a.a.</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" title="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)?">?</button></div><div class="value">4,44%</div></div>
+  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" title="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)?">?</button></div><div class="value">-1,16%</div></div>
 </div>
 
 <h2 class="section">Destaques da Bolsa</h2>
@@ -261,6 +291,21 @@
     body.classList.toggle('light');
     btn.textContent = body.classList.contains('light') ? '☀️' : '🌙';
   }
+
+  // Toque no "?" abre a explicação (o :hover do CSS já cobre mouse; isso
+  // cobre celular, onde não existe hover). Toque fora, ou Esc, fecha.
+  document.addEventListener('click', function (e) {
+    const botao = e.target.closest('.info-btn');
+    const jaAberto = document.querySelector('.info-btn.aberto');
+    if (jaAberto && jaAberto !== botao) jaAberto.classList.remove('aberto');
+    if (botao) { e.stopPropagation(); botao.classList.toggle('aberto'); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      const aberto = document.querySelector('.info-btn.aberto');
+      if (aberto) aberto.classList.remove('aberto');
+    }
+  });
 </script>
 </body>
 </html>
