@@ -2430,6 +2430,39 @@
       });
     </script>
 
+    <!-- CONSULTA RÁPIDA: Ações e FIIs (HG Brasil) — em destaque logo após o
+         hero, largura cheia (dentro de <main class="container">, 1200px),
+         pra quando trouxer o resultado ele ocupar bastante espaço em vez
+         de ficar espremido na grade estreita de antes. -->
+    <section class="hg-busca" id="consulta-rapida" style="padding-top: 8px;">
+      <h2 class="hg-titulo">🔎 Consulta Ações, FIIs, Stocks e ETFs</h2>
+
+      <div class="hg-painel">
+        <div class="hg-linha-busca hg-linha-busca-favoritavel">
+          <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, HGLG11, AAPL, SPY..." autocomplete="off" list="sugestoesTickersB3" />
+          <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
+          <button class="hg-btn-secundario-pequeno" id="hgBtnFavoritar" type="button" title="Acompanhar este ativo no carrossel do topo">☆ Favoritar</button>
+        </div>
+
+        <div class="hg-favoritos-wrap" id="hgFavoritosWrap" style="display:none;">
+          <span class="hg-favoritos-label">No carrossel:</span>
+          <div id="hgFavoritosList" class="hg-favoritos-list"></div>
+        </div>
+
+        <div class="hg-chips">
+          <span class="hg-chip" data-ticker="PETR4">PETR4</span>
+          <span class="hg-chip" data-ticker="VALE3">VALE3</span>
+          <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
+          <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
+          <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
+          <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
+        </div>
+
+        <div class="hg-status" id="hgStatus"></div>
+        <div id="hgResultado"></div>
+      </div>
+    </section>
+
     <!-- NOTÍCIAS DO MERCADO ECONÔMICO — logo abaixo das calculadoras.
          Alimentada por noticias.json, gerado pelo robô (GitHub Actions) a
          partir de feeds RSS públicos (Investing.com / InfoMoney). -->
@@ -3239,37 +3272,7 @@
          Duas fases: aportes (acumulação) e retirada (parte do rendimento
          é sacada pra viver, parte fica reinvestida — o principal nunca é
          tocado diretamente). -->
-    <div class="coluna-consultas-solta consultas-grid-2x2">
-
-        <!-- CONSULTA RÁPIDA: Ações e FIIs (HG Brasil) -->
-        <section class="hg-busca hg-busca-compacta" id="consulta-rapida">
-          <h2 class="hg-titulo">🔎 Consulta Ações, FIIs, Stocks e ETFs</h2>
-
-          <div class="hg-painel">
-            <div class="hg-linha-busca hg-linha-busca-favoritavel">
-              <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, HGLG11, AAPL, SPY..." autocomplete="off" list="sugestoesTickersB3" />
-              <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
-              <button class="hg-btn-secundario-pequeno" id="hgBtnFavoritar" type="button" title="Acompanhar este ativo no carrossel do topo">☆ Favoritar</button>
-            </div>
-
-            <div class="hg-favoritos-wrap" id="hgFavoritosWrap" style="display:none;">
-              <span class="hg-favoritos-label">No carrossel:</span>
-              <div id="hgFavoritosList" class="hg-favoritos-list"></div>
-            </div>
-
-            <div class="hg-chips">
-              <span class="hg-chip" data-ticker="PETR4">PETR4</span>
-              <span class="hg-chip" data-ticker="VALE3">VALE3</span>
-              <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
-              <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
-              <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
-              <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
-            </div>
-
-            <div class="hg-status" id="hgStatus"></div>
-            <div id="hgResultado"></div>
-          </div>
-        </section>
+    <div class="coluna-consultas-solta">
 
         <!-- ANÁLISE FUNDAMENTALISTA: histórico de indicadores por ano (HG Brasil) -->
         <section class="hg-busca hg-busca-compacta" id="analise-fundamentalista">
