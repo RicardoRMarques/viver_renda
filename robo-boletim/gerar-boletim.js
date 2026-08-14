@@ -147,7 +147,7 @@ function montarIndicadoresHtml(indices) {
   const EXPLICACOES = {
     'Ibovespa': 'Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um "termômetro" do humor do mercado com ações brasileiras.',
     'IFIX': 'Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.',
-    'Selic': 'Taxa básica de juros da economia, definida pelo Copom (Banco Central) a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.',
+    'Selic': 'Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.',
     'CDI': 'Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — "render 100% do CDI" é o parâmetro clássico.',
     'IPCA (12 meses)': 'Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.',
     'IGP-M (mensal)': 'Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.',
@@ -178,7 +178,11 @@ function montarIndicadoresHtml(indices) {
   const botaoInfoHtml = (label) => {
     const texto = EXPLICACOES[label];
     if (!texto) return '';
-    return ` <button type="button" class="info-btn" title="${escaparAtributo(texto)}" data-tip="${escaparAtributo(texto)}" aria-label="O que é ${escaparAtributo(label)}?">?</button>`;
+    // Sem title="": esse atributo dispara o balão NATIVO do navegador,
+    // que aparecia ao mesmo tempo que o nosso balão customizado (::after)
+    // — dois balões sobrepostos, um branco e um preto, confuso pro
+    // leitor. aria-label sozinho já cobre leitor de tela sem esse efeito.
+    return ` <button type="button" class="info-btn" data-tip="${escaparAtributo(texto)}" aria-label="O que é ${escaparAtributo(label)}? ${escaparAtributo(texto)}">?</button>`;
   };
 
   return definicoes.map(({ chaves, label, exato }) => {
