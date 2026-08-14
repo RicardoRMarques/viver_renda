@@ -57,12 +57,6 @@ jobs:
           # limite de 15 mil do plano gratuito. Se faltar, o boletim sai
           # só com Selic/IPCA (BCB) e CPI (BLS).
           VIVERDERENDA_BRAPI: ${{ secrets.VIVERDERENDA_BRAPI }}
-          # Chave da bolsai — usada só nos rankings de FIIs (patrimônio
-          # líquido real, DY 12m e volume). É uma chave separada da que está
-          # no Cloudflare Worker: lá ela atende o navegador, aqui roda no
-          # servidor do Actions. Se faltar, o robô pula só os FIIs e mantém
-          # o resto do ranking.
-          VIVERDERENDA_BOLSAI_RANKING: ${{ secrets.VIVERDERENDA_BOLSAI_RANKING }}
           # Alertas de preço: opcionais — se não estiverem configurados nos
           # Secrets do repositório, o robô simplesmente pula essa etapa.
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
