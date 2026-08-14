@@ -5163,6 +5163,66 @@
       }
       carteiraPopularSugestoes(); // já popula na hora, pois "Consulta Rápida" e "Análise Fundamentalista" ficam visíveis assim que a página carrega (não só dentro do modal da Carteira)
 
+      // ================= Autocomplete real via HG Brasil =================
+      // A lista estática acima (CARTEIRA_TICKERS_SUGERIDOS) cobre só ~150
+      // tickers manualmente escolhidos — não tem BDRs, ETFs nem a B3
+      // inteira, e precisa de manutenção manual pra ficar atualizada.
+      // Aqui, enquanto a pessoa digita em qualquer um dos 5 campos que
+      // compartilham a <datalist>, buscamos de verdade na API
+      // (/v2/finance/tickers), que cobre o universo real da B3.
+      //
+      // Se a busca falhar (rede fora, CORS, etc.), NÃO limpamos a
+      // datalist — ela continua com o que já tinha (a lista estática
+      // inicial, ou o último resultado bom), então o autocomplete nunca
+      // fica pior do que já era, só melhora quando funciona.
+      let hgSugestoesDebounce = null;
+      let hgSugestoesUltimaBusca = '';
+
+      async function hgBuscarSugestoesTickers(query) {
+        const termo = query.trim();
+        if (termo.length < 2) return; // evita busca em 1 letra só (muito ruído)
+        hgSugestoesUltimaBusca = termo;
+
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/tickers?query=${encodeURIComponent(termo)}&sources=B3&sort=symbol&order=asc&key=${encodeURIComponent(CHAVE_HG)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+
+          // Se, enquanto a resposta viajava, a pessoa já digitou outra
+          // coisa, descarta — evita a busca antiga "vencer" a mais nova
+          // e mostrar sugestão desatualizada (corrida de requisições).
+          if (termo !== hgSugestoesUltimaBusca) return;
+
+          const resultados = Array.isArray(data?.results) ? data.results : [];
+          if (resultados.length === 0) return; // mantém o que já tinha
+
+          const datalist = document.getElementById('sugestoesTickersB3');
+          if (!datalist) return;
+          datalist.innerHTML = resultados
+            .filter(r => r?.symbol)
+            .map(r => `<option value="${r.symbol}">${r.name || r.symbol}</option>`)
+            .join('');
+        } catch (e) {
+          // Rede fora, CORS, etc. — silencioso de propósito: a datalist
+          // fica como estava (estática ou última busca boa), o campo
+          // continua funcionando normalmente sem autocomplete "vivo".
+          console.error('Autocomplete de tickers indisponível:', e);
+        }
+      }
+
+      function hgLigarAutocompleteTickers(idCampo) {
+        const campo = document.getElementById(idCampo);
+        if (!campo) return;
+        campo.addEventListener('input', () => {
+          clearTimeout(hgSugestoesDebounce);
+          const valor = campo.value;
+          hgSugestoesDebounce = setTimeout(() => hgBuscarSugestoesTickers(valor), 300);
+        });
+      }
+
+      ['hgTickerInput', 'graficoConsultaInput', 'hgFundTickerInput', 'alertasTickerInput', 'carteiraTickerInput']
+        .forEach(hgLigarAutocompleteTickers);
+
       // Busca um ticker na API e empilha (ou soma quantidade, se já
       // existir) no array `carteira` em memória — SEM mexer no status/UI
       // de digitação, pra poder ser reaproveitado tanto pelo botão
