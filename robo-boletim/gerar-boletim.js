@@ -150,11 +150,15 @@ function montarIndicadoresHtml(indices) {
     { chaves: ['BITCOIN', 'BTC'], label: 'Bitcoin' },
     { chaves: ['ETHEREUM', 'ETH'], label: 'Ethereum' },
     { chaves: ['SELIC'], label: 'Selic' },
+    // Sem exato: 'CDI' não é prefixo de nenhum outro rótulo no
+    // indices.json, então o casamento por prefixo já é seguro aqui.
+    { chaves: ['CDI'], label: 'CDI' },
     // ATENÇÃO: precisa ser o rótulo COMPLETO. O indices.json tem
     // "IPCA (mensal)" e "IPCA (12 meses)", e buscarIndicador casa por
     // prefixo devolvendo o primeiro — usar só 'IPCA' aqui pegava o
     // mensal e exibia com o rótulo de 12 meses (valor errado).
     { chaves: ['IPCA (12 MESES)'], label: 'IPCA (12 meses)', exato: true },
+    { chaves: ['IGP-M (MENSAL)', 'IGP-M'], label: 'IGP-M (mensal)' },
   ];
 
   return definicoes.map(({ chaves, label, exato }) => {
@@ -170,7 +174,7 @@ function montarIndicadoresHtml(indices) {
 
     // Caso 2: item de taxa (IPCA, Selic — só tem "valor_pct") → mostra a taxa em si
     if (typeof item.valor_pct === 'number') {
-      const sufixo = label === 'Selic' ? '% a.a.' : '%';
+      const sufixo = (label === 'Selic' || label === 'CDI') ? '% a.a.' : '%';
       return `<div class="indicator"><div class="label">${label}</div><div class="value">${item.valor_pct.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${sufixo}</div></div>`;
     }
 
@@ -492,7 +496,7 @@ function montarResumoIndicesEmail(indices) {
       return `<tr><td style="padding:4px 12px 4px 0;color:#666;">${label}</td><td style="padding:4px 0;font-weight:700;">${fmtValorIndicador(item)}<span style="color:${variacao.classe === 'up' ? '#1a9c4d' : '#c0392b'};"> ${variacao.texto}</span></td></tr>`;
     }
     if (typeof item.valor_pct === 'number') {
-      const sufixo = label === 'Selic' ? '% a.a.' : '%';
+      const sufixo = (label === 'Selic' || label === 'CDI') ? '% a.a.' : '%';
       return `<tr><td style="padding:4px 12px 4px 0;color:#666;">${label}</td><td style="padding:4px 0;font-weight:700;">${item.valor_pct.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${sufixo}</td></tr>`;
     }
     return null;
