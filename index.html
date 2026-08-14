@@ -4517,6 +4517,23 @@
               </div>
             </div>
 
+            ${['stock', 'bdr'].includes(a.kind) ? `
+            <div class="hg-preco-grafico" id="hgDividendosBox">
+              <div class="hg-grafico-box">
+                <div class="hg-grafico-topo">
+                  <div class="hg-grafico-titulo">Histórico de Dividendos</div>
+                  <div class="hg-periodo-tabs" id="hgDividendosPeriodoTabs">
+                    <button type="button" class="hg-periodo-tab" data-anos="1">1 ano</button>
+                    <button type="button" class="hg-periodo-tab hg-periodo-ativo" data-anos="3">3 anos</button>
+                    <button type="button" class="hg-periodo-tab" data-anos="5">5 anos</button>
+                  </div>
+                </div>
+                <div id="hgDividendosConteudo">
+                  <p class="hg-status">Carregando histórico de dividendos...</p>
+                </div>
+              </div>
+            </div>` : ''}
+
             <div class="hg-investido-card">
               <div class="hg-investido-topo">💰 Se você tivesse investido</div>
               <div class="hg-investido-linha">
@@ -4610,6 +4627,17 @@
         hgCarregarGrafico(a.ticker || a.symbol, '30D');
         hgInicializarPeriodoTabs(a);
         hgInicializarInvestido();
+
+        if (['stock', 'bdr'].includes(a.kind)) {
+          hgCarregarDividendos(a.symbol, a.currency, 3);
+          document.getElementById('hgDividendosPeriodoTabs')?.addEventListener('click', (e) => {
+            const btn = e.target.closest('.hg-periodo-tab');
+            if (!btn) return;
+            document.querySelectorAll('#hgDividendosPeriodoTabs .hg-periodo-tab').forEach(b =>
+              b.classList.toggle('hg-periodo-ativo', b === btn));
+            hgCarregarDividendos(a.symbol, a.currency, Number(btn.dataset.anos));
+          });
+        }
       }
 
       // Busca o P/VP e VPA (campo "financials") no endpoint /finance/stock_price
@@ -4642,6 +4670,128 @@
           if (elIndPvp) elIndPvp.textContent = '—';
           console.error('Erro ao buscar P/VP na HG Brasil (stock_price):', e);
         }
+      }
+
+      // Histórico de dividendos via HG Brasil (/v2/finance/dividends).
+      // Cobre ações e BDRs. Cada item de "events" traz "type" e "amount"
+      // confirmados na documentação — o campo de DATA de cada evento não
+      // veio explícito na doc que consultei, então testamos os nomes mais
+      // prováveis (payment_date, ex_date, date, base_date) e usamos o
+      // primeiro que existir. Se nenhum vier, ainda mostra o valor sem
+      // data em vez de esconder o dado.
+      function hgDataEventoDividendo(evento) {
+        return evento.payment_date || evento.ex_date || evento.date || evento.base_date || null;
+      }
+
+      function hgFormatDataDividendo(iso) {
+        if (!iso) return '—';
+        const partes = String(iso).split('-');
+        if (partes.length !== 3) return String(iso);
+        const [ano, mes, dia] = partes;
+        return `${dia}/${mes}/${ano}`;
+      }
+
+      async function hgCarregarDividendos(symbol, moeda, anos) {
+        const container = document.getElementById('hgDividendosConteudo');
+        if (!container) return;
+        container.innerHTML = '<p class="hg-status">Carregando histórico de dividendos...</p>';
+
+        const hoje = new Date();
+        const inicio = new Date();
+        inicio.setFullYear(hoje.getFullYear() - anos);
+        const iso = d => d.toISOString().slice(0, 10);
+
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + symbol)}&start_date=${iso(inicio)}&end_date=${iso(hoje)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const ativo = data?.results?.[0];
+          const eventos = Array.isArray(ativo?.events) ? ativo.events : [];
+
+          if (eventos.length === 0) {
+            container.innerHTML = `<p class="hg-status">Sem histórico de dividendos para ${symbol} nos últimos ${anos} ano${anos > 1 ? 's' : ''}.</p>`;
+            return;
+          }
+
+          // Mais recente primeiro na tabela (leitura natural); mas o
+          // agrupamento por ano usa a ordem cronológica pra não inverter
+          // a soma.
+          const comData = eventos
+            .map(ev => ({ ...ev, _data: hgDataEventoDividendo(ev) }))
+            .filter(ev => typeof ev.amount === 'number');
+          comData.sort((x, y) => new Date(y._data || 0) - new Date(x._data || 0));
+
+          // Soma por ano, pro gráfico de barras — só entra ano com data
+          // válida (eventos sem data reconhecida ficam de fora do gráfico,
+          // mas continuam aparecendo na tabela).
+          const porAno = {};
+          comData.forEach(ev => {
+            if (!ev._data) return;
+            const ano = ev._data.slice(0, 4);
+            porAno[ano] = (porAno[ano] || 0) + ev.amount;
+          });
+          const anosOrdenados = Object.keys(porAno).sort();
+
+          const graficoHtml = anosOrdenados.length
+            ? hgDesenharBarrasDividendos(anosOrdenados.map(a => ({ rotulo: a, valor: porAno[a] })))
+            : '';
+
+          const linhasTabela = comData.map(ev => `
+            <tr>
+              <td>${hgFormatDataDividendo(ev._data)}</td>
+              <td>${ev.type || '—'}</td>
+              <td class="num" style="text-align:right;">${hgFormatMoeda(ev.amount, moeda) ?? ev.amount}</td>
+            </tr>`).join('');
+
+          container.innerHTML = `
+            ${graficoHtml}
+            <div class="hg-tabela-scroll" style="overflow-x:auto; max-width:100%; -webkit-overflow-scrolling:touch; margin-top:${graficoHtml ? '14px' : '0'};">
+              <table class="hg-tabela-fundamentos" style="width:100%; min-width:420px; border-collapse:separate; border-spacing:0; font-family:'Courier New', monospace; font-size:0.85rem;">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:2;">Data</th>
+                    <th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit;">Tipo</th>
+                    <th style="text-align:right; padding:8px 10px; color:var(--muted); font-family:inherit;">Valor/ação</th>
+                  </tr>
+                </thead>
+                <tbody>${linhasTabela}</tbody>
+              </table>
+            </div>
+            <p style="margin-top:10px; font-size:0.74rem; color:var(--muted);">Fonte: HG Brasil.</p>
+          `;
+        } catch (e) {
+          container.innerHTML = `<p class="hg-status erro">Histórico de dividendos indisponível agora para ${symbol}.</p>`;
+          console.error('Erro ao buscar histórico de dividendos (HG Brasil):', e);
+        }
+      }
+
+      // Barras simples por ano, no mesmo espírito visual do resto do site
+      // (SVG leve, sem biblioteca de gráfico).
+      function hgDesenharBarrasDividendos(dados) {
+        const L = 640, A = 180, mE = 46, mD = 14, mT = 16, mB = 26;
+        const larg = L - mE - mD, alt = A - mT - mB;
+        const max = Math.max(...dados.map(d => d.valor || 0)) || 1;
+        const passo = larg / dados.length;
+        const w = Math.min(60, passo * 0.55);
+
+        let grade = '';
+        for (let i = 0; i <= 3; i++) {
+          const v = max * i / 3;
+          const y = mT + alt - (v / max) * alt;
+          grade += `<line x1="${mE}" y1="${y.toFixed(1)}" x2="${L - mD}" y2="${y.toFixed(1)}" stroke="var(--border)" stroke-dasharray="${i ? '2,3' : '0'}"/>
+            <text x="${mE - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="'Courier New',monospace">${hgFormatNumero(v)}</text>`;
+        }
+
+        const barras = dados.map((d, i) => {
+          const h = ((d.valor || 0) / max) * alt;
+          const x = mE + passo * i + (passo - w) / 2;
+          const y = mT + alt - h;
+          return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(h, 1).toFixed(1)}" rx="3" fill="var(--primary)" opacity="0.85"/>
+            <text x="${(x + w / 2).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="'Courier New',monospace">${hgFormatNumero(d.valor)}</text>
+            <text x="${(x + w / 2).toFixed(1)}" y="${A - 8}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="'Courier New',monospace">${d.rotulo}</text>`;
+        }).join('');
+
+        return `<svg viewBox="0 0 ${L} ${A}" role="img" aria-label="Dividendos por ano">${grade}${barras}</svg>`;
       }
 
       // Cache das últimas amostras carregadas (ticker + período), reaproveitado
