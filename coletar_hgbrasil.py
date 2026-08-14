@@ -183,6 +183,13 @@ BLS_CPI_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/CUUR0000SA0"
 # para atualizar esse dado específico depois de reuniões do Copom (dias,
 # às vezes mais), enquanto o BCB publica no mesmo dia da decisão.
 BCB_SELIC_META_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/5?formato=json"
+# CDI anualizado (série 4389, % a.a., base 252) — mesmo formato da Selic
+# meta, então fica comparável lado a lado. Não confundir com a série 12
+# ("CDI ao dia", % a.d.), que é diária e não anualizada.
+BCB_CDI_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.4389/dados/ultimos/5?formato=json"
+# IGP-M (série 189, variação % mensal) — usado sobretudo em reajuste de
+# aluguel, público diferente do IPCA mas mesma fonte/formato.
+BCB_IGPM_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.189/dados/ultimos/1?formato=json"
 
 # Pool fixo de ações e FIIs líquidos, usado como universo para os rankings
 # (Dividend Yield, Valor de Mercado, Receita e "mais negociados"). Ajuste
@@ -902,6 +909,40 @@ def coletar_cpi_eua():
         return None
 
 
+def coletar_cdi_bcb():
+    """CDI anualizado (série SGS 4389, % a.a.), via API pública do Banco
+    Central. Atualiza em dias úteis, junto com o CDI do dia. Formato igual
+    ao da Selic (percentual anualizado), então os dois ficam comparáveis
+    lado a lado — é assim que a maioria dos leitores usa o CDI: como
+    referência de renda fixa."""
+    try:
+        dados = _requisitar_bcb_com_retry(BCB_CDI_URL)
+        if not dados:
+            return None
+        item = dados[-1]
+        valor = float(item["valor"].replace(",", "."))
+        print(f"OK: CDI obtido do Banco Central (SGS 4389): {valor}% (referência: {item.get('data')}).")
+        return {"label": "CDI", "valor_pct": valor, "referencia": item.get("data")}
+    except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
+        print(f"AVISO: falha ao buscar CDI no Banco Central após tentativas: {exc}", file=sys.stderr)
+        return None
+
+
+def coletar_igpm():
+    """Variação mensal do IGP-M (série SGS 189), via API pública do Banco
+    Central. Usado sobretudo em reajuste de contratos de aluguel."""
+    try:
+        dados = _requisitar_bcb_com_retry(BCB_IGPM_URL)
+        if not dados:
+            return None
+        item = dados[-1]
+        valor = float(item["valor"].replace(",", "."))
+        return {"label": "IGP-M (mensal)", "valor_pct": valor, "referencia": item.get("data")}
+    except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
+        print(f"AVISO: falha ao buscar IGP-M no Banco Central após tentativas: {exc}", file=sys.stderr)
+        return None
+
+
 def coletar_indices(token_brapi):
     """Monta a lista completa de índices do boletim: mercado (brapi) +
     Selic/IPCA (Banco Central) + CPI (BLS). A Selic é posicionada logo
@@ -931,12 +972,23 @@ def coletar_indices(token_brapi):
     if not selic:
         print("AVISO: Selic do Banco Central falhou — o boletim sai sem ela nesta execução.", file=sys.stderr)
 
-    # Reordena a Selic para logo depois do Ibovespa, se ambos existirem.
+    # Reordena a Selic (e o CDI logo em seguida) para depois do Ibovespa,
+    # se ambos existirem. CDI fica colado na Selic de propósito: são as
+    # duas taxas de referência de renda fixa, ficam mais úteis juntas.
     if selic:
         posicao_ibovespa = next(
             (i for i, item in enumerate(indices) if item.get("label") == "Ibovespa"), None
         )
         indices.insert((posicao_ibovespa + 1) if posicao_ibovespa is not None else 0, selic)
+
+    cdi = coletar_cdi_bcb()
+    if cdi:
+        posicao_selic = next(
+            (i for i, item in enumerate(indices) if item.get("label") == "Selic (meta)"), None
+        )
+        indices.insert((posicao_selic + 1) if posicao_selic is not None else len(indices), cdi)
+    else:
+        print("AVISO: CDI do Banco Central falhou — o boletim sai sem ele nesta execução.", file=sys.stderr)
 
     ipca = coletar_ipca()
     if ipca:
@@ -945,6 +997,10 @@ def coletar_indices(token_brapi):
     ipca_12m = coletar_ipca_12_meses()
     if ipca_12m:
         indices.append(ipca_12m)
+
+    igpm = coletar_igpm()
+    if igpm:
+        indices.append(igpm)
 
     cpi = coletar_cpi_eua()
     if cpi:
