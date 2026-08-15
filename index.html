@@ -841,7 +841,7 @@
     .hg-periodo-tab:hover { border-color: var(--primary); color: var(--primary); }
     .hg-periodo-tab.hg-periodo-ativo { background: var(--primary); border-color: var(--primary); color: var(--btn-text); }
     .hg-grafico-periodo-valor { font-family: "Courier New", monospace; font-size: 0.72rem; }
-    .hg-grafico-box svg { width: 100%; height: auto; display: block; overflow: visible; }
+    .hg-grafico-box svg { width: 100%; height: auto; max-height: 340px; display: block; overflow: visible; }
     .hg-grafico-eixo-label { font-size: 13px; fill: var(--text); opacity: 0.75; font-family: "Courier New", monospace; font-weight: 600; }
     .hg-grafico-grid-linha { stroke: var(--border); stroke-width: 1; }
     .hg-grafico-tooltip-grupo { pointer-events: none; opacity: 0; transition: opacity 0.1s ease; }
@@ -5134,7 +5134,7 @@
 
       function hgDesenharGrafico(container, amostras, periodo) {
         const larguraTotal = 640;
-        const alturaTotal = 260;
+        const alturaTotal = 230;
         const margemEsq = 58;
         const margemDir = 14;
         const margemTop = 16;
@@ -5205,7 +5205,7 @@
           <svg viewBox="0 0 ${larguraTotal} ${alturaTotal}" preserveAspectRatio="xMidYMid meet">
             <defs>
               <linearGradient id="${gradienteId}" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="${cor}" stop-opacity="0.28"></stop>
+                <stop offset="0%" stop-color="${cor}" stop-opacity="0.18"></stop>
                 <stop offset="100%" stop-color="${cor}" stop-opacity="0"></stop>
               </linearGradient>
             </defs>
@@ -5214,10 +5214,10 @@
             ${datasSvg}
 
             <path d="${pathArea}" fill="url(#${gradienteId})" stroke="none"></path>
-            <path d="${pathLinha}" fill="none" stroke="${cor}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"></path>
+            <path d="${pathLinha}" fill="none" stroke="${cor}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"></path>
 
-            <circle cx="${ultimoPonto.x.toFixed(2)}" cy="${ultimoPonto.y.toFixed(2)}" r="4" fill="${cor}"></circle>
-            <circle cx="${ultimoPonto.x.toFixed(2)}" cy="${ultimoPonto.y.toFixed(2)}" r="8" fill="${cor}" opacity="0.25"></circle>
+            <circle cx="${ultimoPonto.x.toFixed(2)}" cy="${ultimoPonto.y.toFixed(2)}" r="3.2" fill="${cor}"></circle>
+            <circle cx="${ultimoPonto.x.toFixed(2)}" cy="${ultimoPonto.y.toFixed(2)}" r="6.5" fill="${cor}" opacity="0.18"></circle>
 
             <g id="hgTooltipLinha" class="hg-grafico-tooltip-grupo">
               <line x1="0" y1="${margemTop}" x2="0" y2="${margemTop + altura}" stroke="${cor}" stroke-width="1" stroke-dasharray="3,3"></line>
