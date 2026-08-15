@@ -6,16 +6,6 @@
     "variacao_pct": -0.1
   },
   {
-    "label": "Selic (meta)",
-    "valor_pct": 14.0,
-    "referencia": "16/09/2026"
-  },
-  {
-    "label": "CDI",
-    "valor_pct": 13.9,
-    "referencia": "07/08/2026"
-  },
-  {
     "label": "IFIX",
     "prefixo": "pontos",
     "valor": 3686.33,
@@ -29,23 +19,21 @@
     "referencia": "14/08/2026"
   },
   {
-    "label": "Euro",
-    "prefixo": "R$ ",
-    "valor": 6.05,
-    "variacao_pct": 1.1722604056924038,
-    "referencia": "14/08/2026"
-  },
-  {
     "label": "Bitcoin",
     "prefixo": "R$ ",
-    "valor": 329509.0,
-    "variacao_pct": 0.41526906277756565
+    "valor": 329385.0,
+    "variacao_pct": 0.47766851986239406
   },
   {
     "label": "Ethereum",
     "prefixo": "R$ ",
-    "valor": 9835.89,
-    "variacao_pct": 0.3805875916048379
+    "valor": 9832.59,
+    "variacao_pct": 0.37658618967212987
+  },
+  {
+    "label": "CDI",
+    "valor_pct": 13.9,
+    "referencia": "07/08/2026"
   },
   {
     "label": "IPCA (mensal)",
