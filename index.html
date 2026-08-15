@@ -731,6 +731,9 @@
     .hg-btn-secundario-pequeno:hover { color: var(--primary); border-color: var(--primary); }
     .hg-btn-secundario-pequeno.copiado { color: var(--accent); border-color: var(--accent); }
     .hg-btn-secundario-pequeno svg { width: 13px; height: 13px; flex-shrink: 0; }
+    /* Botões lado a lado (ex: "Ver histórico de dividendos" + atalho pra
+       Análise Fundamentalista), quebrando linha em telas estreitas. */
+    .hg-acoes-lado-a-lado { display: flex; gap: 8px; flex-wrap: wrap; }
     .hg-btn-compartilhar {
       display: inline-flex;
       align-items: center;
@@ -842,6 +845,7 @@
     .hg-periodo-tab.hg-periodo-ativo { background: var(--primary); border-color: var(--primary); color: var(--btn-text); }
     .hg-grafico-periodo-valor { font-family: "Courier New", monospace; font-size: 0.72rem; }
     .hg-grafico-box svg { width: 100%; height: auto; max-height: 300px; display: block; overflow: visible; }
+    #hgDividendosConteudo svg { max-height: 220px; }
     .hg-grafico-eixo-label { font-size: 13px; fill: var(--text); opacity: 0.75; font-family: "Courier New", monospace; font-weight: 600; }
     .hg-grafico-eixo-label-preco { font-size: 11px; fill: var(--text); opacity: 0.68; font-family: "Courier New", monospace; font-weight: 600; }
     .hg-grafico-grid-linha { stroke: var(--border); stroke-width: 1; }
@@ -3310,6 +3314,9 @@
             </div>
 
             <div class="hg-status" id="hgFundStatus"></div>
+            <div class="hg-acoes-lado-a-lado" id="hgFundAcoesWrap" style="display:none; margin-bottom:10px;">
+              <button type="button" class="hg-btn-secundario-pequeno" id="hgFundBtnFechar">✕ Fechar resultado</button>
+            </div>
             <div id="hgFundResultado"></div>
           </div>
         </section>
@@ -4364,8 +4371,6 @@
               ['Setor', cls.sector],
               ['Subsetor', cls.subsector],
               ['Segmento', cls.segment],
-              ['Unidade', a.unit],
-              ['Moeda', moeda],
             ],
           },
           {
@@ -4541,14 +4546,20 @@
               <div class="hg-grafico-box">
                 <div class="hg-grafico-topo">
                   <div class="hg-grafico-titulo">Histórico de Dividendos</div>
-                  <div class="hg-periodo-tabs" id="hgDividendosPeriodoTabs" style="display:none;">
-                    <button type="button" class="hg-periodo-tab hg-periodo-ativo" data-anos="1">1 ano</button>
-                    <button type="button" class="hg-periodo-tab" data-anos="3">3 anos</button>
+                  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <div class="hg-periodo-tabs" id="hgDividendosPeriodoTabs" style="display:none;">
+                      <button type="button" class="hg-periodo-tab hg-periodo-ativo" data-anos="1">1 ano</button>
+                      <button type="button" class="hg-periodo-tab" data-anos="3">3 anos</button>
+                    </div>
+                    <button type="button" class="hg-btn-secundario-pequeno" id="hgDividendosBtnToggle">
+                      Ver histórico de dividendos
+                    </button>
                   </div>
                 </div>
-                <div id="hgDividendosConteudo">
-                  <button type="button" class="hg-btn-secundario-pequeno" id="hgDividendosBtnVer">
-                    Ver histórico de dividendos
+                <div id="hgDividendosConteudo"></div>
+                <div class="hg-acoes-lado-a-lado" style="margin-top:12px;">
+                  <button type="button" class="hg-btn-secundario-pequeno" id="hgIrParaFundamentalistaBtn">
+                    📊 Ver Análise Fundamentalista completa
                   </button>
                 </div>
               </div>
@@ -4650,19 +4661,30 @@
 
         if (['stock', 'bdr'].includes(a.kind)) {
           const tabsEl = document.getElementById('hgDividendosPeriodoTabs');
-          const btnVer = document.getElementById('hgDividendosBtnVer');
+          const btnToggle = document.getElementById('hgDividendosBtnToggle');
+          const conteudoEl = document.getElementById('hgDividendosConteudo');
+          let aberto = false;
+          let jaCarregou = false;
 
-          // Só busca quando a pessoa pedir — o histórico de dividendos
-          // não é algo que todo mundo consulta toda vez, e essa consulta
-          // sozinha já podia chegar a ~12 requisições (busca binária pelo
-          // limite do plano). Sob demanda evita gastar isso à toa em
-          // quem só queria ver a cotação.
-          if (btnVer) {
-            btnVer.addEventListener('click', () => {
-              tabsEl.style.display = '';
+          // Botão único de abrir/fechar, sempre visível (fica FORA de
+          // #hgDividendosConteudo, que hgCarregarDividendos sobrescreve —
+          // se o botão estivesse dentro, some no primeiro carregamento e
+          // não haveria como reabrir depois de fechar).
+          //
+          // Só busca na primeira vez que abre — o histórico de dividendos
+          // sozinho já pode chegar a ~12 requisições (busca binária pelo
+          // limite do plano), então reabrir não refaz a busca, só
+          // reexibe o que já tinha carregado.
+          btnToggle?.addEventListener('click', () => {
+            aberto = !aberto;
+            tabsEl.style.display = aberto ? '' : 'none';
+            conteudoEl.style.display = aberto ? '' : 'none';
+            btnToggle.textContent = aberto ? '✕ Fechar histórico' : 'Ver histórico de dividendos';
+            if (aberto && !jaCarregou) {
+              jaCarregou = true;
               hgCarregarDividendos(a.symbol, a.currency, 1); // padrão: 1 ano
-            }, { once: true });
-          }
+            }
+          });
 
           tabsEl?.addEventListener('click', (e) => {
             const btn = e.target.closest('.hg-periodo-tab');
@@ -4672,6 +4694,17 @@
             hgCarregarDividendos(a.symbol, a.currency, Number(btn.dataset.anos));
           });
         }
+
+        // Atalho: leva pra Análise Fundamentalista já com o ticker
+        // preenchido e a busca disparada, em vez da pessoa ter que
+        // digitar de novo numa seção diferente da página.
+        document.getElementById('hgIrParaFundamentalistaBtn')?.addEventListener('click', () => {
+          const campo = document.getElementById('hgFundTickerInput');
+          if (!campo) return;
+          campo.value = a.symbol;
+          document.getElementById('hgFundBtnBuscar')?.click();
+          document.getElementById('analise-fundamentalista')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
       }
 
       // Busca o P/VP e VPA (campo "financials") no endpoint /finance/stock_price
@@ -4898,7 +4931,7 @@
       // Barras simples por ano, no mesmo espírito visual do resto do site
       // (SVG leve, sem biblioteca de gráfico).
       function hgDesenharBarrasDividendos(dados) {
-        const L = 640, A = 200, mE = 54, mD = 14, mT = 22, mB = 32;
+        const L = 640, A = 160, mE = 54, mD = 14, mT = 18, mB = 28;
         const larg = L - mE - mD, alt = A - mT - mB;
         const max = Math.max(...dados.map(d => d.valor || 0)) || 1;
         const passo = larg / dados.length;
@@ -8244,9 +8277,11 @@
             });
           }
           statusFund.textContent = '';
+          document.getElementById('hgFundAcoesWrap').style.display = '';
         } catch (e) {
           statusFund.className = 'hg-status erro';
           statusFund.textContent = e.message || 'Erro ao consultar a análise fundamentalista. Tente novamente.';
+          document.getElementById('hgFundAcoesWrap').style.display = 'none';
           console.error('Erro na análise fundamentalista:', e);
         }
       }
@@ -8365,6 +8400,12 @@
           inputFund.value = chip.dataset.ticker;
           buscarFundamentos();
         });
+      });
+
+      document.getElementById('hgFundBtnFechar')?.addEventListener('click', () => {
+        resultadoFund.innerHTML = '';
+        statusFund.textContent = '';
+        document.getElementById('hgFundAcoesWrap').style.display = 'none';
       });
 
       // Se o link veio de um compartilhamento da própria Análise
