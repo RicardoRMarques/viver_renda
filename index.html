@@ -904,7 +904,7 @@
       text-transform: uppercase;
       letter-spacing: 0.4px;
       color: var(--primary);
-      margin-top: 14px;
+      margin-top: 10px;
       margin-bottom: -2px;
     }
     .hg-grupo-titulo:first-child { margin-top: 0; }
@@ -4667,14 +4667,19 @@
         if (a.kind === 'fii' || a.kind === 'stock') {
           const grid = resultadoEl.querySelector('.hg-grid-dados');
           if (grid) {
+            // Sem título próprio de propósito: "Valuation" tinha só 2
+            // campos curtos, e o grid-column:1/-1 do título forçava uma
+            // faixa nova cheia de espaço vazio (era exatamente o
+            // problema reportado). Os rótulos ficam com o prefixo pra
+            // não perder o contexto sem precisar de uma faixa só pra
+            // isso — fica "ao lado" de Dividendos, na mesma faixa.
             grid.insertAdjacentHTML('beforeend', `
-              <div class="hg-grupo-titulo">Valuation</div>
               <div>
-                <span>P/VP</span>
+                <span>Valuation · P/VP</span>
                 <strong id="hgPvpValor" title="Carregando...">Carregando...</strong>
               </div>
               <div>
-                <span>VPA (valor patrimonial/cota)</span>
+                <span>Valuation · VPA (valor patrimonial/cota)</span>
                 <strong id="hgVpaValor" title="Carregando...">Carregando...</strong>
               </div>
             `);
@@ -8227,6 +8232,7 @@
         'Margem líquida': 'Margem Líquida = percentual da receita que sobra como lucro líquido, depois de todos os custos, despesas, juros e impostos.\n\nCálculo: lucro líquido / receita × 100',
         'ROE': 'ROE (Return on Equity / Retorno sobre o Patrimônio Líquido) = quanto a empresa lucra para cada R$ 1 investido pelos acionistas.\n\nCálculo: lucro líquido / patrimônio líquido × 100',
         'Dividend Yield': 'Dividend Yield (DY) = quanto a empresa pagou em dividendos/proventos no período, em relação à cotação atual da ação.\n\nCálculo: dividendos pagos / cotação atual × 100',
+        'Atual (TTM)': 'TTM = "Trailing Twelve Months" (últimos 12 meses).\n\nOs indicadores desta coluna somam os últimos 4 trimestres divulgados, e não só o trimestre mais recente — dá uma visão mais estável, sem os altos e baixos sazonais de um único trimestre.\n\nAs demais colunas mostram cada trimestre isolado, na data do balanço.',
       };
 
       // Tooltip próprio desta seção: mesmo padrão usado no Comparador de
@@ -8416,7 +8422,12 @@
           return `<tr><th scope="row" style="text-align:left; padding:6px 10px; font-family:inherit; font-weight:700; white-space:nowrap; border-top:1px solid var(--border); position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1; isolation:isolate;">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
         }).join('');
 
-        const cabecalhoHtml = colunas.map(c => `<th>${c.rotulo}</th>`).join('');
+        const cabecalhoHtml = colunas.map(c => {
+          const botaoInfo = c.rotulo === 'Atual (TTM)'
+            ? ` <button type="button" class="hg-info-btn" data-indicador="Atual (TTM)" aria-label="O que é TTM?" title="O que é TTM?">?</button>`
+            : '';
+          return `<th>${c.rotulo}${botaoInfo}</th>`;
+        }).join('');
 
         const nomeExibicao = info.name || info.symbol || '';
         const setorHtml = info.classification?.sector
