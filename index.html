@@ -730,7 +730,7 @@
     }
     .hg-btn-secundario-pequeno:hover { color: var(--primary); border-color: var(--primary); }
     .hg-btn-secundario-pequeno.copiado { color: var(--accent); border-color: var(--accent); }
-    .hg-btn-secundario-pequeno svg { width: 13px; height: 13px; flex-shrink: 0; }
+    button.hg-btn-secundario-pequeno svg { width: 13px; height: 13px; flex-shrink: 0; max-height: none; }
     /* Botões lado a lado (ex: "Ver histórico de dividendos" + atalho pra
        Análise Fundamentalista), quebrando linha em telas estreitas. */
     .hg-acoes-lado-a-lado { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -759,7 +759,13 @@
     }
     .hg-btn-compartilhar:hover { color: var(--primary); border-color: var(--primary); }
     .hg-btn-compartilhar.copiado { color: var(--accent); border-color: var(--accent); }
-    .hg-btn-compartilhar svg { width: 15px; height: 15px; flex-shrink: 0; }
+    /* button. prefixado de propósito: aumenta a especificidade pra
+       sempre vencer ".hg-grafico-box svg" (mesma especificidade sem
+       isso, e a ordem no arquivo decidiria — frágil). Sem essa garantia,
+       o ícone deste botão vira gigante sempre que ele acabar aninhado
+       dentro de um .hg-grafico-box, como aconteceu quando a Análise
+       Fundamentalista passou a abrir embutida ali. */
+    button.hg-btn-compartilhar svg { width: 15px; height: 15px; flex-shrink: 0; max-height: none; }
     .hg-card-topo img {
       width: 46px; height: 46px; border-radius: 10px;
       background: rgba(255,255,255,0.04); object-fit: contain; padding: 5px;
