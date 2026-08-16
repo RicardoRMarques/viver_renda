@@ -4643,7 +4643,7 @@
         // aqui e é reposicionado via JS (position:fixed) quando abre —
         // mesmo padrão que o balão de glossário do site já usa.
         return `
-          <div class="hg-tabela-scroll" style="overflow-x:auto; max-width:100%; -webkit-overflow-scrolling:touch;">
+          <div class="hg-tabela-scroll" style="overflow-x:auto; max-width:100%;">
             <table class="hg-tabela-fundamentos" style="width:100%; min-width:${140 + larguraColuna * lista.length}px; border-collapse:separate; border-spacing:0; font-family:'Courier New', monospace; font-size:0.85rem;">
               <thead><tr>${cabecalho}</tr></thead>
               <tbody>${linhaScore}${linhasIndicadores}</tbody>
@@ -4688,7 +4688,6 @@
         document.addEventListener('click', (e) => {
           if (e.target !== btn && !balao.contains(e.target)) fechar();
         });
-        window.addEventListener('scroll', fechar, { passive: true });
       }
 
       function hgRenderizarAtivo(a) {
