@@ -57,6 +57,29 @@
       --painel-bg: rgba(255,255,255,0.75);
     }
 
+    /* Branco puro: mesma paleta de cores de destaque do modo claro
+       (--primary/--accent/--gold/--danger inalterados — já têm contraste
+       validado sobre fundo claro), só troca os tons de fundo/texto/borda
+       do azulado (#eef2f9) pra neutro, sem tingimento de cor. */
+    html[data-theme="white"] {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --deep: #f6f6f7;
+      --grad-a: #ffffff;
+      --grad-b: #ffffff;
+      --text: #1a1a1a;
+      --muted: #666666;
+      --primary: #0f8fce;
+      --primary-dark: #0c73a6;
+      --accent: #0e9e46;
+      --gold: #a8781a;
+      --danger: #e0233f;
+      --border: rgba(0,0,0,0.1);
+      --shadow: 0 12px 30px rgba(0,0,0,0.08);
+      --btn-text: #ffffff;
+      --painel-bg: rgba(255,255,255,0.92);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -71,6 +94,12 @@
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
+    }
+    /* Branco puro: sem o brilho azulado no topo (ele é uma cor fixa, não
+       amarrada a --primary, então persistiria mesmo aqui sem esse
+       override — quebraria o propósito de "sem nenhuma cor de fundo"). */
+    html[data-theme="white"] body {
+      background: var(--bg);
     }
 
     a {
@@ -2278,8 +2307,8 @@
   <script>
     (function () {
       var temaSalvo = localStorage.getItem('viverderenda_tema');
-      if (temaSalvo === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
+      if (temaSalvo === 'light' || temaSalvo === 'white') {
+        document.documentElement.setAttribute('data-theme', temaSalvo);
       }
     })();
   </script>
@@ -4062,11 +4091,13 @@
     function HG_COR_ACCENT() { return hgCssVar('--accent') || '#7cff92'; }
     function HG_COR_MUTED() { return hgCssVar('--muted') || '#a9b6d3'; }
     function HG_COR_GRID() {
-      const isClaro = document.documentElement.getAttribute('data-theme') === 'light';
+      const tema = document.documentElement.getAttribute('data-theme');
+      const isClaro = tema === 'light' || tema === 'white';
       return isClaro ? 'rgba(15,30,60,0.12)' : 'rgba(169,182,211,0.15)';
     }
     function hgCorPrimariaFundo() {
-      const isClaro = document.documentElement.getAttribute('data-theme') === 'light';
+      const tema = document.documentElement.getAttribute('data-theme');
+      const isClaro = tema === 'light' || tema === 'white';
       return isClaro ? 'rgba(15,143,206,0.15)' : 'rgba(49,195,255,0.12)';
     }
 
@@ -8938,27 +8969,41 @@
       const botao = document.getElementById('themeToggle');
       const html = document.documentElement;
 
-      function atualizarIcone() {
-        const claro = html.getAttribute('data-theme') === 'light';
-        botao.textContent = claro ? '🌙' : '☀️';
-        botao.title = claro ? 'Escurecer a página' : 'Clarear a página';
+      // Ordem do ciclo ao clicar: escuro -> claro (azulado) -> branco puro
+      // -> escuro de novo. O ícone sempre mostra o PRÓXIMO estado (o que
+      // vai acontecer ao clicar), não o atual — mesma lógica que já
+      // existia no botão de 2 estados.
+      const PROXIMO = { dark: 'light', light: 'white', white: 'dark' };
+      const ICONE = { dark: '☀️', light: '⚪', white: '🌙' };
+      const TITULO = {
+        dark: 'Clarear a página (fundo azulado)',
+        light: 'Deixar o fundo branco puro',
+        white: 'Escurecer a página',
+      };
+
+      function temaAtual() {
+        return html.getAttribute('data-theme') || 'dark';
+      }
+
+      function aplicarTema(tema) {
+        if (tema === 'dark') {
+          html.removeAttribute('data-theme');
+        } else {
+          html.setAttribute('data-theme', tema);
+        }
+        localStorage.setItem('viverderenda_tema', tema);
+        botao.textContent = ICONE[tema];
+        botao.title = TITULO[tema];
       }
 
       botao.addEventListener('click', () => {
-        const claroAgora = html.getAttribute('data-theme') === 'light';
-        if (claroAgora) {
-          html.removeAttribute('data-theme');
-          localStorage.setItem('viverderenda_tema', 'dark');
-        } else {
-          html.setAttribute('data-theme', 'light');
-          localStorage.setItem('viverderenda_tema', 'light');
-        }
-        atualizarIcone();
+        aplicarTema(PROXIMO[temaAtual()]);
         // Avisa os gráficos já abertos (Chart.js) pra se redesenharem com
         // as cores do novo tema, sem precisar mexer nos controles de novo.
         window.dispatchEvent(new CustomEvent('hg-tema-mudou'));
       });
-      atualizarIcone();
+
+      aplicarTema(temaAtual());
     })();
 
     // ============================================================
