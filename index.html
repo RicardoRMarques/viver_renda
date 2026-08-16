@@ -1763,6 +1763,17 @@
     .hg-info-vermelho { border-color: #e05555 !important; color: #e05555 !important; }
     .hg-info-vermelho:hover { background: #e05555 !important; color: #fff !important; }
 
+    /* Balão do "?" da Nota Geral no comparador — estilo próprio do site
+       (dark, com borda), em vez do title nativo do navegador (caixa
+       branca com borda preta, fora do padrão visual). */
+    .hg-comparador-tooltip {
+      position: fixed; z-index: 999; max-width: 280px;
+      background: var(--deep); border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; font-size: 0.78rem; line-height: 1.5; color: var(--text);
+      font-family: 'Inter', sans-serif; font-weight: 400; white-space: normal;
+      box-shadow: var(--shadow);
+    }
+
     /* Gráficos de projeção (Juros Compostos, Aposentadoria Renda Passiva) */
     .hg-grafico-bloco { margin-top: 18px; }
     .hg-grafico-legenda {
@@ -4544,16 +4555,26 @@
       // onde negativo significa caixa líquido (ótimo, não ruim).
       function hgClassificarIndicador(def, valor, ehBanco) {
         const faixa = ehBanco ? def.bancos : def.geral;
-        if (!faixa || typeof valor !== 'number' || !isFinite(valor)) return { emoji: '—', pontos: null };
+        if (!faixa || typeof valor !== 'number' || !isFinite(valor)) return { cor: 'na', pontos: null };
         if (def.direcao === 'menor') {
-          if (valor < 0) return def.caixaLiquidoOk ? { emoji: '🟢', pontos: 100 } : { emoji: '🔴', pontos: 15 };
-          if (valor <= faixa[0]) return { emoji: '🟢', pontos: 100 };
-          if (valor <= faixa[1]) return { emoji: '🟡', pontos: 55 };
-          return { emoji: '🔴', pontos: 15 };
+          if (valor < 0) return def.caixaLiquidoOk ? { cor: 'verde', pontos: 100 } : { cor: 'vermelho', pontos: 15 };
+          if (valor <= faixa[0]) return { cor: 'verde', pontos: 100 };
+          if (valor <= faixa[1]) return { cor: 'amarelo', pontos: 55 };
+          return { cor: 'vermelho', pontos: 15 };
         }
-        if (valor >= faixa[0]) return { emoji: '🟢', pontos: 100 };
-        if (valor >= faixa[1]) return { emoji: '🟡', pontos: 55 };
-        return { emoji: '🔴', pontos: 15 };
+        if (valor >= faixa[0]) return { cor: 'verde', pontos: 100 };
+        if (valor >= faixa[1]) return { cor: 'amarelo', pontos: 55 };
+        return { cor: 'vermelho', pontos: 15 };
+      }
+
+      // Bolinha colorida em SVG, não emoji — emoji de cor (🟢🟡🔴) não
+      // renderiza de forma confiável em todo navegador/sistema (mesmo
+      // problema que já corrigimos antes com o ícone de lupa: em alguns
+      // ambientes vira um quadradinho vazio, sem cor nenhuma).
+      const HG_COR_SVG = { verde: '#22c55e', amarelo: '#eab308', vermelho: '#ef4444' };
+      function hgBolinhaComparador(cor) {
+        if (cor === 'na') return '<span style="color:var(--muted);">—</span>';
+        return `<svg viewBox="0 0 14 14" style="display:inline-block; vertical-align:middle; width:14px !important; height:14px !important; max-height:14px !important;"><circle cx="7" cy="7" r="6" fill="${HG_COR_SVG[cor]}"/></svg>`;
       }
 
       async function hgBuscarDadosComparacao(tickerBruto) {
@@ -4594,7 +4615,7 @@
           + lista.map(item => `<th style="text-align:center; padding:8px 8px; font-family:inherit; min-width:${larguraColuna}px;">${item.ticker}</th>`).join('');
 
         const tituloNotaGeral = 'Nota Geral'
-          + ' <button type="button" class="hg-info-btn" title="Média (0 a 100) dos indicadores que se aplicam ao setor de cada ativo — verde soma mais, vermelho soma menos, e o não aplicável (—) fica de fora da conta. É um resumo rápido pra comparar, não uma recomendação." aria-label="Como a Nota Geral é calculada?">?</button>';
+          + ' <button type="button" class="hg-info-btn" id="hgCompararNotaGeralBtn" aria-label="Como a Nota Geral é calculada?">?</button>';
         const linhaScore = `<tr style="background:rgba(255,255,255,0.03);">
             <th scope="row" style="text-align:left; padding:8px 10px; font-weight:800; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1;">${tituloNotaGeral}</th>
             ${scores.map(s => `<td style="text-align:center; padding:8px 8px; font-weight:800; font-size:1.05rem; color:${s === null ? 'var(--muted)' : s >= 75 ? 'var(--accent)' : s >= 45 ? 'var(--gold)' : 'var(--danger)'};">${s === null ? '—' : s}</td>`).join('')}
@@ -4606,14 +4627,21 @@
             ? (grupoAtual = def.grupo, `<tr><td colspan="${lista.length + 1}" style="padding:10px 10px 4px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--primary); border-top:1px solid var(--border);">${def.grupo}</td></tr>`)
             : '';
           const celulas = lista.map(item => {
-            const { emoji } = hgClassificarIndicador(def, item.valores[def.campo], hgEhSetorBanco(item.setor));
-            return `<td style="text-align:center; padding:6px 8px; font-size:1.1rem;">${emoji}</td>`;
+            const { cor } = hgClassificarIndicador(def, item.valores[def.campo], hgEhSetorBanco(item.setor));
+            return `<td style="text-align:center; padding:6px 8px;">${hgBolinhaComparador(cor)}</td>`;
           }).join('');
           return `${linhaGrupo}<tr><th scope="row" style="text-align:left; padding:6px 10px; font-weight:600; font-family:inherit; white-space:normal; max-width:130px; width:130px; line-height:1.25; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1;">${def.rotulo}</th>${celulas}</tr>`;
         }).join('');
 
         const setoresDiferentes = new Set(lista.map(i => hgEhSetorBanco(i.setor))).size > 1;
 
+        // O balão do "?" fica FORA de .hg-tabela-scroll de propósito: como
+        // essa div tem overflow-x:auto, ela também recorta overflow no
+        // eixo vertical (regra da especificação CSS: só um eixo em
+        // "visible" não é permitido — o outro vira auto também). Um
+        // balão posicionado ali dentro ficava cortado. Fica escondido
+        // aqui e é reposicionado via JS (position:fixed) quando abre —
+        // mesmo padrão que o balão de glossário do site já usa.
         return `
           <div class="hg-tabela-scroll" style="overflow-x:auto; max-width:100%; -webkit-overflow-scrolling:touch;">
             <table class="hg-tabela-fundamentos" style="width:100%; min-width:${140 + larguraColuna * lista.length}px; border-collapse:separate; border-spacing:0; font-family:'Courier New', monospace; font-size:0.85rem;">
@@ -4621,11 +4649,46 @@
               <tbody>${linhaScore}${linhasIndicadores}</tbody>
             </table>
           </div>
-          <p style="margin-top:10px; font-size:0.74rem; color:var(--muted); line-height:1.5;">
-            🟢 saudável · 🟡 atenção · 🔴 fora da faixa típica · — não se aplica a esse setor.
-            ${setoresDiferentes ? '<br>As faixas usadas se ajustam ao setor de cada ativo (bancos usam régua própria) — por isso dois ativos de setores diferentes podem ter o mesmo indicador colorido de formas diferentes mesmo com valores parecidos.' : ''}
-            <br>Comparação educativa baseada em faixas típicas de mercado — não é recomendação de investimento.
+          <div id="hgCompararNotaGeralTooltip" class="hg-comparador-tooltip" style="display:none;">Média (0 a 100) dos indicadores que se aplicam ao setor de cada ativo — verde soma mais, vermelho soma menos, e o não aplicável (—) fica de fora da conta. É um resumo rápido pra comparar, não uma recomendação.</div>
+          <p style="margin-top:10px; font-size:0.74rem; color:var(--muted); line-height:1.5; display:flex; flex-wrap:wrap; align-items:center; gap:4px;">
+            ${hgBolinhaComparador('verde')} saudável · ${hgBolinhaComparador('amarelo')} atenção · ${hgBolinhaComparador('vermelho')} fora da faixa típica · — não se aplica a esse setor.
+            ${setoresDiferentes ? '<br style="width:100%;">As faixas usadas se ajustam ao setor de cada ativo (bancos usam régua própria) — por isso dois ativos de setores diferentes podem ter o mesmo indicador colorido de formas diferentes mesmo com valores parecidos.' : ''}
+            <br style="width:100%;">Comparação educativa baseada em faixas típicas de mercado — não é recomendação de investimento.
           </p>`;
+      }
+
+      // Popup customizado pro "?" da Nota Geral, no mesmo visual do site
+      // — o title nativo do navegador (usado antes) renderiza como caixa
+      // branca com borda preta, fora do estilo do resto da página.
+      // position:fixed + coordenadas calculadas via getBoundingClientRect
+      // (mesmo padrão do balão de glossário do site): necessário porque
+      // o balão precisa "escapar" do overflow:auto da tabela rolável.
+      function hgAtivarTooltipComparador() {
+        const btn = document.getElementById('hgCompararNotaGeralBtn');
+        const balao = document.getElementById('hgCompararNotaGeralTooltip');
+        if (!btn || !balao) return;
+        const fechar = () => { balao.style.display = 'none'; };
+        const posicionarEAbrir = () => {
+          balao.style.display = 'block';
+          const rect = btn.getBoundingClientRect();
+          const largura = balao.offsetWidth;
+          let left = rect.left;
+          if (left + largura > window.innerWidth - 8) left = window.innerWidth - largura - 8;
+          if (left < 8) left = 8;
+          let top = rect.bottom + 6;
+          const altura = balao.offsetHeight;
+          if (top + altura > window.innerHeight - 8) top = rect.top - altura - 6;
+          balao.style.top = `${top}px`;
+          balao.style.left = `${left}px`;
+        };
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          balao.style.display === 'block' ? fechar() : posicionarEAbrir();
+        });
+        document.addEventListener('click', (e) => {
+          if (e.target !== btn && !balao.contains(e.target)) fechar();
+        });
+        window.addEventListener('scroll', fechar, { passive: true });
       }
 
       function hgRenderizarAtivo(a) {
@@ -4973,6 +5036,7 @@
               ? `Comparando ${ok.length} de ${tickersUnicos.length} — alguns tickers não foram encontrados.`
               : '';
             resultadoEl.innerHTML = hgRenderizarComparador(ok);
+            hgAtivarTooltipComparador();
           } catch (e) {
             statusEl.className = 'hg-status erro';
             statusEl.textContent = e.message || 'Erro ao comparar os ativos.';
