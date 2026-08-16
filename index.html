@@ -8412,7 +8412,7 @@
           const botaoInfo = AJUDA_FUND[rotulo]
             ? ` <button type="button" class="hg-info-btn" data-indicador="${rotulo}" aria-label="O que é ${rotulo}?" title="O que é ${rotulo}?">?</button>`
             : '';
-          return `<tr><th scope="row" style="text-align:left; padding:6px 10px; font-family:inherit; font-weight:700; white-space:nowrap; border-top:1px solid var(--border); position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1; isolation:isolate;">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
+          return `<tr><th scope="row" style="text-align:left; padding:6px 8px; font-family:inherit; font-weight:700; white-space:normal; max-width:112px; width:112px; line-height:1.25; border-top:1px solid var(--border); position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1; isolation:isolate;">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
         }).join('');
 
         const cabecalhoHtml = colunas.map(c => {
@@ -8445,7 +8445,7 @@
               <table class="hg-tabela-fundamentos" style="width:100%; min-width:560px; border-collapse:separate; border-spacing:0; font-family:'Courier New', monospace; font-size:0.85rem;">
                 <thead>
                   <tr>
-                    <th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:2; isolation:isolate;">Indicador</th>
+                    <th style="text-align:left; padding:8px 8px; color:var(--muted); font-family:inherit; max-width:112px; width:112px; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:2; isolation:isolate;">Indicador</th>
                     ${cabecalhoHtml.replace(/<th>/g, '<th style="text-align:right; padding:8px 10px; color:var(--muted); font-family:inherit; white-space:nowrap;">')}
                   </tr>
                 </thead>
