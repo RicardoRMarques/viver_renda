@@ -4624,7 +4624,10 @@
         let grupoAtual = null;
         const linhasIndicadores = THRESHOLDS_INDICADORES.map(def => {
           const linhaGrupo = def.grupo !== grupoAtual
-            ? (grupoAtual = def.grupo, `<tr><td colspan="${lista.length + 1}" style="padding:10px 10px 4px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--primary); border-top:1px solid var(--border);">${def.grupo}</td></tr>`)
+            ? (grupoAtual = def.grupo, `<tr>
+                <th scope="row" style="text-align:left; padding:10px 10px 4px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--primary); font-family:inherit; border-top:1px solid var(--border); position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1;">${def.grupo}</th>
+                ${lista.map(() => `<td style="border-top:1px solid var(--border);"></td>`).join('')}
+              </tr>`)
             : '';
           const celulas = lista.map(item => {
             const { cor } = hgClassificarIndicador(def, item.valores[def.campo], hgEhSetorBanco(item.setor));
