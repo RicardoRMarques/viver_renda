@@ -4578,7 +4578,7 @@
       }
 
       function hgRenderizarComparador(lista) {
-        const larguraColuna = Math.max(90, Math.floor(420 / lista.length));
+        const larguraColuna = Math.max(80, Math.floor(420 / lista.length));
 
         // Nota Geral: média dos pontos de todo indicador aplicável (não
         // conta o "—" de indicador não aplicável ao setor do ativo).
@@ -4593,8 +4593,10 @@
         const cabecalho = `<th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:2;">Indicador</th>`
           + lista.map(item => `<th style="text-align:center; padding:8px 8px; font-family:inherit; min-width:${larguraColuna}px;">${item.ticker}</th>`).join('');
 
+        const tituloNotaGeral = 'Nota Geral'
+          + ' <button type="button" class="hg-info-btn" title="Média (0 a 100) dos indicadores que se aplicam ao setor de cada ativo — verde soma mais, vermelho soma menos, e o não aplicável (—) fica de fora da conta. É um resumo rápido pra comparar, não uma recomendação." aria-label="Como a Nota Geral é calculada?">?</button>';
         const linhaScore = `<tr style="background:rgba(255,255,255,0.03);">
-            <th scope="row" style="text-align:left; padding:8px 10px; font-weight:800; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1;">Nota Geral</th>
+            <th scope="row" style="text-align:left; padding:8px 10px; font-weight:800; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1;">${tituloNotaGeral}</th>
             ${scores.map(s => `<td style="text-align:center; padding:8px 8px; font-weight:800; font-size:1.05rem; color:${s === null ? 'var(--muted)' : s >= 75 ? 'var(--accent)' : s >= 45 ? 'var(--gold)' : 'var(--danger)'};">${s === null ? '—' : s}</td>`).join('')}
           </tr>`;
 
@@ -4741,7 +4743,7 @@
 
                 <div id="hgCompararWrap" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
                   <div class="hg-linha-busca" style="margin-bottom:10px;">
-                    <input type="text" id="hgCompararTickersInput" placeholder="Ex: BPAC11, ABCB4 (até 2 ativos, separados por vírgula)" autocomplete="off" />
+                    <input type="text" id="hgCompararTickersInput" placeholder="Ex: BPAC11, ABCB4, WEGE3 (até 3 ativos, separados por vírgula)" autocomplete="off" list="sugestoesTickersB3" />
                     <button type="button" class="hg-btn" id="hgCompararBtnBuscar">Comparar</button>
                   </div>
                   <div class="hg-status" id="hgCompararStatus"></div>
@@ -4934,11 +4936,26 @@
           hgSegurarRolagem(scrollAntes);
         });
 
+        // Autocomplete no campo de vários tickers: como o valor é do
+        // tipo "ABCB4, BPA" (em digitação), buscar o campo inteiro não
+        // acharia nada — a API espera um ticker/nome parcial, não uma
+        // lista com vírgula. Em vez disso, busca só o pedaço depois da
+        // ÚLTIMA vírgula, que é o que a pessoa está digitando agora.
+        let hgCompararSugestoesDebounce = null;
+        inputComparar?.addEventListener('input', () => {
+          clearTimeout(hgCompararSugestoesDebounce);
+          const partes = inputComparar.value.split(',');
+          const trechoAtual = partes[partes.length - 1];
+          hgCompararSugestoesDebounce = setTimeout(() => {
+            window.hgBuscarSugestoesTickers?.(trechoAtual);
+          }, 300);
+        });
+
         const executarComparacao = async () => {
           const statusEl = document.getElementById('hgCompararStatus');
           const resultadoEl = document.getElementById('hgCompararResultado');
           const extras = (inputComparar.value || '')
-            .split(',').map(t => t.trim()).filter(Boolean).slice(0, 2); // no máx. 2 além do atual
+            .split(',').map(t => t.trim()).filter(Boolean).slice(0, 3); // no máx. 3 além do atual (4 no total)
           const tickersUnicos = [a.symbol, ...extras.filter(t => t.toUpperCase() !== a.symbol.toUpperCase())];
 
           statusEl.className = 'hg-status';
@@ -5821,6 +5838,7 @@
           hgSugestoesDebounce = setTimeout(() => hgBuscarSugestoesTickers(valor), 300);
         });
       }
+      window.hgBuscarSugestoesTickers = hgBuscarSugestoesTickers;
 
       ['hgTickerInput', 'graficoConsultaInput', 'hgFundTickerInput', 'alertasTickerInput', 'carteiraTickerInput']
         .forEach(hgLigarAutocompleteTickers);
