@@ -5077,7 +5077,7 @@
           const termoLimpo = termo.trim();
           if (termoLimpo.length < 2) { hgCompararFecharDropdown(); return; }
           try {
-            const url = `https://api.hgbrasil.com/v2/finance/tickers?query=${encodeURIComponent(termoLimpo)}&sources=B3&sort=symbol&order=asc&key=${encodeURIComponent(CHAVE_HG)}`;
+            const url = `https://api.hgbrasil.com/v2/finance/tickers?format=json-cors&query=${encodeURIComponent(termoLimpo)}&sources=B3&sort=symbol&order=asc&key=${encodeURIComponent(CHAVE_HG)}`;
             const resp = await fetch(url);
             const data = await resp.json();
             const partesAgora = inputComparar.value.split(',');
@@ -5979,7 +5979,7 @@
         hgSugestoesUltimaBusca = termo;
 
         try {
-          const url = `https://api.hgbrasil.com/v2/finance/tickers?query=${encodeURIComponent(termo)}&sources=B3&sort=symbol&order=asc&key=${encodeURIComponent(CHAVE_HG)}`;
+          const url = `https://api.hgbrasil.com/v2/finance/tickers?format=json-cors&query=${encodeURIComponent(termo)}&sources=B3&sort=symbol&order=asc&key=${encodeURIComponent(CHAVE_HG)}`;
           const resp = await fetch(url);
           const data = await resp.json();
 
