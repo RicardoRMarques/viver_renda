@@ -777,6 +777,13 @@
     }
     .hg-card-topo h3 { font-size: 1.2rem; }
     .hg-card-topo .hg-setor { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+    .hg-crescimento-ebitda {
+      display: flex; align-items: center; gap: 6px; margin-top: 8px;
+      font-size: 0.8rem; color: var(--muted);
+    }
+    .hg-crescimento-ebitda strong { font-family: 'Courier New', monospace; font-size: 0.88rem; }
+    .hg-crescimento-ebitda strong.up { color: var(--accent); }
+    .hg-crescimento-ebitda strong.down { color: var(--danger); }
     /* Resumo de FII na Análise Fundamentalista (só cotação atual — a HG
        não tem série histórica trimestral para fundos, diferente de ações). */
     .hg-badge {
@@ -8174,6 +8181,7 @@
           ev_ebit: v.ev_to_ebit,
           vpa: v.book_value_per_share,
           lpa: v.earnings_per_share,
+          ebitda: v.ebitda, // valor absoluto — confirmado presente na resposta real da HG. Receita e Lucro Líquido NÃO vêm em valor absoluto nesse endpoint, só em índices — por isso só dá pra calcular crescimento de EBITDA, não de Receita/Lucro.
           gross_margin: m.gross_profit_margin,
           ebitda_margin: m.ebitda_margin,
           ebit_margin: m.ebit_margin,
@@ -8214,6 +8222,7 @@
         'ROE': 'ROE (Return on Equity / Retorno sobre o Patrimônio Líquido) = quanto a empresa lucra para cada R$ 1 investido pelos acionistas.\n\nCálculo: lucro líquido / patrimônio líquido × 100',
         'Dividend Yield': 'Dividend Yield (DY) = quanto a empresa pagou em dividendos/proventos no período, em relação à cotação atual da ação.\n\nCálculo: dividendos pagos / cotação atual × 100',
         'Atual (TTM)': 'TTM = "Trailing Twelve Months" (últimos 12 meses).\n\nOs indicadores desta coluna somam os últimos 4 trimestres divulgados, e não só o trimestre mais recente — dá uma visão mais estável, sem os altos e baixos sazonais de um único trimestre.\n\nAs demais colunas mostram cada trimestre isolado, na data do balanço.',
+        'Crescimento EBITDA': 'Compara o EBITDA do trimestre mais recente com o EBITDA do mesmo trimestre um ano atrás (não o trimestre anterior) — assim a conta não confunde variação sazonal com crescimento real.\n\nNão é um CAGR de vários anos: a HG Brasil só fornece cerca de 2 anos de histórico trimestral, então essa é uma comparação de 12 meses, não uma taxa composta de 5 ou 10 anos.\n\nReceita e Lucro Líquido não aparecem em valor absoluto neste endpoint (só em índices), então esse cálculo só é possível para EBITDA.',
       };
 
       // Tooltip próprio desta seção: mesmo padrão usado no Comparador de
@@ -8418,6 +8427,27 @@
           return `<tr><th scope="row" style="text-align:left; padding:6px 8px; font-family:inherit; font-weight:700; white-space:normal; max-width:112px; width:112px; line-height:1.25; border-top:1px solid var(--border); position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1; isolation:isolate;">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
         }).join('');
 
+        // Crescimento de EBITDA interanual (não é CAGR de vários anos —
+        // o plano só alcança ~2 anos de histórico, então comparamos o
+        // trimestre mais recente com o mesmo trimestre do ano anterior
+        // (4 trimestres atrás), em vez do mais antigo vs mais novo, pra
+        // não misturar sazonalidade na conta. Receita e Lucro Líquido
+        // não têm valor absoluto nesse endpoint (só índices), então só
+        // dá pra calcular isso pra EBITDA.
+        let crescimentoEbitdaHtml = '';
+        const ebitdaAtual = statements[0]?.ebitda;
+        const ebitdaAnoAnterior = statements[4]?.ebitda;
+        if (typeof ebitdaAtual === 'number' && typeof ebitdaAnoAnterior === 'number' && ebitdaAnoAnterior !== 0) {
+          const variacao = ((ebitdaAtual - ebitdaAnoAnterior) / Math.abs(ebitdaAnoAnterior)) * 100;
+          const positivo = variacao >= 0;
+          crescimentoEbitdaHtml = `
+            <div class="hg-crescimento-ebitda">
+              <span>Crescimento de EBITDA (interanual)</span>
+              <button type="button" class="hg-info-btn" data-indicador="Crescimento EBITDA" aria-label="Como esse número é calculado?" title="Como esse número é calculado?">?</button>
+              <strong class="${positivo ? 'up' : 'down'}">${positivo ? '▲' : '▼'} ${fmtCelula(Math.abs(variacao), 'pct')}</strong>
+            </div>`;
+        }
+
         const cabecalhoHtml = colunas.map(c => {
           const botaoInfo = c.rotulo === 'Atual (TTM)'
             ? ` <button type="button" class="hg-info-btn" data-indicador="Atual (TTM)" aria-label="O que é TTM?" title="O que é TTM?">?</button>`
@@ -8437,6 +8467,7 @@
                 <div>
                   <h3>${nomeExibicao} <span style="color:var(--muted); font-weight:600;">(${info.symbol})</span></h3>
                   ${setorHtml}
+                  ${crescimentoEbitdaHtml}
                 </div>
               </div>
               <button type="button" class="hg-btn-compartilhar" data-fund-compartilhar title="Copiar link desta análise">
