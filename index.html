@@ -698,7 +698,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       max-width: 1100px;
-      align-items: start;
+      align-items: stretch;
       gap: 14px;
     }
     /* Grid items (como as sections dentro de .consultas-grid-2x2) têm
@@ -711,6 +711,12 @@
        tinha contra o que ficar fixa (a div de scroll nunca chegava a
        ter overflow, pois ela mesma já tinha crescido junto). */
     .consultas-grid-2x2 > section.hg-busca { display: flex; flex-direction: column; min-width: 0; }
+    /* align-items:stretch (acima) só estica o WRAPPER da section até a
+       altura do vizinho mais alto — sem isto aqui, o card visível
+       (.hg-painel, com fundo/borda) continuia do tamanho do próprio
+       conteúdo, deixando um vão sem borda embaixo em vez do card
+       realmente terminar na mesma linha do vizinho. */
+    .consultas-grid-2x2 > section.hg-busca > .hg-painel { flex: 1; display: flex; flex-direction: column; }
     @media (max-width: 900px) {
       .consultas-grid-2x2 { grid-template-columns: 1fr; max-width: 720px; }
       .consultas-grid-2x2 > section.hg-busca { display: block; min-width: 0; }
@@ -3363,7 +3369,7 @@
              pro cadastro da conta). Limite de 5 alertas por pessoa. -->
         <section class="hg-busca hg-busca-compacta" id="alertas-preco">
           <h2 class="hg-titulo">🔔 Meus Alertas de Preço</h2>
-          <p class="calc-ajuda" style="margin:0 0 10px;">Receba no seu e-mail o alerta <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="alertas-email" aria-label="Como recebo o alerta por e-mail?" title="Como recebo o alerta por e-mail?">?</button></p>
+          <p class="calc-ajuda" style="margin:0 0 10px; white-space:nowrap;">Receba no seu e-mail o alerta <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="alertas-email" aria-label="Como recebo o alerta por e-mail?" title="Como recebo o alerta por e-mail?">?</button></p>
           <div class="hg-painel">
             <div id="alertasDeslogado">
               <p class="calc-ajuda" style="margin:0;">Entre na sua conta para criar alertas de preço — a gente avisa por e-mail quando o ativo bater o valor.</p>
