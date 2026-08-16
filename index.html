@@ -93,7 +93,6 @@
     #grafico-consulta,
     #boletim-indices-secao,
     #consulta-rapida,
-    #analise-fundamentalista,
     #boletins-semana,
     #alertas-preco,
     #educacao {
@@ -465,9 +464,12 @@
 
     /* backdrop-filter (o efeito "vidro fosco" do .hg-painel) quebra
        position: sticky em elementos dentro dele, em vários navegadores —
-       desliga só aqui, onde a tabela precisa da coluna "Indicador" fixa
-       ao rolar de lado. */
-    #analise-fundamentalista .hg-painel {
+       desliga aqui, onde a Análise Fundamentalista embutida (e o
+       histórico de dividendos) precisam da 1ª coluna fixa ao rolar de
+       lado. Era escopado só na antiga seção independente; movido pra cá
+       porque essas tabelas agora renderizam dentro do painel da
+       Consulta Rápida. */
+    #consulta-rapida .hg-painel {
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
     }
@@ -2328,7 +2330,7 @@
       <a href="#educacao" class="mobile-menu-item">🎓 Educação</a>
       <div class="mobile-menu-separador">Consultas</div>
       <a href="#consulta-rapida" class="mobile-menu-item">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
-      <a href="#analise-fundamentalista" class="mobile-menu-item">📊 Consulta Ações — Análise Fundamentalista</a>
+      <a href="#consulta-rapida" class="mobile-menu-item">📊 Análise Fundamentalista</a>
       <div class="mobile-menu-separador">Simuladores</div>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário de FIIs e Ações</button>
@@ -3306,33 +3308,6 @@
          é sacada pra viver, parte fica reinvestida — o principal nunca é
          tocado diretamente). -->
     <div class="coluna-consultas-solta">
-
-        <!-- ANÁLISE FUNDAMENTALISTA: histórico de indicadores por ano (HG Brasil) -->
-        <section class="hg-busca hg-busca-compacta" id="analise-fundamentalista">
-          <h2 class="hg-titulo">📊 Consultar Ações — Análise Fundamentalista</h2>
-
-          <div class="hg-painel">
-            <div class="hg-linha-busca">
-              <input type="text" id="hgFundTickerInput" placeholder="Ex: PETR4, VALE3, KLBN11..." autocomplete="off" list="sugestoesTickersB3" />
-              <button class="hg-btn" id="hgFundBtnBuscar">Consultar</button>
-            </div>
-
-            <div class="hg-chips">
-              <span class="hg-chip" data-ticker="PETR4">PETR4</span>
-              <span class="hg-chip" data-ticker="VALE3">VALE3</span>
-              <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
-              <span class="hg-chip" data-ticker="KLBN11">KLBN11</span>
-              <span class="hg-chip" data-ticker="WEGE3">WEGE3</span>
-              <span class="hg-chip" data-ticker="BBAS3">BBAS3</span>
-            </div>
-
-            <div class="hg-status" id="hgFundStatus"></div>
-            <div class="hg-acoes-lado-a-lado" id="hgFundAcoesWrap" style="display:none; margin-bottom:10px;">
-              <button type="button" class="hg-btn-secundario-pequeno" id="hgFundBtnFechar">✕ Fechar resultado</button>
-            </div>
-            <div id="hgFundResultado"></div>
-          </div>
-        </section>
 
         <!-- BOLETIM DE MERCADO DIÁRIO (últimos 7 dias, gerados pelo robô) -->
         <section class="hg-busca hg-busca-compacta" id="boletins-semana">
@@ -4566,7 +4541,7 @@
               </div>
             </div>
 
-            ${['stock', 'bdr'].includes(a.kind) ? `
+            ${a.kind !== 'fii' ? `
             <div class="hg-preco-grafico" id="hgDividendosBox">
               <div class="hg-grafico-box">
                 <div class="hg-grafico-topo">
@@ -4694,7 +4669,7 @@
         hgInicializarPeriodoTabs(a);
         hgInicializarInvestido();
 
-        if (['stock', 'bdr'].includes(a.kind)) {
+        if (a.kind !== 'fii') {
           const tabsEl = document.getElementById('hgDividendosPeriodoTabs');
           const btnToggle = document.getElementById('hgDividendosBtnToggle');
           const conteudoEl = document.getElementById('hgDividendosConteudo');
@@ -8137,7 +8112,10 @@
       const btnFund = document.getElementById('hgFundBtnBuscar');
       const statusFund = document.getElementById('hgFundStatus');
       const resultadoFund = document.getElementById('hgFundResultado');
-      const chipsFund = document.querySelectorAll('#analise-fundamentalista .hg-chip');
+      // Chips fixos da antiga seção independente não existem mais — a
+      // Análise Fundamentalista embutida usa os mesmos chips da Consulta
+      // Rápida (#hgTickerInput), não precisa de chips próprios.
+      const chipsFund = [];
 
       // Linhas da tabela: [rótulo, campo, formato]
       // formato: 'num' (2 casas), 'pct' (percentual), 'moeda'
@@ -8314,27 +8292,19 @@
             const resp = await fetch(url);
             const data = await resp.json();
             const ativo = data?.results?.[0];
-            if (!resp.ok || !ativo || ativo.kind !== 'fii') {
-              throw new Error(`Não encontramos dados de FII para "${simbolo}". Verifique o ticker.`);
+
+            if (resp.ok && ativo && ativo.kind === 'fii') {
+              renderizarFundamentosFII(ativo, containerEl);
+            } else {
+              // Termina em "11" mas não é FII de verdade — é o caso das
+              // Units (KLBN11, SANB11, TAEE11...), que combinam ON+PN
+              // numa unidade só. Sem esse fallback, qualquer Unit caía
+              // direto no erro "não encontramos FII" sem nunca tentar o
+              // caminho de ação.
+              await buscarComoAcao(simbolo, containerEl);
             }
-            renderizarFundamentosFII(ativo, containerEl);
           } else {
-            const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&tickers=${encodeURIComponent('B3:' + simbolo)}&period=quarterly&key=${CHAVE_HG}`;
-            const resp = await fetch(url);
-            const data = await resp.json();
-            const ativo = data?.results?.[0];
-            const statements = Array.isArray(ativo?.statements) ? ativo.statements : [];
-
-            if (!resp.ok || !ativo || statements.length === 0) {
-              throw new Error(`Não encontramos dados fundamentalistas para "${simbolo}". Verifique o ticker ou tente outra ação.`);
-            }
-
-            renderizarFundamentos({
-              symbol: ativo.symbol || simbolo,
-              name: ativo.name || ativo.full_name || simbolo,
-              classification: ativo.classification || null,
-              statements: statements.map(mapearEstatementoHG),
-            }, containerEl);
+            await buscarComoAcao(simbolo, containerEl);
           }
           if (statusEl) statusEl.textContent = '';
           aoTerminar?.(true);
@@ -8346,6 +8316,29 @@
           aoTerminar?.(false);
           console.error('Erro na análise fundamentalista:', e);
         }
+      }
+
+      // Busca fundamentos como ação (statements trimestrais). Extraído
+      // pra função própria porque agora tem 2 pontos de entrada: o
+      // caminho normal (ticker não parece FII) e o fallback de Units
+      // (ticker termina em "11" mas o lookup de FII negou).
+      async function buscarComoAcao(simbolo, containerEl) {
+        const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&tickers=${encodeURIComponent('B3:' + simbolo)}&period=quarterly&key=${CHAVE_HG}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        const ativo = data?.results?.[0];
+        const statements = Array.isArray(ativo?.statements) ? ativo.statements : [];
+
+        if (!resp.ok || !ativo || statements.length === 0) {
+          throw new Error(`Não encontramos dados fundamentalistas para "${simbolo}". Verifique o ticker.`);
+        }
+
+        renderizarFundamentos({
+          symbol: ativo.symbol || simbolo,
+          name: ativo.name || ativo.full_name || simbolo,
+          classification: ativo.classification || null,
+          statements: statements.map(mapearEstatementoHG),
+        }, containerEl);
       }
       // Exposta em window: o painel inline da Consulta Rápida (fora desta
       // IIFE) precisa chamar essa mesma lógica sem duplicar código.
@@ -8475,34 +8468,52 @@
         ativarTooltipsFundamentos(containerEl);
       }
 
-      btnFund.addEventListener('click', buscarFundamentos);
-      inputFund.addEventListener('keydown', (e) => { if (e.key === 'Enter') buscarFundamentos(); });
-      chipsFund.forEach(chip => {
-        chip.addEventListener('click', () => {
-          inputFund.value = chip.dataset.ticker;
-          buscarFundamentos();
+      // Tudo abaixo depende dos elementos da seção antiga e independente
+      // (input/botão/chips fixos, fora da Consulta Rápida). Essa seção
+      // foi removida — a mesma funcionalidade agora vive embutida dentro
+      // de "Consulta Ações, FIIs, Stocks e ETFs". Guarda pra não quebrar
+      // nada caso algum desses elementos não exista mais: sem isso, um
+      // .addEventListener em elemento null pararia a execução do script
+      // inteiro a partir daqui (inclusive código de outras seções mais
+      // abaixo no arquivo).
+      if (inputFund && btnFund && statusFund && resultadoFund) {
+        btnFund.addEventListener('click', buscarFundamentos);
+        inputFund.addEventListener('keydown', (e) => { if (e.key === 'Enter') buscarFundamentos(); });
+        chipsFund.forEach(chip => {
+          chip.addEventListener('click', () => {
+            inputFund.value = chip.dataset.ticker;
+            buscarFundamentos();
+          });
         });
-      });
 
-      document.getElementById('hgFundBtnFechar')?.addEventListener('click', () => {
-        resultadoFund.innerHTML = '';
-        statusFund.textContent = '';
-        document.getElementById('hgFundAcoesWrap').style.display = 'none';
-      });
+        document.getElementById('hgFundBtnFechar')?.addEventListener('click', () => {
+          resultadoFund.innerHTML = '';
+          statusFund.textContent = '';
+          document.getElementById('hgFundAcoesWrap').style.display = 'none';
+        });
+      }
 
       // Se o link veio de um compartilhamento da própria Análise
-      // Fundamentalista (?ticker=XXX&view=fundamentos), abre direto aqui
-      // — em vez de cair na busca rápida, que é o comportamento padrão
-      // para links sem esse parâmetro "view".
+      // Fundamentalista (?ticker=XXX&view=fundamentos), abre direto o
+      // painel embutido dentro da Consulta Rápida — que substituiu a
+      // seção independente que existia antes.
       const parametrosUrlFund = new URLSearchParams(window.location.search);
       const tickerDaUrlFund = parametrosUrlFund.get('ticker');
       const veioDaFundamentalista = parametrosUrlFund.get('view') === 'fundamentos';
       if (tickerDaUrlFund && veioDaFundamentalista) {
         const executarAutoLoadFund = () => {
-          inputFund.value = tickerDaUrlFund.toUpperCase();
+          const inputPrincipal = document.getElementById('hgTickerInput');
+          const btnPrincipal = document.getElementById('hgBtnBuscar');
+          if (!inputPrincipal || !btnPrincipal) return;
+          inputPrincipal.value = tickerDaUrlFund.toUpperCase();
           setTimeout(() => {
-            document.getElementById('analise-fundamentalista')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            buscarFundamentos();
+            document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            btnPrincipal.click();
+            // Espera a ficha do ativo renderizar (ela cria o botão do
+            // painel embutido dinamicamente) antes de tentar abri-lo.
+            setTimeout(() => {
+              document.getElementById('hgFundInlineBtnToggle')?.click();
+            }, 900);
           }, 150);
         };
         if (document.readyState === 'complete') {
