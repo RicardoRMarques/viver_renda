@@ -4505,6 +4505,127 @@
         requestAnimationFrame(checar);
       }
 
+      // ================= Comparador de Ativos =================
+      // Reaproveita os mesmos indicadores já buscados pra Análise
+      // Fundamentalista (mapearEstatementoHG, exposto em window) — sem
+      // chamada nova além de 1 requisição por ticker adicional.
+      //
+      // Faixas SEGMENTADAS por setor: bancos têm estrutura de balanço
+      // fundamentalmente diferente (ROA/ROIC baixos por natureza, não
+      // reportam EBITDA de forma comparável, "dívida" é o próprio
+      // negócio deles) — usar a mesma régua de empresas em geral geraria
+      // viés, mostrando bancos como "piores" só por serem bancos. Onde a
+      // métrica não faz sentido pra banco, o campo "bancos" é null e a
+      // linha aparece como "—" (não entra na nota geral).
+      const THRESHOLDS_INDICADORES = [
+        { grupo: 'Valuation', rotulo: 'P/L', campo: 'pl', direcao: 'menor', geral: [12, 20], bancos: [8, 14] },
+        { grupo: 'Valuation', rotulo: 'P/VP', campo: 'pvp', direcao: 'menor', geral: [1.5, 3], bancos: [1.2, 2.2] },
+        { grupo: 'Valuation', rotulo: 'P/EBITDA', campo: 'p_ebitda', direcao: 'menor', geral: [6, 10], bancos: null },
+        { grupo: 'Valuation', rotulo: 'EV/EBITDA', campo: 'ev_ebitda', direcao: 'menor', geral: [6, 10], bancos: null },
+        { grupo: 'Rentabilidade', rotulo: 'Margem Bruta', campo: 'gross_margin', direcao: 'maior', geral: [40, 20], bancos: null },
+        { grupo: 'Rentabilidade', rotulo: 'Margem EBITDA', campo: 'ebitda_margin', direcao: 'maior', geral: [25, 12], bancos: null },
+        { grupo: 'Rentabilidade', rotulo: 'Margem Líquida', campo: 'net_margin', direcao: 'maior', geral: [12, 5], bancos: [25, 15] },
+        { grupo: 'Rentabilidade', rotulo: 'ROE', campo: 'roe', direcao: 'maior', geral: [15, 8], bancos: [18, 12] },
+        { grupo: 'Rentabilidade', rotulo: 'ROA', campo: 'roa', direcao: 'maior', geral: [8, 3], bancos: [1.5, 0.8] },
+        { grupo: 'Rentabilidade', rotulo: 'ROIC', campo: 'roic', direcao: 'maior', geral: [12, 6], bancos: [8, 4] },
+        { grupo: 'Endividamento', rotulo: 'Liquidez Corrente', campo: 'current_ratio', direcao: 'maior', geral: [1.5, 1.0], bancos: null },
+        { grupo: 'Endividamento', rotulo: 'Dívida/Patrimônio', campo: 'debt_equity', direcao: 'menor', geral: [0.5, 1.0], bancos: null },
+        { grupo: 'Endividamento', rotulo: 'Dívida Líq/PL', campo: 'net_debt_equity', direcao: 'menor', geral: [0.3, 0.8], bancos: null, caixaLiquidoOk: true },
+        { grupo: 'Endividamento', rotulo: 'Dívida Líq/EBITDA', campo: 'net_debt_ebitda', direcao: 'menor', geral: [1.5, 3.0], bancos: null, caixaLiquidoOk: true },
+        { grupo: 'Crescimento', rotulo: 'Cresc. EBITDA (interanual)', campo: '_ebitda_yoy', direcao: 'maior', geral: [10, 0], bancos: null },
+      ];
+
+      function hgEhSetorBanco(setor) {
+        return /banc|financeir/i.test(setor || '');
+      }
+
+      // Vermelho automático pra múltiplo negativo (ex: P/L negativo =
+      // prejuízo, não é "barato") — exceto nos índices de dívida líquida,
+      // onde negativo significa caixa líquido (ótimo, não ruim).
+      function hgClassificarIndicador(def, valor, ehBanco) {
+        const faixa = ehBanco ? def.bancos : def.geral;
+        if (!faixa || typeof valor !== 'number' || !isFinite(valor)) return { emoji: '—', pontos: null };
+        if (def.direcao === 'menor') {
+          if (valor < 0) return def.caixaLiquidoOk ? { emoji: '🟢', pontos: 100 } : { emoji: '🔴', pontos: 15 };
+          if (valor <= faixa[0]) return { emoji: '🟢', pontos: 100 };
+          if (valor <= faixa[1]) return { emoji: '🟡', pontos: 55 };
+          return { emoji: '🔴', pontos: 15 };
+        }
+        if (valor >= faixa[0]) return { emoji: '🟢', pontos: 100 };
+        if (valor >= faixa[1]) return { emoji: '🟡', pontos: 55 };
+        return { emoji: '🔴', pontos: 15 };
+      }
+
+      async function hgBuscarDadosComparacao(tickerBruto) {
+        const ticker = tickerBruto.trim().toUpperCase();
+        const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&period=quarterly&key=${CHAVE_HG}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        const ativo = data?.results?.[0];
+        const statements = Array.isArray(ativo?.statements) ? ativo.statements : [];
+        if (!resp.ok || !ativo || statements.length === 0) {
+          throw new Error(`Não encontramos dados de "${ticker}" pra comparar.`);
+        }
+        const mapeados = statements.map(window.mapearEstatementoHG);
+        const eAtual = mapeados[0]?.ebitda, eAnoAnterior = mapeados[4]?.ebitda;
+        const ebitdaYoy = (typeof eAtual === 'number' && typeof eAnoAnterior === 'number' && eAnoAnterior !== 0)
+          ? ((eAtual - eAnoAnterior) / Math.abs(eAnoAnterior)) * 100 : null;
+        return {
+          ticker: ativo.symbol || ticker,
+          setor: ativo.classification?.sector || '',
+          valores: { ...mapeados[0], _ebitda_yoy: ebitdaYoy },
+        };
+      }
+
+      function hgRenderizarComparador(lista) {
+        const larguraColuna = Math.max(90, Math.floor(420 / lista.length));
+
+        // Nota Geral: média dos pontos de todo indicador aplicável (não
+        // conta o "—" de indicador não aplicável ao setor do ativo).
+        const scores = lista.map(item => {
+          const ehBanco = hgEhSetorBanco(item.setor);
+          const pontos = THRESHOLDS_INDICADORES
+            .map(def => hgClassificarIndicador(def, item.valores[def.campo], ehBanco).pontos)
+            .filter(p => p !== null);
+          return pontos.length ? Math.round(pontos.reduce((a, b) => a + b, 0) / pontos.length) : null;
+        });
+
+        const cabecalho = `<th style="text-align:left; padding:8px 10px; color:var(--muted); font-family:inherit; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:2;">Indicador</th>`
+          + lista.map(item => `<th style="text-align:center; padding:8px 8px; font-family:inherit; min-width:${larguraColuna}px;">${item.ticker}</th>`).join('');
+
+        const linhaScore = `<tr style="background:rgba(255,255,255,0.03);">
+            <th scope="row" style="text-align:left; padding:8px 10px; font-weight:800; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1;">Nota Geral</th>
+            ${scores.map(s => `<td style="text-align:center; padding:8px 8px; font-weight:800; font-size:1.05rem; color:${s === null ? 'var(--muted)' : s >= 75 ? 'var(--accent)' : s >= 45 ? 'var(--gold)' : 'var(--danger)'};">${s === null ? '—' : s}</td>`).join('')}
+          </tr>`;
+
+        let grupoAtual = null;
+        const linhasIndicadores = THRESHOLDS_INDICADORES.map(def => {
+          const linhaGrupo = def.grupo !== grupoAtual
+            ? (grupoAtual = def.grupo, `<tr><td colspan="${lista.length + 1}" style="padding:10px 10px 4px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--primary); border-top:1px solid var(--border);">${def.grupo}</td></tr>`)
+            : '';
+          const celulas = lista.map(item => {
+            const { emoji } = hgClassificarIndicador(def, item.valores[def.campo], hgEhSetorBanco(item.setor));
+            return `<td style="text-align:center; padding:6px 8px; font-size:1.1rem;">${emoji}</td>`;
+          }).join('');
+          return `${linhaGrupo}<tr><th scope="row" style="text-align:left; padding:6px 10px; font-weight:600; font-family:inherit; white-space:normal; max-width:130px; width:130px; line-height:1.25; position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1;">${def.rotulo}</th>${celulas}</tr>`;
+        }).join('');
+
+        const setoresDiferentes = new Set(lista.map(i => hgEhSetorBanco(i.setor))).size > 1;
+
+        return `
+          <div class="hg-tabela-scroll" style="overflow-x:auto; max-width:100%; -webkit-overflow-scrolling:touch;">
+            <table class="hg-tabela-fundamentos" style="width:100%; min-width:${140 + larguraColuna * lista.length}px; border-collapse:separate; border-spacing:0; font-family:'Courier New', monospace; font-size:0.85rem;">
+              <thead><tr>${cabecalho}</tr></thead>
+              <tbody>${linhaScore}${linhasIndicadores}</tbody>
+            </table>
+          </div>
+          <p style="margin-top:10px; font-size:0.74rem; color:var(--muted); line-height:1.5;">
+            🟢 saudável · 🟡 atenção · 🔴 fora da faixa típica · — não se aplica a esse setor.
+            ${setoresDiferentes ? '<br>As faixas usadas se ajustam ao setor de cada ativo (bancos usam régua própria) — por isso dois ativos de setores diferentes podem ter o mesmo indicador colorido de formas diferentes mesmo com valores parecidos.' : ''}
+            <br>Comparação educativa baseada em faixas típicas de mercado — não é recomendação de investimento.
+          </p>`;
+      }
+
       function hgRenderizarAtivo(a) {
         const q = a.quote || {};
         const logo = a.logos?.square_large || a.logos?.square_small;
@@ -4606,6 +4727,9 @@
                   <button type="button" class="hg-btn-secundario-pequeno" id="hgFundInlineBtnToggle">
                     📊 Ver Análise Fundamentalista completa
                   </button>
+                  <button type="button" class="hg-btn-secundario-pequeno" id="hgCompararBtnToggle">
+                    ⚖️ Comparar com outros ativos
+                  </button>
                 </div>
 
                 <div id="hgDividendosConteudo"></div>
@@ -4613,6 +4737,15 @@
                 <div id="hgFundInlineWrap" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
                   <div class="hg-status" id="hgFundInlineStatus"></div>
                   <div id="hgFundInlineResultado"></div>
+                </div>
+
+                <div id="hgCompararWrap" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+                  <div class="hg-linha-busca" style="margin-bottom:10px;">
+                    <input type="text" id="hgCompararTickersInput" placeholder="Ex: BPAC11, ABCB4 (até 2 ativos, separados por vírgula)" autocomplete="off" />
+                    <button type="button" class="hg-btn" id="hgCompararBtnBuscar">Comparar</button>
+                  </div>
+                  <div class="hg-status" id="hgCompararStatus"></div>
+                  <div id="hgCompararResultado"></div>
                 </div>
               </div>
             </div>` : ''}
@@ -4781,6 +4914,57 @@
           }
           hgSegurarRolagem(scrollAntes);
         });
+
+        // Comparador: abre o painel com o campo já convidando a
+        // adicionar mais tickers pra comparar com o atual. A busca só
+        // dispara no botão "Comparar" interno (não no toggle de
+        // abrir/fechar), já que precisa saber quais outros ativos entram
+        // na comparação antes de buscar qualquer coisa.
+        const btnComparar = document.getElementById('hgCompararBtnToggle');
+        const wrapComparar = document.getElementById('hgCompararWrap');
+        const inputComparar = document.getElementById('hgCompararTickersInput');
+        let compararAberto = false;
+
+        btnComparar?.addEventListener('click', () => {
+          const scrollAntes = window.scrollY;
+          compararAberto = !compararAberto;
+          wrapComparar.style.display = compararAberto ? '' : 'none';
+          btnComparar.textContent = compararAberto ? '✕ Fechar comparador' : '⚖️ Comparar com outros ativos';
+          if (compararAberto) inputComparar?.focus({ preventScroll: true });
+          hgSegurarRolagem(scrollAntes);
+        });
+
+        const executarComparacao = async () => {
+          const statusEl = document.getElementById('hgCompararStatus');
+          const resultadoEl = document.getElementById('hgCompararResultado');
+          const extras = (inputComparar.value || '')
+            .split(',').map(t => t.trim()).filter(Boolean).slice(0, 2); // no máx. 2 além do atual
+          const tickersUnicos = [a.symbol, ...extras.filter(t => t.toUpperCase() !== a.symbol.toUpperCase())];
+
+          statusEl.className = 'hg-status';
+          statusEl.textContent = `Comparando ${tickersUnicos.join(', ')}...`;
+          resultadoEl.innerHTML = '';
+
+          try {
+            const resultados = await Promise.allSettled(tickersUnicos.map(hgBuscarDadosComparacao));
+            const ok = resultados.filter(r => r.status === 'fulfilled').map(r => r.value);
+            const falhas = resultados.filter(r => r.status === 'rejected');
+
+            if (ok.length === 0) throw new Error('Não conseguimos dados de nenhum dos ativos informados.');
+
+            statusEl.textContent = falhas.length
+              ? `Comparando ${ok.length} de ${tickersUnicos.length} — alguns tickers não foram encontrados.`
+              : '';
+            resultadoEl.innerHTML = hgRenderizarComparador(ok);
+          } catch (e) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = e.message || 'Erro ao comparar os ativos.';
+            console.error('Erro no comparador de ativos:', e);
+          }
+        };
+
+        document.getElementById('hgCompararBtnBuscar')?.addEventListener('click', executarComparacao);
+        inputComparar?.addEventListener('keydown', (e) => { if (e.key === 'Enter') executarComparacao(); });
       }
 
       // Busca o P/VP e VPA (campo "financials") no endpoint /finance/stock_price
@@ -8392,6 +8576,7 @@
       // Exposta em window: o painel inline da Consulta Rápida (fora desta
       // IIFE) precisa chamar essa mesma lógica sem duplicar código.
       window.hgBuscarFundamentosPara = hgBuscarFundamentosPara;
+      window.mapearEstatementoHG = mapearEstatementoHG;
 
       async function buscarFundamentos() {
         const digitado = inputFund.value.trim();
