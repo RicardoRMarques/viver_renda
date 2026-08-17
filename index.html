@@ -291,8 +291,10 @@
     .carteira-remover:hover { color: #e05555; }
 
     /* Calculadora de Reinvestimento de Dividendos */
-    .reinv-modal { max-width: 900px; }
-    .reinv-form { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 10px; margin-top: 4px; }
+    .reinv-modal { max-width: 1100px; }
+    .reinv-campo-ativo { display: flex; gap: 8px; align-items: stretch; }
+    .reinv-campo-ativo input { flex: 1; min-width: 0; }
+    .reinv-form-linha2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
     .reinv-campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; position: relative; }
     .reinv-campo label { font-size: 0.72rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
     .reinv-campo input[type="text"] {
@@ -311,7 +313,21 @@
     .reinv-modal .carteira-resumo-card span { font-size: 0.76rem; }
     .reinv-modal .carteira-resumo-card strong { font-size: 1.5rem; }
 
-    /* Dropdown de sugestões do campo de múltiplos tickers da calculadora */
+    /* Chips dos ativos já adicionados à lista de cálculo */
+    .reinv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; min-height: 1px; }
+    .reinv-chip {
+      display: inline-flex; align-items: center; gap: 6px; background: rgba(212,175,55,0.12);
+      border: 1px solid rgba(212,175,55,0.35); color: var(--text); border-radius: 999px;
+      padding: 5px 8px 5px 12px; font-size: 0.8rem; font-weight: 700;
+    }
+    .reinv-chip button {
+      background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem;
+      line-height: 1; padding: 2px 4px; border-radius: 50%;
+    }
+    .reinv-chip button:hover { color: var(--danger); background: rgba(224,85,85,0.15); }
+    .reinv-contador { font-size: 0.74rem; color: var(--muted); margin-top: 4px; }
+
+    /* Dropdown de sugestões do campo de ativos da calculadora */
     .reinv-sugestoes {
       position: absolute; top: 100%; left: 0; margin-top: 4px;
       background: var(--deep); border: 1px solid var(--border); border-radius: 10px;
@@ -336,7 +352,32 @@
     .reinv-tabela td.reinv-erro { color: var(--danger); font-weight: 400; text-align: left; white-space: normal; }
 
     @media (max-width: 640px) {
-      .reinv-form { grid-template-columns: 1fr; }
+      .reinv-form-linha2 { grid-template-columns: 1fr; }
+    }
+
+    /* Tabela vira "cards" empilhados no mobile — sem barra de rolagem
+       horizontal, cada ativo ocupa um bloco com rótulo + valor por linha. */
+    @media (max-width: 700px) {
+      .reinv-tabela-wrap { overflow-x: visible; border: none; }
+      .reinv-tabela, .reinv-tabela thead, .reinv-tabela tbody, .reinv-tabela tr, .reinv-tabela th, .reinv-tabela td {
+        display: block; white-space: normal;
+      }
+      .reinv-tabela thead { display: none; }
+      .reinv-tabela tr {
+        border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; background: var(--deep);
+      }
+      .reinv-tabela td {
+        border: none; padding: 6px 0; text-align: right; position: static; background: transparent;
+        display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      }
+      .reinv-tabela td::before {
+        content: attr(data-label); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.02em;
+        color: var(--muted); font-weight: 700; text-align: left;
+      }
+      .reinv-tabela td.reinv-ativo-nome { font-size: 0.95rem; padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+      .reinv-tabela td.reinv-ativo-nome::before { content: ''; }
+      .reinv-tabela td.reinv-erro { display: block; text-align: left; }
+      .reinv-tabela td.reinv-erro::before { content: ''; }
     }
 
     /* Quiz de Perfil de Investidor */
@@ -4047,17 +4088,24 @@
       </div>
       <div class="calc-corpo">
         <p class="calc-ajuda" style="margin-top:0;">
-          Informe um ou mais ativos (até 15, separados por vírgula), a data da compra e quanto você investiu em cada um.
-          Calculamos quanto isso valeria hoje supondo que todo dividendo recebido foi reaplicado no próprio ativo, na
-          data de pagamento — em vez de ficar parado em conta.
+          Digite um ativo, escolha na lista de sugestões (ou clique em "+ Adicionar") pra ir montando sua lista —
+          até 15 ativos. Informe a data da compra e quanto você investiu em cada um. Calculamos quanto isso valeria
+          hoje supondo que todo dividendo recebido foi reaplicado no próprio ativo, na data de pagamento — em vez de
+          ficar parado em conta.
         </p>
 
-        <div class="reinv-form">
-          <div class="reinv-campo">
-            <label for="reinvTickerInput">Ativos (até 15, separados por vírgula)</label>
-            <input type="text" id="reinvTickerInput" placeholder="Ex: HGLG11, PETR4, VALE3..." autocomplete="off" />
-            <div id="reinvSugestoesDropdown" class="reinv-sugestoes" style="display:none;"></div>
+        <div class="reinv-campo reinv-campo-ativo-wrap" style="position:relative;">
+          <label for="reinvTickerInput">Ativos (até 15) — digite e clique em Adicionar</label>
+          <div class="reinv-campo-ativo">
+            <input type="text" id="reinvTickerInput" placeholder="Ex: HGLG11" autocomplete="off" />
+            <button type="button" class="hg-btn-secundario-pequeno" id="reinvBtnAdicionar">+ Adicionar</button>
           </div>
+          <div id="reinvSugestoesDropdown" class="reinv-sugestoes" style="display:none;"></div>
+          <div id="reinvChips" class="reinv-chips"></div>
+          <div class="reinv-contador" id="reinvContador">0 de 15 ativos adicionados</div>
+        </div>
+
+        <div class="reinv-form-linha2">
           <div class="reinv-campo">
             <label for="reinvDataInput">Data da compra</label>
             <input type="date" id="reinvDataInput" />
@@ -6605,12 +6653,48 @@
       const overlay = document.getElementById('reinvOverlay');
       const btnFechar = document.getElementById('reinvFechar');
       const tickerInput = document.getElementById('reinvTickerInput');
+      const btnAdicionar = document.getElementById('reinvBtnAdicionar');
+      const chipsEl = document.getElementById('reinvChips');
+      const contadorEl = document.getElementById('reinvContador');
       const dataInput = document.getElementById('reinvDataInput');
       const valorInput = document.getElementById('reinvValorInput');
       const btnCalcular = document.getElementById('reinvBtnCalcular');
       const statusEl = document.getElementById('reinvStatus');
       const resultadoEl = document.getElementById('reinvResultado');
       if (!btnAbrir || !overlay) return;
+
+      const LIMITE_ATIVOS = 15;
+      let listaTickers = [];
+
+      function renderizarChips() {
+        chipsEl.innerHTML = listaTickers.map(t => `
+          <span class="reinv-chip">${t}<button type="button" data-remover="${t}" aria-label="Remover ${t}">✕</button></span>
+        `).join('');
+        chipsEl.querySelectorAll('button[data-remover]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            listaTickers = listaTickers.filter(t => t !== btn.getAttribute('data-remover'));
+            renderizarChips();
+          });
+        });
+        contadorEl.textContent = `${listaTickers.length} de ${LIMITE_ATIVOS} ativos adicionados`;
+        btnAdicionar.disabled = listaTickers.length >= LIMITE_ATIVOS;
+      }
+
+      function adicionarTickers(texto) {
+        const novos = texto.split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
+        for (const t of novos) {
+          if (listaTickers.length >= LIMITE_ATIVOS) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Máximo de ${LIMITE_ATIVOS} ativos por cálculo.`;
+            break;
+          }
+          if (!listaTickers.includes(t)) listaTickers.push(t);
+        }
+        renderizarChips();
+        tickerInput.value = '';
+        reinvFecharDropdown();
+        tickerInput.focus();
+      }
 
       function abrirModal() {
         overlay.hidden = false;
@@ -6632,11 +6716,12 @@
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnAdicionar.addEventListener('click', () => {
+        if (tickerInput.value.trim()) adicionarTickers(tickerInput.value);
+      });
 
-      // Autocomplete de múltiplos tickers, mesmo padrão do campo do
-      // comparador: um dropdown próprio (não <datalist> nativo, que só
-      // compara o valor INTEIRO do campo) filtrando pelo trecho depois
-      // da última vírgula.
+      // Autocomplete de ativo, mesmo padrão do campo do comparador: um
+      // dropdown próprio (não <datalist> nativo).
       const dropdownReinv = document.getElementById('reinvSugestoesDropdown');
       let reinvSugestoesDebounce = null;
       let reinvSugestoesAtuais = [];
@@ -6651,11 +6736,7 @@
       }
 
       function reinvEscolherSugestao(symbol) {
-        const partes = tickerInput.value.split(',');
-        partes[partes.length - 1] = ' ' + symbol;
-        tickerInput.value = partes.map(p => p.trim()).join(', ') + ', ';
-        reinvFecharDropdown();
-        tickerInput.focus();
+        adicionarTickers(symbol);
       }
 
       function reinvRenderizarDropdown(resultados) {
@@ -6685,9 +6766,7 @@
           const url = `https://api.hgbrasil.com/v2/finance/tickers?format=json-cors&query=${encodeURIComponent(termoLimpo)}&sources=B3&sort=symbol&order=asc&key=${encodeURIComponent(CHAVE_HG)}`;
           const resp = await fetch(url);
           const data = await resp.json();
-          const partesAgora = tickerInput.value.split(',');
-          const trechoAgora = partesAgora[partesAgora.length - 1].trim();
-          if (trechoAgora.toUpperCase() !== termoLimpo.toUpperCase()) return;
+          if (tickerInput.value.trim().toUpperCase() !== termoLimpo.toUpperCase()) return;
           const resultados = Array.isArray(data?.results) ? data.results.filter(r => r?.symbol) : [];
           reinvRenderizarDropdown(resultados);
         } catch (e) {
@@ -6697,12 +6776,17 @@
 
       tickerInput?.addEventListener('input', () => {
         clearTimeout(reinvSugestoesDebounce);
-        const partes = tickerInput.value.split(',');
-        const trechoAtual = partes[partes.length - 1];
-        reinvSugestoesDebounce = setTimeout(() => reinvBuscarSugestoesTicker(trechoAtual), 300);
+        const termo = tickerInput.value;
+        reinvSugestoesDebounce = setTimeout(() => reinvBuscarSugestoesTicker(termo), 300);
       });
 
       tickerInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (!reinvSugestoesAtuais.length || dropdownReinv?.style.display !== 'block')) {
+          // Enter sem sugestão ativa: adiciona o texto digitado direto.
+          e.preventDefault();
+          if (tickerInput.value.trim()) adicionarTickers(tickerInput.value);
+          return;
+        }
         if (!reinvSugestoesAtuais.length || dropdownReinv?.style.display !== 'block') return;
         const itens = dropdownReinv.querySelectorAll('.reinv-sugestao-item');
         if (e.key === 'ArrowDown') {
@@ -6728,6 +6812,8 @@
       tickerInput?.addEventListener('blur', () => {
         setTimeout(reinvFecharDropdown, 150);
       });
+
+      renderizarChips();
 
       // Máscara simples de moeda em R$ (mesmo padrão usado em outras
       // calculadoras do site: só dígitos, formata como 1.000,00 ao digitar).
@@ -6890,14 +6976,14 @@
           const classeRent = r.rentabilidadePct >= 0 ? 'reinv-pos' : 'reinv-neg';
           return `
             <tr>
-              <td class="reinv-ativo-nome">${r.ticker}</td>
-              <td>${reinvFormatMoeda(r.precoCompraInfo.close)}</td>
-              <td>${reinvFormatMoeda(r.precoAtual)}</td>
-              <td>${r.qtdInicial.toFixed(4)} → ${r.qtd.toFixed(4)}</td>
-              <td>${r.eventosReinvestidos}</td>
-              <td>${reinvFormatMoeda(r.totalDividendosRecebidos)}</td>
-              <td>${reinvFormatMoeda(r.valorFinalComReinvestimento)}</td>
-              <td class="${classeRent}">${r.rentabilidadePct >= 0 ? '+' : ''}${r.rentabilidadePct.toFixed(2)}%</td>
+              <td class="reinv-ativo-nome" data-label="Ativo">${r.ticker}</td>
+              <td data-label="Preço compra">${reinvFormatMoeda(r.precoCompraInfo.close)}</td>
+              <td data-label="Preço atual">${reinvFormatMoeda(r.precoAtual)}</td>
+              <td data-label="Cotas (inicial → hoje)">${r.qtdInicial.toFixed(4)} → ${r.qtd.toFixed(4)}</td>
+              <td data-label="Reinvestimentos">${r.eventosReinvestidos}</td>
+              <td data-label="Dividendos recebidos">${reinvFormatMoeda(r.totalDividendosRecebidos)}</td>
+              <td data-label="Valor hoje">${reinvFormatMoeda(r.valorFinalComReinvestimento)}</td>
+              <td data-label="Rentabilidade" class="${classeRent}">${r.rentabilidadePct >= 0 ? '+' : ''}${r.rentabilidadePct.toFixed(2)}%</td>
             </tr>`;
         }).join('');
 
@@ -6964,14 +7050,14 @@
       }
 
       async function executarCalculo() {
-        const tickersDigitados = (tickerInput?.value || '')
-          .split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
-        const tickersUnicos = [...new Set(tickersDigitados)];
+        // Se sobrou algo digitado no campo (usuário esqueceu de clicar em
+        // Adicionar), adiciona automaticamente antes de calcular.
+        if (tickerInput.value.trim()) adicionarTickers(tickerInput.value);
+        const tickersUnicos = listaTickers;
         const dataCompraStr = dataInput?.value;
         const valorInvestido = reinvValorNumerico();
 
-        if (!tickersUnicos.length) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'Informe pelo menos um ativo (ex: HGLG11, PETR4).'; return; }
-        if (tickersUnicos.length > 15) { statusEl.className = 'hg-status erro'; statusEl.textContent = `Máximo de 15 ativos por cálculo — você informou ${tickersUnicos.length}.`; return; }
+        if (!tickersUnicos.length) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'Adicione pelo menos um ativo (ex: HGLG11, PETR4).'; return; }
         if (!dataCompraStr) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'Informe a data da compra.'; return; }
         if (!valorInvestido || valorInvestido <= 0) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'Informe um valor investido válido.'; return; }
 
