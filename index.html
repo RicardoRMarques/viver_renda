@@ -339,45 +339,32 @@
     .reinv-sugestao-item:hover, .reinv-sugestao-item.hg-sugestao-ativa { background: rgba(212,175,55,0.12); }
     .reinv-sugestao-item + .reinv-sugestao-item { border-top: 1px solid var(--border); }
 
-    /* Tabela de resultado (múltiplos ativos lado a lado, um por linha) */
-    .reinv-tabela-wrap { overflow-x: auto; margin-top: 14px; border: 1px solid var(--border); border-radius: 12px; }
-    .reinv-tabela { width: 100%; border-collapse: collapse; font-size: 0.82rem; white-space: nowrap; }
-    .reinv-tabela th, .reinv-tabela td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border); }
-    .reinv-tabela th:first-child, .reinv-tabela td:first-child { text-align: left; position: sticky; left: 0; background: var(--bg); }
-    .reinv-tabela thead th { background: rgba(127,127,127,0.08); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.02em; color: var(--muted); }
-    .reinv-tabela tbody tr:last-child td { border-bottom: none; }
-    .reinv-tabela td.reinv-ativo-nome { font-weight: 700; color: var(--text); }
-    .reinv-tabela td.reinv-pos { color: var(--accent); }
-    .reinv-tabela td.reinv-neg { color: var(--danger); }
-    .reinv-tabela td.reinv-erro { color: var(--danger); font-weight: 400; text-align: left; white-space: normal; }
+    /* Resultado por ativo — sempre em cards empilhados (não uma tabela
+       larga), pra nunca depender de media query / detecção de largura de
+       tela funcionar certo em cada navegador/app. Cada ativo é um bloco
+       com pares rótulo → valor, sem rolagem horizontal em hipótese nenhuma. */
+    .reinv-tabela-wrap { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .reinv-card-ativo {
+      border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--deep);
+    }
+    .reinv-card-ativo-topo {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+      padding-bottom: 10px; margin-bottom: 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap;
+    }
+    .reinv-card-ativo-nome { font-size: 1.05rem; font-weight: 800; color: var(--text); }
+    .reinv-card-ativo-rent { font-size: 1.05rem; font-weight: 800; }
+    .reinv-card-ativo-rent.reinv-pos { color: var(--accent); }
+    .reinv-card-ativo-rent.reinv-neg { color: var(--danger); }
+    .reinv-card-linha {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 5px 0; font-size: 0.85rem;
+    }
+    .reinv-card-linha span:first-child { color: var(--muted); }
+    .reinv-card-linha span:last-child { color: var(--text); font-weight: 700; text-align: right; }
+    .reinv-card-erro { color: var(--danger); font-size: 0.85rem; }
 
     @media (max-width: 640px) {
       .reinv-form-linha2 { grid-template-columns: 1fr; }
-    }
-
-    /* Tabela vira "cards" empilhados no mobile — sem barra de rolagem
-       horizontal, cada ativo ocupa um bloco com rótulo + valor por linha. */
-    @media (max-width: 700px) {
-      .reinv-tabela-wrap { overflow-x: visible; border: none; }
-      .reinv-tabela, .reinv-tabela thead, .reinv-tabela tbody, .reinv-tabela tr, .reinv-tabela th, .reinv-tabela td {
-        display: block; white-space: normal;
-      }
-      .reinv-tabela thead { display: none; }
-      .reinv-tabela tr {
-        border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; background: var(--deep);
-      }
-      .reinv-tabela td {
-        border: none; padding: 6px 0; text-align: right; position: static; background: transparent;
-        display: flex; justify-content: space-between; align-items: center; gap: 10px;
-      }
-      .reinv-tabela td::before {
-        content: attr(data-label); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.02em;
-        color: var(--muted); font-weight: 700; text-align: left;
-      }
-      .reinv-tabela td.reinv-ativo-nome { font-size: 0.95rem; padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
-      .reinv-tabela td.reinv-ativo-nome::before { content: ''; }
-      .reinv-tabela td.reinv-erro { display: block; text-align: left; }
-      .reinv-tabela td.reinv-erro::before { content: ''; }
     }
 
     /* Quiz de Perfil de Investidor */
@@ -6970,21 +6957,23 @@
       function reinvRenderizarTabela(linhas, valorInvestidoPorAtivo) {
         const linhasHtml = linhas.map(l => {
           if (l.erro) {
-            return `<tr><td class="reinv-ativo-nome">${l.ticker}</td><td colspan="7" class="reinv-erro">${l.erro}</td></tr>`;
+            return `<div class="reinv-card-ativo"><div class="reinv-card-ativo-topo"><span class="reinv-card-ativo-nome">${l.ticker}</span></div><div class="reinv-card-erro">${l.erro}</div></div>`;
           }
           const r = l.resultado;
           const classeRent = r.rentabilidadePct >= 0 ? 'reinv-pos' : 'reinv-neg';
           return `
-            <tr>
-              <td class="reinv-ativo-nome" data-label="Ativo">${r.ticker}</td>
-              <td data-label="Preço compra">${reinvFormatMoeda(r.precoCompraInfo.close)}</td>
-              <td data-label="Preço atual">${reinvFormatMoeda(r.precoAtual)}</td>
-              <td data-label="Cotas (inicial → hoje)">${r.qtdInicial.toFixed(4)} → ${r.qtd.toFixed(4)}</td>
-              <td data-label="Reinvestimentos">${r.eventosReinvestidos}</td>
-              <td data-label="Dividendos recebidos">${reinvFormatMoeda(r.totalDividendosRecebidos)}</td>
-              <td data-label="Valor hoje">${reinvFormatMoeda(r.valorFinalComReinvestimento)}</td>
-              <td data-label="Rentabilidade" class="${classeRent}">${r.rentabilidadePct >= 0 ? '+' : ''}${r.rentabilidadePct.toFixed(2)}%</td>
-            </tr>`;
+            <div class="reinv-card-ativo">
+              <div class="reinv-card-ativo-topo">
+                <span class="reinv-card-ativo-nome">${r.ticker}</span>
+                <span class="reinv-card-ativo-rent ${classeRent}">${r.rentabilidadePct >= 0 ? '+' : ''}${r.rentabilidadePct.toFixed(2)}%</span>
+              </div>
+              <div class="reinv-card-linha"><span>Preço de compra</span><span>${reinvFormatMoeda(r.precoCompraInfo.close)}</span></div>
+              <div class="reinv-card-linha"><span>Preço atual</span><span>${reinvFormatMoeda(r.precoAtual)}</span></div>
+              <div class="reinv-card-linha"><span>Cotas/ações</span><span>${r.qtdInicial.toFixed(4)} → ${r.qtd.toFixed(4)}</span></div>
+              <div class="reinv-card-linha"><span>Reinvestimentos</span><span>${r.eventosReinvestidos}</span></div>
+              <div class="reinv-card-linha"><span>Dividendos recebidos</span><span>${reinvFormatMoeda(r.totalDividendosRecebidos)}</span></div>
+              <div class="reinv-card-linha"><span>Valor hoje</span><span>${reinvFormatMoeda(r.valorFinalComReinvestimento)}</span></div>
+            </div>`;
         }).join('');
 
         const truncados = linhas.filter(l => !l.erro && l.resultado.truncado);
@@ -7034,17 +7023,7 @@
 
         return `
           ${resumoHtml}
-          <div class="reinv-tabela-wrap">
-            <table class="reinv-tabela">
-              <thead>
-                <tr>
-                  <th>Ativo</th><th>Preço compra</th><th>Preço atual</th><th>Cotas/ações (inicial → hoje)</th>
-                  <th>Reinvest.</th><th>Dividendos recebidos</th><th>Valor hoje</th><th>Rentab.</th>
-                </tr>
-              </thead>
-              <tbody>${linhasHtml}</tbody>
-            </table>
-          </div>
+          <div class="reinv-tabela-wrap">${linhasHtml}</div>
           ${avisoTruncamento}
         `;
       }
