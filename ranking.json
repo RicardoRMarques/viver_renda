@@ -26,16 +26,16 @@
         "valor": 11.467
       },
       {
+        "ticker": "TAEE11",
+        "nome": "Taesa",
+        "preco": 38.18,
+        "valor": 10.152
+      },
+      {
         "ticker": "BBDC4",
         "nome": "Banco Bradesco",
         "preco": 16.54,
         "valor": 9.401
-      },
-      {
-        "ticker": "ITUB4",
-        "nome": "Banco Itaú Unibanco",
-        "preco": 38.81,
-        "valor": 9.09
       }
     ],
     "valor_mercado": [
@@ -197,11 +197,11 @@
         "valor": 14.469
       },
       {
-        "ticker": "BTHF11",
-        "nome": "FII BTHF",
-        "preco": 8.52,
-        "variacao_pct": -0.8149,
-        "valor": 13.862
+        "ticker": "CPTS11",
+        "nome": "FII Capi Sec",
+        "preco": 7.45,
+        "variacao_pct": 0.2692,
+        "valor": 14.43
       }
     ],
     "mais_negociados": [
