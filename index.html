@@ -290,6 +290,21 @@
     }
     .carteira-remover:hover { color: #e05555; }
 
+    /* Calculadora de Reinvestimento de Dividendos */
+    .reinv-form { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; margin-top: 4px; }
+    .reinv-campo { display: flex; flex-direction: column; gap: 4px; }
+    .reinv-campo label { font-size: 0.72rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+    .reinv-campo input[type="text"], .reinv-campo input[type="date"] {
+      background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 10px 12px; font-size: 0.88rem; font-family: inherit; width: 100%;
+    }
+    .reinv-campo .calc-input-prefixado input { width: 100%; }
+    .reinv-comparativo { font-size: 0.8rem; color: var(--muted); margin-top: 4px; line-height: 1.6; }
+    .reinv-comparativo strong { color: var(--text); }
+    @media (max-width: 640px) {
+      .reinv-form { grid-template-columns: 1fr; }
+    }
+
     /* Quiz de Perfil de Investidor */
     .quiz-pergunta { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px dashed var(--border); }
     .quiz-pergunta:last-of-type { border-bottom: none; }
@@ -2386,6 +2401,9 @@
             <button type="button" class="nav-dropdown-item" id="carteiraBtnAbrir">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>Carteira de Dividendos
             </button>
+            <button type="button" class="nav-dropdown-item" id="reinvBtnAbrir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M3 3v18h18"></path><path d="M18 9l-5 5-3-3-4 4"></path><path d="M14 9h4v4"></path></svg>Reinvestimento de Dividendos
+            </button>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
           </div>
         </div>
@@ -2413,6 +2431,7 @@
       <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="quizBtnAbrir">🧠 Descubra seu Perfil de Investidor</button>
       <button type="button" class="mobile-menu-item" data-mobile-alvo="carteiraBtnAbrir">💰 Carteira de Dividendos</button>
+      <button type="button" class="mobile-menu-item" data-mobile-alvo="reinvBtnAbrir">🔁 Reinvestimento de Dividendos</button>
       <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     </div>
   </header>
@@ -3981,6 +4000,54 @@
 
         <div id="glossarioLista" class="glossario-lista"></div>
         <p id="glossarioVazio" class="calc-ajuda" hidden>Nenhum termo encontrado para essa busca.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Calculadora de Reinvestimento de Dividendos -->
+  <div id="reinvOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="reinvTitulo" hidden>
+    <div class="calc-modal reinv-modal">
+      <div class="calc-modal-topo">
+        <h3 id="reinvTitulo">🔁 Reinvestimento de Dividendos</h3>
+        <button id="reinvFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Informe um ativo, a data da compra e quanto você investiu. Calculamos quanto isso valeria hoje supondo que
+          todo dividendo recebido foi reaplicado no próprio ativo, na data de pagamento — em vez de ficar parado em conta.
+        </p>
+
+        <div class="reinv-form">
+          <div class="reinv-campo">
+            <label for="reinvTickerInput">Ativo</label>
+            <input type="text" id="reinvTickerInput" placeholder="Ex: HGLG11, PETR4..." autocomplete="off" list="sugestoesTickersB3" />
+          </div>
+          <div class="reinv-campo">
+            <label for="reinvDataInput">Data da compra</label>
+            <input type="date" id="reinvDataInput" />
+          </div>
+          <div class="reinv-campo">
+            <label for="reinvValorInput">Valor investido</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" id="reinvValorInput" inputmode="numeric" value="1.000,00" />
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="hg-btn" id="reinvBtnCalcular" style="width:100%; margin-top:4px;">Calcular</button>
+
+        <div id="reinvStatus" class="hg-status"></div>
+        <div id="reinvResultado"></div>
+
+        <p class="calc-ajuda" style="margin-top:16px;">
+          <strong>Como calculamos:</strong> a cada pagamento de dividendo no período, o valor recebido é usado pra
+          comprar mais cotas/ações pelo preço de fechamento da data de pagamento, aumentando a quantidade que segue
+          rendendo dividendos daí em diante (efeito bola de neve). O preço histórico da B3 disponível na nossa fonte
+          de dados cobre um período limitado (normalmente até ~1 ano) — se a data escolhida for mais antiga que isso,
+          avisamos aqui e usamos a data mais antiga disponível como ponto de partida. Simulação educativa; não
+          considera taxas, impostos (quando aplicável) nem garante que o mesmo resultado se repita no futuro.
+        </p>
       </div>
     </div>
   </div>
@@ -6488,6 +6555,244 @@
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+    })();
+
+    // ============================================================
+    // CALCULADORA DE REINVESTIMENTO DE DIVIDENDOS — simula quanto um
+    // valor investido em determinada data valeria hoje, supondo que
+    // todo provento recebido foi usado para comprar mais cotas/ações
+    // do mesmo ativo, no preço de fechamento da data de pagamento
+    // (efeito bola de neve / juros compostos via dividendos).
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('reinvBtnAbrir');
+      const overlay = document.getElementById('reinvOverlay');
+      const btnFechar = document.getElementById('reinvFechar');
+      const tickerInput = document.getElementById('reinvTickerInput');
+      const dataInput = document.getElementById('reinvDataInput');
+      const valorInput = document.getElementById('reinvValorInput');
+      const btnCalcular = document.getElementById('reinvBtnCalcular');
+      const statusEl = document.getElementById('reinvStatus');
+      const resultadoEl = document.getElementById('reinvResultado');
+      if (!btnAbrir || !overlay) return;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        // data padrão: 1 ano atrás, se o campo ainda estiver vazio
+        if (dataInput && !dataInput.value) {
+          const umAnoAtras = new Date();
+          umAnoAtras.setFullYear(umAnoAtras.getFullYear() - 1);
+          dataInput.value = umAnoAtras.toISOString().slice(0, 10);
+        }
+        tickerInput?.focus({ preventScroll: true });
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+
+      // Máscara simples de moeda em R$ (mesmo padrão usado em outras
+      // calculadoras do site: só dígitos, formata como 1.000,00 ao digitar).
+      valorInput?.addEventListener('input', () => {
+        let digitos = valorInput.value.replace(/\D/g, '');
+        if (!digitos) { valorInput.value = ''; return; }
+        const numero = Number(digitos) / 100;
+        valorInput.value = numero.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      });
+
+      function reinvValorNumerico() {
+        const limpo = (valorInput?.value || '').replace(/\./g, '').replace(',', '.');
+        const n = parseFloat(limpo);
+        return Number.isFinite(n) ? n : 0;
+      }
+
+      // Busca busca binária pra achar a data mais antiga com histórico de
+      // PREÇO disponível (mesmo padrão já usado pra dividendos — a HG
+      // Brasil recusa períodos "antigos demais" com um erro de limite).
+      async function reinvTestarIntervaloPrecos(symbol, inicio, fim) {
+        const iso = d => d.toISOString().slice(0, 10);
+        const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent('B3:' + symbol)}&sample_by=1d&start_date=${iso(inicio)}&end_date=${iso(fim)}&key=${encodeURIComponent(CHAVE_HG)}`;
+        try {
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const mensagemErro = data?.errors?.[0]?.message || data?.error?.message
+            || (typeof data?.error === 'string' ? data.error : null)
+            || data?.results?.[0]?.error?.message;
+          if (mensagemErro) return { ok: false, erro: mensagemErro };
+          const amostras = data?.results?.[0]?.samples;
+          const serie = (Array.isArray(amostras) ? amostras : [])
+            .map(p => ({ date: p.date, close: typeof p.close === 'number' ? p.close : p.value }))
+            .filter(p => typeof p.close === 'number' && p.date)
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+          return { ok: true, serie };
+        } catch (e) {
+          return { ok: false, erro: e.message };
+        }
+      }
+
+      async function reinvBuscarHistoricoPrecos(symbol, inicioDesejado, hoje) {
+        let resultado = await reinvTestarIntervaloPrecos(symbol, inicioDesejado, hoje);
+        if (resultado.ok && resultado.serie.length > 0) {
+          return { serie: resultado.serie, truncado: false, inicioEfetivo: inicioDesejado };
+        }
+
+        const ehLimiteDeData = !resultado.ok && /limite|máxima|maximo/i.test(resultado.erro || '');
+        if (resultado.ok && resultado.serie.length === 0) {
+          // Sem erro explícito, mas sem amostras — pode ser período sem
+          // pregão coberto; tenta a busca binária do mesmo jeito, é
+          // inofensivo (só confirma que não há mais profundidade).
+        } else if (!ehLimiteDeData) {
+          throw new Error(resultado.erro || 'Não foi possível carregar o histórico de preços.');
+        }
+
+        let baixo = inicioDesejado.getTime();
+        let alto = hoje.getTime();
+        let melhorInicio = null;
+        let melhorSerie = [];
+        for (let i = 0; i < 12 && (alto - baixo) > 86400000; i++) {
+          const meio = new Date(Math.floor((baixo + alto) / 2));
+          const r = await reinvTestarIntervaloPrecos(symbol, meio, hoje);
+          if (r.ok && r.serie.length > 0) {
+            alto = meio.getTime();
+            melhorInicio = meio;
+            melhorSerie = r.serie;
+          } else {
+            baixo = meio.getTime();
+          }
+        }
+
+        if (!melhorInicio) {
+          throw new Error('Não conseguimos histórico de preços suficiente para esse ativo nesse período.');
+        }
+        return { serie: melhorSerie, truncado: true, inicioEfetivo: melhorInicio };
+      }
+
+      // Acha, dentro da série de preços (ordenada por data crescente), o
+      // preço de fechamento na data pedida ou no pregão disponível mais
+      // próximo ANTES/na data (nunca depois — senão a compra/reinvestimento
+      // usaria um preço que ainda não existia naquele momento).
+      function reinvPrecoNaData(serie, dataAlvo) {
+        let melhor = null;
+        for (const p of serie) {
+          const d = new Date(p.date);
+          if (d <= dataAlvo) melhor = p;
+          else break;
+        }
+        return melhor || serie[0] || null;
+      }
+
+      async function reinvBuscarDividendos(symbol, inicio, fim) {
+        const iso = d => d.toISOString().slice(0, 10);
+        const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + symbol)}&start_date=${iso(inicio)}&end_date=${iso(fim)}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        const mensagemErro = data?.errors?.[0]?.message || data?.error?.message
+          || (typeof data?.error === 'string' ? data.error : null);
+        if (mensagemErro) throw new Error(mensagemErro);
+        const ativo = Array.isArray(data?.results) ? data.results[0] : data?.results;
+        const serie = Array.isArray(ativo?.series) ? ativo.series : [];
+        return serie
+          .filter(ev => ev.category === 'cash' && typeof ev.amount === 'number' && ev.status === 'paid' && ev.payment_date)
+          .sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
+      }
+
+      function reinvFormatMoeda(v) {
+        return (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      }
+
+      async function executarCalculo() {
+        const ticker = (tickerInput?.value || '').trim().toUpperCase();
+        const dataCompraStr = dataInput?.value;
+        const valorInvestido = reinvValorNumerico();
+
+        if (!ticker) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'Informe um ticker (ex: HGLG11, PETR4).'; return; }
+        if (!dataCompraStr) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'Informe a data da compra.'; return; }
+        if (!valorInvestido || valorInvestido <= 0) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'Informe um valor investido válido.'; return; }
+
+        const dataCompra = new Date(dataCompraStr + 'T00:00:00');
+        const hoje = new Date();
+        if (dataCompra >= hoje) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'A data da compra precisa ser no passado.'; return; }
+
+        statusEl.className = 'hg-status';
+        statusEl.textContent = `Calculando ${ticker} desde ${dataCompra.toLocaleDateString('pt-BR')}...`;
+        resultadoEl.innerHTML = '';
+        btnCalcular.disabled = true;
+
+        try {
+          const { serie: precos, truncado, inicioEfetivo } = await reinvBuscarHistoricoPrecos(ticker, dataCompra, hoje);
+          if (!precos.length) throw new Error('Sem histórico de preços disponível pra esse ativo.');
+
+          const dataInicioReal = truncado ? inicioEfetivo : dataCompra;
+          const precoCompraInfo = reinvPrecoNaData(precos, dataInicioReal);
+          if (!precoCompraInfo) throw new Error('Não achamos um preço de compra válido nessa data.');
+
+          const dividendos = await reinvBuscarDividendos(ticker, dataInicioReal, hoje);
+
+          let qtd = valorInvestido / precoCompraInfo.close;
+          const qtdInicial = qtd;
+          let totalReinvestidoEmReais = 0;
+          let totalDividendosRecebidos = 0;
+          let eventosReinvestidos = 0;
+
+          for (const ev of dividendos) {
+            const dataPagamento = new Date(ev.payment_date + 'T00:00:00');
+            if (dataPagamento < dataInicioReal) continue;
+            const precoInfo = reinvPrecoNaData(precos, dataPagamento);
+            if (!precoInfo || !precoInfo.close) continue;
+            const valorRecebido = qtd * ev.amount;
+            totalDividendosRecebidos += valorRecebido;
+            const cotasCompradas = valorRecebido / precoInfo.close;
+            qtd += cotasCompradas;
+            totalReinvestidoEmReais += valorRecebido;
+            eventosReinvestidos++;
+          }
+
+          const precoAtual = precos[precos.length - 1].close;
+          const valorFinalComReinvestimento = qtd * precoAtual;
+          const valorFinalSemReinvestimento = qtdInicial * precoAtual + totalDividendosRecebidos;
+          const rentabilidadePct = ((valorFinalComReinvestimento - valorInvestido) / valorInvestido) * 100;
+          const rentabilidadeSemReinvestPct = ((valorFinalSemReinvestimento - valorInvestido) / valorInvestido) * 100;
+
+          statusEl.textContent = '';
+          resultadoEl.innerHTML = `
+            <div class="carteira-resumo-cards">
+              <div class="carteira-resumo-card">
+                <span>Valor investido</span>
+                <strong>${reinvFormatMoeda(valorInvestido)}</strong>
+              </div>
+              <div class="carteira-resumo-card carteira-resumo-destaque">
+                <span>Valor hoje (com reinvestimento)</span>
+                <strong>${reinvFormatMoeda(valorFinalComReinvestimento)}</strong>
+              </div>
+              <div class="carteira-resumo-card">
+                <span>Rentabilidade total</span>
+                <strong style="color:${rentabilidadePct >= 0 ? 'var(--accent)' : 'var(--danger)'};">${rentabilidadePct >= 0 ? '+' : ''}${rentabilidadePct.toFixed(2)}%</strong>
+              </div>
+            </div>
+            <div class="reinv-comparativo">
+              <div>Quantidade inicial: <strong>${qtdInicial.toFixed(4)}</strong> cotas/ações → quantidade hoje: <strong>${qtd.toFixed(4)}</strong> (${eventosReinvestidos} reinvestimento${eventosReinvestidos === 1 ? '' : 's'})</div>
+              <div>Total recebido em dividendos ao longo do período: <strong>${reinvFormatMoeda(totalDividendosRecebidos)}</strong></div>
+              <div>Sem reinvestir (dividendos parados, só a cotação sobe): <strong>${reinvFormatMoeda(valorFinalSemReinvestimento)}</strong> (${rentabilidadeSemReinvestPct >= 0 ? '+' : ''}${rentabilidadeSemReinvestPct.toFixed(2)}%)</div>
+              <div>Preço de compra usado: <strong>${reinvFormatMoeda(precoCompraInfo.close)}</strong> em ${new Date(precoCompraInfo.date).toLocaleDateString('pt-BR')} · Preço atual: <strong>${reinvFormatMoeda(precoAtual)}</strong></div>
+              ${truncado ? `<div style="color:var(--gold); margin-top:6px;">⚠️ Nosso histórico de preços pra esse ativo só cobre a partir de ${dataInicioReal.toLocaleDateString('pt-BR')} — usamos essa data como ponto de partida em vez de ${dataCompra.toLocaleDateString('pt-BR')}.</div>` : ''}
+            </div>
+          `;
+        } catch (e) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = e.message || 'Erro ao calcular. Confira o ticker e tente de novo.';
+          console.error('Erro na calculadora de reinvestimento:', e);
+        } finally {
+          btnCalcular.disabled = false;
+        }
+      }
+
+      btnCalcular?.addEventListener('click', executarCalculo);
     })();
 
     // ============================================================
