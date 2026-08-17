@@ -291,7 +291,10 @@
     .carteira-remover:hover { color: #e05555; }
 
     /* Calculadora de Reinvestimento de Dividendos */
-    .reinv-modal { max-width: 1100px; }
+    .reinv-modal { max-width: 720px; }
+    @media (min-width: 1024px) {
+      .reinv-modal { max-width: 980px; }
+    }
     .reinv-campo-ativo { display: flex; gap: 8px; align-items: stretch; }
     .reinv-campo-ativo input { flex: 1; min-width: 0; }
     .reinv-form-linha2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
@@ -347,10 +350,6 @@
     .reinv-card-ativo {
       border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; background: var(--deep);
     }
-    @media (max-width: 600px) {
-      .reinv-card-ativo { padding: 12px 12px; }
-      .reinv-modal .carteira-resumo-card { padding: 12px 14px; }
-    }
     .reinv-card-ativo-topo {
       display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
       padding-bottom: 10px; margin-bottom: 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap;
@@ -369,15 +368,6 @@
 
     @media (max-width: 640px) {
       .reinv-form-linha2 { grid-template-columns: 1fr; }
-    }
-
-    /* No mobile, aproveita quase toda a largura da tela pro modal do
-       reinvestimento — menos espaço perdido nas bordas laterais. */
-    @media (max-width: 600px) {
-      #reinvOverlay.calc-overlay { padding: 6px; }
-      #reinvOverlay .calc-modal { max-width: 100%; border-radius: 12px; }
-      #reinvOverlay .calc-corpo { padding: 14px 10px; }
-      #reinvOverlay .calc-modal-topo { padding: 14px 14px; }
     }
 
     /* Quiz de Perfil de Investidor */
