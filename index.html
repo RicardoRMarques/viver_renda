@@ -291,16 +291,19 @@
     .carteira-remover:hover { color: #e05555; }
 
     /* Calculadora de Reinvestimento de Dividendos */
-    .reinv-form { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; margin-top: 4px; }
-    .reinv-campo { display: flex; flex-direction: column; gap: 4px; }
+    .reinv-form { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 10px; margin-top: 4px; }
+    .reinv-campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
     .reinv-campo label { font-size: 0.72rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
     .reinv-campo input[type="text"], .reinv-campo input[type="date"] {
       background: var(--deep); border: 1px solid var(--border); color: var(--text);
-      border-radius: 10px; padding: 10px 12px; font-size: 0.88rem; font-family: inherit; width: 100%;
+      border-radius: 10px; padding: 10px 12px; font-size: 0.88rem; font-family: inherit; width: 100%; min-width: 0;
     }
-    .reinv-campo .calc-input-prefixado input { width: 100%; }
-    .reinv-comparativo { font-size: 0.8rem; color: var(--muted); margin-top: 4px; line-height: 1.6; }
+    .reinv-campo .calc-input-prefixado input { width: 100%; min-width: 60px; font-size: 0.95rem; }
+    .reinv-comparativo { font-size: 0.85rem; color: var(--muted); margin-top: 4px; line-height: 1.7; }
     .reinv-comparativo strong { color: var(--text); }
+    .reinv-modal .carteira-resumo-card { padding: 16px 18px; }
+    .reinv-modal .carteira-resumo-card span { font-size: 0.76rem; }
+    .reinv-modal .carteira-resumo-card strong { font-size: 1.5rem; }
     @media (max-width: 640px) {
       .reinv-form { grid-template-columns: 1fr; }
     }
