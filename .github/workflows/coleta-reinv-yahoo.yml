@@ -1,0 +1,34 @@
+name: Coleta histórico Yahoo (Reinvestimento de Dividendos)
+
+on:
+  schedule:
+    # 06:00 UTC = 03:00 no horário de Brasília (sem horário de verão)
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}  # permite rodar manualmente pela aba Actions, pra testar já
+
+permissions:
+  contents: write
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Rodar coletor (Yahoo Finance)
+        run: python coletar_reinv_yahoo.py
+
+      - name: Commit e push dos dados coletados
+        run: |
+          git config user.name "robo-reinv-yahoo"
+          git config user.email "robo-reinv-yahoo@users.noreply.github.com"
+          git add data/reinv-historico/
+          git commit -m "Histórico Yahoo (Reinvestimento): $(date +'%d-%m-%Y')" || echo "Nada novo para commitar"
+          git pull --rebase origin main
+          git push
