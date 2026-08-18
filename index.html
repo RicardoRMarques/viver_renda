@@ -291,10 +291,6 @@
     .carteira-remover:hover { color: #e05555; }
 
     /* Calculadora de Reinvestimento de Dividendos */
-    .reinv-modal { max-width: 720px; }
-    @media (min-width: 1024px) {
-      .reinv-modal { max-width: 980px; }
-    }
     .reinv-campo-ativo { display: flex; gap: 8px; align-items: stretch; }
     .reinv-campo-ativo input { flex: 1; min-width: 0; }
     .reinv-form-linha2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
@@ -2185,6 +2181,14 @@
     .financ-modal { max-width: 720px; }
     @media (min-width: 1024px) {
       .financ-modal { max-width: 980px; }
+    }
+    /* .reinv-modal precisa vir DEPOIS de .calc-modal (que também define
+       max-width) — regras com a mesma especificidade, quando empatam, a
+       que vem depois no arquivo vence. Colocada antes, essa regra era
+       ignorada e o modal ficava preso nos 480px padrão do .calc-modal. */
+    .reinv-modal { max-width: 720px; }
+    @media (min-width: 1024px) {
+      .reinv-modal { max-width: 980px; }
     }
     .financ-print-area { display: none; }
 
