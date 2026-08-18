@@ -24,20 +24,132 @@ IMPORTANTE (piloto):
 
 import json
 import os
+import sys
 import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 
 # ---------------------------------------------------------------------
-# CONFIGURAÇÃO — edite esta lista pra incluir/tirar ativos do piloto.
-# Comece pequeno, confira a profundidade em _status.json, vá expandindo
-# aos poucos (cada ativo novo = mais 1 requisição por execução).
+# CONFIGURAÇÃO — lista de ativos.
+#
+# Combina DUAS fontes:
+#
+# 1) POOL_ACOES + POOL_FIIS, importados direto do coletar_hgbrasil.py —
+#    a MESMA lista que já alimenta os rankings do site. Editar a lista
+#    lá também muda o que este script coleta, sem editar dois lugares.
+#
+# 2) IBOV_SNAPSHOT — a carteira teórica oficial do Ibovespa (índice de
+#    ações mais negociadas da B3), pra ampliar bastante a cobertura de
+#    ações além do pool curado do site. NÃO é importada dinamicamente
+#    porque não existe hoje uma fonte gratuita simples pra isso — é um
+#    RETRATO estático, coletado manualmente em 18/08/2026 (carteira
+#    vigente maio–agosto/2026, 79 ativos, conferida contra o anúncio
+#    oficial da B3 e cruzada em duas fontes jornalísticas
+#    independentes). A B3 rebalanceia essa carteira a cada 4 meses
+#    (jan/mai/set) — então esse retrato vai ficar levemente desatualizado
+#    com o tempo (ativo novo que entrar não aparece; ativo que sair só
+#    vai dar erro inofensivo na coleta, sem quebrar nada). Vale revisar
+#    esse bloco a cada poucos meses.
+#
+# NÃO incluímos hoje a lista completa do IFIX (índice de FIIs) — a única
+# fonte que achei pra composição atual dele veio com fortes sinais de
+# ter sido gerada por IA sem revisão (texto com resquício de prompt e um
+# ticker duplicado com dois valores diferentes), então preferimos não
+# arriscar publicar tickers possivelmente inventados.
 # ---------------------------------------------------------------------
-TICKERS = [
-    "PETR4", "VALE3", "ITUB4", "BBAS3", "WEGE3", "ABCB4", "BPAC11",
-    "HGLG11", "KNCR11", "XPML11", "ALZR11", "GGRC11", "INFRA11", "KNIP11",
+IBOV_SNAPSHOT = [
+    "ALOS3", "ABEV3", "ASAI3", "AURE3", "AXIA3", "AXIA6", "AZZA3", "B3SA3",
+    "BBSE3", "BBDC3", "BBDC4", "BRAP4", "BBAS3", "BRKM5", "BRAV3", "BPAC11",
+    "CXSE3", "CEAB3", "CMIG4", "COGN3", "CSMG3", "CPLE3", "CSAN3", "CPFE3",
+    "CMIN3", "CURY3", "CYRE3", "DIRR3", "EMBJ3", "ENGI11", "ENEV3", "EGIE3",
+    "EQTL3", "FLRY3", "GGBR4", "GOAU4", "HAPV3", "HYPE3", "IGTI11", "ISAE4",
+    "ITSA4", "ITUB4", "KLBN11", "RENT3", "LREN3", "MGLU3", "POMO4", "MBRF3",
+    "BEEF3", "MOTV3", "MRVE3", "MULT3", "NATU3", "PETR3", "PETR4", "RECV3",
+    "PSSA3", "PRIO3", "RADL3", "RDOR3", "RAIL3", "SBSP3", "SANB11", "CSNA3",
+    "SLCE3", "SMFT3", "SUZB3", "TAEE11", "VIVT3", "TIMS3", "TOTS3", "UGPA3",
+    "USIM5", "VALE3", "VAMO3", "VBBR3", "VIVA3", "WEGE3", "YDUQ3",
 ]
+
+try:
+    from coletar_hgbrasil import POOL_ACOES, POOL_FIIS, obter_token_brapi
+except ImportError:
+    print(
+        "AVISO: não consegui importar de coletar_hgbrasil.py — usando "
+        "retrato fixo de POOL_ACOES/POOL_FIIS (pode estar desatualizado) "
+        "e lendo o token da brapi direto da variável de ambiente. Rode "
+        "este script a partir da raiz do repositório.",
+        file=sys.stderr,
+    )
+    POOL_ACOES = [
+        "PETR4", "VALE3", "ITUB4", "BBDC4", "B3SA3", "ABEV3", "WEGE3", "BBAS3",
+        "RENT3", "SUZB3", "GGBR4", "RADL3", "EQTL3", "PRIO3", "RAIL3", "CSNA3",
+        "ELET3", "CPLE6", "SBSP3", "CMIG4", "BBSE3", "VIVT3", "TAEE11", "AXIA3",
+        "ALOS3",
+    ]
+    POOL_FIIS = [
+        "KNCR11", "CPTS11", "RECR11", "HGLG11", "VILG11", "VISC11", "MXRF11",
+        "XPML11", "BTLG11", "HFOF11", "KNSC11", "VGIR11", "GARE11", "TRXF11",
+        "IRIM11", "ALZR11", "XPCA11", "BTHF11", "MCCI11", "XPLG11",
+    ]
+
+    def obter_token_brapi():
+        return os.environ.get("VIVERDERENDA_BRAPI", "").strip()
+
+# Base "sempre disponível" (sem depender de rede): ranking do site +
+# carteira do Ibovespa. A lista completa de FIIs via brapi.dev é
+# adicionada em main(), se o token VIVERDERENDA_BRAPI tiver acesso ao
+# endpoint /api/quote/list — ver buscar_fiis_brapi().
+TICKERS_BASE = sorted(set(POOL_ACOES) | set(POOL_FIIS) | set(IBOV_SNAPSHOT))
+
+BRAPI_LIST_URL = "https://brapi.dev/api/quote/list"
+
+
+def buscar_fiis_brapi(token):
+    """Busca a lista completa de FIIs (type=fund) via brapi.dev
+    (/api/quote/list), paginando até o fim. Retorna um set de tickers, ou
+    um set vazio se o endpoint não estiver disponível nesse plano/token
+    (ex: 401/403) — nesse caso o robô simplesmente não expande a lista
+    além do que já tinha, sem quebrar a execução.
+    """
+    tickers = set()
+    pagina = 1
+    paginas_max = 15  # trava de segurança — não deve existir plano com >1500 FIIs
+    while pagina <= paginas_max:
+        url = f"{BRAPI_LIST_URL}?type=fund&limit=100&page={pagina}&token={token}"
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                dados = json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            if pagina == 1:
+                print(
+                    f"AVISO: brapi.dev /quote/list respondeu HTTP {e.code} "
+                    f"({e.reason}) — provavelmente esse endpoint não está "
+                    "disponível no plano do seu token. Mantendo só a lista "
+                    "de FIIs já conhecida (POOL_FIIS).",
+                    file=sys.stderr,
+                )
+            break
+        except Exception as e:  # noqa: BLE001
+            print(f"AVISO: falha ao consultar brapi.dev /quote/list: {e}", file=sys.stderr)
+            break
+
+        stocks = dados.get("stocks") or []
+        if not stocks:
+            break
+        for item in stocks:
+            symbol = item.get("stock") or item.get("symbol")
+            if symbol:
+                tickers.add(symbol.strip().upper())
+
+        if not dados.get("hasNextPage"):
+            break
+        pagina += 1
+        time.sleep(0.5)
+
+    return tickers
+
 
 SAIDA_DIR = os.path.join("data", "reinv-historico")
 STATUS_PATH = os.path.join(SAIDA_DIR, "_status.json")
@@ -129,10 +241,34 @@ def main():
     os.makedirs(SAIDA_DIR, exist_ok=True)
     status = {"gerado_em": datetime.now(timezone.utc).isoformat(), "ativos": {}}
 
-    print(f"Coletando histórico Yahoo Finance para {len(TICKERS)} ativos...\n")
+    # Tenta expandir a lista de FIIs via brapi.dev antes de começar a
+    # coleta de verdade. Se o token não tiver acesso a esse endpoint
+    # (plano gratuito pode ou não incluir — ver comentário em
+    # buscar_fiis_brapi), simplesmente segue só com TICKERS_BASE.
+    token_brapi = obter_token_brapi()
+    tickers = set(TICKERS_BASE)
+    if token_brapi:
+        print("Consultando brapi.dev por uma lista completa de FIIs (type=fund)...")
+        fiis_brapi = buscar_fiis_brapi(token_brapi)
+        novos = fiis_brapi - tickers
+        if novos:
+            print(f"  +{len(novos)} FIIs novos encontrados via brapi.dev.\n")
+            tickers |= novos
+        elif fiis_brapi:
+            print("  nenhum FII novo além dos já conhecidos.\n")
+        # se fiis_brapi veio vazio, buscar_fiis_brapi já explicou o motivo
+    else:
+        print(
+            "INFO: VIVERDERENDA_BRAPI não configurado neste ambiente — "
+            "pulando a expansão de FIIs via brapi.dev, usando só a lista "
+            "já conhecida (ranking do site + Ibovespa).\n"
+        )
+    tickers = sorted(tickers)
 
-    for i, ticker in enumerate(TICKERS, 1):
-        print(f"[{i}/{len(TICKERS)}] {ticker}...")
+    print(f"Coletando histórico Yahoo Finance para {len(tickers)} ativos...\n")
+
+    for i, ticker in enumerate(tickers, 1):
+        print(f"[{i}/{len(tickers)}] {ticker}...")
         bruto, erro = buscar_yahoo(ticker)
 
         if erro:
