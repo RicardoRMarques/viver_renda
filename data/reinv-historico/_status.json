@@ -1,85 +1,173 @@
 {
-  "gerado_em": "2026-08-18T17:23:04.543566+00:00",
+  "gerado_em": "2026-08-18T18:01:12.632974+00:00",
   "ativos": {
-    "PETR4": {
+    "03BK11": {
+      "ok": true,
+      "preco_desde": "2026-08-06",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 20,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "10BK11": {
+      "ok": true,
+      "preco_desde": "2026-08-06",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 15,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "3PRE11": {
+      "ok": true,
+      "preco_desde": "2026-06-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 105,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "5PRE11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "AAGR11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-04-09",
+      "total_dividendos": 6
+    },
+    "AAZQ11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-02-01",
+      "total_dividendos": 6
+    },
+    "ABCP11": {
+      "ok": true,
+      "preco_desde": "2010-10-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 192,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "ABEV3": {
       "ok": true,
       "preco_desde": "2000-02-01",
       "preco_ate": "2026-08-18",
       "total_pregoes": 320,
-      "dividendo_desde": "2005-07-01",
-      "total_dividendos": 61
+      "dividendo_desde": "2007-12-11",
+      "total_dividendos": 53
     },
-    "VALE3": {
+    "ABTC11": {
       "ok": true,
-      "preco_desde": "2000-02-01",
+      "preco_desde": "2026-07-15",
       "preco_ate": "2026-08-18",
-      "total_pregoes": 320,
-      "dividendo_desde": "2008-04-11",
-      "total_dividendos": 39
+      "total_pregoes": 172,
+      "dividendo_desde": null,
+      "total_dividendos": 0
     },
-    "ITUB4": {
+    "ACWI11": {
       "ok": true,
-      "preco_desde": "2001-01-01",
+      "preco_desde": "2021-01-25",
       "preco_ate": "2026-08-18",
-      "total_pregoes": 309,
-      "dividendo_desde": "2008-02-01",
-      "total_dividendos": 221
+      "total_pregoes": 291,
+      "dividendo_desde": null,
+      "total_dividendos": 0
     },
-    "BBAS3": {
+    "ADSH11": {
       "ok": true,
-      "preco_desde": "2000-02-01",
+      "preco_desde": "2026-07-21",
       "preco_ate": "2026-08-18",
-      "total_pregoes": 320,
-      "dividendo_desde": "2008-05-15",
-      "total_dividendos": 129
+      "total_pregoes": 21,
+      "dividendo_desde": "2026-04-24",
+      "total_dividendos": 3
     },
-    "WEGE3": {
+    "AFHF11": {
       "ok": true,
-      "preco_desde": "2000-02-01",
+      "preco_desde": "2025-07-14",
       "preco_ate": "2026-08-18",
-      "total_pregoes": 320,
-      "dividendo_desde": "2008-02-20",
-      "total_dividendos": 108
+      "total_pregoes": 274,
+      "dividendo_desde": "2025-08-15",
+      "total_dividendos": 12
     },
-    "ABCB4": {
+    "AFHI11": {
       "ok": true,
-      "preco_desde": "2007-10-01",
+      "preco_desde": "2024-01-29",
       "preco_ate": "2026-08-18",
-      "total_pregoes": 228,
-      "dividendo_desde": "2010-04-01",
-      "total_dividendos": 37
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-19",
+      "total_dividendos": 30
     },
-    "BPAC11": {
+    "AGRI11": {
       "ok": true,
-      "preco_desde": "2017-03-01",
+      "preco_desde": "2022-05-23",
       "preco_ate": "2026-08-18",
-      "total_pregoes": 115,
-      "dividendo_desde": "2017-07-06",
+      "total_pregoes": 222,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "AGRX11": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "AIEC11": {
+      "ok": true,
+      "preco_desde": "2022-03-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 233,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 50
+    },
+    "AJFI11": {
+      "ok": true,
+      "preco_desde": "2023-11-06",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 147,
+      "dividendo_desde": "2023-12-08",
+      "total_dividendos": 32
+    },
+    "ALMI11": {
+      "ok": true,
+      "preco_desde": "2006-06-01",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 244,
+      "dividendo_desde": "2024-07-01",
       "total_dividendos": 24
     },
-    "HGLG11": {
+    "ALOS3": {
       "ok": true,
-      "preco_desde": "2011-04-01",
+      "preco_desde": "2011-03-01",
       "preco_ate": "2026-08-18",
-      "total_pregoes": 186,
-      "dividendo_desde": "2017-11-01",
-      "total_dividendos": 55
+      "total_pregoes": 187,
+      "dividendo_desde": "2011-04-29",
+      "total_dividendos": 36
     },
-    "KNCR11": {
+    "ALUG11": {
       "ok": true,
-      "preco_desde": "2014-09-01",
+      "preco_desde": "2021-10-25",
       "preco_ate": "2026-08-18",
-      "total_pregoes": 145,
-      "dividendo_desde": "2017-11-01",
-      "total_dividendos": 55
+      "total_pregoes": 252,
+      "dividendo_desde": null,
+      "total_dividendos": 0
     },
-    "XPML11": {
+    "ALZC11": {
       "ok": true,
-      "preco_desde": "2020-06-01",
+      "preco_desde": "2023-08-14",
       "preco_ate": "2026-08-18",
-      "total_pregoes": 326,
-      "dividendo_desde": "2022-03-21",
-      "total_dividendos": 53
+      "total_pregoes": 159,
+      "dividendo_desde": "2023-08-16",
+      "total_dividendos": 35
     },
     "ALZR11": {
       "ok": true,
@@ -89,6 +177,2098 @@
       "dividendo_desde": "2022-03-21",
       "total_dividendos": 51
     },
+    "AMAB11": {
+      "ok": true,
+      "preco_desde": "2026-08-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 98,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ANCR11": {
+      "ok": true,
+      "preco_desde": "2014-10-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 144,
+      "dividendo_desde": "2017-11-21",
+      "total_dividendos": 9
+    },
+    "APTO11": {
+      "ok": true,
+      "preco_desde": "2022-03-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 233,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 52
+    },
+    "APXM11": {
+      "ok": true,
+      "preco_desde": "2023-08-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 160,
+      "dividendo_desde": "2023-09-21",
+      "total_dividendos": 35
+    },
+    "APXR11": {
+      "ok": true,
+      "preco_desde": "2024-06-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 114,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "AREA11": {
+      "ok": true,
+      "preco_desde": "2025-10-27",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 193,
+      "dividendo_desde": "2025-11-18",
+      "total_dividendos": 7
+    },
+    "ARGE11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "AROA11": {
+      "ok": true,
+      "preco_desde": "2023-12-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 141,
+      "dividendo_desde": "2024-01-02",
+      "total_dividendos": 32
+    },
+    "ARRI11": {
+      "ok": true,
+      "preco_desde": "2019-11-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 355,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 51
+    },
+    "ARTE11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2026-05-12",
+      "total_dividendos": 4
+    },
+    "ARXD11": {
+      "ok": true,
+      "preco_desde": "2023-05-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 174,
+      "dividendo_desde": "2023-05-02",
+      "total_dividendos": 39
+    },
+    "ASAI3": {
+      "ok": true,
+      "preco_desde": "2021-03-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 287,
+      "dividendo_desde": "2021-04-29",
+      "total_dividendos": 8
+    },
+    "ATSA11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 28
+    },
+    "AUPO11": {
+      "ok": true,
+      "preco_desde": "2026-05-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 459,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "AURB11": {
+      "ok": true,
+      "preco_desde": "2024-01-01",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 138,
+      "dividendo_desde": "2025-08-14",
+      "total_dividendos": 14
+    },
+    "AURE3": {
+      "ok": true,
+      "preco_desde": "2022-03-28",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 231,
+      "dividendo_desde": "2022-05-04",
+      "total_dividendos": 5
+    },
+    "AURO11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": "2025-09-24",
+      "total_dividendos": 11
+    },
+    "AUVP11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "AVUR11": {
+      "ok": true,
+      "preco_desde": "2026-03-11",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 108,
+      "dividendo_desde": "2026-04-01",
+      "total_dividendos": 5
+    },
+    "AVUR15": {
+      "ok": true,
+      "preco_desde": "2026-08-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "AXIA3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-05-05",
+      "total_dividendos": 18
+    },
+    "AXIA6": {
+      "ok": false,
+      "erro": "HTTP 404: Not Found"
+    },
+    "AZIN11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-03-15",
+      "total_dividendos": 6
+    },
+    "AZPL11": {
+      "ok": true,
+      "preco_desde": "2024-09-04",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 485,
+      "dividendo_desde": "2024-10-01",
+      "total_dividendos": 22
+    },
+    "AZZA3": {
+      "ok": true,
+      "preco_desde": "2011-03-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 187,
+      "dividendo_desde": "2011-07-01",
+      "total_dividendos": 50
+    },
+    "B3BR11": {
+      "ok": true,
+      "preco_desde": "2026-08-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "B3SA3": {
+      "ok": true,
+      "preco_desde": "2007-11-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 227,
+      "dividendo_desde": "2008-08-26",
+      "total_dividendos": 83
+    },
+    "B5MB11": {
+      "ok": true,
+      "preco_desde": "2019-12-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 350,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "B5P211": {
+      "ok": true,
+      "preco_desde": "2020-11-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 301,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BBAS3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-05-15",
+      "total_dividendos": 129
+    },
+    "BBDC3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-01-03",
+      "total_dividendos": 222
+    },
+    "BBDC4": {
+      "ok": true,
+      "preco_desde": "2008-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": "2008-02-06",
+      "total_dividendos": 224
+    },
+    "BBFO11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 31
+    },
+    "BBGO11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-03-02",
+      "total_dividendos": 6
+    },
+    "BBIG11": {
+      "ok": true,
+      "preco_desde": "2024-05-06",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 121,
+      "dividendo_desde": "2024-06-03",
+      "total_dividendos": 27
+    },
+    "BBOI11": {
+      "ok": true,
+      "preco_desde": "2022-11-28",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 195,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BBOV11": {
+      "ok": true,
+      "preco_desde": "2020-10-12",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 306,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BBRC11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "BBSD": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BBSD11": {
+      "ok": true,
+      "preco_desde": "2014-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 142,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BBSE3": {
+      "ok": true,
+      "preco_desde": "2013-05-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 161,
+      "dividendo_desde": "2013-08-20",
+      "total_dividendos": 29
+    },
+    "BCDI11": {
+      "ok": true,
+      "preco_desde": "2026-08-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 69,
+      "dividendo_desde": "2026-08-10",
+      "total_dividendos": 1
+    },
+    "BCIA11": {
+      "ok": true,
+      "preco_desde": "2017-10-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 464,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "BCIC11": {
+      "ok": true,
+      "preco_desde": "2023-02-13",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 159,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BCRI11": {
+      "ok": true,
+      "preco_desde": "2017-10-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 464,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 54
+    },
+    "BDAP11": {
+      "ok": true,
+      "preco_desde": "2025-07-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 261,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BDEF11": {
+      "ok": true,
+      "preco_desde": "2023-02-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 159,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BDIF11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-07-16",
+      "total_dividendos": 6
+    },
+    "BDIV11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-04-26",
+      "total_dividendos": 6
+    },
+    "BDOM": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BDOM11": {
+      "ok": true,
+      "preco_desde": "2022-09-19",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 205,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BEEF3": {
+      "ok": true,
+      "preco_desde": "2007-08-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 230,
+      "dividendo_desde": "2011-03-04",
+      "total_dividendos": 13
+    },
+    "BEST11": {
+      "ok": true,
+      "preco_desde": "2025-10-27",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 200,
+      "dividendo_desde": "2025-12-02",
+      "total_dividendos": 9
+    },
+    "BGRB11": {
+      "ok": true,
+      "preco_desde": "2025-01-03",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 404,
+      "dividendo_desde": "2025-02-03",
+      "total_dividendos": 17
+    },
+    "BICE11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 133,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 33
+    },
+    "BIDB11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-12-01",
+      "total_dividendos": 6
+    },
+    "BIME11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": "2022-04-07",
+      "total_dividendos": 52
+    },
+    "BINC11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2024-12-02",
+      "total_dividendos": 20
+    },
+    "BISE11": {
+      "ok": true,
+      "preco_desde": "2026-05-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 458,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BITC11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BITH11": {
+      "ok": true,
+      "preco_desde": "2021-08-02",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 264,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BITI11": {
+      "ok": true,
+      "preco_desde": "2022-11-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 198,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BIZD11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BLCA11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": "2022-04-11",
+      "total_dividendos": 53
+    },
+    "BLFT11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BLMG11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-08",
+      "total_dividendos": 30
+    },
+    "BLMO11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 31
+    },
+    "BLOG11": {
+      "ok": true,
+      "preco_desde": "2024-10-16",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 454,
+      "dividendo_desde": "2024-11-14",
+      "total_dividendos": 10
+    },
+    "BLUE11": {
+      "ok": true,
+      "preco_desde": "2025-01-30",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 384,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BMLC11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-09",
+      "total_dividendos": 55
+    },
+    "BMMT11": {
+      "ok": true,
+      "preco_desde": "2023-02-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 159,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BNDX11": {
+      "ok": true,
+      "preco_desde": "2022-07-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 215,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BNFS11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 53
+    },
+    "BNKS11": {
+      "ok": true,
+      "preco_desde": "2026-08-10",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 46,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BODB11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-07-01",
+      "total_dividendos": 6
+    },
+    "BODI11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2026-05-04",
+      "total_dividendos": 4
+    },
+    "BOL511": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 20,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BOVA": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BOVA11": {
+      "ok": true,
+      "preco_desde": "2008-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 214,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BOVB11": {
+      "ok": true,
+      "preco_desde": "2019-06-24",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 374,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BOVS11": {
+      "ok": true,
+      "preco_desde": "2021-05-31",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 273,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BOVV": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BOVV11": {
+      "ok": true,
+      "preco_desde": "2016-08-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 122,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BOVX11": {
+      "ok": true,
+      "preco_desde": "2021-06-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 270,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BPAC11": {
+      "ok": true,
+      "preco_desde": "2017-03-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 115,
+      "dividendo_desde": "2017-07-06",
+      "total_dividendos": 24
+    },
+    "BPML11": {
+      "ok": true,
+      "preco_desde": "2019-11-04",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 356,
+      "dividendo_desde": "2022-03-21",
+      "total_dividendos": 44
+    },
+    "BPRE11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BRAP4": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2009-11-03",
+      "total_dividendos": 34
+    },
+    "BRAV3": {
+      "ok": true,
+      "preco_desde": "2020-11-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 303,
+      "dividendo_desde": "2024-05-02",
+      "total_dividendos": 2
+    },
+    "BRAX11": {
+      "ok": true,
+      "preco_desde": "2010-03-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 199,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BRAZ11": {
+      "ok": true,
+      "preco_desde": "2025-05-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 323,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BRCO11": {
+      "ok": true,
+      "preco_desde": "2019-12-02",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 352,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 54
+    },
+    "BRCR11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-09",
+      "total_dividendos": 61
+    },
+    "BREW11": {
+      "ok": true,
+      "preco_desde": "2023-02-13",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 165,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BRFT11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-07-04",
+      "total_dividendos": 6
+    },
+    "BRIP11": {
+      "ok": true,
+      "preco_desde": "2022-04-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 228,
+      "dividendo_desde": "2023-02-08",
+      "total_dividendos": 31
+    },
+    "BRKM5": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2005-01-03",
+      "total_dividendos": 17
+    },
+    "BROF11": {
+      "ok": true,
+      "preco_desde": "2023-04-03",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 178,
+      "dividendo_desde": "2023-05-18",
+      "total_dividendos": 39
+    },
+    "BRXC11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BRZP11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2024-11-01",
+      "total_dividendos": 20
+    },
+    "BSLT11": {
+      "ok": true,
+      "preco_desde": "2025-05-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 319,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BTAG11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 6
+    },
+    "BTAL11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-22",
+      "total_dividendos": 30
+    },
+    "BTCI11": {
+      "ok": true,
+      "preco_desde": "2019-01-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 399,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 53
+    },
+    "BTER11": {
+      "ok": true,
+      "preco_desde": "2026-06-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 256,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BTHF11": {
+      "ok": true,
+      "preco_desde": "2024-12-30",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 406,
+      "dividendo_desde": "2025-01-09",
+      "total_dividendos": 20
+    },
+    "BTHI11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-12-06",
+      "total_dividendos": 6
+    },
+    "BTLG11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-10-17",
+      "total_dividendos": 54
+    },
+    "BTRA11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-23",
+      "total_dividendos": 27
+    },
+    "BTRU11": {
+      "ok": true,
+      "preco_desde": "2026-07-27",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 5,
+      "dividendo_desde": "2021-03-01",
+      "total_dividendos": 5
+    },
+    "BTYU11": {
+      "ok": true,
+      "preco_desde": "2024-07-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 113,
+      "dividendo_desde": "2024-07-12",
+      "total_dividendos": 26
+    },
+    "BULZ11": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BVBR11": {
+      "ok": true,
+      "preco_desde": "2026-05-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 289,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BXPO": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BXPO11": {
+      "ok": true,
+      "preco_desde": "2022-09-19",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 205,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "BZEQ11": {
+      "ok": true,
+      "preco_desde": "2026-08-03",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 3,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CACR11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 27
+    },
+    "CAPE11": {
+      "ok": true,
+      "preco_desde": "2025-07-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 274,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CARE11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CASA11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-10-22",
+      "total_dividendos": 10
+    },
+    "CAUT11": {
+      "ok": true,
+      "preco_desde": "2026-07-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 18,
+      "dividendo_desde": "2025-12-01",
+      "total_dividendos": 9
+    },
+    "CBOP11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "CCME11": {
+      "ok": true,
+      "preco_desde": "2023-01-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 188,
+      "dividendo_desde": "2023-02-09",
+      "total_dividendos": 42
+    },
+    "CDIB11": {
+      "ok": true,
+      "preco_desde": "2026-06-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 256,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CDII11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-07-03",
+      "total_dividendos": 6
+    },
+    "CEAB3": {
+      "ok": true,
+      "preco_desde": "2019-11-04",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 356,
+      "dividendo_desde": "2020-01-02",
+      "total_dividendos": 4
+    },
+    "CEOC11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 52
+    },
+    "CHIP11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CJCT11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 30
+    },
+    "CLIN11": {
+      "ok": true,
+      "preco_desde": "2023-11-06",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 147,
+      "dividendo_desde": "2023-11-10",
+      "total_dividendos": 34
+    },
+    "CLOB11": {
+      "ok": true,
+      "preco_desde": "2026-05-12",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 44,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CMDB11": {
+      "ok": true,
+      "preco_desde": "2021-11-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 247,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CMIG4": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2010-04-30",
+      "total_dividendos": 52
+    },
+    "CMIN3": {
+      "ok": true,
+      "preco_desde": "2021-02-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 288,
+      "dividendo_desde": "2021-05-03",
+      "total_dividendos": 17
+    },
+    "CNES11": {
+      "ok": true,
+      "preco_desde": "2011-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 181,
+      "dividendo_desde": "2017-10-24",
+      "total_dividendos": 53
+    },
+    "COGN3": {
+      "ok": true,
+      "preco_desde": "2012-04-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 174,
+      "dividendo_desde": "2013-03-21",
+      "total_dividendos": 30
+    },
+    "COIN11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-01-22",
+      "total_dividendos": 14
+    },
+    "COPN11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-02-03",
+      "total_dividendos": 18
+    },
+    "CORN11": {
+      "ok": true,
+      "preco_desde": "2022-10-24",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 200,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CPFE3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-03-07",
+      "total_dividendos": 26
+    },
+    "CPLE3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2006-04-28",
+      "total_dividendos": 36
+    },
+    "CPLE6": {
+      "ok": false,
+      "erro": "HTTP 404: Not Found"
+    },
+    "CPLG11": {
+      "ok": true,
+      "preco_desde": "2026-07-17",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 153,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CPOF11": {
+      "ok": true,
+      "preco_desde": "2023-07-03",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 165,
+      "dividendo_desde": "2023-12-18",
+      "total_dividendos": 27
+    },
+    "CPSH11": {
+      "ok": true,
+      "preco_desde": "2023-07-03",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 165,
+      "dividendo_desde": "2023-07-19",
+      "total_dividendos": 36
+    },
+    "CPTI11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-06-04",
+      "total_dividendos": 6
+    },
+    "CPTR11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-08-11",
+      "total_dividendos": 6
+    },
+    "CPTS11": {
+      "ok": true,
+      "preco_desde": "2017-10-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 464,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "CPUR11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 28
+    },
+    "CRAA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-05-09",
+      "total_dividendos": 6
+    },
+    "CRFF11": {
+      "ok": true,
+      "preco_desde": "2019-09-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 363,
+      "dividendo_desde": "2022-04-04",
+      "total_dividendos": 52
+    },
+    "CRPT11": {
+      "ok": true,
+      "preco_desde": "2022-05-02",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CSAN3": {
+      "ok": true,
+      "preco_desde": "2005-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 250,
+      "dividendo_desde": "2007-07-30",
+      "total_dividendos": 22
+    },
+    "CSMG3": {
+      "ok": true,
+      "preco_desde": "2006-03-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 247,
+      "dividendo_desde": "2008-08-05",
+      "total_dividendos": 67
+    },
+    "CSNA3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-04-22",
+      "total_dividendos": 28
+    },
+    "CTEM11": {
+      "ok": true,
+      "preco_desde": "2026-08-04",
+      "preco_ate": "2026-08-14",
+      "total_pregoes": 6,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "CTXT11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 2
+    },
+    "CURY3": {
+      "ok": true,
+      "preco_desde": "2020-09-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 310,
+      "dividendo_desde": "2021-04-26",
+      "total_dividendos": 18
+    },
+    "CXAG11": {
+      "ok": true,
+      "preco_desde": "2022-03-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 233,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 52
+    },
+    "CXCE11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 53
+    },
+    "CXCI11": {
+      "ok": true,
+      "preco_desde": "2022-04-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 229,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 51
+    },
+    "CXCO11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 30
+    },
+    "CXRI11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-03",
+      "total_dividendos": 55
+    },
+    "CXSE3": {
+      "ok": true,
+      "preco_desde": "2021-04-26",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 279,
+      "dividendo_desde": "2021-11-05",
+      "total_dividendos": 15
+    },
+    "CXTL11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 48
+    },
+    "CYCR11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 30
+    },
+    "CYLD11": {
+      "ok": true,
+      "preco_desde": "2024-04-15",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 123,
+      "dividendo_desde": "2026-04-10",
+      "total_dividendos": 2
+    },
+    "CYRE3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2010-05-03",
+      "total_dividendos": 21
+    },
+    "DAMA11": {
+      "ok": true,
+      "preco_desde": "2024-07-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 109,
+      "dividendo_desde": "2024-08-08",
+      "total_dividendos": 23
+    },
+    "DAMT11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2025-08-01",
+      "total_dividendos": 3
+    },
+    "DAYM11": {
+      "ok": true,
+      "preco_desde": "2022-08-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 209,
+      "dividendo_desde": "2022-09-19",
+      "total_dividendos": 16
+    },
+    "DCRA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-05-09",
+      "total_dividendos": 6
+    },
+    "DEBB11": {
+      "ok": true,
+      "preco_desde": "2022-06-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 194,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "DEFI11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 236,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "DEVA11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-03-08",
+      "total_dividendos": 30
+    },
+    "DIRR3": {
+      "ok": true,
+      "preco_desde": "2009-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 202,
+      "dividendo_desde": "2010-04-27",
+      "total_dividendos": 22
+    },
+    "DIVD11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-08-07",
+      "total_dividendos": 6
+    },
+    "DIVO": {
+      "ok": true,
+      "preco_desde": "2017-08-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 54,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "DIVO11": {
+      "ok": true,
+      "preco_desde": "2012-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 176,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "DIVS11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-07-01",
+      "total_dividendos": 14
+    },
+    "DOLA11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "DOLB11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "DOLX11": {
+      "ok": true,
+      "preco_desde": "2026-06-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 246,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "DPRO11": {
+      "ok": true,
+      "preco_desde": "2023-01-16",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 188,
+      "dividendo_desde": "2023-02-08",
+      "total_dividendos": 42
+    },
+    "DVER11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "DVFF11": {
+      "ok": true,
+      "preco_desde": "2022-03-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 233,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 50
+    },
+    "DVLP11": {
+      "ok": true,
+      "preco_desde": "2024-08-28",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 489,
+      "dividendo_desde": "2026-08-12",
+      "total_dividendos": 1
+    },
+    "EBIT11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "EBTA11": {
+      "ok": true,
+      "preco_desde": "2026-08-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ECOO": {
+      "ok": true,
+      "preco_desde": "2012-10-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 41,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ECOO11": {
+      "ok": true,
+      "preco_desde": "2012-07-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 171,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "EDFO11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-10",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 54
+    },
+    "EDGA11": {
+      "ok": true,
+      "preco_desde": "2012-10-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 168,
+      "dividendo_desde": "2017-10-25",
+      "total_dividendos": 50
+    },
+    "EDGE11": {
+      "ok": true,
+      "preco_desde": "2025-05-08",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 319,
+      "dividendo_desde": "2026-01-02",
+      "total_dividendos": 2
+    },
+    "EETH11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "EGAF11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-07-08",
+      "total_dividendos": 6
+    },
+    "EGDB11": {
+      "ok": true,
+      "preco_desde": "2024-07-01",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 112,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "EGIE3": {
+      "ok": true,
+      "preco_desde": "2002-03-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 295,
+      "dividendo_desde": "2007-12-14",
+      "total_dividendos": 54
+    },
+    "EGIS11": {
+      "ok": true,
+      "preco_desde": "2026-08-10",
+      "preco_ate": "2026-08-14",
+      "total_pregoes": 3,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "EIRA11": {
+      "ok": true,
+      "preco_desde": "2025-05-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 323,
+      "dividendo_desde": "2025-07-07",
+      "total_dividendos": 13
+    },
+    "ELAS11": {
+      "ok": true,
+      "preco_desde": "2022-03-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 233,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ELET3": {
+      "ok": false,
+      "erro": "HTTP 404: Not Found"
+    },
+    "EMBJ3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-03-18",
+      "total_dividendos": 47
+    },
+    "EMET11": {
+      "ok": true,
+      "preco_desde": "2024-08-19",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 106,
+      "dividendo_desde": "2025-08-08",
+      "total_dividendos": 13
+    },
+    "ENDD11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-12-27",
+      "total_dividendos": 6
+    },
+    "ENEV3": {
+      "ok": true,
+      "preco_desde": "2008-01-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": "2009-04-29",
+      "total_dividendos": 1
+    },
+    "ENGI11": {
+      "ok": true,
+      "preco_desde": "2009-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 202,
+      "dividendo_desde": "2010-03-12",
+      "total_dividendos": 36
+    },
+    "EQIR11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-22",
+      "total_dividendos": 30
+    },
+    "EQTL3": {
+      "ok": true,
+      "preco_desde": "2008-05-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 221,
+      "dividendo_desde": "2008-04-22",
+      "total_dividendos": 27
+    },
+    "ERPA11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 133,
+      "dividendo_desde": "2024-02-08",
+      "total_dividendos": 31
+    },
+    "ESGB11": {
+      "ok": true,
+      "preco_desde": "2020-09-28",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 308,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ETHE11": {
+      "ok": true,
+      "preco_desde": "2021-08-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 262,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ETHY11": {
+      "ok": true,
+      "preco_desde": "2026-05-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 459,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "EUAT11": {
+      "ok": true,
+      "preco_desde": "2026-08-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 27,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "EURO11": {
+      "ok": true,
+      "preco_desde": "2010-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 193,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 53
+    },
+    "EWBZ11": {
+      "ok": true,
+      "preco_desde": "2025-07-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 274,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "EXES11": {
+      "ok": true,
+      "preco_desde": "2022-06-27",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 218,
+      "dividendo_desde": "2022-07-20",
+      "total_dividendos": 48
+    },
+    "EXIF11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 16,
+      "dividendo_desde": "2025-05-09",
+      "total_dividendos": 15
+    },
+    "FAED11": {
+      "ok": true,
+      "preco_desde": "2010-03-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 199,
+      "dividendo_desde": "2017-11-09",
+      "total_dividendos": 54
+    },
+    "FAMB11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 6
+    },
+    "FATN11": {
+      "ok": true,
+      "preco_desde": "2022-03-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 233,
+      "dividendo_desde": "2022-04-07",
+      "total_dividendos": 53
+    },
+    "FCFL11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-10-19",
+      "total_dividendos": 54
+    },
+    "FDES11": {
+      "ok": true,
+      "preco_desde": "2017-09-01",
+      "preco_ate": "2026-08-10",
+      "total_pregoes": 35,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FDES11F": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FGAA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-04-11",
+      "total_dividendos": 6
+    },
+    "FIGS11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "FIIB11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 54
+    },
+    "FIIP11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 52
+    },
+    "FIND": {
+      "ok": true,
+      "preco_desde": "2011-04-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 52,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FIND11": {
+      "ok": true,
+      "preco_desde": "2011-04-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 186,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FISC11": {
+      "ok": true,
+      "preco_desde": "2018-12-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 401,
+      "dividendo_desde": "2022-10-07",
+      "total_dividendos": 45
+    },
+    "FIVN11": {
+      "ok": true,
+      "preco_desde": "2015-04-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 138,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FIXA11": {
+      "ok": true,
+      "preco_desde": "2018-09-10",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 415,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FIXX11": {
+      "ok": true,
+      "preco_desde": "2026-02-02",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 133,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FLCR11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-08",
+      "total_dividendos": 29
+    },
+    "FLMA11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-08",
+      "total_dividendos": 51
+    },
+    "FLRP11": {
+      "ok": true,
+      "preco_desde": "2009-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 202,
+      "dividendo_desde": "2017-10-23",
+      "total_dividendos": 55
+    },
+    "FLRY3": {
+      "ok": true,
+      "preco_desde": "2010-01-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 201,
+      "dividendo_desde": "2010-08-12",
+      "total_dividendos": 41
+    },
+    "FMOF11": {
+      "ok": true,
+      "preco_desde": "2009-07-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 207,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 21
+    },
+    "FNAM11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FNOR11": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FOMO11": {
+      "ok": true,
+      "preco_desde": "2025-05-19",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 313,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FPAB11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "FPNG11": {
+      "ok": true,
+      "preco_desde": "2021-12-27",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 243,
+      "dividendo_desde": "2022-04-07",
+      "total_dividendos": 25
+    },
+    "FPOR11": {
+      "ok": true,
+      "preco_desde": "2015-03-01",
+      "preco_ate": "2026-08-13",
+      "total_pregoes": 124,
+      "dividendo_desde": "2025-05-19",
+      "total_dividendos": 6
+    },
+    "FSPE11": {
+      "ok": true,
+      "preco_desde": "2026-07-31",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 3,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FSRF11": {
+      "ok": true,
+      "preco_desde": "2008-01-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 115,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FSTU11": {
+      "ok": true,
+      "preco_desde": "2008-01-01",
+      "preco_ate": "2026-08-14",
+      "total_pregoes": 127,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "FTCA11": {
+      "ok": true,
+      "preco_desde": "2026-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 389,
+      "dividendo_desde": "2026-06-18",
+      "total_dividendos": 2
+    },
+    "FVPQ11": {
+      "ok": true,
+      "preco_desde": "2015-03-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 139,
+      "dividendo_desde": "2017-10-23",
+      "total_dividendos": 54
+    },
+    "FYTO11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 52
+    },
+    "FZDA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 5,
+      "dividendo_desde": "2024-05-02",
+      "total_dividendos": 2
+    },
+    "GAME11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-14",
+      "total_dividendos": 30
+    },
+    "GARE11": {
+      "ok": true,
+      "preco_desde": "2024-03-04",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 130,
+      "dividendo_desde": "2024-04-01",
+      "total_dividendos": 28
+    },
+    "GBIT11": {
+      "ok": true,
+      "preco_desde": "2026-05-19",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 93,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GBTC11": {
+      "ok": true,
+      "preco_desde": "2025-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 239,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GCDL11": {
+      "ok": true,
+      "preco_desde": "2024-09-24",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 470,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GCRA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-01-09",
+      "total_dividendos": 6
+    },
+    "GCRI11": {
+      "ok": true,
+      "preco_desde": "2022-03-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 233,
+      "dividendo_desde": "2022-04-14",
+      "total_dividendos": 51
+    },
+    "GDIV11": {
+      "ok": true,
+      "preco_desde": "2026-05-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 402,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GENB11": {
+      "ok": true,
+      "preco_desde": "2021-07-26",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 265,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GFDL11": {
+      "ok": true,
+      "preco_desde": "2025-05-28",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 305,
+      "dividendo_desde": "2025-07-15",
+      "total_dividendos": 1
+    },
+    "GGBR4": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2000-06-27",
+      "total_dividendos": 93
+    },
     "GGRC11": {
       "ok": true,
       "preco_desde": "2017-10-09",
@@ -97,9 +2277,957 @@
       "dividendo_desde": "2017-11-03",
       "total_dividendos": 53
     },
-    "INFRA11": {
-      "ok": false,
-      "erro": "HTTP 404: Not Found"
+    "GICP11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GLDI11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GLDX11": {
+      "ok": true,
+      "preco_desde": "2025-06-30",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 284,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GLFT11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GLPF11": {
+      "ok": true,
+      "preco_desde": "2025-02-07",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 378,
+      "dividendo_desde": "2025-03-12",
+      "total_dividendos": 18
+    },
+    "GOAT11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GOAU4": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2000-06-27",
+      "total_dividendos": 90
+    },
+    "GOLB11": {
+      "ok": true,
+      "preco_desde": "2026-06-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 274,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GOLD11": {
+      "ok": true,
+      "preco_desde": "2020-12-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 298,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GOLX11": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 465,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GOVE": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GOVE11": {
+      "ok": true,
+      "preco_desde": "2011-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 178,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GPCA11": {
+      "ok": true,
+      "preco_desde": "2026-07-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 186,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GPUS11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GRAV11": {
+      "ok": true,
+      "preco_desde": "2022-12-26",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 191,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GRUL11": {
+      "ok": true,
+      "preco_desde": "2024-10-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 458,
+      "dividendo_desde": "2024-11-01",
+      "total_dividendos": 22
+    },
+    "GRWA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-05-09",
+      "total_dividendos": 6
+    },
+    "GSFI11": {
+      "ok": true,
+      "preco_desde": "2019-04-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 383,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GSRF11": {
+      "ok": true,
+      "preco_desde": "2025-11-13",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 185,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GTWR11": {
+      "ok": true,
+      "preco_desde": "2019-06-24",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 375,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 52
+    },
+    "GXUS11": {
+      "ok": true,
+      "preco_desde": "2026-05-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 421,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "GZIT11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-23",
+      "total_dividendos": 29
+    },
+    "HAAA11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 30
+    },
+    "HABT11": {
+      "ok": true,
+      "preco_desde": "2019-08-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 369,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "HAPV3": {
+      "ok": true,
+      "preco_desde": "2018-04-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 436,
+      "dividendo_desde": "2018-12-17",
+      "total_dividendos": 11
+    },
+    "HASH11": {
+      "ok": true,
+      "preco_desde": "2021-04-26",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 278,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "HBCR11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 133,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 30
+    },
+    "HCRI11": {
+      "ok": true,
+      "preco_desde": "2006-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 244,
+      "dividendo_desde": "2017-10-16",
+      "total_dividendos": 50
+    },
+    "HCTR11": {
+      "ok": true,
+      "preco_desde": "2019-07-08",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 373,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 52
+    },
+    "HDEL11": {
+      "ok": true,
+      "preco_desde": "2023-02-27",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 182,
+      "dividendo_desde": "2023-07-03",
+      "total_dividendos": 8
+    },
+    "HERT11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "HFOF11": {
+      "ok": true,
+      "preco_desde": "2018-02-26",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 444,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "HGAG11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-10",
+      "total_pregoes": 3,
+      "dividendo_desde": "2022-10-03",
+      "total_dividendos": 5
+    },
+    "HGBL11": {
+      "ok": true,
+      "preco_desde": "2024-04-15",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 124,
+      "dividendo_desde": "2024-05-03",
+      "total_dividendos": 27
+    },
+    "HGBR11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "HGBS11": {
+      "ok": true,
+      "preco_desde": "2012-04-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 174,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 54
+    },
+    "HGCR11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "HGIC11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-05",
+      "total_dividendos": 30
+    },
+    "HGLG11": {
+      "ok": true,
+      "preco_desde": "2011-04-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 186,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "HGRE11": {
+      "ok": true,
+      "preco_desde": "2009-03-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 211,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "HGRU11": {
+      "ok": true,
+      "preco_desde": "2018-07-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 423,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 52
+    },
+    "HIGH11": {
+      "ok": true,
+      "preco_desde": "2024-09-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 329,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "HIRE11": {
+      "ok": true,
+      "preco_desde": "2026-08-03",
+      "preco_ate": "2026-08-12",
+      "total_pregoes": 2,
+      "dividendo_desde": "2026-03-02",
+      "total_dividendos": 6
+    },
+    "HLOG11": {
+      "ok": true,
+      "preco_desde": "2019-12-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 349,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "HODL11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "HOFC11": {
+      "ok": true,
+      "preco_desde": "2023-01-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 188,
+      "dividendo_desde": "2023-02-01",
+      "total_dividendos": 13
+    },
+    "HOMS11": {
+      "ok": true,
+      "preco_desde": "2025-03-20",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 351,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "HOSI11": {
+      "ok": true,
+      "preco_desde": "2020-02-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 340,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 50
+    },
+    "HPDP11": {
+      "ok": true,
+      "preco_desde": "2019-12-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 349,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "HRDF11": {
+      "ok": true,
+      "preco_desde": "2020-01-20",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 344,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "HREC11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 31
+    },
+    "HSAF11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 30
+    },
+    "HSLG11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 31
+    },
+    "HSML11": {
+      "ok": true,
+      "preco_desde": "2019-08-12",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 368,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "HTEK11": {
+      "ok": true,
+      "preco_desde": "2021-06-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 272,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "HTMX11": {
+      "ok": true,
+      "preco_desde": "2008-01-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 50
+    },
+    "HUCG11": {
+      "ok": true,
+      "preco_desde": "2022-05-09",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 224,
+      "dividendo_desde": "2022-06-01",
+      "total_dividendos": 32
+    },
+    "HYBR11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "HYPE3": {
+      "ok": true,
+      "preco_desde": "2008-05-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 221,
+      "dividendo_desde": "2011-05-02",
+      "total_dividendos": 47
+    },
+    "IAAG11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-09-01",
+      "total_dividendos": 6
+    },
+    "IAGR11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-04-05",
+      "total_dividendos": 6
+    },
+    "IB5M11": {
+      "ok": true,
+      "preco_desde": "2019-09-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 361,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "IBBP11": {
+      "ok": true,
+      "preco_desde": "2024-12-19",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 411,
+      "dividendo_desde": "2025-01-09",
+      "total_dividendos": 20
+    },
+    "IBCR11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-14",
+      "total_dividendos": 31
+    },
+    "IBOB11": {
+      "ok": true,
+      "preco_desde": "2021-07-26",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 265,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "IBOV11": {
+      "ok": true,
+      "preco_desde": "2026-08-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ICNE11": {
+      "ok": true,
+      "preco_desde": "2025-11-28",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 175,
+      "dividendo_desde": "2025-12-17",
+      "total_dividendos": 8
+    },
+    "ICRI11": {
+      "ok": true,
+      "preco_desde": "2024-02-19",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 132,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 30
+    },
+    "IDKA11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 218,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "IFRA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-11-01",
+      "total_dividendos": 6
+    },
+    "IFRI11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-08-02",
+      "total_dividendos": 6
+    },
+    "IGTI11": {
+      "ok": true,
+      "preco_desde": "2021-11-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 249,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 10
+    },
+    "IMAB11": {
+      "ok": true,
+      "preco_desde": "2019-05-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 380,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "IMBB11": {
+      "ok": true,
+      "preco_desde": "2019-12-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 350,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "INFB11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 18,
+      "dividendo_desde": "2024-11-08",
+      "total_dividendos": 17
+    },
+    "INLG11": {
+      "ok": true,
+      "preco_desde": "2019-12-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 349,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "INRD11": {
+      "ok": true,
+      "preco_desde": "2019-12-30",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 348,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 52
+    },
+    "IRFM11": {
+      "ok": true,
+      "preco_desde": "2019-09-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 361,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "IRIF11": {
+      "ok": true,
+      "preco_desde": "2026-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 338,
+      "dividendo_desde": "2026-06-09",
+      "total_dividendos": 3
+    },
+    "IRIM11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-14",
+      "total_dividendos": 31
+    },
+    "ISAE4": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2007-12-14",
+      "total_dividendos": 66
+    },
+    "ISEN11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ISET11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 20,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ISNN11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 19,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ISNT11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ISTT11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ISUS": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ISUS11": {
+      "ok": true,
+      "preco_desde": "2011-11-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 179,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ITIP11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 30
+    },
+    "ITIT11": {
+      "ok": true,
+      "preco_desde": "2022-03-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 232,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 51
+    },
+    "ITRI11": {
+      "ok": true,
+      "preco_desde": "2024-08-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 108,
+      "dividendo_desde": "2024-09-02",
+      "total_dividendos": 24
+    },
+    "ITSA4": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2007-11-27",
+      "total_dividendos": 141
+    },
+    "ITUB4": {
+      "ok": true,
+      "preco_desde": "2001-01-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 309,
+      "dividendo_desde": "2008-02-01",
+      "total_dividendos": 221
+    },
+    "IVVB11": {
+      "ok": true,
+      "preco_desde": "2014-05-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 149,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "IVWO11": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 484,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "IWMI11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-01-22",
+      "total_dividendos": 14
+    },
+    "JCCJ11": {
+      "ok": true,
+      "preco_desde": "2023-07-24",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 162,
+      "dividendo_desde": "2023-08-14",
+      "total_dividendos": 36
+    },
+    "JFLL11": {
+      "ok": true,
+      "preco_desde": "2024-02-12",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 133,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 33
+    },
+    "JGPX11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-02-01",
+      "total_dividendos": 6
+    },
+    "JMBI11": {
+      "ok": true,
+      "preco_desde": "2026-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 388,
+      "dividendo_desde": "2026-06-01",
+      "total_dividendos": 3
+    },
+    "JOGO11": {
+      "ok": true,
+      "preco_desde": "2021-12-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 245,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "JPPA11": {
+      "ok": true,
+      "preco_desde": "2019-11-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 354,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "JPRD11": {
+      "ok": true,
+      "preco_desde": "2026-08-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "JSAF11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "JSCR11": {
+      "ok": true,
+      "preco_desde": "2024-08-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 108,
+      "dividendo_desde": "2024-09-02",
+      "total_dividendos": 24
+    },
+    "JSRE11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-09-01",
+      "total_dividendos": 56
+    },
+    "JURO11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-03-02",
+      "total_dividendos": 6
+    },
+    "KCRE11": {
+      "ok": true,
+      "preco_desde": "2022-07-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 216,
+      "dividendo_desde": "2022-08-01",
+      "total_dividendos": 48
+    },
+    "KDIF11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-10-01",
+      "total_dividendos": 6
+    },
+    "KDOL11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-01-02",
+      "total_dividendos": 19
+    },
+    "KFOF11": {
+      "ok": true,
+      "preco_desde": "2019-02-25",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 392,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "KISU11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 31
+    },
+    "KIVO11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 30
+    },
+    "KLBN11": {
+      "ok": true,
+      "preco_desde": "2014-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 152,
+      "dividendo_desde": "2014-03-21",
+      "total_dividendos": 47
+    },
+    "KNCA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-03-02",
+      "total_dividendos": 6
+    },
+    "KNCR11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "KNDI11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-01-02",
+      "total_dividendos": 20
+    },
+    "KNHF11": {
+      "ok": true,
+      "preco_desde": "2023-08-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 158,
+      "dividendo_desde": "2023-09-01",
+      "total_dividendos": 35
+    },
+    "KNHY11": {
+      "ok": true,
+      "preco_desde": "2018-08-06",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 421,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
     },
     "KNIP11": {
       "ok": true,
@@ -108,6 +3236,2670 @@
       "total_pregoes": 464,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 55
+    },
+    "KNOX11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-11-24",
+      "total_dividendos": 6
+    },
+    "KNPR11": {
+      "ok": true,
+      "preco_desde": "2026-06-17",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 221,
+      "dividendo_desde": "2026-07-01",
+      "total_dividendos": 3
+    },
+    "KNRE11": {
+      "ok": true,
+      "preco_desde": "2017-10-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 464,
+      "dividendo_desde": "2017-12-01",
+      "total_dividendos": 7
+    },
+    "KNRI11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "KNSC11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "KNUQ11": {
+      "ok": true,
+      "preco_desde": "2023-10-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 149,
+      "dividendo_desde": "2023-11-01",
+      "total_dividendos": 34
+    },
+    "KOPA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-02-16",
+      "total_dividendos": 6
+    },
+    "KORE11": {
+      "ok": true,
+      "preco_desde": "2023-12-04",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 143,
+      "dividendo_desde": "2024-01-02",
+      "total_dividendos": 31
+    },
+    "LAFI11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-13",
+      "total_pregoes": 8,
+      "dividendo_desde": "2025-05-08",
+      "total_dividendos": 5
+    },
+    "LASC11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 33
+    },
+    "LFIN11": {
+      "ok": true,
+      "preco_desde": "2025-10-27",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 193,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LFIX11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LFTB11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 217,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LFTI11": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 440,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LFTS11": {
+      "ok": true,
+      "preco_desde": "2022-11-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 174,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LFTX11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LIFE11": {
+      "ok": true,
+      "preco_desde": "2022-10-24",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 201,
+      "dividendo_desde": "2022-11-01",
+      "total_dividendos": 45
+    },
+    "LIQB11": {
+      "ok": true,
+      "preco_desde": "2026-08-10",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 35,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LLFT11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 155,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LMAI11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 31
+    },
+    "LPLP11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 133,
+      "dividendo_desde": "2024-03-07",
+      "total_dividendos": 30
+    },
+    "LRDI11": {
+      "ok": true,
+      "preco_desde": "2024-09-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 475,
+      "dividendo_desde": "2025-04-30",
+      "total_dividendos": 7
+    },
+    "LREN3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-04-01",
+      "total_dividendos": 78
+    },
+    "LSAG11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-06-01",
+      "total_dividendos": 6
+    },
+    "LSOP11": {
+      "ok": true,
+      "preco_desde": "2025-11-27",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 176,
+      "dividendo_desde": "2026-01-09",
+      "total_dividendos": 2
+    },
+    "LTBX11": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 494,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LTNB11": {
+      "ok": true,
+      "preco_desde": "2025-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 230,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "LVBI11": {
+      "ok": true,
+      "preco_desde": "2020-03-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 336,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 52
+    },
+    "LVOL11": {
+      "ok": true,
+      "preco_desde": "2024-09-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 331,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "MAGM11": {
+      "ok": true,
+      "preco_desde": "2025-08-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 246,
+      "dividendo_desde": "2025-10-15",
+      "total_dividendos": 10
+    },
+    "MANA11": {
+      "ok": true,
+      "preco_desde": "2022-08-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 209,
+      "dividendo_desde": "2022-10-03",
+      "total_dividendos": 46
+    },
+    "MARG11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 216,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "MATB11": {
+      "ok": true,
+      "preco_desde": "2012-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 176,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "MAXR11": {
+      "ok": true,
+      "preco_desde": "2010-08-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 194,
+      "dividendo_desde": "2017-11-09",
+      "total_dividendos": 54
+    },
+    "MBRF3": {
+      "ok": true,
+      "preco_desde": "2007-07-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 231,
+      "dividendo_desde": "2009-12-30",
+      "total_dividendos": 11
+    },
+    "MCCI11": {
+      "ok": true,
+      "preco_desde": "2019-12-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 351,
+      "dividendo_desde": "2022-04-13",
+      "total_dividendos": 53
+    },
+    "MCLO11": {
+      "ok": true,
+      "preco_desde": "2025-01-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 393,
+      "dividendo_desde": "2025-02-06",
+      "total_dividendos": 19
+    },
+    "MCRE11": {
+      "ok": true,
+      "preco_desde": "2024-11-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 431,
+      "dividendo_desde": "2024-12-17",
+      "total_dividendos": 20
+    },
+    "META11": {
+      "ok": true,
+      "preco_desde": "2022-05-30",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 221,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "MFII11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 59
+    },
+    "MGHT11": {
+      "ok": true,
+      "preco_desde": "2022-03-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 233,
+      "dividendo_desde": "2022-04-13",
+      "total_dividendos": 27
+    },
+    "MGLU3": {
+      "ok": true,
+      "preco_desde": "2011-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 184,
+      "dividendo_desde": "2012-05-02",
+      "total_dividendos": 17
+    },
+    "MIDB11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 20,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "MIDW11": {
+      "ok": true,
+      "preco_desde": "2026-01-19",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 144,
+      "dividendo_desde": "2026-03-25",
+      "total_dividendos": 4
+    },
+    "MILL11": {
+      "ok": true,
+      "preco_desde": "2021-06-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 271,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "MMVE11": {
+      "ok": true,
+      "preco_desde": "2022-06-27",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 217,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "MOTV3": {
+      "ok": true,
+      "preco_desde": "2002-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 296,
+      "dividendo_desde": "2008-03-28",
+      "total_dividendos": 38
+    },
+    "MRVE3": {
+      "ok": true,
+      "preco_desde": "2007-08-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 230,
+      "dividendo_desde": "2009-05-18",
+      "total_dividendos": 24
+    },
+    "MULT3": {
+      "ok": true,
+      "preco_desde": "2007-08-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 230,
+      "dividendo_desde": "2009-05-04",
+      "total_dividendos": 44
+    },
+    "MXRF11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 54
+    },
+    "NASD11": {
+      "ok": true,
+      "preco_desde": "2021-05-24",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 274,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NATU3": {
+      "ok": true,
+      "preco_desde": "2004-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 203,
+      "dividendo_desde": "2008-03-05",
+      "total_dividendos": 24
+    },
+    "NAVT11": {
+      "ok": true,
+      "preco_desde": "2021-04-26",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 279,
+      "dividendo_desde": "2022-04-14",
+      "total_dividendos": 53
+    },
+    "NB0211": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NB0511": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NB1011": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NBIT11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NBOV11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NCDI11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NCRI11": {
+      "ok": true,
+      "preco_desde": "2023-01-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 188,
+      "dividendo_desde": "2023-02-07",
+      "total_dividendos": 41
+    },
+    "NDIV11": {
+      "ok": true,
+      "preco_desde": "2023-09-25",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 152,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NEWL11": {
+      "ok": true,
+      "preco_desde": "2019-12-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 349,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 52
+    },
+    "NEWU11": {
+      "ok": true,
+      "preco_desde": "2020-06-22",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 322,
+      "dividendo_desde": "2022-12-01",
+      "total_dividendos": 45
+    },
+    "NEXG11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-02-08",
+      "total_dividendos": 6
+    },
+    "NLFA11": {
+      "ok": true,
+      "preco_desde": "2026-06-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 291,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NSDV11": {
+      "ok": true,
+      "preco_desde": "2023-09-25",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 152,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NSLU11": {
+      "ok": true,
+      "preco_desde": "2006-11-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 239,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 53
+    },
+    "NTNF11": {
+      "ok": true,
+      "preco_desde": "2026-07-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 136,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NTNS11": {
+      "ok": true,
+      "preco_desde": "2023-06-19",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 142,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NUCL11": {
+      "ok": true,
+      "preco_desde": "2021-12-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 245,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "NUIF11": {
+      "ok": true,
+      "preco_desde": "2026-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 374,
+      "dividendo_desde": "2026-06-01",
+      "total_dividendos": 3
+    },
+    "NVHO11": {
+      "ok": true,
+      "preco_desde": "2018-04-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 437,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 54
+    },
+    "OCRE11": {
+      "ok": true,
+      "preco_desde": "2023-06-19",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 166,
+      "dividendo_desde": "2023-07-12",
+      "total_dividendos": 38
+    },
+    "OGIN11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-01-02",
+      "total_dividendos": 6
+    },
+    "OIAG11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-07-08",
+      "total_dividendos": 6
+    },
+    "OLEO11": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "ONDA11": {
+      "ok": true,
+      "preco_desde": "2025-08-08",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 255,
+      "dividendo_desde": "2025-08-08",
+      "total_dividendos": 11
+    },
+    "OROF11": {
+      "ok": true,
+      "preco_desde": "2026-06-30",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 46,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "OUJP11": {
+      "ok": true,
+      "preco_desde": "2017-10-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 464,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "OURO11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PABY11": {
+      "ok": true,
+      "preco_desde": "2007-02-01",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 236,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PACB11": {
+      "ok": true,
+      "preco_desde": "2025-02-24",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 313,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PACC11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 216,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PACG11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 216,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PACL11": {
+      "ok": true,
+      "preco_desde": "2025-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 230,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PATA11": {
+      "ok": true,
+      "preco_desde": "2024-09-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 472,
+      "dividendo_desde": "2024-10-01",
+      "total_dividendos": 23
+    },
+    "PATC11": {
+      "ok": true,
+      "preco_desde": "2019-04-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 387,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 59
+    },
+    "PCIP11": {
+      "ok": true,
+      "preco_desde": "2019-09-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 362,
+      "dividendo_desde": "2022-04-11",
+      "total_dividendos": 51
+    },
+    "PEMA11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 29
+    },
+    "PETR3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-12-29",
+      "total_dividendos": 50
+    },
+    "PETR4": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2005-07-01",
+      "total_dividendos": 61
+    },
+    "PEVC11": {
+      "ok": true,
+      "preco_desde": "2022-08-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 208,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PFIN11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-04-08",
+      "total_dividendos": 6
+    },
+    "PFJR11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PHIP11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 154,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PIBB11": {
+      "ok": true,
+      "preco_desde": "2008-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PICE11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-08-02",
+      "total_dividendos": 6
+    },
+    "PIPE11": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 470,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PKIN11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PLAG11": {
+      "ok": true,
+      "preco_desde": "2019-12-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 351,
+      "dividendo_desde": "2022-04-04",
+      "total_dividendos": 51
+    },
+    "PLCA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-10-03",
+      "total_dividendos": 6
+    },
+    "PLRI11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 39
+    },
+    "PMIS11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 30
+    },
+    "PMLL11": {
+      "ok": true,
+      "preco_desde": "2018-12-10",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 403,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 51
+    },
+    "PMRL11": {
+      "ok": true,
+      "preco_desde": "2025-12-30",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 155,
+      "dividendo_desde": "2026-01-14",
+      "total_dividendos": 1
+    },
+    "POMO4": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-12-15",
+      "total_dividendos": 47
+    },
+    "PORD11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "POSB11": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 494,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PPEI11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-06-22",
+      "total_dividendos": 6
+    },
+    "PQAG11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 30
+    },
+    "PQDP11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 54
+    },
+    "PRAF11": {
+      "ok": true,
+      "preco_desde": "2026-07-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 65,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PREE11": {
+      "ok": true,
+      "preco_desde": "2026-08-17",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PREX11": {
+      "ok": true,
+      "preco_desde": "2026-07-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 73,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PRIF11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 19,
+      "dividendo_desde": "2025-04-08",
+      "total_dividendos": 16
+    },
+    "PRIO3": {
+      "ok": true,
+      "preco_desde": "2010-11-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 191,
+      "dividendo_desde": "2023-12-14",
+      "total_dividendos": 1
+    },
+    "PRSV11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-14",
+      "total_dividendos": 1
+    },
+    "PSEC11": {
+      "ok": true,
+      "preco_desde": "2020-02-10",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 342,
+      "dividendo_desde": "2022-04-11",
+      "total_dividendos": 48
+    },
+    "PSSA3": {
+      "ok": true,
+      "preco_desde": "2004-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 262,
+      "dividendo_desde": "2009-11-03",
+      "total_dividendos": 53
+    },
+    "PSVM11": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "PVBI11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 31
+    },
+    "QBTC11": {
+      "ok": true,
+      "preco_desde": "2021-06-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 270,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "QDFI11": {
+      "ok": true,
+      "preco_desde": "2022-02-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "QETH11": {
+      "ok": true,
+      "preco_desde": "2021-08-02",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 264,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "QLBR11": {
+      "ok": true,
+      "preco_desde": "2026-06-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 291,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "QQQI11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "QQQQ11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "QSOL11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "RADL3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2007-04-02",
+      "total_dividendos": 83
+    },
+    "RAIL3": {
+      "ok": true,
+      "preco_desde": "2015-05-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 137,
+      "dividendo_desde": "2022-04-28",
+      "total_dividendos": 5
+    },
+    "RARA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 151,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "RBDS11": {
+      "ok": true,
+      "preco_desde": "2011-01-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 189,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 2
+    },
+    "RBFM11": {
+      "ok": true,
+      "preco_desde": "2020-06-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 323,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 52
+    },
+    "RBFY11": {
+      "ok": true,
+      "preco_desde": "2025-10-08",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 211,
+      "dividendo_desde": "2025-11-03",
+      "total_dividendos": 5
+    },
+    "RBHG11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 30
+    },
+    "RBHY11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 30
+    },
+    "RBIF11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-09-15",
+      "total_dividendos": 6
+    },
+    "RBIR11": {
+      "ok": true,
+      "preco_desde": "2020-03-02",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 339,
+      "dividendo_desde": "2022-07-01",
+      "total_dividendos": 29
+    },
+    "RBOP11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2022-04-07",
+      "total_dividendos": 41
+    },
+    "RBRD11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "RBRL11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 52
+    },
+    "RBRP11": {
+      "ok": true,
+      "preco_desde": "2018-08-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 420,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 53
+    },
+    "RBRR11": {
+      "ok": true,
+      "preco_desde": "2018-04-30",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 435,
+      "dividendo_desde": "2022-04-12",
+      "total_dividendos": 52
+    },
+    "RBRS11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 40
+    },
+    "RBRX11": {
+      "ok": true,
+      "preco_desde": "2022-09-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 208,
+      "dividendo_desde": "2022-09-16",
+      "total_dividendos": 46
+    },
+    "RBRY11": {
+      "ok": true,
+      "preco_desde": "2019-05-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 380,
+      "dividendo_desde": "2022-04-12",
+      "total_dividendos": 53
+    },
+    "RBVA11": {
+      "ok": true,
+      "preco_desde": "2019-04-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 383,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 51
+    },
+    "RCFF11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-07-12",
+      "total_dividendos": 7
+    },
+    "RCRB11": {
+      "ok": true,
+      "preco_desde": "2019-11-04",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 356,
+      "dividendo_desde": "2022-04-07",
+      "total_dividendos": 53
+    },
+    "RCRI11": {
+      "ok": true,
+      "preco_desde": "2025-07-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 277,
+      "dividendo_desde": "2025-08-14",
+      "total_dividendos": 13
+    },
+    "RDLI11": {
+      "ok": true,
+      "preco_desde": "2024-07-15",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 111,
+      "dividendo_desde": "2025-12-15",
+      "total_dividendos": 6
+    },
+    "RDOR3": {
+      "ok": true,
+      "preco_desde": "2020-12-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 298,
+      "dividendo_desde": "2021-01-05",
+      "total_dividendos": 21
+    },
+    "RECD11": {
+      "ok": true,
+      "preco_desde": "2024-10-24",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 449,
+      "dividendo_desde": "2024-12-02",
+      "total_dividendos": 23
+    },
+    "RECM11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-01-09",
+      "total_dividendos": 20
+    },
+    "RECR11": {
+      "ok": true,
+      "preco_desde": "2021-06-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 273,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 50
+    },
+    "RECT11": {
+      "ok": true,
+      "preco_desde": "2019-04-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 383,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 52
+    },
+    "RECV3": {
+      "ok": true,
+      "preco_desde": "2021-05-03",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 278,
+      "dividendo_desde": "2022-04-28",
+      "total_dividendos": 11
+    },
+    "RELG11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 133,
+      "dividendo_desde": "2024-02-08",
+      "total_dividendos": 29
+    },
+    "REME11": {
+      "ok": true,
+      "preco_desde": "2026-05-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 314,
+      "dividendo_desde": "2026-06-01",
+      "total_dividendos": 3
+    },
+    "RENT3": {
+      "ok": true,
+      "preco_desde": "2005-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 256,
+      "dividendo_desde": "2007-12-20",
+      "total_dividendos": 87
+    },
+    "RENV11": {
+      "ok": true,
+      "preco_desde": "2024-08-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 108,
+      "dividendo_desde": "2024-10-08",
+      "total_dividendos": 17
+    },
+    "REVE11": {
+      "ok": true,
+      "preco_desde": "2021-07-12",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 267,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "RICO11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "RIFF11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2024-12-02",
+      "total_dividendos": 19
+    },
+    "RINV11": {
+      "ok": true,
+      "preco_desde": "2023-03-06",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 182,
+      "dividendo_desde": "2023-04-03",
+      "total_dividendos": 40
+    },
+    "RMBS11": {
+      "ok": true,
+      "preco_desde": "2026-01-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2026-02-09",
+      "total_dividendos": 7
+    },
+    "RNGO11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "ROCA11": {
+      "ok": true,
+      "preco_desde": "2026-07-02",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 44,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "RPRI11": {
+      "ok": true,
+      "preco_desde": "2022-08-15",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 211,
+      "dividendo_desde": "2022-09-01",
+      "total_dividendos": 47
+    },
+    "RTEL16": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 5,
+      "dividendo_desde": "2024-04-03",
+      "total_dividendos": 5
+    },
+    "RURA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 6
+    },
+    "RZAG11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-01-03",
+      "total_dividendos": 6
+    },
+    "RZAK11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-19",
+      "total_dividendos": 29
+    },
+    "RZAT11": {
+      "ok": true,
+      "preco_desde": "2025-04-08",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 339,
+      "dividendo_desde": "2025-04-15",
+      "total_dividendos": 16
+    },
+    "RZDL11": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": "2026-08-03",
+      "total_dividendos": 1
+    },
+    "RZLC11": {
+      "ok": true,
+      "preco_desde": "2024-09-12",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 479,
+      "dividendo_desde": "2024-10-04",
+      "total_dividendos": 23
+    },
+    "RZTR11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 31
+    },
+    "RZZR11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-14",
+      "total_dividendos": 31
+    },
+    "SANB11": {
+      "ok": true,
+      "preco_desde": "2009-11-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 203,
+      "dividendo_desde": "2010-03-23",
+      "total_dividendos": 68
+    },
+    "SAPI11": {
+      "ok": true,
+      "preco_desde": "2023-10-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 150,
+      "dividendo_desde": "2023-11-01",
+      "total_dividendos": 34
+    },
+    "SBSP3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2007-10-30",
+      "total_dividendos": 25
+    },
+    "SCPF11": {
+      "ok": true,
+      "preco_desde": "2016-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 121,
+      "dividendo_desde": "2017-11-08",
+      "total_dividendos": 25
+    },
+    "SCVB": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SCVB11": {
+      "ok": true,
+      "preco_desde": "2022-10-03",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 203,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SEQR11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-08",
+      "total_dividendos": 31
+    },
+    "SFIX11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SHPH11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-07",
+      "total_dividendos": 53
+    },
+    "SHPP11": {
+      "ok": true,
+      "preco_desde": "2025-06-25",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 287,
+      "dividendo_desde": "2025-07-11",
+      "total_dividendos": 13
+    },
+    "SILK11": {
+      "ok": true,
+      "preco_desde": "2025-08-04",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 260,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SJAU11": {
+      "ok": true,
+      "preco_desde": "2022-03-28",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 231,
+      "dividendo_desde": "2024-07-01",
+      "total_dividendos": 3
+    },
+    "SLCE3": {
+      "ok": true,
+      "preco_desde": "2007-07-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 231,
+      "dividendo_desde": "2010-04-08",
+      "total_dividendos": 21
+    },
+    "SLVR11": {
+      "ok": true,
+      "preco_desde": "2026-06-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 262,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SMAB11": {
+      "ok": true,
+      "preco_desde": "2021-09-06",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 259,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SMAC": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SMAC11": {
+      "ok": true,
+      "preco_desde": "2020-01-27",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 343,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SMAL": {
+      "ok": true,
+      "preco_desde": "2009-01-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 68,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SMAL11": {
+      "ok": true,
+      "preco_desde": "2008-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 214,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SMFT3": {
+      "ok": true,
+      "preco_desde": "2021-07-12",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 268,
+      "dividendo_desde": "2023-10-13",
+      "total_dividendos": 10
+    },
+    "SMRE11": {
+      "ok": true,
+      "preco_desde": "2024-06-03",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 117,
+      "dividendo_desde": "2024-07-01",
+      "total_dividendos": 26
+    },
+    "SNAG11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-10-17",
+      "total_dividendos": 6
+    },
+    "SNCI11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": "2022-04-18",
+      "total_dividendos": 52
+    },
+    "SNEL11": {
+      "ok": true,
+      "preco_desde": "2023-12-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 142,
+      "dividendo_desde": "2024-01-16",
+      "total_dividendos": 29
+    },
+    "SNFF11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-16",
+      "total_dividendos": 30
+    },
+    "SNFZ11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-10-16",
+      "total_dividendos": 6
+    },
+    "SNID11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2023-03-16",
+      "total_dividendos": 6
+    },
+    "SNME11": {
+      "ok": true,
+      "preco_desde": "2023-12-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 141,
+      "dividendo_desde": "2023-12-18",
+      "total_dividendos": 31
+    },
+    "SOLH11": {
+      "ok": true,
+      "preco_desde": "2024-12-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 407,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPBZ11": {
+      "ok": true,
+      "preco_desde": "2026-05-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 155,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPG211": {
+      "ok": true,
+      "preco_desde": "2025-03-18",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 353,
+      "dividendo_desde": "2025-11-03",
+      "total_dividendos": 11
+    },
+    "SPG215": {
+      "ok": true,
+      "preco_desde": "2026-08-05",
+      "preco_ate": "2026-08-06",
+      "total_pregoes": 2,
+      "dividendo_desde": "2026-03-02",
+      "total_dividendos": 5
+    },
+    "SPGM15": {
+      "ok": true,
+      "preco_desde": "2026-08-10",
+      "preco_ate": "2026-08-10",
+      "total_pregoes": 1,
+      "dividendo_desde": "2026-07-01",
+      "total_dividendos": 1
+    },
+    "SPGM16": {
+      "ok": true,
+      "preco_desde": "2026-08-11",
+      "preco_ate": "2026-08-11",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPTW11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "SPUB11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPVT11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPXB11": {
+      "ok": true,
+      "preco_desde": "2021-09-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 258,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPXH11": {
+      "ok": true,
+      "preco_desde": "2026-06-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 212,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPXI11": {
+      "ok": true,
+      "preco_desde": "2015-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 140,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPXR11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPXS11": {
+      "ok": true,
+      "preco_desde": "2022-08-08",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 212,
+      "dividendo_desde": "2022-09-09",
+      "total_dividendos": 48
+    },
+    "SPXU11": {
+      "ok": true,
+      "preco_desde": "2022-02-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SPYI11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2024-03-20",
+      "total_dividendos": 6
+    },
+    "SPYR11": {
+      "ok": true,
+      "preco_desde": "2026-06-08",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 70,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "STYI11": {
+      "ok": true,
+      "preco_desde": "2025-10-07",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 212,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "SUIN11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2026-01-02",
+      "total_dividendos": 7
+    },
+    "SUZB3": {
+      "ok": true,
+      "preco_desde": "2004-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 265,
+      "dividendo_desde": "2009-10-30",
+      "total_dividendos": 22
+    },
+    "SVAL11": {
+      "ok": true,
+      "preco_desde": "2022-07-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 215,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "T10R11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 218,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TAEE11": {
+      "ok": true,
+      "preco_desde": "2007-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 226,
+      "dividendo_desde": "2008-07-31",
+      "total_dividendos": 60
+    },
+    "TD3511": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 314,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TD5011": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 198,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TD6011": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 225,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TECK11": {
+      "ok": true,
+      "preco_desde": "2021-04-26",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 278,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TECX11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TELM11": {
+      "ok": true,
+      "preco_desde": "2025-01-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 398,
+      "dividendo_desde": "2025-01-14",
+      "total_dividendos": 21
+    },
+    "TEPP11": {
+      "ok": true,
+      "preco_desde": "2020-05-04",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 330,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 52
+    },
+    "TGAR11": {
+      "ok": true,
+      "preco_desde": "2017-08-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 471,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 55
+    },
+    "TIMS3": {
+      "ok": true,
+      "preco_desde": "2005-08-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 254,
+      "dividendo_desde": "2010-04-28",
+      "total_dividendos": 45
+    },
+    "TJKB11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-02-20",
+      "total_dividendos": 30
+    },
+    "TMPS11": {
+      "ok": true,
+      "preco_desde": "2023-07-03",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 165,
+      "dividendo_desde": "2023-08-01",
+      "total_dividendos": 37
+    },
+    "TOPP11": {
+      "ok": true,
+      "preco_desde": "2024-10-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 462,
+      "dividendo_desde": "2024-10-14",
+      "total_dividendos": 23
+    },
+    "TOPY11": {
+      "ok": true,
+      "preco_desde": "2026-06-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 173,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TORD11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": "2022-04-08",
+      "total_dividendos": 26
+    },
+    "TOTS3": {
+      "ok": true,
+      "preco_desde": "2006-04-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 246,
+      "dividendo_desde": "2008-03-10",
+      "total_dividendos": 48
+    },
+    "TRBL11": {
+      "ok": true,
+      "preco_desde": "2023-08-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 158,
+      "dividendo_desde": "2023-09-01",
+      "total_dividendos": 36
+    },
+    "TRIG11": {
+      "ok": true,
+      "preco_desde": "2021-11-08",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 250,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TRNT11": {
+      "ok": true,
+      "preco_desde": "2006-06-01",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 244,
+      "dividendo_desde": "2017-10-16",
+      "total_dividendos": 28
+    },
+    "TRPL11": {
+      "ok": true,
+      "preco_desde": "2026-01-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 150,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TRPL15": {
+      "ok": true,
+      "preco_desde": "2026-08-07",
+      "preco_ate": "2026-08-07",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TRUE11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "TRXB11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 30
+    },
+    "TRXF11": {
+      "ok": true,
+      "preco_desde": "2020-01-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 345,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 52
+    },
+    "TRXY11": {
+      "ok": true,
+      "preco_desde": "2025-01-13",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 398,
+      "dividendo_desde": "2025-02-03",
+      "total_dividendos": 19
+    },
+    "TVRI11": {
+      "ok": true,
+      "preco_desde": "2023-11-06",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 147,
+      "dividendo_desde": "2023-12-01",
+      "total_dividendos": 33
+    },
+    "UGPA3": {
+      "ok": true,
+      "preco_desde": "2003-01-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 285,
+      "dividendo_desde": "2008-02-28",
+      "total_dividendos": 36
+    },
+    "URHF11": {
+      "ok": true,
+      "preco_desde": "2024-07-15",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 111,
+      "dividendo_desde": "2024-08-01",
+      "total_dividendos": 25
+    },
+    "URPR11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 31
+    },
+    "USDB11": {
+      "ok": true,
+      "preco_desde": "2022-07-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 183,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "USIM5": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2007-12-28",
+      "total_dividendos": 24
+    },
+    "USTK11": {
+      "ok": true,
+      "preco_desde": "2021-07-26",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 265,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "UTEC11": {
+      "ok": true,
+      "preco_desde": "2022-05-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 223,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "UTLI11": {
+      "ok": true,
+      "preco_desde": "2026-08-11",
+      "preco_ate": "2026-08-11",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "UTLL11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2026-01-05",
+      "total_dividendos": 5
+    },
+    "VALE3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-04-11",
+      "total_dividendos": 39
+    },
+    "VAMO3": {
+      "ok": true,
+      "preco_desde": "2021-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 291,
+      "dividendo_desde": "2021-12-09",
+      "total_dividendos": 6
+    },
+    "VBBR3": {
+      "ok": true,
+      "preco_desde": "2018-03-12",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 442,
+      "dividendo_desde": "2018-04-26",
+      "total_dividendos": 23
+    },
+    "VCJR11": {
+      "ok": true,
+      "preco_desde": "2020-01-27",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 344,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 52
+    },
+    "VCRA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-08-01",
+      "total_dividendos": 6
+    },
+    "VCRI11": {
+      "ok": true,
+      "preco_desde": "2023-01-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 189,
+      "dividendo_desde": "2023-02-01",
+      "total_dividendos": 43
+    },
+    "VCRR11": {
+      "ok": true,
+      "preco_desde": "2022-02-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 237,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "VGHF11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 29
+    },
+    "VGIA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-02-11",
+      "total_dividendos": 6
+    },
+    "VGIP11": {
+      "ok": true,
+      "preco_desde": "2020-03-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 337,
+      "dividendo_desde": "2022-04-13",
+      "total_dividendos": 51
+    },
+    "VGIR11": {
+      "ok": true,
+      "preco_desde": "2018-07-30",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 422,
+      "dividendo_desde": "2022-04-13",
+      "total_dividendos": 52
+    },
+    "VGRI11": {
+      "ok": true,
+      "preco_desde": "2024-04-15",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 124,
+      "dividendo_desde": "2024-05-02",
+      "total_dividendos": 28
+    },
+    "VHFA11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-04-08",
+      "total_dividendos": 17
+    },
+    "VIGT11": {
+      "ok": true,
+      "preco_desde": "2026-05-25",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 406,
+      "dividendo_desde": "2026-06-01",
+      "total_dividendos": 3
+    },
+    "VILG11": {
+      "ok": true,
+      "preco_desde": "2019-03-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 389,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 52
+    },
+    "VINF11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2025-12-01",
+      "total_dividendos": 8
+    },
+    "VINO11": {
+      "ok": true,
+      "preco_desde": "2019-11-25",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 353,
+      "dividendo_desde": "2022-05-02",
+      "total_dividendos": 52
+    },
+    "VISC11": {
+      "ok": true,
+      "preco_desde": "2017-10-30",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 461,
+      "dividendo_desde": "2017-12-01",
+      "total_dividendos": 53
+    },
+    "VIUR11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 26
+    },
+    "VIVA3": {
+      "ok": true,
+      "preco_desde": "2019-10-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 360,
+      "dividendo_desde": "2019-12-30",
+      "total_dividendos": 9
+    },
+    "VIVT3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2009-01-02",
+      "total_dividendos": 115
+    },
+    "VOTS11": {
+      "ok": true,
+      "preco_desde": "2018-07-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 424,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "VPPR11": {
+      "ok": true,
+      "preco_desde": "2019-12-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 351,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 34
+    },
+    "VRTA11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 54
+    },
+    "VRTM11": {
+      "ok": true,
+      "preco_desde": "2023-11-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2023-12-01",
+      "total_dividendos": 33
+    },
+    "VSHO11": {
+      "ok": true,
+      "preco_desde": "2019-01-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 398,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "VSLH11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 135,
+      "dividendo_desde": "2024-02-08",
+      "total_dividendos": 30
+    },
+    "VVCO11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 145,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "VVCR11": {
+      "ok": true,
+      "preco_desde": "2018-04-30",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 435,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 51
+    },
+    "VVDI11": {
+      "ok": true,
+      "preco_desde": "2026-08-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 1,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "VVMR11": {
+      "ok": true,
+      "preco_desde": "2024-02-12",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 133,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 23
+    },
+    "VVRI11": {
+      "ok": true,
+      "preco_desde": "2023-05-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 174,
+      "dividendo_desde": "2023-05-18",
+      "total_dividendos": 36
+    },
+    "VWRA11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "VXXV11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-05-24",
+      "total_dividendos": 1
+    },
+    "WEB311": {
+      "ok": true,
+      "preco_desde": "2022-03-28",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 230,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "WEGE3": {
+      "ok": true,
+      "preco_desde": "2000-02-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 320,
+      "dividendo_desde": "2008-02-20",
+      "total_dividendos": 108
+    },
+    "WEJR11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 20,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "WHGR11": {
+      "ok": true,
+      "preco_desde": "2022-07-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 216,
+      "dividendo_desde": "2022-08-01",
+      "total_dividendos": 49
+    },
+    "WPLZ11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-10-16",
+      "total_dividendos": 55
+    },
+    "WRLD11": {
+      "ok": true,
+      "preco_desde": "2021-10-18",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 253,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "WTSP11": {
+      "ok": true,
+      "preco_desde": "2018-09-03",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 417,
+      "dividendo_desde": "2022-04-18",
+      "total_dividendos": 43
+    },
+    "XB3011": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 213,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XB3511": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XB4511": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 138,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XB5011": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XB6011": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 114,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XBCI11": {
+      "ok": true,
+      "preco_desde": "2026-07-21",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 21,
+      "dividendo_desde": "2026-05-06",
+      "total_dividendos": 4
+    },
+    "XBIT11": {
+      "ok": true,
+      "preco_desde": "2026-06-08",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 139,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XBOV": {
+      "ok": true,
+      "preco_desde": "2013-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 20,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XBOV11": {
+      "ok": true,
+      "preco_desde": "2012-12-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 166,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XCAP11": {
+      "ok": true,
+      "preco_desde": "2026-08-07",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 20,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XETH11": {
+      "ok": true,
+      "preco_desde": "2026-06-09",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 87,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XFIX11": {
+      "ok": true,
+      "preco_desde": "2020-11-23",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 300,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XINA11": {
+      "ok": true,
+      "preco_desde": "2020-12-14",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 297,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XLPR11": {
+      "ok": true,
+      "preco_desde": "2024-02-05",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 134,
+      "dividendo_desde": "2024-03-01",
+      "total_dividendos": 26
+    },
+    "XPCA11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2022-01-03",
+      "total_dividendos": 6
+    },
+    "XPCI11": {
+      "ok": true,
+      "preco_desde": "2019-12-16",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 350,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "XPCM11": {
+      "ok": true,
+      "preco_desde": "2014-09-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 145,
+      "dividendo_desde": "2017-11-01",
+      "total_dividendos": 24
+    },
+    "XPID11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2021-06-01",
+      "total_dividendos": 6
+    },
+    "XPIE11": {
+      "ok": true,
+      "preco_desde": "2026-07-20",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 6,
+      "dividendo_desde": "2020-02-10",
+      "total_dividendos": 6
+    },
+    "XPLG11": {
+      "ok": true,
+      "preco_desde": "2020-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 326,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 51
+    },
+    "XPML11": {
+      "ok": true,
+      "preco_desde": "2020-06-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 326,
+      "dividendo_desde": "2022-03-21",
+      "total_dividendos": 53
+    },
+    "XPSF11": {
+      "ok": true,
+      "preco_desde": "2020-02-17",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 341,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 53
+    },
+    "XRPH11": {
+      "ok": true,
+      "preco_desde": "2025-09-22",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 224,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "XSPI11": {
+      "ok": true,
+      "preco_desde": "2026-05-11",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 452,
+      "dividendo_desde": null,
+      "total_dividendos": 0
+    },
+    "YDUQ3": {
+      "ok": true,
+      "preco_desde": "2008-08-01",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 218,
+      "dividendo_desde": "2009-04-29",
+      "total_dividendos": 21
+    },
+    "ZAGH11": {
+      "ok": true,
+      "preco_desde": "2024-04-15",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 124,
+      "dividendo_desde": "2024-05-15",
+      "total_dividendos": 29
+    },
+    "ZAVC11": {
+      "ok": true,
+      "preco_desde": "2024-04-08",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 125,
+      "dividendo_desde": "2024-05-02",
+      "total_dividendos": 28
+    },
+    "ZAVI11": {
+      "ok": true,
+      "preco_desde": "2022-10-31",
+      "preco_ate": "2026-08-18",
+      "total_pregoes": 200,
+      "dividendo_desde": "2022-11-01",
+      "total_dividendos": 46
+    },
+    "ZIFI11": {
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-08-17",
+      "total_pregoes": 134,
+      "dividendo_desde": null,
+      "total_dividendos": 0
     }
   }
 }
