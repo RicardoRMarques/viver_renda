@@ -6,6 +6,17 @@ on:
     - cron: '0 6 * * *'
   workflow_dispatch: {}  # permite rodar manualmente pela aba Actions, pra testar já
 
+# Impede que duas execuções deste workflow rodem ao mesmo tempo. Sem
+# isso, disparar manualmente enquanto o agendamento (ou outra execução
+# manual) já está rodando faz as duas gerarem e tentarem commitar os
+# MESMOS arquivos novos em paralelo — e o Git não consegue mesclar dois
+# arquivos "nascidos do nada" independentemente (erro add/add). Com
+# cancel-in-progress: false, a execução nova espera a anterior terminar
+# e fazer seu commit/push, em vez de rodar em paralelo e colidir.
+concurrency:
+  group: coleta-reinv-yahoo
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -30,5 +41,14 @@ jobs:
           git config user.email "robo-reinv-yahoo@users.noreply.github.com"
           git add data/reinv-historico/
           git commit -m "Histórico Yahoo (Reinvestimento): $(date +'%d-%m-%Y')" || echo "Nada novo para commitar"
-          git pull --rebase origin main
-          git push
+
+          # Pequeno retry: se outro workflow (ex: robo-boletim) empurrar
+          # pro main bem no mesmo instante, a primeira tentativa de push
+          # pode ser rejeitada por "fetch first" — tenta de novo em vez de
+          # falhar o job direto.
+          for tentativa in 1 2 3; do
+            git pull --rebase origin main && git push && break
+            echo "Tentativa $tentativa falhou, aguardando antes de tentar de novo..."
+            git rebase --abort 2>/dev/null || true
+            sleep $((tentativa * 5))
+          done
