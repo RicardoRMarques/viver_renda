@@ -7180,6 +7180,31 @@
           headStyles: { fillColor: [43, 43, 43], fontSize: 8 },
         });
 
+        // Mesmo aviso de histórico de preço limitado que aparece na tela,
+        // agora também no PDF/relatório compartilhado — texto quebrado
+        // automaticamente pra caber na largura da página, com nova página
+        // se não sobrar espaço.
+        const truncados = linhas.filter(l => !l.erro && l.resultado.truncado);
+        if (truncados.length) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          const alturaPagina = doc.internal.pageSize.getHeight();
+          const textoAviso = `Histórico de preços limitado para: ${truncados.map(l => `${l.ticker} (a partir de ${l.resultado.dataInicioReal.toLocaleDateString('pt-BR')})`).join(', ')}.`;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          const linhasTexto = doc.splitTextToSize(textoAviso, larguraPagina - 80);
+          let y = doc.lastAutoTable.finalY + 20;
+          if (y + linhasTexto.length * 11 > alturaPagina - 30) {
+            doc.addPage();
+            y = 40;
+          }
+          doc.setTextColor(180, 130, 0);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Aviso:', 40, y);
+          doc.setFont('helvetica', 'normal');
+          doc.text(linhasTexto, 68, y);
+          doc.setTextColor(0);
+        }
+
         return doc;
       }
 
