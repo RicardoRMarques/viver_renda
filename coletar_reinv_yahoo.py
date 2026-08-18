@@ -237,6 +237,22 @@ def processar(ticker, bruto):
     }
 
 
+# ---------------------------------------------------------------------
+# Filtro de qualidade — aplicado SÓ aos tickers que vieram da brapi.dev
+# (o pool curado do site + a carteira do Ibovespa nunca são filtrados,
+# são confiáveis por definição). O endpoint type=fund da brapi traz
+# TODO tipo de fundo negociado em bolsa — inclusive muitos recém-
+# listados, com pouquíssimo histórico e zero dividendo pago ainda (ex:
+# "03BK11", 20 pregões, 0 dividendos, listado há 12 dias). Um fundo
+# assim não serve pra nada na calculadora de Reinvestimento — só ocupa
+# espaço no repositório. Em vez de tentar adivinhar liquidez pelos
+# campos da brapi (não testei ao vivo o que eles realmente trazem),
+# usamos os dados REAIS que o próprio Yahoo devolveu pra decidir.
+# ---------------------------------------------------------------------
+MINIMO_PREGOES_UTEIS = 60      # ~3 meses de negociação
+MINIMO_DIVIDENDOS_UTEIS = 1    # já pagou pelo menos 1 provento alguma vez
+
+
 def main():
     os.makedirs(SAIDA_DIR, exist_ok=True)
     status = {"gerado_em": datetime.now(timezone.utc).isoformat(), "ativos": {}}
@@ -246,14 +262,19 @@ def main():
     # (plano gratuito pode ou não incluir — ver comentário em
     # buscar_fiis_brapi), simplesmente segue só com TICKERS_BASE.
     token_brapi = obter_token_brapi()
-    tickers = set(TICKERS_BASE)
+    tickers_confiaveis = set(TICKERS_BASE)
+    tickers_brapi = set()
     if token_brapi:
         print("Consultando brapi.dev por uma lista completa de FIIs (type=fund)...")
         fiis_brapi = buscar_fiis_brapi(token_brapi)
-        novos = fiis_brapi - tickers
-        if novos:
-            print(f"  +{len(novos)} FIIs novos encontrados via brapi.dev.\n")
-            tickers |= novos
+        tickers_brapi = fiis_brapi - tickers_confiaveis
+        if tickers_brapi:
+            print(
+                f"  +{len(tickers_brapi)} FIIs novos encontrados via brapi.dev "
+                f"(serão filtrados depois: só entram os com pelo menos "
+                f"{MINIMO_PREGOES_UTEIS} pregões e {MINIMO_DIVIDENDOS_UTEIS}+ "
+                f"dividendo pago).\n"
+            )
         elif fiis_brapi:
             print("  nenhum FII novo além dos já conhecidos.\n")
         # se fiis_brapi veio vazio, buscar_fiis_brapi já explicou o motivo
@@ -263,12 +284,18 @@ def main():
             "pulando a expansão de FIIs via brapi.dev, usando só a lista "
             "já conhecida (ranking do site + Ibovespa).\n"
         )
-    tickers = sorted(tickers)
 
-    print(f"Coletando histórico Yahoo Finance para {len(tickers)} ativos...\n")
+    # Ordem: primeiro os confiáveis (sempre entram), depois os da brapi
+    # (passam pelo filtro de qualidade abaixo).
+    todos_tickers = sorted(tickers_confiaveis) + sorted(tickers_brapi)
 
-    for i, ticker in enumerate(tickers, 1):
-        print(f"[{i}/{len(tickers)}] {ticker}...")
+    print(f"Coletando histórico Yahoo Finance para {len(todos_tickers)} ativos...\n")
+
+    filtrados_qualidade = 0
+
+    for i, ticker in enumerate(todos_tickers, 1):
+        eh_confiavel = ticker in tickers_confiaveis
+        print(f"[{i}/{len(todos_tickers)}] {ticker}...")
         bruto, erro = buscar_yahoo(ticker)
 
         if erro:
@@ -281,6 +308,29 @@ def main():
         if processado is None:
             print("  sem dados utilizáveis no retorno")
             status["ativos"][ticker] = {"ok": False, "erro": "sem dados no retorno"}
+            time.sleep(PAUSA_ENTRE_REQUISICOES_SEG)
+            continue
+
+        # Filtro de qualidade — só pros tickers vindos da brapi. Se não
+        # passar, NÃO grava o arquivo (evita inchar o repositório com
+        # fundo sem histórico útil), mas registra no status o motivo,
+        # pra ficar visível por que ele não entrou.
+        if not eh_confiavel and (
+            processado["total_pregoes"] < MINIMO_PREGOES_UTEIS
+            or processado["total_dividendos"] < MINIMO_DIVIDENDOS_UTEIS
+        ):
+            filtrados_qualidade += 1
+            status["ativos"][ticker] = {
+                "ok": False,
+                "filtrado_qualidade": True,
+                "motivo": (
+                    f"{processado['total_pregoes']} pregões / "
+                    f"{processado['total_dividendos']} dividendos "
+                    f"(mínimo: {MINIMO_PREGOES_UTEIS} pregões, "
+                    f"{MINIMO_DIVIDENDOS_UTEIS} dividendo)"
+                ),
+            }
+            print(f"  filtrado (histórico insuficiente): {status['ativos'][ticker]['motivo']}")
             time.sleep(PAUSA_ENTRE_REQUISICOES_SEG)
             continue
 
@@ -313,9 +363,14 @@ def main():
         json.dump(status, f, ensure_ascii=False, indent=2)
 
     print(f"\nResumo salvo em {STATUS_PATH}")
-    falhas = [t for t, s in status["ativos"].items() if not s.get("ok")]
+    if filtrados_qualidade:
+        print(f"{filtrados_qualidade} ativo(s) da brapi filtrado(s) por histórico insuficiente (não gravaram arquivo).")
+    falhas = [
+        t for t, s in status["ativos"].items()
+        if not s.get("ok") and not s.get("filtrado_qualidade")
+    ]
     if falhas:
-        print(f"Atenção: {len(falhas)} ativo(s) falharam: {', '.join(falhas)}")
+        print(f"Atenção: {len(falhas)} ativo(s) falharam de verdade: {', '.join(falhas)}")
 
 
 if __name__ == "__main__":
