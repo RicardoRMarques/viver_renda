@@ -372,6 +372,7 @@
     .reinv-card-linha span:first-child { color: var(--muted); }
     .reinv-card-linha span:last-child { color: var(--text); font-weight: 700; text-align: right; }
     .reinv-card-erro { color: var(--danger); font-size: 0.85rem; }
+    .reinv-card-fonte { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.68rem; color: var(--muted); }
 
     @media (max-width: 640px) {
       .reinv-form-linha1 { grid-template-columns: 1fr; }
@@ -6988,15 +6989,60 @@
       // Calcula o resultado de reinvestimento para UM ativo. Lança erro
       // se não conseguir dados suficientes (tratado por ativo lá fora,
       // pra um ticker com problema não travar os outros).
+      // Tenta usar o histórico pré-coletado via Yahoo Finance (piloto,
+      // arquivo estático gerado 1x/dia pelo GitHub Actions — ver
+      // coletar_reinv_yahoo.py). Se o ticker ainda não foi coletado (ou
+      // o arquivo não existe/dá erro), retorna null e quem chamou cai de
+      // volta pro caminho ao vivo via HG Brasil.
+      let _reinvCacheLocal = {};
+      async function reinvBuscarHistoricoLocal(ticker) {
+        if (ticker in _reinvCacheLocal) return _reinvCacheLocal[ticker];
+        try {
+          const resp = await fetch(`data/reinv-historico/${encodeURIComponent(ticker)}.json`, { cache: 'no-store' });
+          if (!resp.ok) { _reinvCacheLocal[ticker] = null; return null; }
+          const dados = await resp.json();
+          if (!Array.isArray(dados?.precos) || !dados.precos.length) { _reinvCacheLocal[ticker] = null; return null; }
+          const serie = dados.precos
+            .map(p => ({ date: p.data, close: p.fechamento }))
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+          const dividendos = (Array.isArray(dados.dividendos) ? dados.dividendos : [])
+            .map(d => ({ payment_date: d.data, amount: d.valor, status: 'paid', category: 'cash' }))
+            .sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
+          const resultado = { serie, dividendos, fonte: 'yahoo' };
+          _reinvCacheLocal[ticker] = resultado;
+          return resultado;
+        } catch (e) {
+          _reinvCacheLocal[ticker] = null;
+          return null;
+        }
+      }
+
       async function reinvCalcularUmAtivo(ticker, dataCompra, valorInvestido, hoje) {
-        const { serie: precos, truncado, inicioEfetivo } = await reinvBuscarHistoricoPrecos(ticker, dataCompra, hoje);
-        if (!precos.length) throw new Error('Sem histórico de preços disponível.');
+        const local = await reinvBuscarHistoricoLocal(ticker);
+
+        let precos, truncado, inicioEfetivo, dividendos, fonteDados;
+
+        if (local && local.serie.length) {
+          precos = local.serie;
+          const primeiraData = new Date(precos[0].date);
+          truncado = primeiraData > dataCompra;
+          inicioEfetivo = truncado ? primeiraData : dataCompra;
+          dividendos = local.dividendos;
+          fonteDados = 'yahoo';
+        } else {
+          const resultadoHg = await reinvBuscarHistoricoPrecos(ticker, dataCompra, hoje);
+          precos = resultadoHg.serie;
+          truncado = resultadoHg.truncado;
+          inicioEfetivo = resultadoHg.inicioEfetivo;
+          if (!precos.length) throw new Error('Sem histórico de preços disponível.');
+          const dataParaBuscarDividendos = truncado ? inicioEfetivo : dataCompra;
+          dividendos = await reinvBuscarDividendos(ticker, dataParaBuscarDividendos, hoje);
+          fonteDados = 'hgbrasil';
+        }
 
         const dataInicioReal = truncado ? inicioEfetivo : dataCompra;
         const precoCompraInfo = reinvPrecoNaData(precos, dataInicioReal);
         if (!precoCompraInfo) throw new Error('Não achamos um preço de compra válido nessa data.');
-
-        const dividendos = await reinvBuscarDividendos(ticker, dataInicioReal, hoje);
 
         let qtd = valorInvestido / precoCompraInfo.close;
         const qtdInicial = qtd;
@@ -7025,6 +7071,7 @@
           qtdInicial, qtd, eventosReinvestidos, totalDividendosRecebidos,
           valorFinalComReinvestimento, valorFinalSemReinvestimento,
           rentabilidadePct, rentabilidadeSemReinvestPct, valorInvestido, dataCompra,
+          fonteDados,
         };
       }
 
@@ -7049,6 +7096,7 @@
               <div class="reinv-card-linha"><span>Reinvestimentos</span><span>${r.eventosReinvestidos}</span></div>
               <div class="reinv-card-linha"><span>Dividendos recebidos</span><span>${reinvFormatMoeda(r.totalDividendosRecebidos)}</span></div>
               <div class="reinv-card-linha"><span>Valor hoje</span><span>${reinvFormatMoeda(r.valorFinalComReinvestimento)}</span></div>
+              <div class="reinv-card-fonte">Fonte do histórico: ${r.fonteDados === 'yahoo' ? 'Yahoo Finance (piloto)' : 'HG Brasil'}</div>
             </div>`;
         }).join('');
 
@@ -7200,9 +7248,9 @@
 
         doc.autoTable({
           startY: doc.lastAutoTable.finalY + 20,
-          head: [['Ativo', 'Data compra', 'Valor investido', 'Preço compra', 'Preço atual', 'Cotas inicial', 'Cotas hoje', 'Reinvest.', 'Dividendos', 'Valor hoje', 'Rentab.']],
+          head: [['Ativo', 'Data compra', 'Valor investido', 'Preço compra', 'Preço atual', 'Cotas inicial', 'Cotas hoje', 'Reinvest.', 'Dividendos', 'Valor hoje', 'Rentab.', 'Fonte']],
           body: linhas.map(l => {
-            if (l.erro) return [l.ticker, l.erro, '', '', '', '', '', '', '', '', ''];
+            if (l.erro) return [l.ticker, l.erro, '', '', '', '', '', '', '', '', '', ''];
             const r = l.resultado;
             return [
               r.ticker,
@@ -7216,11 +7264,12 @@
               reinvFormatMoeda(r.totalDividendosRecebidos),
               reinvFormatMoeda(r.valorFinalComReinvestimento),
               `${r.rentabilidadePct >= 0 ? '+' : ''}${r.rentabilidadePct.toFixed(2)}%`,
+              r.fonteDados === 'yahoo' ? 'Yahoo (piloto)' : 'HG Brasil',
             ];
           }),
           theme: 'striped',
-          styles: { fontSize: 6.8, cellPadding: 3.5 },
-          headStyles: { fillColor: [43, 43, 43], fontSize: 6.8 },
+          styles: { fontSize: 6.5, cellPadding: 3.2 },
+          headStyles: { fillColor: [43, 43, 43], fontSize: 6.5 },
         });
 
         // Mesmo aviso de histórico de preço limitado que aparece na tela,
