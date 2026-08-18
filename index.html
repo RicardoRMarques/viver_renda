@@ -6999,6 +6999,7 @@
                 <span class="reinv-card-ativo-rent ${classeRent}">${r.rentabilidadePct >= 0 ? '+' : ''}${r.rentabilidadePct.toFixed(2)}%</span>
               </div>
               <div class="reinv-card-linha"><span>Preço de compra</span><span>${reinvFormatMoeda(r.precoCompraInfo.close)}</span></div>
+              <div class="reinv-card-linha"><span>Valor investido</span><span>${reinvFormatMoeda(valorInvestidoPorAtivo)}</span></div>
               <div class="reinv-card-linha"><span>Preço atual</span><span>${reinvFormatMoeda(r.precoAtual)}</span></div>
               <div class="reinv-card-linha"><span>Cotas/ações</span><span>${r.qtdInicial.toFixed(4)} → ${r.qtd.toFixed(4)}</span></div>
               <div class="reinv-card-linha"><span>Reinvestimentos</span><span>${r.eventosReinvestidos}</span></div>
@@ -7159,12 +7160,13 @@
 
         doc.autoTable({
           startY: doc.lastAutoTable.finalY + 20,
-          head: [['Ativo', 'Preço compra', 'Preço atual', 'Cotas inicial', 'Cotas hoje', 'Reinvest.', 'Dividendos', 'Valor hoje', 'Rentab.']],
+          head: [['Ativo', 'Valor investido', 'Preço compra', 'Preço atual', 'Cotas inicial', 'Cotas hoje', 'Reinvest.', 'Dividendos', 'Valor hoje', 'Rentab.']],
           body: linhas.map(l => {
-            if (l.erro) return [l.ticker, l.erro, '', '', '', '', '', '', ''];
+            if (l.erro) return [l.ticker, l.erro, '', '', '', '', '', '', '', ''];
             const r = l.resultado;
             return [
               r.ticker,
+              reinvFormatMoeda(valorInvestido),
               reinvFormatMoeda(r.precoCompraInfo.close),
               reinvFormatMoeda(r.precoAtual),
               r.qtdInicial.toFixed(4),
@@ -7176,8 +7178,8 @@
             ];
           }),
           theme: 'striped',
-          styles: { fontSize: 8, cellPadding: 4 },
-          headStyles: { fillColor: [43, 43, 43], fontSize: 8 },
+          styles: { fontSize: 7.5, cellPadding: 4 },
+          headStyles: { fillColor: [43, 43, 43], fontSize: 7.5 },
         });
 
         // Mesmo aviso de histórico de preço limitado que aparece na tela,
