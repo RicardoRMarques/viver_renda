@@ -7096,7 +7096,7 @@
               <div class="reinv-card-linha"><span>Reinvestimentos</span><span>${r.eventosReinvestidos}</span></div>
               <div class="reinv-card-linha"><span>Dividendos recebidos</span><span>${reinvFormatMoeda(r.totalDividendosRecebidos)}</span></div>
               <div class="reinv-card-linha"><span>Valor hoje</span><span>${reinvFormatMoeda(r.valorFinalComReinvestimento)}</span></div>
-              <div class="reinv-card-fonte">Fonte do histórico: ${r.fonteDados === 'yahoo' ? 'Yahoo Finance (piloto)' : 'HG Brasil'}</div>
+              <div class="reinv-card-fonte">Fonte do histórico: ${r.fonteDados === 'yahoo' ? 'Yahoo Finance' : 'HG Brasil'}</div>
             </div>`;
         }).join('');
 
@@ -7264,7 +7264,7 @@
               reinvFormatMoeda(r.totalDividendosRecebidos),
               reinvFormatMoeda(r.valorFinalComReinvestimento),
               `${r.rentabilidadePct >= 0 ? '+' : ''}${r.rentabilidadePct.toFixed(2)}%`,
-              r.fonteDados === 'yahoo' ? 'Yahoo (piloto)' : 'HG Brasil',
+              r.fonteDados === 'yahoo' ? 'Yahoo Finance' : 'HG Brasil',
             ];
           }),
           theme: 'striped',
