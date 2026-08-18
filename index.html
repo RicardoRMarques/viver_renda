@@ -302,8 +302,8 @@
     .carteira-remover:hover { color: #e05555; }
 
     /* Calculadora de Reinvestimento de Dividendos */
-    .reinv-form-linha1 { display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 10px; align-items: end; }
-    .reinv-form-linha1 .hg-btn { white-space: nowrap; padding-left: 16px; padding-right: 16px; }
+    .reinv-form-linha1 { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 10px; }
+    .reinv-btn-adicionar { width: 100%; margin-top: 10px; }
     .reinv-campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; position: relative; }
     .reinv-campo label { font-size: 0.72rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
     .reinv-campo input[type="text"] {
@@ -4099,11 +4099,10 @@
       </div>
       <div class="calc-corpo">
         <p class="calc-ajuda" style="margin-top:0;">
-          Pra cada ativo: digite o ticker, defina o valor investido <strong>nele</strong> e clique em "+ Adicionar" — o
-          valor fica junto com o ativo na lista abaixo, então dá pra usar um valor diferente pra cada um (mude o campo
-          "Valor investido" antes de adicionar o próximo). Depois, uma única data de compra vale pra todos. Calculamos
-          quanto isso valeria hoje supondo que todo dividendo recebido foi reaplicado no próprio ativo, na data de
-          pagamento — em vez de ficar parado em conta.
+          Pra cada ativo: digite o ticker, defina o valor investido <strong>nele</strong> e a data em que comprou, e
+          clique em "+ Adicionar" — tudo fica junto com o ativo na lista abaixo, então dá pra usar valores e datas
+          diferentes pra cada um. Calculamos quanto isso valeria hoje supondo que todo dividendo recebido foi
+          reaplicado no próprio ativo, na data de pagamento — em vez de ficar parado em conta.
         </p>
 
         <div class="reinv-campo reinv-campo-ativo-wrap" style="position:relative;">
@@ -4120,15 +4119,14 @@
                 <input type="text" id="reinvValorInput" inputmode="numeric" value="1.000,00" />
               </div>
             </div>
-            <button type="button" class="hg-btn" id="reinvBtnAdicionar">3. + Adicionar à lista</button>
+            <div class="reinv-campo">
+              <label for="reinvDataInput">3. Data da compra dele</label>
+              <input type="date" id="reinvDataInput" />
+            </div>
           </div>
+          <button type="button" class="hg-btn reinv-btn-adicionar" id="reinvBtnAdicionar">+ Adicionar este ativo à lista</button>
           <div id="reinvChips" class="reinv-chips"></div>
           <div class="reinv-contador" id="reinvContador">0 de 15 ativos adicionados</div>
-        </div>
-
-        <div class="reinv-campo">
-          <label for="reinvDataInput">Data da compra (vale para todos os ativos da lista)</label>
-          <input type="date" id="reinvDataInput" />
         </div>
 
         <button type="button" class="hg-btn" id="reinvBtnCalcular" style="width:100%; margin-top:4px;">Calcular</button>
@@ -6683,7 +6681,7 @@
       if (!btnAbrir || !overlay) return;
 
       const LIMITE_ATIVOS = 15;
-      let listaTickers = []; // [{ ticker, valor }]
+      let listaTickers = []; // [{ ticker, valor, dataCompra: Date }]
 
       function reinvFormatMoedaChip(v) {
         return (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -6691,7 +6689,7 @@
 
       function renderizarChips() {
         chipsEl.innerHTML = listaTickers.map(item => `
-          <span class="reinv-chip">${item.ticker} <span class="reinv-chip-valor">· ${reinvFormatMoedaChip(item.valor)}</span><button type="button" data-remover="${item.ticker}" aria-label="Remover ${item.ticker}">✕</button></span>
+          <span class="reinv-chip">${item.ticker} <span class="reinv-chip-valor">· ${reinvFormatMoedaChip(item.valor)} · ${item.dataCompra.toLocaleDateString('pt-BR')}</span><button type="button" data-remover="${item.ticker}" aria-label="Remover ${item.ticker}">✕</button></span>
         `).join('');
         chipsEl.querySelectorAll('button[data-remover]').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -6703,15 +6701,27 @@
         btnAdicionar.disabled = listaTickers.length >= LIMITE_ATIVOS;
       }
 
-      // Cada ativo adicionado guarda o valor que estava no campo "Valor
-      // investido" NESSE MOMENTO — pra usar valores diferentes por ativo,
-      // é só mudar o valor no campo antes de clicar em "+ Adicionar" de
-      // novo (o valor não é compartilhado entre os ativos já adicionados).
+      // Cada ativo adicionado guarda o valor E a data que estavam nos
+      // campos NESSE MOMENTO — pra usar valores/datas diferentes por
+      // ativo, é só mudar os campos antes de clicar em "+ Adicionar" de
+      // novo (nada é compartilhado entre os ativos já adicionados).
       function adicionarTickers(texto) {
         const valorAtual = reinvValorNumerico();
         if (!valorAtual || valorAtual <= 0) {
           statusEl.className = 'hg-status erro';
           statusEl.textContent = 'Informe um valor investido válido antes de adicionar o ativo.';
+          return;
+        }
+        const dataCompraStr = dataInput?.value;
+        if (!dataCompraStr) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Informe a data da compra antes de adicionar o ativo.';
+          return;
+        }
+        const dataCompraAtual = new Date(dataCompraStr + 'T00:00:00');
+        if (dataCompraAtual >= new Date()) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'A data da compra precisa ser no passado.';
           return;
         }
         const novos = texto.split(',').map(t => t.trim().toUpperCase()).filter(Boolean);
@@ -6723,11 +6733,13 @@
           }
           const existente = listaTickers.find(item => item.ticker === t);
           if (existente) {
-            existente.valor = valorAtual; // já estava na lista: atualiza o valor
+            existente.valor = valorAtual; // já estava na lista: atualiza valor e data
+            existente.dataCompra = dataCompraAtual;
           } else {
-            listaTickers.push({ ticker: t, valor: valorAtual });
+            listaTickers.push({ ticker: t, valor: valorAtual, dataCompra: dataCompraAtual });
           }
         }
+        statusEl.textContent = '';
         renderizarChips();
         tickerInput.value = '';
         reinvFecharDropdown();
@@ -7001,7 +7013,7 @@
           ticker, truncado, dataInicioReal, precoCompraInfo, precoAtual,
           qtdInicial, qtd, eventosReinvestidos, totalDividendosRecebidos,
           valorFinalComReinvestimento, valorFinalSemReinvestimento,
-          rentabilidadePct, rentabilidadeSemReinvestPct, valorInvestido,
+          rentabilidadePct, rentabilidadeSemReinvestPct, valorInvestido, dataCompra,
         };
       }
 
@@ -7018,8 +7030,9 @@
                 <span class="reinv-card-ativo-nome">${r.ticker}</span>
                 <span class="reinv-card-ativo-rent ${classeRent}">${r.rentabilidadePct >= 0 ? '+' : ''}${r.rentabilidadePct.toFixed(2)}%</span>
               </div>
-              <div class="reinv-card-linha"><span>Preço de compra</span><span>${reinvFormatMoeda(r.precoCompraInfo.close)}</span></div>
+              <div class="reinv-card-linha"><span>Data da compra</span><span>${r.dataCompra.toLocaleDateString('pt-BR')}</span></div>
               <div class="reinv-card-linha"><span>Valor investido</span><span>${reinvFormatMoeda(r.valorInvestido)}</span></div>
+              <div class="reinv-card-linha"><span>Preço de compra</span><span>${reinvFormatMoeda(r.precoCompraInfo.close)}</span></div>
               <div class="reinv-card-linha"><span>Preço atual</span><span>${reinvFormatMoeda(r.precoAtual)}</span></div>
               <div class="reinv-card-linha"><span>Cotas/ações</span><span>${r.qtdInicial.toFixed(4)} → ${r.qtd.toFixed(4)}</span></div>
               <div class="reinv-card-linha"><span>Reinvestimentos</span><span>${r.eventosReinvestidos}</span></div>
@@ -7085,14 +7098,10 @@
         // Adicionar), adiciona automaticamente antes de calcular.
         if (tickerInput.value.trim()) adicionarTickers(tickerInput.value);
         const itensParaCalcular = listaTickers;
-        const dataCompraStr = dataInput?.value;
 
         if (!itensParaCalcular.length) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'Adicione pelo menos um ativo (ex: HGLG11, PETR4).'; return; }
-        if (!dataCompraStr) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'Informe a data da compra.'; return; }
 
-        const dataCompra = new Date(dataCompraStr + 'T00:00:00');
         const hoje = new Date();
-        if (dataCompra >= hoje) { statusEl.className = 'hg-status erro'; statusEl.textContent = 'A data da compra precisa ser no passado.'; return; }
 
         statusEl.className = 'hg-status';
         resultadoEl.innerHTML = '';
@@ -7101,7 +7110,7 @@
 
         const linhas = [];
         for (let i = 0; i < itensParaCalcular.length; i++) {
-          const { ticker, valor } = itensParaCalcular[i];
+          const { ticker, valor, dataCompra } = itensParaCalcular[i];
           statusEl.textContent = `Calculando ${ticker} (${i + 1}/${itensParaCalcular.length})...`;
           try {
             const resultado = await reinvCalcularUmAtivo(ticker, dataCompra, valor, hoje);
@@ -7116,7 +7125,7 @@
         resultadoEl.innerHTML = reinvRenderizarTabela(linhas);
         btnCalcular.disabled = false;
 
-        ultimoResultado = { linhas, dataCompra };
+        ultimoResultado = { linhas };
         const temAlgumValido = linhas.some(l => !l.erro);
         acoesWrap.style.display = temAlgumValido ? 'flex' : 'none';
       }
@@ -7128,7 +7137,7 @@
 
       async function montarPdfReinv() {
         if (!ultimoResultado) return null;
-        const { linhas, dataCompra } = ultimoResultado;
+        const { linhas } = ultimoResultado;
         const validos = linhas.filter(l => !l.erro).map(l => l.resultado);
         if (!validos.length) return null;
         if (!window.jspdf) {
@@ -7154,7 +7163,7 @@
         doc.setTextColor(90);
         doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
         doc.setFontSize(8);
-        doc.text(`Compra simulada em ${dataCompra.toLocaleDateString('pt-BR')}. Dividendos reaplicados na data de pagamento.`, 40, 70);
+        doc.text('Cada ativo com sua própria data de compra e valor investido. Dividendos reaplicados na data de pagamento.', 40, 70);
         doc.text('Simulação educativa; não considera taxas nem impostos. Rentabilidade passada não garante resultados futuros.', 40, 81);
         doc.setTextColor(0);
 
@@ -7178,12 +7187,13 @@
 
         doc.autoTable({
           startY: doc.lastAutoTable.finalY + 20,
-          head: [['Ativo', 'Valor investido', 'Preço compra', 'Preço atual', 'Cotas inicial', 'Cotas hoje', 'Reinvest.', 'Dividendos', 'Valor hoje', 'Rentab.']],
+          head: [['Ativo', 'Data compra', 'Valor investido', 'Preço compra', 'Preço atual', 'Cotas inicial', 'Cotas hoje', 'Reinvest.', 'Dividendos', 'Valor hoje', 'Rentab.']],
           body: linhas.map(l => {
-            if (l.erro) return [l.ticker, l.erro, '', '', '', '', '', '', '', ''];
+            if (l.erro) return [l.ticker, l.erro, '', '', '', '', '', '', '', '', ''];
             const r = l.resultado;
             return [
               r.ticker,
+              r.dataCompra.toLocaleDateString('pt-BR'),
               reinvFormatMoeda(r.valorInvestido),
               reinvFormatMoeda(r.precoCompraInfo.close),
               reinvFormatMoeda(r.precoAtual),
@@ -7196,8 +7206,8 @@
             ];
           }),
           theme: 'striped',
-          styles: { fontSize: 7.5, cellPadding: 4 },
-          headStyles: { fillColor: [43, 43, 43], fontSize: 7.5 },
+          styles: { fontSize: 6.8, cellPadding: 3.5 },
+          headStyles: { fillColor: [43, 43, 43], fontSize: 6.8 },
         });
 
         // Mesmo aviso de histórico de preço limitado que aparece na tela,
