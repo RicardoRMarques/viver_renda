@@ -4256,6 +4256,17 @@
       return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    // Mesma formatação de moeda, mas com até 8 casas decimais — usada só
+    // no valor/ação do histórico de dividendos, onde o provento por ação
+    // pode ter mais precisão do que 2 casas decimais mostram (ex: FIIs com
+    // centavos fracionados). Não mexe em hgFormatMoeda pra não afetar
+    // preços/totais no resto do site, que continuam com 2 casas.
+    function hgFormatMoedaPrecisa(valor, moeda = 'BRL') {
+      if (typeof valor !== 'number') return null;
+      const simbolo = moeda === 'BRL' ? 'R$ ' : (moeda === 'USD' ? 'US$ ' : '');
+      return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+    }
+
     function hgFormatNumero(valor, casas = 2) {
       return typeof valor === 'number'
         ? valor.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas })
@@ -5521,7 +5532,7 @@
             <tr${previsto ? ' style="opacity:0.75;"' : ''}>
               <td>${hgFormatDataDividendo(ev.payment_date)}${previsto ? ' <span style="color:var(--primary); font-size:0.75em;">(previsto)</span>' : ''}</td>
               <td>${hgRotuloTipoDividendo(ev.type)}</td>
-              <td class="num" style="text-align:right;">${hgFormatMoeda(ev.amount, moeda) ?? ev.amount}</td>
+              <td class="num" style="text-align:right;">${hgFormatMoedaPrecisa(ev.amount, moeda) ?? ev.amount}</td>
             </tr>`;
           }).join('');
 
