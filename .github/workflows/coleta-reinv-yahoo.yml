@@ -32,7 +32,22 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Instalar dependências
+        # coletar_reinv_yahoo.py agora importa POOL_ACOES/POOL_FIIS de
+        # coletar_hgbrasil.py (pra usar a mesma lista de ativos do
+        # ranking principal do site) — isso executa os imports desse
+        # arquivo também, incluindo "requests".
+        run: pip install requests
+
       - name: Rodar coletor (Yahoo Finance)
+        env:
+          # Mesmo secret já usado pelo coletar_hgbrasil.py pros índices do
+          # boletim (Ibovespa, IFIX, Dólar, Euro) — reaproveitado aqui só
+          # pra tentar ampliar a lista de FIIs via brapi.dev
+          # (/api/quote/list). Se o plano do token não der acesso a esse
+          # endpoint específico, o script detecta e segue sem quebrar,
+          # usando a lista que já tinha.
+          VIVERDERENDA_BRAPI: ${{ secrets.VIVERDERENDA_BRAPI }}
         run: python coletar_reinv_yahoo.py
 
       - name: Commit e push dos dados coletados
