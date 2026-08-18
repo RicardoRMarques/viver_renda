@@ -7169,6 +7169,7 @@
 
         const totalInvestido = validos.reduce((s, r) => s + r.valorInvestido, 0);
         const totalHoje = validos.reduce((s, r) => s + r.valorFinalComReinvestimento, 0);
+        const totalDividendos = validos.reduce((s, r) => s + r.totalDividendosRecebidos, 0);
         const rentGeral = ((totalHoje - totalInvestido) / totalInvestido) * 100;
 
         doc.autoTable({
@@ -7177,6 +7178,7 @@
           body: [
             [`Total investido (${validos.length} ativo${validos.length === 1 ? '' : 's'})`, reinvFormatMoeda(totalInvestido)],
             ['Total hoje (com reinvestimento)', reinvFormatMoeda(totalHoje)],
+            ['Total de dividendos recebidos', reinvFormatMoeda(totalDividendos)],
             ['Rentabilidade da cesta', `${rentGeral >= 0 ? '+' : ''}${rentGeral.toFixed(2)}%`],
           ],
           theme: 'grid',
