@@ -112,6 +112,26 @@
       margin: 0 auto;
     }
 
+    /* Ticker vertical fixo, canto direito — ver comentário no HTML sobre
+       por que só aparece em telas bem largas. */
+    .ticker-lateral-vertical {
+      display: none;
+      position: fixed;
+      top: 96px;
+      right: 16px;
+      width: 210px;
+      max-height: calc(100vh - 116px);
+      overflow-y: auto;
+      z-index: 40;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      box-shadow: var(--shadow);
+    }
+    @media (min-width: 1650px) {
+      .ticker-lateral-vertical { display: block; }
+    }
+
     .val-up { color: var(--accent); font-weight: 800; }
     .val-down { color: var(--danger); font-weight: 800; }
 
@@ -1094,29 +1114,6 @@
       font-size: 1.05rem;
       max-width: 780px;
       margin: 0 auto;
-    }
-
-    /* Linha do título + Ticker Tape do TradingView ao lado. Em telas
-       largas ficam lado a lado; sem espaço suficiente, o ticker quebra
-       pra uma linha própria embaixo do título (sem sumir — só empilha). */
-    .hero-titulo-linha {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 28px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-    .hero-titulo-linha h1 { margin-bottom: 0; }
-    .hero-ticker-wrap {
-      width: 100%;
-      max-width: 320px;
-      flex-shrink: 0;
-      position: relative;
-      z-index: 1;
-    }
-    @media (min-width: 900px) {
-      .hero-ticker-wrap { width: 300px; }
     }
 
     .atalhos-simuladores {
@@ -2606,6 +2603,23 @@
     </div>
   </div>
 
+  <!-- Ticker Tape do TradingView, em pé, fixo na lateral direita da tela.
+       Usa a versão "Web Component" mais nova do widget (script type=module
+       + <tv-ticker-tape>), que é a única que suporta orientação vertical
+       (direction="vertical") — a versão clássica (a que usamos antes) só
+       existe na horizontal. Só aparece em monitores bem largos (≥1650px):
+       o conteúdo principal do site tem no máximo 1200px de largura
+       (.container), então abaixo disso não sobra margem lateral limpa
+       pra encaixar esse painel sem ele cobrir conteúdo. -->
+  <div class="ticker-lateral-vertical" aria-label="Cotações ao vivo">
+    <script type="module" src="https://www.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
+    <tv-ticker-tape
+      symbols="BMFBOVESPA:WIN1!,BMFBOVESPA:WDO1!,BMFBOVESPA:IBOV,BMFBOVESPA:IFIX,BMFBOVESPA:SMLL,BMFBOVESPA:IDIV,BMFBOVESPA:PETR4,BMFBOVESPA:VALE3,BMFBOVESPA:ITUB4,BMFBOVESPA:BBDC4,BMFBOVESPA:BBAS3,BMFBOVESPA:WEGE3"
+      direction="vertical"
+      item-size="compact"
+    ></tv-ticker-tape>
+  </div>
+
   <main class="container">
 
     <section class="section-intro" id="consultas">
@@ -2637,34 +2651,7 @@
         </g>
       </svg>
 
-      <div class="hero-titulo-linha">
-        <h1>Explore o mercado. <br><span style="color: var(--primary);">Tome melhores decisões.</span></h1>
-        <div class="hero-ticker-wrap">
-          <div class="tradingview-widget-container">
-            <div class="tradingview-widget-container__widget"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
-            {
-              "symbols": [
-                { "proName": "BMFBOVESPA:WIN1!", "title": "Mini Índice (WIN)" },
-                { "proName": "BMFBOVESPA:WDO1!", "title": "Mini Dólar (WDO)" },
-                { "proName": "BMFBOVESPA:IBOV", "title": "Ibovespa" },
-                { "proName": "BMFBOVESPA:IFIX", "title": "IFIX" },
-                { "proName": "BMFBOVESPA:VALE3", "title": "Vale ON" },
-                { "proName": "BMFBOVESPA:PETR4", "title": "Petrobras PN" },
-                { "proName": "BMFBOVESPA:ITUB4", "title": "Itaú Unibanco" },
-                { "proName": "BMFBOVESPA:BBDC4", "title": "Bradesco" },
-                { "proName": "BMFBOVESPA:BBAS3", "title": "Banco do Brasil" }
-              ],
-              "showSymbolLogo": true,
-              "colorTheme": "light",
-              "isTransparent": false,
-              "displayMode": "adaptive",
-              "locale": "br"
-            }
-            </script>
-          </div>
-        </div>
-      </div>
+      <h1>Explore o mercado. <br><span style="color: var(--primary);">Tome melhores decisões.</span></h1>
       <p>Acompanhe os destaques do dia: os maiores Fundos Imobiliários e ações com melhor desempenho no ranking da B3, além do boletim diário com índices e notícias do mercado.</p>
 
       <div class="atalhos-simuladores">
