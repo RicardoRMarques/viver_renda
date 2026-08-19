@@ -7,8 +7,9 @@ diretamente no navegador do visitante), publicando os seguintes arquivos
 na raiz do repositório:
 
 - noticias.json : últimas notícias do mercado (feed RSS, sem token)
-- indices.json  : Ibovespa, IFIX (brapi), Dólar/Euro (BCB), Bitcoin (CoinGecko) +
-                   IPCA mensal/acumulado no ano (Banco Central) + CPI EUA (BLS)
+- indices.json  : Ibovespa, IFIX (brapi), Dólar/Euro (BCB), Bitcoin/Ethereum
+                   em USD (CoinGecko) + IPCA mensal/acumulado no ano (Banco
+                   Central) + CPI EUA (BLS)
 - ranking.json  : 6 melhores ações e 6 melhores FIIs do momento (HG Brasil)
 
 Todas as cotações (índices e ranking) agora usam o MESMO token da HG Brasil
@@ -711,8 +712,13 @@ def coletar_cambio_bcb():
 
 
 def coletar_cripto_coingecko():
-    """Bitcoin e Ethereum em reais pela CoinGecko (gratuita, sem chave),
-    com a variação das últimas 24h. Os dois vêm na mesma requisição.
+    """Bitcoin e Ethereum em DÓLAR (USD) pela CoinGecko (gratuita, sem
+    chave), com a variação das últimas 24h. Os dois vêm na mesma
+    requisição.
+
+    Em dólar (não reais) de propósito: cripto é cotada globalmente em
+    USD, então mostrar em USD evita misturar a variação do ativo em si
+    com a variação do câmbio USD/BRL no mesmo número.
 
     Retorna lista vazia se falhar — o boletim sai sem cripto em vez de
     quebrar. Se só um dos ativos vier, o outro ainda entra."""
@@ -722,7 +728,7 @@ def coletar_cripto_coingecko():
             COINGECKO_URL,
             params={
                 "ids": ids,
-                "vs_currencies": "brl",
+                "vs_currencies": "usd",
                 "include_24hr_change": "true",
             },
             headers={"User-Agent": HEADERS_NAVEGADOR["User-Agent"], "Accept": "application/json"},
@@ -737,15 +743,15 @@ def coletar_cripto_coingecko():
     indices = []
     for cripto_id, rotulo in COINGECKO_MOEDAS:
         item = (dados or {}).get(cripto_id) or {}
-        valor = _para_float(item.get("brl"))
+        valor = _para_float(item.get("usd"))
         if valor is None:
             print(f"AVISO: CoinGecko não retornou o preço de {rotulo} ({cripto_id}).", file=sys.stderr)
             continue
         indices.append({
             "label": rotulo,
-            "prefixo": "R$ ",
+            "prefixo": "US$ ",
             "valor": valor,
-            "variacao_pct": _para_float(item.get("brl_24h_change")),
+            "variacao_pct": _para_float(item.get("usd_24h_change")),
         })
     return indices
 
@@ -755,7 +761,8 @@ def coletar_indices_brapi(token):
 
     Ibovespa e IFIX vêm da brapi (2 requisições — o plano gratuito aceita
     1 ticker por chamada). Dólar e Euro vêm do Banco Central (séries SGS,
-    oficiais e sem limite) e o Bitcoin da CoinGecko (gratuita, sem chave)
+    oficiais e sem limite) e Bitcoin/Ethereum em USD da CoinGecko (gratuita,
+    sem chave)
     — os endpoints de câmbio e cripto da brapi são pagos.
 
     Cada bloco é independente: se uma das fontes falhar, os índices da
