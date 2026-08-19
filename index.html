@@ -12915,39 +12915,13 @@
        para gerar a planilha .xlsx da tabela de parcelas. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 
-  <!-- Supabase: base de dados para futuras implementações (histórico de
-       índices, favoritos sincronizados, etc). Por enquanto só testando a
-       conexão — nada é exibido na tela ainda. A "publishable key" é
-       segura para expor no front-end (a segurança de verdade vem das
-       políticas de RLS configuradas no painel do Supabase). -->
+  <!-- Supabase: base de dados usada pra login, alertas de preço,
+       assinatura do boletim e favoritos sincronizados (ver
+       obterSupabaseClient() lá no início do script principal). A
+       "publishable key" é segura para expor no front-end (a segurança
+       de verdade vem das políticas de RLS configuradas no painel do
+       Supabase). -->
   <script src="vendor/supabase.min.js" defer></script>
-  <script defer>
-    // A criação do cliente em si agora mora em obterSupabaseClient() (lá
-    // no início do script principal) — cada trecho do site que precisa do
-    // Supabase chama essa função, que cria o cliente na hora se ainda não
-    // existir. Isso evita depender de ordem entre scripts.
-    (async () => {
-      const cliente = obterSupabaseClient();
-      if (!cliente) {
-        console.error('Supabase: biblioteca não carregou.');
-        return;
-      }
-
-      // Teste de conexão: busca os 5 registros mais recentes da tabela
-      // historico_indices. Só aparece no console (F12) — não afeta o site.
-      const { data, error } = await cliente
-        .from('historico_indices')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (error) {
-        console.error('Supabase: falha ao conectar/ler historico_indices.', error.message);
-      } else {
-        console.log(`Supabase conectado! ${data.length} registro(s) encontrado(s) em historico_indices:`, data);
-      }
-    })();
-  </script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
