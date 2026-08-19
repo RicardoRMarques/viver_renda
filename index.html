@@ -290,7 +290,10 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
     .carteira-resumo-card span { font-size: 0.68rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
-    .carteira-resumo-card strong { font-size: 1.05rem; font-weight: 800; color: var(--text); font-family: "Courier New", monospace; }
+    .carteira-resumo-card strong {
+      font-size: 1.05rem; font-weight: 800; color: var(--text); font-family: "Courier New", monospace;
+      overflow-wrap: break-word; word-break: break-word;
+    }
     .carteira-resumo-destaque { border-color: var(--primary); }
     .carteira-resumo-destaque strong { color: var(--primary); }
     .carteira-secao-titulo { font-size: 0.85rem; font-weight: 700; color: var(--text); margin: 18px 0 8px; }
@@ -321,6 +324,15 @@
     .reinv-modal .carteira-resumo-card { padding: 16px 18px; }
     .reinv-modal .carteira-resumo-card span { font-size: 0.76rem; }
     .reinv-modal .carteira-resumo-card strong { font-size: 1.5rem; }
+
+    /* Em telas estreitas, o valor em fonte grande (1.5rem, monoespaçada)
+       não cabia dentro do card de 150px mínimo e vazava pra fora da
+       borda arredondada. Empilha os cards em 1 coluna só e reduz a
+       fonte, garantindo que sempre caiba. */
+    @media (max-width: 520px) {
+      .carteira-resumo-cards { grid-template-columns: 1fr; }
+      .reinv-modal .carteira-resumo-card strong { font-size: 1.3rem; }
+    }
 
     /* Chips dos ativos já adicionados à lista de cálculo */
     .reinv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; min-height: 1px; }
