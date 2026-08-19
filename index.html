@@ -439,6 +439,20 @@
       .nav-dropdown { display: none; }
     }
 
+    /* Ticker Tape do TradingView, na barra do topo — largura contida
+       (o widget se adapta ao container, "displayMode: adaptive"), sem
+       altura fixa (ele mesmo calcula a altura certa do conteúdo).
+       Escondido até 1150px: a barra do topo já acumula bastante coisa
+       (busca, links, Simuladores, tema, login) e não sobra espaço
+       decente pra uma faixa de ticker rolando símbolos antes disso. */
+    .topbar-ticker-wrap { display: none; width: 230px; flex-shrink: 0; overflow: hidden; }
+    @media (min-width: 1150px) {
+      .topbar-ticker-wrap { display: block; }
+    }
+    @media (min-width: 1350px) {
+      .topbar-ticker-wrap { width: 300px; }
+    }
+
     /* Carrossel de índices em tempo real, logo abaixo do header */
     .ticker-carrossel {
       width: 100%;
@@ -2499,6 +2513,35 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M3 3v18h18"></path><path d="M18 9l-5 5-3-3-4 4"></path><path d="M14 9h4v4"></path></svg>Reinvestimento de Dividendos
             </button>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
+          </div>
+        </div>
+        <!-- Ticker Tape do TradingView — faixa estreita no canto direito
+             da barra do topo. Só aparece em telas largas o bastante (a
+             barra já fica cheia de itens; em telas menores o menu vira
+             hambúrguer e não sobra espaço nenhum pra essa faixa). -->
+        <div class="topbar-ticker-wrap">
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+            {
+              "symbols": [
+                { "proName": "BMFBOVESPA:WIN1!", "title": "Mini Índice (WIN)" },
+                { "proName": "BMFBOVESPA:WDO1!", "title": "Mini Dólar (WDO)" },
+                { "proName": "BMFBOVESPA:IBOV", "title": "Ibovespa" },
+                { "proName": "BMFBOVESPA:IFIX", "title": "IFIX" },
+                { "proName": "BMFBOVESPA:VALE3", "title": "Vale ON" },
+                { "proName": "BMFBOVESPA:PETR4", "title": "Petrobras PN" },
+                { "proName": "BMFBOVESPA:ITUB4", "title": "Itaú Unibanco" },
+                { "proName": "BMFBOVESPA:BBDC4", "title": "Bradesco" },
+                { "proName": "BMFBOVESPA:BBAS3", "title": "Banco do Brasil" }
+              ],
+              "showSymbolLogo": true,
+              "colorTheme": "light",
+              "isTransparent": false,
+              "displayMode": "adaptive",
+              "locale": "br"
+            }
+            </script>
           </div>
         </div>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
