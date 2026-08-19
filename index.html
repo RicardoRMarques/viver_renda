@@ -8891,6 +8891,32 @@
         }
       }
 
+      // O Supabase redireciona de volta pro site com o erro dentro do
+      // "#" da URL quando o link de login (magic link) por algum motivo
+      // não pôde ser usado — ex: expirou (padrão: 1h), ou já foi clicado
+      // antes. Sem isso, a pessoa só via a página normal sem nenhuma
+      // explicação do que deu errado.
+      function tratarErroAuthNaUrl() {
+        const hash = window.location.hash;
+        if (!hash || !hash.includes('error=')) return false;
+        const params = new URLSearchParams(hash.replace(/^#/, ''));
+        const codigo = params.get('error_code');
+        const descricaoBruta = params.get('error_description');
+
+        const MENSAGENS = {
+          otp_expired: 'Esse link de login expirou. Peça um novo abaixo — o link vale por um tempo limitado a partir do envio.',
+          access_denied: 'Não foi possível concluir o login com esse link (pode já ter sido usado ou ter expirado). Peça um novo abaixo.',
+        };
+        const mensagem = MENSAGENS[codigo]
+          || (descricaoBruta ? decodeURIComponent(descricaoBruta.replace(/\+/g, ' ')) : 'Não foi possível concluir o login. Peça um novo link abaixo.');
+
+        abrirModalAuth();
+        if (mensagemEl) mensagemEl.textContent = mensagem;
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        return true;
+      }
+      tratarErroAuthNaUrl();
+
       btnEnviar?.addEventListener('click', async () => {
         const email = emailInput.value.trim();
         if (!email || !email.includes('@')) {
