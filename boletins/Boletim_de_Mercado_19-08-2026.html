@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boletim de Mercado | Dividendos Viver de Renda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Paleta igual à do site (Dividendos | Viver de Renda) */
+  :root{
+    --bg:#0b1220; --card:#101b2e; --card-border:rgba(255,255,255,0.08);
+    --gold:#31c3ff; --gold-soft:#31c3ff; --green:#7cff92; --red:#ff5c5c;
+    --text:#e8eefc; --muted:#a9b6d3;
+  }
+  body.light{
+    --bg:#eef2f9; --card:#ffffff; --card-border:rgba(15,30,60,0.1);
+    --gold:#0f8fce; --gold-soft:#0f8fce; --green:#0e9e46; --red:#d64545;
+    --text:#16223b; --muted:#5b6b8c;
+  }
+  body{transition:background 0.2s ease, color 0.2s ease;}
+  .theme-toggle{position:absolute;top:20px;right:20px;background:var(--card);border:1px solid var(--card-border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;user-select:none;}
+  .voltar-site-barra{
+    position:sticky;top:0;z-index:50;
+    background:var(--bg);border-bottom:1px solid var(--card-border);
+    padding:10px 0;margin:0 0 20px;
+  }
+  .voltar-site{display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:12px;text-decoration:none;font-family:'Inter',sans-serif;}
+  .voltar-site:hover{color:var(--gold-soft);}
+  .voltar-site svg{width:14px;height:14px;flex-shrink:0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;padding:0 0 40px;}
+  .wrap{max-width:640px;margin:0 auto;padding:24px 18px;}
+  header{text-align:center;margin-bottom:28px;position:relative;}
+  header .brand{font-family:'Fraunces',serif;font-weight:700;font-size:22px;color:var(--gold-soft);letter-spacing:0.5px;}
+  header .sub{color:var(--muted);font-size:13px;margin-top:4px;font-family:'IBM Plex Mono',monospace;}
+  h2.section{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--gold-soft);margin:30px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--card-border);}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .indicator{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:12px 14px;}
+  .indicator .label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;display:flex;align-items:center;gap:5px;}
+  .indicator .value{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:500;margin-top:4px;}
+  .up{color:var(--green);} .down{color:var(--red);}
+  /* "?" de explicação nos indicadores. Aberto/fechado por clique (via
+     JS inline abaixo) — assim funciona em toque de celular, não só hover
+     de mouse. title="" fica como reforço de acessibilidade (leitor de
+     tela e navegadores que não rodam o JS por algum motivo). */
+  .info-btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:14px;height:14px;border-radius:50%;border:1px solid var(--muted);
+    color:var(--muted);font-size:9.5px;line-height:1;font-family:'Inter',sans-serif;
+    text-transform:none;letter-spacing:normal;cursor:pointer;background:transparent;
+    flex-shrink:0;padding:0;
+  }
+  .info-btn:hover,.info-btn:focus-visible{border-color:var(--gold-soft);color:var(--gold-soft);}
+  .info-btn:hover::after,.info-btn.aberto::after{
+    content:attr(data-tip);
+    position:absolute;z-index:20;top:100%;left:0;margin-top:6px;
+    width:max-content;max-width:230px;
+    /* Cores FIXAS, não var(--text)/var(--card-border): o balão é sempre
+       escuro nos dois temas. No modo claro, --text vira azul-marinho
+       escuro (pensado pra fundo claro) — usá-lo aqui deixava texto
+       escuro sobre fundo escuro, ilegível. */
+    background:#0e0e0e;border:1px solid rgba(255,255,255,0.14);border-radius:8px;
+    padding:9px 11px;font-size:11.5px;line-height:1.5;color:#f1f3f8;
+    font-family:'Inter',sans-serif;font-weight:400;text-transform:none;letter-spacing:normal;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);white-space:normal;
+  }
+  .indicator{position:relative;}
+  /* Nos cards da coluna DIREITA da grade (2 colunas), abrir o balão
+     alinhado à esquerda do botão empurra o texto pra fora da tela em
+     viewports estreitos. Nesses, abre alinhado à direita do botão
+     (cresce pra esquerda) em vez de vazar. */
+  .grid .indicator:nth-child(even) .info-btn:hover::after,
+  .grid .indicator:nth-child(even) .info-btn.aberto::after{
+    left:auto;right:0;
+  }
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;padding:6px 4px;border-bottom:1px solid var(--card-border);}
+  td{padding:8px 4px;border-bottom:1px solid #1c1c1c;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+  td.name{font-family:'Inter',sans-serif;font-weight:600;color:var(--text);}
+  .rationale{font-family:'Inter',sans-serif;font-size:11px;color:var(--muted);}
+  .movers{display:flex;flex-direction:column;gap:6px;}
+  .mover-row{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--card-border);border-radius:8px;padding:9px 12px;}
+  .mover-row .tk{font-weight:600;font-size:13px;}
+  .mover-row .pct{font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  /* Miniaturas. A regra .com-thumb só entra quando existe imagem, então
+     linhas sem foto continuam com o layout original, sem buraco. O "tk"
+     vira flex:1 para o título ocupar o espaço restante e a fonte ficar
+     encostada à direita, como já era. */
+  .mover-row.com-thumb{gap:10px;}
+  .mover-row.com-thumb .tk{flex:1;min-width:0;}
+  .tk-thumb{width:44px;height:44px;flex-shrink:0;border-radius:6px;object-fit:cover;
+    background:var(--card-border);display:block;}
+  .news-item{background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+  .news-item.com-thumb{display:flex;gap:12px;align-items:flex-start;}
+  .news-item.com-thumb .n-conteudo{flex:1;min-width:0;}
+  .n-thumb{width:64px;height:64px;flex-shrink:0;border-radius:8px;object-fit:cover;
+    background:var(--card-border);display:block;}
+  .news-item .n-title{font-weight:600;font-size:13.5px;margin-bottom:4px;}
+  .n-title a.n-link, .tk a.tk-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--gold); }
+  .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
+  .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
+  .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
+  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .section-com-lyket [data-lyket-type]{
+    font-size:12px;
+    background:#f2f2f2;
+    border-radius:20px;
+    padding:4px 10px;
+    display:inline-flex;
+    align-items:center;
+    box-shadow:0 1px 4px rgba(0,0,0,0.35);
+  }
+  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
+  .grupo-whatsapp-card{
+    display:flex;align-items:center;gap:12px;margin-top:12px;
+    background:var(--card);border:1px solid var(--card-border);border-radius:12px;
+    padding:10px 14px;text-decoration:none;
+  }
+  .grupo-whatsapp-card img{border-radius:6px;background:#fff;padding:3px;flex-shrink:0;}
+  .grupo-whatsapp-card span{display:flex;flex-direction:column;gap:2px;}
+  .grupo-whatsapp-card strong{color:var(--text);font-size:13.5px;}
+  .grupo-whatsapp-card small{color:var(--muted);font-size:11.5px;line-height:1.4;}
+  .alert b{color:var(--gold-soft);}
+  footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
+</style>
+<script src="https://unpkg.com/@lyket/widget@latest/dist/lyket.js?apiKey=pt_d2c19f94733791f2b25c44987dd17e"></script>
+</head>
+<body>
+<div class="wrap">
+
+<div class="voltar-site-barra">
+  <a class="voltar-site" href="https://viverderenda.dev.br/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+    Voltar ao site
+  </a>
+</div>
+
+<header>
+  <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
+  <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
+  <div class="sub">Boletim de Mercado · Quarta-feira, 19 de Agosto de 2026</div>
+</header>
+
+<h2 class="section section-com-lyket">
+  <span>Indicadores Principais</span>
+  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-19-08-2026"></div>
+</h2>
+
+<a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
+  <span>
+    <strong>Entre no grupo do WhatsApp</strong>
+    <small>Dividendos | Viver de Renda — aponte a câmera ou toque aqui</small>
+  </span>
+</a>
+
+<div class="grid">
+  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value down">166.334,86 pts ▼ 0.27%</div></div>
+  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.666,83 pts ▲ 0.33%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,20 ▲ 0.06%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value down">R$ 6,03 ▼ 0.03%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">R$ 335.560,00 ▲ 0.56%</div></div>
+  <div class="indicator"><div class="label">Ethereum</div><div class="value up">R$ 10.018,14 ▲ 1.55%</div></div>
+  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">14,00% a.a.</div></div>
+  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,90% a.a.</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,44%</div></div>
+  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-1,16%</div></div>
+</div>
+
+<h2 class="section">Destaques da Bolsa</h2>
+<div class="movers">
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPED0C0KP_M.jpg" alt="Por que as ações da Keysight Technologies estão disparando hoje?" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-keysight-technologies-estao-disparando-hoje-93CH-2043701" target="_blank" rel="noopener noreferrer" class="tk-link">Por que as ações da Keysight Technologies estão disparando hoje?</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEA7P0D2_L.jpg" alt="Tráfego marítimo pelo Estreito de Ormuz desacelera com incerteza sobre guerra no Irã" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/trafego-maritimo-pelo-estreito-de-ormuz-desacelera-com-incerteza-sobre-guerra-no-ira-2043707" target="_blank" rel="noopener noreferrer" class="tk-link">Tráfego marítimo pelo Estreito de Ormuz desacelera com incerteza sobre guerra no Irã</a></span><span class="pct">Investing.com (Economia)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/SP500StandardandPoors500Index_800x533_L_1657544297.jpg" alt="Por que as ações da Carlsberg estão caindo hoje?" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-carlsberg-estao-caindo-hoje-93CH-2043700" target="_blank" rel="noopener noreferrer" class="tk-link">Por que as ações da Carlsberg estão caindo hoje?</a></span><span class="pct">Investing.com (Ações)</span></div>
+</div>
+
+<h2 class="section">FIIs - Maiores Dividend Yield</h2>
+<table>
+  <tr><th>Ticker</th><th>DY (12m)</th><th>Preço</th><th>Nome</th></tr>
+  
+  <tr>
+    <td class="name">XPCA11</td>
+    <td>18.44%</td>
+    <td>R$ 7.05</td>
+    <td class="rationale">Fiagro XP Ca</td>
+  </tr>
+  <tr>
+    <td class="name">IRIM11</td>
+    <td>16.77%</td>
+    <td>R$ 59.91</td>
+    <td class="rationale">FII Irim</td>
+  </tr>
+  <tr>
+    <td class="name">VGIR11</td>
+    <td>16.45%</td>
+    <td>R$ 9.18</td>
+    <td class="rationale">FII Valreiii</td>
+  </tr>
+  <tr>
+    <td class="name">TRXF11</td>
+    <td>15.13%</td>
+    <td>R$ 77.99</td>
+    <td class="rationale">FII Trx Real</td>
+  </tr>
+  <tr>
+    <td class="name">CPTS11</td>
+    <td>14.75%</td>
+    <td>R$ 7.29</td>
+    <td class="rationale">FII Capi Sec</td>
+  </tr>
+  <tr>
+    <td class="name">RECR11</td>
+    <td>14.62%</td>
+    <td>R$ 74.50</td>
+    <td class="rationale">FII Rec Rece</td>
+  </tr>
+</table>
+
+<h2 class="section">Ações - Maiores Dividend Yield</h2>
+<table>
+  <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
+  
+  <tr>
+    <td class="name">SBSP3</td>
+    <td>14.61%</td>
+    <td>R$ 23.80</td>
+    <td class="rationale">Sabesp</td>
+  </tr>
+  <tr>
+    <td class="name">CMIG4</td>
+    <td>12.53%</td>
+    <td>R$ 10.22</td>
+    <td class="rationale">CEMIG</td>
+  </tr>
+  <tr>
+    <td class="name">BBSE3</td>
+    <td>12.31%</td>
+    <td>R$ 37.30</td>
+    <td class="rationale">BB Seguridade</td>
+  </tr>
+  <tr>
+    <td class="name">ALOS3</td>
+    <td>11.55%</td>
+    <td>R$ 25.44</td>
+    <td class="rationale">ALLOS</td>
+  </tr>
+  <tr>
+    <td class="name">TAEE11</td>
+    <td>10.37%</td>
+    <td>R$ 37.39</td>
+    <td class="rationale">Taesa</td>
+  </tr>
+  <tr>
+    <td class="name">BBDC4</td>
+    <td>9.59%</td>
+    <td>R$ 16.22</td>
+    <td class="rationale">Banco Bradesco</td>
+  </tr>
+</table>
+
+<h2 class="section">Top 3 Notícias</h2>
+
+<div class="news-item com-thumb">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/01/2026-01-19T132403Z_1_LYNXMPEM0I0S1_RTROPTP_4_USA-FED.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Ata do Fed, inflação na Europa, balanços de varejistas e mais destaques nesta quarta" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <div class="n-conteudo">
+    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/ata-fed-inflacao-europa-balancos-varejistas-19082026/" target="_blank" rel="noopener noreferrer" class="n-link">1. Ata do Fed, inflação na Europa, balanços de varejistas e mais destaques nesta quarta</a></div>
+    <div class="n-body">Fonte: InfoMoney (geral)</div>
+  </div>
+</div>
+
+<div class="news-item com-thumb">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2024/11/cropped-receita-federal-1.webp?fit=225%2C300&amp;quality=70&amp;strip=all" alt="Saídas fiscais crescem 80% e acendem alerta para fiscalização da Receita Federal" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <div class="n-conteudo">
+    <div class="n-title"><a href="https://www.infomoney.com.br/minhas-financas/saidas-fiscais-crescem-80-e-acendem-alerta-para-fiscalizacao-da-receita-federal/" target="_blank" rel="noopener noreferrer" class="n-link">2. Saídas fiscais crescem 80% e acendem alerta para fiscalização da Receita Federal</a></div>
+    <div class="n-body">Fonte: InfoMoney (geral)</div>
+  </div>
+</div>
+
+<div class="news-item com-thumb">
+  <img src="https://content-media.investing.com/news/SP500StandardandPoors500Index_800x533_L_1657544297.jpg" alt="Por que as ações da Carlsberg estão caindo hoje?" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <div class="n-conteudo">
+    <div class="n-title"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-carlsberg-estao-caindo-hoje-93CH-2043700" target="_blank" rel="noopener noreferrer" class="n-link">3. Por que as ações da Carlsberg estão caindo hoje?</a></div>
+    <div class="n-body">Fonte: Investing.com (Ações)</div>
+  </div>
+</div>
+
+<div class="alert">
+  ⚠ <b>Alerta de Risco:</b> Este é um alerta padrão: mercados financeiros envolvem risco de perda. Diversifique, avalie seu perfil de investidor e evite posições alavancadas sem gestão de risco adequada. Acompanhe o calendário do Copom e os resultados corporativos da temporada para eventos que podem gerar volatilidade.
+</div>
+
+<footer>
+  Fonte: HG Brasil · Fontes públicas de mercado — dados sujeitos a variação intradiária.<br>
+  Este boletim tem caráter meramente informativo e não constitui recomendação de compra ou venda de ativos.<br>
+  Dividendos | Viver de Renda — viverderenda.dev.br
+</footer>
+
+</div>
+<script>
+  function toggleTheme(){
+    const body = document.body;
+    const btn = document.getElementById('themeToggle');
+    body.classList.toggle('light');
+    btn.textContent = body.classList.contains('light') ? '☀️' : '🌙';
+  }
+
+  // Toque no "?" abre a explicação (o :hover do CSS já cobre mouse; isso
+  // cobre celular, onde não existe hover). Toque fora, ou Esc, fecha.
+  document.addEventListener('click', function (e) {
+    const botao = e.target.closest('.info-btn');
+    const jaAberto = document.querySelector('.info-btn.aberto');
+    if (jaAberto && jaAberto !== botao) jaAberto.classList.remove('aberto');
+    if (botao) { e.stopPropagation(); botao.classList.toggle('aberto'); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      const aberto = document.querySelector('.info-btn.aberto');
+      if (aberto) aberto.classList.remove('aberto');
+    }
+  });
+</script>
+</body>
+</html>
