@@ -511,7 +511,7 @@ ${noticiasHtml}
 <footer>
   Fonte: HG Brasil · Fontes públicas de mercado — dados sujeitos a variação intradiária.<br>
   Este boletim tem caráter meramente informativo e não constitui recomendação de compra ou venda de ativos.<br>
-  Dividendos | Viver de Renda — viverderenda.dev.br
+  Dividendos | Viver de Renda — suporte@viverderenda.dev.br
 </footer>
 
 </div>
