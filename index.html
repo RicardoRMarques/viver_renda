@@ -112,26 +112,6 @@
       margin: 0 auto;
     }
 
-    /* Ticker vertical fixo, canto direito — ver comentário no HTML sobre
-       por que só aparece em telas bem largas. */
-    .ticker-lateral-vertical {
-      display: none;
-      position: fixed;
-      top: 96px;
-      right: 16px;
-      width: 210px;
-      max-height: calc(100vh - 116px);
-      overflow-y: auto;
-      z-index: 40;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--bg);
-      box-shadow: var(--shadow);
-    }
-    @media (min-width: 1650px) {
-      .ticker-lateral-vertical { display: block; }
-    }
-
     .val-up { color: var(--accent); font-weight: 800; }
     .val-down { color: var(--danger); font-weight: 800; }
 
@@ -2601,23 +2581,6 @@
       <span class="ticker-item ticker-skeleton"></span>
       <span class="ticker-item ticker-skeleton"></span>
     </div>
-  </div>
-
-  <!-- Ticker Tape do TradingView, em pé, fixo na lateral direita da tela.
-       Usa a versão "Web Component" mais nova do widget (script type=module
-       + <tv-ticker-tape>), que é a única que suporta orientação vertical
-       (direction="vertical") — a versão clássica (a que usamos antes) só
-       existe na horizontal. Só aparece em monitores bem largos (≥1650px):
-       o conteúdo principal do site tem no máximo 1200px de largura
-       (.container), então abaixo disso não sobra margem lateral limpa
-       pra encaixar esse painel sem ele cobrir conteúdo. -->
-  <div class="ticker-lateral-vertical" aria-label="Cotações ao vivo">
-    <script type="module" src="https://www.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
-    <tv-ticker-tape
-      symbols="BMFBOVESPA:WIN1!,BMFBOVESPA:WDO1!,BMFBOVESPA:IBOV,BMFBOVESPA:IFIX,BMFBOVESPA:SMLL,BMFBOVESPA:IDIV,BMFBOVESPA:PETR4,BMFBOVESPA:VALE3,BMFBOVESPA:ITUB4,BMFBOVESPA:BBDC4,BMFBOVESPA:BBAS3,BMFBOVESPA:WEGE3"
-      direction="vertical"
-      item-size="compact"
-    ></tv-ticker-tape>
   </div>
 
   <main class="container">
