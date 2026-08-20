@@ -4991,7 +4991,6 @@
               </div>
             </div>
 
-            ${a.kind !== 'fii' ? `
             <div class="hg-preco-grafico" id="hgDividendosBox">
               <div class="hg-grafico-box">
                 <div class="hg-grafico-topo">
@@ -5006,16 +5005,19 @@
                   <button type="button" class="hg-btn-secundario-pequeno" id="hgDividendosBtnToggle">
                     📊 Ver histórico de dividendos
                   </button>
+                  ${a.kind !== 'fii' ? `
                   <button type="button" class="hg-btn-secundario-pequeno" id="hgFundInlineBtnToggle">
                     📊 Ver Análise Fundamentalista completa
                   </button>
                   <button type="button" class="hg-btn-secundario-pequeno" id="hgCompararBtnToggle">
                     ⚖️ Comparar com outros ativos
                   </button>
+                  ` : ''}
                 </div>
 
                 <div id="hgDividendosConteudo"></div>
 
+                ${a.kind !== 'fii' ? `
                 <div id="hgFundInlineWrap" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
                   <div class="hg-status" id="hgFundInlineStatus"></div>
                   <div id="hgFundInlineResultado"></div>
@@ -5030,8 +5032,9 @@
                   <div class="hg-status" id="hgCompararStatus"></div>
                   <div id="hgCompararResultado"></div>
                 </div>
+                ` : ''}
               </div>
-            </div>` : ''}
+            </div>
 
             <div class="hg-investido-card">
               <div class="hg-investido-topo">💰 Se você tivesse investido</div>
@@ -5132,43 +5135,45 @@
         hgInicializarPeriodoTabs(a);
         hgInicializarInvestido();
 
-        if (a.kind !== 'fii') {
-          const tabsEl = document.getElementById('hgDividendosPeriodoTabs');
-          const btnToggle = document.getElementById('hgDividendosBtnToggle');
-          const conteudoEl = document.getElementById('hgDividendosConteudo');
-          let aberto = false;
-          let jaCarregou = false;
+        // Histórico de Dividendos: disponível pra qualquer tipo de ativo
+        // (ações, FIIs, FIAGROs) — só "Análise Fundamentalista" e
+        // "Comparar" continuam exclusivos de ações (ver condição no HTML
+        // acima, a.kind !== 'fii').
+        const tabsEl = document.getElementById('hgDividendosPeriodoTabs');
+        const btnToggle = document.getElementById('hgDividendosBtnToggle');
+        const conteudoEl = document.getElementById('hgDividendosConteudo');
+        let aberto = false;
+        let jaCarregou = false;
 
-          // Botão único de abrir/fechar, sempre visível (fica FORA de
-          // #hgDividendosConteudo, que hgCarregarDividendos sobrescreve —
-          // se o botão estivesse dentro, some no primeiro carregamento e
-          // não haveria como reabrir depois de fechar).
-          //
-          // Só busca na primeira vez que abre — o histórico de dividendos
-          // sozinho já pode chegar a ~12 requisições (busca binária pelo
-          // limite do plano), então reabrir não refaz a busca, só
-          // reexibe o que já tinha carregado.
-          btnToggle?.addEventListener('click', async () => {
-            const scrollAntes = window.scrollY;
-            aberto = !aberto;
-            tabsEl.style.display = aberto ? '' : 'none';
-            conteudoEl.style.display = aberto ? '' : 'none';
-            btnToggle.textContent = aberto ? '✕ Fechar histórico de dividendos' : '📊 Ver histórico de dividendos';
-            if (aberto && !jaCarregou) {
-              jaCarregou = true;
-              await hgCarregarDividendos(a.symbol, a.currency, 1); // padrão: 1 ano
-            }
-            hgSegurarRolagem(scrollAntes);
-          });
+        // Botão único de abrir/fechar, sempre visível (fica FORA de
+        // #hgDividendosConteudo, que hgCarregarDividendos sobrescreve —
+        // se o botão estivesse dentro, some no primeiro carregamento e
+        // não haveria como reabrir depois de fechar).
+        //
+        // Só busca na primeira vez que abre — o histórico de dividendos
+        // sozinho já pode chegar a ~12 requisições (busca binária pelo
+        // limite do plano), então reabrir não refaz a busca, só
+        // reexibe o que já tinha carregado.
+        btnToggle?.addEventListener('click', async () => {
+          const scrollAntes = window.scrollY;
+          aberto = !aberto;
+          tabsEl.style.display = aberto ? '' : 'none';
+          conteudoEl.style.display = aberto ? '' : 'none';
+          btnToggle.textContent = aberto ? '✕ Fechar histórico de dividendos' : '📊 Ver histórico de dividendos';
+          if (aberto && !jaCarregou) {
+            jaCarregou = true;
+            await hgCarregarDividendos(a.symbol, a.currency, 1); // padrão: 1 ano
+          }
+          hgSegurarRolagem(scrollAntes);
+        });
 
-          tabsEl?.addEventListener('click', (e) => {
-            const btn = e.target.closest('.hg-periodo-tab');
-            if (!btn) return;
-            document.querySelectorAll('#hgDividendosPeriodoTabs .hg-periodo-tab').forEach(b =>
-              b.classList.toggle('hg-periodo-ativo', b === btn));
-            hgCarregarDividendos(a.symbol, a.currency, Number(btn.dataset.anos));
-          });
-        }
+        tabsEl?.addEventListener('click', (e) => {
+          const btn = e.target.closest('.hg-periodo-tab');
+          if (!btn) return;
+          document.querySelectorAll('#hgDividendosPeriodoTabs .hg-periodo-tab').forEach(b =>
+            b.classList.toggle('hg-periodo-ativo', b === btn));
+          hgCarregarDividendos(a.symbol, a.currency, Number(btn.dataset.anos));
+        });
 
         // Análise Fundamentalista embutida: abre AQUI MESMO, no topo da
         // página (dentro da Consulta Rápida), em vez de rolar até a
