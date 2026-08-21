@@ -2,8 +2,8 @@
   {
     "label": "Ibovespa",
     "prefixo": "pontos",
-    "valor": 170971.56,
-    "variacao_pct": 1.81
+    "valor": 170934.3,
+    "variacao_pct": 1.79
   },
   {
     "label": "Selic (meta)",
@@ -18,8 +18,8 @@
   {
     "label": "IFIX",
     "prefixo": "pontos",
-    "valor": 3680.33,
-    "variacao_pct": 0.9
+    "valor": 3680.9,
+    "variacao_pct": 0.92
   },
   {
     "label": "Dólar",
@@ -38,14 +38,14 @@
   {
     "label": "Bitcoin",
     "prefixo": "US$ ",
-    "valor": 77393.0,
-    "variacao_pct": 6.421467061191451
+    "valor": 77399.0,
+    "variacao_pct": 6.561177052146261
   },
   {
     "label": "Ethereum",
     "prefixo": "US$ ",
-    "valor": 2420.63,
-    "variacao_pct": 3.2736293753277774
+    "valor": 2423.53,
+    "variacao_pct": 3.650209691293502
   },
   {
     "label": "IPCA (mensal)",
@@ -62,10 +62,5 @@
     "label": "IGP-M (mensal)",
     "valor_pct": -1.16,
     "referencia": "01/07/2026"
-  },
-  {
-    "label": "CPI (EUA, mensal)",
-    "valor_pct": -0.010181103871212575,
-    "referencia": "July"
   }
 ]
