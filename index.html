@@ -4069,7 +4069,7 @@
         </p>
 
         <div class="carteira-add-linha">
-          <input type="text" id="carteiraTickerInput" placeholder="Ex: HGLG11, PETR4..." autocomplete="off" list="sugestoesTickersB3" />
+          <input type="text" id="carteiraTickerInput" placeholder="Ex: HGLG11, PETR4, AAPL, VOO..." autocomplete="off" list="sugestoesTickersB3" />
           <datalist id="sugestoesTickersB3"></datalist>
           <input type="number" id="carteiraQtdInput" placeholder="Qtd." min="1" value="10" />
           <button type="button" class="hg-btn" id="carteiraBtnAdicionar" style="flex:0 0 auto;">+ Adicionar</button>
@@ -4117,6 +4117,16 @@
               <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
             </thead>
             <tbody id="carteiraTbodyFiis"></tbody>
+          </table>
+        </div>
+
+        <div class="carteira-secao-titulo" id="carteiraTituloIntl" hidden>🌎 Stocks/ETFs Internacionais</div>
+        <div class="cmp-tabela-wrap" id="carteiraWrapIntl" hidden>
+          <table class="cmp-tabela carteira-tabela">
+            <thead>
+              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
+            </thead>
+            <tbody id="carteiraTbodyIntl"></tbody>
           </table>
         </div>
 
@@ -6204,6 +6214,9 @@
       const tituloFiis = document.getElementById('carteiraTituloFiis');
       const wrapFiis = document.getElementById('carteiraWrapFiis');
       const tbodyFiis = document.getElementById('carteiraTbodyFiis');
+      const tituloIntl = document.getElementById('carteiraTituloIntl');
+      const wrapIntl = document.getElementById('carteiraWrapIntl');
+      const tbodyIntl = document.getElementById('carteiraTbodyIntl');
       const elTotalInvestido = document.getElementById('carteiraTotalInvestido');
       const elTotalProventos = document.getElementById('carteiraTotalProventos');
       const elYieldMedio = document.getElementById('carteiraYieldMedio');
@@ -6321,28 +6334,83 @@
         const data = await resp.json();
         const a = data?.results?.[0];
 
-        if (!a || (a.kind !== 'stock' && a.kind !== 'fii' && a.kind !== 'fiagro' && a.kind !== 'fund')) return false;
+        if (a && (a.kind === 'stock' || a.kind === 'fii' || a.kind === 'fiagro' || a.kind === 'fund')) {
+          const preco = a.quote?.value ?? null;
+          const yield12mCash = a.dividends?.yield_12m_cash;
+          const proventoMes = typeof yield12mCash === 'number' ? yield12mCash / 12 : null;
 
-        const preco = a.quote?.value ?? null;
-        const yield12mCash = a.dividends?.yield_12m_cash;
-        const proventoMes = typeof yield12mCash === 'number' ? yield12mCash / 12 : null;
-
-        const existente = carteira.find(l => l.ticker === ticker);
-        if (existente) {
-          existente.qtd = qtd; // ao restaurar, usa a quantidade salva (não soma)
-        } else {
-          carteira.push({
-            ticker,
-            kind: a.kind,
-            nome: a.name || ticker,
-            preco,
-            moeda: a.currency || 'BRL',
-            dyPercent: typeof a.dividends?.yield_12m_percent === 'number' ? a.dividends.yield_12m_percent : null,
-            proventoMes,
-            qtd,
-          });
+          const existente = carteira.find(l => l.ticker === ticker);
+          if (existente) {
+            existente.qtd = qtd; // ao restaurar, usa a quantidade salva (não soma)
+          } else {
+            carteira.push({
+              ticker,
+              kind: a.kind,
+              nome: a.name || ticker,
+              preco,
+              moeda: a.currency || 'BRL',
+              dyPercent: typeof a.dividends?.yield_12m_percent === 'number' ? a.dividends.yield_12m_percent : null,
+              proventoMes,
+              qtd,
+            });
+          }
+          return true;
         }
-        return true;
+
+        // Não achou na B3 — tenta como Stock/ETF internacional via
+        // TwelveData (mesma fonte já usada na Consulta Rápida e nos
+        // Alertas de Preço, plano gratuito).
+        return await buscarEEmpilharTwelveData(ticker, qtd);
+      }
+
+      async function buscarEEmpilharTwelveData(ticker, qtd) {
+        try {
+          const urlQuote = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(CHAVE_TWELVEDATA)}`;
+          const respQuote = await fetch(urlQuote);
+          const q = await respQuote.json();
+          if (!respQuote.ok || q.status === 'error' || !q.symbol) return false;
+
+          // Dividend yield vem como % (não valor em dinheiro, diferente da
+          // HG Brasil) — é um extra opcional, plano free pode não liberar.
+          // Falha silenciosa: adiciona o ativo mesmo sem esse dado.
+          let dividendYieldPct = null;
+          try {
+            const urlStats = `https://api.twelvedata.com/statistics?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(CHAVE_TWELVEDATA)}`;
+            const respStats = await fetch(urlStats);
+            const stats = await respStats.json();
+            const dy = stats?.statistics?.stock_statistics?.dividend_yield ?? stats?.statistics?.dividends_and_splits?.dividend_yield;
+            if (typeof dy === 'number') dividendYieldPct = dy;
+          } catch (e) { /* segue sem o dado */ }
+
+          const precoNum = parseFloat(q.close);
+          const preco = Number.isFinite(precoNum) ? precoNum : null;
+          // Yield da TwelveData é anual em % — converte pra provento médio
+          // mensal em dinheiro, no mesmo formato que a HG Brasil já usa
+          // (valor_atual × yield% ÷ 12), pra caber na mesma tabela/soma.
+          const proventoMes = (typeof dividendYieldPct === 'number' && preco !== null)
+            ? (dividendYieldPct / 100 * preco) / 12
+            : null;
+
+          const existente = carteira.find(l => l.ticker === ticker);
+          if (existente) {
+            existente.qtd = qtd;
+          } else {
+            carteira.push({
+              ticker,
+              kind: 'internacional',
+              nome: q.name || ticker,
+              preco,
+              moeda: q.currency || 'USD',
+              dyPercent: typeof dividendYieldPct === 'number' ? dividendYieldPct : null,
+              proventoMes,
+              qtd,
+            });
+          }
+          return true;
+        } catch (e) {
+          console.error('Erro ao buscar Stock/ETF internacional na Carteira:', e);
+          return false;
+        }
       }
 
       // --- Persistência local (localStorage) — funciona pra qualquer
@@ -6466,7 +6534,7 @@
           const ok = await buscarEEmpilhar(ticker, qtd);
           if (!ok) {
             statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro ou FI-Infra. Confira o ticker digitado.`;
+            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro, FI-Infra ou Stock/ETF americano. Confira o ticker digitado.`;
             return;
           }
           statusEl.textContent = '';
@@ -6503,6 +6571,7 @@
       function renderizar() {
         const acoes = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'stock');
         const fiis = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'fii' || x.item.kind === 'fiagro' || x.item.kind === 'fund');
+        const intl = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'internacional');
 
         vazioEl.hidden = carteira.length > 0;
 
@@ -6518,6 +6587,9 @@
 
         tituloFiis.hidden = wrapFiis.hidden = fiis.length === 0;
         if (fiis.length > 0) tbodyFiis.innerHTML = fiis.map(x => linhaHtml(x.item, x.idx, totalInvestido)).join('');
+
+        tituloIntl.hidden = wrapIntl.hidden = intl.length === 0;
+        if (intl.length > 0) tbodyIntl.innerHTML = intl.map(x => linhaHtml(x.item, x.idx, totalInvestido)).join('');
 
         elTotalInvestido.textContent = hgFormatMoeda(totalInvestido) ?? 'R$ 0,00';
         elTotalProventos.textContent = hgFormatMoeda(totalProventos) ?? 'R$ 0,00';
@@ -6618,7 +6690,7 @@
             const pctCarteira = totalInvestido > 0 ? (investimento / totalInvestido) * 100 : 0;
             return [
               item.ticker,
-              item.kind === 'fii' ? 'FII' : (item.kind === 'fiagro' ? 'Fiagro' : (item.kind === 'fund' ? 'FI-Infra' : 'Ação')),
+              item.kind === 'fii' ? 'FII' : (item.kind === 'fiagro' ? 'Fiagro' : (item.kind === 'fund' ? 'FI-Infra' : (item.kind === 'internacional' ? 'Stock/ETF' : 'Ação'))),
               hgFormatMoeda(item.preco, item.moeda) ?? '—',
               item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—',
               item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—',
