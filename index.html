@@ -4110,7 +4110,7 @@
           </table>
         </div>
 
-        <div class="carteira-secao-titulo" id="carteiraTituloFiis" hidden>🏢 Fundos Imobiliários</div>
+        <div class="carteira-secao-titulo" id="carteiraTituloFiis" hidden>🏢 Fundos Imobiliários e FI-Infra</div>
         <div class="cmp-tabela-wrap" id="carteiraWrapFiis" hidden>
           <table class="cmp-tabela carteira-tabela">
             <thead>
@@ -6321,7 +6321,7 @@
         const data = await resp.json();
         const a = data?.results?.[0];
 
-        if (!a || (a.kind !== 'stock' && a.kind !== 'fii' && a.kind !== 'fiagro')) return false;
+        if (!a || (a.kind !== 'stock' && a.kind !== 'fii' && a.kind !== 'fiagro' && a.kind !== 'fund')) return false;
 
         const preco = a.quote?.value ?? null;
         const yield12mCash = a.dividends?.yield_12m_cash;
@@ -6466,7 +6466,7 @@
           const ok = await buscarEEmpilhar(ticker, qtd);
           if (!ok) {
             statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII ou Fiagro. Confira o ticker digitado.`;
+            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro ou FI-Infra. Confira o ticker digitado.`;
             return;
           }
           statusEl.textContent = '';
@@ -6502,7 +6502,7 @@
 
       function renderizar() {
         const acoes = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'stock');
-        const fiis = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'fii' || x.item.kind === 'fiagro');
+        const fiis = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'fii' || x.item.kind === 'fiagro' || x.item.kind === 'fund');
 
         vazioEl.hidden = carteira.length > 0;
 
@@ -6618,7 +6618,7 @@
             const pctCarteira = totalInvestido > 0 ? (investimento / totalInvestido) * 100 : 0;
             return [
               item.ticker,
-              item.kind === 'fii' ? 'FII' : (item.kind === 'fiagro' ? 'Fiagro' : 'Ação'),
+              item.kind === 'fii' ? 'FII' : (item.kind === 'fiagro' ? 'Fiagro' : (item.kind === 'fund' ? 'FI-Infra' : 'Ação')),
               hgFormatMoeda(item.preco, item.moeda) ?? '—',
               item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—',
               item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—',
