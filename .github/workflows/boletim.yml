@@ -58,6 +58,7 @@ jobs:
           git config user.name "robo-boletim"
           git config user.email "robo-boletim@users.noreply.github.com"
           git add boletins/
+          git add sitemap.xml
           if git diff --cached --quiet; then
             echo "Nada novo para commitar (o boletim de hoje já existia)."
           else
