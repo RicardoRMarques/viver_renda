@@ -20,17 +20,12 @@
   <meta name="description" content="Simule reinvestimento de dividendos com histórico real, monte sua carteira e receba alertas de preço grátis. Cotações e dividendos de Ações, FIIs, Fiagros e FI-Infra da B3." />
   <link rel="canonical" href="https://viverderenda.dev.br/" />
 
-  <!-- Preconnect: abre a conexão (DNS + TLS) com esses domínios externos
-       ANTES de qualquer script realmente precisar deles — encurta a
-       "árvore de dependência" que atrasa a primeira chamada de API de
-       cada um. Só os que o site sempre usa logo de cara (dados +
-       widgets); CDNs de bibliotecas (jsPDF/xlsx) ficam de fora porque só
-       carregam quando alguém realmente usa aquela função. -->
+  <!-- Preconnect: só a HG Brasil, que é chamada logo de cara (índices do
+       topo/carrossel) — usar demais atrapalha mais do que ajuda (o
+       próprio PageSpeed Insights avisa: "mais de quatro conexões
+       preconnect... usar com moderação, só pras origens mais
+       importantes". Testamos com 5 e o desempenho PIOROU. -->
   <link rel="preconnect" href="https://api.hgbrasil.com" />
-  <link rel="preconnect" href="https://mzknjnupizprfatfmxqg.supabase.co" />
-  <link rel="preconnect" href="https://s3.tradingview.com" />
-  <link rel="dns-prefetch" href="https://api.twelvedata.com" />
-  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
 
   <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
   <meta property="og:type" content="website" />
