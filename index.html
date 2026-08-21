@@ -7499,10 +7499,19 @@
       // futuras nunca esbarram no limite de profundidade do plano).
       async function agendaBuscarProventosFuturos(ticker) {
         const hoje = new Date();
+        // A API parece filtrar pela data em que o provento foi ANUNCIADO
+        // (não pela data de pagamento em si) — um provento com pagamento
+        // daqui a 5 dias pode ter sido anunciado semanas atrás. Por isso
+        // o start_date volta 90 dias pra trás (pega anúncios recentes,
+        // mesmo com pagamento já perto), e o filtro de "só o que ainda
+        // não pagou" é feito depois, olhando o payment_date de cada
+        // evento — não pela janela pedida à API.
+        const inicioBusca = new Date(hoje);
+        inicioBusca.setDate(inicioBusca.getDate() - 90);
         const limite = new Date(hoje);
         limite.setDate(limite.getDate() + 120); // ~4 meses à frente
         const iso = d => d.toISOString().slice(0, 10);
-        const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + ticker)}&start_date=${iso(hoje)}&end_date=${iso(limite)}`;
+        const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + ticker)}&start_date=${iso(inicioBusca)}&end_date=${iso(limite)}`;
         try {
           const resp = await fetch(url);
           const data = await resp.json();
