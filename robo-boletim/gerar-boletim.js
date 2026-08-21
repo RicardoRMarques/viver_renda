@@ -738,15 +738,31 @@ function reconciliarComPasta(indiceAtual) {
 }
 
 // ---------- Execução principal ----------
-// Gera sitemap.xml na raiz do site: a home + todo boletim ainda ativo no
-// índice (indiceAtual já vem sem os que passaram dos 7 dias de retenção,
-// pela limparBoletinsAntigos que roda antes desta função ser chamada).
-// Sempre reescrito do zero — não precisa de manutenção manual nem corre
-// risco de listar um boletim que já foi apagado.
+// Páginas estáticas de ferramentas com URL própria (fora do modal da
+// home) — adicione aqui sempre que criar uma nova, pra entrar no
+// sitemap.xml automaticamente na próxima execução do robô.
+const PAGINAS_FERRAMENTAS = [
+  { arquivo: 'financiamento-imobiliario.html', prioridade: '0.9' },
+  { arquivo: 'calculadora-renda-fixa.html', prioridade: '0.9' },
+  { arquivo: 'calculadora-juros-compostos.html', prioridade: '0.9' },
+];
+
+// Gera sitemap.xml na raiz do site: a home + páginas de ferramentas +
+// todo boletim ainda ativo no índice (indiceAtual já vem sem os que
+// passaram dos 7 dias de retenção, pela limparBoletinsAntigos que roda
+// antes desta função ser chamada). Sempre reescrito do zero — não
+// precisa de manutenção manual nem corre risco de listar um boletim que
+// já foi apagado.
 function gerarSitemap(indiceAtual) {
   const hojeIso = new Date().toISOString().slice(0, 10);
   const urls = [
     { loc: 'https://viverderenda.dev.br/', lastmod: hojeIso, changefreq: 'daily', priority: '1.0' },
+    ...PAGINAS_FERRAMENTAS.map(p => ({
+      loc: `https://viverderenda.dev.br/${p.arquivo}`,
+      lastmod: hojeIso, // sem data de "última mudança real" rastreada — usa a data da execução
+      changefreq: 'monthly',
+      priority: p.prioridade,
+    })),
     ...indiceAtual.map(e => ({
       loc: `https://viverderenda.dev.br/boletins/${e.arquivo}`,
       lastmod: (e.dataIso || hojeIso).slice(0, 10),
@@ -767,7 +783,7 @@ ${urls.map(u => `  <url>
 `;
 
   fs.writeFileSync(path.join(RAIZ, 'sitemap.xml'), xml, 'utf-8');
-  console.log(`[boletim] sitemap.xml atualizado (${urls.length} URL(s): home + ${urls.length - 1} boletim(ns)).`);
+  console.log(`[boletim] sitemap.xml atualizado (${urls.length} URL(s): home + ${PAGINAS_FERRAMENTAS.length} ferramenta(s) + ${indiceAtual.length} boletim(ns)).`);
 }
 
 async function main() {
