@@ -4365,6 +4365,27 @@
       return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
     }
 
+    // Traduz o "type" cru que a HG Brasil devolve nos eventos de
+    // dividendo pra um rótulo em português. Escopo GLOBAL de propósito
+    // (não dentro da IIFE da Consulta Rápida) — tanto o histórico de
+    // dividendos quanto a Agenda de Proventos precisam dela.
+    const HG_TIPO_DIVIDENDO = {
+      dividend: 'Dividendo',
+      interest_on_equity: 'JCP',
+      income: 'Rendimento',
+      bonus_issue: 'Bonificação em ações',
+      stock_split: 'Desdobramento',
+      reverse_split: 'Grupamento',
+    };
+
+    function hgRotuloTipoDividendo(tipo) {
+      if (HG_TIPO_DIVIDENDO[tipo]) return HG_TIPO_DIVIDENDO[tipo];
+      if (!tipo) return '—';
+      // Tipo não mapeado: formata "algo_assim" -> "Algo assim" em vez
+      // de mostrar o código cru.
+      return tipo.charAt(0).toUpperCase() + tipo.slice(1).replace(/_/g, ' ');
+    }
+
     function hgFormatNumero(valor, casas = 2) {
       return typeof valor === 'number'
         ? valor.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas })
@@ -5489,22 +5510,9 @@
       // status "approved" = já aprovado mas ainda não pago (data futura);
       // "paid" = já pago de fato. Só "paid" entra na soma por ano do
       // gráfico; "approved" aparece na tabela marcado como previsto.
-      const HG_TIPO_DIVIDENDO = {
-        dividend: 'Dividendo',
-        interest_on_equity: 'JCP',
-        income: 'Rendimento',
-        bonus_issue: 'Bonificação em ações',
-        stock_split: 'Desdobramento',
-        reverse_split: 'Grupamento',
-      };
-
-      function hgRotuloTipoDividendo(tipo) {
-        if (HG_TIPO_DIVIDENDO[tipo]) return HG_TIPO_DIVIDENDO[tipo];
-        if (!tipo) return '—';
-        // Tipo não mapeado: formata "algo_assim" -> "Algo assim" em vez
-        // de mostrar o código cru.
-        return tipo.charAt(0).toUpperCase() + tipo.slice(1).replace(/_/g, ' ');
-      }
+      // (HG_TIPO_DIVIDENDO e hgRotuloTipoDividendo agora moraram lá em
+      // cima, no escopo global — Agenda de Proventos também precisa
+      // delas, e essa IIFE aqui não é visível de fora.)
 
       function hgFormatDataDividendo(iso) {
         if (!iso) return '—';
