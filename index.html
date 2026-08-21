@@ -304,6 +304,42 @@
     }
     .carteira-remover:hover { color: #e05555; }
 
+    /* Agenda de Proventos */
+    .agenda-modal { max-width: 720px; }
+    @media (min-width: 1024px) {
+      .agenda-modal { max-width: 980px; }
+    }
+    .agenda-vazio {
+      text-align: center; padding: 30px 16px; color: var(--muted); font-size: 0.9rem;
+      border: 1px dashed var(--border); border-radius: 12px;
+    }
+    .agenda-mes-grupo { margin-top: 18px; }
+    .agenda-mes-grupo:first-child { margin-top: 0; }
+    .agenda-mes-titulo {
+      font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--muted); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    .agenda-item {
+      display: flex; align-items: center; gap: 14px; padding: 10px 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .agenda-item:last-child { border-bottom: none; }
+    .agenda-item-data {
+      flex-shrink: 0; width: 46px; height: 46px; border-radius: 10px; background: var(--deep);
+      border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.1rem; color: var(--text);
+    }
+    .agenda-item-info { flex: 1; min-width: 0; }
+    .agenda-item-topo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .agenda-item-topo strong { font-size: 0.95rem; }
+    .agenda-item-badge {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;
+      color: var(--gold); background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.35);
+      border-radius: 999px; padding: 2px 8px;
+    }
+    .agenda-item-detalhe { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    .agenda-item-valor { flex-shrink: 0; font-weight: 800; font-family: "Courier New", monospace; text-align: right; }
+
     /* Calculadora de Reinvestimento de Dividendos */
     .reinv-form-linha1 { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 10px; }
     .reinv-btn-adicionar { width: 100%; margin-top: 10px; }
@@ -2498,6 +2534,9 @@
             <button type="button" class="nav-dropdown-item" id="reinvBtnAbrir">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><path d="M3 3v18h18"></path><path d="M18 9l-5 5-3-3-4 4"></path><path d="M14 9h4v4"></path></svg>Reinvestimento de Dividendos
             </button>
+            <button type="button" class="nav-dropdown-item" id="agendaBtnAbrir">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-2px; margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>Agenda de Proventos
+            </button>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
           </div>
         </div>
@@ -2533,6 +2572,7 @@
     <button type="button" class="mobile-menu-item" data-mobile-alvo="quizBtnAbrir">🧠 Descubra seu Perfil de Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="carteiraBtnAbrir">💰 Carteira de Dividendos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="reinvBtnAbrir">🔁 Reinvestimento de Dividendos</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="agendaBtnAbrir">📅 Agenda de Proventos</button>
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
   </div>
 
@@ -4163,6 +4203,31 @@
           avisamos aqui e usamos a data mais antiga disponível como ponto de partida. Simulação educativa; não
           considera taxas, impostos (quando aplicável) nem garante que o mesmo resultado se repita no futuro.
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Agenda de Proventos -->
+  <div id="agendaOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="agendaTitulo" hidden>
+    <div class="calc-modal agenda-modal">
+      <div class="calc-modal-topo">
+        <h3 id="agendaTitulo">📅 Agenda de Proventos</h3>
+        <button id="agendaFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Próximos pagamentos anunciados dos seus ativos — junta automaticamente os favoritos ⭐ do carrossel com os
+          ativos da sua <strong>Carteira de Dividendos</strong>, sem precisar cadastrar nada de novo. Datas marcadas
+          como "previsto" ainda podem mudar até a empresa/fundo confirmar oficialmente.
+        </p>
+
+        <div id="agendaSemAtivos" class="agenda-vazio" style="display:none;">
+          Nenhum ativo encontrado nos seus favoritos ⭐ ou na Carteira de Dividendos ainda. Favorite um ativo na
+          Consulta Rápida ou adicione algo à Carteira pra essa agenda se preencher sozinha.
+        </div>
+
+        <div id="agendaStatus" class="hg-status"></div>
+        <div id="agendaResultado"></div>
       </div>
     </div>
   </div>
@@ -7353,6 +7418,176 @@
       });
 
       btnCalcular?.addEventListener('click', executarCalculo);
+    })();
+
+    // ============================================================
+    // AGENDA DE PROVENTOS — junta os favoritos ⭐ do carrossel com os
+    // ativos da Carteira de Dividendos (local + nuvem, se logado — mesmo
+    // padrão "local primeiro" dessas duas features) e mostra os próximos
+    // pagamentos anunciados de cada um, numa linha do tempo só.
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('agendaBtnAbrir');
+      const overlay = document.getElementById('agendaOverlay');
+      const btnFechar = document.getElementById('agendaFechar');
+      const statusEl = document.getElementById('agendaStatus');
+      const resultadoEl = document.getElementById('agendaResultado');
+      const semAtivosEl = document.getElementById('agendaSemAtivos');
+      if (!btnAbrir || !overlay) return;
+
+      let jaCarregou = false;
+
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        if (!jaCarregou) {
+          jaCarregou = true;
+          carregarAgenda();
+        }
+      }
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+
+      // Mesmas chaves de localStorage que Carteira de Dividendos e
+      // Favoritos do Carrossel já usam — lidas direto aqui (essas duas
+      // funções vivem em outra IIFE, sem acesso cross-scope), então
+      // reaproveita os MESMOS dados que a pessoa já tem, sem duplicar
+      // nenhum cadastro.
+      function agendaTickersLocais() {
+        const tickers = new Set();
+        try {
+          const favoritos = JSON.parse(localStorage.getItem('vrCarrosselFavoritos'));
+          if (Array.isArray(favoritos)) favoritos.forEach(t => t && tickers.add(String(t).toUpperCase()));
+        } catch (e) { /* localStorage indisponível ou corrompido — segue sem favoritos locais */ }
+        try {
+          const carteira = JSON.parse(localStorage.getItem('vrCarteiraDividendos'));
+          if (Array.isArray(carteira)) carteira.forEach(item => item?.ticker && tickers.add(String(item.ticker).toUpperCase()));
+        } catch (e) { /* idem, pra carteira local */ }
+        return tickers;
+      }
+
+      // Funde com a nuvem, se a pessoa estiver logada — mesma lógica de
+      // "nuvem soma ao que já tinha localmente" usada em Carteira/Favoritos.
+      async function agendaTickersComNuvem() {
+        const tickers = agendaTickersLocais();
+        const cliente = obterSupabaseClient();
+        if (!cliente) return tickers;
+        try {
+          const { data: { session } } = await cliente.auth.getSession();
+          if (!session?.user) return tickers;
+
+          const [favoritosNuvem, carteiraNuvem] = await Promise.all([
+            cliente.from('favoritos_carrossel').select('ticker').eq('user_id', session.user.id),
+            cliente.from('carteira_dividendos').select('ticker').eq('user_id', session.user.id),
+          ]);
+          (favoritosNuvem.data || []).forEach(r => r.ticker && tickers.add(String(r.ticker).toUpperCase()));
+          (carteiraNuvem.data || []).forEach(r => r.ticker && tickers.add(String(r.ticker).toUpperCase()));
+        } catch (e) {
+          console.warn('Agenda de Proventos: não sincronizou com a nuvem, seguindo só com o que tinha localmente.', e);
+        }
+        return tickers;
+      }
+
+      // Busca só os pagamentos FUTUROS anunciados de um ticker (janela
+      // curta, sem precisar da busca binária usada no histórico — datas
+      // futuras nunca esbarram no limite de profundidade do plano).
+      async function agendaBuscarProventosFuturos(ticker) {
+        const hoje = new Date();
+        const limite = new Date(hoje);
+        limite.setDate(limite.getDate() + 120); // ~4 meses à frente
+        const iso = d => d.toISOString().slice(0, 10);
+        const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + ticker)}&start_date=${iso(hoje)}&end_date=${iso(limite)}`;
+        try {
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const ativo = Array.isArray(data?.results) ? data.results[0] : data?.results;
+          const serie = Array.isArray(ativo?.series) ? ativo.series : [];
+          return serie
+            .filter(ev => ev.category === 'cash' && typeof ev.amount === 'number' && ev.payment_date)
+            .filter(ev => new Date(ev.payment_date + 'T00:00:00') >= new Date(hoje.toDateString())) // só o que ainda não pagou
+            .map(ev => ({ ticker, tipo: ev.type || 'Provento', valor: ev.amount, data: ev.payment_date }));
+        } catch (e) {
+          console.warn(`Agenda de Proventos: falha ao buscar ${ticker}.`, e);
+          return [];
+        }
+      }
+
+      function agendaFormatMoeda(v) {
+        return (v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      }
+
+      const MESES_PT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+      function agendaRenderizar(eventos) {
+        if (!eventos.length) {
+          resultadoEl.innerHTML = '<div class="agenda-vazio">Nenhum pagamento anunciado nos próximos ~4 meses pros seus ativos favoritados/da carteira.</div>';
+          return;
+        }
+        eventos.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+        const grupos = [];
+        let grupoAtual = null;
+        for (const ev of eventos) {
+          const d = new Date(ev.data + 'T00:00:00');
+          const chave = `${d.getFullYear()}-${d.getMonth()}`;
+          if (!grupoAtual || grupoAtual.chave !== chave) {
+            grupoAtual = { chave, titulo: `${MESES_PT[d.getMonth()]} de ${d.getFullYear()}`, itens: [] };
+            grupos.push(grupoAtual);
+          }
+          grupoAtual.itens.push(ev);
+        }
+
+        resultadoEl.innerHTML = grupos.map(g => `
+          <div class="agenda-mes-grupo">
+            <div class="agenda-mes-titulo">${g.titulo}</div>
+            ${g.itens.map(ev => {
+              const d = new Date(ev.data + 'T00:00:00');
+              return `
+              <div class="agenda-item">
+                <div class="agenda-item-data">${String(d.getDate()).padStart(2, '0')}</div>
+                <div class="agenda-item-info">
+                  <div class="agenda-item-topo">
+                    <strong>${ev.ticker}</strong>
+                    <span class="agenda-item-badge">Previsto</span>
+                  </div>
+                  <div class="agenda-item-detalhe">${ev.tipo} · pagamento em ${d.toLocaleDateString('pt-BR')}</div>
+                </div>
+                <div class="agenda-item-valor">${agendaFormatMoeda(ev.valor)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        `).join('');
+      }
+
+      async function carregarAgenda() {
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Buscando seus ativos favoritados e da carteira...';
+        semAtivosEl.style.display = 'none';
+        resultadoEl.innerHTML = '';
+
+        const tickers = [...await agendaTickersComNuvem()];
+        if (!tickers.length) {
+          statusEl.textContent = '';
+          semAtivosEl.style.display = 'block';
+          return;
+        }
+
+        const todosEventos = [];
+        for (let i = 0; i < tickers.length; i++) {
+          statusEl.textContent = `Consultando ${tickers[i]} (${i + 1}/${tickers.length})...`;
+          const eventos = await agendaBuscarProventosFuturos(tickers[i]);
+          todosEventos.push(...eventos);
+        }
+
+        statusEl.textContent = '';
+        agendaRenderizar(todosEventos);
+      }
     })();
 
     // ============================================================
