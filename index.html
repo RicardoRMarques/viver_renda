@@ -2602,7 +2602,6 @@
         </a>
         <a href="#boletins-semana">Boletim de Mercado Diário</a>
         <a href="#educacao">Educação</a>
-        <button type="button" class="nav-link-botao" id="sobreBtnAbrirNav">Sobre</button>
         <div class="nav-dropdown">
           <button type="button" class="nav-dropdown-btn" id="navRendaFixaBtn" aria-haspopup="true" aria-expanded="false">
             Simuladores <span class="nav-dropdown-seta">▾</span>
@@ -2655,7 +2654,6 @@
     <a href="#alertas-preco" class="mobile-menu-item">🔔 Meus Alertas de Preço</a>
     <a href="#simuladorVisual" class="mobile-menu-item">📈 Veja o poder dos juros compostos</a>
     <a href="#educacao" class="mobile-menu-item">🎓 Educação</a>
-    <button type="button" class="mobile-menu-item" data-mobile-alvo="sobreBtnAbrirNav">ℹ️ Sobre o Viver de Renda</button>
     <div class="mobile-menu-separador">Consultas</div>
     <a href="#consulta-rapida" class="mobile-menu-item">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
     <a href="#consulta-rapida" class="mobile-menu-item">📊 Análise Fundamentalista</a>
@@ -7939,7 +7937,7 @@
         document.body.style.overflow = '';
       }
 
-      ['sobreBtnAbrirNav', 'sobreBtnAbrir'].forEach(id => {
+      ['sobreBtnAbrir'].forEach(id => {
         document.getElementById(id)?.addEventListener('click', abrirModal);
       });
       btnFechar?.addEventListener('click', fecharModal);
