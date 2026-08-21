@@ -20,6 +20,18 @@
   <meta name="description" content="Simule reinvestimento de dividendos com histórico real, monte sua carteira e receba alertas de preço grátis. Cotações e dividendos de Ações, FIIs, Fiagros e FI-Infra da B3." />
   <link rel="canonical" href="https://viverderenda.dev.br/" />
 
+  <!-- Preconnect: abre a conexão (DNS + TLS) com esses domínios externos
+       ANTES de qualquer script realmente precisar deles — encurta a
+       "árvore de dependência" que atrasa a primeira chamada de API de
+       cada um. Só os que o site sempre usa logo de cara (dados +
+       widgets); CDNs de bibliotecas (jsPDF/xlsx) ficam de fora porque só
+       carregam quando alguém realmente usa aquela função. -->
+  <link rel="preconnect" href="https://api.hgbrasil.com" />
+  <link rel="preconnect" href="https://mzknjnupizprfatfmxqg.supabase.co" />
+  <link rel="preconnect" href="https://s3.tradingview.com" />
+  <link rel="dns-prefetch" href="https://api.twelvedata.com" />
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+
   <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://viverderenda.dev.br/" />
@@ -4031,7 +4043,7 @@
             <label class="conv-label" for="convValorInput">Valor</label>
             <div class="conv-campo-moeda">
               <button type="button" class="conv-select-moeda" id="convDeBotao" data-lado="de" aria-haspopup="listbox" aria-expanded="false">
-                <img class="conv-bandeira" id="convDeBandeira" src="" alt="" />
+                <img class="conv-bandeira" id="convDeBandeira" src="" alt="" loading="lazy" />
                 <span class="conv-codigo" id="convDeCodigo">USD</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="conv-seta-select"><path d="m6 9 6 6 6-6"></path></svg>
               </button>
@@ -4051,7 +4063,7 @@
             <label class="conv-label">Convertido para</label>
             <div class="conv-campo-moeda">
               <button type="button" class="conv-select-moeda" id="convParaBotao" data-lado="para" aria-haspopup="listbox" aria-expanded="false">
-                <img class="conv-bandeira" id="convParaBandeira" src="" alt="" />
+                <img class="conv-bandeira" id="convParaBandeira" src="" alt="" loading="lazy" />
                 <span class="conv-codigo" id="convParaCodigo">BRL</span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="conv-seta-select"><path d="m6 9 6 6 6-6"></path></svg>
               </button>
@@ -5238,7 +5250,7 @@
           <div class="hg-card">
             <div class="hg-card-topo">
               <div class="hg-card-topo-info">
-                ${logo ? `<img src="${logo}" alt="" onerror="this.remove()">` : ''}
+                ${logo ? `<img src="${logo}" alt="" loading="lazy" onerror="this.remove()">` : ''}
                 <div>
                   <h3>${a.name || a.symbol} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span></h3>
                   <div class="hg-setor">${a.classification?.sector || a.full_name || ''}</div>
@@ -8715,7 +8727,7 @@
         listaItensEl.innerHTML = MOEDAS.map(m => `
           <button type="button" class="conv-lista-item ${estado[lado] === m.codigo ? 'conv-selecionado' : ''}" data-codigo="${m.codigo}">
             ${m.iso
-              ? `<img class="conv-bandeira" src="${urlBandeira(m.iso)}" alt="" />`
+              ? `<img class="conv-bandeira" src="${urlBandeira(m.iso)}" alt="" loading="lazy" />`
               : `<span class="conv-bandeira conv-bandeira-cripto">${SVG_BITCOIN}</span>`}
             <span class="conv-lista-item-nome"><b>${m.codigo}</b><small>${m.nome}</small></span>
           </button>`).join('');
@@ -8982,7 +8994,7 @@
           <tr>
             <td>
               <div class="bas-banco-cel">
-                <span class="bas-banco-logo">${l.logo ? `<img src="${l.logo}" alt="" onerror="this.parentElement.textContent='${l.ticker.slice(0, 2)}'">` : l.ticker.slice(0, 2)}</span>
+                <span class="bas-banco-logo">${l.logo ? `<img src="${l.logo}" alt="" loading="lazy" onerror="this.parentElement.textContent='${l.ticker.slice(0, 2)}'">` : l.ticker.slice(0, 2)}</span>
                 <span><span class="bas-banco-nome">${l.ticker}</span><br><span class="bas-banco-sub">${l.nome}</span></span>
               </div>
             </td>
@@ -9809,7 +9821,7 @@
           <thead>
             <tr>
               <th>Indicador</th>
-              ${ativosValidos.map(a => `<th class="cmp-ativo-col">${(a.logos?.square_small ? `<img src="${a.logos.square_small}" alt="" style="width:20px; height:20px; border-radius:4px; vertical-align:-5px; margin-right:6px;" onerror="this.remove()">` : '')}<strong>${a.symbol}</strong></th>`).join('')}
+              ${ativosValidos.map(a => `<th class="cmp-ativo-col">${(a.logos?.square_small ? `<img src="${a.logos.square_small}" alt="" loading="lazy" style="width:20px; height:20px; border-radius:4px; vertical-align:-5px; margin-right:6px;" onerror="this.remove()">` : '')}<strong>${a.symbol}</strong></th>`).join('')}
             </tr>
           </thead>`;
 
