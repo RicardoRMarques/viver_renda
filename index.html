@@ -305,10 +305,6 @@
     .carteira-remover:hover { color: #e05555; }
 
     /* Agenda de Proventos */
-    .agenda-modal { max-width: 720px; }
-    @media (min-width: 1024px) {
-      .agenda-modal { max-width: 980px; }
-    }
     .agenda-vazio {
       text-align: center; padding: 30px 16px; color: var(--muted); font-size: 0.9rem;
       border: 1px dashed var(--border); border-radius: 12px;
@@ -338,7 +334,10 @@
       border-radius: 999px; padding: 2px 8px;
     }
     .agenda-item-detalhe { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
-    .agenda-item-valor { flex-shrink: 0; font-weight: 800; font-family: "Courier New", monospace; text-align: right; }
+    .agenda-item-valor { flex-shrink: 0; text-align: right; }
+    .agenda-item-valor-un { font-weight: 700; font-family: "Courier New", monospace; font-size: 0.88rem; color: var(--text); }
+    .agenda-item-valor-un span { font-weight: 400; color: var(--muted); font-family: inherit; }
+    .agenda-item-valor-total { font-weight: 800; font-family: "Courier New", monospace; font-size: 1rem; color: var(--accent); margin-top: 2px; }
 
     /* Calculadora de Reinvestimento de Dividendos */
     .reinv-form-linha1 { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 10px; }
@@ -2241,6 +2240,10 @@
     .financ-modal { max-width: 720px; }
     @media (min-width: 1024px) {
       .financ-modal { max-width: 980px; }
+    }
+    .agenda-modal { max-width: 720px; }
+    @media (min-width: 1024px) {
+      .agenda-modal { max-width: 980px; }
     }
     /* .reinv-modal precisa vir DEPOIS de .calc-modal (que também define
        max-width) — regras com a mesma especificidade, quando empatam, a
@@ -7459,39 +7462,50 @@
       // funções vivem em outra IIFE, sem acesso cross-scope), então
       // reaproveita os MESMOS dados que a pessoa já tem, sem duplicar
       // nenhum cadastro.
-      function agendaTickersLocais() {
+      // Lê tickers (favoritos + carteira) E a quantidade que a pessoa tem
+      // de cada um (só a carteira carrega quantidade — favoritos é só
+      // "acompanhar", sem posição). Local primeiro, nuvem depois — mesma
+      // lógica de "nuvem tem prioridade" usada em Carteira/Favoritos.
+      async function agendaDadosComNuvem() {
         const tickers = new Set();
+        const qtdPorTicker = new Map();
+
         try {
           const favoritos = JSON.parse(localStorage.getItem('vrCarrosselFavoritos'));
           if (Array.isArray(favoritos)) favoritos.forEach(t => t && tickers.add(String(t).toUpperCase()));
         } catch (e) { /* localStorage indisponível ou corrompido — segue sem favoritos locais */ }
         try {
           const carteira = JSON.parse(localStorage.getItem('vrCarteiraDividendos'));
-          if (Array.isArray(carteira)) carteira.forEach(item => item?.ticker && tickers.add(String(item.ticker).toUpperCase()));
+          if (Array.isArray(carteira)) carteira.forEach(item => {
+            if (!item?.ticker) return;
+            const tk = String(item.ticker).toUpperCase();
+            tickers.add(tk);
+            if (typeof item.qtd === 'number') qtdPorTicker.set(tk, item.qtd);
+          });
         } catch (e) { /* idem, pra carteira local */ }
-        return tickers;
-      }
 
-      // Funde com a nuvem, se a pessoa estiver logada — mesma lógica de
-      // "nuvem soma ao que já tinha localmente" usada em Carteira/Favoritos.
-      async function agendaTickersComNuvem() {
-        const tickers = agendaTickersLocais();
         const cliente = obterSupabaseClient();
-        if (!cliente) return tickers;
-        try {
-          const { data: { session } } = await cliente.auth.getSession();
-          if (!session?.user) return tickers;
-
-          const [favoritosNuvem, carteiraNuvem] = await Promise.all([
-            cliente.from('favoritos_carrossel').select('ticker').eq('user_id', session.user.id),
-            cliente.from('carteira_dividendos').select('ticker').eq('user_id', session.user.id),
-          ]);
-          (favoritosNuvem.data || []).forEach(r => r.ticker && tickers.add(String(r.ticker).toUpperCase()));
-          (carteiraNuvem.data || []).forEach(r => r.ticker && tickers.add(String(r.ticker).toUpperCase()));
-        } catch (e) {
-          console.warn('Agenda de Proventos: não sincronizou com a nuvem, seguindo só com o que tinha localmente.', e);
+        if (cliente) {
+          try {
+            const { data: { session } } = await cliente.auth.getSession();
+            if (session?.user) {
+              const [favoritosNuvem, carteiraNuvem] = await Promise.all([
+                cliente.from('favoritos_carrossel').select('ticker').eq('user_id', session.user.id),
+                cliente.from('carteira_dividendos').select('ticker, qtd').eq('user_id', session.user.id),
+              ]);
+              (favoritosNuvem.data || []).forEach(r => r.ticker && tickers.add(String(r.ticker).toUpperCase()));
+              (carteiraNuvem.data || []).forEach(r => {
+                if (!r.ticker) return;
+                const tk = String(r.ticker).toUpperCase();
+                tickers.add(tk);
+                if (typeof r.qtd === 'number') qtdPorTicker.set(tk, r.qtd); // nuvem prioridade, sobrescreve o valor local
+              });
+            }
+          } catch (e) {
+            console.warn('Agenda de Proventos: não sincronizou com a nuvem, seguindo só com o que tinha localmente.', e);
+          }
         }
-        return tickers;
+        return { tickers, qtdPorTicker };
       }
 
       // Busca só os pagamentos FUTUROS anunciados de um ticker (janela
@@ -7533,7 +7547,7 @@
 
       const MESES_PT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-      function agendaRenderizar(eventos) {
+      function agendaRenderizar(eventos, qtdPorTicker) {
         if (!eventos.length) {
           resultadoEl.innerHTML = '<div class="agenda-vazio">Nenhum pagamento anunciado nos próximos ~4 meses pros seus ativos favoritados/da carteira.</div>';
           return;
@@ -7557,6 +7571,11 @@
             <div class="agenda-mes-titulo">${g.titulo}</div>
             ${g.itens.map(ev => {
               const d = new Date(ev.data + 'T00:00:00');
+              const qtd = qtdPorTicker.get(ev.ticker);
+              const temPosicao = typeof qtd === 'number' && qtd > 0;
+              const detalhe = temPosicao
+                ? `${ev.tipo} · pagamento em ${d.toLocaleDateString('pt-BR')} · você tem ${qtd.toLocaleString('pt-BR')} cotas/ações`
+                : `${ev.tipo} · pagamento em ${d.toLocaleDateString('pt-BR')}`;
               return `
               <div class="agenda-item">
                 <div class="agenda-item-data">${String(d.getDate()).padStart(2, '0')}</div>
@@ -7565,9 +7584,12 @@
                     <strong>${ev.ticker}</strong>
                     <span class="agenda-item-badge">Previsto</span>
                   </div>
-                  <div class="agenda-item-detalhe">${ev.tipo} · pagamento em ${d.toLocaleDateString('pt-BR')}</div>
+                  <div class="agenda-item-detalhe">${detalhe}</div>
                 </div>
-                <div class="agenda-item-valor">${agendaFormatMoeda(ev.valor)}</div>
+                <div class="agenda-item-valor">
+                  <div class="agenda-item-valor-un">${agendaFormatMoeda(ev.valor)} <span>/un.</span></div>
+                  ${temPosicao ? `<div class="agenda-item-valor-total">Total: ${agendaFormatMoeda(qtd * ev.valor)}</div>` : ''}
+                </div>
               </div>`;
             }).join('')}
           </div>
@@ -7580,7 +7602,8 @@
         semAtivosEl.style.display = 'none';
         resultadoEl.innerHTML = '';
 
-        const tickers = [...await agendaTickersComNuvem()];
+        const { tickers: tickersSet, qtdPorTicker } = await agendaDadosComNuvem();
+        const tickers = [...tickersSet];
         if (!tickers.length) {
           statusEl.textContent = '';
           semAtivosEl.style.display = 'block';
@@ -7595,7 +7618,7 @@
         }
 
         statusEl.textContent = '';
-        agendaRenderizar(todosEventos);
+        agendaRenderizar(todosEventos, qtdPorTicker);
       }
     })();
 
