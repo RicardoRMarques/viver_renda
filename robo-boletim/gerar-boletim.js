@@ -23,6 +23,11 @@
  *   - boletins/index.json                            (lista dos últimos
  *     boletins, usada pelo site para montar a listinha "boletins da
  *     semana" com o botão de compartilhar)
+ *   - sitemap.xml                                    (na raiz do site —
+ *     lista a home + todo boletim ainda ativo, pro Google indexar. Como
+ *     boletins são apagados automaticamente depois de 7 dias, o sitemap
+ *     é regenerado do zero a cada execução — nunca fica desatualizado
+ *     nem precisa de manutenção manual)
  *
  * Retenção: qualquer boletim com mais de 7 dias é apagado automaticamente
  * (arquivo .html + entrada no index.json), então o repositório nunca
@@ -733,6 +738,38 @@ function reconciliarComPasta(indiceAtual) {
 }
 
 // ---------- Execução principal ----------
+// Gera sitemap.xml na raiz do site: a home + todo boletim ainda ativo no
+// índice (indiceAtual já vem sem os que passaram dos 7 dias de retenção,
+// pela limparBoletinsAntigos que roda antes desta função ser chamada).
+// Sempre reescrito do zero — não precisa de manutenção manual nem corre
+// risco de listar um boletim que já foi apagado.
+function gerarSitemap(indiceAtual) {
+  const hojeIso = new Date().toISOString().slice(0, 10);
+  const urls = [
+    { loc: 'https://viverderenda.dev.br/', lastmod: hojeIso, changefreq: 'daily', priority: '1.0' },
+    ...indiceAtual.map(e => ({
+      loc: `https://viverderenda.dev.br/boletins/${e.arquivo}`,
+      lastmod: (e.dataIso || hojeIso).slice(0, 10),
+      changefreq: 'never', // boletim de um dia específico não muda depois de publicado
+      priority: '0.5',
+    })),
+  ];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(u => `  <url>
+    <loc>${u.loc}</loc>
+    <lastmod>${u.lastmod}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n')}
+</urlset>
+`;
+
+  fs.writeFileSync(path.join(RAIZ, 'sitemap.xml'), xml, 'utf-8');
+  console.log(`[boletim] sitemap.xml atualizado (${urls.length} URL(s): home + ${urls.length - 1} boletim(ns)).`);
+}
+
 async function main() {
   fs.mkdirSync(PASTA_BOLETINS, { recursive: true });
 
@@ -796,6 +833,8 @@ async function main() {
 
   fs.writeFileSync(caminhoIndice, JSON.stringify(indiceAtual, null, 2), 'utf-8');
   console.log(`[boletim] Índice atualizado: boletins/index.json (${indiceAtual.length} boletim(ns) na semana)`);
+
+  gerarSitemap(indiceAtual);
 
   await notificarAssinantes({ dataExtenso, nomeArquivo, indices });
 }
