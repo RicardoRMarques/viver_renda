@@ -339,6 +339,22 @@
     .agenda-item-valor-un span { font-weight: 400; color: var(--muted); font-family: inherit; }
     .agenda-item-valor-total { font-weight: 800; font-family: "Courier New", monospace; font-size: 1rem; color: var(--accent); margin-top: 2px; }
 
+    /* Em telas estreitas, a coluna de valor (unitário + total) não cabe
+       mais ao lado do texto — ele já quebra em várias linhas sozinho
+       (principalmente com "você tem X cotas/ações" no fim), e os dois
+       ficavam se encavalando. Abaixo de 560px, o valor passa a ocupar
+       uma linha própria, alinhada embaixo do texto (não embaixo da
+       "caixinha" da data). */
+    @media (max-width: 560px) {
+      .agenda-item { flex-wrap: wrap; align-items: flex-start; }
+      .agenda-item-info { flex-basis: calc(100% - 60px); }
+      .agenda-item-valor {
+        width: 100%; margin-left: 60px; margin-top: 8px; text-align: left;
+        display: flex; align-items: baseline; gap: 12px;
+      }
+      .agenda-item-valor-total { margin-top: 0; }
+    }
+
     /* Calculadora de Reinvestimento de Dividendos */
     .reinv-form-linha1 { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 10px; }
     .reinv-btn-adicionar { width: 100%; margin-top: 10px; }
@@ -5476,6 +5492,7 @@
       const HG_TIPO_DIVIDENDO = {
         dividend: 'Dividendo',
         interest_on_equity: 'JCP',
+        income: 'Rendimento',
         bonus_issue: 'Bonificação em ações',
         stock_split: 'Desdobramento',
         reverse_split: 'Grupamento',
@@ -7534,7 +7551,7 @@
           return serie
             .filter(ev => ev.category === 'cash' && typeof ev.amount === 'number' && ev.payment_date)
             .filter(ev => new Date(ev.payment_date + 'T00:00:00') >= new Date(hoje.toDateString())) // só o que ainda não pagou
-            .map(ev => ({ ticker, tipo: ev.type || 'Provento', valor: ev.amount, data: ev.payment_date }));
+            .map(ev => ({ ticker, tipo: hgRotuloTipoDividendo(ev.type), valor: ev.amount, data: ev.payment_date }));
         } catch (e) {
           console.warn(`Agenda de Proventos: falha ao buscar ${ticker}.`, e);
           return [];
