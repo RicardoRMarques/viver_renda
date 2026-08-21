@@ -166,6 +166,11 @@
       font-weight: bold;
     }
     .nav a:hover { color: var(--primary); }
+    .nav-link-botao {
+      background: none; border: none; color: var(--muted); font: inherit;
+      font-size: 0.85rem; font-weight: bold; cursor: pointer; padding: 0;
+    }
+    .nav-link-botao:hover { color: var(--primary); }
     .nav-icone-lupa { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: bold; }
     .nav-icone-lupa svg { width: 17px; height: 17px; flex-shrink: 0; }
     .nav-icone-lupa:hover { color: var(--primary); }
@@ -487,6 +492,7 @@
     @media (max-width: 760px) {
       .mobile-menu-btn { display: inline-flex; }
       .nav > a { display: none; }
+      .nav-link-botao { display: none; }
       .nav-dropdown { display: none; }
     }
 
@@ -2262,6 +2268,15 @@
     @media (min-width: 1024px) {
       .agenda-modal { max-width: 980px; }
     }
+    .sobre-modal { max-width: 720px; }
+    @media (min-width: 1024px) {
+      .sobre-modal { max-width: 900px; }
+    }
+    .sobre-modal .calc-corpo h4 {
+      font-size: 0.95rem; margin: 20px 0 8px; color: var(--primary);
+    }
+    .sobre-modal .calc-corpo h4:first-child { margin-top: 0; }
+    .sobre-modal .calc-corpo p { margin: 0 0 4px; line-height: 1.6; font-size: 0.9rem; }
     /* .reinv-modal precisa vir DEPOIS de .calc-modal (que também define
        max-width) — regras com a mesma especificidade, quando empatam, a
        que vem depois no arquivo vence. Colocada antes, essa regra era
@@ -2530,6 +2545,7 @@
         </a>
         <a href="#boletins-semana">Boletim de Mercado Diário</a>
         <a href="#educacao">Educação</a>
+        <button type="button" class="nav-link-botao" id="sobreBtnAbrirNav">Sobre</button>
         <div class="nav-dropdown">
           <button type="button" class="nav-dropdown-btn" id="navRendaFixaBtn" aria-haspopup="true" aria-expanded="false">
             Simuladores <span class="nav-dropdown-seta">▾</span>
@@ -2582,6 +2598,7 @@
     <a href="#alertas-preco" class="mobile-menu-item">🔔 Meus Alertas de Preço</a>
     <a href="#simuladorVisual" class="mobile-menu-item">📈 Veja o poder dos juros compostos</a>
     <a href="#educacao" class="mobile-menu-item">🎓 Educação</a>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="sobreBtnAbrirNav">ℹ️ Sobre o Viver de Renda</button>
     <div class="mobile-menu-separador">Consultas</div>
     <a href="#consulta-rapida" class="mobile-menu-item">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
     <a href="#consulta-rapida" class="mobile-menu-item">📊 Análise Fundamentalista</a>
@@ -4262,6 +4279,71 @@
     </div>
   </div>
 
+  <!-- Modal: Sobre o Viver de Renda -->
+  <div id="sobreOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="sobreTitulo" hidden>
+    <div class="calc-modal sobre-modal">
+      <div class="calc-modal-topo">
+        <h3 id="sobreTitulo">ℹ️ Sobre o Viver de Renda</h3>
+        <button id="sobreFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+
+        <h4>O projeto</h4>
+        <p>
+          O <strong>Dividendos | Viver de Renda</strong> é um site independente de educação financeira e consulta de
+          dados de mercado, focado em investimento em dividendos — ações, Fundos Imobiliários (FIIs), Fiagros e
+          Fundos de Infraestrutura (FI-Infra) listados na B3. O objetivo é reunir, num só lugar e de graça, as
+          ferramentas que um investidor de renda passiva usa no dia a dia: cotações, histórico de dividendos,
+          simuladores de reinvestimento e financiamento, calculadoras de renda fixa, alertas de preço e um boletim
+          diário de mercado.
+        </p>
+
+        <!-- ===================================================================
+             (Já preenchido em 21/08/2026 — Ricardo Marques.)
+             =================================================================== -->
+
+        <h4>Quem sou eu</h4>
+        <p>
+          Meu nome é Ricardo Marques. Trabalho há mais de 38 anos na área de tecnologia como analista e sou
+          investidor há 7 anos. Minha estratégia de investimentos é focada em renda fixa e fundos imobiliários dos
+          segmentos de logística, papel e híbridos, além de uma fatia direcionada a ações e fundos de
+          infraestrutura. Profissionalmente, dedico-me a prover suporte especializado para o departamento de TI,
+          assegurando a alta disponibilidade e a performance das aplicações, além de pesquisar novas soluções e
+          propor melhorias nos processos. Tenho expertise na instalação e gerência de bancos de dados Informix e
+          SQL Server, incluindo a configuração de ambientes de replicação como HDR e Log Shipping. Sou graduado em
+          Sistemas de Informação.
+        </p>
+        <p>
+          O que me motivou a criar este espaço foi o momento em que me encontro hoje: iniciando a minha
+          aposentadoria. Meu propósito aqui é ajudar você a buscar a sua renda passiva, para que lá na frente o seu
+          futuro não dependa apenas do governo.
+        </p>
+
+        <h4>Como o site funciona</h4>
+        <p>
+          Sou eu quem desenvolve e mantém o site sozinho — o código, o design e as ferramentas são criados e
+          atualizados por mim. Os dados de mercado (cotações, dividendos, índices) vêm de APIs de fornecedores
+          especializados (como HG Brasil e Yahoo Finance) e são atualizados automaticamente ao longo do dia; não são
+          inseridos manualmente nem calculados por opinião própria.
+        </p>
+
+        <h4>Isto não é uma recomendação de investimento</h4>
+        <p>
+          Nenhuma ferramenta, calculadora ou conteúdo deste site constitui recomendação de compra, venda ou
+          manutenção de qualquer ativo financeiro — o objetivo é puramente educativo e informativo. Rentabilidade
+          passada não representa garantia de rentabilidade futura. Antes de investir, avalie seu próprio perfil de
+          risco e, se necessário, consulte um profissional certificado.
+        </p>
+
+        <h4>Contato</h4>
+        <p>
+          Dúvidas, sugestões, correções ou parcerias: <a href="#" id="sobreContatoLink" class="footer-contato-link">carregando contato...</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+
   <footer>
     <div class="container">
       <p>Desenvolvido para investidores. Dados fornecidos via integração com a B3.</p>
@@ -4273,6 +4355,7 @@
       </p>
       <p class="disclaimer" style="margin-top:10px;">
         Dúvidas, sugestões ou parcerias: <a href="#" id="footerContatoLink" class="footer-contato-link">carregando contato...</a>
+        · <button type="button" id="sobreBtnAbrir" class="footer-contato-link" style="background:none; border:none; font: inherit; cursor:pointer; padding:0;">Sobre o Viver de Renda</button>
       </p>
     </div>
   </footer>
@@ -4285,11 +4368,13 @@
       const usuario = 'suporte';
       const dominio = 'viverderenda.dev.br';
       const enderecoCompleto = `${usuario}@${dominio}`;
-      const link = document.getElementById('footerContatoLink');
-      if (link) {
-        link.href = `mailto:${enderecoCompleto}`;
-        link.textContent = enderecoCompleto;
-      }
+      ['footerContatoLink', 'sobreContatoLink'].forEach(id => {
+        const link = document.getElementById(id);
+        if (link) {
+          link.href = `mailto:${enderecoCompleto}`;
+          link.textContent = enderecoCompleto;
+        }
+      });
     })();
   </script>
 
@@ -7718,6 +7803,34 @@
         statusEl.textContent = '';
         agendaRenderizar(todosEventos, qtdPorTicker);
       }
+    })();
+
+    // ============================================================
+    // SOBRE O VIVER DE RENDA — modal simples, sem busca de API. Dois
+    // gatilhos apontam pra cá: o link direto no menu (desktop) e o item
+    // correspondente no menu mobile (via data-mobile-alvo). O rodapé usa
+    // um <button> parecido, com o mesmo listener.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('sobreOverlay');
+      const btnFechar = document.getElementById('sobreFechar');
+      if (!overlay) return;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      ['sobreBtnAbrirNav', 'sobreBtnAbrir'].forEach(id => {
+        document.getElementById(id)?.addEventListener('click', abrirModal);
+      });
+      btnFechar?.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
     })();
 
     // ============================================================
