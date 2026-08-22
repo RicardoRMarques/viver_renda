@@ -7228,7 +7228,14 @@
       }
 
       function reinvEscolherSugestao(symbol) {
-        adicionarTickers(symbol);
+        // Só preenche o campo com o ticker escolhido — não adiciona
+        // direto à lista. Isso dá chance de ajustar valor/data ANTES de
+        // confirmar com "+ Adicionar" (clicar na sugestão não deve
+        // "pular" essa etapa, senão usa o valor/data que sobrou de um
+        // ativo anterior, sem a pessoa perceber).
+        tickerInput.value = symbol;
+        reinvFecharDropdown();
+        tickerInput.focus();
       }
 
       function reinvRenderizarDropdown(resultados) {
