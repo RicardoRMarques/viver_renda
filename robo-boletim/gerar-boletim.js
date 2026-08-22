@@ -48,7 +48,7 @@ const path = require('path');
 
 const RAIZ = path.resolve(__dirname, '..'); // raiz do repositório
 const PASTA_BOLETINS = path.join(RAIZ, 'boletins');
-const DIAS_RETENCAO = 7;
+const DIAS_RETENCAO = 31; // ~1 mês — dá margem pro mês mais longo (31 dias)
 
 // ---------- Utilidades de data ----------
 function agoraSaoPaulo() {
@@ -327,7 +327,7 @@ function montarDestaquesHtml(destaques) {
 }
 
 // ---------- Template do boletim (mesmo layout do original) ----------
-function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, tabelaFiisHtml, tabelaAcoesHtml, noticiasHtml, alertaTexto }) {
+function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, graficoMensalHtml, destaquesHtml, tabelaFiisHtml, tabelaAcoesHtml, noticiasHtml, alertaTexto }) {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -488,6 +488,8 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, destaquesHtml, 
 <div class="grid">
   ${indicadoresHtml}
 </div>
+
+${graficoMensalHtml}
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
@@ -786,6 +788,242 @@ ${urls.map(u => `  <url>
   console.log(`[boletim] sitemap.xml atualizado (${urls.length} URL(s): home + ${PAGINAS_FERRAMENTAS.length} ferramenta(s) + ${indiceAtual.length} boletim(ns)).`);
 }
 
+// ---------- Histórico de indicadores + média mensal ----------
+// Guarda um "retrato" numérico dos indicadores principais todo dia,
+// separado do ciclo de vida dos boletins HTML (que são apagados depois
+// de DIAS_RETENCAO) — assim a série histórica pra calcular médias
+// mensais não fica refém de quanto tempo os HTMLs ficam publicados.
+const CAMINHO_HISTORICO_INDICADORES = path.join(PASTA_BOLETINS, 'indicadores-historico.json');
+const CAMINHO_MEDIAS_MENSAIS = path.join(PASTA_BOLETINS, 'medias-mensais.json');
+
+// Mesmo conjunto de indicadores mostrado no grid do boletim
+// (montarIndicadoresHtml) — chave técnica (pro JSON) + como buscar no
+// indices.json + se é uma taxa (valor_pct) ou cotação (valor).
+const INDICADORES_RASTREADOS = [
+  { chave: 'ibovespa', chaves: ['IBOVESPA'] },
+  { chave: 'ifix', chaves: ['IFIX'] },
+  { chave: 'dolar', chaves: ['DÓLAR', 'DOLAR', 'USD/BRL'] },
+  { chave: 'euro', chaves: ['EURO', 'EUR/BRL'] },
+  { chave: 'bitcoin', chaves: ['BITCOIN', 'BTC'] },
+  { chave: 'ethereum', chaves: ['ETHEREUM', 'ETH'] },
+  { chave: 'selic', chaves: ['SELIC'] },
+  { chave: 'cdi', chaves: ['CDI'] },
+  { chave: 'ipca_12m', chaves: ['IPCA (12 MESES)'], exato: true },
+  { chave: 'igpm_mensal', chaves: ['IGP-M (MENSAL)', 'IGP-M'] },
+];
+
+function extrairSnapshotIndicadores(indices) {
+  const snapshot = {};
+  for (const { chave, chaves, exato } of INDICADORES_RASTREADOS) {
+    const item = buscarIndicador(indices, ...chaves, Boolean(exato));
+    if (!item) continue;
+    if (typeof item.valor === 'number') snapshot[chave] = item.valor;
+    else if (typeof item.valor_pct === 'number') snapshot[chave] = item.valor_pct;
+  }
+  return snapshot;
+}
+
+// Acrescenta (ou substitui, se já rodou hoje) o retrato do dia no
+// histórico. Retorna o histórico atualizado, pra gerarMediaMensalSeAplicavel
+// já usar sem precisar reler o arquivo do disco.
+function atualizarHistoricoIndicadores(snapshot, agora) {
+  const dataIso = agora.toISOString().slice(0, 10); // AAAA-MM-DD
+  let historico = lerJsonSeExistir(CAMINHO_HISTORICO_INDICADORES, []);
+  historico = historico.filter(e => e.data !== dataIso); // evita duplicar se rodar 2x no dia
+  historico.push({ data: dataIso, ...snapshot });
+  historico.sort((a, b) => a.data.localeCompare(b.data));
+  fs.writeFileSync(CAMINHO_HISTORICO_INDICADORES, JSON.stringify(historico, null, 2), 'utf-8');
+  console.log(`[boletim] Histórico de indicadores atualizado (${historico.length} dia(s) registrados no total).`);
+  return historico;
+}
+
+const NOMES_MES_PT = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro',
+];
+
+// No primeiro dia do mês, calcula a média de cada indicador com base
+// nos dias do mês ANTERIOR presentes no histórico, e acrescenta ao
+// medias-mensais.json (nunca sobrescreve meses já calculados). Se o mês
+// anterior não tiver nenhum dia no histórico ainda (ex: a própria
+// primeira vez que esse recurso roda), não gera nada — sem inventar
+// médias com zero dado.
+function gerarMediaMensalSeAplicavel(agora, historico) {
+  if (agora.getDate() !== 1) return; // só roda no dia 1 do mês
+
+  const mesAnterior = new Date(agora.getFullYear(), agora.getMonth() - 1, 1);
+  const anoMes = `${mesAnterior.getFullYear()}-${String(mesAnterior.getMonth() + 1).padStart(2, '0')}`;
+
+  let medias = lerJsonSeExistir(CAMINHO_MEDIAS_MENSAIS, []);
+  if (medias.some(m => m.mes === anoMes)) return; // já calculado antes, não repete
+
+  const diasDoMes = historico.filter(e => e.data.startsWith(anoMes));
+  if (diasDoMes.length === 0) {
+    console.log(`[boletim] Sem dias registrados de ${anoMes} no histórico — pulando média mensal (normal na primeira vez que esse recurso roda).`);
+    return;
+  }
+
+  const somaPorIndicador = {};
+  const contagemPorIndicador = {};
+  for (const dia of diasDoMes) {
+    for (const { chave } of INDICADORES_RASTREADOS) {
+      if (typeof dia[chave] !== 'number') continue;
+      somaPorIndicador[chave] = (somaPorIndicador[chave] || 0) + dia[chave];
+      contagemPorIndicador[chave] = (contagemPorIndicador[chave] || 0) + 1;
+    }
+  }
+  const mediasIndicadores = {};
+  for (const chave of Object.keys(somaPorIndicador)) {
+    mediasIndicadores[chave] = somaPorIndicador[chave] / contagemPorIndicador[chave];
+  }
+
+  medias.push({
+    mes: anoMes,
+    label: `${NOMES_MES_PT[mesAnterior.getMonth()]} de ${mesAnterior.getFullYear()}`,
+    dias_considerados: diasDoMes.length,
+    // Se o mês tiver menos de ~20 dias úteis no histórico, é porque esse
+    // recurso começou no meio do mês (ex: nosso primeiro mês, agosto/2026,
+    // só a partir do dia 22) — marca como parcial, pro site poder avisar
+    // que essa média não representa o mês inteiro.
+    parcial: diasDoMes.length < 20,
+    medias: mediasIndicadores,
+    gerado_em: agora.toISOString(),
+  });
+  medias.sort((a, b) => a.mes.localeCompare(b.mes));
+
+  fs.writeFileSync(CAMINHO_MEDIAS_MENSAIS, JSON.stringify(medias, null, 2), 'utf-8');
+  console.log(`[boletim] Média mensal de ${anoMes} calculada e salva (${diasDoMes.length} dia(s) considerados).`);
+}
+
+// ---------- Gráfico de médias mensais (SVG, sem depender de nenhuma
+// biblioteca externa — o boletim é um HTML estático, compartilhado por
+// WhatsApp, então precisa renderizar sozinho, sem esperar nada carregar
+// de fora) ----------
+
+// Barras horizontais — usado pras TAXAS (Selic, CDI, IPCA, IGP-M), que
+// já vêm todas em %, então cabe comparar lado a lado na mesma escala.
+function gerarGraficoBarrasSVG(itens) {
+  const largura = 560, alturaLinha = 34, margemEsq = 130, margemDir = 70, topo = 10;
+  const altura = topo * 2 + itens.length * alturaLinha;
+  const maiorValor = Math.max(...itens.map(i => i.valor), 0.01);
+  const larguraBarraMax = largura - margemEsq - margemDir;
+
+  const barras = itens.map((item, i) => {
+    const y = topo + i * alturaLinha;
+    const larguraBarra = Math.max((item.valor / maiorValor) * larguraBarraMax, 2);
+    return `
+      <text x="${margemEsq - 10}" y="${y + alturaLinha / 2 + 4}" text-anchor="end" font-size="12" fill="var(--muted)" font-family="Inter,sans-serif">${item.label}</text>
+      <rect x="${margemEsq}" y="${y + 6}" width="${larguraBarra}" height="${alturaLinha - 14}" rx="4" fill="var(--gold-soft)" opacity="0.85" />
+      <text x="${margemEsq + larguraBarra + 8}" y="${y + alturaLinha / 2 + 4}" font-size="12" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">${item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${item.sufixo || '%'}</text>
+    `;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${largura} ${altura}" width="100%" style="max-width:${largura}px; display:block; margin:0 auto;">${barras}</svg>`;
+}
+
+// Linha com pontos — usado pra cada indicador de COTAÇÃO (Ibovespa,
+// Dólar, etc), mostrando a evolução da média mensal ao longo dos meses
+// já acumulados. Com só 1-2 meses de histórico ainda fica só um ponto
+// ou dois — vai enriquecendo sozinho com o tempo.
+function gerarGraficoLinhaSVG(pontos, opcoes = {}) {
+  const { prefixo = '', sufixo = '', casasDecimais = 2 } = opcoes;
+  const largura = 260, altura = 110, margem = { topo: 14, baixo: 26, esq: 8, dir: 8 };
+  const areaLargura = largura - margem.esq - margem.dir;
+  const areaAltura = altura - margem.topo - margem.baixo;
+
+  if (pontos.length === 1) {
+    // Só 1 mês de histórico ainda — não dá pra desenhar uma linha (precisa
+    // de 2+ pontos), mostra só o ponto e o valor.
+    const p = pontos[0];
+    return `<svg viewBox="0 0 ${largura} ${altura}" width="100%" style="max-width:${largura}px;">
+      <circle cx="${largura / 2}" cy="${altura / 2 - 8}" r="4" fill="var(--gold-soft)" />
+      <text x="${largura / 2}" y="${altura / 2 + 14}" text-anchor="middle" font-size="13" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">${prefixo}${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: casasDecimais, maximumFractionDigits: casasDecimais })}${sufixo}</text>
+      <text x="${largura / 2}" y="${altura - 6}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="Inter,sans-serif">${p.label}</text>
+    </svg>`;
+  }
+
+  const valores = pontos.map(p => p.valor);
+  const min = Math.min(...valores), max = Math.max(...valores);
+  const faixa = (max - min) || 1;
+  const x = i => margem.esq + (i / (pontos.length - 1)) * areaLargura;
+  const y = v => margem.topo + areaAltura - ((v - min) / faixa) * areaAltura;
+
+  const linha = pontos.map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(i).toFixed(1)} ${y(p.valor).toFixed(1)}`).join(' ');
+  const pontosCirculos = pontos.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.valor).toFixed(1)}" r="3" fill="var(--gold-soft)" />`).join('');
+  const rotulos = pontos.map((p, i) => `<text x="${x(i).toFixed(1)}" y="${altura - 6}" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">${p.label}</text>`).join('');
+  const ultimo = pontos[pontos.length - 1];
+
+  return `<svg viewBox="0 0 ${largura} ${altura}" width="100%" style="max-width:${largura}px;">
+    <path d="${linha}" fill="none" stroke="var(--gold-soft)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+    ${pontosCirculos}
+    <text x="${x(pontos.length - 1).toFixed(1)}" y="${(y(ultimo.valor) - 10).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">${prefixo}${ultimo.valor.toLocaleString('pt-BR', { minimumFractionDigits: casasDecimais, maximumFractionDigits: casasDecimais })}${sufixo}</text>
+    ${rotulos}
+  </svg>`;
+}
+
+// Rótulos/formatação de cada indicador pro gráfico — só entra aqui quem
+// faz sentido visualizar (Bitcoin/Ethereum ficam de fora dos gráficos de
+// linha por terem escala muito diferente e mais volatilidade, o que
+// distorceria a leitura junto dos outros; continuam no boletim normal).
+const CONFIG_GRAFICO_TAXAS = [
+  { chave: 'selic', label: 'Selic' },
+  { chave: 'cdi', label: 'CDI' },
+  { chave: 'ipca_12m', label: 'IPCA (12m)' },
+  { chave: 'igpm_mensal', label: 'IGP-M (mensal)' },
+];
+const CONFIG_GRAFICO_COTACOES = [
+  { chave: 'ibovespa', label: 'Ibovespa', prefixo: '', sufixo: ' pts', casasDecimais: 0 },
+  { chave: 'ifix', label: 'IFIX', prefixo: '', sufixo: ' pts', casasDecimais: 0 },
+  { chave: 'dolar', label: 'Dólar', prefixo: 'R$ ', sufixo: '', casasDecimais: 2 },
+  { chave: 'euro', label: 'Euro', prefixo: 'R$ ', sufixo: '', casasDecimais: 2 },
+];
+
+// Só aparece nos primeiros dias do mês (a média do mês que acabou de
+// fechar) — depois disso, vira "notícia velha" e some sozinho no
+// próximo boletim, sem precisar apagar nada manualmente.
+const DIAS_MOSTRAR_GRAFICO_MENSAL = 5;
+
+function montarGraficoMensalHtml(agora) {
+  if (agora.getDate() > DIAS_MOSTRAR_GRAFICO_MENSAL) return '';
+
+  const medias = lerJsonSeExistir(CAMINHO_MEDIAS_MENSAIS, []);
+  if (medias.length === 0) return '';
+
+  const mesAnterior = new Date(agora.getFullYear(), agora.getMonth() - 1, 1);
+  const anoMesAnterior = `${mesAnterior.getFullYear()}-${String(mesAnterior.getMonth() + 1).padStart(2, '0')}`;
+  const registroMesAnterior = medias.find(m => m.mes === anoMesAnterior);
+  if (!registroMesAnterior) return ''; // nada calculado ainda pro mês passado
+
+  const itensTaxas = CONFIG_GRAFICO_TAXAS
+    .filter(c => typeof registroMesAnterior.medias[c.chave] === 'number')
+    .map(c => ({ label: c.label, valor: registroMesAnterior.medias[c.chave], sufixo: '%' }));
+
+  const graficoLinhaHtml = CONFIG_GRAFICO_COTACOES.map(c => {
+    const pontos = medias
+      .filter(m => typeof m.medias[c.chave] === 'number')
+      .slice(-6) // últimos 6 meses no máximo, pra não espremer o gráfico
+      .map(m => ({ label: m.label.split(' de ')[0].slice(0, 3), valor: m.medias[c.chave] }));
+    if (pontos.length === 0) return '';
+    return `
+      <div style="text-align:center;">
+        <div style="font-size:11px; color:var(--muted); margin-bottom:4px; font-family:Inter,sans-serif;">${c.label}</div>
+        ${gerarGraficoLinhaSVG(pontos, c)}
+      </div>`;
+  }).filter(Boolean).join('\n');
+
+  const avisoParcial = registroMesAnterior.parcial
+    ? `<p style="font-size:11px; color:var(--muted); margin:8px 0 0; font-family:Inter,sans-serif;">* Média parcial — considerando ${registroMesAnterior.dias_considerados} dia(s) úteis registrados naquele mês (recurso novo, ainda coletando histórico completo).</p>`
+    : '';
+
+  return `
+<div style="background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:16px; margin-bottom:24px;">
+  <h2 class="section" style="margin-top:0;">📊 Resumo de ${registroMesAnterior.label}</h2>
+  ${itensTaxas.length ? gerarGraficoBarrasSVG(itensTaxas) : ''}
+  ${graficoLinhaHtml ? `<div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:18px;">${graficoLinhaHtml}</div>` : ''}
+  ${avisoParcial}
+</div>`;
+}
+
 async function main() {
   fs.mkdirSync(PASTA_BOLETINS, { recursive: true });
 
@@ -797,6 +1035,13 @@ async function main() {
   const noticiasRaw = lerJsonSeExistir(path.join(RAIZ, 'noticias.json'), { destaques: [], top3: [] });
   const ranking = lerJsonSeExistir(path.join(RAIZ, 'ranking.json'), {});
 
+  // Histórico de indicadores (pra médias mensais) — grava o retrato de
+  // hoje, e se hoje for dia 1, calcula a média do mês que acabou de
+  // fechar (ver comentário nas funções pra detalhes).
+  const snapshotIndicadores = extrairSnapshotIndicadores(indices);
+  const historicoIndicadores = atualizarHistoricoIndicadores(snapshotIndicadores, agora);
+  gerarMediaMensalSeAplicavel(agora, historicoIndicadores);
+
   // Compatibilidade: o coletor de notícias passou a gerar dois grupos
   // separados ({ destaques, top3 }) em vez de uma lista única — mas se por
   // algum motivo o noticias.json ainda estiver no formato antigo (lista
@@ -807,6 +1052,7 @@ async function main() {
   const noticiasTop3 = Array.isArray(noticiasRaw) ? noticiasRaw : (noticiasRaw.top3 || []);
 
   const indicadoresHtml = montarIndicadoresHtml(indices);
+  const graficoMensalHtml = montarGraficoMensalHtml(agora);
   const tabelaFiisHtml = montarTabelaFiis(ranking);
   const tabelaAcoesHtml = montarTabelaAcoes(ranking);
   const noticiasHtml = montarNoticiasHtml(noticiasTop3);
@@ -817,6 +1063,7 @@ async function main() {
     dataExtenso,
     dataArquivo,
     indicadoresHtml,
+    graficoMensalHtml,
     destaquesHtml,
     tabelaFiisHtml,
     tabelaAcoesHtml,
@@ -848,7 +1095,7 @@ async function main() {
   indiceAtual.sort((a, b) => new Date(b.dataIso) - new Date(a.dataIso));
 
   fs.writeFileSync(caminhoIndice, JSON.stringify(indiceAtual, null, 2), 'utf-8');
-  console.log(`[boletim] Índice atualizado: boletins/index.json (${indiceAtual.length} boletim(ns) na semana)`);
+  console.log(`[boletim] Índice atualizado: boletins/index.json (${indiceAtual.length} boletim(ns) no mês)`);
 
   gerarSitemap(indiceAtual);
 
