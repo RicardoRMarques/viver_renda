@@ -38,14 +38,30 @@
   {
     "label": "Bitcoin",
     "prefixo": "US$ ",
-    "valor": 77392.0,
-    "variacao_pct": 0.3415390575967832
+    "valor": 77439.0,
+    "variacao_pct": 0.4575216307902377
   },
   {
     "label": "Ethereum",
     "prefixo": "US$ ",
-    "valor": 2433.71,
-    "variacao_pct": 0.7046448962162979
+    "valor": 2441.62,
+    "variacao_pct": 1.135198883539649
+  },
+  {
+    "label": "IPCA (mensal)",
+    "valor_pct": 0.07,
+    "referencia": "01/07/2026"
+  },
+  {
+    "label": "IPCA (12 meses)",
+    "valor_pct": 4.44302461783459,
+    "referencia": "01/07/2026",
+    "meses": 12
+  },
+  {
+    "label": "IGP-M (mensal)",
+    "valor_pct": -1.16,
+    "referencia": "01/07/2026"
   },
   {
     "label": "CPI (EUA, mensal)",
