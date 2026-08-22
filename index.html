@@ -505,6 +505,10 @@
     .reinv-card-linha span:last-child { color: var(--text); font-weight: 700; text-align: right; }
     .reinv-card-erro { color: var(--danger); font-size: 0.85rem; }
     .reinv-card-fonte { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.68rem; color: var(--muted); }
+    .reinv-card-aviso {
+      margin-top: 8px; padding: 8px 10px; border-radius: 8px; font-size: 0.75rem; line-height: 1.5;
+      background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); color: var(--gold);
+    }
 
     @media (max-width: 640px) {
       .reinv-form-linha1 { grid-template-columns: 1fr; }
@@ -7458,6 +7462,13 @@
           valorFinalComReinvestimento, valorFinalSemReinvestimento,
           rentabilidadePct, rentabilidadeSemReinvestPct, valorInvestido, dataCompra,
           fonteDados,
+          // Na vida real, FII/ação só se compra em cotas/unidades inteiras
+          // (não existe "0,62 cotas"). Esse cálculo trata a quantidade
+          // como um número contínuo, de propósito (é o jeito padrão de
+          // simular juros compostos) — mas se o valor investido nem dá
+          // pra comprar 1 cota inteira ao preço da época, é bom avisar,
+          // já que na prática essa compra específica não seria possível.
+          compraImpossivelNaPratica: valorInvestido < precoCompraInfo.close,
         };
       }
 
@@ -7482,6 +7493,7 @@
               <div class="reinv-card-linha"><span>Reinvestimentos</span><span>${r.eventosReinvestidos}</span></div>
               <div class="reinv-card-linha"><span>Dividendos recebidos</span><span>${reinvFormatMoeda(r.totalDividendosRecebidos)}</span></div>
               <div class="reinv-card-linha"><span>Valor hoje</span><span>${reinvFormatMoeda(r.valorFinalComReinvestimento)}</span></div>
+              ${r.compraImpossivelNaPratica ? `<div class="reinv-card-aviso">⚠️ Com ${reinvFormatMoeda(r.valorInvestido)}, não daria pra comprar nem 1 cota/ação inteira ao preço da época (${reinvFormatMoeda(r.precoCompraInfo.close)}) — essa compra específica não seria possível na prática. O cálculo trata a quantidade como fração, útil pra ver o efeito do reinvestimento, mas não é uma ordem real executável.</div>` : ''}
               <div class="reinv-card-fonte">Fonte do histórico: ${r.fonteDados === 'yahoo' ? 'Yahoo Finance' : 'HG Brasil'}</div>
             </div>`;
         }).join('');
@@ -7680,6 +7692,30 @@
           doc.text('Aviso:', 40, y);
           doc.setFont('helvetica', 'normal');
           doc.text(linhasTexto, 68, y);
+          doc.setTextColor(0);
+        }
+
+        // Aviso: valor investido menor que o preço de 1 cota/ação na
+        // época — compra que na prática não seria executável (não existe
+        // fração de cota/ação em FII/ação de verdade).
+        const compraImpossivel = linhas.filter(l => !l.erro && l.resultado.compraImpossivelNaPratica);
+        if (compraImpossivel.length) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          const alturaPagina = doc.internal.pageSize.getHeight();
+          const textoAviso2 = `Valor investido menor que o preço de 1 cota/ação na época (compra não executável na prática) para: ${compraImpossivel.map(l => l.ticker).join(', ')}.`;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          const linhasTexto2 = doc.splitTextToSize(textoAviso2, larguraPagina - 80);
+          let y2 = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 96) + (truncados.length ? 40 : 20);
+          if (y2 + linhasTexto2.length * 11 > alturaPagina - 30) {
+            doc.addPage();
+            y2 = 40;
+          }
+          doc.setTextColor(180, 130, 0);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Aviso:', 40, y2);
+          doc.setFont('helvetica', 'normal');
+          doc.text(linhasTexto2, 68, y2);
           doc.setTextColor(0);
         }
 
