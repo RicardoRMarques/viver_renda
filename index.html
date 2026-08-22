@@ -7080,6 +7080,44 @@
       const btnCalcular = document.getElementById('reinvBtnCalcular');
       const statusEl = document.getElementById('reinvStatus');
       const resultadoEl = document.getElementById('reinvResultado');
+
+      // No celular, o seletor nativo de data (calendário/roleta) é
+      // incômodo de usar — troca pra campo de texto com máscara
+      // DD/MM/AAAA, mais rápido de digitar direto. No desktop mantém o
+      // <input type="date"> nativo (com o ícone de calendário), que
+      // funciona bem por lá.
+      if (dataInput && ehDispositivoMovel()) {
+        dataInput.type = 'text';
+        dataInput.setAttribute('inputmode', 'numeric');
+        dataInput.setAttribute('placeholder', 'DD/MM/AAAA');
+        dataInput.setAttribute('maxlength', '10');
+        dataInput.addEventListener('input', () => {
+          let v = dataInput.value.replace(/\D/g, '').slice(0, 8);
+          if (v.length >= 5) v = `${v.slice(0, 2)}/${v.slice(2, 4)}/${v.slice(4)}`;
+          else if (v.length >= 3) v = `${v.slice(0, 2)}/${v.slice(2)}`;
+          dataInput.value = v;
+        });
+      }
+
+      // Lê a data do campo sempre em ISO (AAAA-MM-DD), não importa se o
+      // campo é o <input type="date"> nativo (desktop) ou o texto
+      // mascarado DD/MM/AAAA (mobile) — o resto do código só lida com
+      // ISO, sem precisar saber qual dos dois modos está ativo.
+      function reinvLerDataISO() {
+        if (!dataInput) return '';
+        if (dataInput.type === 'date') return dataInput.value;
+        const m = dataInput.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        return m ? `${m[3]}-${m[2]}-${m[1]}` : '';
+      }
+
+      // Contrário da de cima: escreve uma data ISO no campo, no formato
+      // certo pra cada modo (usado só pra preencher o valor padrão).
+      function reinvEscreverDataISO(iso) {
+        if (!dataInput) return;
+        if (dataInput.type === 'date') { dataInput.value = iso; return; }
+        const [y, mo, d] = iso.split('-');
+        dataInput.value = `${d}/${mo}/${y}`;
+      }
       if (!btnAbrir || !overlay) return;
 
       const LIMITE_ATIVOS = 15;
@@ -7114,10 +7152,12 @@
           statusEl.textContent = 'Informe um valor investido válido antes de adicionar o ativo.';
           return;
         }
-        const dataCompraStr = dataInput?.value;
+        const dataCompraStr = reinvLerDataISO();
         if (!dataCompraStr) {
           statusEl.className = 'hg-status erro';
-          statusEl.textContent = 'Informe a data da compra antes de adicionar o ativo.';
+          statusEl.textContent = ehDispositivoMovel()
+            ? 'Informe a data da compra no formato DD/MM/AAAA antes de adicionar o ativo.'
+            : 'Informe a data da compra antes de adicionar o ativo.';
           return;
         }
         const dataCompraAtual = new Date(dataCompraStr + 'T00:00:00');
@@ -7155,7 +7195,7 @@
         if (dataInput && !dataInput.value) {
           const umAnoAtras = new Date();
           umAnoAtras.setFullYear(umAnoAtras.getFullYear() - 1);
-          dataInput.value = umAnoAtras.toISOString().slice(0, 10);
+          reinvEscreverDataISO(umAnoAtras.toISOString().slice(0, 10));
         }
         tickerInput?.focus({ preventScroll: true });
       }
