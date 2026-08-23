@@ -7528,38 +7528,33 @@
         const qtdInicial = qtd;
         let totalDividendosRecebidos = 0;
         let eventosReinvestidos = 0;
-        const splitsAplicados = [];
+        const splitsNoPeriodo = [];
 
-        // Dividendos e desdobramentos/grupamentos precisam ser processados
-        // na ORDEM CRONOLÓGICA CERTA, misturados — o preço histórico do
-        // Yahoo não é ajustado por split (o valor da cota "pula" na data
-        // do evento), então sem reajustar a quantidade nesse ponto exato,
-        // o resultado final ficaria inflado/distorcido pela proporção do
-        // split, mesmo esse evento não representando ganho ou perda real
-        // nenhuma pro investidor.
-        const eventos = [
-          ...dividendos.map(ev => ({ tipo: 'dividendo', data: ev.payment_date, ev })),
-          ...splits.map(ev => ({ tipo: 'split', data: ev.data, ev })),
-        ].sort((a, b) => new Date(a.data) - new Date(b.data));
-
-        for (const evento of eventos) {
-          const dataEvento = new Date(evento.data + 'T00:00:00');
-          if (dataEvento < dataInicioReal) continue;
-
-          if (evento.tipo === 'split') {
-            const { fator, numerador, denominador } = evento.ev;
-            if (!Number.isFinite(fator) || fator <= 0) continue;
-            qtd *= fator;
-            splitsAplicados.push({ data: evento.data, numerador, denominador, fator });
-            continue;
-          }
-
-          const precoInfo = reinvPrecoNaData(precos, dataEvento);
+        // IMPORTANTE: o preço histórico que o Yahoo Finance devolve (o
+        // campo "close" que salvamos) já vem AJUSTADO pra desdobramento/
+        // grupamento — confirmado na prática (arquivo real do GGRC11):
+        // o preço muda menos de 1% entre uma semana e outra bem no meio
+        // do split de 10:1 de 06/03/2024, quando o esperado seria uma
+        // queda de ~90% se fosse preço bruto. Por isso NÃO precisa (e
+        // NÃO deve) mexer na quantidade de cotas quando encontra um
+        // split — o preço já "absorveu" o evento sozinho. A lista de
+        // splits só serve pra AVISAR que o evento existiu naquele
+        // período (informativo), sem alterar o cálculo.
+        for (const ev of dividendos) {
+          const dataPagamento = new Date(ev.payment_date + 'T00:00:00');
+          if (dataPagamento < dataInicioReal) continue;
+          const precoInfo = reinvPrecoNaData(precos, dataPagamento);
           if (!precoInfo || !precoInfo.close) continue;
-          const valorRecebido = qtd * evento.ev.amount;
+          const valorRecebido = qtd * ev.amount;
           totalDividendosRecebidos += valorRecebido;
           qtd += valorRecebido / precoInfo.close;
           eventosReinvestidos++;
+        }
+
+        for (const s of splits) {
+          const dataEvento = new Date(s.data + 'T00:00:00');
+          if (dataEvento < dataInicioReal) continue;
+          splitsNoPeriodo.push(s);
         }
 
         const precoAtual = precos[precos.length - 1].close;
@@ -7573,7 +7568,7 @@
           qtdInicial, qtd, eventosReinvestidos, totalDividendosRecebidos,
           valorFinalComReinvestimento, valorFinalSemReinvestimento,
           rentabilidadePct, rentabilidadeSemReinvestPct, valorInvestido, dataCompra,
-          fonteDados, splitsAplicados,
+          fonteDados, splitsNoPeriodo,
           // Na vida real, FII/ação só se compra em cotas/unidades inteiras
           // (não existe "0,62 cotas"). Esse cálculo trata a quantidade
           // como um número contínuo, de propósito (é o jeito padrão de
@@ -7606,7 +7601,7 @@
               <div class="reinv-card-linha"><span>Dividendos recebidos</span><span>${reinvFormatMoeda(r.totalDividendosRecebidos)}</span></div>
               <div class="reinv-card-linha"><span>Valor hoje</span><span>${reinvFormatMoeda(r.valorFinalComReinvestimento)}</span></div>
               ${r.compraImpossivelNaPratica ? `<div class="reinv-card-aviso">⚠️ Com ${reinvFormatMoeda(r.valorInvestido)}, não daria pra comprar nem 1 cota/ação inteira ao preço da época (${reinvFormatMoeda(r.precoCompraInfo.close)}) — essa compra específica não seria possível na prática. O cálculo trata a quantidade como fração, útil pra ver o efeito do reinvestimento, mas não é uma ordem real executável.</div>` : ''}
-              ${r.splitsAplicados && r.splitsAplicados.length ? `<div class="reinv-card-aviso">🔀 ${r.splitsAplicados.length === 1 ? 'Detectamos e ajustamos 1 desdobramento/grupamento' : `Detectamos e ajustamos ${r.splitsAplicados.length} desdobramentos/grupamentos`} no período: ${r.splitsAplicados.map(s => `${new Date(s.data + 'T00:00:00').toLocaleDateString('pt-BR')} (proporção ${s.numerador}:${s.denominador})`).join(', ')}. A quantidade de cotas/ações já foi corrigida na mesma proporção — o "pulo" no preço da cota naquela data não representa ganho ou perda real.</div>` : ''}
+              ${r.splitsNoPeriodo && r.splitsNoPeriodo.length ? `<div class="reinv-card-aviso">🔀 ${r.splitsNoPeriodo.length === 1 ? 'Este ativo passou por 1 desdobramento/grupamento' : `Este ativo passou por ${r.splitsNoPeriodo.length} desdobramentos/grupamentos`} no período: ${r.splitsNoPeriodo.map(s => `${new Date(s.data + 'T00:00:00').toLocaleDateString('pt-BR')} (proporção ${s.numerador}:${s.denominador})`).join(', ')}. Isso é só um aviso informativo — o preço histórico que usamos já vem ajustado pra esse tipo de evento, então o cálculo não precisa (nem deve) fazer nenhum ajuste extra.</div>` : ''}
               <div class="reinv-card-fonte">Fonte do histórico: ${r.fonteDados === 'yahoo' ? 'Yahoo Finance' : 'HG Brasil'}</div>
             </div>`;
         }).join('');
@@ -7832,13 +7827,13 @@
           doc.setTextColor(0);
         }
 
-        // Aviso: desdobramento/grupamento detectado e ajustado no período
-        // (mesma lógica do card na tela).
-        const comSplit = linhas.filter(l => !l.erro && l.resultado.splitsAplicados && l.resultado.splitsAplicados.length);
+        // Aviso: desdobramento/grupamento (informativo — mesma lógica do
+        // card na tela).
+        const comSplit = linhas.filter(l => !l.erro && l.resultado.splitsNoPeriodo && l.resultado.splitsNoPeriodo.length);
         if (comSplit.length) {
           const larguraPagina = doc.internal.pageSize.getWidth();
           const alturaPagina = doc.internal.pageSize.getHeight();
-          const textoAviso3 = `Desdobramento/grupamento detectado e ajustado automaticamente para: ${comSplit.map(l => `${l.ticker} (${l.resultado.splitsAplicados.map(s => `${new Date(s.data + 'T00:00:00').toLocaleDateString('pt-BR')} — ${s.numerador}:${s.denominador}`).join(', ')})`).join('; ')}.`;
+          const textoAviso3 = `Passaram por desdobramento/grupamento no período (informativo — o preço histórico já vem ajustado, sem impacto no cálculo): ${comSplit.map(l => `${l.ticker} (${l.resultado.splitsNoPeriodo.map(s => `${new Date(s.data + 'T00:00:00').toLocaleDateString('pt-BR')} — ${s.numerador}:${s.denominador}`).join(', ')})`).join('; ')}.`;
           doc.setFont('helvetica', 'normal');
           doc.setFontSize(8);
           const linhasTexto3 = doc.splitTextToSize(textoAviso3, larguraPagina - 80);
