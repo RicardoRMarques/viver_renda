@@ -4368,10 +4368,23 @@
         <p class="calc-ajuda" style="margin-top:16px;">
           <strong>Como calculamos:</strong> a cada pagamento de dividendo no período, o valor recebido é usado pra
           comprar mais cotas/ações pelo preço de fechamento da data de pagamento, aumentando a quantidade que segue
-          rendendo dividendos daí em diante (efeito bola de neve). O preço histórico da B3 disponível na nossa fonte
-          de dados cobre um período limitado (normalmente até ~1 ano) — se a data escolhida for mais antiga que isso,
-          avisamos aqui e usamos a data mais antiga disponível como ponto de partida. Simulação educativa; não
-          considera taxas, impostos (quando aplicável) nem garante que o mesmo resultado se repita no futuro.
+          rendendo dividendos daí em diante (efeito bola de neve).
+        </p>
+        <p class="calc-ajuda">
+          <strong>"Dividendos recebidos" não é dinheiro parado</strong> — é a soma do que caiu em cada pagamento, mas
+          esse valor já foi usado na hora pra comprar mais cotas (é o próprio mecanismo do reinvestimento). Por isso
+          "Valor investido" + "Dividendos recebidos" não bate exatamente com "Valor hoje": as cotas compradas com o
+          dividendo valem, hoje, o que o preço atual diz que valem — não o valor "congelado" de quando o dividendo
+          caiu. "Valor hoje" (quantidade final de cotas × preço de hoje) é sempre o número correto; os outros dois
+          são só informação de apoio pra entender o caminho até ali.
+        </p>
+        <p class="calc-ajuda">
+          <strong>Fonte do histórico de preço:</strong> usamos o Yahoo Finance como fonte principal — cobre décadas
+          de histórico pros ativos já coletados. Se um ticker ainda não estiver nessa base, caímos pra HG Brasil como
+          reserva, que tem um período mais curto disponível (normalmente até ~1 ano); nesse caso, se a data escolhida
+          for mais antiga do que isso, avisamos aqui e usamos a data mais antiga disponível como ponto de partida.
+          Simulação educativa; não considera taxas, impostos (quando aplicável) nem garante que o mesmo resultado se
+          repita no futuro.
         </p>
       </div>
     </div>
