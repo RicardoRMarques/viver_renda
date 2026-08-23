@@ -7458,7 +7458,11 @@
           const dividendos = (Array.isArray(dados.dividendos) ? dados.dividendos : [])
             .map(d => ({ payment_date: d.data, amount: d.valor, status: 'paid', category: 'cash' }))
             .sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
-          const resultado = { serie, dividendos, fonte: 'yahoo' };
+          const splits = (Array.isArray(dados.splits) ? dados.splits : [])
+            .filter(s => typeof s.numerador === 'number' && typeof s.denominador === 'number' && s.denominador !== 0)
+            .map(s => ({ data: s.data, fator: s.numerador / s.denominador, numerador: s.numerador, denominador: s.denominador }))
+            .sort((a, b) => new Date(a.data) - new Date(b.data));
+          const resultado = { serie, dividendos, splits, fonte: 'yahoo' };
           _reinvCacheLocal[ticker] = resultado;
           return resultado;
         } catch (e) {
@@ -7470,7 +7474,7 @@
       async function reinvCalcularUmAtivo(ticker, dataCompra, valorInvestido, hoje) {
         const local = await reinvBuscarHistoricoLocal(ticker);
 
-        let precos, truncado, inicioEfetivo, dividendos, fonteDados;
+        let precos, truncado, inicioEfetivo, dividendos, fonteDados, splits;
 
         if (local && local.serie.length) {
           precos = local.serie;
@@ -7478,6 +7482,7 @@
           truncado = primeiraData > dataCompra;
           inicioEfetivo = truncado ? primeiraData : dataCompra;
           dividendos = local.dividendos;
+          splits = local.splits || []; // só o Yahoo traz isso — HG Brasil não tem essa informação
           fonteDados = 'yahoo';
         } else {
           const resultadoHg = await reinvBuscarHistoricoPrecos(ticker, dataCompra, hoje);
@@ -7487,6 +7492,7 @@
           if (!precos.length) throw new Error('Sem histórico de preços disponível.');
           const dataParaBuscarDividendos = truncado ? inicioEfetivo : dataCompra;
           dividendos = await reinvBuscarDividendos(ticker, dataParaBuscarDividendos, hoje);
+          splits = [];
           fonteDados = 'hgbrasil';
         }
 
@@ -7498,13 +7504,35 @@
         const qtdInicial = qtd;
         let totalDividendosRecebidos = 0;
         let eventosReinvestidos = 0;
+        const splitsAplicados = [];
 
-        for (const ev of dividendos) {
-          const dataPagamento = new Date(ev.payment_date + 'T00:00:00');
-          if (dataPagamento < dataInicioReal) continue;
-          const precoInfo = reinvPrecoNaData(precos, dataPagamento);
+        // Dividendos e desdobramentos/grupamentos precisam ser processados
+        // na ORDEM CRONOLÓGICA CERTA, misturados — o preço histórico do
+        // Yahoo não é ajustado por split (o valor da cota "pula" na data
+        // do evento), então sem reajustar a quantidade nesse ponto exato,
+        // o resultado final ficaria inflado/distorcido pela proporção do
+        // split, mesmo esse evento não representando ganho ou perda real
+        // nenhuma pro investidor.
+        const eventos = [
+          ...dividendos.map(ev => ({ tipo: 'dividendo', data: ev.payment_date, ev })),
+          ...splits.map(ev => ({ tipo: 'split', data: ev.data, ev })),
+        ].sort((a, b) => new Date(a.data) - new Date(b.data));
+
+        for (const evento of eventos) {
+          const dataEvento = new Date(evento.data + 'T00:00:00');
+          if (dataEvento < dataInicioReal) continue;
+
+          if (evento.tipo === 'split') {
+            const { fator, numerador, denominador } = evento.ev;
+            if (!Number.isFinite(fator) || fator <= 0) continue;
+            qtd *= fator;
+            splitsAplicados.push({ data: evento.data, numerador, denominador, fator });
+            continue;
+          }
+
+          const precoInfo = reinvPrecoNaData(precos, dataEvento);
           if (!precoInfo || !precoInfo.close) continue;
-          const valorRecebido = qtd * ev.amount;
+          const valorRecebido = qtd * evento.ev.amount;
           totalDividendosRecebidos += valorRecebido;
           qtd += valorRecebido / precoInfo.close;
           eventosReinvestidos++;
@@ -7521,7 +7549,7 @@
           qtdInicial, qtd, eventosReinvestidos, totalDividendosRecebidos,
           valorFinalComReinvestimento, valorFinalSemReinvestimento,
           rentabilidadePct, rentabilidadeSemReinvestPct, valorInvestido, dataCompra,
-          fonteDados,
+          fonteDados, splitsAplicados,
           // Na vida real, FII/ação só se compra em cotas/unidades inteiras
           // (não existe "0,62 cotas"). Esse cálculo trata a quantidade
           // como um número contínuo, de propósito (é o jeito padrão de
@@ -7554,6 +7582,7 @@
               <div class="reinv-card-linha"><span>Dividendos recebidos</span><span>${reinvFormatMoeda(r.totalDividendosRecebidos)}</span></div>
               <div class="reinv-card-linha"><span>Valor hoje</span><span>${reinvFormatMoeda(r.valorFinalComReinvestimento)}</span></div>
               ${r.compraImpossivelNaPratica ? `<div class="reinv-card-aviso">⚠️ Com ${reinvFormatMoeda(r.valorInvestido)}, não daria pra comprar nem 1 cota/ação inteira ao preço da época (${reinvFormatMoeda(r.precoCompraInfo.close)}) — essa compra específica não seria possível na prática. O cálculo trata a quantidade como fração, útil pra ver o efeito do reinvestimento, mas não é uma ordem real executável.</div>` : ''}
+              ${r.splitsAplicados && r.splitsAplicados.length ? `<div class="reinv-card-aviso">🔀 ${r.splitsAplicados.length === 1 ? 'Detectamos e ajustamos 1 desdobramento/grupamento' : `Detectamos e ajustamos ${r.splitsAplicados.length} desdobramentos/grupamentos`} no período: ${r.splitsAplicados.map(s => `${new Date(s.data + 'T00:00:00').toLocaleDateString('pt-BR')} (proporção ${s.numerador}:${s.denominador})`).join(', ')}. A quantidade de cotas/ações já foi corrigida na mesma proporção — o "pulo" no preço da cota naquela data não representa ganho ou perda real.</div>` : ''}
               <div class="reinv-card-fonte">Fonte do histórico: ${r.fonteDados === 'yahoo' ? 'Yahoo Finance' : 'HG Brasil'}</div>
             </div>`;
         }).join('');
@@ -7776,6 +7805,29 @@
           doc.text('Aviso:', 40, y2);
           doc.setFont('helvetica', 'normal');
           doc.text(linhasTexto2, 68, y2);
+          doc.setTextColor(0);
+        }
+
+        // Aviso: desdobramento/grupamento detectado e ajustado no período
+        // (mesma lógica do card na tela).
+        const comSplit = linhas.filter(l => !l.erro && l.resultado.splitsAplicados && l.resultado.splitsAplicados.length);
+        if (comSplit.length) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          const alturaPagina = doc.internal.pageSize.getHeight();
+          const textoAviso3 = `Desdobramento/grupamento detectado e ajustado automaticamente para: ${comSplit.map(l => `${l.ticker} (${l.resultado.splitsAplicados.map(s => `${new Date(s.data + 'T00:00:00').toLocaleDateString('pt-BR')} — ${s.numerador}:${s.denominador}`).join(', ')})`).join('; ')}.`;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          const linhasTexto3 = doc.splitTextToSize(textoAviso3, larguraPagina - 80);
+          let y3 = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 96) + (truncados.length ? 20 : 0) + 40;
+          if (y3 + linhasTexto3.length * 11 > alturaPagina - 30) {
+            doc.addPage();
+            y3 = 40;
+          }
+          doc.setTextColor(180, 130, 0);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Aviso:', 40, y3);
+          doc.setFont('helvetica', 'normal');
+          doc.text(linhasTexto3, 68, y3);
           doc.setTextColor(0);
         }
 
