@@ -175,6 +175,27 @@ def buscar_yahoo(ticker_b3):
         return None, str(e)
 
 
+def deduplicar_splits(splits_ordenados):
+    """O Yahoo Finance às vezes registra o MESMO desdobramento/grupamento
+    duas vezes, com datas próximas (1-2 dias de diferença) — nenhum
+    fundo/empresa faz o mesmo split duas vezes em poucos dias. Junta como
+    um evento só quando a proporção é igual e as datas estão próximas
+    (até 5 dias), mantendo o primeiro."""
+    JANELA_DIAS_DUPLICATA = 5
+    resultado = []
+    for s in splits_ordenados:
+        data_s = datetime.strptime(s["data"], "%Y-%m-%d")
+        duplicata = any(
+            s["numerador"] == r["numerador"]
+            and s["denominador"] == r["denominador"]
+            and abs((data_s - datetime.strptime(r["data"], "%Y-%m-%d")).days) <= JANELA_DIAS_DUPLICATA
+            for r in resultado
+        )
+        if not duplicata:
+            resultado.append(s)
+    return resultado
+
+
 def processar(ticker, bruto):
     try:
         resultado = bruto["chart"]["result"][0]
@@ -208,9 +229,13 @@ def processar(ticker, bruto):
         key=lambda d: d["data"],
     )
 
-    # Splits ficam guardados pra uso futuro — a calculadora ainda NÃO
-    # ajusta quantidade/preço em caso de desdobramento/grupamento.
-    splits = sorted(
+    # A calculadora de reinvestimento (index.html) já usa isso pra
+    # ajustar quantidade/preço em caso de desdobramento/grupamento —
+    # deduplicar_splits() abaixo evita que o mesmo evento real apareça
+    # duas vezes na base do Yahoo (visto de verdade no ALZR11: um único
+    # desdobramento efetivado em 05/05/2025 apareceu como dois registros,
+    # 06/05 e 07/05, o que inflava o resultado em 10x indevidos).
+    splits_brutos_lista = sorted(
         (
             {
                 "data": data_iso(ev["date"]),
@@ -221,6 +246,7 @@ def processar(ticker, bruto):
         ),
         key=lambda d: d["data"],
     )
+    splits = deduplicar_splits(splits_brutos_lista)
 
     return {
         "ticker": ticker,

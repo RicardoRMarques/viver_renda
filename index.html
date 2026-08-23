@@ -7445,6 +7445,29 @@
       // o arquivo não existe/dá erro), retorna null e quem chamou cai de
       // volta pro caminho ao vivo via HG Brasil.
       let _reinvCacheLocal = {};
+      // O Yahoo Finance (via o robô coletor) às vezes registra o MESMO
+      // desdobramento/grupamento duas vezes, com datas de 1-2 dias de
+      // diferença (visto de verdade no ALZR11: um único desdobramento
+      // real de 1-pra-10, efetivado em 05/05/2025, apareceu na base como
+      // dois eventos separados — 06/05 e 07/05, mesma proporção — o que
+      // duplicava o ajuste, 10× × 10× = 100× em vez de só 10×). Nenhum
+      // fundo/empresa faz o mesmo split duas vezes em poucos dias — junta
+      // como um evento só quando a proporção é igual e as datas estão
+      // próximas, mantendo o primeiro.
+      function reinvDedupSplits(splitsBrutos) {
+        const ordenados = [...splitsBrutos].sort((a, b) => new Date(a.data) - new Date(b.data));
+        const JANELA_DIAS_DUPLICATA = 5;
+        const resultado = [];
+        for (const s of ordenados) {
+          const duplicata = resultado.some(r =>
+            r.numerador === s.numerador && r.denominador === s.denominador &&
+            Math.abs(new Date(s.data) - new Date(r.data)) <= JANELA_DIAS_DUPLICATA * 24 * 60 * 60 * 1000
+          );
+          if (!duplicata) resultado.push(s);
+        }
+        return resultado;
+      }
+
       async function reinvBuscarHistoricoLocal(ticker) {
         if (ticker in _reinvCacheLocal) return _reinvCacheLocal[ticker];
         try {
@@ -7458,10 +7481,11 @@
           const dividendos = (Array.isArray(dados.dividendos) ? dados.dividendos : [])
             .map(d => ({ payment_date: d.data, amount: d.valor, status: 'paid', category: 'cash' }))
             .sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date));
-          const splits = (Array.isArray(dados.splits) ? dados.splits : [])
-            .filter(s => typeof s.numerador === 'number' && typeof s.denominador === 'number' && s.denominador !== 0)
-            .map(s => ({ data: s.data, fator: s.numerador / s.denominador, numerador: s.numerador, denominador: s.denominador }))
-            .sort((a, b) => new Date(a.data) - new Date(b.data));
+          const splits = reinvDedupSplits(
+            (Array.isArray(dados.splits) ? dados.splits : [])
+              .filter(s => typeof s.numerador === 'number' && typeof s.denominador === 'number' && s.denominador !== 0)
+              .map(s => ({ data: s.data, fator: s.numerador / s.denominador, numerador: s.numerador, denominador: s.denominador }))
+          );
           const resultado = { serie, dividendos, splits, fonte: 'yahoo' };
           _reinvCacheLocal[ticker] = resultado;
           return resultado;
