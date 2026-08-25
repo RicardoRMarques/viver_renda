@@ -2949,10 +2949,17 @@
               symbol: detectarSimbolo(ticker),
               interval: 'D',
               timezone: 'America/Sao_Paulo',
-              theme: document.body.classList.contains('tema-claro') ? 'light' : 'dark',
+              // Fundo branco como padrão (independe do tema escuro/claro/branco
+              // do site — o widget do TradingView sempre abre no tema "light",
+              // que é o de fundo branco). Antes disso checava a classe CSS
+              // "tema-claro" no <body>, mas o site nunca chega a aplicar essa
+              // classe (o alternador de tema usa o atributo data-theme no
+              // <html> — ver aplicarTema() mais abaixo no arquivo), então o
+              // gráfico sempre abria no tema escuro por engano.
+              theme: 'light',
+              toolbar_bg: '#ffffff',
               style: '1',
               locale: 'br',
-              toolbar_bg: 'transparent',
               enable_publishing: false,
               hide_top_toolbar: false,
               hide_legend: false,
