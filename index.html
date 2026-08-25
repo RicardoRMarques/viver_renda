@@ -1570,9 +1570,14 @@
       color: var(--muted);
     }
 
-    /* Seção "Notícias do Mercado Econômico" — logo abaixo das calculadoras */
+    /* Seção "Notícias do Mercado Econômico" — logo abaixo das calculadoras.
+       max-width igual ao do .container (1200px) — antes estava em 1100px,
+       100px mais estreito que o container que a envolve, então a seção
+       inteira sobrava "recuada" pra dentro (auto-margin preenchendo a
+       diferença dos dois lados) em vez de acompanhar a largura da caixa
+       de Consulta Ações/FIIs logo acima, que usa a largura cheia. */
     .section-noticias-mercado {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 8px auto 32px;
       padding: 0 20px;
     }
@@ -1597,9 +1602,12 @@
       .section-noticias-mercado { padding: 0 16px; }
     }
 
-    /* Seção "Consultar gráfico de um ativo" — busca de ticker + widget TradingView */
+    /* Seção "Consultar gráfico de um ativo" — busca de ticker + widget TradingView.
+       Mesmo ajuste da seção de Notícias logo acima: max-width igual ao do
+       .container (1200px) pra acompanhar a largura da caixa de Consulta
+       Ações/FIIs, em vez de ficar 100px mais estreita e recuada. */
     .section-grafico-consulta {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 8px auto 32px;
       padding: 0 20px;
     }
