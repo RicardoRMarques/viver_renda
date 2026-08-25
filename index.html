@@ -404,6 +404,18 @@
       .carteira-modal .calc-corpo { padding-top: 14px; }
     }
     .carteira-fixo-corpo { padding: 14px 20px 16px; display: flex; flex-direction: column; gap: 14px; }
+    /* #carteiraStatus fica vazio na maior parte do tempo (só mostra texto
+       depois de tentar adicionar um ativo) mas, como qualquer .hg-status,
+       carrega margin:14px 0 + min-height:1.2em próprios — somados ao
+       gap:14px do flex acima e ao margin-top:14px que .carteira-resumo-cards
+       também tem, o espaço entre os chips e os cards de resumo ficava bem
+       maior do que os outros "gaps" de 14px do bloco. Zerando as duas
+       margens só aqui (com o elemento vazio) e o margin-top dos cards, o
+       espaçamento volta a ser só o gap:14px do flex, igual ao resto —
+       quando #carteiraStatus tiver mesmo uma mensagem pra mostrar, ele
+       deixa de ser :empty e volta a ter a margem normal. */
+    .carteira-fixo-corpo #carteiraStatus:empty { margin: 0; min-height: 0; }
+    .carteira-fixo-corpo .carteira-resumo-cards { margin-top: 0; }
 
     /* Carteira de Rendimentos — mover e redimensionar (só desktop/tablet).
        Diferente dos outros modais (fixos e centralizados via flex do
