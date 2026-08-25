@@ -372,6 +372,25 @@
       font-size: 1rem; line-height: 1; padding: 2px 6px;
     }
     .carteira-remover:hover { color: #e05555; }
+    /* Cabeçalho + formulário de adicionar ativo + cards de resumo fixos
+       no topo do modal: com muitos ativos na carteira, o .calc-modal
+       inteiro rola verticalmente (ver comentário acima sobre
+       max-height:90vh + overflow-y:auto) — sem isso, pra ver o total
+       investido/proventos ou adicionar outro ativo era preciso rolar de
+       volta ao topo. .calc-modal-topo já é sticky (top:0) sozinho; aqui
+       ele entra DENTRO de .carteira-fixo, que também é sticky no mesmo
+       topo — assim os dois "grudam" juntos, sem precisar calcular a
+       altura de um pra dar de offset (top) no outro. */
+    .carteira-modal .carteira-fixo {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .carteira-modal .carteira-fixo .calc-modal-topo { border-bottom: none; }
+    .carteira-fixo-corpo { padding: 14px 20px 16px; display: flex; flex-direction: column; gap: 14px; }
+    .carteira-modal .calc-corpo { padding-top: 14px; }
 
     /* Agenda de Proventos */
     .agenda-vazio {
@@ -4197,50 +4216,53 @@
   <!-- Modal: Carteira de Rendimentos -->
   <div id="carteiraOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="carteiraTitulo" hidden>
     <div class="calc-modal carteira-modal">
-      <div class="calc-modal-topo">
-        <h3 id="carteiraTitulo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>Carteira de Rendimentos
-        </h3>
-        <button id="carteiraFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      <div class="carteira-fixo">
+        <div class="calc-modal-topo">
+          <h3 id="carteiraTitulo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>Carteira de Rendimentos
+          </h3>
+          <button id="carteiraFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+        <div class="carteira-fixo-corpo">
+          <p class="calc-ajuda" style="margin-top:0;">
+            Monte sua carteira de ações e FIIs, informe a quantidade de cada um, e veja o total estimado de proventos
+            por mês — com dados reais de cotação e dividendos, ao vivo.
+          </p>
+
+          <div class="carteira-add-linha">
+            <input type="text" id="carteiraTickerInput" placeholder="Ex: HGLG11, PETR4, AAPL, VOO..." autocomplete="off" list="sugestoesTickersB3" />
+            <datalist id="sugestoesTickersB3"></datalist>
+            <input type="number" id="carteiraQtdInput" placeholder="Qtd." min="1" value="10" />
+            <button type="button" class="hg-btn" id="carteiraBtnAdicionar" style="flex:0 0 auto;">+ Adicionar</button>
+          </div>
+          <div class="hg-chips" style="margin-top:8px;">
+            <span class="hg-chip" data-ticker="PETR4">PETR4</span>
+            <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
+            <span class="hg-chip" data-ticker="BBAS3">BBAS3</span>
+            <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
+            <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
+            <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
+          </div>
+
+          <div id="carteiraStatus" class="hg-status"></div>
+
+          <div class="carteira-resumo-cards">
+            <div class="carteira-resumo-card">
+              <span>Total investido</span>
+              <strong id="carteiraTotalInvestido">R$ 0,00</strong>
+            </div>
+            <div class="carteira-resumo-card carteira-resumo-destaque">
+              <span>Proventos / mês (estimado)</span>
+              <strong id="carteiraTotalProventos">R$ 0,00</strong>
+            </div>
+            <div class="carteira-resumo-card">
+              <span>Yield médio da carteira</span>
+              <strong id="carteiraYieldMedio">—</strong>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="calc-corpo">
-        <p class="calc-ajuda" style="margin-top:0;">
-          Monte sua carteira de ações e FIIs, informe a quantidade de cada um, e veja o total estimado de proventos
-          por mês — com dados reais de cotação e dividendos, ao vivo.
-        </p>
-
-        <div class="carteira-add-linha">
-          <input type="text" id="carteiraTickerInput" placeholder="Ex: HGLG11, PETR4, AAPL, VOO..." autocomplete="off" list="sugestoesTickersB3" />
-          <datalist id="sugestoesTickersB3"></datalist>
-          <input type="number" id="carteiraQtdInput" placeholder="Qtd." min="1" value="10" />
-          <button type="button" class="hg-btn" id="carteiraBtnAdicionar" style="flex:0 0 auto;">+ Adicionar</button>
-        </div>
-        <div class="hg-chips" style="margin-top:8px;">
-          <span class="hg-chip" data-ticker="PETR4">PETR4</span>
-          <span class="hg-chip" data-ticker="ITUB4">ITUB4</span>
-          <span class="hg-chip" data-ticker="BBAS3">BBAS3</span>
-          <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
-          <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
-          <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
-        </div>
-
-        <div id="carteiraStatus" class="hg-status"></div>
-
-        <div class="carteira-resumo-cards">
-          <div class="carteira-resumo-card">
-            <span>Total investido</span>
-            <strong id="carteiraTotalInvestido">R$ 0,00</strong>
-          </div>
-          <div class="carteira-resumo-card carteira-resumo-destaque">
-            <span>Proventos / mês (estimado)</span>
-            <strong id="carteiraTotalProventos">R$ 0,00</strong>
-          </div>
-          <div class="carteira-resumo-card">
-            <span>Yield médio da carteira</span>
-            <strong id="carteiraYieldMedio">—</strong>
-          </div>
-        </div>
-
         <div class="carteira-secao-titulo" id="carteiraTituloAcoes" hidden>📈 Ações</div>
         <div class="cmp-tabela-wrap" id="carteiraWrapAcoes" hidden>
           <table class="cmp-tabela carteira-tabela">
