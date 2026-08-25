@@ -405,6 +405,38 @@
     }
     .carteira-fixo-corpo { padding: 14px 20px 16px; display: flex; flex-direction: column; gap: 14px; }
 
+    /* Carteira de Rendimentos — mover e redimensionar (só desktop/tablet).
+       Diferente dos outros modais (fixos e centralizados via flex do
+       .calc-overlay), este pode ter dezenas de ativos e ficar bem grande,
+       então dá pra arrastar pra um canto e redimensionar puxando o
+       cantinho. No celular (<640px) fica tudo exatamente como antes —
+       nada de arrastar/redimensionar lá, até porque a tela é pequena
+       demais pra isso valer a pena e o gesto de arrastar colide com o
+       gesto de rolar a página. min-height:540px abaixo é de propósito
+       generoso: tem que sobrar mais altura que o próprio cabeçalho fixo
+       (.carteira-fixo, ~430-460px), senão volta o mesmo bug do scroll
+       "travado" no celular (ver comentário grande logo acima), só que
+       agora causado por redimensionar demais em vez de por causa da tela
+       ser pequena. */
+    @media (min-width: 640px) {
+      .carteira-modal.carteira-arrastavel {
+        position: fixed;
+        margin: 0;
+        resize: both;
+        overflow: auto;
+        min-width: 420px;
+        min-height: 540px;
+        max-width: 96vw;
+        max-height: 92vh;
+      }
+      .carteira-modal.carteira-arrastavel .carteira-fixo .calc-modal-topo {
+        cursor: move;
+      }
+      .carteira-modal.carteira-arrastavel .carteira-fixo .calc-modal-topo #carteiraFechar {
+        cursor: pointer;
+      }
+    }
+
     /* Agenda de Proventos */
     .agenda-vazio {
       text-align: center; padding: 30px 16px; color: var(--muted); font-size: 0.9rem;
@@ -6464,6 +6496,7 @@
     (function () {
       const btnAbrir = document.getElementById('carteiraBtnAbrir');
       const overlay = document.getElementById('carteiraOverlay');
+      const modal = overlay.querySelector('.calc-modal');
       const btnFechar = document.getElementById('carteiraFechar');
       const tickerInput = document.getElementById('carteiraTickerInput');
       const qtdInput = document.getElementById('carteiraQtdInput');
@@ -6766,9 +6799,79 @@
         carteiraSalvarLocal(); // já garante que o localStorage também reflete o que veio da nuvem
       }
 
+      // Mover (arrastar pela barra de título) e redimensionar (puxando o
+      // canto) o modal — só faz sentido em telas ≥640px (ver CSS
+      // .carteira-arrastavel); no celular o modal continua se comportando
+      // exatamente como antes, sem nada disso.
+      const modalTopo = modal.querySelector('.calc-modal-topo');
+      let posicaoInicializada = false;
+
+      function podeArrastarRedimensionar() {
+        return window.innerWidth >= 640;
+      }
+
+      // Na primeira vez que abre em tela grande, "congela" a posição
+      // centralizada natural (a que o flex do .calc-overlay já calculou)
+      // em top/left absolutos e troca pra position:fixed — assim o modal
+      // some da centralização automática, mas começa exatamente onde já
+      // estava, sem pulo nenhum, e a partir daí pode ser arrastado livre.
+      function centralizarModalSeNecessario() {
+        if (!podeArrastarRedimensionar()) return;
+        modal.classList.add('carteira-arrastavel');
+        if (posicaoInicializada) return;
+        const r = modal.getBoundingClientRect();
+        modal.style.top = r.top + 'px';
+        modal.style.left = r.left + 'px';
+        modal.style.width = r.width + 'px';
+        modal.style.height = r.height + 'px';
+        posicaoInicializada = true;
+      }
+
+      function iniciarArraste(e) {
+        if (!podeArrastarRedimensionar()) return;
+        if (e.target.closest('#carteiraFechar')) return; // não arrasta ao clicar no X
+        const pontoInicial = e.touches ? e.touches[0] : e;
+        const xInicial = pontoInicial.clientX;
+        const yInicial = pontoInicial.clientY;
+        const rectInicial = modal.getBoundingClientRect();
+        const margemMinima = 40; // sempre deixa um pedacinho visível/alcançável
+
+        function mover(ev) {
+          const ponto = ev.touches ? ev.touches[0] : ev;
+          const deltaX = ponto.clientX - xInicial;
+          const deltaY = ponto.clientY - yInicial;
+          let novoTop = rectInicial.top + deltaY;
+          let novoLeft = rectInicial.left + deltaX;
+          // Verticalmente NÃO deixa passar do topo da tela (top < 0): é
+          // justamente a barra de título — a "alça" de arrastar — que
+          // ficaria inacessível se sumisse pra cima, e a pessoa perderia
+          // o jeito de arrastar o modal de volta. Só limita o mínimo (0);
+          // o máximo (quase toda a altura da tela) deixa arrastar pra
+          // baixo à vontade, sempre sobrando a barrinha pra pegar de novo.
+          novoTop = Math.min(Math.max(novoTop, 0), window.innerHeight - margemMinima);
+          novoLeft = Math.min(Math.max(novoLeft, -rectInicial.width + margemMinima), window.innerWidth - margemMinima);
+          modal.style.top = novoTop + 'px';
+          modal.style.left = novoLeft + 'px';
+          if (ev.cancelable) ev.preventDefault();
+        }
+        function soltar() {
+          document.removeEventListener('mousemove', mover);
+          document.removeEventListener('mouseup', soltar);
+          document.removeEventListener('touchmove', mover);
+          document.removeEventListener('touchend', soltar);
+        }
+        document.addEventListener('mousemove', mover);
+        document.addEventListener('mouseup', soltar);
+        document.addEventListener('touchmove', mover, { passive: false });
+        document.addEventListener('touchend', soltar);
+      }
+      modalTopo?.addEventListener('mousedown', iniciarArraste);
+      modalTopo?.addEventListener('touchstart', iniciarArraste, { passive: true });
+
       function abrirModal() {
         overlay.hidden = false;
         document.body.style.overflow = 'hidden';
+        centralizarModalSeNecessario();
       }
       function fecharModal() {
         overlay.hidden = true;
