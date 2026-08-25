@@ -380,17 +380,30 @@
        volta ao topo. .calc-modal-topo já é sticky (top:0) sozinho; aqui
        ele entra DENTRO de .carteira-fixo, que também é sticky no mesmo
        topo — assim os dois "grudam" juntos, sem precisar calcular a
-       altura de um pra dar de offset (top) no outro. */
-    .carteira-modal .carteira-fixo {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
+       altura de um pra dar de offset (top) no outro.
+       IMPORTANTE — só acima de 640px de largura: em telas de celular, os
+       cards de resumo empilham em 1 coluna (@media max-width:520px logo
+       abaixo) e o bloco inteiro (título + ajuda + formulário + chips +
+       3 cards empilhados) passa a ficar MAIS ALTO que o próprio modal.
+       Um elemento sticky mais alto que seu container nunca "libera" a
+       tela — ele cobre 100% da área visível o tempo todo, e a rolagem
+       parece travada (dava a impressão de tela presa mesmo arrastando,
+       reportado no celular) mesmo com o scroll realmente acontecendo por
+       trás. Abaixo de 640px o bloco volta a rolar junto com o resto
+       (comportamento normal); só o .calc-modal-topo (a barra de título,
+       bem baixinha) continua sticky sozinho, como já era antes. */
+    @media (min-width: 640px) {
+      .carteira-modal .carteira-fixo {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+      }
+      .carteira-modal .carteira-fixo .calc-modal-topo { border-bottom: none; }
+      .carteira-modal .calc-corpo { padding-top: 14px; }
     }
-    .carteira-modal .carteira-fixo .calc-modal-topo { border-bottom: none; }
     .carteira-fixo-corpo { padding: 14px 20px 16px; display: flex; flex-direction: column; gap: 14px; }
-    .carteira-modal .calc-corpo { padding-top: 14px; }
 
     /* Agenda de Proventos */
     .agenda-vazio {
