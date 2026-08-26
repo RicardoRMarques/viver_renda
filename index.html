@@ -850,14 +850,21 @@
     }
     .hg-chip:hover { color: var(--primary); border-color: var(--primary); }
 
-    /* Grid: consultas (esquerda, compactas) + boletim de mercado (canto direito) */
+    /* Grid: consultas (esquerda, compactas) + boletim de mercado (canto direito).
+       max-width igual ao do .container (1200px) — antes estava em 1100px,
+       mesmo desalinhamento já corrigido em .section-noticias-mercado e
+       .section-grafico-consulta: 100px mais estreito que o container que
+       envolve o site, então a seção (simulador de juros compostos +
+       Índices/Taxas) ficava recuada pra dentro em vez de acompanhar a
+       largura cheia da página. */
     .consultas-boletim-grid {
       display: grid;
       grid-template-columns: 1fr 420px;
       gap: 24px;
       align-items: stretch;
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto 64px;
+      padding: 0 20px;
     }
     .coluna-consultas { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
     .coluna-boletim-canto { min-width: 0; display: flex; flex-direction: column; }
