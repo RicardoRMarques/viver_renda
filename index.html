@@ -5228,7 +5228,7 @@
 
       async function hgBuscarDadosComparacao(tickerBruto) {
         const ticker = tickerBruto.trim().toUpperCase();
-        const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&period=quarterly&key=${CHAVE_HG}`;
+        const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&period=annual&key=${CHAVE_HG}`;
         const resp = await fetch(url);
         const data = await resp.json();
         const ativo = data?.results?.[0];
@@ -5237,7 +5237,9 @@
           throw new Error(`Não encontramos dados de "${ticker}" pra comparar.`);
         }
         const mapeados = statements.map(window.mapearEstatementoHG);
-        const eAtual = mapeados[0]?.ebitda, eAnoAnterior = mapeados[4]?.ebitda;
+        // Com period=annual, mapeados[0] é o TTM e mapeados[1] é o último
+        // ano fiscal já fechado — comparação interanual correta aqui.
+        const eAtual = mapeados[0]?.ebitda, eAnoAnterior = mapeados[1]?.ebitda;
         const ebitdaYoy = (typeof eAtual === 'number' && typeof eAnoAnterior === 'number' && eAnoAnterior !== 0)
           ? ((eAtual - eAnoAnterior) / Math.abs(eAnoAnterior)) * 100 : null;
         return {
@@ -10377,7 +10379,10 @@
 
       // Linhas da tabela: [rótulo, campo, formato]
       // formato: 'num' (2 casas), 'pct' (percentual), 'moeda'
-      // Fonte: HG Brasil (/v2/finance/fundamentals?period=quarterly).
+      // Fonte: HG Brasil (/v2/finance/fundamentals?period=annual — precisa
+      // ser "annual", não "quarterly": a própria documentação da HG diz que
+      // só o modo annual devolve o TTM como statements[0]; quarterly nunca
+      // traz TTM, só trimestres isolados em sequência).
       // Os campos aninhados da HG (valuation/leverage/margins/profitability)
       // são achatados por mapearEstatementoHG() pros mesmos nomes que esta
       // tabela já usava. CAGR Receita/Lucro (5a) foi removido: a HG não
@@ -10404,7 +10409,7 @@
         ['Dívida/Patrimônio',  'debt_equity',        'num'],
         ['Dív.Líq/PL',         'net_debt_equity',   'num'],
         ['Dív.Líq/EBITDA',     'net_debt_ebitda',   'num'],
-        ['Dividend Yield (trim.)', 'dividend_yield_trimestre', 'pct'],
+        ['Dividend Yield', 'dividend_yield_trimestre', 'pct'],
       ];
 
       // Achata o retorno aninhado da HG (statements[i].valuation.*,
@@ -10469,8 +10474,8 @@
         'Margem líquida': 'Margem Líquida = percentual da receita que sobra como lucro líquido, depois de todos os custos, despesas, juros e impostos.\n\nCálculo: lucro líquido / receita × 100',
         'ROE': 'ROE (Return on Equity / Retorno sobre o Patrimônio Líquido) = quanto a empresa lucra para cada R$ 1 investido pelos acionistas.\n\nCálculo: lucro líquido / patrimônio líquido × 100',
         'Dividend Yield': 'Dividend Yield (DY) = quanto a empresa pagou em dividendos/proventos no período, em relação à cotação atual da ação.\n\nCálculo: dividendos pagos / cotação atual × 100',
-        'Atual (TTM)': 'TTM = "Trailing Twelve Months" (últimos 12 meses).\n\nOs indicadores desta coluna somam os últimos 4 trimestres divulgados, e não só o trimestre mais recente — dá uma visão mais estável, sem os altos e baixos sazonais de um único trimestre.\n\nAs demais colunas mostram cada trimestre isolado, na data do balanço.',
-        'Crescimento EBITDA': 'Compara o EBITDA do trimestre mais recente com o EBITDA do mesmo trimestre um ano atrás (não o trimestre anterior) — assim a conta não confunde variação sazonal com crescimento real.\n\nNão é um CAGR de vários anos: a HG Brasil só fornece cerca de 2 anos de histórico trimestral, então essa é uma comparação de 12 meses, não uma taxa composta de 5 ou 10 anos.\n\nReceita e Lucro Líquido não aparecem em valor absoluto neste endpoint (só em índices), então esse cálculo só é possível para EBITDA.',
+        'Atual (TTM)': 'TTM = "Trailing Twelve Months" (últimos 12 meses).\n\nOs indicadores desta coluna somam os últimos 4 trimestres divulgados, e não só o último ano fiscal fechado — dá uma visão mais atualizada, sem esperar o fechamento do exercício anual.\n\nAs demais colunas mostram cada ano fiscal fechado, no encerramento do exercício.',
+        'Crescimento EBITDA': 'Compara o EBITDA do TTM (últimos 12 meses) com o EBITDA do último ano fiscal já fechado — assim a conta reflete a tendência mais recente sem misturar exercícios antigos.\n\nNão é um CAGR de vários anos: é uma comparação de 12 meses, não uma taxa composta de 5 ou 10 anos.\n\nReceita e Lucro Líquido não aparecem em valor absoluto neste endpoint (só em índices), então esse cálculo só é possível para EBITDA.',
       };
 
       // Tooltip próprio desta seção: mesmo padrão usado no Comparador de
@@ -10578,12 +10583,14 @@
         }
       }
 
-      // Busca fundamentos como ação (statements trimestrais). Extraído
+      // Busca fundamentos como ação (statements anuais: TTM + anos fiscais
+      // fechados — period=annual é o único modo que a HG devolve TTM,
+      // conforme a própria documentação). Extraído
       // pra função própria porque agora tem 2 pontos de entrada: o
       // caminho normal (ticker não parece FII) e o fallback de Units
       // (ticker termina em "11" mas o lookup de FII negou).
       async function buscarComoAcao(simbolo, containerEl) {
-        const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&tickers=${encodeURIComponent('B3:' + simbolo)}&period=quarterly&key=${CHAVE_HG}`;
+        const url = `https://api.hgbrasil.com/v2/finance/fundamentals?format=json-cors&tickers=${encodeURIComponent('B3:' + simbolo)}&period=annual&key=${CHAVE_HG}`;
         const resp = await fetch(url);
         const data = await resp.json();
         const ativo = data?.results?.[0];
@@ -10658,10 +10665,13 @@
         const statements = info.statements;
 
         // Cabeçalho de cada coluna: cada item já vem mapeado dos campos
-        // aninhados da HG (histórico trimestral, até 2 anos) —
-        // mostra só os 5 mais recentes pra não ficar tabela demais.
+        // aninhados da HG (period=annual: statements[0] é o TTM real,
+        // statements[1..] são os anos fiscais fechados, em ordem
+        // decrescente) — mostra só os 5 mais recentes pra não ficar
+        // tabela demais. Colunas de ano mostram só o ano (ex: "2025"),
+        // igual ao próprio site da HG Brasil, em vez da data completa.
         const colunas = statements.slice(0, 5).map((s, i) => ({
-          rotulo: i === 0 ? 'Atual (TTM)' : fmtDataBr(s.reference_date),
+          rotulo: i === 0 ? 'Atual (TTM)' : (String(s.reference_date || '').split('-')[0] || fmtDataBr(s.reference_date)),
           statement: s,
         }));
 
@@ -10676,16 +10686,14 @@
           return `<tr><th scope="row" style="text-align:left; padding:6px 8px; font-family:inherit; font-weight:700; white-space:normal; max-width:112px; width:112px; line-height:1.25; border-top:1px solid var(--border); position:-webkit-sticky; position:sticky; left:0; background:var(--deep); z-index:1; isolation:isolate;">${rotulo}${botaoInfo}</th>${celulas}</tr>`;
         }).join('');
 
-        // Crescimento de EBITDA interanual (não é CAGR de vários anos —
-        // o plano só alcança ~2 anos de histórico, então comparamos o
-        // trimestre mais recente com o mesmo trimestre do ano anterior
-        // (4 trimestres atrás), em vez do mais antigo vs mais novo, pra
-        // não misturar sazonalidade na conta. Receita e Lucro Líquido
-        // não têm valor absoluto nesse endpoint (só índices), então só
-        // dá pra calcular isso pra EBITDA.
+        // Crescimento de EBITDA interanual: TTM (statements[0]) vs último
+        // ano fiscal já fechado (statements[1]) — não é um CAGR de vários
+        // anos, é uma comparação de 12 meses. Receita e Lucro Líquido não
+        // têm valor absoluto nesse endpoint (só índices), então só dá pra
+        // calcular isso pra EBITDA.
         let crescimentoEbitdaHtml = '';
         const ebitdaAtual = statements[0]?.ebitda;
-        const ebitdaAnoAnterior = statements[4]?.ebitda;
+        const ebitdaAnoAnterior = statements[1]?.ebitda;
         if (typeof ebitdaAtual === 'number' && typeof ebitdaAnoAnterior === 'number' && ebitdaAnoAnterior !== 0) {
           const variacao = ((ebitdaAtual - ebitdaAnoAnterior) / Math.abs(ebitdaAnoAnterior)) * 100;
           const positivo = variacao >= 0;
