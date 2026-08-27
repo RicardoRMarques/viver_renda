@@ -8606,13 +8606,9 @@
             id: 'rotulosDestaqueSim',
             afterDatasetsDraw(chart) {
               const { ctx, chartArea } = chart;
-              const meta = chart.getDatasetMeta(0);
-              const pontos = [
-                { index: indexTransicao, alinhar: indexTransicao === indexFinal ? 'centro' : 'esquerda' },
-                { index: indexFinal, alinhar: 'direita' },
-              ].filter((p, i, arr) => p.index != null && arr.findIndex(q => q.index === p.index) === i);
+              const pontos = [indexTransicao, indexFinal].filter((v, i, arr) => v != null && arr.indexOf(v) === i);
 
-              pontos.forEach(({ index, alinhar }) => {
+              pontos.forEach((index) => {
                 const elAporteMeta = chart.getDatasetMeta(0).data[index];
                 const elRetiradaMeta = chart.getDatasetMeta(1).data[index];
                 const ponto = (elAporteMeta && !isNaN(elAporteMeta.y)) ? elAporteMeta : elRetiradaMeta;
@@ -8627,14 +8623,27 @@
                 const larguraCaixa = Math.max(largura1, largura2) + 16;
                 const alturaCaixa = 36;
 
-                let x = ponto.x;
-                if (alinhar === 'esquerda') x -= larguraCaixa - 8;
-                else if (alinhar === 'centro') x -= larguraCaixa / 2;
-                else x -= 8;
-                x = Math.max(chartArea.left, Math.min(x, chartArea.right - larguraCaixa));
+                // Centralizado em cima do pontinho por padrão; só desloca
+                // pra não vazar da área do gráfico — nesse caso desenha
+                // uma linha conectando a caixa de volta ao pontinho, pra
+                // continuar claro a qual ponto o rótulo se refere.
+                const xCentralizado = ponto.x - larguraCaixa / 2;
+                const x = Math.max(chartArea.left, Math.min(xCentralizado, chartArea.right - larguraCaixa));
+                const deslocado = Math.abs(x - xCentralizado) > 1;
 
-                let y = ponto.y - alturaCaixa - 10;
-                if (y < chartArea.top) y = ponto.y + 10;
+                let y = ponto.y - alturaCaixa - 12;
+                if (y < chartArea.top) y = ponto.y + 12;
+
+                if (deslocado) {
+                  ctx.beginPath();
+                  ctx.strokeStyle = HG_COR_PRIMARIA();
+                  ctx.lineWidth = 1;
+                  ctx.setLineDash([2, 2]);
+                  ctx.moveTo(ponto.x, ponto.y + (y < ponto.y ? -4 : 4));
+                  ctx.lineTo(x + larguraCaixa / 2, y < ponto.y ? y + alturaCaixa : y);
+                  ctx.stroke();
+                  ctx.setLineDash([]);
+                }
 
                 ctx.fillStyle = 'rgba(11,18,32,0.92)';
                 ctx.strokeStyle = HG_COR_PRIMARIA();
@@ -8677,7 +8686,7 @@
             },
             options: {
               responsive: true, maintainAspectRatio: false, animation: false,
-              layout: { padding: { top: 40 } },
+              layout: { padding: { top: 40, left: 8, right: 8 } },
               plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
               scales: {
                 x: { title: { display: true, text: 'Anos', color: HG_COR_MUTED(), font: { size: 10 } }, ticks: { autoSkip: true, maxTicksLimit: 10, color: HG_COR_MUTED() }, grid: { display: false } },
