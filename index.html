@@ -8627,12 +8627,17 @@
                 // pra não vazar da área do gráfico — nesse caso desenha
                 // uma linha conectando a caixa de volta ao pontinho, pra
                 // continuar claro a qual ponto o rótulo se refere.
+                // Limite horizontal é a largura total do canvas (não a
+                // chartArea) porque reservamos padding extra no layout
+                // do Chart.js justamente pra caber a caixa inteira perto
+                // do ponto, mesmo quando o ponto está bem na borda.
+                const margemCanvas = 4;
                 const xCentralizado = ponto.x - larguraCaixa / 2;
-                const x = Math.max(chartArea.left, Math.min(xCentralizado, chartArea.right - larguraCaixa));
+                const x = Math.max(margemCanvas, Math.min(xCentralizado, chart.width - larguraCaixa - margemCanvas));
                 const deslocado = Math.abs(x - xCentralizado) > 1;
 
-                let y = ponto.y - alturaCaixa - 12;
-                if (y < chartArea.top) y = ponto.y + 12;
+                let y = ponto.y - alturaCaixa - 6;
+                if (y < margemCanvas) y = ponto.y + 6;
 
                 if (deslocado) {
                   ctx.beginPath();
@@ -8686,7 +8691,7 @@
             },
             options: {
               responsive: true, maintainAspectRatio: false, animation: false,
-              layout: { padding: { top: 40, left: 8, right: 8 } },
+              layout: { padding: { top: 46, left: 46, right: 46 } },
               plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
               scales: {
                 x: { title: { display: true, text: 'Anos', color: HG_COR_MUTED(), font: { size: 10 } }, ticks: { autoSkip: true, maxTicksLimit: 10, color: HG_COR_MUTED() }, grid: { display: false } },
