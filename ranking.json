@@ -2,12 +2,6 @@
   "acoes": {
     "dividend_yield": [
       {
-        "ticker": "SBSP3",
-        "nome": "Sabesp",
-        "preco": 25.26,
-        "valor": 13.765
-      },
-      {
         "ticker": "CMIG4",
         "nome": "CEMIG",
         "preco": 10.5,
@@ -36,6 +30,12 @@
         "nome": "Petrobras",
         "preco": 43.53,
         "valor": 8.397
+      },
+      {
+        "ticker": "ITUB4",
+        "nome": "Banco Itaú Unibanco",
+        "preco": 39.09,
+        "valor": 8.097
       }
     ],
     "valor_mercado": [
