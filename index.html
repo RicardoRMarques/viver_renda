@@ -8611,7 +8611,13 @@
               pontos.forEach((index) => {
                 const elAporteMeta = chart.getDatasetMeta(0).data[index];
                 const elRetiradaMeta = chart.getDatasetMeta(1).data[index];
-                const ponto = (elAporteMeta && !isNaN(elAporteMeta.y)) ? elAporteMeta : elRetiradaMeta;
+                // Usa o dado bruto (não o pixel do Chart.js) pra decidir qual
+                // dataset é o "dono" do ponto: em índices onde a fase de
+                // aportes já não tem valor (null), o Chart.js ainda calcula
+                // um meta.y numérico (não NaN) reaproveitando a posição do
+                // último ponto válido — então checar isNaN(elAporteMeta.y)
+                // não pega esse caso e a caixa acabava presa num y errado.
+                const ponto = serieAporte[index] !== null && serieAporte[index] !== undefined ? elAporteMeta : elRetiradaMeta;
                 if (!ponto) return;
 
                 const [linha1, linha2] = rotuloPonto(index);
