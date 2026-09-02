@@ -933,12 +933,14 @@ function gerarGraficoLinhaSVG(pontos, opcoes = {}) {
 
   if (pontos.length === 1) {
     // Só 1 mês de histórico ainda — não dá pra desenhar uma linha (precisa
-    // de 2+ pontos), mostra só o ponto e o valor.
+    // de 2+ pontos). Em vez do ponto solto com o SVG de altura cheia (que
+    // sobrava um monte de espaço vazio em cima/embaixo), mostra só o
+    // valor num cartãozinho compacto, igual aos indicadores do topo.
     const p = pontos[0];
-    return `<svg viewBox="0 0 ${largura} ${altura}" width="100%" style="max-width:${largura}px;">
-      <circle cx="${largura / 2}" cy="${altura / 2 - 8}" r="4" fill="var(--gold-soft)" />
-      <text x="${largura / 2}" y="${altura / 2 + 14}" text-anchor="middle" font-size="13" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">${prefixo}${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: casasDecimais, maximumFractionDigits: casasDecimais })}${sufixo}</text>
-      <text x="${largura / 2}" y="${altura - 6}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="Inter,sans-serif">${p.label}</text>
+    const alturaCompacta = 44;
+    return `<svg viewBox="0 0 ${largura} ${alturaCompacta}" width="100%" style="max-width:${largura}px; display:block;">
+      <text x="${largura / 2}" y="20" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">${prefixo}${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: casasDecimais, maximumFractionDigits: casasDecimais })}${sufixo}</text>
+      <text x="${largura / 2}" y="37" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="Inter,sans-serif">${p.label}</text>
     </svg>`;
   }
 
@@ -1005,9 +1007,9 @@ function montarGraficoMensalHtml(agora) {
       .map(m => ({ label: m.label.split(' de ')[0].slice(0, 3), valor: m.medias[c.chave] }));
     if (pontos.length === 0) return '';
     return `
-      <div style="text-align:center;">
-        <div style="font-size:11px; color:var(--muted); margin-bottom:4px; font-family:Inter,sans-serif;">${c.label}</div>
-        ${gerarGraficoLinhaSVG(pontos, c)}
+      <div class="indicator" style="text-align:center;">
+        <div class="label" style="justify-content:center;">${c.label}</div>
+        <div style="margin-top:4px;">${gerarGraficoLinhaSVG(pontos, c)}</div>
       </div>`;
   }).filter(Boolean).join('\n');
 
@@ -1019,7 +1021,7 @@ function montarGraficoMensalHtml(agora) {
 <div style="background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:16px; margin-bottom:24px;">
   <h2 class="section" style="margin-top:0;">📊 Resumo de ${registroMesAnterior.label}</h2>
   ${itensTaxas.length ? gerarGraficoBarrasSVG(itensTaxas) : ''}
-  ${graficoLinhaHtml ? `<div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:18px;">${graficoLinhaHtml}</div>` : ''}
+  ${graficoLinhaHtml ? `<div class="grid" style="margin-top:18px;">${graficoLinhaHtml}</div>` : ''}
   ${avisoParcial}
 </div>`;
 }
