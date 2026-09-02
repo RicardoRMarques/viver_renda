@@ -1060,7 +1060,7 @@
     }
     .hg-card-topo { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
     .hg-card-topo-info { display: flex; align-items: center; gap: 14px; flex: 1 1 auto; }
-    .hg-card-topo-acoes { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .hg-card-topo-acoes { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; max-width: 100%; }
     .hg-btn-secundario-pequeno {
       display: inline-flex;
       align-items: center;
@@ -1079,7 +1079,7 @@
     }
     .hg-btn-secundario-pequeno:hover { color: var(--primary); border-color: var(--primary); }
     .hg-btn-secundario-pequeno.copiado { color: var(--accent); border-color: var(--accent); }
-    button.hg-btn-secundario-pequeno svg { width: 13px; height: 13px; flex-shrink: 0; max-height: none; }
+    button.hg-btn-secundario-pequeno svg, a.hg-btn-secundario-pequeno svg { width: 13px; height: 13px; flex-shrink: 0; max-height: none; }
     /* Botões lado a lado (ex: "Ver histórico de dividendos" + atalho pra
        Análise Fundamentalista), quebrando linha em telas estreitas. */
     .hg-acoes-lado-a-lado { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -5379,7 +5379,7 @@
                   <span id="hgBtnCompartilharTexto" class="hg-btn-compartilhar-texto">Compartilhar</span>
                 </button>
                 ${['fii', 'fiagro'].includes(a.kind) && a.tax_id ? `
-                <a class="hg-btn-secundario-pequeno" href="https://fnet.bmfbovespa.com.br/fnet/publico/abrirGerenciadorDocumentosCVM?cnpjFundo=${a.tax_id.replace(/\D/g, '')}" target="_blank" rel="noopener noreferrer" title="Relatórios gerenciais, informes e comunicados oficiais na B3/CVM">
+                <a class="hg-btn-secundario-pequeno" style="white-space:normal; text-align:center; line-height:1.3;" href="https://fnet.bmfbovespa.com.br/fnet/publico/abrirGerenciadorDocumentosCVM?cnpjFundo=${a.tax_id.replace(/\D/g, '')}" target="_blank" rel="noopener noreferrer" title="Relatórios gerenciais, informes e comunicados oficiais na B3/CVM">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                   Ver Relatórios Gerenciais (B3/CVM)
                 </a>` : ''}
