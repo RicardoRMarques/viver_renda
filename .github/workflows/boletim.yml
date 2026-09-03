@@ -4,7 +4,7 @@ on:
   schedule:
     # Com o suporte nativo a timezone do GitHub Actions (desde mar/2026),
     # não precisa mais converter pra UTC na mão — escreve direto no
-    # horário de Brasília. Roda 5h05 (de propósito, minuto não-redondo —
+    # horário de Brasília. Roda 3h05 (de propósito, minuto não-redondo —
     # evita a fila pesada que o GitHub Actions tem em horários "redondos"
     # como 5h00), de segunda (1) a sexta (5).
     - cron: '5 3 * * 1-5'
