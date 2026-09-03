@@ -8605,8 +8605,9 @@
           const pluginRotulosDestaque = {
             id: 'rotulosDestaqueSim',
             afterDatasetsDraw(chart) {
-              const { ctx, chartArea } = chart;
+              const { ctx } = chart;
               const pontos = [indexTransicao, indexFinal].filter((v, i, arr) => v != null && arr.indexOf(v) === i);
+              const caixasDesenhadas = [];
 
               pontos.forEach((index) => {
                 const elAporteMeta = chart.getDatasetMeta(0).data[index];
@@ -8622,12 +8623,18 @@
 
                 const [linha1, linha2] = rotuloPonto(index);
                 ctx.save();
-                ctx.font = '700 11px Inter, sans-serif';
+                // Fonte pequena (9/10px) — os valores da fase final podem
+                // ficar bem largos (ex: "R$ 3.575.355,17") e os dois pontos
+                // de destaque (fim dos aportes / final) costumam cair perto
+                // um do outro no eixo X quando "anos de retirada" é curto,
+                // então a fonte precisa ser compacta pra caixa não vazar
+                // nem encavalar com a caixa vizinha.
+                ctx.font = '700 9px Inter, sans-serif';
                 const largura1 = ctx.measureText(linha1).width;
-                ctx.font = '700 12px "IBM Plex Mono", monospace';
+                ctx.font = '700 10px "IBM Plex Mono", monospace';
                 const largura2 = ctx.measureText(linha2).width;
-                const larguraCaixa = Math.max(largura1, largura2) + 16;
-                const alturaCaixa = 36;
+                const larguraCaixa = Math.max(largura1, largura2) + 14;
+                const alturaCaixa = 30;
 
                 // Centralizado em cima do pontinho por padrão; só desloca
                 // pra não vazar da área do gráfico — nesse caso desenha
@@ -8645,7 +8652,24 @@
                 let y = ponto.y - alturaCaixa - 6;
                 if (y < margemCanvas) y = ponto.y + 6;
 
-                if (deslocado) {
+                // Se essa caixa esbarraria em alguma já desenhada (comum
+                // quando "fim dos aportes" e "final" caem perto um do
+                // outro no eixo X), empurra pra cima o suficiente pra não
+                // encavalar — sempre puxa uma linha até o pontinho nesse
+                // caso, pra continuar dando pra saber de qual ponto é.
+                const colide = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+                let caixaAtual = { x, y, w: larguraCaixa, h: alturaCaixa };
+                let empurrado = false;
+                for (const anterior of caixasDesenhadas) {
+                  if (colide(caixaAtual, anterior)) {
+                    caixaAtual.y = anterior.y - alturaCaixa - 4;
+                    empurrado = true;
+                  }
+                }
+                y = caixaAtual.y;
+                caixasDesenhadas.push(caixaAtual);
+
+                if (deslocado || empurrado) {
                   ctx.beginPath();
                   ctx.strokeStyle = HG_COR_PRIMARIA();
                   ctx.lineWidth = 1;
@@ -8668,11 +8692,11 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e8edf5';
-                ctx.font = '700 11px Inter, sans-serif';
-                ctx.fillText(linha1, x + larguraCaixa / 2, y + 12);
+                ctx.font = '700 9px Inter, sans-serif';
+                ctx.fillText(linha1, x + larguraCaixa / 2, y + 10);
                 ctx.fillStyle = HG_COR_PRIMARIA();
-                ctx.font = '700 12px "IBM Plex Mono", monospace';
-                ctx.fillText(linha2, x + larguraCaixa / 2, y + 26);
+                ctx.font = '700 10px "IBM Plex Mono", monospace';
+                ctx.fillText(linha2, x + larguraCaixa / 2, y + 21);
                 ctx.restore();
               });
             },
@@ -8697,7 +8721,7 @@
             },
             options: {
               responsive: true, maintainAspectRatio: false, animation: false,
-              layout: { padding: { top: 46, left: 46, right: 46 } },
+              layout: { padding: { top: 70, left: 46, right: 46 } },
               plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${hgFormatMoeda(c.parsed.y)}` } } },
               scales: {
                 x: { title: { display: true, text: 'Anos', color: HG_COR_MUTED(), font: { size: 10 } }, ticks: { autoSkip: true, maxTicksLimit: 10, color: HG_COR_MUTED() }, grid: { display: false } },
