@@ -7,7 +7,7 @@ on:
     # horário de Brasília. Roda 5h05 (de propósito, minuto não-redondo —
     # evita a fila pesada que o GitHub Actions tem em horários "redondos"
     # como 5h00), de segunda (1) a sexta (5).
-    - cron: '5 5 * * 1-5'
+    - cron: '5 3 * * 1-5'
       timezone: 'America/Sao_Paulo'
   workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
 
