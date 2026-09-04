@@ -52,6 +52,97 @@ PAUSA_ENTRE_LOTES = 0.3  # segundos, só pra não martelar a API sem necessidade
 SAIDA_ACOES = "mercado-acoes.json"
 SAIDA_FIIS = "mercado-fiis.json"
 
+# A HG Brasil devolve o setor no nível mais granular do "Setor de Atuação
+# B3" (~70 categorias, tipo "Cervejas e Refrigerantes", "Bicicletas" etc.)
+# — bom demais pro filtro da listagem virar uma parede de 70 chips. Esse
+# mapa agrupa isso nos ~11 setores MACRO oficiais da B3, que é o nível que
+# faz sentido pra filtro (Financeiro, Saúde, Materiais Básicos etc.).
+# Qualquer categoria nova/desconhecida cai em "Outros" — não quebra nada,
+# só não fica agrupada até alguém adicionar aqui.
+MAPA_SETOR_MACRO = {
+    "Agricultura": "Consumo não Cíclico",
+    "Alimentos": "Consumo não Cíclico",
+    "Aluguel de carros": "Consumo Cíclico",
+    "Armas e Munições": "Bens Industriais",
+    "Atividades Esportivas": "Consumo Cíclico",
+    "Automóveis e Motocicletas": "Consumo Cíclico",
+    "Açucar e Alcool": "Consumo não Cíclico",
+    "Açúcar e Álcool": "Consumo não Cíclico",
+    "Bancos": "Financeiro",
+    "Bens Industriais": "Bens Industriais",
+    "Bicicletas": "Bens Industriais",
+    "Brinquedos e Jogos": "Consumo Cíclico",
+    "Calçados": "Consumo Cíclico",
+    "Carnes e Derivados": "Consumo não Cíclico",
+    "Cervejas e Refrigerantes": "Consumo não Cíclico",
+    "Computadores e Equipamentos": "Tecnologia da Informação",
+    "Construção Pesada": "Bens Industriais",
+    "Construção e Engenharia": "Bens Industriais",
+    "Consumo Cíclico": "Consumo Cíclico",
+    "Consumo não Cíclico": "Consumo não Cíclico",
+    "Educação": "Consumo Cíclico",
+    "Eletrodomésticos": "Consumo Cíclico",
+    "Energia": "Utilidade Pública",
+    "Energia Elétrica": "Utilidade Pública",
+    "Engenharia Consultiva": "Bens Industriais",
+    "Equipamentos Industriais": "Bens Industriais",
+    "Equipamentos de Construção e Agrícolas": "Bens Industriais",
+    "Equipamentos de Saúde": "Saúde",
+    "Exploração de Imóveis": "Financeiro",
+    "Exploração de Rodovias": "Bens Industriais",
+    "Fios e Tecidos": "Consumo Cíclico",
+    "Gás": "Utilidade Pública",
+    "Holdings Diversificadas": "Financeiro",
+    "Hotelaria": "Consumo Cíclico",
+    "Incorporações": "Financeiro",
+    "Intermediação Imobiliária": "Financeiro",
+    "Intermediários Financeiros": "Financeiro",
+    "Madeira": "Materiais Básicos",
+    "Materiais Básicos": "Materiais Básicos",
+    "Material Aeronáutico e Defesa": "Bens Industriais",
+    "Material Rodoviário": "Bens Industriais",
+    "Material de Transporte": "Bens Industriais",
+    "Medicamentos": "Saúde",
+    "Minerais Metálicos": "Materiais Básicos",
+    "Mineração": "Materiais Básicos",
+    "Máquinas e Equipamentos": "Bens Industriais",
+    "Móveis": "Consumo Cíclico",
+    "Papel e Celulose": "Materiais Básicos",
+    "Petróleo, Gás e Biocombustíveis": "Petróleo, Gás e Biocombustíveis",
+    "Produtos Diversos": "Outros",
+    "Produtos de Limpeza": "Consumo não Cíclico",
+    "Produtos de Uso Pessoal": "Consumo não Cíclico",
+    "Produção de Eventos e Shows": "Consumo Cíclico",
+    "Programas de Fidelização": "Consumo Cíclico",
+    "Publicidade e Propaganda": "Consumo Cíclico",
+    "Químicos": "Materiais Básicos",
+    "Restaurante e Similares": "Consumo Cíclico",
+    "Saúde": "Saúde",
+    "Seguradoras": "Financeiro",
+    "Serviços Educacionais": "Consumo Cíclico",
+    "Serviços Financeiros Diversos": "Financeiro",
+    "Serviços de Apoio e Armazenagem": "Bens Industriais",
+    "Siderurgia e Metalurgia": "Materiais Básicos",
+    "Softwares": "Tecnologia da Informação",
+    "Telecomunicações": "Comunicações",
+    "Transporte Aéreo": "Bens Industriais",
+    "Transporte Ferroviário": "Bens Industriais",
+    "Transporte Hidroviário": "Bens Industriais",
+    "Transporte Rodoviário": "Bens Industriais",
+    "Utensílios Domésticos": "Consumo Cíclico",
+    "Utilidade Pública": "Utilidade Pública",
+    "Vestuário": "Consumo Cíclico",
+    "Vestuário e Acessórios": "Consumo Cíclico",
+    "Viagens e Turismo": "Consumo Cíclico",
+    "Água e Saneamento": "Utilidade Pública",
+}
+
+
+def macro_setor(sub_setor):
+    if not sub_setor:
+        return "Outros"
+    return MAPA_SETOR_MACRO.get(sub_setor.strip(), "Outros")
+
 
 def log(msg):
     print(f"[coletar_mercado] {msg}", flush=True)
@@ -106,7 +197,7 @@ def buscar_universo_acoes():
             ativos.append({
                 "ticker": item["symbol"],
                 "nome": item.get("name") or item.get("full_name") or item["symbol"],
-                "setor": classificacao.get("sector") or "Outros",
+                "setor": macro_setor(classificacao.get("sector")),
             })
         log(f"  página {pagina}: +{len(resultados)} itens (acumulado ações: {len(ativos)})")
         if len(resultados) < 20:  # heurística de "última página" — ajuste se
@@ -173,12 +264,21 @@ def enriquecer_acoes_com_fundamentals(universo):
 # ---------------------------------------------------------------------------
 # 3) FIIs — cotação/variação via HG Brasil, fundamentos via Fundamentus
 # ---------------------------------------------------------------------------
-def _normalizar_num_br(texto):
-    """'12,34' -> 12.34 | '1.234,56' -> 1234.56 | '-' ou vazio -> None"""
-    if texto is None:
+def _normalizar_num_br(valor):
+    """Aceita tanto texto BR ('12,34', '1.234,56') quanto valores já
+    convertidos em número pelo pandas (float/int/NaN) — o pd.read_html
+    com decimal=","/thousands="." já converte a maioria das colunas
+    sozinho, então aplicar essa função de novo em cima de um float pronto
+    corrompe o valor (ex: 0.88 -> "0.88" -> remove o ponto -> 88.0)."""
+    if valor is None:
         return None
-    t = str(texto).strip().replace("%", "")
-    if t in ("", "-", "N/A", "nan"):
+    if isinstance(valor, (int, float)):
+        # NaN é float e "é diferente de si mesmo" — forma padrão de checar
+        if valor != valor:
+            return None
+        return float(valor)
+    t = str(valor).strip().replace("%", "")
+    if t in ("", "-", "N/A", "nan", "None"):
         return None
     t = t.replace(".", "").replace(",", ".")
     try:
@@ -203,7 +303,11 @@ def buscar_fiis_fundamentus():
     }
     resp = requests.get(url, headers=headers, timeout=TIMEOUT)
     resp.raise_for_status()
-    resp.encoding = "utf-8"
+    # O Fundamentus é um site antigo e serve as páginas em ISO-8859-1
+    # (Latin-1), não em UTF-8 — forçar UTF-8 aqui é o que corrompia os
+    # acentos ("Híbrido" virava "H�brido"). requests já detecta isso
+    # sozinho via apparent_encoding; não sobrescrever.
+    resp.encoding = resp.apparent_encoding or "ISO-8859-1"
 
     try:
         import pandas as pd
