@@ -1,0 +1,44 @@
+name: Coletar Mercado (Ações e FIIs)
+
+on:
+  schedule:
+    # Roda de madrugada, depois do fechamento do pregão — os fundamentos
+    # (P/L, P/VP, margem) não mudam intradiário, então não precisa rodar
+    # mais de 1x/dia. Minuto quebrado de propósito (mesmo motivo do
+    # boletim.yml: evita a fila pesada em horários redondos).
+    - cron: '10 4 * * 1-5'
+      timezone: 'America/Sao_Paulo'
+  workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
+
+concurrency:
+  group: coletar-mercado
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependências
+        run: pip install requests pandas lxml
+
+      - name: Rodar robô de coleta
+        env:
+          HGBRASIL_TOKEN: ${{ secrets.HGBRASIL_TOKEN }}
+        run: python robo/coletar_mercado.py
+
+      - name: Commitar resultado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add mercado-acoes.json mercado-fiis.json
+          git diff --staged --quiet || git commit -m "Atualiza mercado-acoes.json e mercado-fiis.json"
+          git push
