@@ -1,41 +1,44 @@
 {
-  "atualizado_em": "2026-09-04T12:06:33.060503+00:00",
+  "atualizado_em": "2026-09-04T21:13:52.755980+00:00",
   "ativos": [
     {
       "ticker": "AALR3",
       "nome": "Alliar",
       "setor": "Saúde",
-      "preco": 3.2,
+      "preco": 3.3,
       "valor_mercado": 949000000.0,
-      "variacao_dia_pct": -3.0303,
-      "pl": -0.36,
-      "pvp": -1.93,
+      "variacao_dia_pct": 0.6098,
+      "pl": -0.37,
+      "pvp": -1.99,
       "margem_liquida_pct": -118.89,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 543.88
     },
     {
       "ticker": "ABCB4",
       "nome": "ABC Brasil",
       "setor": "Financeiro",
-      "preco": 24.76,
+      "preco": 24.5,
       "valor_mercado": 3197000000.0,
-      "variacao_dia_pct": 0.6504,
-      "pl": 6.33,
-      "pvp": 0.89,
+      "variacao_dia_pct": -1.3688,
+      "pl": 6.26,
+      "pvp": 0.88,
       "margem_liquida_pct": 12.6,
-      "dy_pct": 10.9
+      "dy_pct": 11.02,
+      "roe_pct": 14.05
     },
     {
       "ticker": "ABEV3",
       "nome": "Ambev S.A.",
       "setor": "Outros",
-      "preco": 15.74,
+      "preco": 15.78,
       "valor_mercado": 250012000000.0,
-      "variacao_dia_pct": 0.8974,
-      "pl": 15.0,
-      "pvp": 2.74,
+      "variacao_dia_pct": 0.1269,
+      "pl": 15.04,
+      "pvp": 2.75,
       "margem_liquida_pct": 18.41,
-      "dy_pct": 5.74
+      "dy_pct": 5.72,
+      "roe_pct": 18.28
     },
     {
       "ticker": "AERI3",
@@ -43,11 +46,12 @@
       "setor": "Outros",
       "preco": 2.07,
       "valor_mercado": 127000000.0,
-      "variacao_dia_pct": 0.4854,
+      "variacao_dia_pct": -0.9569,
       "pl": -0.14,
       "pvp": -0.13,
       "margem_liquida_pct": -174.62,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 93.29
     },
     {
       "ticker": "AFLT3",
@@ -59,31 +63,34 @@
       "pl": 13.08,
       "pvp": 1.91,
       "margem_liquida_pct": 55.98,
-      "dy_pct": 6.96
+      "dy_pct": 6.96,
+      "roe_pct": 14.63
     },
     {
       "ticker": "AGRO3",
       "nome": "Brasilagro",
       "setor": "Outros",
-      "preco": 19.0,
+      "preco": 19.24,
       "valor_mercado": 1964000000.0,
-      "variacao_dia_pct": -1.4523,
-      "pl": 15.64,
-      "pvp": 0.96,
+      "variacao_dia_pct": 1.2632,
+      "pl": 15.84,
+      "pvp": 0.97,
       "margem_liquida_pct": 11.22,
-      "dy_pct": 3.96
+      "dy_pct": 3.91,
+      "roe_pct": 6.11
     },
     {
       "ticker": "AGXY3",
       "nome": "Agrogalaxy",
       "setor": "Outros",
-      "preco": 1.35,
+      "preco": 1.33,
       "valor_mercado": 32000000.0,
-      "variacao_dia_pct": -3.5714,
+      "variacao_dia_pct": -0.7463,
       "pl": 0.02,
       "pvp": -0.14,
       "margem_liquida_pct": 70.06,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -661.54
     },
     {
       "ticker": "AHEB3",
@@ -95,7 +102,8 @@
       "pl": 4.06,
       "pvp": 0.68,
       "margem_liquida_pct": 9.91,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 16.64
     },
     {
       "ticker": "AHEB5",
@@ -107,7 +115,8 @@
       "pl": 9.86,
       "pvp": 1.64,
       "margem_liquida_pct": 9.91,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 16.64
     },
     {
       "ticker": "AHEB6",
@@ -119,175 +128,190 @@
       "pl": 9.35,
       "pvp": 1.56,
       "margem_liquida_pct": 9.91,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 16.64
     },
     {
       "ticker": "ALLD3",
       "nome": "Allied",
       "setor": "Outros",
-      "preco": 5.22,
+      "preco": 5.17,
       "valor_mercado": 438000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 1.38,
+      "variacao_dia_pct": -1.1472,
+      "pl": 1.37,
       "pvp": 0.32,
       "margem_liquida_pct": 6.56,
-      "dy_pct": 22.18
+      "dy_pct": 22.4,
+      "roe_pct": 23.06
     },
     {
       "ticker": "ALOS3",
       "nome": "ALLOS",
       "setor": "Financeiro",
-      "preco": 28.99,
+      "preco": 28.82,
       "valor_mercado": 13507000000.0,
-      "variacao_dia_pct": 1.6123,
-      "pl": 15.64,
-      "pvp": 1.13,
+      "variacao_dia_pct": -0.6892,
+      "pl": 15.54,
+      "pvp": 1.12,
       "margem_liquida_pct": 32.27,
-      "dy_pct": 9.48
+      "dy_pct": 9.54,
+      "roe_pct": 7.22
     },
     {
       "ticker": "ALPA3",
       "nome": "Alpargatas",
       "setor": "Outros",
-      "preco": 10.01,
+      "preco": 10.2,
       "valor_mercado": 6957000000.0,
-      "variacao_dia_pct": -3.5645,
-      "pl": 9.76,
-      "pvp": 1.89,
+      "variacao_dia_pct": 0.0,
+      "pl": 9.94,
+      "pvp": 1.92,
       "margem_liquida_pct": 14.52,
-      "dy_pct": 4.92
+      "dy_pct": 4.82,
+      "roe_pct": 19.37
     },
     {
       "ticker": "ALPA4",
       "nome": "Alpargatas",
       "setor": "Outros",
-      "preco": 13.69,
+      "preco": 13.5,
       "valor_mercado": 6957000000.0,
-      "variacao_dia_pct": -3.7948,
-      "pl": 13.34,
-      "pvp": 2.58,
+      "variacao_dia_pct": -1.7467,
+      "pl": 13.16,
+      "pvp": 2.55,
       "margem_liquida_pct": 14.52,
-      "dy_pct": 3.95
+      "dy_pct": 4.01,
+      "roe_pct": 19.37
     },
     {
       "ticker": "ALPK3",
       "nome": "Estapar",
       "setor": "Outros",
-      "preco": 4.52,
+      "preco": 4.55,
       "valor_mercado": 923000000.0,
-      "variacao_dia_pct": -3.212,
-      "pl": 59.47,
-      "pvp": 2.62,
+      "variacao_dia_pct": 0.6637,
+      "pl": 59.87,
+      "pvp": 2.64,
       "margem_liquida_pct": 0.83,
-      "dy_pct": 0.18
+      "dy_pct": 0.18,
+      "roe_pct": 4.42
     },
     {
       "ticker": "ALUP11",
       "nome": "Alupar",
       "setor": "Energia Elétrica",
-      "preco": 33.39,
+      "preco": 33.64,
       "valor_mercado": 10943000000.0,
-      "variacao_dia_pct": -0.0599,
-      "pl": 7.94,
-      "pvp": 0.82,
+      "variacao_dia_pct": 0.5079,
+      "pl": 8.0,
+      "pvp": 0.83,
       "margem_liquida_pct": 27.68,
-      "dy_pct": 2.61
+      "dy_pct": 2.59,
+      "roe_pct": 10.36
     },
     {
       "ticker": "ALUP3",
       "nome": "Alupar",
       "setor": "Energia Elétrica",
-      "preco": 11.74,
+      "preco": 11.66,
       "valor_mercado": 10943000000.0,
-      "variacao_dia_pct": 2.5328,
-      "pl": 8.37,
-      "pvp": 0.87,
+      "variacao_dia_pct": -0.6814,
+      "pl": 8.32,
+      "pvp": 0.86,
       "margem_liquida_pct": 27.68,
-      "dy_pct": 2.47
+      "dy_pct": 2.49,
+      "roe_pct": 10.36
     },
     {
       "ticker": "ALUP4",
       "nome": "Alupar",
       "setor": "Energia Elétrica",
-      "preco": 10.88,
+      "preco": 10.92,
       "valor_mercado": 10943000000.0,
-      "variacao_dia_pct": -1.0909,
-      "pl": 7.76,
-      "pvp": 0.8,
+      "variacao_dia_pct": 0.5525,
+      "pl": 7.79,
+      "pvp": 0.81,
       "margem_liquida_pct": 27.68,
-      "dy_pct": 2.67
+      "dy_pct": 2.66,
+      "roe_pct": 10.36
     },
     {
       "ticker": "AMAR3",
       "nome": "Lojas MariSA",
       "setor": "Outros",
-      "preco": 0.77,
+      "preco": 0.8,
       "valor_mercado": 292000000.0,
-      "variacao_dia_pct": -3.75,
-      "pl": -1.73,
-      "pvp": 6.47,
+      "variacao_dia_pct": 1.2658,
+      "pl": -1.8,
+      "pvp": 6.72,
       "margem_liquida_pct": -15.62,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -375.31
     },
     {
       "ticker": "AMBP3",
       "nome": "Ambipar",
       "setor": "Energia Elétrica",
-      "preco": 0.15,
+      "preco": 0.14,
       "valor_mercado": 267000000.0,
       "variacao_dia_pct": 0.0,
-      "pl": -1.35,
-      "pvp": 0.12,
+      "pl": -1.26,
+      "pvp": 0.11,
       "margem_liquida_pct": -2.56,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -8.55
     },
     {
       "ticker": "AMER3",
       "nome": "Americanas",
       "setor": "Outros",
-      "preco": 5.35,
+      "preco": 5.55,
       "valor_mercado": 867000000.0,
-      "variacao_dia_pct": 2.0992,
-      "pl": -3.83,
-      "pvp": 0.26,
+      "variacao_dia_pct": 4.3233,
+      "pl": -3.97,
+      "pvp": 0.27,
       "margem_liquida_pct": -2.37,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -6.74
     },
     {
       "ticker": "AMOB3",
       "nome": "Automob",
       "setor": "Outros",
-      "preco": 11.8,
+      "preco": 12.13,
       "valor_mercado": 506000000.0,
-      "variacao_dia_pct": -0.8403,
-      "pl": -1.2,
-      "pvp": 0.24,
+      "variacao_dia_pct": 3.1463,
+      "pl": -1.23,
+      "pvp": 0.25,
       "margem_liquida_pct": -2.79,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -20.02
     },
     {
       "ticker": "ANIM3",
       "nome": "Anima",
       "setor": "Outros",
-      "preco": 2.89,
+      "preco": 2.95,
       "valor_mercado": 848000000.0,
-      "variacao_dia_pct": 1.7606,
-      "pl": 7.59,
-      "pvp": 0.39,
+      "variacao_dia_pct": 2.0761,
+      "pl": 7.74,
+      "pvp": 0.4,
       "margem_liquida_pct": 3.71,
-      "dy_pct": 2.7
+      "dy_pct": 2.64,
+      "roe_pct": 5.16
     },
     {
       "ticker": "ARML3",
       "nome": "Armac",
       "setor": "Outros",
-      "preco": 3.8,
+      "preco": 3.84,
       "valor_mercado": 1122000000.0,
-      "variacao_dia_pct": -0.2625,
-      "pl": 21.23,
-      "pvp": 0.85,
+      "variacao_dia_pct": 1.0526,
+      "pl": 21.45,
+      "pvp": 0.86,
       "margem_liquida_pct": 3.11,
-      "dy_pct": 12.29
+      "dy_pct": 12.16,
+      "roe_pct": 3.99
     },
     {
       "ticker": "ASAI3",
@@ -295,11 +319,12 @@
       "setor": "Outros",
       "preco": 9.11,
       "valor_mercado": 10977000000.0,
-      "variacao_dia_pct": -0.2191,
+      "variacao_dia_pct": 0.0,
       "pl": 12.79,
       "pvp": 1.94,
       "margem_liquida_pct": 1.24,
-      "dy_pct": 1.14
+      "dy_pct": 1.14,
+      "roe_pct": 15.21
     },
     {
       "ticker": "ATMP3",
@@ -311,31 +336,34 @@
       "pl": -0.61,
       "pvp": 0.68,
       "margem_liquida_pct": -11.92,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -111.17
     },
     {
       "ticker": "AUAU3",
       "nome": "União Pet Participações S.A.",
       "setor": "Outros",
-      "preco": 3.93,
+      "preco": 4.03,
       "valor_mercado": 2771000000.0,
-      "variacao_dia_pct": -0.5063,
-      "pl": 17.54,
-      "pvp": 1.06,
+      "variacao_dia_pct": 2.5445,
+      "pl": 17.99,
+      "pvp": 1.09,
       "margem_liquida_pct": 3.84,
-      "dy_pct": 0.76
+      "dy_pct": 0.74,
+      "roe_pct": 6.04
     },
     {
       "ticker": "AURE3",
       "nome": "Auren",
       "setor": "Energia Elétrica",
-      "preco": 11.58,
+      "preco": 12.0,
       "valor_mercado": 11890000000.0,
-      "variacao_dia_pct": -0.6861,
-      "pl": -11.82,
-      "pvp": 0.95,
+      "variacao_dia_pct": 3.1814,
+      "pl": -12.24,
+      "pvp": 0.99,
       "margem_liquida_pct": -7.64,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -8.07
     },
     {
       "ticker": "AVLL3",
@@ -347,19 +375,21 @@
       "pl": -0.62,
       "pvp": -0.24,
       "margem_liquida_pct": -15.44,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 39.36
     },
     {
       "ticker": "AXIA3",
       "nome": "Axia Energia",
       "setor": "Energia Elétrica",
-      "preco": 55.72,
+      "preco": 55.5,
       "valor_mercado": 150398000000.0,
-      "variacao_dia_pct": 0.288,
-      "pl": 13.6,
+      "variacao_dia_pct": -0.4484,
+      "pl": 13.55,
       "pvp": 1.34,
       "margem_liquida_pct": 27.05,
-      "dy_pct": 3.39
+      "dy_pct": 3.41,
+      "roe_pct": 9.86
     },
     {
       "ticker": "AXIA5",
@@ -371,7 +401,8 @@
       "pl": 13.55,
       "pvp": 1.34,
       "margem_liquida_pct": 27.05,
-      "dy_pct": 2.85
+      "dy_pct": 2.85,
+      "roe_pct": 9.86
     },
     {
       "ticker": "AXIA6",
@@ -383,31 +414,34 @@
       "pl": 13.61,
       "pvp": 1.34,
       "margem_liquida_pct": 27.05,
-      "dy_pct": 3.73
+      "dy_pct": 3.73,
+      "roe_pct": 9.86
     },
     {
       "ticker": "AZEV3",
       "nome": "Azevedo",
       "setor": "Outros",
-      "preco": 9.1,
+      "preco": 8.39,
       "valor_mercado": 190000000.0,
-      "variacao_dia_pct": 37.0482,
-      "pl": -1.52,
-      "pvp": 2.44,
+      "variacao_dia_pct": -6.7778,
+      "pl": -1.41,
+      "pvp": 2.25,
       "margem_liquida_pct": -120.71,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -160.34
     },
     {
       "ticker": "AZEV4",
       "nome": "Azevedo",
       "setor": "Outros",
-      "preco": 1.51,
+      "preco": 1.45,
       "valor_mercado": 190000000.0,
-      "variacao_dia_pct": -0.6579,
-      "pl": -0.25,
-      "pvp": 0.41,
+      "variacao_dia_pct": -3.9735,
+      "pl": -0.24,
+      "pvp": 0.39,
       "margem_liquida_pct": -120.71,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -160.34
     },
     {
       "ticker": "AZUL54",
@@ -419,31 +453,34 @@
       "pl": 16.46,
       "pvp": -5.18,
       "margem_liquida_pct": 7.46,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -31.48
     },
     {
       "ticker": "AZZA3",
       "nome": "Arezzo Indústria e Comércio S.A.",
       "setor": "Outros",
-      "preco": 17.05,
+      "preco": 17.6,
       "valor_mercado": 3533000000.0,
-      "variacao_dia_pct": 1.6696,
-      "pl": 10.86,
-      "pvp": 0.44,
+      "variacao_dia_pct": 3.0445,
+      "pl": 11.21,
+      "pvp": 0.45,
       "margem_liquida_pct": 2.85,
-      "dy_pct": 14.52
+      "dy_pct": 14.07,
+      "roe_pct": 4.03
     },
     {
       "ticker": "B3SA3",
       "nome": "B3 S.A. - Brasil, Bolsa, Balcão",
       "setor": "Financeiro",
-      "preco": 17.41,
+      "preco": 17.32,
       "valor_mercado": 79331000000.0,
-      "variacao_dia_pct": 0.8691,
-      "pl": 16.49,
-      "pvp": 4.69,
+      "variacao_dia_pct": -0.1729,
+      "pl": 16.4,
+      "pvp": 4.67,
       "margem_liquida_pct": 44.41,
-      "dy_pct": 4.33
+      "dy_pct": 4.35,
+      "roe_pct": 28.46
     },
     {
       "ticker": "BALM3",
@@ -455,7 +492,8 @@
       "pl": 11.27,
       "pvp": 1.58,
       "margem_liquida_pct": 11.01,
-      "dy_pct": 18.53
+      "dy_pct": 18.53,
+      "roe_pct": 14.02
     },
     {
       "ticker": "BALM4",
@@ -467,7 +505,8 @@
       "pl": 6.5,
       "pvp": 0.91,
       "margem_liquida_pct": 11.01,
-      "dy_pct": 32.15
+      "dy_pct": 32.15,
+      "roe_pct": 14.02
     },
     {
       "ticker": "BAUH4",
@@ -475,71 +514,77 @@
       "setor": "Outros",
       "preco": 93.39,
       "valor_mercado": 490000000.0,
-      "variacao_dia_pct": -0.54,
+      "variacao_dia_pct": 0.0,
       "pl": 21.33,
       "pvp": 3.18,
       "margem_liquida_pct": 7.84,
-      "dy_pct": 1.16
+      "dy_pct": 1.16,
+      "roe_pct": 14.9
     },
     {
       "ticker": "BAZA3",
       "nome": "Amazonia",
       "setor": "Financeiro",
-      "preco": 68.49,
+      "preco": 68.15,
       "valor_mercado": 3413000000.0,
-      "variacao_dia_pct": 2.0563,
-      "pl": 4.54,
+      "variacao_dia_pct": -0.4964,
+      "pl": 4.52,
       "pvp": 0.53,
       "margem_liquida_pct": 12.73,
-      "dy_pct": 11.7
+      "dy_pct": 11.76,
+      "roe_pct": 11.77
     },
     {
       "ticker": "BBAS3",
       "nome": "Banco do Brasil S.A.",
       "setor": "Financeiro",
-      "preco": 22.42,
+      "preco": 22.45,
       "valor_mercado": 117482000000.0,
-      "variacao_dia_pct": 0.7188,
-      "pl": 10.47,
+      "variacao_dia_pct": 0.0,
+      "pl": 10.49,
       "pvp": 0.67,
       "margem_liquida_pct": 3.71,
-      "dy_pct": 2.46
+      "dy_pct": 2.45,
+      "roe_pct": 6.43
     },
     {
       "ticker": "BBDC3",
       "nome": "Banco Bradesco S.A.",
       "setor": "Financeiro",
-      "preco": 15.63,
+      "preco": 15.75,
       "valor_mercado": 185342000000.0,
-      "variacao_dia_pct": 0.2566,
-      "pl": 6.81,
+      "variacao_dia_pct": 0.5105,
+      "pl": 6.86,
       "pvp": 0.91,
       "margem_liquida_pct": 8.11,
-      "dy_pct": 7.03
+      "dy_pct": 6.98,
+      "roe_pct": 13.31
     },
     {
       "ticker": "BBDC4",
       "nome": "Banco Bradesco S.A.",
       "setor": "Financeiro",
-      "preco": 17.78,
+      "preco": 17.84,
       "valor_mercado": 185342000000.0,
-      "variacao_dia_pct": 0.169,
-      "pl": 7.74,
+      "variacao_dia_pct": 0.2811,
+      "pl": 7.77,
       "pvp": 1.03,
       "margem_liquida_pct": 8.11,
-      "dy_pct": 6.8
+      "dy_pct": 6.78,
+      "roe_pct": 13.31
     },
     {
       "ticker": "BBSE3",
       "nome": "BB Seguridade Participações S.A.",
       "setor": "Financeiro",
-      "preco": 41.82,
+      "preco": 42.15,
       "valor_mercado": 78704000000.0,
-      "variacao_dia_pct": 0.0718,
-      "pl": 8.84,
-      "pvp": 7.45,
+      "variacao_dia_pct": 1.1034,
+      "pl": 8.91,
+      "pvp": 7.51,
       "margem_liquida_pct": null,
-      "dy_pct": 10.88
+      "dy_pct": 10.79,
+      "roe_pct": 84.38
     },
     {
       "ticker": "BDLL3",
@@ -551,7 +596,8 @@
       "pl": 9.3,
       "pvp": -0.03,
       "margem_liquida_pct": 2.17,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -0.3
     },
     {
       "ticker": "BDLL4",
@@ -563,55 +609,60 @@
       "pl": 6.71,
       "pvp": -0.02,
       "margem_liquida_pct": 2.17,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -0.3
     },
     {
       "ticker": "BEEF3",
       "nome": "Minerva",
       "setor": "Outros",
-      "preco": 3.8,
+      "preco": 3.97,
       "valor_mercado": 3461000000.0,
-      "variacao_dia_pct": -1.5544,
-      "pl": 8.3,
-      "pvp": 1.74,
+      "variacao_dia_pct": 4.7493,
+      "pl": 8.67,
+      "pvp": 1.82,
       "margem_liquida_pct": 0.8,
-      "dy_pct": 5.16
+      "dy_pct": 4.94,
+      "roe_pct": 21.02
     },
     {
       "ticker": "BEES3",
       "nome": "Banestes",
       "setor": "Financeiro",
-      "preco": 8.95,
+      "preco": 8.85,
       "valor_mercado": 3056000000.0,
-      "variacao_dia_pct": 1.1299,
-      "pl": 7.03,
-      "pvp": 1.24,
+      "variacao_dia_pct": -1.1173,
+      "pl": 6.95,
+      "pvp": 1.22,
       "margem_liquida_pct": 7.61,
-      "dy_pct": 9.12
+      "dy_pct": 9.22,
+      "roe_pct": 17.62
     },
     {
       "ticker": "BEES4",
       "nome": "Banestes",
       "setor": "Financeiro",
-      "preco": 9.11,
+      "preco": 8.97,
       "valor_mercado": 3056000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 7.15,
-      "pvp": 1.26,
+      "variacao_dia_pct": -1.5368,
+      "pl": 7.04,
+      "pvp": 1.24,
       "margem_liquida_pct": 7.61,
-      "dy_pct": 8.96
+      "dy_pct": 9.1,
+      "roe_pct": 17.62
     },
     {
       "ticker": "BGIP3",
       "nome": "Banese",
       "setor": "Financeiro",
-      "preco": 45.7,
+      "preco": 46.37,
       "valor_mercado": 926000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 6.23,
-      "pvp": 1.07,
+      "variacao_dia_pct": 1.47,
+      "pl": 6.32,
+      "pvp": 1.09,
       "margem_liquida_pct": 8.57,
-      "dy_pct": 7.26
+      "dy_pct": 7.16,
+      "roe_pct": 17.22
     },
     {
       "ticker": "BGIP4",
@@ -619,11 +670,12 @@
       "setor": "Financeiro",
       "preco": 34.0,
       "valor_mercado": 926000000.0,
-      "variacao_dia_pct": 0.0294,
+      "variacao_dia_pct": 0.0,
       "pl": 4.63,
       "pvp": 0.8,
       "margem_liquida_pct": 8.57,
-      "dy_pct": 10.74
+      "dy_pct": 10.74,
+      "roe_pct": 17.22
     },
     {
       "ticker": "BHIA3",
@@ -631,71 +683,77 @@
       "setor": "Outros",
       "preco": 0.69,
       "valor_mercado": 821000000.0,
-      "variacao_dia_pct": -2.8169,
+      "variacao_dia_pct": 0.0,
       "pl": -0.05,
       "pvp": -0.08,
       "margem_liquida_pct": -44.42,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 159.69
     },
     {
       "ticker": "BIOM3",
       "nome": "Biomm",
       "setor": "Saúde",
-      "preco": 6.42,
+      "preco": 6.54,
       "valor_mercado": 810000000.0,
-      "variacao_dia_pct": -0.4651,
-      "pl": 28.92,
-      "pvp": 2.7,
+      "variacao_dia_pct": 1.8692,
+      "pl": 29.46,
+      "pvp": 2.75,
       "margem_liquida_pct": 7.89,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 9.33
     },
     {
       "ticker": "BLAU3",
       "nome": "Blau",
       "setor": "Saúde",
-      "preco": 9.5,
+      "preco": 9.4,
       "valor_mercado": 2045000000.0,
-      "variacao_dia_pct": -1.758,
-      "pl": 9.47,
-      "pvp": 0.96,
+      "variacao_dia_pct": -1.0526,
+      "pl": 9.37,
+      "pvp": 0.95,
       "margem_liquida_pct": 13.09,
-      "dy_pct": 9.72
+      "dy_pct": 9.82,
+      "roe_pct": 10.09
     },
     {
       "ticker": "BMEB3",
       "nome": "Merc Brasil",
       "setor": "Financeiro",
-      "preco": 50.61,
+      "preco": 50.64,
       "valor_mercado": 5153000000.0,
-      "variacao_dia_pct": 0.2973,
+      "variacao_dia_pct": 0.0593,
       "pl": 7.52,
       "pvp": 1.99,
       "margem_liquida_pct": 8.73,
-      "dy_pct": 3.37
+      "dy_pct": 3.37,
+      "roe_pct": 26.44
     },
     {
       "ticker": "BMEB4",
       "nome": "Merc Brasil",
       "setor": "Financeiro",
-      "preco": 60.14,
+      "preco": 61.23,
       "valor_mercado": 5153000000.0,
-      "variacao_dia_pct": 0.4007,
-      "pl": 8.93,
-      "pvp": 2.36,
+      "variacao_dia_pct": 1.8124,
+      "pl": 9.09,
+      "pvp": 2.4,
       "margem_liquida_pct": 8.73,
-      "dy_pct": 3.12
+      "dy_pct": 3.07,
+      "roe_pct": 26.44
     },
     {
       "ticker": "BMGB4",
       "nome": "Banco Bmg",
       "setor": "Financeiro",
-      "preco": 5.87,
+      "preco": 5.98,
       "valor_mercado": 1246000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 13.13,
-      "pvp": 0.75,
+      "variacao_dia_pct": 0.8432,
+      "pl": 13.38,
+      "pvp": 0.76,
       "margem_liquida_pct": 3.15,
-      "dy_pct": 9.32
+      "dy_pct": 9.15,
+      "roe_pct": 5.71
     },
     {
       "ticker": "BMIN3",
@@ -707,7 +765,8 @@
       "pl": 7.35,
       "pvp": 0.63,
       "margem_liquida_pct": 19.99,
-      "dy_pct": 2.63
+      "dy_pct": 2.63,
+      "roe_pct": 8.56
     },
     {
       "ticker": "BMIN4",
@@ -715,47 +774,51 @@
       "setor": "Financeiro",
       "preco": 18.86,
       "valor_mercado": 91000000.0,
-      "variacao_dia_pct": -0.053,
+      "variacao_dia_pct": 0.0,
       "pl": 7.11,
       "pvp": 0.61,
       "margem_liquida_pct": 19.99,
-      "dy_pct": 7.42
+      "dy_pct": 7.42,
+      "roe_pct": 8.56
     },
     {
       "ticker": "BMKS3",
       "nome": "Bic Monark",
       "setor": "Outros",
-      "preco": 371.55,
+      "preco": 377.0,
       "valor_mercado": 172000000.0,
-      "variacao_dia_pct": 1.1213,
-      "pl": 2.84,
-      "pvp": 0.82,
+      "variacao_dia_pct": 1.4668,
+      "pl": 2.88,
+      "pvp": 0.83,
       "margem_liquida_pct": 445.49,
-      "dy_pct": 41.21
+      "dy_pct": 40.62,
+      "roe_pct": 28.82
     },
     {
       "ticker": "BMOB3",
       "nome": "Bemobi Tech",
       "setor": "Outros",
-      "preco": 24.91,
+      "preco": 26.05,
       "valor_mercado": 1972000000.0,
-      "variacao_dia_pct": -2.885,
-      "pl": 13.36,
-      "pvp": 2.2,
+      "variacao_dia_pct": 4.0335,
+      "pl": 13.97,
+      "pvp": 2.3,
       "margem_liquida_pct": 8.49,
-      "dy_pct": 8.57
+      "dy_pct": 8.19,
+      "roe_pct": 16.49
     },
     {
       "ticker": "BNBR3",
       "nome": "Nord Brasil",
       "setor": "Financeiro",
-      "preco": 107.0,
+      "preco": 109.25,
       "valor_mercado": 11693000000.0,
-      "variacao_dia_pct": -2.6388,
-      "pl": 3.83,
-      "pvp": 0.63,
+      "variacao_dia_pct": 2.1028,
+      "pl": 3.91,
+      "pvp": 0.64,
       "margem_liquida_pct": 25.85,
-      "dy_pct": 6.56
+      "dy_pct": 6.43,
+      "roe_pct": 16.4
     },
     {
       "ticker": "BOBR3",
@@ -767,55 +830,60 @@
       "pl": 3.83,
       "pvp": -0.17,
       "margem_liquida_pct": 3.93,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -4.42
     },
     {
       "ticker": "BOBR4",
       "nome": "Bombril",
       "setor": "Outros",
-      "preco": 1.21,
+      "preco": 1.29,
       "valor_mercado": 320000000.0,
-      "variacao_dia_pct": 0.8333,
-      "pl": 4.64,
-      "pvp": -0.2,
+      "variacao_dia_pct": 6.6116,
+      "pl": 4.94,
+      "pvp": -0.22,
       "margem_liquida_pct": 3.93,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -4.42
     },
     {
       "ticker": "BPAC11",
       "nome": "Banco BTG Pactual S.A.",
       "setor": "Financeiro",
-      "preco": 58.49,
+      "preco": 58.93,
       "valor_mercado": 217593000000.0,
-      "variacao_dia_pct": 1.4043,
-      "pl": 10.07,
-      "pvp": 2.53,
+      "variacao_dia_pct": 0.2,
+      "pl": 10.15,
+      "pvp": 2.55,
       "margem_liquida_pct": 72.39,
-      "dy_pct": 2.13
+      "dy_pct": 2.12,
+      "roe_pct": 25.11
     },
     {
       "ticker": "BPAC3",
       "nome": "Btgp Banco",
       "setor": "Financeiro",
-      "preco": 23.2,
+      "preco": 23.47,
       "valor_mercado": 217593000000.0,
-      "variacao_dia_pct": 0.0431,
-      "pl": 11.98,
-      "pvp": 3.01,
+      "variacao_dia_pct": 1.1202,
+      "pl": 12.12,
+      "pvp": 3.05,
       "margem_liquida_pct": 72.39,
-      "dy_pct": 1.79
+      "dy_pct": 1.77,
+      "roe_pct": 25.11
     },
     {
       "ticker": "BPAC5",
       "nome": "Btgp Banco",
       "setor": "Financeiro",
-      "preco": 19.45,
+      "preco": 19.61,
       "valor_mercado": 217593000000.0,
-      "variacao_dia_pct": 1.8858,
-      "pl": 10.05,
-      "pvp": 2.52,
+      "variacao_dia_pct": 1.2913,
+      "pl": 10.13,
+      "pvp": 2.54,
       "margem_liquida_pct": 72.39,
-      "dy_pct": 2.14
+      "dy_pct": 2.12,
+      "roe_pct": 25.11
     },
     {
       "ticker": "BPAN4",
@@ -827,55 +895,60 @@
       "pl": 113.84,
       "pvp": 2.13,
       "margem_liquida_pct": 0.87,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 1.86
     },
     {
       "ticker": "BRAP3",
       "nome": "Bradespar S.A.",
       "setor": "Materiais Básicos",
-      "preco": 19.08,
+      "preco": 19.3,
       "valor_mercado": 8123000000.0,
-      "variacao_dia_pct": -0.6767,
-      "pl": 12.83,
-      "pvp": 0.93,
+      "variacao_dia_pct": 0.7833,
+      "pl": 12.98,
+      "pvp": 0.94,
       "margem_liquida_pct": null,
-      "dy_pct": 11.23
+      "dy_pct": 11.1,
+      "roe_pct": 7.26
     },
     {
       "ticker": "BRAP4",
       "nome": "Bradespar S.A.",
       "setor": "Materiais Básicos",
-      "preco": 22.52,
+      "preco": 22.57,
       "valor_mercado": 8123000000.0,
-      "variacao_dia_pct": -2.0017,
-      "pl": 15.14,
+      "variacao_dia_pct": 0.1331,
+      "pl": 15.18,
       "pvp": 1.1,
       "margem_liquida_pct": null,
-      "dy_pct": 10.47
+      "dy_pct": 10.44,
+      "roe_pct": 7.26
     },
     {
       "ticker": "BRAV3",
       "nome": "Brava",
       "setor": "Outros",
-      "preco": 18.7,
+      "preco": 18.05,
       "valor_mercado": 9755000000.0,
-      "variacao_dia_pct": -1.1628,
-      "pl": 159.83,
-      "pvp": 0.71,
+      "variacao_dia_pct": -3.269,
+      "pl": 154.27,
+      "pvp": 0.68,
       "margem_liquida_pct": 0.44,
-      "dy_pct": 0.66
+      "dy_pct": 0.69,
+      "roe_pct": 0.44
     },
     {
       "ticker": "BRBI11",
       "nome": "BR Partners",
       "setor": "Financeiro",
-      "preco": 14.08,
+      "preco": 14.09,
       "valor_mercado": 1529000000.0,
-      "variacao_dia_pct": -1.9499,
+      "variacao_dia_pct": -0.7047,
       "pl": 8.45,
       "pvp": 1.83,
       "margem_liquida_pct": 52.37,
-      "dy_pct": 11.08
+      "dy_pct": 11.07,
+      "roe_pct": 21.62
     },
     {
       "ticker": "BRFS3",
@@ -887,7 +960,8 @@
       "pl": 11.18,
       "pvp": 1.87,
       "margem_liquida_pct": 3.91,
-      "dy_pct": 11.62
+      "dy_pct": 11.62,
+      "roe_pct": 16.74
     },
     {
       "ticker": "BRIV3",
@@ -899,7 +973,8 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "BRIV4",
@@ -911,31 +986,34 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "BRKM3",
       "nome": "Braskem S.A.",
       "setor": "Materiais Básicos",
-      "preco": 4.31,
+      "preco": 4.27,
       "valor_mercado": 4374000000.0,
-      "variacao_dia_pct": -0.6912,
-      "pl": -0.52,
+      "variacao_dia_pct": -0.9281,
+      "pl": -0.51,
       "pvp": -0.26,
       "margem_liquida_pct": -9.4,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 50.69
     },
     {
       "ticker": "BRKM5",
       "nome": "Braskem S.A.",
       "setor": "Materiais Básicos",
-      "preco": 4.89,
+      "preco": 4.8,
       "valor_mercado": 4374000000.0,
-      "variacao_dia_pct": 0.2049,
-      "pl": -0.59,
-      "pvp": -0.3,
+      "variacao_dia_pct": -2.834,
+      "pl": -0.58,
+      "pvp": -0.29,
       "margem_liquida_pct": -9.4,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 50.69
     },
     {
       "ticker": "BRKM6",
@@ -947,7 +1025,8 @@
       "pl": -0.84,
       "pvp": -0.43,
       "margem_liquida_pct": -9.4,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 50.69
     },
     {
       "ticker": "BRPR3",
@@ -959,19 +1038,21 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "BRSR3",
       "nome": "Banrisul",
       "setor": "Financeiro",
-      "preco": 17.92,
+      "preco": 17.76,
       "valor_mercado": 6580000000.0,
-      "variacao_dia_pct": 0.3922,
-      "pl": 4.46,
-      "pvp": 0.62,
+      "variacao_dia_pct": -1.0033,
+      "pl": 4.42,
+      "pvp": 0.61,
       "margem_liquida_pct": 7.1,
-      "dy_pct": 8.86
+      "dy_pct": 8.94,
+      "roe_pct": 13.86
     },
     {
       "ticker": "BRSR5",
@@ -983,31 +1064,34 @@
       "pl": 4.48,
       "pvp": 0.62,
       "margem_liquida_pct": 7.1,
-      "dy_pct": 9.02
+      "dy_pct": 9.02,
+      "roe_pct": 13.86
     },
     {
       "ticker": "BRSR6",
       "nome": "Banco do Estado do Rio Grande do Sul S.A.",
       "setor": "Financeiro",
-      "preco": 15.06,
+      "preco": 14.9,
       "valor_mercado": 6580000000.0,
-      "variacao_dia_pct": 0.467,
-      "pl": 3.75,
-      "pvp": 0.52,
+      "variacao_dia_pct": -0.6667,
+      "pl": 3.71,
+      "pvp": 0.51,
       "margem_liquida_pct": 7.1,
-      "dy_pct": 10.54
+      "dy_pct": 10.65,
+      "roe_pct": 13.86
     },
     {
       "ticker": "BSLI3",
       "nome": "Brb Banco",
       "setor": "Financeiro",
-      "preco": 2.6,
+      "preco": 2.59,
       "valor_mercado": 6286000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 1.5,
+      "variacao_dia_pct": -0.3846,
+      "pl": 1.49,
       "pvp": 0.32,
       "margem_liquida_pct": 8.03,
-      "dy_pct": 4.5
+      "dy_pct": 4.52,
+      "roe_pct": 21.22
     },
     {
       "ticker": "BSLI4",
@@ -1019,7 +1103,8 @@
       "pl": 1.5,
       "pvp": 0.32,
       "margem_liquida_pct": 8.03,
-      "dy_pct": 4.96
+      "dy_pct": 4.96,
+      "roe_pct": 21.22
     },
     {
       "ticker": "CALI3",
@@ -1031,43 +1116,47 @@
       "pl": 4.3,
       "pvp": 0.51,
       "margem_liquida_pct": 11.33,
-      "dy_pct": 3.01
+      "dy_pct": 3.01,
+      "roe_pct": 11.9
     },
     {
       "ticker": "CAMB3",
       "nome": "Cambuci",
       "setor": "Outros",
-      "preco": 8.48,
+      "preco": 8.52,
       "valor_mercado": 388000000.0,
-      "variacao_dia_pct": -1.3953,
-      "pl": 5.87,
-      "pvp": 1.13,
+      "variacao_dia_pct": -1.5029,
+      "pl": 5.9,
+      "pvp": 1.14,
       "margem_liquida_pct": 16.11,
-      "dy_pct": 14.42
+      "dy_pct": 14.35,
+      "roe_pct": 19.24
     },
     {
       "ticker": "CAML3",
       "nome": "Camil Alimentos S.A.",
       "setor": "Outros",
-      "preco": 5.08,
+      "preco": 4.97,
       "valor_mercado": 1641000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 11.98,
-      "pvp": 0.59,
+      "variacao_dia_pct": -2.1654,
+      "pl": 11.72,
+      "pvp": 0.58,
       "margem_liquida_pct": 1.33,
-      "dy_pct": 7.2
+      "dy_pct": 7.36,
+      "roe_pct": 4.92
     },
     {
       "ticker": "CASH3",
       "nome": "Meliuz",
       "setor": "Outros",
-      "preco": 5.62,
+      "preco": 5.42,
       "valor_mercado": 490000000.0,
-      "variacao_dia_pct": 1.444,
-      "pl": -5.78,
-      "pvp": 1.34,
+      "variacao_dia_pct": -3.5587,
+      "pl": -5.58,
+      "pvp": 1.3,
       "margem_liquida_pct": -20.42,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -23.23
     },
     {
       "ticker": "CASN3",
@@ -1079,79 +1168,86 @@
       "pl": 25.16,
       "pvp": 3.6,
       "margem_liquida_pct": 19.01,
-      "dy_pct": 0.85
+      "dy_pct": 0.85,
+      "roe_pct": 14.32
     },
     {
       "ticker": "CBAV3",
       "nome": "CBA",
       "setor": "Materiais Básicos",
-      "preco": 11.2,
+      "preco": 11.15,
       "valor_mercado": 7109000000.0,
-      "variacao_dia_pct": 0.4484,
-      "pl": 12.2,
-      "pvp": 1.38,
+      "variacao_dia_pct": -0.4464,
+      "pl": 12.15,
+      "pvp": 1.37,
       "margem_liquida_pct": 6.41,
-      "dy_pct": 0.39
+      "dy_pct": 0.39,
+      "roe_pct": 11.3
     },
     {
       "ticker": "CBEE3",
       "nome": "Ampla Energ",
       "setor": "Energia Elétrica",
-      "preco": 8.81,
+      "preco": 8.82,
       "valor_mercado": 4536000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 70.48,
+      "variacao_dia_pct": 0.1135,
+      "pl": 70.56,
       "pvp": 0.4,
       "margem_liquida_pct": 0.55,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 0.57
     },
     {
       "ticker": "CEAB3",
       "nome": "C&A Modas",
       "setor": "Outros",
-      "preco": 9.32,
+      "preco": 9.21,
       "valor_mercado": 2959000000.0,
-      "variacao_dia_pct": -0.7455,
-      "pl": 5.11,
-      "pvp": 0.76,
+      "variacao_dia_pct": -1.1803,
+      "pl": 5.05,
+      "pvp": 0.75,
       "margem_liquida_pct": 7.02,
-      "dy_pct": 5.6
+      "dy_pct": 5.67,
+      "roe_pct": 14.79
     },
     {
       "ticker": "CEBR3",
       "nome": "Ceb",
       "setor": "Energia Elétrica",
-      "preco": 23.54,
+      "preco": 23.56,
       "valor_mercado": 1832000000.0,
-      "variacao_dia_pct": 2.0815,
-      "pl": 10.61,
+      "variacao_dia_pct": 0.085,
+      "pl": 10.62,
       "pvp": 1.43,
       "margem_liquida_pct": 35.02,
-      "dy_pct": 16.74
+      "dy_pct": 16.73,
+      "roe_pct": 13.45
     },
     {
       "ticker": "CEBR5",
       "nome": "Ceb",
       "setor": "Energia Elétrica",
-      "preco": 23.46,
+      "preco": 23.61,
       "valor_mercado": 1832000000.0,
-      "variacao_dia_pct": 0.0426,
-      "pl": 10.58,
-      "pvp": 1.42,
+      "variacao_dia_pct": 0.6394,
+      "pl": 10.64,
+      "pvp": 1.43,
       "margem_liquida_pct": 35.02,
-      "dy_pct": 16.8
+      "dy_pct": 16.69,
+      "roe_pct": 13.45
     },
     {
       "ticker": "CEBR6",
       "nome": "Ceb",
       "setor": "Energia Elétrica",
-      "preco": 27.55,
+      "preco": 27.08,
       "valor_mercado": 1832000000.0,
-      "variacao_dia_pct": 2.3783,
-      "pl": 12.42,
-      "pvp": 1.67,
+      "variacao_dia_pct": -1.706,
+      "pl": 12.21,
+      "pvp": 1.64,
       "margem_liquida_pct": 35.02,
-      "dy_pct": 15.74
+      "dy_pct": 16.01,
+      "roe_pct": 13.45
     },
     {
       "ticker": "CEDO3",
@@ -1163,31 +1259,34 @@
       "pl": -1.85,
       "pvp": 0.35,
       "margem_liquida_pct": -6.31,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -19.08
     },
     {
       "ticker": "CEDO4",
       "nome": "Cedro",
       "setor": "Outros",
-      "preco": 5.25,
+      "preco": 5.12,
       "valor_mercado": 77000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": -1.08,
-      "pvp": 0.21,
+      "variacao_dia_pct": -0.7752,
+      "pl": -1.05,
+      "pvp": 0.2,
       "margem_liquida_pct": -6.31,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -19.08
     },
     {
       "ticker": "CEEB3",
       "nome": "Coelba",
       "setor": "Energia Elétrica",
-      "preco": 46.45,
+      "preco": 47.2,
       "valor_mercado": 8273000000.0,
-      "variacao_dia_pct": -1.11,
-      "pl": 8.16,
-      "pvp": 1.46,
+      "variacao_dia_pct": 1.61,
+      "pl": 8.29,
+      "pvp": 1.49,
       "margem_liquida_pct": 7.7,
-      "dy_pct": 12.56
+      "dy_pct": 12.36,
+      "roe_pct": 17.94
     },
     {
       "ticker": "CEEB5",
@@ -1199,7 +1298,8 @@
       "pl": 7.03,
       "pvp": 1.26,
       "margem_liquida_pct": 7.7,
-      "dy_pct": 14.59
+      "dy_pct": 14.59,
+      "roe_pct": 17.94
     },
     {
       "ticker": "CEED3",
@@ -1211,7 +1311,8 @@
       "pl": -1.58,
       "pvp": -0.16,
       "margem_liquida_pct": -6.29,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 10.19
     },
     {
       "ticker": "CEED4",
@@ -1223,7 +1324,8 @@
       "pl": -3.15,
       "pvp": -0.32,
       "margem_liquida_pct": -6.29,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 10.19
     },
     {
       "ticker": "CEGR3",
@@ -1235,7 +1337,8 @@
       "pl": 12.72,
       "pvp": 3.87,
       "margem_liquida_pct": 15.6,
-      "dy_pct": 1.86
+      "dy_pct": 1.86,
+      "roe_pct": 30.44
     },
     {
       "ticker": "CGAS3",
@@ -1247,43 +1350,47 @@
       "pl": 10.86,
       "pvp": 10.42,
       "margem_liquida_pct": 15.11,
-      "dy_pct": 9.64
+      "dy_pct": 9.64,
+      "roe_pct": 95.9
     },
     {
       "ticker": "CGAS5",
       "nome": "Comgas",
       "setor": "Energia Elétrica",
-      "preco": 121.0,
+      "preco": 121.06,
       "valor_mercado": 16480000000.0,
-      "variacao_dia_pct": 0.3317,
+      "variacao_dia_pct": 0.0496,
       "pl": 10.46,
       "pvp": 10.03,
       "margem_liquida_pct": 15.11,
-      "dy_pct": 11.01
+      "dy_pct": 11.01,
+      "roe_pct": 95.9
     },
     {
       "ticker": "CGRA3",
       "nome": "Grazziotin",
       "setor": "Outros",
-      "preco": 23.95,
+      "preco": 23.75,
       "valor_mercado": 616000000.0,
-      "variacao_dia_pct": 0.8421,
-      "pl": 7.27,
-      "pvp": 0.66,
+      "variacao_dia_pct": -0.8351,
+      "pl": 7.21,
+      "pvp": 0.65,
       "margem_liquida_pct": 11.39,
-      "dy_pct": 26.56
+      "dy_pct": 26.79,
+      "roe_pct": 9.02
     },
     {
       "ticker": "CGRA4",
       "nome": "Grazziotin",
       "setor": "Outros",
-      "preco": 23.46,
+      "preco": 23.61,
       "valor_mercado": 616000000.0,
-      "variacao_dia_pct": 1.2953,
-      "pl": 7.12,
-      "pvp": 0.64,
+      "variacao_dia_pct": 0.6394,
+      "pl": 7.17,
+      "pvp": 0.65,
       "margem_liquida_pct": 11.39,
-      "dy_pct": 27.12
+      "dy_pct": 26.95,
+      "roe_pct": 9.02
     },
     {
       "ticker": "CLSC3",
@@ -1295,55 +1402,60 @@
       "pl": 5.91,
       "pvp": 1.22,
       "margem_liquida_pct": 6.99,
-      "dy_pct": 8.26
+      "dy_pct": 8.26,
+      "roe_pct": 20.7
     },
     {
       "ticker": "CLSC4",
       "nome": "Celesc",
       "setor": "Energia Elétrica",
-      "preco": 156.95,
+      "preco": 157.44,
       "valor_mercado": 5190000000.0,
-      "variacao_dia_pct": 0.4159,
-      "pl": 6.92,
-      "pvp": 1.43,
+      "variacao_dia_pct": 0.3122,
+      "pl": 6.94,
+      "pvp": 1.44,
       "margem_liquida_pct": 6.99,
-      "dy_pct": 7.76
+      "dy_pct": 7.73,
+      "roe_pct": 20.7
     },
     {
       "ticker": "CMIG3",
       "nome": "Companhia Energética de Minas Gerais",
       "setor": "Energia Elétrica",
-      "preco": 16.75,
+      "preco": 17.16,
       "valor_mercado": 37376000000.0,
-      "variacao_dia_pct": 1.5767,
-      "pl": 10.43,
-      "pvp": 1.64,
+      "variacao_dia_pct": 2.4478,
+      "pl": 10.68,
+      "pvp": 1.68,
       "margem_liquida_pct": 10.51,
-      "dy_pct": 7.65
+      "dy_pct": 7.47,
+      "roe_pct": 15.74
     },
     {
       "ticker": "CMIG4",
       "nome": "Companhia Energética de Minas Gerais",
       "setor": "Energia Elétrica",
-      "preco": 11.2,
+      "preco": 11.25,
       "valor_mercado": 37376000000.0,
-      "variacao_dia_pct": 2.0966,
-      "pl": 6.97,
+      "variacao_dia_pct": 0.6261,
+      "pl": 7.0,
       "pvp": 1.1,
       "margem_liquida_pct": 10.51,
-      "dy_pct": 11.44
+      "dy_pct": 11.39,
+      "roe_pct": 15.74
     },
     {
       "ticker": "CMIN3",
       "nome": "Csnmineracao",
       "setor": "Materiais Básicos",
-      "preco": 6.75,
+      "preco": 6.59,
       "valor_mercado": 31505000000.0,
-      "variacao_dia_pct": 5.4688,
-      "pl": 15.73,
-      "pvp": 5.0,
+      "variacao_dia_pct": -1.0511,
+      "pl": 15.36,
+      "pvp": 4.88,
       "margem_liquida_pct": 13.41,
-      "dy_pct": 5.72
+      "dy_pct": 5.86,
+      "roe_pct": 31.79
     },
     {
       "ticker": "COCE3",
@@ -1355,31 +1467,34 @@
       "pl": 5.88,
       "pvp": 0.44,
       "margem_liquida_pct": 4.36,
-      "dy_pct": 0.83
+      "dy_pct": 0.83,
+      "roe_pct": 7.54
     },
     {
       "ticker": "COCE5",
       "nome": "Coelce",
       "setor": "Energia Elétrica",
-      "preco": 31.79,
+      "preco": 31.11,
       "valor_mercado": 3002000000.0,
-      "variacao_dia_pct": -0.0314,
-      "pl": 6.49,
-      "pvp": 0.49,
+      "variacao_dia_pct": -2.139,
+      "pl": 6.36,
+      "pvp": 0.48,
       "margem_liquida_pct": 4.36,
-      "dy_pct": 4.66
+      "dy_pct": 4.77,
+      "roe_pct": 7.54
     },
     {
       "ticker": "COGN3",
       "nome": "Cogna Educação S.A.",
       "setor": "Outros",
-      "preco": 2.4,
+      "preco": 2.42,
       "valor_mercado": 4438000000.0,
-      "variacao_dia_pct": -0.4149,
-      "pl": 7.06,
+      "variacao_dia_pct": 0.8333,
+      "pl": 7.12,
       "pvp": 0.36,
       "margem_liquida_pct": 8.96,
-      "dy_pct": 5.38
+      "dy_pct": 5.33,
+      "roe_pct": 5.11
     },
     {
       "ticker": "CORR4",
@@ -1391,31 +1506,34 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "CPFE3",
       "nome": "CPFL Energia S.A.",
       "setor": "Energia Elétrica",
-      "preco": 46.83,
+      "preco": 47.07,
       "valor_mercado": 51563000000.0,
-      "variacao_dia_pct": 1.6276,
-      "pl": 8.99,
-      "pvp": 2.28,
+      "variacao_dia_pct": 0.7276,
+      "pl": 9.03,
+      "pvp": 2.29,
       "margem_liquida_pct": 13.17,
-      "dy_pct": 7.97
+      "dy_pct": 7.93,
+      "roe_pct": 25.36
     },
     {
       "ticker": "CPLE3",
       "nome": "Companhia Paranaense de Energia - COPEL",
       "setor": "Energia Elétrica",
-      "preco": 15.82,
+      "preco": 15.73,
       "valor_mercado": 44085000000.0,
-      "variacao_dia_pct": 1.4103,
-      "pl": 15.05,
-      "pvp": 1.95,
+      "variacao_dia_pct": -0.3169,
+      "pl": 14.97,
+      "pvp": 1.94,
       "margem_liquida_pct": 11.2,
-      "dy_pct": 6.72
+      "dy_pct": 6.76,
+      "roe_pct": 12.98
     },
     {
       "ticker": "CPLE5",
@@ -1427,7 +1545,8 @@
       "pl": 12.92,
       "pvp": 1.68,
       "margem_liquida_pct": 11.2,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 12.98
     },
     {
       "ticker": "CPLE6",
@@ -1439,7 +1558,8 @@
       "pl": 13.57,
       "pvp": 1.76,
       "margem_liquida_pct": 11.2,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 12.98
     },
     {
       "ticker": "CRFB3",
@@ -1451,7 +1571,8 @@
       "pl": 9.84,
       "pvp": 0.76,
       "margem_liquida_pct": 1.52,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 7.75
     },
     {
       "ticker": "CRIV3",
@@ -1463,7 +1584,8 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "CRIV4",
@@ -1475,7 +1597,8 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "CRPG3",
@@ -1487,19 +1610,21 @@
       "pl": -4.12,
       "pvp": 0.95,
       "margem_liquida_pct": -12.38,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -23.1
     },
     {
       "ticker": "CRPG5",
       "nome": "Cristal",
       "setor": "Materiais Básicos",
-      "preco": 9.05,
+      "preco": 8.89,
       "valor_mercado": 405000000.0,
-      "variacao_dia_pct": 0.5556,
-      "pl": -2.19,
-      "pvp": 0.51,
+      "variacao_dia_pct": -1.768,
+      "pl": -2.16,
+      "pvp": 0.5,
       "margem_liquida_pct": -12.38,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -23.1
     },
     {
       "ticker": "CRPG6",
@@ -1507,71 +1632,77 @@
       "setor": "Materiais Básicos",
       "preco": 9.45,
       "valor_mercado": 405000000.0,
-      "variacao_dia_pct": -3.0769,
+      "variacao_dia_pct": 0.0,
       "pl": -2.29,
       "pvp": 0.53,
       "margem_liquida_pct": -12.38,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -23.1
     },
     {
       "ticker": "CSAN3",
       "nome": "Cosan S.A.",
       "setor": "Outros",
-      "preco": 3.82,
+      "preco": 3.78,
       "valor_mercado": 15668000000.0,
-      "variacao_dia_pct": 0.7916,
-      "pl": -1.71,
+      "variacao_dia_pct": -1.0471,
+      "pl": -1.69,
       "pvp": 0.47,
       "margem_liquida_pct": -22.08,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -27.73
     },
     {
       "ticker": "CSED3",
       "nome": "Cruzeiro Edu",
       "setor": "Outros",
-      "preco": 5.23,
+      "preco": 5.56,
       "valor_mercado": 1472000000.0,
-      "variacao_dia_pct": -1.3208,
-      "pl": 6.15,
-      "pvp": 1.14,
+      "variacao_dia_pct": 6.3098,
+      "pl": 6.54,
+      "pvp": 1.21,
       "margem_liquida_pct": 10.59,
-      "dy_pct": 9.29
+      "dy_pct": 8.74,
+      "roe_pct": 18.49
     },
     {
       "ticker": "CSMG3",
       "nome": "CopaSA",
       "setor": "Energia Elétrica",
-      "preco": 56.79,
+      "preco": 55.96,
       "valor_mercado": 24111000000.0,
-      "variacao_dia_pct": -0.6125,
-      "pl": 16.7,
-      "pvp": 2.44,
+      "variacao_dia_pct": -1.6174,
+      "pl": 16.46,
+      "pvp": 2.4,
       "margem_liquida_pct": 14.88,
-      "dy_pct": 3.85
+      "dy_pct": 3.9,
+      "roe_pct": 14.6
     },
     {
       "ticker": "CSNA3",
       "nome": "Companhia Siderúrgica Nacional",
       "setor": "Materiais Básicos",
-      "preco": 6.42,
+      "preco": 6.32,
       "valor_mercado": 7572000000.0,
-      "variacao_dia_pct": 7.3579,
-      "pl": -4.31,
-      "pvp": 0.56,
+      "variacao_dia_pct": -0.9404,
+      "pl": -4.25,
+      "pvp": 0.55,
       "margem_liquida_pct": -4.37,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -12.94
     },
     {
       "ticker": "CSUD3",
       "nome": "CSU Digital",
       "setor": "Outros",
-      "preco": 14.2,
+      "preco": 14.15,
       "valor_mercado": 600000000.0,
-      "variacao_dia_pct": 1.3562,
-      "pl": 6.05,
-      "pvp": 1.21,
+      "variacao_dia_pct": -0.4923,
+      "pl": 6.03,
+      "pvp": 1.2,
       "margem_liquida_pct": 14.84,
-      "dy_pct": 15.36
+      "dy_pct": 15.41,
+      "roe_pct": 19.98
     },
     {
       "ticker": "CTKA3",
@@ -1583,19 +1714,21 @@
       "pl": 14.13,
       "pvp": 2.86,
       "margem_liquida_pct": 2.49,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 20.28
     },
     {
       "ticker": "CTKA4",
       "nome": "Karsten",
       "setor": "Outros",
-      "preco": 31.0,
+      "preco": 31.01,
       "valor_mercado": 226000000.0,
-      "variacao_dia_pct": 1.27,
+      "variacao_dia_pct": 0.03,
       "pl": 9.96,
       "pvp": 2.02,
       "margem_liquida_pct": 2.49,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 20.28
     },
     {
       "ticker": "CTNM3",
@@ -1607,7 +1740,8 @@
       "pl": -0.28,
       "pvp": -0.24,
       "margem_liquida_pct": -165.86,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 87.47
     },
     {
       "ticker": "CTNM4",
@@ -1619,7 +1753,8 @@
       "pl": -0.03,
       "pvp": -0.03,
       "margem_liquida_pct": -165.86,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 87.47
     },
     {
       "ticker": "CTSA3",
@@ -1631,7 +1766,8 @@
       "pl": -0.09,
       "pvp": 0.14,
       "margem_liquida_pct": -453.89,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -162.82
     },
     {
       "ticker": "CTSA4",
@@ -1643,31 +1779,34 @@
       "pl": -0.06,
       "pvp": 0.09,
       "margem_liquida_pct": -453.89,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -162.82
     },
     {
       "ticker": "CURY3",
       "nome": "Cury S/A",
       "setor": "Financeiro",
-      "preco": 33.0,
+      "preco": 33.28,
       "valor_mercado": 9361000000.0,
-      "variacao_dia_pct": -1.9608,
-      "pl": 9.25,
-      "pvp": 4.96,
+      "variacao_dia_pct": 1.4634,
+      "pl": 9.33,
+      "pvp": 5.0,
       "margem_liquida_pct": 17.89,
-      "dy_pct": 13.26
+      "dy_pct": 13.15,
+      "roe_pct": 53.62
     },
     {
       "ticker": "CVCB3",
       "nome": "CVC Brasil Operadora e Agência de Viagens S.A.",
       "setor": "Outros",
-      "preco": 1.79,
+      "preco": 1.88,
       "valor_mercado": 714000000.0,
-      "variacao_dia_pct": -1.6484,
-      "pl": 71.6,
-      "pvp": 2.92,
+      "variacao_dia_pct": 5.0279,
+      "pl": 75.2,
+      "pvp": 3.06,
       "margem_liquida_pct": 0.88,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 4.01
     },
     {
       "ticker": "CXSE3",
@@ -1675,71 +1814,77 @@
       "setor": "Financeiro",
       "preco": 19.86,
       "valor_mercado": 62160000000.0,
-      "variacao_dia_pct": 0.3537,
+      "variacao_dia_pct": 0.4552,
       "pl": 13.88,
       "pvp": 4.32,
       "margem_liquida_pct": null,
-      "dy_pct": 6.61
+      "dy_pct": 6.61,
+      "roe_pct": 31.11
     },
     {
       "ticker": "CYRE3",
       "nome": "Cyrela Brazil Realty S.A. Empreendimentos e Participações",
       "setor": "Financeiro",
-      "preco": 25.47,
+      "preco": 25.45,
       "valor_mercado": 9542000000.0,
-      "variacao_dia_pct": -0.0392,
+      "variacao_dia_pct": 0.4341,
       "pl": 5.66,
       "pvp": 0.93,
       "margem_liquida_pct": 20.67,
-      "dy_pct": 10.72
+      "dy_pct": 10.73,
+      "roe_pct": 16.38
     },
     {
       "ticker": "DASA3",
       "nome": "DaSA",
       "setor": "Saúde",
-      "preco": 2.78,
+      "preco": 2.75,
       "valor_mercado": 3576000000.0,
-      "variacao_dia_pct": 4.5113,
-      "pl": -3.97,
-      "pvp": 0.51,
+      "variacao_dia_pct": -1.7857,
+      "pl": -3.93,
+      "pvp": 0.5,
       "margem_liquida_pct": -9.42,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -12.8
     },
     {
       "ticker": "DESK3",
       "nome": "Desktop",
       "setor": "Outros",
-      "preco": 18.88,
+      "preco": 18.82,
       "valor_mercado": 2099000000.0,
-      "variacao_dia_pct": 0.1592,
-      "pl": 39.33,
-      "pvp": 1.5,
+      "variacao_dia_pct": -0.6336,
+      "pl": 39.21,
+      "pvp": 1.49,
       "margem_liquida_pct": 4.4,
-      "dy_pct": 0.77
+      "dy_pct": 0.78,
+      "roe_pct": 3.81
     },
     {
       "ticker": "DIRR3",
       "nome": "Direcional",
       "setor": "Financeiro",
-      "preco": 11.47,
+      "preco": 11.42,
       "valor_mercado": 6162000000.0,
-      "variacao_dia_pct": 0.0873,
-      "pl": 6.98,
-      "pvp": 2.18,
+      "variacao_dia_pct": -0.4359,
+      "pl": 6.95,
+      "pvp": 2.17,
       "margem_liquida_pct": 17.73,
-      "dy_pct": 13.51
+      "dy_pct": 13.57,
+      "roe_pct": 31.27
     },
     {
       "ticker": "DMVF3",
       "nome": "D1000 Vfarma",
       "setor": "Saúde",
-      "preco": 6.26,
+      "preco": 6.23,
       "valor_mercado": 314000000.0,
-      "variacao_dia_pct": -0.9494,
-      "pl": 14.56,
+      "variacao_dia_pct": 0.8091,
+      "pl": 14.49,
       "pvp": 0.34,
       "margem_liquida_pct": 0.79,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 2.35
     },
     {
       "ticker": "DOHL3",
@@ -1751,31 +1896,34 @@
       "pl": -3230.0,
       "pvp": 0.71,
       "margem_liquida_pct": -0.03,
-      "dy_pct": 0.51
+      "dy_pct": 0.51,
+      "roe_pct": -0.02
     },
     {
       "ticker": "DOHL4",
       "nome": "Dohler",
       "setor": "Outros",
-      "preco": 3.69,
+      "preco": 3.73,
       "valor_mercado": 434000000.0,
-      "variacao_dia_pct": 0.545,
-      "pl": -1845.0,
+      "variacao_dia_pct": 1.084,
+      "pl": -1865.0,
       "pvp": 0.41,
       "margem_liquida_pct": -0.03,
-      "dy_pct": 0.98
+      "dy_pct": 0.97,
+      "roe_pct": -0.02
     },
     {
       "ticker": "DOTZ3",
       "nome": "Dotz S.A.",
       "setor": "Outros",
-      "preco": 10.96,
+      "preco": 10.95,
       "valor_mercado": 63000000.0,
-      "variacao_dia_pct": -14.7082,
+      "variacao_dia_pct": 1.3889,
       "pl": 5.09,
       "pvp": -0.67,
       "margem_liquida_pct": 7.77,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -13.2
     },
     {
       "ticker": "DTCY3",
@@ -1787,43 +1935,47 @@
       "pl": -24.68,
       "pvp": -108.33,
       "margem_liquida_pct": -12.23,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 434.83
     },
     {
       "ticker": "EALT3",
       "nome": "Aco Altona",
       "setor": "Outros",
-      "preco": 11.9,
+      "preco": 12.3,
       "valor_mercado": 265000000.0,
-      "variacao_dia_pct": 5.8719,
-      "pl": 4.67,
-      "pvp": 0.73,
+      "variacao_dia_pct": 3.3613,
+      "pl": 4.83,
+      "pvp": 0.76,
       "margem_liquida_pct": 10.93,
-      "dy_pct": 7.7
+      "dy_pct": 7.45,
+      "roe_pct": 15.66
     },
     {
       "ticker": "EALT4",
       "nome": "Aco Altona",
       "setor": "Outros",
-      "preco": 11.08,
+      "preco": 11.19,
       "valor_mercado": 265000000.0,
-      "variacao_dia_pct": 0.3623,
-      "pl": 4.35,
-      "pvp": 0.68,
+      "variacao_dia_pct": 0.9928,
+      "pl": 4.39,
+      "pvp": 0.69,
       "margem_liquida_pct": 10.93,
-      "dy_pct": 9.1
+      "dy_pct": 9.01,
+      "roe_pct": 15.66
     },
     {
       "ticker": "ECOR3",
       "nome": "EcoRodovias Infraestrutura e Logística S.A.",
       "setor": "Outros",
-      "preco": 7.69,
+      "preco": 7.85,
       "valor_mercado": 4964000000.0,
-      "variacao_dia_pct": -0.5175,
-      "pl": 9.81,
-      "pvp": 1.22,
+      "variacao_dia_pct": 2.7487,
+      "pl": 10.01,
+      "pvp": 1.24,
       "margem_liquida_pct": 4.59,
-      "dy_pct": 7.95
+      "dy_pct": 7.78,
+      "roe_pct": 12.41
     },
     {
       "ticker": "ECPR3",
@@ -1835,7 +1987,8 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "ECPR4",
@@ -1847,19 +2000,21 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "EGIE3",
       "nome": "Engie Brasil Energia S.A.",
       "setor": "Energia Elétrica",
-      "preco": 30.35,
+      "preco": 30.31,
       "valor_mercado": 39683000000.0,
-      "variacao_dia_pct": 0.6633,
-      "pl": 10.86,
+      "variacao_dia_pct": -0.1647,
+      "pl": 10.84,
       "pvp": 2.67,
       "margem_liquida_pct": 28.94,
-      "dy_pct": 1.9
+      "dy_pct": 1.9,
+      "roe_pct": 24.6
     },
     {
       "ticker": "EKTR3",
@@ -1871,7 +2026,8 @@
       "pl": 13.05,
       "pvp": 4.58,
       "margem_liquida_pct": 7.4,
-      "dy_pct": 4.51
+      "dy_pct": 4.51,
+      "roe_pct": 35.11
     },
     {
       "ticker": "EKTR4",
@@ -1879,11 +2035,12 @@
       "setor": "Energia Elétrica",
       "preco": 38.0,
       "valor_mercado": 8776000000.0,
-      "variacao_dia_pct": 0.2639,
+      "variacao_dia_pct": 0.0,
       "pl": 9.63,
       "pvp": 3.38,
       "margem_liquida_pct": 7.4,
-      "dy_pct": 6.73
+      "dy_pct": 6.73,
+      "roe_pct": 35.11
     },
     {
       "ticker": "ELMD3",
@@ -1895,7 +2052,8 @@
       "pl": 39.74,
       "pvp": 3.73,
       "margem_liquida_pct": 8.95,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 9.39
     },
     {
       "ticker": "EMAE3",
@@ -1907,91 +2065,99 @@
       "pl": -45.18,
       "pvp": 8.25,
       "margem_liquida_pct": -29.53,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -18.27
     },
     {
       "ticker": "EMAE4",
       "nome": "Emae",
       "setor": "Energia Elétrica",
-      "preco": 34.46,
+      "preco": 34.76,
       "valor_mercado": 1331000000.0,
-      "variacao_dia_pct": 1.0854,
-      "pl": -10.38,
-      "pvp": 1.9,
+      "variacao_dia_pct": 0.0576,
+      "pl": -10.47,
+      "pvp": 1.91,
       "margem_liquida_pct": -29.53,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -18.27
     },
     {
       "ticker": "EMBJ3",
       "nome": "Embraer S.A.",
       "setor": "Outros",
-      "preco": 93.39,
+      "preco": 94.74,
       "valor_mercado": 64346000000.0,
-      "variacao_dia_pct": 0.9622,
-      "pl": 29.69,
-      "pvp": 3.49,
+      "variacao_dia_pct": 0.8623,
+      "pl": 30.11,
+      "pvp": 3.54,
       "margem_liquida_pct": 5.28,
-      "dy_pct": 1.08
+      "dy_pct": 1.06,
+      "roe_pct": 11.75
     },
     {
       "ticker": "ENEV3",
       "nome": "Eneva",
       "setor": "Energia Elétrica",
-      "preco": 27.6,
+      "preco": 27.58,
       "valor_mercado": 49223000000.0,
-      "variacao_dia_pct": 0.6198,
-      "pl": 55.76,
+      "variacao_dia_pct": -0.2171,
+      "pl": 55.72,
       "pvp": 2.44,
       "margem_liquida_pct": 5.03,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 4.38
     },
     {
       "ticker": "ENGI11",
       "nome": "EnergiSA",
       "setor": "Energia Elétrica",
-      "preco": 51.62,
+      "preco": 51.56,
       "valor_mercado": 26490000000.0,
-      "variacao_dia_pct": 0.9189,
-      "pl": 28.57,
-      "pvp": 1.89,
+      "variacao_dia_pct": 0.3699,
+      "pl": 28.53,
+      "pvp": 1.88,
       "margem_liquida_pct": 4.13,
-      "dy_pct": 3.3
+      "dy_pct": 3.3,
+      "roe_pct": 6.6
     },
     {
       "ticker": "ENGI3",
       "nome": "EnergiSA",
       "setor": "Energia Elétrica",
-      "preco": 12.34,
+      "preco": 12.39,
       "valor_mercado": 26490000000.0,
-      "variacao_dia_pct": 1.6474,
-      "pl": 20.5,
-      "pvp": 1.35,
+      "variacao_dia_pct": -0.0806,
+      "pl": 20.58,
+      "pvp": 1.36,
       "margem_liquida_pct": 4.13,
-      "dy_pct": 2.76
+      "dy_pct": 2.74,
+      "roe_pct": 6.6
     },
     {
       "ticker": "ENGI4",
       "nome": "EnergiSA",
       "setor": "Energia Elétrica",
-      "preco": 9.81,
+      "preco": 9.86,
       "valor_mercado": 26490000000.0,
-      "variacao_dia_pct": 0.5123,
-      "pl": 16.3,
-      "pvp": 1.07,
+      "variacao_dia_pct": 0.5097,
+      "pl": 16.38,
+      "pvp": 1.08,
       "margem_liquida_pct": 4.13,
-      "dy_pct": 3.47
+      "dy_pct": 3.45,
+      "roe_pct": 6.6
     },
     {
       "ticker": "ENJU3",
       "nome": "Enjoei",
       "setor": "Outros",
-      "preco": 0.74,
+      "preco": 0.75,
       "valor_mercado": 159000000.0,
       "variacao_dia_pct": 0.0,
-      "pl": -2.65,
-      "pvp": 0.73,
+      "pl": -2.69,
+      "pvp": 0.74,
       "margem_liquida_pct": -23.32,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -27.47
     },
     {
       "ticker": "ENMT3",
@@ -1999,47 +2165,51 @@
       "setor": "Energia Elétrica",
       "preco": 33.6,
       "valor_mercado": 7911000000.0,
-      "variacao_dia_pct": -1.5,
+      "variacao_dia_pct": 0.0,
       "pl": 12.78,
       "pvp": 1.85,
       "margem_liquida_pct": 6.04,
-      "dy_pct": 10.39
+      "dy_pct": 10.39,
+      "roe_pct": 14.47
     },
     {
       "ticker": "ENMT4",
       "nome": "EnergiSA Mt",
       "setor": "Energia Elétrica",
-      "preco": 34.99,
+      "preco": 34.61,
       "valor_mercado": 7911000000.0,
-      "variacao_dia_pct": 1.72,
-      "pl": 13.3,
-      "pvp": 1.93,
+      "variacao_dia_pct": -1.09,
+      "pl": 13.16,
+      "pvp": 1.9,
       "margem_liquida_pct": 6.04,
-      "dy_pct": 9.98
+      "dy_pct": 10.09,
+      "roe_pct": 14.47
     },
     {
       "ticker": "EPAR3",
       "nome": "Embpar",
       "setor": "Outros",
-      "preco": 1.34,
+      "preco": 1.35,
       "valor_mercado": 20000000.0,
-      "variacao_dia_pct": -1.4706,
-      "pl": -89.33,
+      "variacao_dia_pct": 0.7463,
+      "pl": -90.0,
       "pvp": 0.49,
       "margem_liquida_pct": -9.65,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -0.53
     },
     {
       "ticker": "EQPA3",
       "nome": "Eqtl Para",
       "setor": "Energia Elétrica",
-      "preco": 5.51,
+      "preco": 5.52,
       "valor_mercado": 40000000.0,
-      "variacao_dia_pct": -1.2545,
+      "variacao_dia_pct": 0.1815,
       "pl": 0.63,
       "pvp": 2.32,
       "margem_liquida_pct": 150.85,
-      "dy_pct": 8.19
+      "dy_pct": 8.17,
+      "roe_pct": 366.78
     },
     {
       "ticker": "EQPA5",
@@ -2047,11 +2217,12 @@
       "setor": "Energia Elétrica",
       "preco": 9.78,
       "valor_mercado": 40000000.0,
-      "variacao_dia_pct": -0.14,
+      "variacao_dia_pct": 0.0,
       "pl": 1.12,
       "pvp": 4.11,
       "margem_liquida_pct": 150.85,
-      "dy_pct": 4.61
+      "dy_pct": 4.61,
+      "roe_pct": 366.78
     },
     {
       "ticker": "EQPA6",
@@ -2063,7 +2234,8 @@
       "pl": 0.76,
       "pvp": 2.77,
       "margem_liquida_pct": 150.85,
-      "dy_pct": 6.84
+      "dy_pct": 6.84,
+      "roe_pct": 366.78
     },
     {
       "ticker": "EQPA7",
@@ -2075,31 +2247,34 @@
       "pl": 1.15,
       "pvp": 4.21,
       "margem_liquida_pct": 150.85,
-      "dy_pct": 18.06
+      "dy_pct": 18.06,
+      "roe_pct": 366.78
     },
     {
       "ticker": "EQTL3",
       "nome": "Equatorial Energia S.A.",
       "setor": "Energia Elétrica",
-      "preco": 38.89,
+      "preco": 39.22,
       "valor_mercado": 48864000000.0,
-      "variacao_dia_pct": 1.3288,
-      "pl": 51.1,
-      "pvp": 1.71,
+      "variacao_dia_pct": 0.7708,
+      "pl": 51.54,
+      "pvp": 1.72,
       "margem_liquida_pct": 1.77,
-      "dy_pct": 4.07
+      "dy_pct": 4.04,
+      "roe_pct": 3.34
     },
     {
       "ticker": "ESPA3",
       "nome": "Espacolaser",
       "setor": "Outros",
-      "preco": 7.61,
+      "preco": 7.13,
       "valor_mercado": 294000000.0,
-      "variacao_dia_pct": -2.3107,
-      "pl": 35.73,
-      "pvp": 0.32,
+      "variacao_dia_pct": -4.6791,
+      "pl": 33.47,
+      "pvp": 0.3,
       "margem_liquida_pct": 0.7,
-      "dy_pct": 0.5
+      "dy_pct": 0.53,
+      "roe_pct": 0.89
     },
     {
       "ticker": "ESTR3",
@@ -2111,31 +2286,34 @@
       "pl": 0.17,
       "pvp": -0.11,
       "margem_liquida_pct": 94.25,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -62.71
     },
     {
       "ticker": "ESTR4",
       "nome": "Estrela",
       "setor": "Outros",
-      "preco": 1.44,
+      "preco": 1.39,
       "valor_mercado": 18000000.0,
-      "variacao_dia_pct": 0.0,
+      "variacao_dia_pct": -3.47,
       "pl": 0.08,
       "pvp": -0.05,
       "margem_liquida_pct": 94.25,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -62.71
     },
     {
       "ticker": "ETER3",
       "nome": "Eternit",
       "setor": "Outros",
-      "preco": 3.76,
+      "preco": 3.75,
       "valor_mercado": 227000000.0,
-      "variacao_dia_pct": 0.2667,
-      "pl": 7.61,
-      "pvp": 0.28,
+      "variacao_dia_pct": -0.5305,
+      "pl": 7.59,
+      "pvp": 0.27,
       "margem_liquida_pct": 2.67,
-      "dy_pct": 4.55
+      "dy_pct": 4.56,
+      "roe_pct": 3.61
     },
     {
       "ticker": "EUCA3",
@@ -2143,47 +2321,51 @@
       "setor": "Materiais Básicos",
       "preco": 21.5,
       "valor_mercado": 2038000000.0,
-      "variacao_dia_pct": 0.7026,
+      "variacao_dia_pct": 0.0,
       "pl": 14.41,
       "pvp": 0.66,
       "margem_liquida_pct": 4.37,
-      "dy_pct": 4.76
+      "dy_pct": 4.76,
+      "roe_pct": 4.58
     },
     {
       "ticker": "EUCA4",
       "nome": "Eucatex",
       "setor": "Materiais Básicos",
-      "preco": 20.88,
+      "preco": 20.86,
       "valor_mercado": 2038000000.0,
-      "variacao_dia_pct": -3.6456,
-      "pl": 13.99,
+      "variacao_dia_pct": -1.7891,
+      "pl": 13.98,
       "pvp": 0.64,
       "margem_liquida_pct": 4.37,
-      "dy_pct": 5.39
+      "dy_pct": 5.39,
+      "roe_pct": 4.58
     },
     {
       "ticker": "EVEN3",
       "nome": "Even",
       "setor": "Financeiro",
-      "preco": 4.38,
+      "preco": 4.23,
       "valor_mercado": 996000000.0,
-      "variacao_dia_pct": 0.6897,
-      "pl": 4.42,
-      "pvp": 0.38,
+      "variacao_dia_pct": -2.5346,
+      "pl": 4.27,
+      "pvp": 0.37,
       "margem_liquida_pct": 12.83,
-      "dy_pct": 20.91
+      "dy_pct": 21.65,
+      "roe_pct": 8.6
     },
     {
       "ticker": "EZTC3",
       "nome": "Eztec",
       "setor": "Financeiro",
-      "preco": 13.25,
+      "preco": 12.95,
       "valor_mercado": 3178000000.0,
-      "variacao_dia_pct": 0.3788,
-      "pl": 6.92,
-      "pvp": 0.69,
+      "variacao_dia_pct": -2.2642,
+      "pl": 6.76,
+      "pvp": 0.68,
       "margem_liquida_pct": 36.95,
-      "dy_pct": 10.69
+      "dy_pct": 10.93,
+      "roe_pct": 9.99
     },
     {
       "ticker": "FESA3",
@@ -2191,71 +2373,77 @@
       "setor": "Materiais Básicos",
       "preco": 10.15,
       "valor_mercado": 2611000000.0,
-      "variacao_dia_pct": 5.8394,
+      "variacao_dia_pct": 0.0,
       "pl": 24.28,
       "pvp": 1.09,
       "margem_liquida_pct": 6.78,
-      "dy_pct": 6.3
+      "dy_pct": 6.3,
+      "roe_pct": 4.49
     },
     {
       "ticker": "FESA4",
       "nome": "FerbaSA",
       "setor": "Materiais Básicos",
-      "preco": 5.77,
+      "preco": 5.63,
       "valor_mercado": 2611000000.0,
-      "variacao_dia_pct": 1.9435,
-      "pl": 13.8,
-      "pvp": 0.62,
+      "variacao_dia_pct": -1.5734,
+      "pl": 13.47,
+      "pvp": 0.6,
       "margem_liquida_pct": 6.78,
-      "dy_pct": 12.17
+      "dy_pct": 12.47,
+      "roe_pct": 4.49
     },
     {
       "ticker": "FHER3",
       "nome": "Fer Heringer",
       "setor": "Materiais Básicos",
-      "preco": 3.15,
+      "preco": 3.07,
       "valor_mercado": 191000000.0,
-      "variacao_dia_pct": 3.9604,
-      "pl": -0.75,
-      "pvp": -0.13,
+      "variacao_dia_pct": -2.5397,
+      "pl": -0.73,
+      "pvp": -0.12,
       "margem_liquida_pct": -6.77,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 16.81
     },
     {
       "ticker": "FIQE3",
       "nome": "Unifique",
       "setor": "Outros",
-      "preco": 5.01,
+      "preco": 4.96,
       "valor_mercado": 2202000000.0,
-      "variacao_dia_pct": -1.378,
-      "pl": 8.93,
-      "pvp": 1.65,
+      "variacao_dia_pct": -0.2012,
+      "pl": 8.84,
+      "pvp": 1.63,
       "margem_liquida_pct": 17.16,
-      "dy_pct": 15.55
+      "dy_pct": 15.71,
+      "roe_pct": 18.41
     },
     {
       "ticker": "FLRY3",
       "nome": "Fleury S.A.",
       "setor": "Saúde",
-      "preco": 20.07,
+      "preco": 20.27,
       "valor_mercado": 9045000000.0,
-      "variacao_dia_pct": 2.0336,
-      "pl": 15.59,
-      "pvp": 1.99,
+      "variacao_dia_pct": 0.8458,
+      "pl": 15.75,
+      "pvp": 2.01,
       "margem_liquida_pct": 8.01,
-      "dy_pct": 6.02
+      "dy_pct": 5.96,
+      "roe_pct": 12.76
     },
     {
       "ticker": "FRAS3",
       "nome": "Fras Le",
       "setor": "Outros",
-      "preco": 22.81,
+      "preco": 22.84,
       "valor_mercado": 5816000000.0,
-      "variacao_dia_pct": -3.0599,
-      "pl": 21.83,
+      "variacao_dia_pct": 0.3956,
+      "pl": 21.86,
       "pvp": 2.52,
       "margem_liquida_pct": 5.39,
-      "dy_pct": 3.11
+      "dy_pct": 3.11,
+      "roe_pct": 11.54
     },
     {
       "ticker": "FRIO3",
@@ -2267,7 +2455,8 @@
       "pl": 19.71,
       "pvp": 2.66,
       "margem_liquida_pct": 2.65,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 13.49
     },
     {
       "ticker": "GEPA3",
@@ -2279,103 +2468,112 @@
       "pl": -121.7,
       "pvp": 2.31,
       "margem_liquida_pct": -22.03,
-      "dy_pct": 18.99
+      "dy_pct": 18.99,
+      "roe_pct": -1.9
     },
     {
       "ticker": "GEPA4",
       "nome": "Ger Paranap",
       "setor": "Energia Elétrica",
-      "preco": 35.99,
+      "preco": 36.26,
       "valor_mercado": 3459000000.0,
-      "variacao_dia_pct": -2.7297,
-      "pl": -129.93,
-      "pvp": 2.47,
+      "variacao_dia_pct": 0.7502,
+      "pl": -130.9,
+      "pvp": 2.49,
       "margem_liquida_pct": -22.03,
-      "dy_pct": 17.79
+      "dy_pct": 17.65,
+      "roe_pct": -1.9
     },
     {
       "ticker": "GFSA3",
       "nome": "Gafisa",
       "setor": "Financeiro",
-      "preco": 0.22,
+      "preco": 0.21,
       "valor_mercado": 54000000.0,
-      "variacao_dia_pct": 4.7619,
-      "pl": -0.06,
+      "variacao_dia_pct": -4.5455,
+      "pl": -0.05,
       "pvp": 0.02,
       "margem_liquida_pct": -124.06,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -39.87
     },
     {
       "ticker": "GGBR3",
       "nome": "Gerdau S.A.",
       "setor": "Materiais Básicos",
-      "preco": 21.6,
+      "preco": 21.8,
       "valor_mercado": 46085000000.0,
-      "variacao_dia_pct": -1.0536,
-      "pl": 19.1,
+      "variacao_dia_pct": 1.9645,
+      "pl": 19.27,
       "pvp": 0.8,
       "margem_liquida_pct": 3.22,
-      "dy_pct": 3.15
+      "dy_pct": 3.12,
+      "roe_pct": 4.16
     },
     {
       "ticker": "GGBR4",
       "nome": "Gerdau S.A.",
       "setor": "Materiais Básicos",
-      "preco": 25.15,
+      "preco": 25.41,
       "valor_mercado": 46085000000.0,
-      "variacao_dia_pct": -1.0622,
-      "pl": 22.24,
-      "pvp": 0.93,
+      "variacao_dia_pct": 1.074,
+      "pl": 22.47,
+      "pvp": 0.94,
       "margem_liquida_pct": 3.22,
-      "dy_pct": 2.7
+      "dy_pct": 2.68,
+      "roe_pct": 4.16
     },
     {
       "ticker": "GGPS3",
       "nome": "GPS",
       "setor": "Outros",
-      "preco": 12.98,
+      "preco": 13.09,
       "valor_mercado": 8757000000.0,
-      "variacao_dia_pct": -1.2928,
-      "pl": 10.67,
-      "pvp": 2.16,
+      "variacao_dia_pct": 1.4729,
+      "pl": 10.76,
+      "pvp": 2.18,
       "margem_liquida_pct": 5.1,
-      "dy_pct": 2.5
+      "dy_pct": 2.48,
+      "roe_pct": 20.23
     },
     {
       "ticker": "GMAT3",
       "nome": "Grupo Mateus S.A.",
       "setor": "Outros",
-      "preco": 4.8,
+      "preco": 4.89,
       "valor_mercado": 8823000000.0,
-      "variacao_dia_pct": 0.6289,
-      "pl": 6.81,
-      "pvp": 0.9,
+      "variacao_dia_pct": 1.875,
+      "pl": 6.94,
+      "pvp": 0.91,
       "margem_liquida_pct": 4.0,
-      "dy_pct": 2.54
+      "dy_pct": 2.49,
+      "roe_pct": 13.16
     },
     {
       "ticker": "GOAU3",
       "nome": "Gerdau Met",
       "setor": "Materiais Básicos",
-      "preco": 9.95,
+      "preco": 9.97,
       "valor_mercado": 13677000000.0,
-      "variacao_dia_pct": -1.4851,
-      "pl": 16.56,
-      "pvp": 0.24,
+      "variacao_dia_pct": 0.201,
+      "pl": 16.59,
+      "pvp": 0.25,
       "margem_liquida_pct": 1.14,
-      "dy_pct": 4.02
+      "dy_pct": 4.01,
+      "roe_pct": 1.48
     },
     {
       "ticker": "GOAU4",
       "nome": "Metalurgica Gerdau S.A.",
       "setor": "Materiais Básicos",
-      "preco": 11.08,
+      "preco": 11.16,
       "valor_mercado": 13677000000.0,
-      "variacao_dia_pct": -0.3597,
-      "pl": 18.44,
+      "variacao_dia_pct": 0.5405,
+      "pl": 18.57,
       "pvp": 0.27,
       "margem_liquida_pct": 1.14,
-      "dy_pct": 3.61
+      "dy_pct": 3.58,
+      "roe_pct": 1.48
     },
     {
       "ticker": "GOLL4",
@@ -2387,7 +2585,8 @@
       "pl": null,
       "pvp": -395.0,
       "margem_liquida_pct": -5.9,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 7.67
     },
     {
       "ticker": "GPAR3",
@@ -2399,19 +2598,21 @@
       "pl": -40.11,
       "pvp": null,
       "margem_liquida_pct": 111.61,
-      "dy_pct": 14.42
+      "dy_pct": 14.42,
+      "roe_pct": null
     },
     {
       "ticker": "GRND3",
       "nome": "Grendene S.A.",
       "setor": "Outros",
-      "preco": 3.65,
+      "preco": 3.7,
       "valor_mercado": 3356000000.0,
-      "variacao_dia_pct": -0.8152,
-      "pl": 5.69,
-      "pvp": 1.03,
+      "variacao_dia_pct": 0.271,
+      "pl": 5.76,
+      "pvp": 1.04,
       "margem_liquida_pct": 22.71,
-      "dy_pct": 42.14
+      "dy_pct": 41.57,
+      "roe_pct": 18.04
     },
     {
       "ticker": "GSHP3",
@@ -2423,7 +2624,8 @@
       "pl": -0.01,
       "pvp": -0.0,
       "margem_liquida_pct": -209.37,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 23.14
     },
     {
       "ticker": "GUAR3",
@@ -2435,79 +2637,86 @@
       "pl": 3.31,
       "pvp": 0.94,
       "margem_liquida_pct": 14.35,
-      "dy_pct": 30.51
+      "dy_pct": 30.51,
+      "roe_pct": 28.35
     },
     {
       "ticker": "HAGA3",
       "nome": "Haga S/A",
       "setor": "Outros",
-      "preco": 2.57,
+      "preco": 2.63,
       "valor_mercado": 24000000.0,
-      "variacao_dia_pct": -3.3835,
-      "pl": 0.35,
-      "pvp": 0.86,
+      "variacao_dia_pct": -0.3788,
+      "pl": 0.36,
+      "pvp": 0.88,
       "margem_liquida_pct": 263.46,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 244.2
     },
     {
       "ticker": "HAGA4",
       "nome": "Haga S/A",
       "setor": "Outros",
-      "preco": 1.96,
+      "preco": 1.95,
       "valor_mercado": 24000000.0,
-      "variacao_dia_pct": -0.5076,
+      "variacao_dia_pct": -0.5102,
       "pl": 0.27,
-      "pvp": 0.66,
+      "pvp": 0.65,
       "margem_liquida_pct": 263.46,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 244.2
     },
     {
       "ticker": "HAPV3",
       "nome": "Hapvida",
       "setor": "Saúde",
-      "preco": 7.33,
+      "preco": 7.24,
       "valor_mercado": 5121000000.0,
-      "variacao_dia_pct": 6.6958,
-      "pl": -21.31,
+      "variacao_dia_pct": -1.2278,
+      "pl": -21.05,
       "pvp": 0.08,
       "margem_liquida_pct": -0.54,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -0.36
     },
     {
       "ticker": "HBOR3",
       "nome": "Helbor Empreendimentos S.A.",
       "setor": "Financeiro",
-      "preco": 2.18,
+      "preco": 2.06,
       "valor_mercado": 247000000.0,
-      "variacao_dia_pct": 1.8692,
-      "pl": 64.12,
+      "variacao_dia_pct": -6.3636,
+      "pl": 60.59,
       "pvp": 0.1,
       "margem_liquida_pct": 0.41,
-      "dy_pct": 6.1
+      "dy_pct": 6.46,
+      "roe_pct": 0.16
     },
     {
       "ticker": "HBRE3",
       "nome": "Hbr Realty",
       "setor": "Financeiro",
-      "preco": 2.62,
+      "preco": 2.56,
       "valor_mercado": 218000000.0,
-      "variacao_dia_pct": -0.3802,
-      "pl": 7.4,
+      "variacao_dia_pct": -4.8327,
+      "pl": 7.23,
       "pvp": 0.1,
       "margem_liquida_pct": 6.56,
-      "dy_pct": 44.47
+      "dy_pct": 45.51,
+      "roe_pct": 1.39
     },
     {
       "ticker": "HBSA3",
       "nome": "Hidrovias",
       "setor": "Outros",
-      "preco": 3.46,
+      "preco": 3.42,
       "valor_mercado": 4421000000.0,
-      "variacao_dia_pct": -2.5352,
-      "pl": -26.41,
-      "pvp": 2.25,
+      "variacao_dia_pct": 0.0,
+      "pl": -26.11,
+      "pvp": 2.23,
       "margem_liquida_pct": -7.96,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -8.56
     },
     {
       "ticker": "HBTS5",
@@ -2519,7 +2728,8 @@
       "pl": 4.95,
       "pvp": 0.45,
       "margem_liquida_pct": 130.62,
-      "dy_pct": 22.55
+      "dy_pct": 22.55,
+      "roe_pct": 9.07
     },
     {
       "ticker": "HETA3",
@@ -2531,7 +2741,8 @@
       "pl": 60.53,
       "pvp": -0.14,
       "margem_liquida_pct": 18.13,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -0.23
     },
     {
       "ticker": "HETA4",
@@ -2543,91 +2754,99 @@
       "pl": 3.03,
       "pvp": -0.01,
       "margem_liquida_pct": 18.13,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -0.23
     },
     {
       "ticker": "HOOT4",
       "nome": "Hoteis Othon",
       "setor": "Outros",
-      "preco": 8.1,
+      "preco": 8.89,
       "valor_mercado": 126000000.0,
-      "variacao_dia_pct": 5.1948,
-      "pl": 4.86,
-      "pvp": -3.59,
+      "variacao_dia_pct": 9.7531,
+      "pl": 5.34,
+      "pvp": -3.94,
       "margem_liquida_pct": 14.55,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -73.71
     },
     {
       "ticker": "HYPE3",
       "nome": "Hypera S.A.",
       "setor": "Saúde",
-      "preco": 22.73,
+      "preco": 23.11,
       "valor_mercado": 14826000000.0,
-      "variacao_dia_pct": 1.2021,
-      "pl": 9.17,
-      "pvp": 1.11,
+      "variacao_dia_pct": 1.6718,
+      "pl": 9.32,
+      "pvp": 1.13,
       "margem_liquida_pct": 19.8,
-      "dy_pct": 4.89
+      "dy_pct": 4.81,
+      "roe_pct": 12.1
     },
     {
       "ticker": "IFCM3",
       "nome": "Infracomm",
       "setor": "Outros",
-      "preco": 1.73,
+      "preco": 1.76,
       "valor_mercado": 40000000.0,
-      "variacao_dia_pct": -1.1429,
+      "variacao_dia_pct": 0.0,
       "pl": -0.15,
       "pvp": 0.36,
       "margem_liquida_pct": -50.54,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -237.77
     },
     {
       "ticker": "IGTI11",
       "nome": "Iguatemi S.A.",
       "setor": "Financeiro",
-      "preco": 26.57,
+      "preco": 26.43,
       "valor_mercado": 7112000000.0,
-      "variacao_dia_pct": 2.153,
+      "variacao_dia_pct": -0.5269,
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "IGTI3",
       "nome": "Iguatemi S.A.",
       "setor": "Financeiro",
-      "preco": 3.36,
+      "preco": 3.34,
       "valor_mercado": 7112000000.0,
-      "variacao_dia_pct": 0.9009,
+      "variacao_dia_pct": -0.5952,
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "IGTI4",
       "nome": "Iguatemi S.A.",
       "setor": "Financeiro",
-      "preco": 11.72,
+      "preco": 11.75,
       "valor_mercado": 7112000000.0,
-      "variacao_dia_pct": 1.91,
+      "variacao_dia_pct": 0.26,
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "INBR32",
       "nome": "Inter & Co Inc",
       "setor": "Financeiro",
-      "preco": 29.53,
+      "preco": 29.0,
       "valor_mercado": 2454000000.0,
-      "variacao_dia_pct": -1.2375,
-      "pl": 5.08,
-      "pvp": 0.89,
+      "variacao_dia_pct": -1.7282,
+      "pl": 4.99,
+      "pvp": 0.88,
       "margem_liquida_pct": 13.08,
-      "dy_pct": 2.0
+      "dy_pct": 2.03,
+      "roe_pct": 17.6
     },
     {
       "ticker": "INEP3",
@@ -2635,71 +2854,77 @@
       "setor": "Outros",
       "preco": 1.45,
       "valor_mercado": 94000000.0,
-      "variacao_dia_pct": 2.8369,
+      "variacao_dia_pct": 0.0,
       "pl": -0.29,
       "pvp": -0.04,
       "margem_liquida_pct": -3341.15,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 14.93
     },
     {
       "ticker": "INEP4",
       "nome": "Inepar",
       "setor": "Outros",
-      "preco": 1.38,
+      "preco": 1.35,
       "valor_mercado": 94000000.0,
-      "variacao_dia_pct": 2.9851,
-      "pl": -0.28,
+      "variacao_dia_pct": -2.1739,
+      "pl": -0.27,
       "pvp": -0.04,
       "margem_liquida_pct": -3341.15,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 14.93
     },
     {
       "ticker": "INTB3",
       "nome": "Intelbras",
       "setor": "Outros",
-      "preco": 15.2,
+      "preco": 14.94,
       "valor_mercado": 4442000000.0,
-      "variacao_dia_pct": 0.0658,
-      "pl": 17.47,
-      "pvp": 1.5,
+      "variacao_dia_pct": -1.2558,
+      "pl": 17.17,
+      "pvp": 1.47,
       "margem_liquida_pct": 6.26,
-      "dy_pct": 7.42
+      "dy_pct": 7.55,
+      "roe_pct": 8.57
     },
     {
       "ticker": "IRBR3",
       "nome": "IRB-Brasil Resseguros S.A.",
       "setor": "Financeiro",
-      "preco": 59.45,
+      "preco": 61.99,
       "valor_mercado": 4419000000.0,
-      "variacao_dia_pct": 3.716,
-      "pl": 20.22,
-      "pvp": 0.91,
+      "variacao_dia_pct": 4.2725,
+      "pl": 21.09,
+      "pvp": 0.95,
       "margem_liquida_pct": 5.39,
-      "dy_pct": 2.66
+      "dy_pct": 2.55,
+      "roe_pct": 4.52
     },
     {
       "ticker": "ISAE3",
       "nome": "ISA CTEEP",
       "setor": "Energia Elétrica",
-      "preco": 33.05,
+      "preco": 32.6,
       "valor_mercado": 18686000000.0,
-      "variacao_dia_pct": -2.5936,
-      "pl": 8.25,
-      "pvp": 1.03,
+      "variacao_dia_pct": -1.3616,
+      "pl": 8.14,
+      "pvp": 1.02,
       "margem_liquida_pct": 26.39,
-      "dy_pct": 5.6
+      "dy_pct": 5.68,
+      "roe_pct": 12.53
     },
     {
       "ticker": "ISAE4",
       "nome": "ISA CTEEP",
       "setor": "Energia Elétrica",
-      "preco": 27.64,
+      "preco": 27.84,
       "valor_mercado": 18686000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 6.9,
-      "pvp": 0.86,
+      "variacao_dia_pct": 0.7236,
+      "pl": 6.95,
+      "pvp": 0.87,
       "margem_liquida_pct": 26.39,
-      "dy_pct": 6.7
+      "dy_pct": 6.65,
+      "roe_pct": 12.53
     },
     {
       "ticker": "ITSA3",
@@ -2707,59 +2932,64 @@
       "setor": "Financeiro",
       "preco": 14.06,
       "valor_mercado": 154638000000.0,
-      "variacao_dia_pct": 0.9332,
+      "variacao_dia_pct": 0.1425,
       "pl": 8.68,
       "pvp": 1.6,
       "margem_liquida_pct": 214.29,
-      "dy_pct": 9.45
+      "dy_pct": 9.45,
+      "roe_pct": 18.42
     },
     {
       "ticker": "ITSA4",
       "nome": "Itaúsa - Investimentos Itaú S.A.",
       "setor": "Financeiro",
-      "preco": 13.79,
+      "preco": 13.9,
       "valor_mercado": 154638000000.0,
-      "variacao_dia_pct": 1.0256,
-      "pl": 8.51,
-      "pvp": 1.57,
+      "variacao_dia_pct": 1.1645,
+      "pl": 8.58,
+      "pvp": 1.58,
       "margem_liquida_pct": 214.29,
-      "dy_pct": 9.64
+      "dy_pct": 9.56,
+      "roe_pct": 18.42
     },
     {
       "ticker": "ITUB3",
       "nome": "Itaú Unibanco Holding S.A.",
       "setor": "Financeiro",
-      "preco": 45.75,
+      "preco": 45.93,
       "valor_mercado": 485548000000.0,
-      "variacao_dia_pct": 1.8477,
-      "pl": 9.22,
-      "pvp": 2.21,
+      "variacao_dia_pct": 0.3057,
+      "pl": 9.26,
+      "pvp": 2.22,
       "margem_liquida_pct": 14.17,
-      "dy_pct": 7.71
+      "dy_pct": 7.68,
+      "roe_pct": 23.98
     },
     {
       "ticker": "ITUB4",
       "nome": "Itaú Unibanco Holding S.A.",
       "setor": "Financeiro",
-      "preco": 41.99,
+      "preco": 41.88,
       "valor_mercado": 485548000000.0,
-      "variacao_dia_pct": 1.4006,
-      "pl": 8.47,
+      "variacao_dia_pct": -0.0954,
+      "pl": 8.44,
       "pvp": 2.03,
       "margem_liquida_pct": 14.17,
-      "dy_pct": 8.4
+      "dy_pct": 8.42,
+      "roe_pct": 23.98
     },
     {
       "ticker": "JALL3",
       "nome": "Jallesmachad",
       "setor": "Outros",
-      "preco": 2.63,
+      "preco": 2.64,
       "valor_mercado": 607000000.0,
-      "variacao_dia_pct": -2.5926,
-      "pl": 84.84,
+      "variacao_dia_pct": -0.3774,
+      "pl": 85.16,
       "pvp": 0.4,
       "margem_liquida_pct": 0.44,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 0.47
     },
     {
       "ticker": "JBSS3",
@@ -2771,7 +3001,8 @@
       "pl": 5.6,
       "pvp": 0.72,
       "margem_liquida_pct": 1.26,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 12.9
     },
     {
       "ticker": "JFEN3",
@@ -2779,23 +3010,25 @@
       "setor": "Financeiro",
       "preco": 0.44,
       "valor_mercado": 6000000.0,
-      "variacao_dia_pct": -2.2222,
+      "variacao_dia_pct": 0.0,
       "pl": -0.04,
       "pvp": -0.02,
       "margem_liquida_pct": -159.76,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 50.68
     },
     {
       "ticker": "JHSF3",
       "nome": "JHSF Participacoes S.A.",
       "setor": "Financeiro",
-      "preco": 11.79,
+      "preco": 11.46,
       "valor_mercado": 7541000000.0,
-      "variacao_dia_pct": 2.1664,
-      "pl": 3.78,
-      "pvp": 1.02,
+      "variacao_dia_pct": -1.7153,
+      "pl": 3.68,
+      "pvp": 0.99,
       "margem_liquida_pct": 52.59,
-      "dy_pct": 5.09
+      "dy_pct": 5.24,
+      "roe_pct": 26.99
     },
     {
       "ticker": "JOPA3",
@@ -2807,7 +3040,8 @@
       "pl": 12.23,
       "pvp": 0.23,
       "margem_liquida_pct": 0.87,
-      "dy_pct": 1.87
+      "dy_pct": 1.87,
+      "roe_pct": 1.92
     },
     {
       "ticker": "JOPA4",
@@ -2819,115 +3053,125 @@
       "pl": 12.88,
       "pvp": 0.25,
       "margem_liquida_pct": 0.87,
-      "dy_pct": 1.95
+      "dy_pct": 1.95,
+      "roe_pct": 1.92
     },
     {
       "ticker": "JSLG3",
       "nome": "JSL",
       "setor": "Outros",
-      "preco": 5.94,
+      "preco": 5.91,
       "valor_mercado": 1586000000.0,
-      "variacao_dia_pct": -1.3289,
-      "pl": -16.23,
+      "variacao_dia_pct": 0.1695,
+      "pl": -16.15,
       "pvp": 1.43,
       "margem_liquida_pct": -1.07,
-      "dy_pct": 32.19
+      "dy_pct": 32.35,
+      "roe_pct": -8.83
     },
     {
       "ticker": "KEPL3",
       "nome": "Kepler Weber",
       "setor": "Outros",
-      "preco": 6.6,
+      "preco": 6.66,
       "valor_mercado": 1150000000.0,
-      "variacao_dia_pct": 0.7634,
-      "pl": 10.2,
-      "pvp": 1.49,
+      "variacao_dia_pct": 0.9091,
+      "pl": 10.29,
+      "pvp": 1.5,
       "margem_liquida_pct": 8.08,
-      "dy_pct": 6.56
+      "dy_pct": 6.5,
+      "roe_pct": 14.58
     },
     {
       "ticker": "KLBN11",
       "nome": "KLABIN S/A  UNT     N2",
       "setor": "Materiais Básicos",
-      "preco": 19.54,
+      "preco": 19.5,
       "valor_mercado": 22227000000.0,
-      "variacao_dia_pct": 0.2051,
-      "pl": 75.74,
+      "variacao_dia_pct": -0.31,
+      "pl": 75.58,
       "pvp": 2.54,
       "margem_liquida_pct": 2.59,
-      "dy_pct": 7.29
+      "dy_pct": 7.3,
+      "roe_pct": 3.36
     },
     {
       "ticker": "KLBN3",
       "nome": "Klabin S/A",
       "setor": "Materiais Básicos",
-      "preco": 4.07,
+      "preco": 4.05,
       "valor_mercado": 22227000000.0,
-      "variacao_dia_pct": 1.4963,
-      "pl": 47.33,
-      "pvp": 1.59,
+      "variacao_dia_pct": 0.0,
+      "pl": 47.09,
+      "pvp": 1.58,
       "margem_liquida_pct": 2.59,
-      "dy_pct": 7.0
+      "dy_pct": 7.04,
+      "roe_pct": 3.36
     },
     {
       "ticker": "KLBN4",
       "nome": "Klabin S/A",
       "setor": "Materiais Básicos",
-      "preco": 3.85,
+      "preco": 3.87,
       "valor_mercado": 22227000000.0,
-      "variacao_dia_pct": 0.2604,
-      "pl": 44.77,
-      "pvp": 1.5,
+      "variacao_dia_pct": 0.2591,
+      "pl": 45.0,
+      "pvp": 1.51,
       "margem_liquida_pct": 2.59,
-      "dy_pct": 7.4
+      "dy_pct": 7.36,
+      "roe_pct": 3.36
     },
     {
       "ticker": "LAND3",
       "nome": "TerraSAntapa",
       "setor": "Outros",
-      "preco": 9.29,
+      "preco": 9.55,
       "valor_mercado": 808000000.0,
-      "variacao_dia_pct": -0.1075,
-      "pl": 189.59,
-      "pvp": 1.37,
+      "variacao_dia_pct": 2.139,
+      "pl": 194.9,
+      "pvp": 1.41,
       "margem_liquida_pct": 5.23,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 0.73
     },
     {
       "ticker": "LAVV3",
       "nome": "Lavvi",
       "setor": "Financeiro",
-      "preco": 10.71,
+      "preco": 10.59,
       "valor_mercado": 2007000000.0,
-      "variacao_dia_pct": -1.2903,
-      "pl": 5.8,
-      "pvp": 1.22,
+      "variacao_dia_pct": -0.9355,
+      "pl": 5.73,
+      "pvp": 1.2,
       "margem_liquida_pct": 19.91,
-      "dy_pct": 24.02
+      "dy_pct": 24.3,
+      "roe_pct": 21.02
     },
     {
       "ticker": "LEVE3",
       "nome": "Metal Leve",
       "setor": "Outros",
-      "preco": 32.78,
+      "preco": 32.95,
       "valor_mercado": 4242000000.0,
-      "variacao_dia_pct": -0.3647,
-      "pl": 6.37,
-      "pvp": 4.6,
+      "variacao_dia_pct": 0.5186,
+      "pl": 6.41,
+      "pvp": 4.62,
       "margem_liquida_pct": 13.01,
-      "dy_pct": 8.7
+      "dy_pct": 8.65,
+      "roe_pct": 72.12
     },
     {
       "ticker": "LIGT3",
       "nome": "Light S/A",
       "setor": "Energia Elétrica",
-      "preco": 3.61,
+      "preco": 3.56,
       "valor_mercado": 1900000000.0,
-      "variacao_dia_pct": -2.4324,
-      "pl": 2.41,
+      "variacao_dia_pct": -2.1978,
+      "pl": 2.37,
       "pvp": 0.62,
       "margem_liquida_pct": 15.44,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 25.94
     },
     {
       "ticker": "LIPR3",
@@ -2939,91 +3183,99 @@
       "pl": 16.64,
       "pvp": 1.82,
       "margem_liquida_pct": null,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 10.96
     },
     {
       "ticker": "LJQQ3",
       "nome": "Quero Quero",
       "setor": "Outros",
-      "preco": 1.22,
+      "preco": 1.25,
       "valor_mercado": 244000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": -1.28,
-      "pvp": 0.86,
+      "variacao_dia_pct": 1.626,
+      "pl": -1.31,
+      "pvp": 0.88,
       "margem_liquida_pct": -6.88,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -67.62
     },
     {
       "ticker": "LOGG3",
       "nome": "Log Com Prop",
       "setor": "Financeiro",
-      "preco": 25.24,
+      "preco": 24.71,
       "valor_mercado": 2289000000.0,
-      "variacao_dia_pct": -1.0196,
-      "pl": 5.93,
-      "pvp": 0.63,
+      "variacao_dia_pct": -1.5145,
+      "pl": 5.8,
+      "pvp": 0.61,
       "margem_liquida_pct": 141.69,
-      "dy_pct": 27.55
+      "dy_pct": 28.14,
+      "roe_pct": 10.55
     },
     {
       "ticker": "LOGN3",
       "nome": "Log In",
       "setor": "Outros",
-      "preco": 27.99,
+      "preco": 28.0,
       "valor_mercado": 2988000000.0,
-      "variacao_dia_pct": -0.0357,
-      "pl": 21.88,
+      "variacao_dia_pct": 0.0,
+      "pl": 21.89,
       "pvp": 2.49,
       "margem_liquida_pct": 4.4,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 11.37
     },
     {
       "ticker": "LPSB3",
       "nome": "Lopes Brasil",
       "setor": "Financeiro",
-      "preco": 1.3,
+      "preco": 1.28,
       "valor_mercado": 219000000.0,
-      "variacao_dia_pct": 1.5625,
-      "pl": 6.57,
-      "pvp": 0.82,
+      "variacao_dia_pct": -0.7752,
+      "pl": 6.46,
+      "pvp": 0.81,
       "margem_liquida_pct": 14.09,
-      "dy_pct": 17.08
+      "dy_pct": 17.34,
+      "roe_pct": 12.5
     },
     {
       "ticker": "LREN3",
       "nome": "Lojas Renner S.A.",
       "setor": "Outros",
-      "preco": 11.46,
+      "preco": 11.36,
       "valor_mercado": 13824000000.0,
-      "variacao_dia_pct": 1.0582,
-      "pl": 7.72,
-      "pvp": 1.11,
+      "variacao_dia_pct": -0.3509,
+      "pl": 7.65,
+      "pvp": 1.1,
       "margem_liquida_pct": 9.35,
-      "dy_pct": 9.62
+      "dy_pct": 9.71,
+      "roe_pct": 14.41
     },
     {
       "ticker": "LUPA3",
       "nome": "Lupatech",
       "setor": "Outros",
-      "preco": 3.7,
+      "preco": 3.63,
       "valor_mercado": 27000000.0,
-      "variacao_dia_pct": 0.0,
+      "variacao_dia_pct": -1.8919,
       "pl": -0.16,
-      "pvp": 1.3,
+      "pvp": 1.28,
       "margem_liquida_pct": -281.99,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -795.76
     },
     {
       "ticker": "LUXM4",
       "nome": "TreviSA",
       "setor": "Outros",
-      "preco": 2.64,
+      "preco": 2.6,
       "valor_mercado": 112000000.0,
-      "variacao_dia_pct": 2.3256,
-      "pl": 5.39,
-      "pvp": 0.63,
+      "variacao_dia_pct": -1.1407,
+      "pl": 5.31,
+      "pvp": 0.62,
       "margem_liquida_pct": 12.91,
-      "dy_pct": 5.19
+      "dy_pct": 5.27,
+      "roe_pct": 11.62
     },
     {
       "ticker": "LVTC3",
@@ -3035,7 +3287,8 @@
       "pl": -1.33,
       "pvp": 0.48,
       "margem_liquida_pct": -20.96,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -36.33
     },
     {
       "ticker": "LWSA3",
@@ -3043,23 +3296,25 @@
       "setor": "Outros",
       "preco": 4.21,
       "valor_mercado": 2092000000.0,
-      "variacao_dia_pct": 0.2381,
+      "variacao_dia_pct": 0.7177,
       "pl": 91.52,
       "pvp": 0.97,
       "margem_liquida_pct": 1.67,
-      "dy_pct": 1.24
+      "dy_pct": 1.24,
+      "roe_pct": 1.06
     },
     {
       "ticker": "MAPT3",
       "nome": "Cemepe",
       "setor": "Outros",
-      "preco": 2.5,
+      "preco": 2.06,
       "valor_mercado": 2000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": -23.36,
-      "pvp": -0.35,
+      "variacao_dia_pct": -17.6,
+      "pl": -19.25,
+      "pvp": -0.29,
       "margem_liquida_pct": null,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 1.48
     },
     {
       "ticker": "MAPT4",
@@ -3071,19 +3326,21 @@
       "pl": -28.04,
       "pvp": -0.42,
       "margem_liquida_pct": null,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 1.48
     },
     {
       "ticker": "MATD3",
       "nome": "Mater Dei",
       "setor": "Saúde",
-      "preco": 5.04,
+      "preco": 5.16,
       "valor_mercado": 1654000000.0,
-      "variacao_dia_pct": 0.5988,
-      "pl": 11.86,
-      "pvp": 1.12,
+      "variacao_dia_pct": 2.1782,
+      "pl": 12.14,
+      "pvp": 1.14,
       "margem_liquida_pct": 6.12,
-      "dy_pct": 3.0
+      "dy_pct": 2.93,
+      "roe_pct": 9.41
     },
     {
       "ticker": "MBLY3",
@@ -3095,67 +3352,73 @@
       "pl": -0.27,
       "pvp": -1.25,
       "margem_liquida_pct": -23.21,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 469.13
     },
     {
       "ticker": "MBRF3",
       "nome": "Marfrig Global Foods S.A.",
       "setor": "Outros",
-      "preco": 18.37,
+      "preco": 17.69,
       "valor_mercado": 21935000000.0,
-      "variacao_dia_pct": -0.7027,
-      "pl": 69.58,
-      "pvp": 1.84,
+      "variacao_dia_pct": -3.7017,
+      "pl": 67.01,
+      "pvp": 1.77,
       "margem_liquida_pct": 0.22,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 2.65
     },
     {
       "ticker": "MDIA3",
       "nome": "M. Dias Branco S.A. Indústria e Comércio de Alimentos",
       "setor": "Outros",
-      "preco": 17.61,
+      "preco": 17.78,
       "valor_mercado": 5830000000.0,
-      "variacao_dia_pct": -0.0568,
-      "pl": 9.2,
-      "pvp": 0.7,
+      "variacao_dia_pct": 0.8508,
+      "pl": 9.28,
+      "pvp": 0.71,
       "margem_liquida_pct": 6.23,
-      "dy_pct": 6.0
+      "dy_pct": 5.94,
+      "roe_pct": 7.65
     },
     {
       "ticker": "MDNE3",
       "nome": "Moura Dubeux",
       "setor": "Financeiro",
-      "preco": 25.65,
+      "preco": 25.81,
       "valor_mercado": 2647000000.0,
-      "variacao_dia_pct": -1.0417,
-      "pl": 4.77,
+      "variacao_dia_pct": -0.1547,
+      "pl": 4.8,
       "pvp": 1.17,
       "margem_liquida_pct": 21.43,
-      "dy_pct": 13.95
+      "dy_pct": 13.87,
+      "roe_pct": 24.43
     },
     {
       "ticker": "MEAL3",
       "nome": "International Meal Company Alimentacao S.A.",
       "setor": "Outros",
-      "preco": 0.66,
+      "preco": 0.68,
       "valor_mercado": 180000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": -1.15,
-      "pvp": 0.25,
+      "variacao_dia_pct": 3.0303,
+      "pl": -1.18,
+      "pvp": 0.26,
       "margem_liquida_pct": -9.94,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -21.9
     },
     {
       "ticker": "MELK3",
       "nome": "Melnick",
       "setor": "Financeiro",
-      "preco": 2.92,
+      "preco": 2.91,
       "valor_mercado": 596000000.0,
-      "variacao_dia_pct": 0.6897,
-      "pl": 5.38,
+      "variacao_dia_pct": -1.0204,
+      "pl": 5.36,
       "pvp": 0.49,
       "margem_liquida_pct": 9.78,
-      "dy_pct": 14.28
+      "dy_pct": 14.33,
+      "roe_pct": 9.18
     },
     {
       "ticker": "MERC3",
@@ -3167,7 +3430,8 @@
       "pl": 19.92,
       "pvp": 1.06,
       "margem_liquida_pct": 27.06,
-      "dy_pct": 0.96
+      "dy_pct": 0.96,
+      "roe_pct": 5.33
     },
     {
       "ticker": "MERC4",
@@ -3179,31 +3443,34 @@
       "pl": 21.19,
       "pvp": 1.13,
       "margem_liquida_pct": 27.06,
-      "dy_pct": 3.26
+      "dy_pct": 3.26,
+      "roe_pct": 5.33
     },
     {
       "ticker": "MGEL4",
       "nome": "Mangels Indl",
       "setor": "Materiais Básicos",
-      "preco": 5.32,
+      "preco": 5.34,
       "valor_mercado": 19000000.0,
-      "variacao_dia_pct": -0.3745,
+      "variacao_dia_pct": 1.7143,
       "pl": 0.77,
-      "pvp": 0.5,
+      "pvp": 0.51,
       "margem_liquida_pct": 3.55,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 65.89
     },
     {
       "ticker": "MGLU3",
       "nome": "Magazine Luiza S.A.",
       "setor": "Outros",
-      "preco": 5.54,
+      "preco": 5.74,
       "valor_mercado": 3747000000.0,
-      "variacao_dia_pct": 2.5926,
-      "pl": 48.6,
-      "pvp": 0.38,
+      "variacao_dia_pct": 3.2374,
+      "pl": 50.35,
+      "pvp": 0.4,
       "margem_liquida_pct": 0.23,
-      "dy_pct": 1.46
+      "dy_pct": 1.41,
+      "roe_pct": 0.79
     },
     {
       "ticker": "MILS3",
@@ -3215,19 +3482,21 @@
       "pl": 8.21,
       "pvp": 1.95,
       "margem_liquida_pct": 23.53,
-      "dy_pct": 6.75
+      "dy_pct": 6.75,
+      "roe_pct": 23.77
     },
     {
       "ticker": "MLAS3",
       "nome": "Multilaser",
       "setor": "Outros",
-      "preco": 1.88,
+      "preco": 1.85,
       "valor_mercado": 1452000000.0,
-      "variacao_dia_pct": -2.5907,
-      "pl": 5.09,
-      "pvp": 0.48,
+      "variacao_dia_pct": -1.5957,
+      "pl": 5.01,
+      "pvp": 0.47,
       "margem_liquida_pct": 7.46,
-      "dy_pct": 2.66
+      "dy_pct": 2.7,
+      "roe_pct": 9.38
     },
     {
       "ticker": "MMXM11",
@@ -3239,7 +3508,8 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "MNDL3",
@@ -3247,23 +3517,25 @@
       "setor": "Outros",
       "preco": 18.5,
       "valor_mercado": 170000000.0,
-      "variacao_dia_pct": 0.1082,
+      "variacao_dia_pct": 0.0,
       "pl": -5.47,
       "pvp": 1.69,
       "margem_liquida_pct": -3.23,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -30.91
     },
     {
       "ticker": "MNPR3",
       "nome": "Minupar",
       "setor": "Outros",
-      "preco": 4.03,
+      "preco": 4.12,
       "valor_mercado": 280000000.0,
-      "variacao_dia_pct": 0.2488,
-      "pl": 6.55,
-      "pvp": 1.27,
+      "variacao_dia_pct": 1.7284,
+      "pl": 6.7,
+      "pvp": 1.29,
       "margem_liquida_pct": 9.66,
-      "dy_pct": 3.23
+      "dy_pct": 3.16,
+      "roe_pct": 19.31
     },
     {
       "ticker": "MOAR3",
@@ -3275,43 +3547,47 @@
       "pl": 23.52,
       "pvp": 0.81,
       "margem_liquida_pct": null,
-      "dy_pct": 52.67
+      "dy_pct": 52.67,
+      "roe_pct": 3.45
     },
     {
       "ticker": "MOTV3",
       "nome": "Motiva S.A.",
       "setor": "Outros",
-      "preco": 16.36,
+      "preco": 16.69,
       "valor_mercado": 27936600000.0,
-      "variacao_dia_pct": 1.175,
-      "pl": 8.53,
-      "pvp": 1.83,
+      "variacao_dia_pct": 1.3973,
+      "pl": 8.7,
+      "pvp": 1.87,
       "margem_liquida_pct": 20.63,
-      "dy_pct": 2.37
+      "dy_pct": 2.32,
+      "roe_pct": 21.48
     },
     {
       "ticker": "MOVI3",
       "nome": "Movida Participacoes S.A.",
       "setor": "Outros",
-      "preco": 7.8,
+      "preco": 8.04,
       "valor_mercado": 3317000000.0,
-      "variacao_dia_pct": -0.8895,
-      "pl": 7.26,
-      "pvp": 0.8,
+      "variacao_dia_pct": 3.6082,
+      "pl": 7.48,
+      "pvp": 0.83,
       "margem_liquida_pct": 2.89,
-      "dy_pct": 9.64
+      "dy_pct": 9.35,
+      "roe_pct": 11.08
     },
     {
       "ticker": "MRVE3",
       "nome": "MRV Engenharia e Participações S.A.",
       "setor": "Financeiro",
-      "preco": 5.61,
+      "preco": 5.57,
       "valor_mercado": 2628000000.0,
-      "variacao_dia_pct": -1.2324,
-      "pl": -5.6,
-      "pvp": 0.61,
+      "variacao_dia_pct": -0.713,
+      "pl": -5.56,
+      "pvp": 0.6,
       "margem_liquida_pct": -4.82,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -10.84
     },
     {
       "ticker": "MSPA3",
@@ -3323,7 +3599,8 @@
       "pl": -5.09,
       "pvp": 0.31,
       "margem_liquida_pct": -26.7,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -6.06
     },
     {
       "ticker": "MSPA4",
@@ -3335,7 +3612,8 @@
       "pl": -4.78,
       "pvp": 0.29,
       "margem_liquida_pct": -26.7,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -6.06
     },
     {
       "ticker": "MTRE3",
@@ -3343,11 +3621,12 @@
       "setor": "Financeiro",
       "preco": 3.44,
       "valor_mercado": 314000000.0,
-      "variacao_dia_pct": 0.0,
+      "variacao_dia_pct": 0.8798,
       "pl": 5.55,
       "pvp": 0.34,
       "margem_liquida_pct": 5.89,
-      "dy_pct": 11.83
+      "dy_pct": 11.83,
+      "roe_pct": 6.11
     },
     {
       "ticker": "MTSA3",
@@ -3359,31 +3638,34 @@
       "pl": 19.62,
       "pvp": 1.43,
       "margem_liquida_pct": 6.79,
-      "dy_pct": 4.21
+      "dy_pct": 4.21,
+      "roe_pct": 7.29
     },
     {
       "ticker": "MTSA4",
       "nome": "MetiSA",
       "setor": "Outros",
-      "preco": 47.25,
+      "preco": 46.75,
       "valor_mercado": 418000000.0,
-      "variacao_dia_pct": 0.2546,
-      "pl": 12.2,
-      "pvp": 0.89,
+      "variacao_dia_pct": -0.5319,
+      "pl": 12.07,
+      "pvp": 0.88,
       "margem_liquida_pct": 6.79,
-      "dy_pct": 7.45
+      "dy_pct": 7.53,
+      "roe_pct": 7.29
     },
     {
       "ticker": "MULT3",
       "nome": "Multiplan Empreendimentos Imobiliários S.A.",
       "setor": "Financeiro",
-      "preco": 30.4,
+      "preco": 30.11,
       "valor_mercado": 14656000000.0,
-      "variacao_dia_pct": 3.296,
-      "pl": 11.26,
-      "pvp": 2.31,
+      "variacao_dia_pct": -0.7908,
+      "pl": 11.15,
+      "pvp": 2.29,
       "margem_liquida_pct": 43.41,
-      "dy_pct": 3.69
+      "dy_pct": 3.73,
+      "roe_pct": 20.52
     },
     {
       "ticker": "MWET3",
@@ -3391,47 +3673,51 @@
       "setor": "Outros",
       "preco": 24.5,
       "valor_mercado": 31000000.0,
-      "variacao_dia_pct": 4.75,
+      "variacao_dia_pct": 0.0,
       "pl": -1.2,
       "pvp": -1.52,
       "margem_liquida_pct": -22.42,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 126.07
     },
     {
       "ticker": "MWET4",
       "nome": "Wetzel S/A",
       "setor": "Outros",
-      "preco": 31.0,
+      "preco": 31.89,
       "valor_mercado": 31000000.0,
-      "variacao_dia_pct": -5.459,
-      "pl": -1.52,
-      "pvp": -1.92,
+      "variacao_dia_pct": 0.283,
+      "pl": -1.57,
+      "pvp": -1.97,
       "margem_liquida_pct": -22.42,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 126.07
     },
     {
       "ticker": "MYPK3",
       "nome": "Iochpe-Maxion S.A.",
       "setor": "Outros",
-      "preco": 9.68,
+      "preco": 9.81,
       "valor_mercado": 1432000000.0,
-      "variacao_dia_pct": -1.8256,
-      "pl": 16.27,
+      "variacao_dia_pct": 1.8692,
+      "pl": 16.49,
       "pvp": 0.32,
       "margem_liquida_pct": 0.6,
-      "dy_pct": 3.17
+      "dy_pct": 3.13,
+      "roe_pct": 1.95
     },
     {
       "ticker": "NATU3",
       "nome": "Natura Cosméticos S.A.",
       "setor": "Outros",
-      "preco": 9.2,
+      "preco": 8.85,
       "valor_mercado": 11670000000.0,
-      "variacao_dia_pct": -0.8621,
+      "variacao_dia_pct": -3.8043,
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "NEOE3",
@@ -3443,19 +3729,21 @@
       "pl": 8.96,
       "pvp": 1.08,
       "margem_liquida_pct": 8.59,
-      "dy_pct": 2.64
+      "dy_pct": 2.64,
+      "roe_pct": 12.03
     },
     {
       "ticker": "NEXP3",
       "nome": "Nexpe Participações",
       "setor": "Financeiro",
-      "preco": 2.35,
+      "preco": 2.33,
       "valor_mercado": 6000000.0,
-      "variacao_dia_pct": 0.0,
+      "variacao_dia_pct": -0.8511,
       "pl": 0.07,
       "pvp": -0.05,
       "margem_liquida_pct": 13008.52,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -79.29
     },
     {
       "ticker": "NGRD3",
@@ -3467,43 +3755,47 @@
       "pl": 413.01,
       "pvp": 0.72,
       "margem_liquida_pct": 0.28,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 0.17
     },
     {
       "ticker": "NORD3",
       "nome": "Nordon Met",
       "setor": "Outros",
-      "preco": 1.49,
+      "preco": 1.39,
       "valor_mercado": 12000000.0,
-      "variacao_dia_pct": -0.6667,
-      "pl": -1.09,
+      "variacao_dia_pct": -6.7114,
+      "pl": -1.02,
       "pvp": -0.05,
       "margem_liquida_pct": -324.16,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 4.88
     },
     {
       "ticker": "NUTR3",
       "nome": "Nutriplant",
       "setor": "Materiais Básicos",
-      "preco": 2.18,
+      "preco": 2.17,
       "valor_mercado": 30000000.0,
-      "variacao_dia_pct": -1.8018,
-      "pl": 11.91,
-      "pvp": 0.57,
+      "variacao_dia_pct": -0.4587,
+      "pl": 11.86,
+      "pvp": 0.56,
       "margem_liquida_pct": 1.37,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 4.75
     },
     {
       "ticker": "OFSA3",
       "nome": "Ourofino S/A",
       "setor": "Saúde",
-      "preco": 27.51,
+      "preco": 26.99,
       "valor_mercado": 1456000000.0,
-      "variacao_dia_pct": 2.7259,
-      "pl": 6.29,
-      "pvp": 1.79,
+      "variacao_dia_pct": -1.8902,
+      "pl": 6.17,
+      "pvp": 1.76,
       "margem_liquida_pct": 17.29,
-      "dy_pct": 4.69
+      "dy_pct": 4.78,
+      "roe_pct": 28.55
     },
     {
       "ticker": "OIBR3",
@@ -3515,7 +3807,8 @@
       "pl": -0.02,
       "pvp": -0.0,
       "margem_liquida_pct": -808.87,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 11.91
     },
     {
       "ticker": "OIBR4",
@@ -3527,79 +3820,86 @@
       "pl": -0.09,
       "pvp": -0.01,
       "margem_liquida_pct": -808.87,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 11.91
     },
     {
       "ticker": "ONCO3",
       "nome": "Oncoclinicas",
       "setor": "Saúde",
-      "preco": 1.35,
+      "preco": 1.4,
       "valor_mercado": 692000000.0,
-      "variacao_dia_pct": 12.5,
-      "pl": -0.35,
-      "pvp": 15.52,
+      "variacao_dia_pct": 2.9412,
+      "pl": -0.36,
+      "pvp": 16.09,
       "margem_liquida_pct": -87.61,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -4450.11
     },
     {
       "ticker": "OPCT3",
       "nome": "Oceanpact",
       "setor": "Outros",
-      "preco": 10.93,
+      "preco": 11.48,
       "valor_mercado": 2109000000.0,
-      "variacao_dia_pct": -1.5315,
-      "pl": 13.04,
-      "pvp": 2.11,
+      "variacao_dia_pct": 5.032,
+      "pl": 13.7,
+      "pvp": 2.22,
       "margem_liquida_pct": 6.99,
-      "dy_pct": 0.89
+      "dy_pct": 0.84,
+      "roe_pct": 16.21
     },
     {
       "ticker": "ORVR3",
       "nome": "Orizon",
       "setor": "Energia Elétrica",
-      "preco": 16.89,
+      "preco": 17.18,
       "valor_mercado": 9825000000.0,
-      "variacao_dia_pct": 1.4414,
-      "pl": 185.6,
-      "pvp": 1.77,
+      "variacao_dia_pct": 2.0796,
+      "pl": 188.79,
+      "pvp": 1.8,
       "margem_liquida_pct": 3.35,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 0.96
     },
     {
       "ticker": "OSXB3",
       "nome": "Osx Brasil",
       "setor": "Outros",
-      "preco": 1.04,
+      "preco": 1.15,
       "valor_mercado": 3000000.0,
-      "variacao_dia_pct": 0.0,
+      "variacao_dia_pct": 10.5769,
       "pl": -0.0,
       "pvp": -0.0,
       "margem_liquida_pct": -1321.11,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 11.06
     },
     {
       "ticker": "PASS3",
       "nome": "Compass",
       "setor": "Energia Elétrica",
-      "preco": 23.43,
-      "valor_mercado": 16733473925.85,
-      "variacao_dia_pct": 0.7309,
-      "pl": 14.55,
-      "pvp": 2.07,
+      "preco": 23.38,
+      "valor_mercado": 16697764421.1,
+      "variacao_dia_pct": -0.9322,
+      "pl": 14.52,
+      "pvp": 2.06,
       "margem_liquida_pct": 7.59,
-      "dy_pct": 5.41
+      "dy_pct": 5.42,
+      "roe_pct": 14.2
     },
     {
       "ticker": "PATI3",
       "nome": "Panatlantica",
       "setor": "Materiais Básicos",
-      "preco": 30.88,
+      "preco": 28.99,
       "valor_mercado": 722000000.0,
-      "variacao_dia_pct": 6.5195,
-      "pl": 14.82,
-      "pvp": 0.95,
+      "variacao_dia_pct": -6.1205,
+      "pl": 13.91,
+      "pvp": 0.89,
       "margem_liquida_pct": 2.58,
-      "dy_pct": 7.65
+      "dy_pct": 8.15,
+      "roe_pct": 6.41
     },
     {
       "ticker": "PATI4",
@@ -3611,19 +3911,21 @@
       "pl": 14.57,
       "pvp": 0.93,
       "margem_liquida_pct": 2.58,
-      "dy_pct": 8.74
+      "dy_pct": 8.74,
+      "roe_pct": 6.41
     },
     {
       "ticker": "PCAR3",
       "nome": "GPA Companhia Brasileira de Distribuição",
       "setor": "Outros",
-      "preco": 2.7,
+      "preco": 2.83,
       "valor_mercado": 1349000000.0,
-      "variacao_dia_pct": -0.7353,
-      "pl": -0.63,
-      "pvp": 3.25,
+      "variacao_dia_pct": 4.8148,
+      "pl": -0.66,
+      "pvp": 3.41,
       "margem_liquida_pct": -11.6,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -518.09
     },
     {
       "ticker": "PDGR3",
@@ -3635,19 +3937,21 @@
       "pl": -0.02,
       "pvp": -0.0,
       "margem_liquida_pct": -247.33,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 6.33
     },
     {
       "ticker": "PDTC3",
       "nome": "Padtec",
       "setor": "Financeiro",
-      "preco": 1.69,
+      "preco": 1.7,
       "valor_mercado": 158000000.0,
-      "variacao_dia_pct": -2.3121,
-      "pl": 12.07,
-      "pvp": 0.95,
+      "variacao_dia_pct": 0.5917,
+      "pl": 12.14,
+      "pvp": 0.96,
       "margem_liquida_pct": -88.37,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 7.92
     },
     {
       "ticker": "PEAB3",
@@ -3659,7 +3963,8 @@
       "pl": 16.1,
       "pvp": 0.76,
       "margem_liquida_pct": 37.76,
-      "dy_pct": 3.72
+      "dy_pct": 3.72,
+      "roe_pct": 4.73
     },
     {
       "ticker": "PEAB4",
@@ -3671,31 +3976,34 @@
       "pl": 16.11,
       "pvp": 0.76,
       "margem_liquida_pct": 37.76,
-      "dy_pct": 4.09
+      "dy_pct": 4.09,
+      "roe_pct": 4.73
     },
     {
       "ticker": "PETR3",
       "nome": "Petrobrás",
       "setor": "Outros",
-      "preco": 52.63,
+      "preco": 51.85,
       "valor_mercado": 567178000000.0,
-      "variacao_dia_pct": -1.6997,
-      "pl": 5.09,
-      "pvp": 1.41,
+      "variacao_dia_pct": -1.3884,
+      "pl": 5.01,
+      "pvp": 1.39,
       "margem_liquida_pct": 24.32,
-      "dy_pct": 4.38
+      "dy_pct": 4.45,
+      "roe_pct": 27.68
     },
     {
       "ticker": "PETR4",
       "nome": "Petrobrás",
       "setor": "Outros",
-      "preco": 47.56,
+      "preco": 46.99,
       "valor_mercado": 567178000000.0,
-      "variacao_dia_pct": -1.3278,
-      "pl": 4.6,
-      "pvp": 1.27,
+      "variacao_dia_pct": -1.2,
+      "pl": 4.54,
+      "pvp": 1.26,
       "margem_liquida_pct": 24.32,
-      "dy_pct": 4.85
+      "dy_pct": 4.91,
+      "roe_pct": 27.68
     },
     {
       "ticker": "PETZ3",
@@ -3707,55 +4015,60 @@
       "pl": 41.03,
       "pvp": 1.16,
       "margem_liquida_pct": 1.32,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 2.83
     },
     {
       "ticker": "PFRM3",
       "nome": "Profarma",
       "setor": "Saúde",
-      "preco": 7.61,
+      "preco": 7.87,
       "valor_mercado": 767000000.0,
-      "variacao_dia_pct": -1.297,
-      "pl": 6.1,
-      "pvp": 0.56,
+      "variacao_dia_pct": 2.6076,
+      "pl": 6.31,
+      "pvp": 0.58,
       "margem_liquida_pct": 1.24,
-      "dy_pct": 8.46
+      "dy_pct": 8.18,
+      "roe_pct": 9.17
     },
     {
       "ticker": "PGMN3",
       "nome": "Pague Menos",
       "setor": "Saúde",
-      "preco": 3.77,
+      "preco": 3.84,
       "valor_mercado": 2403000000.0,
-      "variacao_dia_pct": -0.2646,
-      "pl": 8.3,
-      "pvp": 0.8,
+      "variacao_dia_pct": 2.4,
+      "pl": 8.46,
+      "pvp": 0.81,
       "margem_liquida_pct": 2.1,
-      "dy_pct": 6.84
+      "dy_pct": 6.72,
+      "roe_pct": 9.59
     },
     {
       "ticker": "PINE4",
       "nome": "Pine",
       "setor": "Financeiro",
-      "preco": 11.28,
+      "preco": 11.14,
       "valor_mercado": 3409000000.0,
-      "variacao_dia_pct": -2.0833,
-      "pl": 4.75,
-      "pvp": 1.56,
+      "variacao_dia_pct": -1.24,
+      "pl": 4.69,
+      "pvp": 1.54,
       "margem_liquida_pct": 10.74,
-      "dy_pct": 7.26
+      "dy_pct": 7.35,
+      "roe_pct": 32.94
     },
     {
       "ticker": "PLAS3",
       "nome": "Plascar Part",
       "setor": "Outros",
-      "preco": 2.42,
+      "preco": 2.59,
       "valor_mercado": 30000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 5.31,
+      "variacao_dia_pct": 7.0248,
+      "pl": 5.68,
       "pvp": -0.04,
       "margem_liquida_pct": 0.48,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -0.69
     },
     {
       "ticker": "PLPL3",
@@ -3763,71 +4076,77 @@
       "setor": "Financeiro",
       "preco": 7.24,
       "valor_mercado": 1563000000.0,
-      "variacao_dia_pct": -4.862,
+      "variacao_dia_pct": 0.8357,
       "pl": 4.84,
       "pvp": 1.21,
       "margem_liquida_pct": 8.62,
-      "dy_pct": 6.81
+      "dy_pct": 6.81,
+      "roe_pct": 25.06
     },
     {
       "ticker": "PMAM3",
       "nome": "Paranapanema",
       "setor": "Materiais Básicos",
-      "preco": 0.23,
+      "preco": 0.31,
       "valor_mercado": 580000000.0,
-      "variacao_dia_pct": 21.0526,
-      "pl": -0.05,
+      "variacao_dia_pct": 34.7826,
+      "pl": -0.07,
       "pvp": -0.01,
       "margem_liquida_pct": -225.66,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 16.89
     },
     {
       "ticker": "PNVL3",
       "nome": "Dimed",
       "setor": "Saúde",
-      "preco": 12.86,
+      "preco": 13.11,
       "valor_mercado": 1748000000.0,
-      "variacao_dia_pct": 0.8627,
-      "pl": 14.05,
-      "pvp": 1.47,
+      "variacao_dia_pct": 1.944,
+      "pl": 14.33,
+      "pvp": 1.5,
       "margem_liquida_pct": 2.33,
-      "dy_pct": 2.92
+      "dy_pct": 2.87,
+      "roe_pct": 10.45
     },
     {
       "ticker": "POMO3",
       "nome": "Marcopolo",
       "setor": "Outros",
-      "preco": 4.3,
+      "preco": 4.29,
       "valor_mercado": 6418000000.0,
-      "variacao_dia_pct": -0.9217,
-      "pl": 4.47,
+      "variacao_dia_pct": -0.2326,
+      "pl": 4.46,
       "pvp": 1.25,
       "margem_liquida_pct": 13.19,
-      "dy_pct": 23.95
+      "dy_pct": 24.01,
+      "roe_pct": 27.93
     },
     {
       "ticker": "POMO4",
       "nome": "Marcopolo",
       "setor": "Outros",
-      "preco": 4.56,
+      "preco": 4.55,
       "valor_mercado": 6418000000.0,
-      "variacao_dia_pct": -0.8696,
-      "pl": 4.75,
-      "pvp": 1.33,
+      "variacao_dia_pct": -0.2193,
+      "pl": 4.73,
+      "pvp": 1.32,
       "margem_liquida_pct": 13.19,
-      "dy_pct": 22.59
+      "dy_pct": 22.64,
+      "roe_pct": 27.93
     },
     {
       "ticker": "POSI3",
       "nome": "Positivo Tec",
       "setor": "Outros",
-      "preco": 3.46,
+      "preco": 3.43,
       "valor_mercado": 499000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 39.32,
+      "variacao_dia_pct": -0.2907,
+      "pl": 38.98,
       "pvp": 0.31,
       "margem_liquida_pct": 0.36,
-      "dy_pct": 5.2
+      "dy_pct": 5.25,
+      "roe_pct": 0.8
     },
     {
       "ticker": "PPLA11",
@@ -3839,43 +4158,47 @@
       "pl": -79.23,
       "pvp": 33.99,
       "margem_liquida_pct": null,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -42.86
     },
     {
       "ticker": "PRIO3",
       "nome": "Petrorio",
       "setor": "Outros",
-      "preco": 61.5,
+      "preco": 60.23,
       "valor_mercado": 48606000000.0,
-      "variacao_dia_pct": -4.5179,
-      "pl": 13.87,
-      "pvp": 1.9,
+      "variacao_dia_pct": -2.065,
+      "pl": 13.58,
+      "pvp": 1.86,
       "margem_liquida_pct": 18.11,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 13.71
     },
     {
       "ticker": "PRNR3",
       "nome": "Priner",
       "setor": "Outros",
-      "preco": 18.2,
+      "preco": 18.12,
       "valor_mercado": 1083000000.0,
-      "variacao_dia_pct": -1.087,
-      "pl": 23.67,
-      "pvp": 1.88,
+      "variacao_dia_pct": -0.7667,
+      "pl": 23.56,
+      "pvp": 1.87,
       "margem_liquida_pct": 2.55,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 7.92
     },
     {
       "ticker": "PSSA3",
       "nome": "Porto Seguro S.A.",
       "setor": "Financeiro",
-      "preco": 51.49,
+      "preco": 51.56,
       "valor_mercado": 35103000000.0,
-      "variacao_dia_pct": 0.9806,
-      "pl": 9.04,
+      "variacao_dia_pct": 0.6245,
+      "pl": 9.05,
       "pvp": 2.05,
       "margem_liquida_pct": 8.64,
-      "dy_pct": 5.85
+      "dy_pct": 5.84,
+      "roe_pct": 22.71
     },
     {
       "ticker": "PSVM11",
@@ -3887,19 +4210,21 @@
       "pl": -7.46,
       "pvp": 24.17,
       "margem_liquida_pct": null,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -324.26
     },
     {
       "ticker": "PTBL3",
       "nome": "Portobello",
       "setor": "Outros",
-      "preco": 1.68,
+      "preco": 1.67,
       "valor_mercado": 242000000.0,
-      "variacao_dia_pct": -2.3256,
+      "variacao_dia_pct": -1.1834,
       "pl": -0.74,
-      "pvp": -2.28,
+      "pvp": -2.27,
       "margem_liquida_pct": -12.37,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 306.65
     },
     {
       "ticker": "PTNT3",
@@ -3911,7 +4236,8 @@
       "pl": 9.01,
       "pvp": 0.81,
       "margem_liquida_pct": 5.26,
-      "dy_pct": 3.15
+      "dy_pct": 3.15,
+      "roe_pct": 8.97
     },
     {
       "ticker": "PTNT4",
@@ -3923,103 +4249,112 @@
       "pl": 9.09,
       "pvp": 0.82,
       "margem_liquida_pct": 5.26,
-      "dy_pct": 3.12
+      "dy_pct": 3.12,
+      "roe_pct": 8.97
     },
     {
       "ticker": "QUAL3",
       "nome": "Qualicorp Consultoria e Corretora de Seguros S.A.",
       "setor": "Saúde",
-      "preco": 1.51,
+      "preco": 1.54,
       "valor_mercado": 400000000.0,
-      "variacao_dia_pct": -2.5806,
-      "pl": 16.41,
+      "variacao_dia_pct": 0.6536,
+      "pl": 16.74,
       "pvp": 0.32,
       "margem_liquida_pct": 1.93,
-      "dy_pct": 0.6
+      "dy_pct": 0.58,
+      "roe_pct": 1.93
     },
     {
       "ticker": "RADL3",
       "nome": "Raia Drogasil S.A.",
       "setor": "Saúde",
-      "preco": 20.19,
+      "preco": 20.05,
       "valor_mercado": 31840000000.0,
-      "variacao_dia_pct": -0.1484,
-      "pl": 26.36,
-      "pvp": 4.85,
+      "variacao_dia_pct": -1.0853,
+      "pl": 26.17,
+      "pvp": 4.82,
       "margem_liquida_pct": 2.98,
-      "dy_pct": 1.63
+      "dy_pct": 1.64,
+      "roe_pct": 18.41
     },
     {
       "ticker": "RAIL3",
       "nome": "Rumo S.A.",
       "setor": "Outros",
-      "preco": 14.72,
+      "preco": 14.48,
       "valor_mercado": 25597000000.0,
-      "variacao_dia_pct": 0.4093,
-      "pl": 22.3,
-      "pvp": 1.86,
+      "variacao_dia_pct": -2.2282,
+      "pl": 21.94,
+      "pvp": 1.83,
       "margem_liquida_pct": 8.53,
-      "dy_pct": 0.73
+      "dy_pct": 0.75,
+      "roe_pct": 8.36
     },
     {
       "ticker": "RAIZ4",
       "nome": "Raizen",
       "setor": "Outros",
-      "preco": 0.28,
+      "preco": 0.27,
       "valor_mercado": 353000000.0,
-      "variacao_dia_pct": 7.6923,
-      "pl": -0.11,
-      "pvp": -0.35,
+      "variacao_dia_pct": 0.0,
+      "pl": -0.1,
+      "pvp": -0.34,
       "margem_liquida_pct": -12.01,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 327.92
     },
     {
       "ticker": "RANI3",
       "nome": "Irani",
       "setor": "Materiais Básicos",
-      "preco": 7.72,
+      "preco": 7.71,
       "valor_mercado": 1827000000.0,
-      "variacao_dia_pct": 0.1297,
-      "pl": 13.74,
+      "variacao_dia_pct": 0.7843,
+      "pl": 13.72,
       "pvp": 1.24,
       "margem_liquida_pct": 7.65,
-      "dy_pct": 6.19
+      "dy_pct": 6.2,
+      "roe_pct": 9.03
     },
     {
       "ticker": "RAPT3",
       "nome": "Randon Part",
       "setor": "Outros",
-      "preco": 8.45,
+      "preco": 8.35,
       "valor_mercado": 1665000000.0,
-      "variacao_dia_pct": -3.0963,
-      "pl": -21.95,
-      "pvp": 0.65,
+      "variacao_dia_pct": -1.7647,
+      "pl": -21.69,
+      "pvp": 0.64,
       "margem_liquida_pct": -1.03,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -2.95
     },
     {
       "ticker": "RAPT4",
       "nome": "Randon Part",
       "setor": "Outros",
-      "preco": 5.16,
+      "preco": 4.8,
       "valor_mercado": 1665000000.0,
-      "variacao_dia_pct": 0.5848,
-      "pl": -13.4,
-      "pvp": 0.39,
+      "variacao_dia_pct": -6.9767,
+      "pl": -12.47,
+      "pvp": 0.37,
       "margem_liquida_pct": -1.03,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -2.95
     },
     {
       "ticker": "RCSL3",
       "nome": "Recrusul",
       "setor": "Outros",
-      "preco": 0.37,
+      "preco": 0.4,
       "valor_mercado": 72000000.0,
-      "variacao_dia_pct": -5.1282,
-      "pl": -3.14,
-      "pvp": -3.16,
+      "variacao_dia_pct": 8.1081,
+      "pl": -3.39,
+      "pvp": -3.42,
       "margem_liquida_pct": -6462.93,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 100.48
     },
     {
       "ticker": "RCSL4",
@@ -4027,11 +4362,12 @@
       "setor": "Outros",
       "preco": 0.43,
       "valor_mercado": 72000000.0,
-      "variacao_dia_pct": -6.5217,
+      "variacao_dia_pct": 0.0,
       "pl": -3.64,
       "pvp": -3.68,
       "margem_liquida_pct": -6462.93,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 100.48
     },
     {
       "ticker": "RDNI3",
@@ -4043,55 +4379,60 @@
       "pl": -0.9,
       "pvp": 3.18,
       "margem_liquida_pct": -57.3,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -352.72
     },
     {
       "ticker": "RDOR3",
       "nome": "Rede D Or",
       "setor": "Saúde",
-      "preco": 37.45,
+      "preco": 37.13,
       "valor_mercado": 75273000000.0,
-      "variacao_dia_pct": 0.8618,
-      "pl": 17.39,
-      "pvp": 3.66,
+      "variacao_dia_pct": -0.6954,
+      "pl": 17.25,
+      "pvp": 3.63,
       "margem_liquida_pct": 8.34,
-      "dy_pct": 11.35
+      "dy_pct": 11.45,
+      "roe_pct": 21.02
     },
     {
       "ticker": "RECV3",
       "nome": "Petrorecôncavo S.A.",
       "setor": "Outros",
-      "preco": 11.42,
+      "preco": 11.07,
       "valor_mercado": 3005000000.0,
-      "variacao_dia_pct": -1.0399,
-      "pl": 5.25,
-      "pvp": 0.76,
+      "variacao_dia_pct": -3.2343,
+      "pl": 5.09,
+      "pvp": 0.73,
       "margem_liquida_pct": 21.4,
-      "dy_pct": 11.95
+      "dy_pct": 12.33,
+      "roe_pct": 14.4
     },
     {
       "ticker": "REDE3",
       "nome": "Rede Energia",
       "setor": "Energia Elétrica",
-      "preco": 5.63,
+      "preco": 5.54,
       "valor_mercado": 14818000000.0,
-      "variacao_dia_pct": 1.8083,
-      "pl": 14.08,
-      "pvp": 2.08,
+      "variacao_dia_pct": -1.5986,
+      "pl": 13.85,
+      "pvp": 2.05,
       "margem_liquida_pct": 5.1,
-      "dy_pct": 7.39
+      "dy_pct": 7.51,
+      "roe_pct": 14.81
     },
     {
       "ticker": "RENT3",
       "nome": "Localiza Rent a Car S.A.",
       "setor": "Outros",
-      "preco": 36.83,
+      "preco": 36.62,
       "valor_mercado": 42356000000.0,
-      "variacao_dia_pct": 1.2926,
-      "pl": 12.09,
-      "pvp": 1.53,
+      "variacao_dia_pct": -0.3537,
+      "pl": 12.02,
+      "pvp": 1.52,
       "margem_liquida_pct": 7.39,
-      "dy_pct": 5.67
+      "dy_pct": 5.7,
+      "roe_pct": 12.63
     },
     {
       "ticker": "RNEW11",
@@ -4103,43 +4444,47 @@
       "pl": -8.35,
       "pvp": 1.05,
       "margem_liquida_pct": -27.65,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -12.55
     },
     {
       "ticker": "RNEW3",
       "nome": "Renova",
       "setor": "Energia Elétrica",
-      "preco": 0.84,
+      "preco": 0.87,
       "valor_mercado": 291000000.0,
-      "variacao_dia_pct": -3.4483,
-      "pl": -2.17,
-      "pvp": 0.27,
+      "variacao_dia_pct": -3.3333,
+      "pl": -2.25,
+      "pvp": 0.28,
       "margem_liquida_pct": -27.65,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -12.55
     },
     {
       "ticker": "RNEW4",
       "nome": "Renova",
       "setor": "Energia Elétrica",
-      "preco": 0.82,
+      "preco": 0.86,
       "valor_mercado": 291000000.0,
-      "variacao_dia_pct": -3.5294,
-      "pl": -2.12,
-      "pvp": 0.27,
+      "variacao_dia_pct": 6.1728,
+      "pl": -2.22,
+      "pvp": 0.28,
       "margem_liquida_pct": -27.65,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -12.55
     },
     {
       "ticker": "ROMI3",
       "nome": "Inds Romi",
       "setor": "Outros",
-      "preco": 5.89,
+      "preco": 5.95,
       "valor_mercado": 550000000.0,
-      "variacao_dia_pct": 1.2027,
-      "pl": 7.32,
+      "variacao_dia_pct": 1.3629,
+      "pl": 7.39,
       "pvp": 0.44,
       "margem_liquida_pct": 5.8,
-      "dy_pct": 7.13
+      "dy_pct": 7.06,
+      "roe_pct": 6.0
     },
     {
       "ticker": "RPAD3",
@@ -4151,7 +4496,8 @@
       "pl": 7.95,
       "pvp": 0.57,
       "margem_liquida_pct": null,
-      "dy_pct": 0.13
+      "dy_pct": 0.13,
+      "roe_pct": 7.13
     },
     {
       "ticker": "RPAD5",
@@ -4163,7 +4509,8 @@
       "pl": 8.85,
       "pvp": 0.63,
       "margem_liquida_pct": null,
-      "dy_pct": 7.33
+      "dy_pct": 7.33,
+      "roe_pct": 7.13
     },
     {
       "ticker": "RPAD6",
@@ -4175,7 +4522,8 @@
       "pl": 7.95,
       "pvp": 0.57,
       "margem_liquida_pct": null,
-      "dy_pct": 0.14
+      "dy_pct": 0.14,
+      "roe_pct": 7.13
     },
     {
       "ticker": "RPMG3",
@@ -4187,7 +4535,8 @@
       "pl": -0.03,
       "pvp": -0.01,
       "margem_liquida_pct": -19.19,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 22.31
     },
     {
       "ticker": "RSID3",
@@ -4199,43 +4548,47 @@
       "pl": -0.21,
       "pvp": -0.04,
       "margem_liquida_pct": -601.74,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 17.04
     },
     {
       "ticker": "RSUL4",
       "nome": "Riosulense",
       "setor": "Outros",
-      "preco": 38.25,
+      "preco": 38.14,
       "valor_mercado": 263000000.0,
-      "variacao_dia_pct": -0.3387,
-      "pl": 3.8,
+      "variacao_dia_pct": -0.2876,
+      "pl": 3.79,
       "pvp": 0.77,
       "margem_liquida_pct": 14.58,
-      "dy_pct": 6.56
+      "dy_pct": 6.58,
+      "roe_pct": 20.33
     },
     {
       "ticker": "SANB11",
       "nome": "Banco Santander S.A.",
       "setor": "Financeiro",
-      "preco": 30.46,
+      "preco": 30.37,
       "valor_mercado": 103280000000.0,
-      "variacao_dia_pct": 1.8048,
-      "pl": 5.26,
+      "variacao_dia_pct": -0.23,
+      "pl": 5.25,
       "pvp": 0.59,
       "margem_liquida_pct": 8.58,
-      "dy_pct": 7.58
+      "dy_pct": 7.6,
+      "roe_pct": 11.2
     },
     {
       "ticker": "SANB3",
       "nome": "Banco Santander (Brasil) S.A.",
       "setor": "Financeiro",
-      "preco": 15.28,
+      "preco": 15.19,
       "valor_mercado": 103280000000.0,
-      "variacao_dia_pct": 2.0708,
-      "pl": 7.92,
-      "pvp": 0.89,
+      "variacao_dia_pct": 0.1318,
+      "pl": 7.87,
+      "pvp": 0.88,
       "margem_liquida_pct": 8.58,
-      "dy_pct": 7.19
+      "dy_pct": 7.24,
+      "roe_pct": 11.2
     },
     {
       "ticker": "SANB4",
@@ -4243,107 +4596,116 @@
       "setor": "Financeiro",
       "preco": 15.12,
       "valor_mercado": 103280000000.0,
-      "variacao_dia_pct": 2.0932,
+      "variacao_dia_pct": -0.1321,
       "pl": 7.84,
       "pvp": 0.88,
       "margem_liquida_pct": 8.58,
-      "dy_pct": 8.0
+      "dy_pct": 8.0,
+      "roe_pct": 11.2
     },
     {
       "ticker": "SAPR11",
       "nome": "Sanepar",
       "setor": "Energia Elétrica",
-      "preco": 35.37,
+      "preco": 34.95,
       "valor_mercado": 11239000000.0,
-      "variacao_dia_pct": 1.086,
-      "pl": 39.13,
-      "pvp": 1.47,
+      "variacao_dia_pct": -1.577,
+      "pl": 38.66,
+      "pvp": 1.45,
       "margem_liquida_pct": 6.04,
-      "dy_pct": 1.56
+      "dy_pct": 1.58,
+      "roe_pct": 3.76
     },
     {
       "ticker": "SAPR3",
       "nome": "Sanepar",
       "setor": "Energia Elétrica",
-      "preco": 7.72,
+      "preco": 7.68,
       "valor_mercado": 11239000000.0,
-      "variacao_dia_pct": 1.3123,
-      "pl": 25.65,
+      "variacao_dia_pct": 0.1304,
+      "pl": 25.51,
       "pvp": 0.96,
       "margem_liquida_pct": 6.04,
-      "dy_pct": 1.32
+      "dy_pct": 1.33,
+      "roe_pct": 3.76
     },
     {
       "ticker": "SAPR4",
       "nome": "Sanepar",
       "setor": "Energia Elétrica",
-      "preco": 6.9,
+      "preco": 6.84,
       "valor_mercado": 11239000000.0,
-      "variacao_dia_pct": 1.9202,
-      "pl": 22.92,
-      "pvp": 0.86,
+      "variacao_dia_pct": -1.013,
+      "pl": 22.72,
+      "pvp": 0.85,
       "margem_liquida_pct": 6.04,
-      "dy_pct": 1.64
+      "dy_pct": 1.65,
+      "roe_pct": 3.76
     },
     {
       "ticker": "SAUD3",
       "nome": "Bradsaude",
       "setor": "Saúde",
-      "preco": 14.82,
+      "preco": 14.65,
       "valor_mercado": 7470770000.0,
-      "variacao_dia_pct": 1.6461,
-      "pl": 41.17,
-      "pvp": 2.32,
-      "margem_liquida_pct": 10.6,
-      "dy_pct": 0.53
+      "variacao_dia_pct": -1.1471,
+      "pl": 93.91,
+      "pvp": 2.29,
+      "margem_liquida_pct": 6.04,
+      "dy_pct": 0.54,
+      "roe_pct": 2.43
     },
     {
       "ticker": "SBFG3",
       "nome": "Grupo Sbf",
       "setor": "Outros",
-      "preco": 8.96,
+      "preco": 9.03,
       "valor_mercado": 2207000000.0,
-      "variacao_dia_pct": 0.3359,
-      "pl": 4.93,
+      "variacao_dia_pct": 0.4449,
+      "pl": 4.97,
       "pvp": 0.65,
       "margem_liquida_pct": 5.0,
-      "dy_pct": 6.06
+      "dy_pct": 6.01,
+      "roe_pct": 13.07
     },
     {
       "ticker": "SBSP3",
       "nome": "Companhia de Saneamento Básico do Estado de São Paulo - SABESP",
       "setor": "Energia Elétrica",
-      "preco": 26.21,
+      "preco": 26.55,
       "valor_mercado": 101753000000.0,
-      "variacao_dia_pct": 0.2294,
-      "pl": 28.9,
-      "pvp": 2.04,
+      "variacao_dia_pct": 1.1429,
+      "pl": 29.27,
+      "pvp": 2.07,
       "margem_liquida_pct": 7.82,
-      "dy_pct": 3.32
+      "dy_pct": 3.27,
+      "roe_pct": 7.05
     },
     {
       "ticker": "SCAR3",
       "nome": "Sao Carlos",
       "setor": "Financeiro",
-      "preco": 12.9,
+      "preco": 12.82,
       "valor_mercado": 710000000.0,
-      "variacao_dia_pct": -1.5267,
-      "pl": -5.52,
-      "pvp": 0.77,
+      "variacao_dia_pct": 0.1562,
+      "pl": -5.49,
+      "pvp": 0.76,
       "margem_liquida_pct": -53.68,
-      "dy_pct": 55.05
+      "dy_pct": 55.39,
+      "roe_pct": -13.86
     },
     {
       "ticker": "SEER3",
       "nome": "Ser Educa",
       "setor": "Outros",
-      "preco": 13.47,
+      "preco": 13.66,
       "valor_mercado": 1488000000.0,
-      "variacao_dia_pct": -1.2463,
-      "pl": 30.27,
-      "pvp": 1.14,
+      "variacao_dia_pct": 2.2455,
+      "pl": 30.7,
+      "pvp": 1.15,
       "margem_liquida_pct": 2.5,
-      "dy_pct": 3.55
+      "dy_pct": 3.5,
+      "roe_pct": 3.76
     },
     {
       "ticker": "SEQL3",
@@ -4351,11 +4713,12 @@
       "setor": "Outros",
       "preco": 0.07,
       "valor_mercado": 445000000.0,
-      "variacao_dia_pct": 16.6667,
+      "variacao_dia_pct": 0.0,
       "pl": -1.71,
       "pvp": -1.75,
       "margem_liquida_pct": -47.42,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 102.71
     },
     {
       "ticker": "SGPS3",
@@ -4367,7 +4730,8 @@
       "pl": -0.03,
       "pvp": -0.02,
       "margem_liquida_pct": -139.61,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 64.46
     },
     {
       "ticker": "SHOW3",
@@ -4379,43 +4743,47 @@
       "pl": -0.62,
       "pvp": 0.47,
       "margem_liquida_pct": -42.15,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -74.77
     },
     {
       "ticker": "SHUL4",
       "nome": "Schulz",
       "setor": "Outros",
-      "preco": 4.45,
+      "preco": 4.44,
       "valor_mercado": 935000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 6.12,
-      "pvp": 1.02,
+      "variacao_dia_pct": -0.6711,
+      "pl": 6.11,
+      "pvp": 1.01,
       "margem_liquida_pct": 13.91,
-      "dy_pct": 14.25
+      "dy_pct": 14.28,
+      "roe_pct": 16.57
     },
     {
       "ticker": "SIMH3",
       "nome": "Simpar",
       "setor": "Financeiro",
-      "preco": 7.52,
+      "preco": 7.72,
       "valor_mercado": 4459000000.0,
-      "variacao_dia_pct": -0.1328,
-      "pl": -55.7,
-      "pvp": 0.45,
+      "variacao_dia_pct": 2.9333,
+      "pl": -57.19,
+      "pvp": 0.46,
       "margem_liquida_pct": -0.18,
-      "dy_pct": 2.27
+      "dy_pct": 2.22,
+      "roe_pct": -0.8
     },
     {
       "ticker": "SLCE3",
       "nome": "Slc Agricola",
       "setor": "Outros",
-      "preco": 16.54,
+      "preco": 16.58,
       "valor_mercado": 6673000000.0,
-      "variacao_dia_pct": 0.9768,
-      "pl": 21.23,
-      "pvp": 1.35,
+      "variacao_dia_pct": 0.5458,
+      "pl": 21.28,
+      "pvp": 1.36,
       "margem_liquida_pct": 3.85,
-      "dy_pct": 5.48
+      "dy_pct": 5.46,
+      "roe_pct": 6.37
     },
     {
       "ticker": "SLED3",
@@ -4427,7 +4795,8 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "SLED4",
@@ -4439,31 +4808,34 @@
       "pl": null,
       "pvp": null,
       "margem_liquida_pct": null,
-      "dy_pct": null
+      "dy_pct": null,
+      "roe_pct": null
     },
     {
       "ticker": "SMFT3",
       "nome": "Smart Fit",
       "setor": "Outros",
-      "preco": 17.74,
+      "preco": 17.9,
       "valor_mercado": 12180000000.0,
-      "variacao_dia_pct": 0.1129,
-      "pl": 15.92,
-      "pvp": 1.79,
+      "variacao_dia_pct": 1.21,
+      "pl": 16.07,
+      "pvp": 1.81,
       "margem_liquida_pct": 8.53,
-      "dy_pct": 5.86
+      "dy_pct": 5.8,
+      "roe_pct": 11.27
     },
     {
       "ticker": "SMTO3",
       "nome": "Sao Martinho",
       "setor": "Outros",
-      "preco": 20.15,
+      "preco": 20.47,
       "valor_mercado": 4876000000.0,
-      "variacao_dia_pct": -4.908,
-      "pl": 8.01,
-      "pvp": 0.91,
+      "variacao_dia_pct": 1.1364,
+      "pl": 8.14,
+      "pvp": 0.92,
       "margem_liquida_pct": 11.25,
-      "dy_pct": 2.27
+      "dy_pct": 2.23,
+      "roe_pct": 11.35
     },
     {
       "ticker": "SNSY3",
@@ -4475,19 +4847,21 @@
       "pl": -0.23,
       "pvp": -0.03,
       "margem_liquida_pct": -32.25,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 12.8
     },
     {
       "ticker": "SNSY5",
       "nome": "Sansuy",
       "setor": "Materiais Básicos",
-      "preco": 2.35,
+      "preco": 2.32,
       "valor_mercado": 36000000.0,
-      "variacao_dia_pct": -0.8439,
+      "variacao_dia_pct": -1.2766,
       "pl": -0.06,
       "pvp": -0.01,
       "margem_liquida_pct": -32.25,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 12.8
     },
     {
       "ticker": "SNSY6",
@@ -4499,19 +4873,21 @@
       "pl": -0.28,
       "pvp": -0.04,
       "margem_liquida_pct": -32.25,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 12.8
     },
     {
       "ticker": "SOJA3",
       "nome": "Boa Safra",
       "setor": "Outros",
-      "preco": 7.83,
+      "preco": 7.95,
       "valor_mercado": 840000000.0,
-      "variacao_dia_pct": -3.3333,
-      "pl": 48.04,
-      "pvp": 0.82,
+      "variacao_dia_pct": 1.7926,
+      "pl": 48.77,
+      "pvp": 0.83,
       "margem_liquida_pct": 0.88,
-      "dy_pct": 3.79
+      "dy_pct": 3.74,
+      "roe_pct": 1.72
     },
     {
       "ticker": "SOND3",
@@ -4523,7 +4899,8 @@
       "pl": 2.21,
       "pvp": 1.39,
       "margem_liquida_pct": 17.16,
-      "dy_pct": 38.69
+      "dy_pct": 38.69,
+      "roe_pct": 63.05
     },
     {
       "ticker": "SOND5",
@@ -4535,19 +4912,21 @@
       "pl": 4.69,
       "pvp": 2.95,
       "margem_liquida_pct": 17.16,
-      "dy_pct": 20.04
+      "dy_pct": 20.04,
+      "roe_pct": 63.05
     },
     {
       "ticker": "SOND6",
       "nome": "Sondotecnica",
       "setor": "Outros",
-      "preco": 79.52,
+      "preco": 78.56,
       "valor_mercado": 153000000.0,
       "variacao_dia_pct": 0.0,
-      "pl": 4.54,
-      "pvp": 2.86,
+      "pl": 4.48,
+      "pvp": 2.83,
       "margem_liquida_pct": 17.16,
-      "dy_pct": 20.69
+      "dy_pct": 20.94,
+      "roe_pct": 63.05
     },
     {
       "ticker": "STBP3",
@@ -4559,115 +4938,125 @@
       "pl": 25.98,
       "pvp": 10.21,
       "margem_liquida_pct": 12.31,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 39.32
     },
     {
       "ticker": "SUZB3",
       "nome": "Suzano S.A.",
       "setor": "Materiais Básicos",
-      "preco": 46.65,
+      "preco": 46.76,
       "valor_mercado": 52928000000.0,
-      "variacao_dia_pct": -0.2139,
-      "pl": 7.22,
-      "pvp": 1.18,
+      "variacao_dia_pct": -0.0641,
+      "pl": 7.24,
+      "pvp": 1.19,
       "margem_liquida_pct": 17.08,
-      "dy_pct": 2.4
+      "dy_pct": 2.4,
+      "roe_pct": 16.39
     },
     {
       "ticker": "SYNE3",
       "nome": "SYN Prop e Tech",
       "setor": "Financeiro",
-      "preco": 3.91,
+      "preco": 3.74,
       "valor_mercado": 618000000.0,
-      "variacao_dia_pct": 1.5584,
-      "pl": 10.95,
-      "pvp": 0.41,
+      "variacao_dia_pct": -5.3165,
+      "pl": 10.48,
+      "pvp": 0.39,
       "margem_liquida_pct": 16.32,
-      "dy_pct": 10.72
+      "dy_pct": 11.2,
+      "roe_pct": 3.7
     },
     {
       "ticker": "TAEE11",
       "nome": "Transmissora Aliança de Energia Elétrica S.A.",
       "setor": "Energia Elétrica",
-      "preco": 41.76,
+      "preco": 41.74,
       "valor_mercado": 13762000000.0,
-      "variacao_dia_pct": 2.1277,
+      "variacao_dia_pct": 0.46,
       "pl": 8.85,
       "pvp": 1.78,
       "margem_liquida_pct": 36.25,
-      "dy_pct": 5.76
+      "dy_pct": 5.76,
+      "roe_pct": 20.14
     },
     {
       "ticker": "TAEE3",
       "nome": "TaeSA",
       "setor": "Energia Elétrica",
-      "preco": 13.73,
+      "preco": 13.74,
       "valor_mercado": 13762000000.0,
-      "variacao_dia_pct": 1.2537,
+      "variacao_dia_pct": -0.1453,
       "pl": 8.73,
       "pvp": 1.76,
       "margem_liquida_pct": 36.25,
-      "dy_pct": 5.84
+      "dy_pct": 5.84,
+      "roe_pct": 20.14
     },
     {
       "ticker": "TAEE4",
       "nome": "TaeSA",
       "setor": "Energia Elétrica",
-      "preco": 13.91,
+      "preco": 14.06,
       "valor_mercado": 13762000000.0,
-      "variacao_dia_pct": 1.3848,
-      "pl": 8.84,
-      "pvp": 1.78,
+      "variacao_dia_pct": 1.0784,
+      "pl": 8.94,
+      "pvp": 1.8,
       "margem_liquida_pct": 36.25,
-      "dy_pct": 5.77
+      "dy_pct": 5.7,
+      "roe_pct": 20.14
     },
     {
       "ticker": "TASA3",
       "nome": "Taurus Armas",
       "setor": "Outros",
-      "preco": 5.58,
+      "preco": 5.67,
       "valor_mercado": 682000000.0,
-      "variacao_dia_pct": 1.087,
-      "pl": 29.06,
+      "variacao_dia_pct": 1.6129,
+      "pl": 29.53,
       "pvp": 0.61,
       "margem_liquida_pct": 1.87,
-      "dy_pct": 0.05
+      "dy_pct": 0.05,
+      "roe_pct": 2.08
     },
     {
       "ticker": "TASA4",
       "nome": "Taurus Armas S.A.",
       "setor": "Outros",
-      "preco": 5.54,
+      "preco": 5.63,
       "valor_mercado": 682000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 28.85,
-      "pvp": 0.6,
+      "variacao_dia_pct": 2.1779,
+      "pl": 29.32,
+      "pvp": 0.61,
       "margem_liquida_pct": 1.87,
-      "dy_pct": 0.05
+      "dy_pct": 0.05,
+      "roe_pct": 2.08
     },
     {
       "ticker": "TCSA3",
       "nome": "Tecnisa S.A.",
       "setor": "Financeiro",
-      "preco": 0.64,
+      "preco": 0.63,
       "valor_mercado": 59000000.0,
-      "variacao_dia_pct": 1.5873,
-      "pl": -0.73,
-      "pvp": 0.19,
+      "variacao_dia_pct": -3.0769,
+      "pl": -0.72,
+      "pvp": 0.18,
       "margem_liquida_pct": -33.87,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -25.5
     },
     {
       "ticker": "TECN3",
       "nome": "Technos",
       "setor": "Outros",
-      "preco": 9.96,
+      "preco": 10.09,
       "valor_mercado": 596000000.0,
-      "variacao_dia_pct": 0.2012,
-      "pl": 4.92,
-      "pvp": 1.19,
+      "variacao_dia_pct": 2.1255,
+      "pl": 4.98,
+      "pvp": 1.21,
       "margem_liquida_pct": 24.88,
-      "dy_pct": 4.12
+      "dy_pct": 4.06,
+      "roe_pct": 24.27
     },
     {
       "ticker": "TEKA3",
@@ -4679,7 +5068,8 @@
       "pl": 0.15,
       "pvp": -0.01,
       "margem_liquida_pct": 39.95,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -6.48
     },
     {
       "ticker": "TEKA4",
@@ -4691,79 +5081,86 @@
       "pl": 0.07,
       "pvp": -0.0,
       "margem_liquida_pct": 39.95,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -6.48
     },
     {
       "ticker": "TELB3",
       "nome": "Telebras",
       "setor": "Outros",
-      "preco": 18.05,
+      "preco": 17.86,
       "valor_mercado": 988000000.0,
-      "variacao_dia_pct": 1.4045,
-      "pl": 13.38,
-      "pvp": 1.09,
+      "variacao_dia_pct": -1.0526,
+      "pl": 13.24,
+      "pvp": 1.08,
       "margem_liquida_pct": 25.25,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 8.14
     },
     {
       "ticker": "TELB4",
       "nome": "Telebras",
       "setor": "Outros",
-      "preco": 8.28,
+      "preco": 8.11,
       "valor_mercado": 988000000.0,
-      "variacao_dia_pct": 0.2421,
-      "pl": 6.14,
-      "pvp": 0.5,
+      "variacao_dia_pct": 0.6203,
+      "pl": 6.01,
+      "pvp": 0.49,
       "margem_liquida_pct": 25.25,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 8.14
     },
     {
       "ticker": "TEND3",
       "nome": "Tenda",
       "setor": "Financeiro",
-      "preco": 33.62,
+      "preco": 34.54,
       "valor_mercado": 3774000000.0,
-      "variacao_dia_pct": -1.8394,
-      "pl": 7.12,
-      "pvp": 2.69,
+      "variacao_dia_pct": 2.7365,
+      "pl": 7.31,
+      "pvp": 2.76,
       "margem_liquida_pct": 12.08,
-      "dy_pct": 2.45
+      "dy_pct": 2.39,
+      "roe_pct": 37.72
     },
     {
       "ticker": "TFCO4",
       "nome": "Track Field",
       "setor": "Outros",
-      "preco": 12.94,
+      "preco": 13.06,
       "valor_mercado": 927000000.0,
-      "variacao_dia_pct": -3.5048,
-      "pl": 82.95,
-      "pvp": 19.82,
+      "variacao_dia_pct": -0.3053,
+      "pl": 83.72,
+      "pvp": 20.0,
       "margem_liquida_pct": 13.1,
-      "dy_pct": 2.47
+      "dy_pct": 2.44,
+      "roe_pct": 23.88
     },
     {
       "ticker": "TGMA3",
       "nome": "Tegma",
       "setor": "Outros",
-      "preco": 34.37,
+      "preco": 33.93,
       "valor_mercado": 2042000000.0,
-      "variacao_dia_pct": -0.3479,
-      "pl": 205.81,
-      "pvp": 2.28,
+      "variacao_dia_pct": -1.021,
+      "pl": 203.17,
+      "pvp": 2.25,
       "margem_liquida_pct": 0.44,
-      "dy_pct": 11.17
+      "dy_pct": 11.32,
+      "roe_pct": 1.11
     },
     {
       "ticker": "TIMS3",
       "nome": "TIM S.A.",
       "setor": "Outros",
-      "preco": 19.09,
+      "preco": 18.93,
       "valor_mercado": 51430000000.0,
-      "variacao_dia_pct": 1.5426,
-      "pl": 3181.67,
-      "pvp": 1.83,
+      "variacao_dia_pct": -0.2109,
+      "pl": 3155.0,
+      "pvp": 1.81,
       "margem_liquida_pct": 1.76,
-      "dy_pct": 7.62
+      "dy_pct": 7.69,
+      "roe_pct": 0.05
     },
     {
       "ticker": "TKNO4",
@@ -4775,31 +5172,34 @@
       "pl": 21.21,
       "pvp": 2.2,
       "margem_liquida_pct": 10.11,
-      "dy_pct": 0.31
+      "dy_pct": 0.31,
+      "roe_pct": 10.38
     },
     {
       "ticker": "TOTS3",
       "nome": "TOTVS S.A.",
       "setor": "Outros",
-      "preco": 34.78,
+      "preco": 34.5,
       "valor_mercado": 17610000000.0,
-      "variacao_dia_pct": 0.1151,
-      "pl": 14.13,
-      "pvp": 3.69,
+      "variacao_dia_pct": -0.919,
+      "pl": 14.02,
+      "pvp": 3.66,
       "margem_liquida_pct": 22.14,
-      "dy_pct": 1.96
+      "dy_pct": 1.97,
+      "roe_pct": 26.12
     },
     {
       "ticker": "TPIS3",
       "nome": "Triunfo Part",
       "setor": "Outros",
-      "preco": 9.97,
+      "preco": 9.81,
       "valor_mercado": 371000000.0,
-      "variacao_dia_pct": -0.8946,
-      "pl": -1.09,
-      "pvp": 0.93,
+      "variacao_dia_pct": -1.998,
+      "pl": -1.07,
+      "pvp": 0.92,
       "margem_liquida_pct": -44.63,
-      "dy_pct": 5.51
+      "dy_pct": 5.6,
+      "roe_pct": -85.72
     },
     {
       "ticker": "TRAD3",
@@ -4811,43 +5211,47 @@
       "pl": 0.55,
       "pvp": 0.46,
       "margem_liquida_pct": 314.84,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 84.31
     },
     {
       "ticker": "TRIS3",
       "nome": "Trisul",
       "setor": "Financeiro",
-      "preco": 4.91,
+      "preco": 4.97,
       "valor_mercado": 964000000.0,
-      "variacao_dia_pct": -0.8081,
-      "pl": 6.06,
-      "pvp": 0.75,
+      "variacao_dia_pct": 0.2016,
+      "pl": 6.14,
+      "pvp": 0.76,
       "margem_liquida_pct": 12.4,
-      "dy_pct": 20.06
+      "dy_pct": 19.82,
+      "roe_pct": 12.37
     },
     {
       "ticker": "TTEN3",
       "nome": "3tentos",
       "setor": "Outros",
-      "preco": 11.59,
+      "preco": 11.37,
       "valor_mercado": 7631000000.0,
-      "variacao_dia_pct": -3.0936,
-      "pl": 9.86,
-      "pvp": 1.16,
+      "variacao_dia_pct": -1.8982,
+      "pl": 9.68,
+      "pvp": 1.14,
       "margem_liquida_pct": 3.22,
-      "dy_pct": 1.57
+      "dy_pct": 1.6,
+      "roe_pct": 11.75
     },
     {
       "ticker": "TUPY3",
       "nome": "Tupy",
       "setor": "Outros",
-      "preco": 15.78,
+      "preco": 15.69,
       "valor_mercado": 2234000000.0,
-      "variacao_dia_pct": -0.1898,
-      "pl": -2.71,
-      "pvp": 0.91,
+      "variacao_dia_pct": -0.0637,
+      "pl": -2.69,
+      "pvp": 0.9,
       "margem_liquida_pct": -8.24,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -33.56
     },
     {
       "ticker": "TXRX3",
@@ -4859,43 +5263,47 @@
       "pl": -0.57,
       "pvp": -0.09,
       "margem_liquida_pct": -58.11,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 15.16
     },
     {
       "ticker": "UCAS3",
       "nome": "UnicaSA",
       "setor": "Outros",
-      "preco": 1.17,
+      "preco": 1.14,
       "valor_mercado": 75000000.0,
-      "variacao_dia_pct": 0.8621,
-      "pl": -4.78,
-      "pvp": 0.46,
+      "variacao_dia_pct": -2.5641,
+      "pl": -4.65,
+      "pvp": 0.45,
       "margem_liquida_pct": -7.11,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -9.66
     },
     {
       "ticker": "UGPA3",
       "nome": "Ultrapar Participações S.A.",
       "setor": "Outros",
-      "preco": 36.41,
+      "preco": 37.24,
       "valor_mercado": 35807000000.0,
-      "variacao_dia_pct": -0.8712,
-      "pl": 11.75,
-      "pvp": 2.03,
+      "variacao_dia_pct": 2.1674,
+      "pl": 12.02,
+      "pvp": 2.07,
       "margem_liquida_pct": 2.26,
-      "dy_pct": 3.57
+      "dy_pct": 3.49,
+      "roe_pct": 17.26
     },
     {
       "ticker": "UNIP3",
       "nome": "Unipar",
       "setor": "Materiais Básicos",
-      "preco": 56.31,
+      "preco": 56.21,
       "valor_mercado": 6875000000.0,
-      "variacao_dia_pct": 0.5536,
-      "pl": 23.91,
-      "pvp": 3.17,
+      "variacao_dia_pct": 0.0356,
+      "pl": 23.87,
+      "pvp": 3.16,
       "margem_liquida_pct": 5.09,
-      "dy_pct": 16.43
+      "dy_pct": 16.46,
+      "roe_pct": 13.26
     },
     {
       "ticker": "UNIP5",
@@ -4903,47 +5311,51 @@
       "setor": "Materiais Básicos",
       "preco": 57.7,
       "valor_mercado": 6875000000.0,
-      "variacao_dia_pct": 1.2103,
+      "variacao_dia_pct": 0.0,
       "pl": 24.5,
       "pvp": 3.25,
       "margem_liquida_pct": 5.09,
-      "dy_pct": 17.64
+      "dy_pct": 17.64,
+      "roe_pct": 13.26
     },
     {
       "ticker": "UNIP6",
       "nome": "Unipar",
       "setor": "Materiais Básicos",
-      "preco": 57.68,
+      "preco": 57.3,
       "valor_mercado": 6875000000.0,
-      "variacao_dia_pct": 0.7159,
-      "pl": 24.49,
-      "pvp": 3.25,
+      "variacao_dia_pct": 0.1048,
+      "pl": 24.33,
+      "pvp": 3.22,
       "margem_liquida_pct": 5.09,
-      "dy_pct": 17.65
+      "dy_pct": 17.76,
+      "roe_pct": 13.26
     },
     {
       "ticker": "USIM3",
       "nome": "Usiminas",
       "setor": "Materiais Básicos",
-      "preco": 7.2,
+      "preco": 7.07,
       "valor_mercado": 10144000000.0,
-      "variacao_dia_pct": -1.0989,
-      "pl": -4.4,
-      "pvp": 0.38,
+      "variacao_dia_pct": -2.8846,
+      "pl": -4.32,
+      "pvp": 0.37,
       "margem_liquida_pct": -8.27,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -8.67
     },
     {
       "ticker": "USIM5",
       "nome": "Usinas Siderúrgicas de Minas Gerais S.A.",
       "setor": "Materiais Básicos",
-      "preco": 7.84,
+      "preco": 7.67,
       "valor_mercado": 10144000000.0,
-      "variacao_dia_pct": 0.6418,
-      "pl": -4.79,
-      "pvp": 0.42,
+      "variacao_dia_pct": -1.7926,
+      "pl": -4.69,
+      "pvp": 0.41,
       "margem_liquida_pct": -8.27,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -8.67
     },
     {
       "ticker": "USIM6",
@@ -4955,163 +5367,177 @@
       "pl": -3.95,
       "pvp": 0.34,
       "margem_liquida_pct": -8.27,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -8.67
     },
     {
       "ticker": "VALE3",
       "nome": "Vale S.A.",
       "setor": "Materiais Básicos",
-      "preco": 78.41,
+      "preco": 78.46,
       "valor_mercado": 336000000000.0,
-      "variacao_dia_pct": -2.9579,
-      "pl": 33.57,
+      "variacao_dia_pct": 0.0127,
+      "pl": 33.59,
       "pvp": 1.73,
       "margem_liquida_pct": 4.75,
-      "dy_pct": 6.99
+      "dy_pct": 6.98,
+      "roe_pct": 5.15
     },
     {
       "ticker": "VAMO3",
       "nome": "Vamos",
       "setor": "Outros",
-      "preco": 3.4,
+      "preco": 3.47,
       "valor_mercado": 3873000000.0,
-      "variacao_dia_pct": -1.7341,
-      "pl": 13.18,
-      "pvp": 1.26,
+      "variacao_dia_pct": 2.6627,
+      "pl": 13.45,
+      "pvp": 1.29,
       "margem_liquida_pct": 5.1,
-      "dy_pct": 4.15
+      "dy_pct": 4.06,
+      "roe_pct": 9.57
     },
     {
       "ticker": "VBBR3",
       "nome": "Vibra Energia S.A.",
       "setor": "Outros",
-      "preco": 36.73,
+      "preco": 36.76,
       "valor_mercado": 41350000000.0,
-      "variacao_dia_pct": 1.0454,
-      "pl": 8.71,
+      "variacao_dia_pct": -0.2983,
+      "pl": 8.72,
       "pvp": 1.86,
       "margem_liquida_pct": 2.48,
-      "dy_pct": 4.25
+      "dy_pct": 4.24,
+      "roe_pct": 21.38
     },
     {
       "ticker": "VITT3",
       "nome": "Vittia Fertilizantes S.A.",
       "setor": "Materiais Básicos",
-      "preco": 3.18,
+      "preco": 3.19,
       "valor_mercado": 537000000.0,
-      "variacao_dia_pct": -0.625,
-      "pl": 7.68,
+      "variacao_dia_pct": 0.3145,
+      "pl": 7.71,
       "pvp": 0.83,
       "margem_liquida_pct": 7.96,
-      "dy_pct": 4.47
+      "dy_pct": 4.45,
+      "roe_pct": 10.8
     },
     {
       "ticker": "VIVA3",
       "nome": "Vivara Participacoes S.A.",
       "setor": "Outros",
-      "preco": 23.33,
+      "preco": 23.19,
       "valor_mercado": 5198000000.0,
-      "variacao_dia_pct": -1.8098,
-      "pl": 9.41,
-      "pvp": 1.73,
+      "variacao_dia_pct": -0.3438,
+      "pl": 9.35,
+      "pvp": 1.72,
       "margem_liquida_pct": 18.56,
-      "dy_pct": 2.99
+      "dy_pct": 3.01,
+      "roe_pct": 18.4
     },
     {
       "ticker": "VIVR3",
       "nome": "Viver",
       "setor": "Financeiro",
-      "preco": 1.48,
+      "preco": 1.51,
       "valor_mercado": 8000000.0,
-      "variacao_dia_pct": -1.3333,
-      "pl": -0.4,
+      "variacao_dia_pct": 2.027,
+      "pl": -0.41,
       "pvp": 0.17,
       "margem_liquida_pct": -81.57,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -41.58
     },
     {
       "ticker": "VIVT3",
       "nome": "Telef Brasil",
       "setor": "Outros",
-      "preco": 30.42,
+      "preco": 30.04,
       "valor_mercado": 116511000000.0,
-      "variacao_dia_pct": 0.7285,
-      "pl": 14.88,
-      "pvp": 1.49,
+      "variacao_dia_pct": -0.8908,
+      "pl": 14.69,
+      "pvp": 1.48,
       "margem_liquida_pct": 10.68,
-      "dy_pct": 3.28
+      "dy_pct": 3.32,
+      "roe_pct": 10.04
     },
     {
       "ticker": "VLID3",
       "nome": "Valid Solucoes S.A.",
       "setor": "Outros",
-      "preco": 17.92,
+      "preco": 18.06,
       "valor_mercado": 1423000000.0,
-      "variacao_dia_pct": -0.4444,
-      "pl": 6.34,
-      "pvp": 0.83,
+      "variacao_dia_pct": 1.5748,
+      "pl": 6.39,
+      "pvp": 0.84,
       "margem_liquida_pct": 11.15,
-      "dy_pct": 9.41
+      "dy_pct": 9.34,
+      "roe_pct": 13.1
     },
     {
       "ticker": "VTRU3",
       "nome": "VITRUEDUCA",
       "setor": "Outros",
-      "preco": 14.48,
+      "preco": 14.65,
       "valor_mercado": 1848000000.0,
-      "variacao_dia_pct": -1.6972,
-      "pl": 1.98,
-      "pvp": 0.54,
+      "variacao_dia_pct": 1.0345,
+      "pl": 2.01,
+      "pvp": 0.55,
       "margem_liquida_pct": 46.56,
-      "dy_pct": 0.17
+      "dy_pct": 0.17,
+      "roe_pct": 27.23
     },
     {
       "ticker": "VULC3",
       "nome": "Vulcabras",
       "setor": "Outros",
-      "preco": 13.0,
+      "preco": 13.08,
       "valor_mercado": 4451000000.0,
-      "variacao_dia_pct": -2.2556,
-      "pl": 4.45,
-      "pvp": 1.56,
+      "variacao_dia_pct": 0.538,
+      "pl": 4.47,
+      "pvp": 1.57,
       "margem_liquida_pct": 24.89,
-      "dy_pct": 36.18
+      "dy_pct": 35.96,
+      "roe_pct": 35.06
     },
     {
       "ticker": "VVEO3",
       "nome": "Viveo",
       "setor": "Saúde",
-      "preco": 0.79,
+      "preco": 0.75,
       "valor_mercado": 837000000.0,
-      "variacao_dia_pct": 0.0,
-      "pl": 14.11,
-      "pvp": 0.14,
+      "variacao_dia_pct": -5.0633,
+      "pl": 13.39,
+      "pvp": 0.13,
       "margem_liquida_pct": 0.16,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": 1.0
     },
     {
       "ticker": "WEGE3",
       "nome": "WEG S.A.",
       "setor": "Outros",
-      "preco": 52.07,
+      "preco": 51.78,
       "valor_mercado": 194756000000.0,
-      "variacao_dia_pct": 2.4194,
-      "pl": 34.95,
-      "pvp": 10.82,
+      "variacao_dia_pct": -0.5378,
+      "pl": 34.75,
+      "pvp": 10.76,
       "margem_liquida_pct": 15.58,
-      "dy_pct": 4.18
+      "dy_pct": 4.21,
+      "roe_pct": 30.97
     },
     {
       "ticker": "WEST3",
       "nome": "Westwing",
       "setor": "Outros",
-      "preco": 2.96,
+      "preco": 2.9,
       "valor_mercado": 37000000.0,
-      "variacao_dia_pct": 1.3699,
-      "pl": -3.25,
+      "variacao_dia_pct": -4.2904,
+      "pl": -3.19,
       "pvp": 0.22,
       "margem_liquida_pct": -6.63,
-      "dy_pct": 0.0
+      "dy_pct": 0.0,
+      "roe_pct": -6.79
     },
     {
       "ticker": "WHRL3",
@@ -5119,23 +5545,25 @@
       "setor": "Outros",
       "preco": 3.67,
       "valor_mercado": 5868000000.0,
-      "variacao_dia_pct": 0.8242,
+      "variacao_dia_pct": 0.0,
       "pl": 18.82,
       "pvp": 2.79,
       "margem_liquida_pct": 2.39,
-      "dy_pct": 5.31
+      "dy_pct": 5.31,
+      "roe_pct": 14.85
     },
     {
       "ticker": "WHRL4",
       "nome": "Whirlpool",
       "setor": "Outros",
-      "preco": 3.82,
+      "preco": 3.73,
       "valor_mercado": 5868000000.0,
-      "variacao_dia_pct": 1.0582,
-      "pl": 19.59,
-      "pvp": 2.91,
+      "variacao_dia_pct": -2.356,
+      "pl": 19.13,
+      "pvp": 2.84,
       "margem_liquida_pct": 2.39,
-      "dy_pct": 5.63
+      "dy_pct": 5.76,
+      "roe_pct": 14.85
     },
     {
       "ticker": "WIZC3",
@@ -5143,11 +5571,12 @@
       "setor": "Financeiro",
       "preco": 8.08,
       "valor_mercado": 1308000000.0,
-      "variacao_dia_pct": -0.2469,
+      "variacao_dia_pct": 0.0,
       "pl": 6.51,
       "pvp": 0.96,
       "margem_liquida_pct": 15.57,
-      "dy_pct": 7.78
+      "dy_pct": 7.78,
+      "roe_pct": 14.78
     },
     {
       "ticker": "WLMM3",
@@ -5159,31 +5588,34 @@
       "pl": 9.16,
       "pvp": 0.89,
       "margem_liquida_pct": 2.72,
-      "dy_pct": 9.39
+      "dy_pct": 9.39,
+      "roe_pct": 9.68
     },
     {
       "ticker": "WLMM4",
       "nome": "Wlm Ind Com",
       "setor": "Outros",
-      "preco": 15.98,
+      "preco": 15.96,
       "valor_mercado": 668000000.0,
-      "variacao_dia_pct": -0.0625,
-      "pl": 7.43,
+      "variacao_dia_pct": 1.0127,
+      "pl": 7.42,
       "pvp": 0.72,
       "margem_liquida_pct": 2.72,
-      "dy_pct": 12.73
+      "dy_pct": 12.74,
+      "roe_pct": 9.68
     },
     {
       "ticker": "YDUQ3",
       "nome": "Estácio Participações S.A.",
       "setor": "Outros",
-      "preco": 9.42,
+      "preco": 9.58,
       "valor_mercado": 2176000000.0,
-      "variacao_dia_pct": 1.1815,
-      "pl": 22.75,
-      "pvp": 0.88,
+      "variacao_dia_pct": 0.9484,
+      "pl": 23.14,
+      "pvp": 0.89,
       "margem_liquida_pct": 2.04,
-      "dy_pct": 6.04
+      "dy_pct": 5.94,
+      "roe_pct": 3.86
     }
   ]
 }
