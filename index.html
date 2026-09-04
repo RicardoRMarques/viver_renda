@@ -755,6 +755,47 @@
     }
     .nav-dropdown-item:hover { background: var(--deep); color: var(--primary); }
 
+    /* ---------- Listas de Mercado (Ações / FIIs) ---------- */
+    .lista-mercado-filtros { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 16px; }
+    .lista-mercado-filtro-chip {
+      border: 1px solid var(--border); background: var(--card); color: var(--muted);
+      border-radius: 999px; padding: 6px 13px; font-size: 0.78rem; cursor: pointer;
+      font-family: inherit; transition: border-color .15s, color .15s;
+    }
+    .lista-mercado-filtro-chip:hover { color: var(--text); }
+    .lista-mercado-filtro-chip.ativo { color: var(--primary); border-color: var(--primary); background: rgba(49,195,255,0.08); }
+    .lista-mercado-tabela-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+    table.lista-mercado-tabela { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 680px; }
+    .lista-mercado-tabela thead th {
+      text-align: left; padding: 12px 14px; font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.03em; color: var(--muted); border-bottom: 1px solid var(--border);
+      white-space: nowrap; cursor: pointer; user-select: none;
+    }
+    .lista-mercado-tabela thead th:hover { color: var(--text); }
+    .lista-mercado-tabela thead th.ordenado-asc::after { content: ' ▲'; color: var(--primary); font-size: 0.65em; }
+    .lista-mercado-tabela thead th.ordenado-desc::after { content: ' ▼'; color: var(--primary); font-size: 0.65em; }
+    .lista-mercado-tabela tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; }
+    .lista-mercado-tabela tbody tr:last-child { border-bottom: none; }
+    .lista-mercado-tabela tbody tr:hover { background: var(--deep); }
+    .lista-mercado-tabela td { padding: 11px 14px; white-space: nowrap; }
+    .lista-mercado-tabela td.lm-ativo-cel { display: flex; align-items: center; gap: 10px; white-space: normal; }
+    .lm-ativo-logo {
+      width: 28px; height: 28px; border-radius: 7px; background: var(--deep);
+      display: flex; align-items: center; justify-content: center; font-size: 0.62rem;
+      font-weight: 700; color: var(--muted); flex-shrink: 0;
+    }
+    .lm-ativo-ticker { font-weight: 700; font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace; color: var(--text); }
+    .lm-ativo-nome { font-size: 0.72rem; color: var(--muted); }
+    .lista-mercado-tabela td.lm-num { font-family: 'IBM Plex Mono', monospace; }
+    .lm-variacao-pos { color: var(--accent); }
+    .lm-variacao-neg { color: var(--danger); }
+    .lm-setor-tag { font-size: 0.75rem; color: var(--muted); }
+    .lista-mercado-carregando { padding: 20px 14px !important; color: var(--muted); font-size: 0.85rem; white-space: normal !important; }
+    @media (max-width: 640px) {
+      table.lista-mercado-tabela { font-size: 0.78rem; }
+      .lista-mercado-tabela td, .lista-mercado-tabela thead th { padding: 9px 8px; }
+    }
+
     .theme-toggle {
       display: inline-flex;
       align-items: center;
@@ -2698,13 +2739,19 @@
         <span class="brand-texto">DIVIDENDOS |<br class="brand-quebra-mobile"> VIVER DE RENDA</span>
       </a>
       <nav class="nav">
-        <a href="#consulta-rapida" class="nav-icone-lupa" title="Consulta Ações, FIIs, Stocks e ETFs" aria-label="Consulta Ações, FIIs, Stocks e ETFs">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          Consulta Ações, FIIs, Stocks e ETFs
-        </a>
+        <div class="nav-dropdown" id="navMercadoDropdown">
+          <button type="button" class="nav-dropdown-btn" id="navMercadoBtn" aria-haspopup="true" aria-expanded="false">
+            Mercado <span class="nav-dropdown-seta">▾</span>
+          </button>
+          <div class="nav-dropdown-menu" id="navMercadoMenu">
+            <a class="nav-dropdown-item" href="#consulta-rapida">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
+            <a class="nav-dropdown-item" href="#lista-acoes">📈 Lista de Ações</a>
+            <a class="nav-dropdown-item" href="#lista-fiis">🏢 Lista de Fundos Imobiliários</a>
+          </div>
+        </div>
         <a href="#boletins-semana">Boletim de Mercado Diário</a>
         <a href="#educacao">Educação</a>
-        <div class="nav-dropdown">
+        <div class="nav-dropdown" id="navRendaFixaDropdown">
           <button type="button" class="nav-dropdown-btn" id="navRendaFixaBtn" aria-haspopup="true" aria-expanded="false">
             Simuladores <span class="nav-dropdown-seta">▾</span>
           </button>
@@ -2756,9 +2803,11 @@
     <a href="#alertas-preco" class="mobile-menu-item">🔔 Meus Alertas de Preço</a>
     <a href="#simuladorVisual" class="mobile-menu-item">📈 Veja o poder dos juros compostos</a>
     <a href="#educacao" class="mobile-menu-item">🎓 Educação</a>
-    <div class="mobile-menu-separador">Consultas</div>
+    <div class="mobile-menu-separador">Mercado</div>
     <a href="#consulta-rapida" class="mobile-menu-item">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
     <a href="#consulta-rapida" class="mobile-menu-item">📊 Análise Fundamentalista</a>
+    <a href="#lista-acoes" class="mobile-menu-item">📈 Lista de Ações</a>
+    <a href="#lista-fiis" class="mobile-menu-item">🏢 Lista de Fundos Imobiliários</a>
     <div class="mobile-menu-separador">Simuladores</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário de FIIs e Ações</button>
@@ -2924,6 +2973,52 @@
 
         <div class="hg-status" id="hgStatus"></div>
         <div id="hgResultado"></div>
+      </div>
+    </section>
+
+    <!-- LISTA DE AÇÕES — menu "Mercado". Populada a partir de
+         mercado-acoes.json, gerado pelo robô coletar_mercado.py
+         (GitHub Actions, 1x/dia). -->
+    <section class="hg-busca lista-mercado" id="lista-acoes">
+      <h2 class="hg-titulo">📈 Todas as Ações</h2>
+      <div class="lista-mercado-filtros" id="filtrosListaAcoes"></div>
+      <div class="lista-mercado-tabela-wrap">
+        <table class="lista-mercado-tabela" id="tabelaListaAcoes">
+          <thead>
+            <tr>
+              <th data-col="ativo" data-tipo="texto">Ativos</th>
+              <th data-col="valor_mercado" data-tipo="numero" class="ordenado-desc">Valor de Mercado</th>
+              <th data-col="pl" data-tipo="numero">P/L</th>
+              <th data-col="pvp" data-tipo="numero">P/VP</th>
+              <th data-col="dy_pct" data-tipo="numero">Dividend Yield</th>
+              <th data-col="margem_liquida_pct" data-tipo="numero">Margem Líquida</th>
+              <th data-col="setor" data-tipo="texto">Setor</th>
+            </tr>
+          </thead>
+          <tbody><tr><td colspan="7" class="lista-mercado-carregando">Carregando ações…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- LISTA DE FIIs — menu "Mercado". Populada a partir de
+         mercado-fiis.json (mesmo robô). -->
+    <section class="hg-busca lista-mercado" id="lista-fiis">
+      <h2 class="hg-titulo">🏢 Todos os Fundos Imobiliários</h2>
+      <div class="lista-mercado-filtros" id="filtrosListaFiis"></div>
+      <div class="lista-mercado-tabela-wrap">
+        <table class="lista-mercado-tabela" id="tabelaListaFiis">
+          <thead>
+            <tr>
+              <th data-col="ativo" data-tipo="texto">Ativos</th>
+              <th data-col="patrimonio_liquido" data-tipo="numero" class="ordenado-desc">Patrimônio Líquido</th>
+              <th data-col="pvp" data-tipo="numero">P/VP</th>
+              <th data-col="dy_pct" data-tipo="numero">Dividend Yield</th>
+              <th data-col="variacao_dia_pct" data-tipo="numero">Variação do dia</th>
+              <th data-col="segmento" data-tipo="texto">Segmento</th>
+            </tr>
+          </thead>
+          <tbody><tr><td colspan="6" class="lista-mercado-carregando">Carregando FIIs…</td></tr></tbody>
+        </table>
       </div>
     </section>
 
@@ -11372,13 +11467,13 @@
     // DROPDOWN "Renda Fixa" (Calculadora / Yubb Busca Investimento)
     // ============================================================
     function fecharDropdownRendaFixa() {
-      const dropdown = document.querySelector('.nav-dropdown');
+      const dropdown = document.getElementById('navRendaFixaDropdown');
       const botao = document.getElementById('navRendaFixaBtn');
       if (dropdown) dropdown.classList.remove('aberto');
       if (botao) botao.setAttribute('aria-expanded', 'false');
     }
     (function () {
-      const dropdown = document.querySelector('.nav-dropdown');
+      const dropdown = document.getElementById('navRendaFixaDropdown');
       const botao = document.getElementById('navRendaFixaBtn');
       if (!dropdown || !botao) return;
 
@@ -11402,6 +11497,199 @@
       // ficaria aberto por cima da seção depois do salto.
       document.getElementById('navAbrirAlertasPreco')?.addEventListener('click', fecharDropdownRendaFixa);
     })();
+
+    // ============================================================
+    // DROPDOWN "Mercado" (Consulta / Lista de Ações / Lista de FIIs)
+    // ============================================================
+    (function () {
+      const dropdown = document.getElementById('navMercadoDropdown');
+      const botao = document.getElementById('navMercadoBtn');
+      if (!dropdown || !botao) return;
+
+      const fechar = () => {
+        dropdown.classList.remove('aberto');
+        botao.setAttribute('aria-expanded', 'false');
+      };
+
+      botao.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const abrindo = !dropdown.classList.contains('aberto');
+        dropdown.classList.toggle('aberto', abrindo);
+        botao.setAttribute('aria-expanded', String(abrindo));
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) fechar();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') fechar();
+      });
+      // Os 3 itens são âncoras pra seções da própria página — sem fechar
+      // explicitamente ao clicar, o menu ficaria aberto por cima depois do salto.
+      dropdown.querySelectorAll('.nav-dropdown-item').forEach(item => {
+        item.addEventListener('click', fechar);
+      });
+    })();
+
+    // ============================================================
+    // LISTAS DE MERCADO (Ações / FIIs) — menu "Mercado"
+    // Dados vêm de mercado-acoes.json e mercado-fiis.json, gerados 1x/dia
+    // pelo robô coletar_mercado.py (GitHub Actions). Cada tabela é
+    // ordenável (clique no cabeçalho) e filtrável por setor/segmento
+    // (chips acima da tabela). Clicar numa linha abre a consulta
+    // detalhada daquele ativo (reaproveita window.hgConsultarAtivo, a
+    // mesma função usada pelos rankings de "Explore o mercado").
+    // ============================================================
+    function moedaGlobal(v) {
+      if (v == null || isNaN(v)) return '—';
+      if (Math.abs(v) >= 1e9) return 'R$ ' + (v / 1e9).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' bi';
+      if (Math.abs(v) >= 1e6) return 'R$ ' + (v / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' mi';
+      return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function numeroGlobal(v, casas = 2) {
+      if (v == null || isNaN(v)) return '—';
+      return v.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas });
+    }
+    function percentualGlobal(v) {
+      if (v == null || isNaN(v)) return '—';
+      return numeroGlobal(v) + '%';
+    }
+    function variacaoColoridaGlobal(v) {
+      if (v == null || isNaN(v)) return '<span class="lm-setor-tag">—</span>';
+      const cor = v >= 0 ? 'lm-variacao-pos' : 'lm-variacao-neg';
+      const seta = v >= 0 ? '▲' : '▼';
+      return `<span class="${cor}">${numeroGlobal(Math.abs(v))}% ${seta}</span>`;
+    }
+
+    function montarTabelaMercado({ url, tbodySeletor, theadSeletor, filtrosContainerId, campoFiltro, colunas }) {
+      const tbody = document.querySelector(tbodySeletor);
+      const thead = document.querySelector(theadSeletor);
+      const filtrosEl = document.getElementById(filtrosContainerId);
+      if (!tbody || !thead || !filtrosEl) return;
+
+      let dados = [];
+      let valoresFiltro = [];
+      let filtroAtivo = null;
+      let colunaOrdenada = colunas.find(c => c.padrao) || colunas[0];
+      let direcaoAsc = false;
+      let carregado = false;
+
+      function renderFiltros() {
+        filtrosEl.innerHTML = '';
+        const criarChip = (rotulo, valor) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'lista-mercado-filtro-chip' + (filtroAtivo === valor ? ' ativo' : '');
+          b.textContent = rotulo;
+          b.addEventListener('click', () => { filtroAtivo = valor; render(); });
+          return b;
+        };
+        filtrosEl.appendChild(criarChip('Todos', null));
+        valoresFiltro.forEach(v => filtrosEl.appendChild(criarChip(v, v)));
+      }
+
+      function render() {
+        renderFiltros();
+        let lista = filtroAtivo ? dados.filter(d => d[campoFiltro] === filtroAtivo) : dados;
+        lista = [...lista].sort((a, b) => {
+          const campo = colunaOrdenada.campo;
+          if (campo === 'ativo') {
+            return direcaoAsc ? a.ticker.localeCompare(b.ticker) : b.ticker.localeCompare(a.ticker);
+          }
+          const va = a[campo], vb = b[campo];
+          if (va == null && vb == null) return 0;
+          if (va == null) return 1;   // valores ausentes sempre por último
+          if (vb == null) return -1;
+          if (typeof va === 'string') return direcaoAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+          return direcaoAsc ? va - vb : vb - va;
+        });
+
+        thead.querySelectorAll('th').forEach(th => {
+          th.classList.remove('ordenado-asc', 'ordenado-desc');
+          if (th.dataset.col === colunaOrdenada.campo) th.classList.add(direcaoAsc ? 'ordenado-asc' : 'ordenado-desc');
+        });
+
+        if (lista.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="${colunas.length}" class="lista-mercado-carregando">Nenhum ativo encontrado nesse filtro.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = lista.map(d => `
+          <tr data-ticker="${d.ticker}">
+            <td class="lm-ativo-cel">
+              <div class="lm-ativo-logo">${d.ticker.slice(0, 2)}</div>
+              <div>
+                <div class="lm-ativo-ticker">${d.ticker}</div>
+                <div class="lm-ativo-nome">${d.nome || ''}</div>
+              </div>
+            </td>
+            ${colunas.slice(1).map(c => `<td class="lm-num ${c.classe || ''}">${c.render(d)}</td>`).join('')}
+          </tr>
+        `).join('');
+
+        tbody.querySelectorAll('tr[data-ticker]').forEach(tr => {
+          tr.addEventListener('click', () => {
+            if (window.hgConsultarAtivo) window.hgConsultarAtivo(tr.dataset.ticker);
+          });
+        });
+      }
+
+      thead.addEventListener('click', (e) => {
+        const th = e.target.closest('th');
+        if (!th || !carregado) return;
+        const col = colunas.find(c => c.campo === th.dataset.col);
+        if (!col) return;
+        if (colunaOrdenada === col) direcaoAsc = !direcaoAsc;
+        else { colunaOrdenada = col; direcaoAsc = false; }
+        render();
+      });
+
+      fetch(url)
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(json => {
+          dados = json.ativos || [];
+          valoresFiltro = [...new Set(dados.map(d => d[campoFiltro]).filter(Boolean))].sort();
+          carregado = true;
+          render();
+        })
+        .catch(err => {
+          console.error('Falha ao carregar ' + url, err);
+          tbody.innerHTML = `<tr><td colspan="${colunas.length}" class="lista-mercado-carregando">Não foi possível carregar os dados agora. Tenta de novo mais tarde.</td></tr>`;
+        });
+    }
+
+    montarTabelaMercado({
+      url: 'mercado-acoes.json',
+      tbodySeletor: '#tabelaListaAcoes tbody',
+      theadSeletor: '#tabelaListaAcoes thead',
+      filtrosContainerId: 'filtrosListaAcoes',
+      campoFiltro: 'setor',
+      colunas: [
+        { campo: 'ativo' },
+        { campo: 'valor_mercado', padrao: true, render: d => moedaGlobal(d.valor_mercado) },
+        { campo: 'pl', render: d => numeroGlobal(d.pl) },
+        { campo: 'pvp', render: d => numeroGlobal(d.pvp) },
+        { campo: 'dy_pct', render: d => percentualGlobal(d.dy_pct) },
+        { campo: 'margem_liquida_pct', render: d => percentualGlobal(d.margem_liquida_pct) },
+        { campo: 'setor', classe: 'lm-setor-tag', render: d => d.setor || '—' },
+      ],
+    });
+
+    montarTabelaMercado({
+      url: 'mercado-fiis.json',
+      tbodySeletor: '#tabelaListaFiis tbody',
+      theadSeletor: '#tabelaListaFiis thead',
+      filtrosContainerId: 'filtrosListaFiis',
+      campoFiltro: 'segmento',
+      colunas: [
+        { campo: 'ativo' },
+        { campo: 'patrimonio_liquido', padrao: true, render: d => moedaGlobal(d.patrimonio_liquido) },
+        { campo: 'pvp', render: d => numeroGlobal(d.pvp) },
+        { campo: 'dy_pct', render: d => percentualGlobal(d.dy_pct) },
+        { campo: 'variacao_dia_pct', render: d => variacaoColoridaGlobal(d.variacao_dia_pct) },
+        { campo: 'segmento', classe: 'lm-setor-tag', render: d => d.segmento || '—' },
+      ],
+    });
 
     // ============================================================
     // CALCULADORA DE INVESTIMENTOS — RENDA FIXA
