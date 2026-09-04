@@ -2979,7 +2979,7 @@
     <!-- LISTA DE AÇÕES — menu "Mercado". Populada a partir de
          mercado-acoes.json, gerado pelo robô coletar_mercado.py
          (GitHub Actions, 1x/dia). -->
-    <section class="hg-busca lista-mercado" id="lista-acoes">
+    <section class="hg-busca lista-mercado" id="lista-acoes" hidden>
       <h2 class="hg-titulo">📈 Todas as Ações</h2>
       <div class="lista-mercado-filtros" id="filtrosListaAcoes"></div>
       <div class="lista-mercado-tabela-wrap">
@@ -3002,7 +3002,7 @@
 
     <!-- LISTA DE FIIs — menu "Mercado". Populada a partir de
          mercado-fiis.json (mesmo robô). -->
-    <section class="hg-busca lista-mercado" id="lista-fiis">
+    <section class="hg-busca lista-mercado" id="lista-fiis" hidden>
       <h2 class="hg-titulo">🏢 Todos os Fundos Imobiliários</h2>
       <div class="lista-mercado-filtros" id="filtrosListaFiis"></div>
       <div class="lista-mercado-tabela-wrap">
@@ -11530,6 +11530,32 @@
         item.addEventListener('click', fechar);
       });
     })();
+
+    // ============================================================
+    // Revela as seções "Lista de Ações" / "Lista de FIIs" só quando
+    // alguém realmente pede (clique no menu "Mercado", no menu mobile,
+    // ou link direto tipo site.com/#lista-acoes) — por padrão elas ficam
+    // com [hidden] pra não aparecer sozinhas embaixo da consulta rápida
+    // toda vez que a home carrega.
+    // ============================================================
+    function revelarSecaoMercado(id) {
+      const secao = document.getElementById(id);
+      if (!secao) return;
+      secao.hidden = false;
+      // Só rola até a seção se ela não estava visível ainda (evita um
+      // salto estranho se o usuário já estiver vendo ela).
+      requestAnimationFrame(() => secao.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }
+    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        revelarSecaoMercado(link.getAttribute('href').slice(1));
+      });
+    });
+    // Link direto (compartilhado ou digitado na barra de endereço)
+    if (window.location.hash === '#lista-acoes' || window.location.hash === '#lista-fiis') {
+      revelarSecaoMercado(window.location.hash.slice(1));
+    }
 
     // ============================================================
     // LISTAS DE MERCADO (Ações / FIIs) — menu "Mercado"
