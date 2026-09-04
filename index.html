@@ -755,6 +755,15 @@
       display: block;
     }
     .nav-dropdown-item:hover { background: var(--deep); color: var(--primary); }
+    .nav-dropdown-fechar {
+      position: absolute; top: 6px; right: 6px; width: 26px; height: 26px;
+      border-radius: 50%; border: none; background: var(--deep); color: var(--muted);
+      font-size: 0.85rem; line-height: 1; cursor: pointer; display: none;
+    }
+    .nav-dropdown-fechar:hover { color: var(--primary); }
+    @media (max-width: 640px) {
+      .nav-dropdown-fechar { display: block; }
+    }
     .nav-dropdown-separador { height: 1px; background: var(--border); margin: 6px 4px; }
     .nav-submenu { padding-left: 12px; margin: 0 0 6px; border-left: 1px solid var(--border); display: flex; flex-direction: column; }
     .nav-submenu-item {
@@ -800,6 +809,15 @@
     .lm-variacao-neg { color: var(--danger); }
     .lm-setor-tag { font-size: 0.75rem; color: var(--muted); }
     .lista-mercado-carregando { padding: 20px 14px !important; color: var(--muted); font-size: 0.85rem; white-space: normal !important; }
+    .lista-mercado-paginacao { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+    .lista-mercado-paginacao button {
+      border: 1px solid var(--border); background: var(--card); color: var(--muted);
+      border-radius: 8px; padding: 6px 11px; font-size: 0.8rem; cursor: pointer; font-family: inherit;
+    }
+    .lista-mercado-paginacao button:hover:not(:disabled) { color: var(--text); }
+    .lista-mercado-paginacao button:disabled { opacity: 0.35; cursor: default; }
+    .lista-mercado-paginacao button.ativo { color: var(--primary); border-color: var(--primary); background: rgba(49,195,255,0.08); }
+    .lista-mercado-paginacao .lm-pagina-info { font-size: 0.78rem; color: var(--muted); margin: 0 4px; }
     @media (max-width: 640px) {
       table.lista-mercado-tabela { font-size: 0.78rem; }
       .lista-mercado-tabela td, .lista-mercado-tabela thead th { padding: 9px 8px; }
@@ -2753,6 +2771,7 @@
             Mercado <span class="nav-dropdown-seta">▾</span>
           </button>
           <div class="nav-dropdown-menu" id="navMercadoMenu">
+            <button type="button" class="nav-dropdown-fechar" id="navMercadoFechar" aria-label="Fechar menu">✕</button>
             <a class="nav-dropdown-item" href="#consulta-rapida">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
             <div class="nav-dropdown-separador"></div>
             <a class="nav-dropdown-item" href="#lista-acoes">📈 Lista de Ações</a>
@@ -3028,6 +3047,7 @@
           <tbody><tr><td colspan="7" class="lista-mercado-carregando">Carregando ações…</td></tr></tbody>
         </table>
       </div>
+      <div class="lista-mercado-paginacao" id="paginacaoListaAcoes"></div>
     </section>
 
     <!-- LISTA DE FIIs — menu "Mercado". Populada a partir de
@@ -3050,6 +3070,7 @@
           <tbody><tr><td colspan="6" class="lista-mercado-carregando">Carregando FIIs…</td></tr></tbody>
         </table>
       </div>
+      <div class="lista-mercado-paginacao" id="paginacaoListaFiis"></div>
     </section>
 
     <!-- NOTÍCIAS DO MERCADO ECONÔMICO — logo abaixo das calculadoras.
@@ -11554,11 +11575,13 @@
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') fechar();
       });
-      // Os 3 itens são âncoras pra seções da própria página — sem fechar
-      // explicitamente ao clicar, o menu ficaria aberto por cima depois do salto.
-      dropdown.querySelectorAll('.nav-dropdown-item').forEach(item => {
+      // Os itens (links E os botões de setor/segmento do submenu) fecham o
+      // menu ao clicar — sem isso, ele ficava aberto por cima da lista
+      // depois do salto/filtro (bug reportado no mobile).
+      dropdown.querySelectorAll('.nav-dropdown-item, .nav-submenu-item').forEach(item => {
         item.addEventListener('click', fechar);
       });
+      document.getElementById('navMercadoFechar')?.addEventListener('click', fechar);
     })();
 
     // ============================================================
@@ -11622,12 +11645,14 @@
     // filtrada, sem precisar simular clique em nenhum chip.
     window.tabelasMercado = {};
 
-    function montarTabelaMercado({ chave, url, tbodySeletor, theadSeletor, filtrosContainerId, campoFiltro, colunas, ocultarDosChips = [] }) {
+    function montarTabelaMercado({ chave, url, tbodySeletor, theadSeletor, filtrosContainerId, paginacaoContainerId, campoFiltro, colunas, ocultarDosChips = [] }) {
       const tbody = document.querySelector(tbodySeletor);
       const thead = document.querySelector(theadSeletor);
       const filtrosEl = document.getElementById(filtrosContainerId);
+      const paginacaoEl = document.getElementById(paginacaoContainerId);
       if (!tbody || !thead || !filtrosEl) return;
 
+      const ITENS_POR_PAGINA = 20;
       let dados = [];
       let valoresFiltro = [];
       let filtroAtivo = null;
@@ -11635,6 +11660,7 @@
       let colunaOrdenada = colunas.find(c => c.padrao) || colunas[0];
       let direcaoAsc = false;
       let carregado = false;
+      let paginaAtual = 1;
 
       function renderFiltros() {
         filtrosEl.innerHTML = '';
@@ -11643,13 +11669,48 @@
           b.type = 'button';
           b.className = 'lista-mercado-filtro-chip' + (filtroAtivo === valor ? ' ativo' : '');
           b.textContent = rotulo;
-          b.addEventListener('click', () => { filtroAtivo = valor; render(); });
+          b.addEventListener('click', () => { filtroAtivo = valor; paginaAtual = 1; render(); });
           return b;
         };
         filtrosEl.appendChild(criarChip('Todos', null));
         valoresFiltro
           .filter(v => !ocultarDosChips.includes(v))
           .forEach(v => filtrosEl.appendChild(criarChip(v, v)));
+      }
+
+      function renderPaginacao(totalItens) {
+        if (!paginacaoEl) return;
+        const totalPaginas = Math.max(1, Math.ceil(totalItens / ITENS_POR_PAGINA));
+        paginacaoEl.innerHTML = '';
+        if (totalPaginas <= 1) return;
+
+        const botao = (rotulo, pagina, opcoes = {}) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = rotulo;
+          if (opcoes.ativo) b.classList.add('ativo');
+          if (opcoes.desabilitado) b.disabled = true;
+          b.addEventListener('click', () => { paginaAtual = pagina; render(); paginacaoEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+          return b;
+        };
+
+        paginacaoEl.appendChild(botao('‹ Anterior', paginaAtual - 1, { desabilitado: paginaAtual === 1 }));
+
+        // Mostra no máximo 5 números de página por vez, centrados na atual,
+        // pra não virar uma linha infinita quando tiver muita página.
+        let inicio = Math.max(1, paginaAtual - 2);
+        let fim = Math.min(totalPaginas, inicio + 4);
+        inicio = Math.max(1, fim - 4);
+        for (let p = inicio; p <= fim; p++) {
+          paginacaoEl.appendChild(botao(String(p), p, { ativo: p === paginaAtual }));
+        }
+
+        paginacaoEl.appendChild(botao('Próxima ›', paginaAtual + 1, { desabilitado: paginaAtual === totalPaginas }));
+
+        const info = document.createElement('span');
+        info.className = 'lm-pagina-info';
+        info.textContent = `${totalItens} ativos`;
+        paginacaoEl.appendChild(info);
       }
 
       function render() {
@@ -11675,10 +11736,16 @@
 
         if (lista.length === 0) {
           tbody.innerHTML = `<tr><td colspan="${colunas.length}" class="lista-mercado-carregando">Nenhum ativo encontrado nesse filtro.</td></tr>`;
+          if (paginacaoEl) paginacaoEl.innerHTML = '';
           return;
         }
 
-        tbody.innerHTML = lista.map(d => `
+        const totalPaginas = Math.max(1, Math.ceil(lista.length / ITENS_POR_PAGINA));
+        if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+        const inicioFatia = (paginaAtual - 1) * ITENS_POR_PAGINA;
+        const paginaDeItens = lista.slice(inicioFatia, inicioFatia + ITENS_POR_PAGINA);
+
+        tbody.innerHTML = paginaDeItens.map(d => `
           <tr data-ticker="${d.ticker}">
             <td class="lm-ativo-cel">
               <div class="lm-ativo-logo">${d.ticker.slice(0, 2)}</div>
@@ -11696,6 +11763,8 @@
             if (window.hgConsultarAtivo) window.hgConsultarAtivo(tr.dataset.ticker);
           });
         });
+
+        renderPaginacao(lista.length);
       }
 
       thead.addEventListener('click', (e) => {
@@ -11705,6 +11774,7 @@
         if (!col) return;
         if (colunaOrdenada === col) direcaoAsc = !direcaoAsc;
         else { colunaOrdenada = col; direcaoAsc = false; }
+        paginaAtual = 1;
         render();
       });
 
@@ -11730,6 +11800,7 @@
           aplicarFiltro(valor) {
             if (!carregado) { filtroPendente = valor; return; }
             filtroAtivo = valor;
+            paginaAtual = 1;
             render();
           },
         };
@@ -11742,6 +11813,7 @@
       tbodySeletor: '#tabelaListaAcoes tbody',
       theadSeletor: '#tabelaListaAcoes thead',
       filtrosContainerId: 'filtrosListaAcoes',
+      paginacaoContainerId: 'paginacaoListaAcoes',
       campoFiltro: 'setor',
       ocultarDosChips: ['Outros'],
       colunas: [
@@ -11761,6 +11833,7 @@
       tbodySeletor: '#tabelaListaFiis tbody',
       theadSeletor: '#tabelaListaFiis thead',
       filtrosContainerId: 'filtrosListaFiis',
+      paginacaoContainerId: 'paginacaoListaFiis',
       campoFiltro: 'segmento',
       colunas: [
         { campo: 'ativo' },
