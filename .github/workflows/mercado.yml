@@ -33,7 +33,7 @@ jobs:
       - name: Rodar robô de coleta
         env:
           HGBRASIL_TOKEN: ${{ secrets.HGBRASIL_TOKEN }}
-        run: python robo/coletar_mercado.py
+        run: python coletar_mercado.py
 
       - name: Commitar resultado
         run: |
