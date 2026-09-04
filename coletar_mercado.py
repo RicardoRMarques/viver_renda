@@ -317,10 +317,18 @@ def buscar_fiis_fundamentus():
             continue
         fiis.append({
             "ticker": ticker,
+            "nome": ticker,  # default — sobrescrito pela HG se o lote não falhar
             "segmento": macro_segmento_fii(str(linha.get("Segmento", "")).strip()),
             "dy_pct": _normalizar_num_br(linha.get("Dividend Yield")),
             "pvp": _normalizar_num_br(linha.get("P/VP")),
             "patrimonio_liquido": _normalizar_num_br(linha.get("Valor de Mercado")),
+            # Preço já sai do próprio Fundamentus — antes isso só vinha da
+            # HG Brasil em enriquecer_fiis_com_quotes(), e um lote da HG
+            # que falhasse (rate limit, timeout) derrubava o FII inteiro
+            # da lista final (o filtro descarta quem não tem preço). Com
+            # o Fundamentus como base, a HG vira só um complemento
+            # (variação do dia) — se ela falhar, o FII continua na lista.
+            "preco": _normalizar_num_br(linha.get("Cotação")),
         })
     log(f"  {len(fiis)} FIIs lidos do Fundamentus")
     return fiis
@@ -353,7 +361,11 @@ def enriquecer_fiis_com_quotes(fiis):
                 continue
             registro["nome"] = resultado.get("name") or simbolo
             quote = resultado.get("quote") or {}
-            registro["preco"] = quote.get("value")
+            # Preço já veio do Fundamentus (mais fresco, é o request mais
+            # recente) — só usa o da HG se por algum motivo o Fundamentus
+            # não trouxe (nunca sobrescreve com None).
+            if quote.get("value") is not None:
+                registro["preco"] = quote.get("value")
             registro["variacao_dia_pct"] = quote.get("change_percent")
             # Só usa o valor de mercado da HG como fallback — o do
             # Fundamentus já é o "oficial" pra manter consistência com o

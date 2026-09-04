@@ -774,6 +774,13 @@
     .nav-submenu-item:hover { background: var(--deep); color: var(--primary); }
 
     /* ---------- Listas de Mercado (Ações / FIIs) ---------- */
+    .lista-mercado-topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .lista-mercado-fechar {
+      border: 1px solid var(--border); background: var(--card); color: var(--muted);
+      width: 32px; height: 32px; border-radius: 50%; font-size: 0.9rem; cursor: pointer;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .lista-mercado-fechar:hover { color: var(--primary); border-color: var(--primary); }
     .lista-mercado-filtros { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 16px; }
     .lista-mercado-filtro-chip {
       border: 1px solid var(--border); background: var(--card); color: var(--muted);
@@ -3029,7 +3036,10 @@
          mercado-acoes.json, gerado pelo robô coletar_mercado.py
          (GitHub Actions, 1x/dia). -->
     <section class="hg-busca lista-mercado" id="lista-acoes" hidden>
-      <h2 class="hg-titulo">📈 Todas as Ações</h2>
+      <div class="lista-mercado-topo">
+        <h2 class="hg-titulo">📈 Todas as Ações</h2>
+        <button type="button" class="lista-mercado-fechar" data-fechar-secao="lista-acoes" aria-label="Fechar lista de ações">✕</button>
+      </div>
       <div class="lista-mercado-filtros" id="filtrosListaAcoes"></div>
       <div class="lista-mercado-tabela-wrap">
         <table class="lista-mercado-tabela" id="tabelaListaAcoes">
@@ -3053,7 +3063,10 @@
     <!-- LISTA DE FIIs — menu "Mercado". Populada a partir de
          mercado-fiis.json (mesmo robô). -->
     <section class="hg-busca lista-mercado" id="lista-fiis" hidden>
-      <h2 class="hg-titulo">🏢 Todos os Fundos Imobiliários</h2>
+      <div class="lista-mercado-topo">
+        <h2 class="hg-titulo">🏢 Todos os Fundos Imobiliários</h2>
+        <button type="button" class="lista-mercado-fechar" data-fechar-secao="lista-fiis" aria-label="Fechar lista de FIIs">✕</button>
+      </div>
       <div class="lista-mercado-filtros" id="filtrosListaFiis"></div>
       <div class="lista-mercado-tabela-wrap">
         <table class="lista-mercado-tabela" id="tabelaListaFiis">
@@ -11609,6 +11622,17 @@
     if (window.location.hash === '#lista-acoes' || window.location.hash === '#lista-fiis') {
       revelarSecaoMercado(window.location.hash.slice(1));
     }
+    // Botão "✕" no topo de cada lista — esconde a seção de novo e rola
+    // suavemente de volta pra consulta rápida, em vez de deixar o usuário
+    // "perdido" no meio de uma seção que sumiu.
+    document.querySelectorAll('[data-fechar-secao]').forEach(botao => {
+      botao.addEventListener('click', () => {
+        const secao = document.getElementById(botao.dataset.fecharSecao);
+        if (!secao) return;
+        secao.hidden = true;
+        document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
 
     // ============================================================
     // LISTAS DE MERCADO (Ações / FIIs) — menu "Mercado"
