@@ -144,6 +144,37 @@ def macro_setor(sub_setor):
     return MAPA_SETOR_MACRO.get(sub_setor.strip(), "Outros")
 
 
+# O Fundamentus classifica FII num nível bem mais fino (Escritórios,
+# Hospital, Hotel, Lajes Corporativas, Multicategoria, Residencial,
+# Shoppings, Varejo etc.) do que os 4 grupos macro que fazem sentido pro
+# filtro (igual o mockup original: Tijolo, Papel, Logístico, Híbrido).
+# "Tijolo" agrupa tudo que é imóvel físico "puro" (exceto logística, que
+# vira grupo próprio); "Papel" é recebíveis/CRI; "Híbrido" fica igual.
+MAPA_SEGMENTO_MACRO = {
+    "Escritórios": "Tijolo",
+    "Hospital": "Tijolo",
+    "Hotel": "Tijolo",
+    "Lajes Corporativas": "Tijolo",
+    "Residencial": "Tijolo",
+    "Shoppings": "Tijolo",
+    "Varejo": "Tijolo",
+    "Multicategoria": "Tijolo",
+    "Outros": "Tijolo",
+    "Logística": "Logístico",
+    "Logístico": "Logístico",
+    "Títulos e Val. Mob.": "Papel",
+    "Títulos e Valores Mobiliários": "Papel",
+    "Papel": "Papel",
+    "Híbrido": "Híbrido",
+}
+
+
+def macro_segmento_fii(sub_segmento):
+    if not sub_segmento:
+        return "Tijolo"
+    return MAPA_SEGMENTO_MACRO.get(sub_segmento.strip(), "Tijolo")
+
+
 def log(msg):
     print(f"[coletar_mercado] {msg}", flush=True)
 
@@ -333,7 +364,7 @@ def buscar_fiis_fundamentus():
             continue
         fiis.append({
             "ticker": ticker,
-            "segmento": str(linha.get("Segmento", "Outros")).strip() or "Outros",
+            "segmento": macro_segmento_fii(str(linha.get("Segmento", "")).strip()),
             "dy_pct": _normalizar_num_br(linha.get("Dividend Yield")),
             "pvp": _normalizar_num_br(linha.get("P/VP")),
             "patrimonio_liquido": _normalizar_num_br(linha.get("Valor de Mercado")),
