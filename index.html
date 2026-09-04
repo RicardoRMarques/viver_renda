@@ -11608,9 +11608,16 @@
       const secao = document.getElementById(id);
       if (!secao) return;
       secao.hidden = false;
-      // Só rola até a seção se ela não estava visível ainda (evita um
-      // salto estranho se o usuário já estiver vendo ela).
-      requestAnimationFrame(() => secao.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+      // scrollIntoView sozinho alinha o topo da seção com o topo da tela,
+      // mas o cabeçalho do site é fixo — isso deixava o título e o botão
+      // "✕" escondidos atrás dele. Rolando manualmente e descontando a
+      // altura do cabeçalho (mesma conta já usada no menu mobile).
+      requestAnimationFrame(() => {
+        const cabecalho = document.querySelector('header');
+        const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 60;
+        const posicao = secao.getBoundingClientRect().top + window.scrollY - alturaCabecalho - 12;
+        window.scrollTo({ top: posicao, behavior: 'smooth' });
+      });
     }
     document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"]').forEach(link => {
       link.addEventListener('click', (e) => {
@@ -11630,7 +11637,13 @@
         const secao = document.getElementById(botao.dataset.fecharSecao);
         if (!secao) return;
         secao.hidden = true;
-        document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const destino = document.getElementById('consulta-rapida');
+        if (destino) {
+          const cabecalho = document.querySelector('header');
+          const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 60;
+          const posicao = destino.getBoundingClientRect().top + window.scrollY - alturaCabecalho - 12;
+          window.scrollTo({ top: posicao, behavior: 'smooth' });
+        }
       });
     });
 
