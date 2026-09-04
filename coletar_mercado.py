@@ -30,6 +30,7 @@ Actions secret), não a de browser/CORS.
 import io
 import json
 import os
+import re
 import sys
 import time
 import unicodedata
@@ -99,33 +100,65 @@ def macro_setor(sub_setor):
 
 # O Fundamentus classifica FII num nível bem mais fino (Escritórios,
 # Hospital, Hotel, Lajes Corporativas, Multicategoria, Residencial,
-# Shoppings, Varejo etc.) do que os 4 grupos macro que fazem sentido pro
-# filtro (igual o mockup original: Tijolo, Papel, Logístico, Híbrido).
-# "Tijolo" agrupa tudo que é imóvel físico "puro" (exceto logística, que
-# vira grupo próprio); "Papel" é recebíveis/CRI; "Híbrido" fica igual.
+# Shopping Centers, Varejo etc.) do que os 4 grupos macro que fazem
+# sentido pro filtro (igual o mockup original: Tijolo, Papel, Logístico,
+# Híbrido). "Tijolo" agrupa tudo que é imóvel físico "puro" (exceto
+# logística, que vira grupo próprio); "Papel" é recebíveis/CRI; "Híbrido"
+# fica igual.
+#
+# As chaves aqui são comparadas de forma NORMALIZADA (sem acento, minúsculo,
+# espaços colapsados — ver _normalizar_chave) porque o texto exato que o
+# Fundamentus usa pode variar (ex: "Shopping Centers" vs "Shoppings") e
+# não dá pra testar ao vivo daqui. Por segurança, qualquer segmento que não
+# bata com nada aqui cai em "Outros" — NUNCA em "Tijolo" — pra não
+# misturar Papel/Híbrido sem querer dentro do balde errado (foi
+# exatamente esse bug que fez metade dos FIIs de papel aparecerem como
+# "Tijolo").
 MAPA_SEGMENTO_MACRO = {
-    "Escritórios": "Tijolo",
-    "Hospital": "Tijolo",
-    "Hotel": "Tijolo",
-    "Lajes Corporativas": "Tijolo",
-    "Residencial": "Tijolo",
-    "Shoppings": "Tijolo",
-    "Varejo": "Tijolo",
-    "Multicategoria": "Tijolo",
-    "Outros": "Tijolo",
-    "Logística": "Logístico",
-    "Logístico": "Logístico",
-    "Títulos e Val. Mob.": "Papel",
-    "Títulos e Valores Mobiliários": "Papel",
-    "Papel": "Papel",
-    "Híbrido": "Híbrido",
+    "escritorios": "Tijolo",
+    "hospital": "Tijolo",
+    "hoteis": "Tijolo",
+    "hotel": "Tijolo",
+    "lajes corporativas": "Tijolo",
+    "residencial": "Tijolo",
+    "shoppings": "Tijolo",
+    "shopping centers": "Tijolo",
+    "shopping": "Tijolo",
+    "varejo": "Tijolo",
+    "multicategoria": "Tijolo",
+    "logistica": "Logístico",
+    "logistico": "Logístico",
+    "industrial e logistico": "Logístico",
+    "titulos e val mob": "Papel",
+    "titulos e valores mobiliarios": "Papel",
+    "recebiveis": "Papel",
+    "papel": "Papel",
+    "fiagro": "Papel",
+    "hibrido": "Híbrido",
 }
 
 
+def _normalizar_chave(texto):
+    """Remove acento, baixa a caixa e colapsa espaços/pontuação — pra
+    comparar 'Shopping Centers' com 'shopping centers' e 'Títulos e Val.
+    Mob.' com 'titulos e val mob' sem depender de bater a grafia exata."""
+    if not texto:
+        return ""
+    sem_acento = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"[^a-z0-9]+", " ", sem_acento.lower()).strip()
+
+
 def macro_segmento_fii(sub_segmento):
-    if not sub_segmento:
-        return "Tijolo"
-    return MAPA_SEGMENTO_MACRO.get(sub_segmento.strip(), "Tijolo")
+    chave = _normalizar_chave(sub_segmento)
+    if not chave:
+        return "Outros"
+    resultado = MAPA_SEGMENTO_MACRO.get(chave)
+    if resultado is None:
+        # Fica registrado no log do Actions pra dar pra ver rapidinho
+        # quais segmentos novos/diferentes apareceram e completar o mapa.
+        log(f"  segmento de FII não mapeado (caiu em 'Outros'): {sub_segmento!r}")
+        return "Outros"
+    return resultado
 
 
 def log(msg):
