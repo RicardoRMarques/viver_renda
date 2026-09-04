@@ -14,6 +14,9 @@ concurrency:
   group: coletar-mercado
   cancel-in-progress: false
 
+permissions:
+  contents: write
+
 jobs:
   coletar:
     runs-on: ubuntu-latest
