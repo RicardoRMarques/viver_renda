@@ -292,6 +292,7 @@
     }
     .mobile-menu-item:last-child { border-bottom: none; }
     .mobile-menu-item:hover { color: var(--primary); background: rgba(127,127,127,0.08); }
+    .mobile-menu-subitem { padding-left: 34px; font-size: 0.8rem; font-weight: 500; color: var(--muted); }
 
     .auth-btn-entrar {
       background: var(--primary);
@@ -754,6 +755,14 @@
       display: block;
     }
     .nav-dropdown-item:hover { background: var(--deep); color: var(--primary); }
+    .nav-dropdown-separador { height: 1px; background: var(--border); margin: 6px 4px; }
+    .nav-submenu { padding-left: 12px; margin: 0 0 6px; border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+    .nav-submenu-item {
+      background: none; border: none; color: var(--muted); font-family: inherit;
+      font-size: 0.78rem; text-align: left; text-decoration: none; white-space: nowrap;
+      padding: 7px 12px; border-radius: 8px; cursor: pointer; display: block;
+    }
+    .nav-submenu-item:hover { background: var(--deep); color: var(--primary); }
 
     /* ---------- Listas de Mercado (Ações / FIIs) ---------- */
     .lista-mercado-filtros { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 16px; }
@@ -2745,8 +2754,21 @@
           </button>
           <div class="nav-dropdown-menu" id="navMercadoMenu">
             <a class="nav-dropdown-item" href="#consulta-rapida">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
+            <div class="nav-dropdown-separador"></div>
             <a class="nav-dropdown-item" href="#lista-acoes">📈 Lista de Ações</a>
+            <div class="nav-submenu">
+              <button type="button" class="nav-submenu-item" data-lista="acoes" data-filtro="Financeiro">Financeiro</button>
+              <button type="button" class="nav-submenu-item" data-lista="acoes" data-filtro="Energia Elétrica">Energia elétrica</button>
+              <button type="button" class="nav-submenu-item" data-lista="acoes" data-filtro="Saúde">Saúde</button>
+              <button type="button" class="nav-submenu-item" data-lista="acoes" data-filtro="Materiais Básicos">Materiais básicos</button>
+            </div>
             <a class="nav-dropdown-item" href="#lista-fiis">🏢 Lista de Fundos Imobiliários</a>
+            <div class="nav-submenu">
+              <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Tijolo">Tijolo</button>
+              <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Papel">Papel</button>
+              <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Logístico">Logístico</button>
+              <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Híbrido">Híbrido</button>
+            </div>
           </div>
         </div>
         <a href="#boletins-semana">Boletim de Mercado Diário</a>
@@ -2807,7 +2829,15 @@
     <a href="#consulta-rapida" class="mobile-menu-item">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
     <a href="#consulta-rapida" class="mobile-menu-item">📊 Análise Fundamentalista</a>
     <a href="#lista-acoes" class="mobile-menu-item">📈 Lista de Ações</a>
+    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Financeiro">↳ Financeiro</button>
+    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Energia Elétrica">↳ Energia elétrica</button>
+    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Saúde">↳ Saúde</button>
+    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Materiais Básicos">↳ Materiais básicos</button>
     <a href="#lista-fiis" class="mobile-menu-item">🏢 Lista de Fundos Imobiliários</a>
+    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Tijolo">↳ Tijolo</button>
+    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Papel">↳ Papel</button>
+    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Logístico">↳ Logístico</button>
+    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Híbrido">↳ Híbrido</button>
     <div class="mobile-menu-separador">Simuladores</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário de FIIs e Ações</button>
@@ -11587,7 +11617,12 @@
       return `<span class="${cor}">${numeroGlobal(Math.abs(v))}% ${seta}</span>`;
     }
 
-    function montarTabelaMercado({ url, tbodySeletor, theadSeletor, filtrosContainerId, campoFiltro, colunas }) {
+    // Registro global das tabelas montadas — o submenu do "Mercado" usa
+    // isso pra aplicar um filtro de setor/segmento e já abrir a lista
+    // filtrada, sem precisar simular clique em nenhum chip.
+    window.tabelasMercado = {};
+
+    function montarTabelaMercado({ chave, url, tbodySeletor, theadSeletor, filtrosContainerId, campoFiltro, colunas, ocultarDosChips = [] }) {
       const tbody = document.querySelector(tbodySeletor);
       const thead = document.querySelector(theadSeletor);
       const filtrosEl = document.getElementById(filtrosContainerId);
@@ -11596,6 +11631,7 @@
       let dados = [];
       let valoresFiltro = [];
       let filtroAtivo = null;
+      let filtroPendente = null; // se aplicarFiltro() for chamado antes do fetch terminar
       let colunaOrdenada = colunas.find(c => c.padrao) || colunas[0];
       let direcaoAsc = false;
       let carregado = false;
@@ -11611,7 +11647,9 @@
           return b;
         };
         filtrosEl.appendChild(criarChip('Todos', null));
-        valoresFiltro.forEach(v => filtrosEl.appendChild(criarChip(v, v)));
+        valoresFiltro
+          .filter(v => !ocultarDosChips.includes(v))
+          .forEach(v => filtrosEl.appendChild(criarChip(v, v)));
       }
 
       function render() {
@@ -11676,20 +11714,36 @@
           dados = json.ativos || [];
           valoresFiltro = [...new Set(dados.map(d => d[campoFiltro]).filter(Boolean))].sort();
           carregado = true;
+          if (filtroPendente !== undefined && filtroPendente !== null) {
+            filtroAtivo = filtroPendente;
+            filtroPendente = null;
+          }
           render();
         })
         .catch(err => {
           console.error('Falha ao carregar ' + url, err);
           tbody.innerHTML = `<tr><td colspan="${colunas.length}" class="lista-mercado-carregando">Não foi possível carregar os dados agora. Tenta de novo mais tarde.</td></tr>`;
         });
+
+      if (chave) {
+        window.tabelasMercado[chave] = {
+          aplicarFiltro(valor) {
+            if (!carregado) { filtroPendente = valor; return; }
+            filtroAtivo = valor;
+            render();
+          },
+        };
+      }
     }
 
     montarTabelaMercado({
+      chave: 'acoes',
       url: 'mercado-acoes.json',
       tbodySeletor: '#tabelaListaAcoes tbody',
       theadSeletor: '#tabelaListaAcoes thead',
       filtrosContainerId: 'filtrosListaAcoes',
       campoFiltro: 'setor',
+      ocultarDosChips: ['Outros'],
       colunas: [
         { campo: 'ativo' },
         { campo: 'valor_mercado', padrao: true, render: d => moedaGlobal(d.valor_mercado) },
@@ -11702,6 +11756,7 @@
     });
 
     montarTabelaMercado({
+      chave: 'fiis',
       url: 'mercado-fiis.json',
       tbodySeletor: '#tabelaListaFiis tbody',
       theadSeletor: '#tabelaListaFiis thead',
@@ -11715,6 +11770,17 @@
         { campo: 'variacao_dia_pct', render: d => variacaoColoridaGlobal(d.variacao_dia_pct) },
         { campo: 'segmento', classe: 'lm-setor-tag', render: d => d.segmento || '—' },
       ],
+    });
+
+    // Botões do submenu "Mercado" (Financeiro, Energia elétrica... /
+    // Tijolo, Papel...): revela a seção certa e já aplica o filtro.
+    document.querySelectorAll('[data-lista][data-filtro]').forEach(botao => {
+      botao.addEventListener('click', () => {
+        const idSecao = botao.dataset.lista === 'acoes' ? 'lista-acoes' : 'lista-fiis';
+        revelarSecaoMercado(idSecao);
+        const tabela = window.tabelasMercado[botao.dataset.lista];
+        if (tabela) tabela.aplicarFiltro(botao.dataset.filtro);
+      });
     });
 
     // ============================================================

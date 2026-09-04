@@ -54,87 +54,40 @@ SAIDA_FIIS = "mercado-fiis.json"
 
 # A HG Brasil devolve o setor no nível mais granular do "Setor de Atuação
 # B3" (~70 categorias, tipo "Cervejas e Refrigerantes", "Bicicletas" etc.)
-# — bom demais pro filtro da listagem virar uma parede de 70 chips. Esse
-# mapa agrupa isso nos ~11 setores MACRO oficiais da B3, que é o nível que
-# faz sentido pra filtro (Financeiro, Saúde, Materiais Básicos etc.).
-# Qualquer categoria nova/desconhecida cai em "Outros" — não quebra nada,
-# só não fica agrupada até alguém adicionar aqui.
+# — bom demais pro filtro da listagem virar uma parede de chips. Reduzido
+# a pedido pros 4 setores que interessam pro perfil de dividendos do site
+# (Financeiro, Energia Elétrica, Saúde, Materiais Básicos); tudo que não
+# se encaixa nesses 4 cai em "Outros" (continua na tabela quando o filtro
+# é "Todos", só não vira chip/submenu próprio).
 MAPA_SETOR_MACRO = {
-    "Agricultura": "Consumo não Cíclico",
-    "Alimentos": "Consumo não Cíclico",
-    "Aluguel de carros": "Consumo Cíclico",
-    "Armas e Munições": "Bens Industriais",
-    "Atividades Esportivas": "Consumo Cíclico",
-    "Automóveis e Motocicletas": "Consumo Cíclico",
-    "Açucar e Alcool": "Consumo não Cíclico",
-    "Açúcar e Álcool": "Consumo não Cíclico",
+    # --- Financeiro ---
     "Bancos": "Financeiro",
-    "Bens Industriais": "Bens Industriais",
-    "Bicicletas": "Bens Industriais",
-    "Brinquedos e Jogos": "Consumo Cíclico",
-    "Calçados": "Consumo Cíclico",
-    "Carnes e Derivados": "Consumo não Cíclico",
-    "Cervejas e Refrigerantes": "Consumo não Cíclico",
-    "Computadores e Equipamentos": "Tecnologia da Informação",
-    "Construção Pesada": "Bens Industriais",
-    "Construção e Engenharia": "Bens Industriais",
-    "Consumo Cíclico": "Consumo Cíclico",
-    "Consumo não Cíclico": "Consumo não Cíclico",
-    "Educação": "Consumo Cíclico",
-    "Eletrodomésticos": "Consumo Cíclico",
-    "Energia": "Utilidade Pública",
-    "Energia Elétrica": "Utilidade Pública",
-    "Engenharia Consultiva": "Bens Industriais",
-    "Equipamentos Industriais": "Bens Industriais",
-    "Equipamentos de Construção e Agrícolas": "Bens Industriais",
-    "Equipamentos de Saúde": "Saúde",
-    "Exploração de Imóveis": "Financeiro",
-    "Exploração de Rodovias": "Bens Industriais",
-    "Fios e Tecidos": "Consumo Cíclico",
-    "Gás": "Utilidade Pública",
     "Holdings Diversificadas": "Financeiro",
-    "Hotelaria": "Consumo Cíclico",
     "Incorporações": "Financeiro",
     "Intermediação Imobiliária": "Financeiro",
     "Intermediários Financeiros": "Financeiro",
+    "Seguradoras": "Financeiro",
+    "Serviços Financeiros Diversos": "Financeiro",
+    "Exploração de Imóveis": "Financeiro",
+    "Financeiro": "Financeiro",
+    # --- Energia Elétrica ---
+    "Energia": "Energia Elétrica",
+    "Energia Elétrica": "Energia Elétrica",
+    "Gás": "Energia Elétrica",
+    "Utilidade Pública": "Energia Elétrica",
+    "Água e Saneamento": "Energia Elétrica",
+    # --- Saúde ---
+    "Equipamentos de Saúde": "Saúde",
+    "Medicamentos": "Saúde",
+    "Saúde": "Saúde",
+    # --- Materiais Básicos ---
     "Madeira": "Materiais Básicos",
     "Materiais Básicos": "Materiais Básicos",
-    "Material Aeronáutico e Defesa": "Bens Industriais",
-    "Material Rodoviário": "Bens Industriais",
-    "Material de Transporte": "Bens Industriais",
-    "Medicamentos": "Saúde",
     "Minerais Metálicos": "Materiais Básicos",
     "Mineração": "Materiais Básicos",
-    "Máquinas e Equipamentos": "Bens Industriais",
-    "Móveis": "Consumo Cíclico",
     "Papel e Celulose": "Materiais Básicos",
-    "Petróleo, Gás e Biocombustíveis": "Petróleo, Gás e Biocombustíveis",
-    "Produtos Diversos": "Outros",
-    "Produtos de Limpeza": "Consumo não Cíclico",
-    "Produtos de Uso Pessoal": "Consumo não Cíclico",
-    "Produção de Eventos e Shows": "Consumo Cíclico",
-    "Programas de Fidelização": "Consumo Cíclico",
-    "Publicidade e Propaganda": "Consumo Cíclico",
     "Químicos": "Materiais Básicos",
-    "Restaurante e Similares": "Consumo Cíclico",
-    "Saúde": "Saúde",
-    "Seguradoras": "Financeiro",
-    "Serviços Educacionais": "Consumo Cíclico",
-    "Serviços Financeiros Diversos": "Financeiro",
-    "Serviços de Apoio e Armazenagem": "Bens Industriais",
     "Siderurgia e Metalurgia": "Materiais Básicos",
-    "Softwares": "Tecnologia da Informação",
-    "Telecomunicações": "Comunicações",
-    "Transporte Aéreo": "Bens Industriais",
-    "Transporte Ferroviário": "Bens Industriais",
-    "Transporte Hidroviário": "Bens Industriais",
-    "Transporte Rodoviário": "Bens Industriais",
-    "Utensílios Domésticos": "Consumo Cíclico",
-    "Utilidade Pública": "Utilidade Pública",
-    "Vestuário": "Consumo Cíclico",
-    "Vestuário e Acessórios": "Consumo Cíclico",
-    "Viagens e Turismo": "Consumo Cíclico",
-    "Água e Saneamento": "Utilidade Pública",
 }
 
 
