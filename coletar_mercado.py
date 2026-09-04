@@ -296,12 +296,14 @@ def enriquecer_acoes_com_fundamentals(universo):
                 valuation = ttm.get("valuation") or {}
                 margens = ttm.get("margins") or {}
                 dividendos = ttm.get("dividends") or {}
+                rentabilidade = ttm.get("profitability") or {}
                 registro["pl"] = valuation.get("price_to_earnings_ratio")
                 registro["pvp"] = valuation.get("price_to_book_ratio")
                 registro["margem_liquida_pct"] = margens.get("net_profit_margin")
                 registro["dy_pct"] = dividendos.get("yield_percent")
+                registro["roe_pct"] = rentabilidade.get("return_on_equity")
             else:
-                registro["pl"] = registro["pvp"] = registro["margem_liquida_pct"] = registro["dy_pct"] = None
+                registro["pl"] = registro["pvp"] = registro["margem_liquida_pct"] = registro["dy_pct"] = registro["roe_pct"] = None
 
         log(f"  lote {i}-{i+len(lote)} ok ({len(dados.get('results', []))} retornados)")
         time.sleep(PAUSA_ENTRE_LOTES)

@@ -3067,10 +3067,11 @@
               <th data-col="pvp" data-tipo="numero">P/VP</th>
               <th data-col="dy_pct" data-tipo="numero">Dividend Yield</th>
               <th data-col="margem_liquida_pct" data-tipo="numero">Margem Líquida</th>
+              <th data-col="roe_pct" data-tipo="numero">ROE</th>
               <th data-col="setor" data-tipo="texto">Setor</th>
             </tr>
           </thead>
-          <tbody><tr><td colspan="7" class="lista-mercado-carregando">Carregando ações…</td></tr></tbody>
+          <tbody><tr><td colspan="8" class="lista-mercado-carregando">Carregando ações…</td></tr></tbody>
         </table>
       </div>
       <div class="lista-mercado-paginacao" id="paginacaoListaAcoes"></div>
@@ -11879,6 +11880,7 @@
         { campo: 'pvp', render: d => numeroGlobal(d.pvp) },
         { campo: 'dy_pct', render: d => percentualGlobal(d.dy_pct) },
         { campo: 'margem_liquida_pct', render: d => percentualGlobal(d.margem_liquida_pct) },
+        { campo: 'roe_pct', render: d => percentualGlobal(d.roe_pct) },
         { campo: 'setor', classe: 'lm-setor-tag', render: d => d.setor || '—' },
       ],
     });
