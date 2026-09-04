@@ -129,12 +129,17 @@ MAPA_SEGMENTO_MACRO = {
     "logistica": "Logístico",
     "logistico": "Logístico",
     "industrial e logistico": "Logístico",
+    "galpoes logisticos": "Logístico",
     "titulos e val mob": "Papel",
     "titulos e valores mobiliarios": "Papel",
     "recebiveis": "Papel",
     "papel": "Papel",
+    "papeis": "Papel",   # é assim que a HG Brasil chama (confirmado: KNCR11)
     "fiagro": "Papel",
     "hibrido": "Híbrido",
+    "hibridos": "Híbrido",
+    "fundo de fundos": "Híbrido",
+    "fof": "Híbrido",
 }
 
 
@@ -159,6 +164,33 @@ def macro_segmento_fii(sub_segmento):
         log(f"  segmento de FII não mapeado (caiu em 'Outros'): {sub_segmento!r}")
         return "Outros"
     return resultado
+
+
+# Camada de segurança por cima do texto raspado do Fundamentus: pros FIIs
+# mais líquidos/conhecidos (justamente os que mais aparecem no topo das
+# listas por patrimônio), fixa a classificação com base em fonte pública
+# confirmada (ex: classificação ANBIMA/CVM), independente do que o texto
+# scraped disser. Existe porque o texto do Fundamentus pra um fundo
+# específico pode não bater com nenhuma chave do MAPA_SEGMENTO_MACRO (ou
+# bater errado) sem eu conseguir testar ao vivo contra a página deles
+# pra descobrir o motivo exato. Vale a pena crescer essa lista conforme
+# forem aparecendo mais casos errados.
+OVERRIDE_SEGMENTO_TICKER = {
+    "KNCR11": "Papel",   # Kinea Rendimentos Imobiliários — CRI/papel
+    "KNIP11": "Papel",   # Kinea Índices de Preços — CRI/papel
+    "MXRF11": "Papel",   # Maxi Renda — papel
+    "CPTS11": "Papel",   # Capitânia Securities — papel
+    "RECR11": "Papel",   # REC Recebíveis Imobiliários — papel
+    "IRDM11": "Papel",   # Iridium Recebíveis Imobiliários — papel
+    "HCTR11": "Papel",   # Hectare CE — papel
+    "VGIR11": "Papel",   # Valora RE III — papel
+    "DEVA11": "Papel",   # Devant Recebíveis Imobiliários — papel
+    "KNCA11": "Papel",   # Fiagro Kinea — papel/CRA
+}
+
+
+def aplicar_override_segmento(ticker, segmento_calculado):
+    return OVERRIDE_SEGMENTO_TICKER.get(ticker, segmento_calculado)
 
 
 def log(msg):
@@ -348,10 +380,14 @@ def buscar_fiis_fundamentus():
         ticker = str(linha.get("Papel", "")).strip().upper()
         if not ticker:
             continue
+        segmento_bruto = str(linha.get("Segmento", "")).strip()
+        segmento_final = aplicar_override_segmento(ticker, macro_segmento_fii(segmento_bruto))
+        if ticker in OVERRIDE_SEGMENTO_TICKER:
+            log(f"  override aplicado em {ticker}: Fundamentus disse {segmento_bruto!r} -> forçado para {segmento_final!r}")
         fiis.append({
             "ticker": ticker,
             "nome": ticker,  # default — sobrescrito pela HG se o lote não falhar
-            "segmento": macro_segmento_fii(str(linha.get("Segmento", "")).strip()),
+            "segmento": segmento_final,
             "dy_pct": _normalizar_num_br(linha.get("Dividend Yield")),
             "pvp": _normalizar_num_br(linha.get("P/VP")),
             "patrimonio_liquido": _normalizar_num_br(linha.get("Valor de Mercado")),
@@ -405,6 +441,17 @@ def enriquecer_fiis_com_quotes(fiis):
             # P/VP (os dois vêm da mesma fonte, mesma data-base).
             if registro.get("patrimonio_liquido") is None:
                 registro["patrimonio_liquido"] = quote.get("market_cap")
+
+            # Segmento: a HG Brasil devolve classification.sector também
+            # pra FII (confirmado ao vivo: KNCR11 -> "Papéis") — é a MESMA
+            # fonte que a "Consulta Ações, FIIs..." já usa e mostra
+            # certinho, então tem prioridade sobre o texto raspado do
+            # Fundamentus (que se mostrou inconsistente pra alguns
+            # fundos). Só mantém o valor do Fundamentus se a HG não
+            # devolver nada pra esse ticker nesse lote.
+            setor_hg = (resultado.get("classification") or {}).get("sector")
+            if setor_hg:
+                registro["segmento"] = aplicar_override_segmento(simbolo, macro_segmento_fii(setor_hg))
 
         time.sleep(PAUSA_ENTRE_LOTES)
 
