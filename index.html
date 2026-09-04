@@ -11802,7 +11802,10 @@
         render();
       });
 
-      fetch(url)
+      // cache: 'no-store' + timestamp na query — o JSON é regerado 1x/dia,
+      // mas sem isso o navegador (ou CDN do host) podia continuar servindo
+      // uma cópia antiga em cache mesmo com o arquivo já atualizado no repo.
+      fetch(`${url}?v=${Date.now()}`, { cache: 'no-store' })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(json => {
           dados = json.ativos || [];
