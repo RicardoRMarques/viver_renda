@@ -11623,14 +11623,29 @@
     // rolar, logo abaixo do menu do site — precisa saber a altura atual
     // do menu (varia um pouco entre desktop/mobile e se o texto quebra
     // linha) pra grudar bem colado, sem espaço nem sobreposição.
+    //
+    // Só calcular 1x no carregamento não é confiável — se o menu ainda
+    // não tinha terminado de renderizar (fonte carregando, layout ainda
+    // ajustando), a altura saía errada (às vezes 0), e o cabeçalho da
+    // tabela ficava grudado embaixo do menu fixo do site, que tem
+    // prioridade visual e cobria ele por completo (sumia a linha com
+    // "Ativos, Valor de Mercado..."). Um ResizeObserver mantém o valor
+    // sempre certo, reagindo a qualquer mudança de tamanho do menu.
     // ============================================================
     function atualizarAlturaHeaderMercado() {
       const cabecalho = document.querySelector('header');
       const altura = cabecalho ? cabecalho.getBoundingClientRect().height : 64;
-      document.documentElement.style.setProperty('--altura-header-mercado', altura + 'px');
+      if (altura > 0) {
+        document.documentElement.style.setProperty('--altura-header-mercado', altura + 'px');
+      }
     }
     atualizarAlturaHeaderMercado();
     window.addEventListener('resize', atualizarAlturaHeaderMercado);
+    window.addEventListener('load', atualizarAlturaHeaderMercado);
+    if (window.ResizeObserver) {
+      const cabecalhoEl = document.querySelector('header');
+      if (cabecalhoEl) new ResizeObserver(atualizarAlturaHeaderMercado).observe(cabecalhoEl);
+    }
 
     // ============================================================
     // Revela as seções "Lista de Ações" / "Lista de FIIs" só quando
