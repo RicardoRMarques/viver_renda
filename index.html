@@ -790,7 +790,7 @@
     .lista-mercado-filtro-chip:hover { color: var(--text); }
     .lista-mercado-filtro-chip.ativo { color: var(--primary); border-color: var(--primary); background: rgba(49,195,255,0.08); }
     .lista-mercado-tabela-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
-    table.lista-mercado-tabela { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 680px; }
+    table.lista-mercado-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; min-width: 680px; }
     .lista-mercado-tabela thead th {
       position: sticky;
       top: 64px;
@@ -803,8 +803,9 @@
     .lista-mercado-tabela thead th:hover { color: var(--text); }
     .lista-mercado-tabela thead th.ordenado-asc::after { content: ' ▲'; color: var(--primary); font-size: 0.65em; }
     .lista-mercado-tabela thead th.ordenado-desc::after { content: ' ▼'; color: var(--primary); font-size: 0.65em; }
-    .lista-mercado-tabela tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; }
-    .lista-mercado-tabela tbody tr:last-child { border-bottom: none; }
+    .lista-mercado-tabela tbody tr { cursor: pointer; }
+    .lista-mercado-tabela tbody td { border-bottom: 1px solid var(--border); }
+    .lista-mercado-tabela tbody tr:last-child td { border-bottom: none; }
     .lista-mercado-tabela tbody tr:hover { background: var(--deep); }
     .lista-mercado-tabela tbody tr:hover td:first-child { background: var(--deep); }
     .lista-mercado-tabela td { padding: 11px 14px; white-space: nowrap; }
