@@ -865,8 +865,13 @@
     @media (max-width: 1199px) { .lista-mercado-tabela thead th { top: 0; } }
     @media (min-width: 1200px) { .lista-mercado-tabela thead th { top: 64px; } }
     .lista-mercado-tabela thead th:hover { color: var(--text); }
+    .lista-mercado-tabela thead th.lm-col-ordenavel::after { content: ' ⇅'; opacity: 0.45; font-size: 0.7em; }
     .lista-mercado-tabela thead th.ordenado-asc::after { content: ' ▲'; color: var(--primary); font-size: 0.65em; }
     .lista-mercado-tabela thead th.ordenado-desc::after { content: ' ▼'; color: var(--primary); font-size: 0.65em; }
+    .lista-mercado-tabela thead th .hg-info-btn {
+      width: 13px; height: 13px; font-size: 0.58rem; margin-left: 4px; vertical-align: 1px;
+      text-transform: none; letter-spacing: normal; cursor: pointer;
+    }
     .lista-mercado-tabela tbody tr { cursor: pointer; }
     .lista-mercado-tabela tbody td { border-bottom: 1px solid var(--border); }
     .lista-mercado-tabela tbody tr:last-child td { border-bottom: none; }
@@ -3117,13 +3122,13 @@
           <thead>
             <tr>
               <th data-col="ativo" data-tipo="texto">Ativos</th>
-              <th data-col="valor_mercado" data-tipo="numero" class="ordenado-desc">Valor de Mercado</th>
-              <th data-col="pl" data-tipo="numero">P/L</th>
-              <th data-col="pvp" data-tipo="numero">P/VP</th>
-              <th data-col="dy_pct" data-tipo="numero">Dividend Yield</th>
-              <th data-col="margem_liquida_pct" data-tipo="numero">Margem Líquida</th>
-              <th data-col="roe_pct" data-tipo="numero">ROE</th>
-              <th data-col="setor" data-tipo="texto">Setor</th>
+              <th data-col="valor_mercado" data-tipo="numero" class="lm-col-ordenavel ordenado-desc">Valor de Mercado <button type="button" class="hg-info-btn" data-glossario="valor-mercado" aria-label="O que é Valor de Mercado?" title="O que é Valor de Mercado?">?</button></th>
+              <th data-col="pl" data-tipo="numero" class="lm-col-ordenavel">P/L <button type="button" class="hg-info-btn" data-glossario="pl-indicador" aria-label="O que é P/L?" title="O que é P/L?">?</button></th>
+              <th data-col="pvp" data-tipo="numero" class="lm-col-ordenavel">P/VP <button type="button" class="hg-info-btn" data-glossario="pvp-indicador" aria-label="O que é P/VP?" title="O que é P/VP?">?</button></th>
+              <th data-col="dy_pct" data-tipo="numero" class="lm-col-ordenavel">Dividend Yield <button type="button" class="hg-info-btn" data-glossario="dy-acoes" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></th>
+              <th data-col="margem_liquida_pct" data-tipo="numero" class="lm-col-ordenavel">Margem Líquida <button type="button" class="hg-info-btn" data-glossario="margem-liquida-indicador" aria-label="O que é Margem Líquida?" title="O que é Margem Líquida?">?</button></th>
+              <th data-col="roe_pct" data-tipo="numero" class="lm-col-ordenavel">ROE <button type="button" class="hg-info-btn" data-glossario="roe-indicador" aria-label="O que é ROE?" title="O que é ROE?">?</button></th>
+              <th data-col="setor" data-tipo="texto" class="lm-col-ordenavel">Setor</th>
             </tr>
           </thead>
           <tbody><tr><td colspan="8" class="lista-mercado-carregando">Carregando ações…</td></tr></tbody>
@@ -3145,11 +3150,11 @@
           <thead>
             <tr>
               <th data-col="ativo" data-tipo="texto">Ativos</th>
-              <th data-col="patrimonio_liquido" data-tipo="numero" class="ordenado-desc">Patrimônio Líquido</th>
-              <th data-col="pvp" data-tipo="numero">P/VP</th>
-              <th data-col="dy_pct" data-tipo="numero">Dividend Yield</th>
-              <th data-col="variacao_dia_pct" data-tipo="numero">Variação do dia</th>
-              <th data-col="segmento" data-tipo="texto">Segmento</th>
+              <th data-col="patrimonio_liquido" data-tipo="numero" class="lm-col-ordenavel ordenado-desc">Patrimônio Líquido <button type="button" class="hg-info-btn" data-glossario="valor-patrimonial" aria-label="O que é Patrimônio Líquido?" title="O que é Patrimônio Líquido?">?</button></th>
+              <th data-col="pvp" data-tipo="numero" class="lm-col-ordenavel">P/VP <button type="button" class="hg-info-btn" data-glossario="pvp-indicador" aria-label="O que é P/VP?" title="O que é P/VP?">?</button></th>
+              <th data-col="dy_pct" data-tipo="numero" class="lm-col-ordenavel">Dividend Yield <button type="button" class="hg-info-btn" data-glossario="dy-fii" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></th>
+              <th data-col="variacao_dia_pct" data-tipo="numero" class="lm-col-ordenavel">Variação do dia <button type="button" class="hg-info-btn" data-glossario="variacao-dia-fii" aria-label="O que é Variação do dia?" title="O que é Variação do dia?">?</button></th>
+              <th data-col="segmento" data-tipo="texto" class="lm-col-ordenavel">Segmento</th>
             </tr>
           </thead>
           <tbody><tr><td colspan="6" class="lista-mercado-carregando">Carregando FIIs…</td></tr></tbody>
@@ -9502,6 +9507,11 @@
         'ir-isencao-acoes': 'Vendas de ações (fora de day-trade) até R$ 20.000,00 no mês são isentas de Imposto de Renda sobre o lucro — essa regra vale só pra ações, não pra FIIs, e é por mês, somando todas as vendas.\n\nSe o total vendido no mês passar de R$ 20.000, o IR de 15% incide sobre o lucro de TODAS as vendas do mês, não só sobre o excedente.',
         'ir-tipos-investimento': 'CDB / Tesouro Direto / Fundo DI: investimentos de renda fixa "tradicionais". CDB é emitido por bancos; Tesouro Direto é título público (Selic, IPCA+ ou Prefixado); Fundo DI busca acompanhar o CDI. Os três seguem a mesma tabela regressiva de IR, por isso ficam juntos aqui.\n\nLCI / LCA: títulos de crédito imobiliário/agronegócio, emitidos por bancos. Isentos de IR para pessoa física.\n\nAções: participação em empresas negociadas na B3 (ex: PETR4, VALE3). Tem faixa de isenção de IR pra vendas de até R$ 20.000/mês (fora day-trade).\n\nFundos Imobiliários (FIIs): fundos que investem em imóveis ou papéis do setor imobiliário (ex: HGLG11, MXRF11). Aqui a calculadora trata do IR na venda de cotas com lucro — os rendimentos mensais distribuídos são tratados à parte (geralmente isentos).',
         'alertas-email': 'Cadastre seu e-mail no topo do site, no botão "Entrar", para receber o e-mail dos Alertas.\n\nNão esqueça de conferir a caixa de Spam/Lixo Eletrônico, caso o e-mail não apareça na caixa de entrada principal.',
+        'pl-indicador': 'P/L = Preço sobre o Lucro.\n\nIndica quantos anos de lucro atual seriam necessários para "pagar" o preço da ação, ou quanto o mercado está disposto a pagar por cada R$ 1 de lucro anual.\n\nCálculo: preço atual da ação / lucro por ação (LPA)',
+        'pvp-indicador': 'P/VP = Preço sobre o Valor Patrimonial.\n\nIndica quanto o mercado está disposto a pagar pelo patrimônio da empresa ou fundo. Abaixo de 1, indica que está sendo negociado por menos do que vale "no papel".\n\nCálculo: preço/cotação atual ÷ valor patrimonial por ação (ou cota)',
+        'margem-liquida-indicador': 'Margem Líquida = percentual da receita que sobra como lucro líquido, depois de todos os custos, despesas, juros e impostos.\n\nCálculo: lucro líquido ÷ receita × 100',
+        'roe-indicador': 'ROE (Return on Equity / Retorno sobre o Patrimônio Líquido) = quanto a empresa lucra para cada R$ 1 investido pelos acionistas.\n\nCálculo: lucro líquido ÷ patrimônio líquido × 100',
+        'variacao-dia-fii': 'Variação do dia = quanto a cota do fundo subiu ou caiu no pregão de hoje, em relação ao fechamento do dia anterior.\n\nCálculo: (cotação atual − fechamento anterior) ÷ fechamento anterior × 100',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
