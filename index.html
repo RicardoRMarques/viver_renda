@@ -790,29 +790,20 @@
     .lista-mercado-filtro-chip:hover { color: var(--text); }
     .lista-mercado-filtro-chip.ativo { color: var(--primary); border-color: var(--primary); background: rgba(49,195,255,0.08); }
     .lista-mercado-tabela-wrap {
-      overflow: auto;
-      max-height: 70vh;
+      overflow-x: auto;
       border: 1px solid var(--border);
       border-radius: 12px;
       background: var(--card);
     }
-    /* No desktop volta a ser uma tabela normal — sem caixa com scroll
-       vertical próprio (a barra lateral incomodava) e sem cabeçalho
-       fixo. Grudar o cabeçalho enquanto a tabela também rola de lado
-       esbarra numa limitação real do CSS (o navegador trata o container
-       com overflow-x:auto como "caixa" pra tudo que tem sticky dentro,
-       mesmo com overflow-y:visible) — a caixa com scroll interno é a
-       forma correta de resolver isso, mas só compensa no mobile/tablet,
-       onde a barra de rolagem é discreta/automática. No desktop, a tela
-       já é larga o bastante pra raramente precisar rolar de lado mesmo. */
-    @media (min-width: 1025px) {
-      .lista-mercado-tabela-wrap { overflow-x: auto; overflow-y: visible; max-height: none; }
-      .lista-mercado-tabela thead th { position: static; }
-    }
+    /* Cabeçalho fixo (sticky) foi tentado em várias formas — e sempre
+       esbarrou na mesma limitação real do CSS: um cabeçalho grudado
+       enquanto a tabela também rola de lado é instável entre
+       navegadores/dispositivos (funcionava num, quebrava em outro).
+       Desistimos do sticky aqui: tabela simples em todo tamanho de
+       tela, sem caixa de scroll própria. */
     table.lista-mercado-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; min-width: 680px; }
     .lista-mercado-tabela thead th {
-      position: sticky;
-      top: 0;
+      position: static;
       text-align: left; padding: 12px 14px; font-size: 0.7rem; text-transform: uppercase;
       letter-spacing: 0.03em; color: var(--muted); border-bottom: 1px solid var(--border);
       white-space: nowrap; cursor: pointer; user-select: none;
