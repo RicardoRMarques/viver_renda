@@ -796,6 +796,19 @@
       border-radius: 12px;
       background: var(--card);
     }
+    /* No desktop volta a ser uma tabela normal — sem caixa com scroll
+       vertical próprio (a barra lateral incomodava) e sem cabeçalho
+       fixo. Grudar o cabeçalho enquanto a tabela também rola de lado
+       esbarra numa limitação real do CSS (o navegador trata o container
+       com overflow-x:auto como "caixa" pra tudo que tem sticky dentro,
+       mesmo com overflow-y:visible) — a caixa com scroll interno é a
+       forma correta de resolver isso, mas só compensa no mobile/tablet,
+       onde a barra de rolagem é discreta/automática. No desktop, a tela
+       já é larga o bastante pra raramente precisar rolar de lado mesmo. */
+    @media (min-width: 1025px) {
+      .lista-mercado-tabela-wrap { overflow-x: auto; overflow-y: visible; max-height: none; }
+      .lista-mercado-tabela thead th { position: static; }
+    }
     table.lista-mercado-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; min-width: 680px; }
     .lista-mercado-tabela thead th {
       position: sticky;
