@@ -831,11 +831,26 @@
     }
     @media (min-width: 1200px) {
       .lista-mercado-tabela-wrap { overflow: visible; }
+      /* Usa var(--card) — a MESMA cor do cartão da tabela logo abaixo —
+         em vez de var(--bg)/fundo da página. O fundo da página é um
+         degradê (brilho radial perto do topo + degradê vertical) que
+         muda de tom conforme a posição na página; um fundo CHAPADO
+         tentando imitar isso ficava incompatível com o tom real naquele
+         ponto da rolagem e aparecia como uma faixa escura destacada
+         (bug relatado). var(--card) é uma cor fixa que já aparece o
+         tempo todo nesta mesma seção (tabela, chips), então o bloco
+         título+chips+colunas passa a ler como UM cartão contínuo em vez
+         de tentar (e falhar em) se camuflar com o fundo da página —
+         e por isso também NÃO estica até a borda da tela: fica do
+         mesmo tamanho do cartão da tabela abaixo, alinhado com ele. */
       .lista-mercado-topo {
-        position: sticky; top: 0; z-index: 8; background: var(--bg);
+        position: sticky; top: 0; z-index: 8; background: var(--card);
+        padding: 10px 0 8px;
       }
       .lista-mercado-filtros {
-        position: sticky; top: 0; z-index: 7; background: var(--bg);
+        position: sticky; top: 0; z-index: 7; background: var(--card);
+        padding-bottom: 12px; margin-bottom: 0;
+        box-shadow: 0 6px 10px -6px rgba(0,0,0,0.35);
       }
     }
     table.lista-mercado-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; min-width: 680px; }
@@ -11660,64 +11675,24 @@
     // com [hidden] pra não aparecer sozinhas embaixo da consulta rápida
     // toda vez que a home carrega.
     // ============================================================
-    // .lista-mercado-topo/.lista-mercado-filtros vivem dentro de
-    // <main class="container"> (largura min(1200px, 94%), centralizada —
-    // ver ".container" no CSS), não coladas na borda da tela. Um
-    // background sólido nelas (necessário pra esconder as linhas da
-    // tabela passando por trás, já que agora ficam sticky) cobre só a
-    // largura do container — sobra uma faixa cinza-degradê do fundo da
-    // página (o brilho radial de "body") visível nas laterais, criando
-    // aquele efeito de "caixa" com borda estranha. Solução: esticar o
-    // background dessas duas barras até a borda real da tela (medindo a
-    // folga real de cada lado com JS, em vez do truque de `100vw`, que
-    // em muitos navegadores conta a barra de rolagem e sobra 1 pixel de
-    // scroll horizontal indesejado) — a MARGEM negativa some com a
-    // borda esquerda/direita e o PADDING equivalente traz o conteúdo
-    // (texto, botão, chips) de volta pra posição original, então nada
-    // se move visualmente, só o fundo passa a ir até a ponta da tela.
-    function esticarFundoAteABorda(el) {
-      if (!el) return;
-      el.style.marginLeft = '';
-      el.style.marginRight = '';
-      el.style.paddingLeft = '';
-      el.style.paddingRight = '';
-      const rect = el.getBoundingClientRect();
-      const larguraTela = document.documentElement.clientWidth;
-      const folgaEsquerda = rect.left;
-      const folgaDireita = larguraTela - rect.right;
-      el.style.marginLeft = (-folgaEsquerda) + 'px';
-      el.style.marginRight = (-folgaDireita) + 'px';
-      el.style.paddingLeft = folgaEsquerda + 'px';
-      el.style.paddingRight = folgaDireita + 'px';
-    }
-    function limparFundoAteABorda(el) {
-      if (!el) return;
-      el.style.marginLeft = '';
-      el.style.marginRight = '';
-      el.style.paddingLeft = '';
-      el.style.paddingRight = '';
-    }
-
     // Empilha o "cabeçalho fixo" de uma lista de mercado (título+fechar,
     // chips de filtro e linha de colunas da tabela) medindo as alturas de
     // verdade em vez de chutar valores em px — ver comentário no CSS
     // (".lista-mercado-tabela thead th"). Em telas estreitas (<1200px) a
     // tabela já tem sua própria caixa com scroll e cabeçalho grudado
-    // (top:0 relativo a ELA), então aqui só limpamos qualquer `top`/fundo
-    // esticado deixado por uma medição anterior em tela larga.
+    // (top:0 relativo a ELA), então aqui só limpamos qualquer `top`
+    // deixado por uma medição anterior em tela larga.
     function atualizarCabecalhoFixoListaMercado(secao) {
       if (!secao || secao.hidden) return;
       const topo = secao.querySelector('.lista-mercado-topo');
       const filtros = secao.querySelector('.lista-mercado-filtros');
       const ths = secao.querySelectorAll('.lista-mercado-tabela thead th');
       if (window.innerWidth < 1200) {
-        if (topo) { topo.style.top = ''; limparFundoAteABorda(topo); }
-        if (filtros) { filtros.style.top = ''; limparFundoAteABorda(filtros); }
+        if (topo) topo.style.top = '';
+        if (filtros) filtros.style.top = '';
         ths.forEach(th => { th.style.top = ''; });
         return;
       }
-      if (topo) esticarFundoAteABorda(topo);
-      if (filtros) esticarFundoAteABorda(filtros);
       const cabecalho = document.querySelector('header');
       const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 64;
       if (topo) topo.style.top = alturaCabecalho + 'px';
