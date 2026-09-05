@@ -876,8 +876,9 @@
     .lm-ativo-logo {
       width: 28px; height: 28px; border-radius: 7px; background: var(--deep);
       display: flex; align-items: center; justify-content: center; font-size: 0.62rem;
-      font-weight: 700; color: var(--muted); flex-shrink: 0;
+      font-weight: 700; color: var(--muted); flex-shrink: 0; overflow: hidden;
     }
+    .lm-ativo-logo img { width: 100%; height: 100%; object-fit: cover; }
     .lm-ativo-ticker { font-weight: 700; font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace; color: var(--text); }
     .lm-ativo-nome { font-size: 0.72rem; color: var(--muted); }
     .lista-mercado-tabela td.lm-num { font-family: 'IBM Plex Mono', monospace; }
@@ -11906,7 +11907,7 @@
         tbody.innerHTML = paginaDeItens.map(d => `
           <tr data-ticker="${d.ticker}">
             <td class="lm-ativo-cel">
-              <div class="lm-ativo-logo">${d.ticker.slice(0, 2)}</div>
+              <div class="lm-ativo-logo">${d.logo ? `<img src="${d.logo}" alt="" loading="lazy" onerror="this.parentElement.textContent='${d.ticker.slice(0, 2)}'">` : d.ticker.slice(0, 2)}</div>
               <div>
                 <div class="lm-ativo-ticker">${d.ticker}</div>
                 <div class="lm-ativo-nome">${d.nome || ''}</div>

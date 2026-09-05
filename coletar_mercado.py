@@ -260,10 +260,19 @@ def buscar_universo_acoes():
             if item.get("kind") != "stock":
                 continue
             classificacao = item.get("classification") or {}
+            # "logos" já vem nesse endpoint pra alguns ativos (não é
+            # garantido pra todos) — mesmo campo (square_small/square_large)
+            # que o site já usa ao vivo no navegador em outras telas (busca
+            # rápida, comparador). Sem custo extra de requisição; se vier
+            # vazio aqui, enriquecer_acoes_com_fundamentals tenta de novo, e
+            # se nenhuma das duas trouxer nada o site cai pro "selo" com as
+            # iniciais do ticker (fallback já existente no index.html).
+            logos = item.get("logos") or {}
             ativos.append({
                 "ticker": item["symbol"],
                 "nome": item.get("name") or item.get("full_name") or item["symbol"],
                 "setor": macro_setor(classificacao.get("sector")),
+                "logo": logos.get("square_small") or logos.get("square_large"),
             })
         log(f"  página {pagina}: +{len(resultados)} itens (acumulado ações: {len(ativos)})")
         if len(resultados) < 20:  # heurística de "última página" — ajuste se
@@ -308,6 +317,13 @@ def enriquecer_acoes_com_fundamentals(universo):
             registro["preco"] = (resultado.get("quote") or {}).get("value")
             registro["valor_mercado"] = (resultado.get("quote") or {}).get("market_cap")
             registro["variacao_dia_pct"] = (resultado.get("quote") or {}).get("change_percent")
+
+            # Só sobrescreve o logo se /fundamentals trouxer um e o
+            # /tickers não tiver trazido nada antes (ver comentário em
+            # buscar_universo_acoes) — nunca apaga um logo que já veio ok.
+            if not registro.get("logo"):
+                logos_fund = resultado.get("logos") or {}
+                registro["logo"] = logos_fund.get("square_small") or logos_fund.get("square_large")
 
             if ttm:
                 valuation = ttm.get("valuation") or {}
@@ -417,6 +433,7 @@ def buscar_fiis_fundamentus():
             # o Fundamentus como base, a HG vira só um complemento
             # (variação do dia) — se ela falhar, o FII continua na lista.
             "preco": _normalizar_num_br(linha.get("Cotação")),
+            "logo": None,  # Fundamentus não tem logo — vem da HG em enriquecer_fiis_com_quotes()
         })
     log(f"  {len(fiis)} FIIs lidos do Fundamentus")
     return fiis
@@ -471,6 +488,15 @@ def enriquecer_fiis_com_quotes(fiis):
             setor_hg = (resultado.get("classification") or {}).get("sector")
             if setor_hg:
                 registro["segmento"] = aplicar_override_segmento(simbolo, macro_segmento_fii(setor_hg))
+
+            # Logo: mesmo campo (logos.square_small/square_large) que o
+            # site já usa ao vivo pra ações e FIIs na "Consulta Ações,
+            # FIIs..." e no comparador (confirmado funcionando ali) — vem
+            # desse MESMO endpoint /v2/finance/quotes.
+            logos = resultado.get("logos") or {}
+            logo = logos.get("square_small") or logos.get("square_large")
+            if logo:
+                registro["logo"] = logo
 
         time.sleep(PAUSA_ENTRE_LOTES)
 
