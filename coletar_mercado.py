@@ -186,6 +186,23 @@ OVERRIDE_SEGMENTO_TICKER = {
     "VGIR11": "Papel",   # Valora RE III — papel
     "DEVA11": "Papel",   # Devant Recebíveis Imobiliários — papel
     "KNCA11": "Papel",   # Fiagro Kinea — papel/CRA
+    # --- Logístico: mesmo problema do BRCO11 (relatado pelo Ricardo) pode
+    # afetar qualquer um desses — nem o texto do Fundamentus nem o
+    # classification.sector da HG são garantidos bater com as chaves de
+    # MAPA_SEGMENTO_MACRO ("logistica", "galpoes logisticos" etc.), então
+    # trava os principais/mais líquidos FIIs de logística da B3 direto
+    # aqui (lista checada contra Investidor10/Funds Explorer/Suno em
+    # 05/09/2026 — vale revisar se a carteira desses fundos mudar).
+    "BRCO11": "Logístico",  # Bresco Logística
+    "HGLG11": "Logístico",  # Pátria Logística (ex-CSHG Logística) — o maior/mais líquido do segmento
+    "XPLG11": "Logístico",  # XP Log
+    "BTLG11": "Logístico",  # BTG Pactual Logística
+    "VILG11": "Logístico",  # Vinci Logística
+    "LVBI11": "Logístico",  # VBI Logístico
+    "GGRC11": "Logístico",  # GGR Covepi Renda
+    "HSLG11": "Logístico",  # HSI Logística
+    "RBRL11": "Logístico",  # RBR Log
+    "TRBL11": "Logístico",  # SDI Logística Rio / Tellus Rio Bravo Renda Logística
 }
 
 
