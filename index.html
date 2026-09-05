@@ -100,6 +100,7 @@
       --shadow: 0 16px 40px rgba(0,0,0,0.28);
       --btn-text: #04101a;
       --painel-bg: rgba(17,27,46,0.7);
+      --zebra: rgba(255,255,255,0.035);
     }
 
     html[data-theme="light"] {
@@ -119,6 +120,7 @@
       --shadow: 0 12px 30px rgba(20,40,80,0.12);
       --btn-text: #ffffff;
       --painel-bg: rgba(255,255,255,0.75);
+      --zebra: rgba(15,30,60,0.035);
     }
 
     /* Branco puro: mesma paleta de cores de destaque do modo claro
@@ -142,6 +144,7 @@
       --shadow: 0 12px 30px rgba(0,0,0,0.08);
       --btn-text: #ffffff;
       --painel-bg: rgba(255,255,255,0.92);
+      --zebra: rgba(0,0,0,0.03);
     }
 
     * {
@@ -876,6 +879,8 @@
     .lista-mercado-tabela tbody td { border-bottom: 1px solid var(--border); }
     .lista-mercado-tabela tbody tr:last-child td { border-bottom: none; }
     .lista-mercado-tabela tbody tr:hover { background: var(--deep); }
+    .lista-mercado-tabela tbody tr:nth-child(even) td { background: var(--zebra); }
+    .lista-mercado-tabela tbody tr:hover td { background: var(--deep); }
     .lista-mercado-tabela td { padding: 11px 14px; white-space: nowrap; }
     .lista-mercado-tabela td.lm-ativo-cel { display: flex; align-items: center; gap: 10px; white-space: normal; }
     .lm-ativo-logo {
