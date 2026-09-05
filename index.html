@@ -794,27 +794,42 @@
       border-radius: 12px;
       background: var(--card);
     }
-    /* Cabeçalho fixo (sticky) — tentativa nova, dessa vez isolando UM
-       tipo de "grudar" por vez (só o cabeçalho; a coluna "Ativos" não
-       fica mais fixa horizontalmente, porque combinar os dois ao mesmo
-       tempo — cabeçalho em cima + coluna do lado — é o clássico
-       problema do "canto congelado" de planilha, notoriamente instável
-       entre navegadores, e foi provavelmente a causa da instabilidade
-       nas tentativas anteriores).
+    /* Cabeçalho fixo (sticky) — isolando UM tipo de "grudar" por vez (só
+       o bloco do cabeçalho; a coluna "Ativos" não fica fixa
+       horizontalmente, porque combinar os dois ao mesmo tempo —
+       cabeçalho em cima + coluna do lado — é o clássico problema do
+       "canto congelado" de planilha, notoriamente instável entre
+       navegadores).
        - Telas estreitas (a tabela PRECISA rolar de lado): usa uma caixa
-         com scroll próprio (overflow:auto) e o cabeçalho gruda no topo
-         DESSA caixa (top:0) — não tem limitação de navegador aqui,
-         porque o cabeçalho e o scroll pertencem ao mesmo container.
+         com scroll próprio (overflow:auto) e SÓ o cabeçalho da tabela
+         gruda, no topo DESSA caixa (top:0) — não tem limitação de
+         navegador aqui, porque o cabeçalho e o scroll pertencem ao
+         mesmo container. O título e os chips de filtro rolam normal
+         junto com a página (a caixa já resolve a visibilidade do que
+         importa: as colunas).
        - Telas largas (a tabela cabe sem precisar rolar de lado): nem
-         cria a caixa com scroll — o cabeçalho gruda relativo à
-         PÁGINA (top: 64px, abaixo do menu do site), o que também é
-         seguro justamente por não ter nenhum container com scroll
-         próprio no meio do caminho atrapalhando. */
+         cria a caixa com scroll — o bloco INTEIRO do cabeçalho (título
+         + botão fechar, chips de filtro e a linha de colunas) gruda
+         relativo à PÁGINA, empilhado logo abaixo do menu do site, um
+         embaixo do outro, formando uma única barra fixa (é o que
+         aparece no print: tudo isso preso no topo enquanto a lista
+         rola por baixo). O `top` de cada peça é calculado e aplicado
+         via JS (função atualizarCabecalhoFixoListaMercado, mais abaixo
+         no arquivo) — a altura real do menu do site e do título variam
+         (fonte, tema, se o texto quebra linha), então um valor fixo em
+         px quebraria fácil; medindo em tempo real cada peça já sabe
+         exatamente onde a próxima começa. */
     @media (max-width: 1199px) {
       .lista-mercado-tabela-wrap { overflow: auto; max-height: 70vh; }
     }
     @media (min-width: 1200px) {
       .lista-mercado-tabela-wrap { overflow: visible; }
+      .lista-mercado-topo {
+        position: sticky; top: 0; z-index: 8; background: var(--bg);
+      }
+      .lista-mercado-filtros {
+        position: sticky; top: 0; z-index: 7; background: var(--bg);
+      }
     }
     table.lista-mercado-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; min-width: 680px; }
     .lista-mercado-tabela thead th {
@@ -11638,10 +11653,50 @@
     // com [hidden] pra não aparecer sozinhas embaixo da consulta rápida
     // toda vez que a home carrega.
     // ============================================================
+    // Empilha o "cabeçalho fixo" de uma lista de mercado (título+fechar,
+    // chips de filtro e linha de colunas da tabela) medindo as alturas de
+    // verdade em vez de chutar valores em px — ver comentário no CSS
+    // (".lista-mercado-tabela thead th"). Em telas estreitas (<1200px) a
+    // tabela já tem sua própria caixa com scroll e cabeçalho grudado
+    // (top:0 relativo a ELA), então aqui só limpamos qualquer `top`
+    // inline deixado por uma medição anterior em tela larga.
+    function atualizarCabecalhoFixoListaMercado(secao) {
+      if (!secao || secao.hidden) return;
+      const topo = secao.querySelector('.lista-mercado-topo');
+      const filtros = secao.querySelector('.lista-mercado-filtros');
+      const ths = secao.querySelectorAll('.lista-mercado-tabela thead th');
+      if (window.innerWidth < 1200) {
+        if (topo) topo.style.top = '';
+        if (filtros) filtros.style.top = '';
+        ths.forEach(th => { th.style.top = ''; });
+        return;
+      }
+      const cabecalho = document.querySelector('header');
+      const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 64;
+      if (topo) topo.style.top = alturaCabecalho + 'px';
+      const alturaTopo = topo ? topo.getBoundingClientRect().height : 0;
+      if (filtros) filtros.style.top = (alturaCabecalho + alturaTopo) + 'px';
+      const alturaFiltros = filtros ? filtros.getBoundingClientRect().height : 0;
+      const topoDaTabela = alturaCabecalho + alturaTopo + alturaFiltros;
+      ths.forEach(th => { th.style.top = topoDaTabela + 'px'; });
+    }
+    function atualizarTodosCabecalhosFixosMercado() {
+      atualizarCabecalhoFixoListaMercado(document.getElementById('lista-acoes'));
+      atualizarCabecalhoFixoListaMercado(document.getElementById('lista-fiis'));
+    }
+    // Reajusta ao redimensionar (ex.: virar o celular, ou passar de/para
+    // o breakpoint de 1200px) e também quando as fontes acabam de
+    // carregar (pode mudar a altura do título por uma fração de px).
+    window.addEventListener('resize', atualizarTodosCabecalhosFixosMercado);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(atualizarTodosCabecalhosFixosMercado);
+    }
+
     function revelarSecaoMercado(id) {
       const secao = document.getElementById(id);
       if (!secao) return;
       secao.hidden = false;
+      atualizarCabecalhoFixoListaMercado(secao);
       // scrollIntoView sozinho alinha o topo da seção com o topo da tela,
       // mas o cabeçalho do site é fixo — isso deixava o título e o botão
       // "✕" escondidos atrás dele. Rolando manualmente e descontando a
@@ -11651,6 +11706,11 @@
         const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 60;
         const posicao = secao.getBoundingClientRect().top + window.scrollY - alturaCabecalho - 12;
         window.scrollTo({ top: posicao, behavior: 'smooth' });
+        // O clique que abriu a lista pode ter vindo do submenu com um
+        // filtro já aplicado (aplicarFiltro), o que muda a altura dos
+        // chips (pode entrar/sair de "ativo" ou mudar quantidade) só
+        // depois desse frame — mede de novo pra garantir.
+        atualizarCabecalhoFixoListaMercado(secao);
       });
     }
     document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"]').forEach(link => {
@@ -11786,6 +11846,11 @@
 
       function render() {
         renderFiltros();
+        // Os chips de filtro podem mudar de altura (entrar/sair "ativo",
+        // ou a quantidade de setores mudar depois do fetch) — reajusta o
+        // empilhamento do cabeçalho fixo pra não deixar espaço sobrando
+        // nem sobrepor a linha de colunas.
+        atualizarCabecalhoFixoListaMercado(thead.closest('.lista-mercado'));
         let lista = filtroAtivo ? dados.filter(d => d[campoFiltro] === filtroAtivo) : dados;
         lista = [...lista].sort((a, b) => {
           const campo = colunaOrdenada.campo;
