@@ -793,7 +793,7 @@
     table.lista-mercado-tabela { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 680px; }
     .lista-mercado-tabela thead th {
       position: sticky;
-      top: var(--altura-header-mercado, 64px);
+      top: 64px;
       text-align: left; padding: 12px 14px; font-size: 0.7rem; text-transform: uppercase;
       letter-spacing: 0.03em; color: var(--muted); border-bottom: 1px solid var(--border);
       white-space: nowrap; cursor: pointer; user-select: none;
@@ -845,6 +845,7 @@
     @media (max-width: 640px) {
       table.lista-mercado-tabela { font-size: 0.78rem; }
       .lista-mercado-tabela td, .lista-mercado-tabela thead th { padding: 9px 8px; }
+      .lista-mercado-tabela thead th { top: 56px; }
       .lista-mercado-tabela th:first-child,
       .lista-mercado-tabela td:first-child:not([colspan]) { max-width: 118px; }
       .lm-ativo-nome { max-width: 78px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -11619,35 +11620,6 @@
     })();
 
     // ============================================================
-    // Cabeçalho da tabela (Ativos, Valor de Mercado, P/L...) fixo ao
-    // rolar, logo abaixo do menu do site — precisa saber a altura atual
-    // do menu (varia um pouco entre desktop/mobile e se o texto quebra
-    // linha) pra grudar bem colado, sem espaço nem sobreposição.
-    //
-    // Só calcular 1x no carregamento não é confiável — se o menu ainda
-    // não tinha terminado de renderizar (fonte carregando, layout ainda
-    // ajustando), a altura saía errada (às vezes 0), e o cabeçalho da
-    // tabela ficava grudado embaixo do menu fixo do site, que tem
-    // prioridade visual e cobria ele por completo (sumia a linha com
-    // "Ativos, Valor de Mercado..."). Um ResizeObserver mantém o valor
-    // sempre certo, reagindo a qualquer mudança de tamanho do menu.
-    // ============================================================
-    function atualizarAlturaHeaderMercado() {
-      const cabecalho = document.querySelector('header');
-      const altura = cabecalho ? cabecalho.getBoundingClientRect().height : 64;
-      if (altura > 0) {
-        document.documentElement.style.setProperty('--altura-header-mercado', altura + 'px');
-      }
-    }
-    atualizarAlturaHeaderMercado();
-    window.addEventListener('resize', atualizarAlturaHeaderMercado);
-    window.addEventListener('load', atualizarAlturaHeaderMercado);
-    if (window.ResizeObserver) {
-      const cabecalhoEl = document.querySelector('header');
-      if (cabecalhoEl) new ResizeObserver(atualizarAlturaHeaderMercado).observe(cabecalhoEl);
-    }
-
-    // ============================================================
     // Revela as seções "Lista de Ações" / "Lista de FIIs" só quando
     // alguém realmente pede (clique no menu "Mercado", no menu mobile,
     // ou link direto tipo site.com/#lista-acoes) — por padrão elas ficam
@@ -11658,7 +11630,6 @@
       const secao = document.getElementById(id);
       if (!secao) return;
       secao.hidden = false;
-      atualizarAlturaHeaderMercado();
       // scrollIntoView sozinho alinha o topo da seção com o topo da tela,
       // mas o cabeçalho do site é fixo — isso deixava o título e o botão
       // "✕" escondidos atrás dele. Rolando manualmente e descontando a
