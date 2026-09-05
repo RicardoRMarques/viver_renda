@@ -11831,6 +11831,32 @@
       let carregado = false;
       let paginaAtual = 1;
 
+      // Ao trocar de página ou de filtro, a tabela pode encolher muito de
+      // uma vez (ex.: cair numa página/filtro com só 1 ativo) — o
+      // documento fica bem mais baixo e o navegador "puxa" o scroll pra
+      // caber no novo tamanho, mas o `scrollIntoView({block:'nearest'})`
+      // da paginação só garante que ELA fique visível, sem se importar
+      // com o título/filtros/cabeçalho da tabela: eles podem acabar
+      // ficando acima do topo da tela, escondidos. Resultado: a lista
+      // parece "quebrada" — rolar pra cima não traz o cabeçalho fixo de
+      // volta, porque ele não está mais dentro da área visível pra
+      // grudar. Esta função reaproveita a mesma conta de
+      // `revelarSecaoMercado()` pra realinhar a seção logo abaixo do
+      // cabeçalho do site sempre que isso acontecer.
+      function reposicionarListaAposMudanca() {
+        const secao = thead.closest('.lista-mercado');
+        if (!secao) { if (paginacaoEl) paginacaoEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return; }
+        const cabecalho = document.querySelector('header');
+        const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 64;
+        const topo = secao.querySelector('.lista-mercado-topo') || secao;
+        if (topo.getBoundingClientRect().top < alturaCabecalho) {
+          const posicao = secao.getBoundingClientRect().top + window.scrollY - alturaCabecalho - 12;
+          window.scrollTo({ top: Math.max(0, posicao), behavior: 'smooth' });
+        } else if (paginacaoEl) {
+          paginacaoEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+
       function renderFiltros() {
         filtrosEl.innerHTML = '';
         const criarChip = (rotulo, valor) => {
@@ -11838,7 +11864,12 @@
           b.type = 'button';
           b.className = 'lista-mercado-filtro-chip' + (filtroAtivo === valor ? ' ativo' : '');
           b.textContent = rotulo;
-          b.addEventListener('click', () => { filtroAtivo = valor; paginaAtual = 1; render(); });
+          b.addEventListener('click', () => {
+            filtroAtivo = valor;
+            paginaAtual = 1;
+            render();
+            reposicionarListaAposMudanca();
+          });
           return b;
         };
         filtrosEl.appendChild(criarChip('Todos', null));
@@ -11859,7 +11890,11 @@
           b.textContent = rotulo;
           if (opcoes.ativo) b.classList.add('ativo');
           if (opcoes.desabilitado) b.disabled = true;
-          b.addEventListener('click', () => { paginaAtual = pagina; render(); paginacaoEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+          b.addEventListener('click', () => {
+            paginaAtual = pagina;
+            render();
+            reposicionarListaAposMudanca();
+          });
           return b;
         };
 
