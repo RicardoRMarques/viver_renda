@@ -790,26 +790,43 @@
     .lista-mercado-filtro-chip:hover { color: var(--text); }
     .lista-mercado-filtro-chip.ativo { color: var(--primary); border-color: var(--primary); background: rgba(49,195,255,0.08); }
     .lista-mercado-tabela-wrap {
-      overflow-x: auto;
       border: 1px solid var(--border);
       border-radius: 12px;
       background: var(--card);
     }
-    /* Cabeçalho fixo (sticky) foi tentado em várias formas — e sempre
-       esbarrou na mesma limitação real do CSS: um cabeçalho grudado
-       enquanto a tabela também rola de lado é instável entre
-       navegadores/dispositivos (funcionava num, quebrava em outro).
-       Desistimos do sticky aqui: tabela simples em todo tamanho de
-       tela, sem caixa de scroll própria. */
+    /* Cabeçalho fixo (sticky) — tentativa nova, dessa vez isolando UM
+       tipo de "grudar" por vez (só o cabeçalho; a coluna "Ativos" não
+       fica mais fixa horizontalmente, porque combinar os dois ao mesmo
+       tempo — cabeçalho em cima + coluna do lado — é o clássico
+       problema do "canto congelado" de planilha, notoriamente instável
+       entre navegadores, e foi provavelmente a causa da instabilidade
+       nas tentativas anteriores).
+       - Telas estreitas (a tabela PRECISA rolar de lado): usa uma caixa
+         com scroll próprio (overflow:auto) e o cabeçalho gruda no topo
+         DESSA caixa (top:0) — não tem limitação de navegador aqui,
+         porque o cabeçalho e o scroll pertencem ao mesmo container.
+       - Telas largas (a tabela cabe sem precisar rolar de lado): nem
+         cria a caixa com scroll — o cabeçalho gruda relativo à
+         PÁGINA (top: 64px, abaixo do menu do site), o que também é
+         seguro justamente por não ter nenhum container com scroll
+         próprio no meio do caminho atrapalhando. */
+    @media (max-width: 1199px) {
+      .lista-mercado-tabela-wrap { overflow: auto; max-height: 70vh; }
+    }
+    @media (min-width: 1200px) {
+      .lista-mercado-tabela-wrap { overflow: visible; }
+    }
     table.lista-mercado-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; min-width: 680px; }
     .lista-mercado-tabela thead th {
-      position: static;
+      position: sticky;
       text-align: left; padding: 12px 14px; font-size: 0.7rem; text-transform: uppercase;
       letter-spacing: 0.03em; color: var(--muted); border-bottom: 1px solid var(--border);
       white-space: nowrap; cursor: pointer; user-select: none;
       background: var(--card);
       z-index: 4;
     }
+    @media (max-width: 1199px) { .lista-mercado-tabela thead th { top: 0; } }
+    @media (min-width: 1200px) { .lista-mercado-tabela thead th { top: 64px; } }
     .lista-mercado-tabela thead th:hover { color: var(--text); }
     .lista-mercado-tabela thead th.ordenado-asc::after { content: ' ▲'; color: var(--primary); font-size: 0.65em; }
     .lista-mercado-tabela thead th.ordenado-desc::after { content: ' ▼'; color: var(--primary); font-size: 0.65em; }
@@ -817,21 +834,8 @@
     .lista-mercado-tabela tbody td { border-bottom: 1px solid var(--border); }
     .lista-mercado-tabela tbody tr:last-child td { border-bottom: none; }
     .lista-mercado-tabela tbody tr:hover { background: var(--deep); }
-    .lista-mercado-tabela tbody tr:hover td:first-child { background: var(--deep); }
     .lista-mercado-tabela td { padding: 11px 14px; white-space: nowrap; }
     .lista-mercado-tabela td.lm-ativo-cel { display: flex; align-items: center; gap: 10px; white-space: normal; }
-    /* Coluna "Ativos" fixa ao rolar a tabela pros lados no celular — sem
-       isso, o ticker saía de tela junto com o resto da coluna e ficava
-       impossível saber qual linha é qual enquanto rolava. */
-    .lista-mercado-tabela th:first-child,
-    .lista-mercado-tabela td:first-child:not([colspan]) {
-      position: sticky;
-      left: 0;
-      z-index: 2;
-      background: var(--card);
-      box-shadow: 2px 0 6px -2px rgba(0,0,0,0.35);
-    }
-    .lista-mercado-tabela thead th:first-child { z-index: 5; }
     .lm-ativo-logo {
       width: 28px; height: 28px; border-radius: 7px; background: var(--deep);
       display: flex; align-items: center; justify-content: center; font-size: 0.62rem;
@@ -856,8 +860,6 @@
     @media (max-width: 640px) {
       table.lista-mercado-tabela { font-size: 0.78rem; }
       .lista-mercado-tabela td, .lista-mercado-tabela thead th { padding: 9px 8px; }
-      .lista-mercado-tabela th:first-child,
-      .lista-mercado-tabela td:first-child:not([colspan]) { max-width: 118px; }
       .lm-ativo-nome { max-width: 78px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     }
 
