@@ -794,33 +794,40 @@
       border-radius: 12px;
       background: var(--card);
     }
-    /* Cabeçalho fixo (sticky) — isolando UM tipo de "grudar" por vez (só
-       o bloco do cabeçalho; a coluna "Ativos" não fica fixa
-       horizontalmente, porque combinar os dois ao mesmo tempo —
-       cabeçalho em cima + coluna do lado — é o clássico problema do
-       "canto congelado" de planilha, notoriamente instável entre
-       navegadores).
+    /* Cabeçalho fixo (sticky) — evitando o "canto congelado": a MESMA
+       célula nunca fica sticky nos dois eixos ao mesmo tempo (isso sim é
+       o combo notoriamente instável entre navegadores). Cada eixo gruda
+       numa célula diferente:
        - Telas estreitas (a tabela PRECISA rolar de lado): usa uma caixa
-         com scroll próprio (overflow:auto) e SÓ o cabeçalho da tabela
-         gruda, no topo DESSA caixa (top:0) — não tem limitação de
-         navegador aqui, porque o cabeçalho e o scroll pertencem ao
-         mesmo container. O título e os chips de filtro rolam normal
-         junto com a página (a caixa já resolve a visibilidade do que
-         importa: as colunas).
+         com scroll próprio (overflow:auto). O cabeçalho da tabela gruda
+         no topo DESSA caixa (top:0 — mesmo container do scroll, sem
+         limitação de navegador) e, no eixo horizontal, é a CÉLULA DO
+         ATIVO (ticker+nome, em cada linha do corpo) que gruda na
+         esquerda — nunca as duas coisas na mesma célula: o <th>
+         "Ativos" do cabeçalho fica só com o sticky de cima, rola
+         horizontal junto com o resto da linha de colunas. Título e chips
+         de filtro rolam normal junto com a página.
        - Telas largas (a tabela cabe sem precisar rolar de lado): nem
-         cria a caixa com scroll — o bloco INTEIRO do cabeçalho (título
-         + botão fechar, chips de filtro e a linha de colunas) gruda
-         relativo à PÁGINA, empilhado logo abaixo do menu do site, um
-         embaixo do outro, formando uma única barra fixa (é o que
-         aparece no print: tudo isso preso no topo enquanto a lista
-         rola por baixo). O `top` de cada peça é calculado e aplicado
-         via JS (função atualizarCabecalhoFixoListaMercado, mais abaixo
-         no arquivo) — a altura real do menu do site e do título variam
+         cria a caixa com scroll, nem precisa da coluna presa (não tem
+         scroll horizontal pra travar contra) — o bloco INTEIRO do
+         cabeçalho (título + botão fechar, chips de filtro e a linha de
+         colunas) gruda relativo à PÁGINA, empilhado logo abaixo do menu
+         do site, um embaixo do outro, formando uma única barra fixa (é o
+         que aparece no print: tudo isso preso no topo enquanto a lista
+         rola por baixo). O `top` de cada peça é calculado e aplicado via
+         JS (função atualizarCabecalhoFixoListaMercado, mais abaixo no
+         arquivo) — a altura real do menu do site e do título variam
          (fonte, tema, se o texto quebra linha), então um valor fixo em
          px quebraria fácil; medindo em tempo real cada peça já sabe
          exatamente onde a próxima começa. */
     @media (max-width: 1199px) {
       .lista-mercado-tabela-wrap { overflow: auto; max-height: 70vh; }
+      .lista-mercado-tabela td.lm-ativo-cel {
+        position: sticky; left: 0; z-index: 2;
+        background: var(--card);
+        border-right: 1px solid var(--border);
+      }
+      .lista-mercado-tabela tbody tr:hover td.lm-ativo-cel { background: var(--deep); }
     }
     @media (min-width: 1200px) {
       .lista-mercado-tabela-wrap { overflow: visible; }
