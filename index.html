@@ -789,11 +789,17 @@
     }
     .lista-mercado-filtro-chip:hover { color: var(--text); }
     .lista-mercado-filtro-chip.ativo { color: var(--primary); border-color: var(--primary); background: rgba(49,195,255,0.08); }
-    .lista-mercado-tabela-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+    .lista-mercado-tabela-wrap {
+      overflow: auto;
+      max-height: 70vh;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+    }
     table.lista-mercado-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; min-width: 680px; }
     .lista-mercado-tabela thead th {
       position: sticky;
-      top: 64px;
+      top: 0;
       text-align: left; padding: 12px 14px; font-size: 0.7rem; text-transform: uppercase;
       letter-spacing: 0.03em; color: var(--muted); border-bottom: 1px solid var(--border);
       white-space: nowrap; cursor: pointer; user-select: none;
@@ -846,7 +852,6 @@
     @media (max-width: 640px) {
       table.lista-mercado-tabela { font-size: 0.78rem; }
       .lista-mercado-tabela td, .lista-mercado-tabela thead th { padding: 9px 8px; }
-      .lista-mercado-tabela thead th { top: 56px; }
       .lista-mercado-tabela th:first-child,
       .lista-mercado-tabela td:first-child:not([colspan]) { max-width: 118px; }
       .lm-ativo-nome { max-width: 78px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
