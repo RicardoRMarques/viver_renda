@@ -789,12 +789,16 @@
     }
     .lista-mercado-filtro-chip:hover { color: var(--text); }
     .lista-mercado-filtro-chip.ativo { color: var(--primary); border-color: var(--primary); background: rgba(49,195,255,0.08); }
-    .lista-mercado-tabela-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+    .lista-mercado-tabela-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
     table.lista-mercado-tabela { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 680px; }
     .lista-mercado-tabela thead th {
+      position: sticky;
+      top: var(--altura-header-mercado, 64px);
       text-align: left; padding: 12px 14px; font-size: 0.7rem; text-transform: uppercase;
       letter-spacing: 0.03em; color: var(--muted); border-bottom: 1px solid var(--border);
       white-space: nowrap; cursor: pointer; user-select: none;
+      background: var(--card);
+      z-index: 4;
     }
     .lista-mercado-tabela thead th:hover { color: var(--text); }
     .lista-mercado-tabela thead th.ordenado-asc::after { content: ' ▲'; color: var(--primary); font-size: 0.65em; }
@@ -816,7 +820,7 @@
       background: var(--card);
       box-shadow: 2px 0 6px -2px rgba(0,0,0,0.35);
     }
-    .lista-mercado-tabela thead th:first-child { z-index: 3; }
+    .lista-mercado-tabela thead th:first-child { z-index: 5; }
     .lm-ativo-logo {
       width: 28px; height: 28px; border-radius: 7px; background: var(--deep);
       display: flex; align-items: center; justify-content: center; font-size: 0.62rem;
@@ -11615,6 +11619,20 @@
     })();
 
     // ============================================================
+    // Cabeçalho da tabela (Ativos, Valor de Mercado, P/L...) fixo ao
+    // rolar, logo abaixo do menu do site — precisa saber a altura atual
+    // do menu (varia um pouco entre desktop/mobile e se o texto quebra
+    // linha) pra grudar bem colado, sem espaço nem sobreposição.
+    // ============================================================
+    function atualizarAlturaHeaderMercado() {
+      const cabecalho = document.querySelector('header');
+      const altura = cabecalho ? cabecalho.getBoundingClientRect().height : 64;
+      document.documentElement.style.setProperty('--altura-header-mercado', altura + 'px');
+    }
+    atualizarAlturaHeaderMercado();
+    window.addEventListener('resize', atualizarAlturaHeaderMercado);
+
+    // ============================================================
     // Revela as seções "Lista de Ações" / "Lista de FIIs" só quando
     // alguém realmente pede (clique no menu "Mercado", no menu mobile,
     // ou link direto tipo site.com/#lista-acoes) — por padrão elas ficam
@@ -11625,6 +11643,7 @@
       const secao = document.getElementById(id);
       if (!secao) return;
       secao.hidden = false;
+      atualizarAlturaHeaderMercado();
       // scrollIntoView sozinho alinha o topo da seção com o topo da tela,
       // mas o cabeçalho do site é fixo — isso deixava o título e o botão
       // "✕" escondidos atrás dele. Rolando manualmente e descontando a
