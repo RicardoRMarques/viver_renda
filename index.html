@@ -792,6 +792,84 @@
     }
     .lista-mercado-filtro-chip:hover { color: var(--text); }
     .lista-mercado-filtro-chip.ativo { color: var(--primary); border-color: var(--primary); background: rgba(49,195,255,0.08); }
+
+    /* ---------- Botão "Customizar" + escolha de colunas ---------- */
+    .lm-chips-separador { color: var(--border); align-self: center; padding: 0 2px; user-select: none; }
+    .lm-btn-customizar {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--border); background: var(--card); color: var(--muted);
+      border-radius: 999px; padding: 6px 13px; font-size: 0.78rem; font-family: inherit;
+      cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .lm-btn-customizar:hover { color: var(--primary); border-color: var(--primary); }
+    .lm-btn-customizar svg { width: 14px; height: 14px; flex-shrink: 0; max-height: none; }
+    /* Esconder coluna: precisa valer pro <th> e pro <td>, e com !important
+       porque outras regras da tabela definem display nas células (ex.: a
+       coluna "Ativos" grudada à esquerda no celular). */
+    .lista-mercado-tabela .lm-col-oculta { display: none !important; }
+
+    /* .calc-modal. prefixado: a regra base .calc-modal (max-width:480px)
+       vem depois no arquivo e ganharia no desempate por ordem. */
+    .calc-modal.lm-colunas-modal { max-width: 760px; }
+    .lm-col-ajuda { color: var(--muted); font-size: 0.82rem; margin: 0 0 4px; }
+    .lm-col-grupo h4 {
+      margin: 14px 0 8px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--primary);
+    }
+    /* Duas colunas de toggles quando cabe; uma só no celular. */
+    .lm-col-lista { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 20px; }
+    .lm-col-item { display: flex; align-items: center; gap: 9px; cursor: pointer; font-size: 0.86rem; }
+    .lm-col-item .lm-col-nome { min-width: 0; }
+    /* O "?" fica logo depois do nome (não empurrado pra borda da coluna). */
+    .lm-col-item .hg-info-btn { margin-left: 2px; flex: 0 0 auto; }
+    /* O checkbox real fica invisível mas continua no fluxo de foco/teclado —
+       o que se vê é o .lm-switch logo depois dele. */
+    .lm-col-check { position: absolute; opacity: 0; width: 0; height: 0; }
+    .lm-switch {
+      flex: 0 0 auto; position: relative; width: 38px; height: 21px; border-radius: 999px;
+      background: var(--border); transition: background 0.18s ease;
+    }
+    .lm-switch::after {
+      content: ''; position: absolute; top: 3px; left: 3px; width: 15px; height: 15px;
+      border-radius: 50%; background: #fff; transition: transform 0.18s ease;
+    }
+    .lm-col-check:checked + .lm-switch { background: var(--primary); }
+    .lm-col-check:checked + .lm-switch::after { transform: translateX(17px); }
+    .lm-col-check:focus-visible + .lm-switch { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .lm-col-rodape {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px 20px; border-top: 1px solid var(--border);
+      position: sticky; bottom: 0; background: var(--bg); border-radius: 0 0 16px 16px;
+    }
+    .lm-col-item-travado { opacity: 0.45; cursor: not-allowed; }
+    .lm-col-contador { color: var(--muted); font-size: 0.78rem; margin-left: auto; margin-right: 12px; white-space: nowrap; }
+    .lm-col-contador.no-teto { color: var(--gold, var(--primary)); }
+    /* Com muitas colunas ligadas, células mais justas e — o que mais
+       economiza largura — títulos de coluna podendo quebrar em duas
+       linhas ("Margem / Líquida") em vez de forçar a coluna inteira a
+       ter a largura do rótulo. Junto com o teto de colunas, isso mantém
+       a tabela dentro do cartão sem precisar mexer no overflow do wrap
+       (que quebraria o cabeçalho fixo da lista). */
+    .lista-mercado-tabela.lm-compacta thead th,
+    .lista-mercado-tabela.lm-compacta td { padding: 8px 7px; }
+    .lista-mercado-tabela.lm-compacta { font-size: 0.78rem; }
+    .lista-mercado-tabela.lm-compacta thead th {
+      font-size: 0.62rem;
+      white-space: normal;
+      line-height: 1.2;
+      vertical-align: bottom;
+    }
+    .lista-mercado-tabela.lm-compacta td { white-space: nowrap; }
+    .lm-col-restaurar {
+      border: none; background: none; color: var(--muted); font-family: inherit;
+      font-size: 0.84rem; cursor: pointer; padding: 6px 2px;
+    }
+    .lm-col-restaurar:hover { color: var(--primary); text-decoration: underline; }
+    .lm-col-salvar {
+      border: none; background: var(--primary); color: #05121f; font-family: inherit;
+      font-size: 0.86rem; font-weight: 700; border-radius: 999px; padding: 10px 22px; cursor: pointer;
+    }
+    .lm-col-salvar:hover { filter: brightness(1.08); }
     .lista-mercado-tabela-wrap {
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -2842,6 +2920,11 @@
       /* No celular a mensagem de estado dos índices quebra linha em vez de
          virar "…", já que aqui ela é um aviso e não um rótulo curto. */
       .indice-label { white-space: normal; }
+      /* Rodapé do "Personalizar colunas" cabendo em uma linha no celular. */
+      .lm-col-rodape { padding: 12px 14px; gap: 8px; }
+      .lm-col-restaurar { font-size: 0.78rem; white-space: nowrap; }
+      .lm-col-contador { font-size: 0.72rem; margin-right: 4px; }
+      .lm-col-salvar { padding: 9px 16px; font-size: 0.8rem; white-space: nowrap; }
       .hg-grid-dados { gap: 12px 12px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
       .hg-grid-dados strong {
         white-space: normal;
@@ -3199,13 +3282,33 @@
         <table class="lista-mercado-tabela" id="tabelaListaAcoes">
           <thead>
             <tr>
+              <!-- Colunas marcadas com data-opcional="1" começam ocultas e
+                   são ligadas/desligadas no botão "Customizar" (ao lado dos
+                   chips de setor). As demais são o padrão da lista. Todas
+                   ficam aqui no HTML de propósito, mesmo as ocultas: o
+                   glossário liga os handlers do "?" uma vez só, no
+                   carregamento, varrendo [data-glossario] — botão criado
+                   depois por JS não ganharia tooltip. -->
               <th data-col="ativo" data-tipo="texto">Ativos</th>
+              <th data-col="preco" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Preço <button type="button" class="hg-info-btn" data-glossario="preco-indicador" aria-label="O que é Preço?" title="O que é Preço?">?</button></th>
+              <th data-col="variacao_dia_pct" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Variação do dia <button type="button" class="hg-info-btn" data-glossario="variacao-dia-acoes" aria-label="O que é Variação do dia?" title="O que é Variação do dia?">?</button></th>
               <th data-col="valor_mercado" data-tipo="numero" class="lm-col-ordenavel ordenado-desc">Valor de Mercado <button type="button" class="hg-info-btn" data-glossario="valor-mercado" aria-label="O que é Valor de Mercado?" title="O que é Valor de Mercado?">?</button></th>
               <th data-col="pl" data-tipo="numero" class="lm-col-ordenavel">P/L <button type="button" class="hg-info-btn" data-glossario="pl-indicador" aria-label="O que é P/L?" title="O que é P/L?">?</button></th>
               <th data-col="pvp" data-tipo="numero" class="lm-col-ordenavel">P/VP <button type="button" class="hg-info-btn" data-glossario="pvp-indicador" aria-label="O que é P/VP?" title="O que é P/VP?">?</button></th>
+              <th data-col="vpa" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">VPA <button type="button" class="hg-info-btn" data-glossario="vpa-indicador" aria-label="O que é VPA?" title="O que é VPA?">?</button></th>
+              <th data-col="lpa" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">LPA <button type="button" class="hg-info-btn" data-glossario="lpa-indicador" aria-label="O que é LPA?" title="O que é LPA?">?</button></th>
+              <th data-col="p_receita" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">P/Receita <button type="button" class="hg-info-btn" data-glossario="p-receita-indicador" aria-label="O que é P/Receita?" title="O que é P/Receita?">?</button></th>
+              <th data-col="ev_ebitda" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">EV/EBITDA <button type="button" class="hg-info-btn" data-glossario="ev-ebitda-indicador" aria-label="O que é EV/EBITDA?" title="O que é EV/EBITDA?">?</button></th>
               <th data-col="dy_pct" data-tipo="numero" class="lm-col-ordenavel">Dividend Yield <button type="button" class="hg-info-btn" data-glossario="dy-acoes" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></th>
+              <th data-col="margem_bruta_pct" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Margem Bruta <button type="button" class="hg-info-btn" data-glossario="margem-bruta-indicador" aria-label="O que é Margem Bruta?" title="O que é Margem Bruta?">?</button></th>
               <th data-col="margem_liquida_pct" data-tipo="numero" class="lm-col-ordenavel">Margem Líquida <button type="button" class="hg-info-btn" data-glossario="margem-liquida-indicador" aria-label="O que é Margem Líquida?" title="O que é Margem Líquida?">?</button></th>
+              <th data-col="margem_ebitda_pct" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Margem EBITDA <button type="button" class="hg-info-btn" data-glossario="margem-ebitda-indicador" aria-label="O que é Margem EBITDA?" title="O que é Margem EBITDA?">?</button></th>
               <th data-col="roe_pct" data-tipo="numero" class="lm-col-ordenavel">ROE <button type="button" class="hg-info-btn" data-glossario="roe-indicador" aria-label="O que é ROE?" title="O que é ROE?">?</button></th>
+              <th data-col="roa_pct" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">ROA <button type="button" class="hg-info-btn" data-glossario="roa-indicador" aria-label="O que é ROA?" title="O que é ROA?">?</button></th>
+              <th data-col="roic_pct" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">ROIC <button type="button" class="hg-info-btn" data-glossario="roic-indicador" aria-label="O que é ROIC?" title="O que é ROIC?">?</button></th>
+              <th data-col="div_liq_ebitda" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Dív. Líq/EBITDA <button type="button" class="hg-info-btn" data-glossario="div-liq-ebitda-indicador" aria-label="O que é Dívida Líquida sobre EBITDA?" title="O que é Dívida Líquida sobre EBITDA?">?</button></th>
+              <th data-col="divida_patrimonio" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Dívida/Patrimônio <button type="button" class="hg-info-btn" data-glossario="divida-patrimonio-indicador" aria-label="O que é Dívida sobre Patrimônio?" title="O que é Dívida sobre Patrimônio?">?</button></th>
+              <th data-col="liquidez_corrente" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Liquidez Corrente <button type="button" class="hg-info-btn" data-glossario="liquidez-corrente-indicador" aria-label="O que é Liquidez Corrente?" title="O que é Liquidez Corrente?">?</button></th>
               <th data-col="setor" data-tipo="texto" class="lm-col-ordenavel">Setor</th>
             </tr>
           </thead>
@@ -3228,6 +3331,7 @@
           <thead>
             <tr>
               <th data-col="ativo" data-tipo="texto">Ativos</th>
+              <th data-col="preco" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Cotação <button type="button" class="hg-info-btn" data-glossario="preco-indicador" aria-label="O que é Cotação?" title="O que é Cotação?">?</button></th>
               <th data-col="patrimonio_liquido" data-tipo="numero" class="lm-col-ordenavel ordenado-desc">Patrimônio Líquido <button type="button" class="hg-info-btn" data-glossario="valor-patrimonial" aria-label="O que é Patrimônio Líquido?" title="O que é Patrimônio Líquido?">?</button></th>
               <th data-col="pvp" data-tipo="numero" class="lm-col-ordenavel">P/VP <button type="button" class="hg-info-btn" data-glossario="pvp-indicador" aria-label="O que é P/VP?" title="O que é P/VP?">?</button></th>
               <th data-col="dy_pct" data-tipo="numero" class="lm-col-ordenavel">Dividend Yield <button type="button" class="hg-info-btn" data-glossario="dy-fii" aria-label="O que é Dividend Yield?" title="O que é Dividend Yield?">?</button></th>
@@ -9590,6 +9694,20 @@
         'margem-liquida-indicador': 'Margem Líquida = percentual da receita que sobra como lucro líquido, depois de todos os custos, despesas, juros e impostos.\n\nCálculo: lucro líquido ÷ receita × 100',
         'roe-indicador': 'ROE (Return on Equity / Retorno sobre o Patrimônio Líquido) = quanto a empresa lucra para cada R$ 1 investido pelos acionistas.\n\nCálculo: lucro líquido ÷ patrimônio líquido × 100',
         'variacao-dia-fii': 'Variação do dia = quanto a cota do fundo subiu ou caiu no pregão de hoje, em relação ao fechamento do dia anterior.\n\nCálculo: (cotação atual − fechamento anterior) ÷ fechamento anterior × 100',
+        // --- Indicadores opcionais do botão "Customizar" das listas ---
+        'preco-indicador': 'Preço = cotação mais recente do ativo no pregão, conforme a última atualização do robô que alimenta esta lista.',
+        'variacao-dia-acoes': 'Variação do dia = quanto a ação subiu ou caiu no pregão de hoje, em relação ao fechamento do dia anterior.\n\nCálculo: (cotação atual − fechamento anterior) ÷ fechamento anterior × 100',
+        'vpa-indicador': 'VPA (Valor Patrimonial por Ação) = quanto do patrimônio líquido da empresa corresponde a cada ação. É o "valor contábil" de uma ação.\n\nCálculo: patrimônio líquido ÷ número de ações em circulação\n\nComparar o VPA com a cotação é o que dá o P/VP.',
+        'lpa-indicador': 'LPA (Lucro por Ação) = quanto de lucro líquido a empresa gerou para cada ação, nos últimos 12 meses.\n\nCálculo: lucro líquido ÷ número de ações em circulação\n\nComparar o LPA com a cotação é o que dá o P/L.',
+        'p-receita-indicador': 'P/Receita (Preço sobre Receita, ou P/S) = quanto o mercado paga por cada R$ 1 de receita anual da empresa.\n\nCálculo: valor de mercado ÷ receita dos últimos 12 meses\n\nÚtil para avaliar empresas que ainda têm lucro baixo ou negativo, quando o P/L não ajuda.',
+        'ev-ebitda-indicador': 'EV/EBITDA = valor da empresa (valor de mercado + dívida líquida) dividido pelo EBITDA, a geração de caixa operacional.\n\nÉ um "P/L que enxerga a dívida": duas empresas com o mesmo P/L podem ter EV/EBITDA bem diferentes se uma delas for muito endividada.\n\nNão se aplica a bancos.',
+        'margem-bruta-indicador': 'Margem Bruta = percentual da receita que sobra depois de descontar apenas o custo direto do que foi vendido (antes de despesas, juros e impostos).\n\nCálculo: (receita − custo dos produtos vendidos) ÷ receita × 100\n\nMostra o poder de precificação do negócio.',
+        'margem-ebitda-indicador': 'Margem EBITDA = percentual da receita que vira geração de caixa operacional, antes de juros, impostos, depreciação e amortização.\n\nCálculo: EBITDA ÷ receita × 100\n\nMede a eficiência da operação em si, sem o efeito da estrutura de capital.',
+        'roa-indicador': 'ROA (Return on Assets / Retorno sobre os Ativos) = quanto a empresa lucra para cada R$ 1 de ativo que ela possui.\n\nCálculo: lucro líquido ÷ ativo total × 100\n\nDiferente do ROE, o ROA não "melhora" só porque a empresa se endividou mais.',
+        'roic-indicador': 'ROIC (Return on Invested Capital / Retorno sobre o Capital Investido) = quanto a empresa gera de retorno sobre todo o capital colocado no negócio, próprio e de terceiros.\n\nCálculo: lucro operacional após impostos ÷ (patrimônio líquido + dívida)\n\nÉ o indicador que melhor mostra se a empresa cria valor: ROIC acima do custo de capital significa que cada real investido rende mais do que custa.',
+        'div-liq-ebitda-indicador': 'Dívida Líquida / EBITDA = quantos anos de geração de caixa atual seriam necessários para quitar toda a dívida líquida da empresa.\n\nCálculo: (dívida total − caixa) ÷ EBITDA\n\nQuanto menor, mais folgada a situação. Valor negativo significa caixa maior que a dívida (caixa líquido), o que é positivo. Não se aplica a bancos.',
+        'divida-patrimonio-indicador': 'Dívida / Patrimônio = quanto a empresa deve para cada R$ 1 de patrimônio dos acionistas.\n\nCálculo: dívida total ÷ patrimônio líquido\n\nQuanto maior, mais alavancada a empresa — mais lucro nos bons momentos, mais risco nos ruins.',
+        'liquidez-corrente-indicador': 'Liquidez Corrente = capacidade de pagar as contas de curto prazo com o que a empresa tem a receber no mesmo período.\n\nCálculo: ativo circulante ÷ passivo circulante\n\nAcima de 1 significa que há mais a receber do que a pagar nos próximos 12 meses.',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
@@ -9618,9 +9736,19 @@
         glossarioTooltipEl.style.left = `${left}px`;
       }
 
-      document.querySelectorAll('[data-glossario]').forEach(botao => {
+      // Exposta em window porque partes da página criam botões "?" depois
+      // do carregamento (ex.: o modal "Personalizar colunas" das listas de
+      // Ações/FIIs) — sem isso, esses botões ficariam sem balão, já que a
+      // varredura abaixo roda uma vez só.
+      window.ligarGlossario = function (raiz) {
+        (raiz || document).querySelectorAll('[data-glossario]').forEach(ligarBotaoGlossario);
+      };
+
+      function ligarBotaoGlossario(botao) {
+        if (botao.dataset.glossarioLigado === '1') return;
         const texto = GLOSSARIO[botao.getAttribute('data-glossario')];
         if (!texto) return;
+        botao.dataset.glossarioLigado = '1';
         botao.addEventListener('click', (e) => {
           e.stopPropagation();
           const meuIndice = botao.getAttribute('data-glossario');
@@ -9637,7 +9765,9 @@
         botao.addEventListener('mouseleave', () => {
           if (!glossarioTooltipEl.classList.contains('cmp-info-aberto')) fechar();
         });
-      });
+      }
+
+      window.ligarGlossario();
 
       document.addEventListener('click', fechar);
       window.addEventListener('scroll', fechar, { passive: true });
@@ -11910,6 +12040,7 @@
     function montarTabelaMercado({ chave, url, tbodySeletor, theadSeletor, filtrosContainerId, paginacaoContainerId, campoFiltro, colunas, ocultarDosChips = [] }) {
       const tbody = document.querySelector(tbodySeletor);
       const thead = document.querySelector(theadSeletor);
+      const tabelaEl = thead ? thead.closest('table') : null;
       const filtrosEl = document.getElementById(filtrosContainerId);
       const paginacaoEl = document.getElementById(paginacaoContainerId);
       if (!tbody || !thead || !filtrosEl) return;
@@ -11919,6 +12050,61 @@
       let valoresFiltro = [];
       let filtroAtivo = null;
       let filtroPendente = null; // se aplicarFiltro() for chamado antes do fetch terminar
+
+      // ---- Colunas visíveis (botão "Customizar") ----------------------
+      // A escolha fica no localStorage do próprio visitante — é preferência
+      // de exibição, não dado do site, então não precisa (nem deve) ir pro
+      // servidor. Se o armazenamento estiver bloqueado (aba anônima, cookies
+      // de terceiros desligados), tudo continua funcionando: cai no padrão.
+      const CHAVE_COLUNAS = `vr_colunas_${chave}`;
+      const padraoVisivel = () => new Set(colunas.filter(c => c.fixa || c.visivel !== false).map(c => c.campo));
+      function lerColunasSalvas() {
+        try {
+          const bruto = localStorage.getItem(CHAVE_COLUNAS);
+          if (!bruto) return padraoVisivel();
+          const salvos = JSON.parse(bruto);
+          if (!Array.isArray(salvos) || salvos.length === 0) return padraoVisivel();
+          // Só aceita campos que ainda existem (a lista de colunas pode
+          // mudar entre versões do site) e garante as colunas fixas.
+          const validos = salvos.filter(campo => colunas.some(c => c.campo === campo));
+          const conjunto = new Set(validos);
+          colunas.filter(c => c.fixa).forEach(c => conjunto.add(c.campo));
+          return conjunto.size > 1 ? conjunto : padraoVisivel();
+        } catch (e) {
+          return padraoVisivel();
+        }
+      }
+      function salvarColunas(conjunto) {
+        try { localStorage.setItem(CHAVE_COLUNAS, JSON.stringify([...conjunto])); } catch (e) { /* sem storage: só não persiste */ }
+      }
+      let colunasVisiveis = lerColunasSalvas();
+      const estaVisivel = c => colunasVisiveis.has(c.campo);
+      const colunasAtivas = () => colunas.filter(estaVisivel);
+
+      // Teto de colunas simultâneas: sem isso, ligando tudo a tabela passa
+      // de 2600px e é a PÁGINA INTEIRA que passa a rolar de lado (o
+      // cabeçalho do site, o hero, tudo) — porque no desktop o wrap da
+      // tabela é overflow:visible de propósito, pra não quebrar o
+      // cabeçalho fixo da lista. Com o teto + o modo compacto abaixo, a
+      // tabela cabe na largura do cartão em qualquer combinação possível.
+      const MAX_COLUNAS = 14;
+      const LIMITE_COMPACTO = 9; // a partir daqui, células mais justas
+
+      function aplicarVisibilidadeColunas() {
+        const total = colunasAtivas().length;
+        tabelaEl?.classList.toggle('lm-compacta', total >= LIMITE_COMPACTO);
+        thead.querySelectorAll('th').forEach(th => {
+          th.classList.toggle('lm-col-oculta', !colunasVisiveis.has(th.dataset.col));
+        });
+        tbody.querySelectorAll('tr').forEach(tr => {
+          const celulas = tr.querySelectorAll('td');
+          // Linhas de aviso ("Nenhum ativo encontrado") têm uma célula só,
+          // com colspan — não têm coluna pra esconder.
+          if (celulas.length !== colunas.length) return;
+          celulas.forEach((td, i) => td.classList.toggle('lm-col-oculta', !estaVisivel(colunas[i])));
+        });
+      }
+
       let colunaOrdenada = colunas.find(c => c.padrao) || colunas[0];
       let direcaoAsc = false;
       let carregado = false;
@@ -11969,6 +12155,153 @@
         valoresFiltro
           .filter(v => !ocultarDosChips.includes(v))
           .forEach(v => filtrosEl.appendChild(criarChip(v, v)));
+
+        // Separador "|" + botão que abre a escolha de colunas, depois do
+        // último chip de setor/segmento.
+        const separador = document.createElement('span');
+        separador.className = 'lm-chips-separador';
+        separador.setAttribute('aria-hidden', 'true');
+        separador.textContent = '|';
+        filtrosEl.appendChild(separador);
+
+        const btnCustomizar = document.createElement('button');
+        btnCustomizar.type = 'button';
+        btnCustomizar.className = 'lm-btn-customizar';
+        btnCustomizar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"></line><circle cx="10" cy="7" r="2.4" fill="var(--card)"></circle><line x1="4" y1="17" x2="20" y2="17"></line><circle cx="16" cy="17" r="2.4" fill="var(--card)"></circle></svg>Customizar';
+        btnCustomizar.addEventListener('click', abrirModalColunas);
+        filtrosEl.appendChild(btnCustomizar);
+      }
+
+      // ---- Modal de escolha de colunas --------------------------------
+      // Montado sob demanda (uma vez por tabela) e guardado pra reabrir:
+      // são até 20 linhas de toggle, não faz sentido existirem no HTML
+      // desde o carregamento se a maioria dos visitantes nunca abre.
+      let overlayColunas = null;
+      function construirModalColunas() {
+        const overlay = document.createElement('div');
+        overlay.className = 'calc-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.hidden = true;
+
+        const grupos = [];
+        colunas.filter(c => !c.fixa).forEach(c => {
+          const nome = c.grupo || 'Outros';
+          let g = grupos.find(x => x.nome === nome);
+          if (!g) { g = { nome, itens: [] }; grupos.push(g); }
+          g.itens.push(c);
+        });
+
+        // O "?" de cada indicador reaproveita o mesmo data-glossario dos
+        // cabeçalhos da tabela — mas como o glossário liga os handlers só
+        // no carregamento da página, aqui a ligação é feita à mão logo
+        // depois de montar o modal (ver ligarGlossarioNoModal).
+        const chaveGlossarioPorCampo = {};
+        thead.querySelectorAll('th[data-col]').forEach(th => {
+          const btn = th.querySelector('[data-glossario]');
+          if (btn) chaveGlossarioPorCampo[th.dataset.col] = btn.getAttribute('data-glossario');
+        });
+
+        const html = grupos.map(g => `
+          <div class="lm-col-grupo">
+            <h4>${g.nome}</h4>
+            <div class="lm-col-lista">
+              ${g.itens.map(c => {
+                const chaveGlos = chaveGlossarioPorCampo[c.campo];
+                return `
+                <label class="lm-col-item">
+                  <input type="checkbox" class="lm-col-check" data-campo="${c.campo}" />
+                  <span class="lm-switch" aria-hidden="true"></span>
+                  <span class="lm-col-nome">${c.rotulo || c.campo}</span>
+                  ${chaveGlos ? `<button type="button" class="hg-info-btn" data-glossario="${chaveGlos}" aria-label="O que é ${c.rotulo}?" title="O que é ${c.rotulo}?">?</button>` : ''}
+                </label>`;
+              }).join('')}
+            </div>
+          </div>`).join('');
+
+        overlay.innerHTML = `
+          <div class="calc-modal lm-colunas-modal">
+            <div class="calc-modal-topo">
+              <h3>Personalizar colunas</h3>
+              <button type="button" class="calc-fechar" aria-label="Fechar">✕</button>
+            </div>
+            <div class="calc-corpo">
+              <p class="lm-col-ajuda">Escolha os indicadores que aparecem na tabela. A escolha fica salva neste navegador.</p>
+              ${html}
+            </div>
+            <div class="lm-col-rodape">
+              <button type="button" class="lm-col-restaurar">Restaurar padrão</button>
+              <span class="lm-col-contador" aria-live="polite"></span>
+              <button type="button" class="lm-col-salvar">Salvar seleção</button>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+
+        const checks = [...overlay.querySelectorAll('.lm-col-check')];
+        const contadorEl = overlay.querySelector('.lm-col-contador');
+        const fixas = colunas.filter(c => c.fixa).length;
+
+        // Mantém o contador em dia e trava o que ainda está desligado
+        // quando o teto é atingido (o já ligado continua clicável, pra
+        // sempre dar pra trocar uma coluna por outra).
+        function atualizarLimite() {
+          const ligados = checks.filter(ch => ch.checked).length + fixas;
+          const noTeto = ligados >= MAX_COLUNAS;
+          checks.forEach(ch => { ch.disabled = noTeto && !ch.checked; });
+          overlay.querySelectorAll('.lm-col-item').forEach(item => {
+            const ch = item.querySelector('.lm-col-check');
+            item.classList.toggle('lm-col-item-travado', ch.disabled);
+          });
+          if (contadorEl) {
+            contadorEl.textContent = `${ligados} de ${MAX_COLUNAS} colunas`;
+            contadorEl.classList.toggle('no-teto', noTeto);
+          }
+        }
+        checks.forEach(ch => ch.addEventListener('change', atualizarLimite));
+
+        const marcarConforme = conjunto => {
+          checks.forEach(ch => { ch.disabled = false; ch.checked = conjunto.has(ch.dataset.campo); });
+          atualizarLimite();
+        };
+
+        const fechar = () => { overlay.hidden = true; };
+        overlay.querySelector('.calc-fechar').addEventListener('click', fechar);
+        overlay.addEventListener('click', e => { if (e.target === overlay) fechar(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) fechar(); });
+
+        overlay.querySelector('.lm-col-restaurar').addEventListener('click', () => marcarConforme(padraoVisivel()));
+
+        overlay.querySelector('.lm-col-salvar').addEventListener('click', () => {
+          const escolhidas = new Set(checks.filter(ch => ch.checked).map(ch => ch.dataset.campo));
+          colunas.filter(c => c.fixa).forEach(c => escolhidas.add(c.campo));
+          colunasVisiveis = escolhidas;
+          salvarColunas(colunasVisiveis);
+          // Se a coluna que estava ordenando saiu, volta pra ordenação padrão.
+          if (!colunasVisiveis.has(colunaOrdenada.campo)) {
+            colunaOrdenada = colunas.find(c => c.padrao && colunasVisiveis.has(c.campo)) || colunasAtivas()[0];
+            direcaoAsc = false;
+          }
+          fechar();
+          render();
+        });
+
+        ligarGlossarioNoModal(overlay);
+        overlay._marcarConforme = marcarConforme;
+        return overlay;
+      }
+
+      // O glossário do site varre [data-glossario] uma vez, no
+      // carregamento — os "?" criados aqui depois disso precisam ser
+      // ligados manualmente. Reaproveita a função global exposta pelo
+      // próprio glossário, sem duplicar a lógica do balão.
+      function ligarGlossarioNoModal(raiz) {
+        if (typeof window.ligarGlossario === 'function') window.ligarGlossario(raiz);
+      }
+
+      function abrirModalColunas() {
+        if (!overlayColunas) overlayColunas = construirModalColunas();
+        overlayColunas._marcarConforme(colunasVisiveis);
+        overlayColunas.hidden = false;
       }
 
       function renderPaginacao(totalItens) {
@@ -12037,7 +12370,8 @@
         });
 
         if (lista.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="${colunas.length}" class="lista-mercado-carregando">Nenhum ativo encontrado nesse filtro.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="${colunasAtivas().length}" class="lista-mercado-carregando">Nenhum ativo encontrado nesse filtro.</td></tr>`;
+          aplicarVisibilidadeColunas();
           if (paginacaoEl) paginacaoEl.innerHTML = '';
           // Reavalia com o conteúdo já atualizado (a 1ª chamada, lá no
           // início de render(), ainda viu o corpo da renderização
@@ -12064,6 +12398,8 @@
             ${colunas.slice(1).map(c => `<td class="lm-num ${c.classe || ''}">${c.render(d)}</td>`).join('')}
           </tr>
         `).join('');
+
+        aplicarVisibilidadeColunas();
 
         tbody.querySelectorAll('tr[data-ticker]').forEach(tr => {
           tr.addEventListener('click', () => {
@@ -12130,15 +12466,31 @@
       paginacaoContainerId: 'paginacaoListaAcoes',
       campoFiltro: 'setor',
       ocultarDosChips: ['Outros'],
+      // "visivel: false" = coluna existe, mas começa desligada (o usuário
+      // liga no botão "Customizar"). "grupo" só organiza o modal.
+      // "padrao: true" marca a coluna usada na ordenação inicial.
       colunas: [
-        { campo: 'ativo' },
-        { campo: 'valor_mercado', padrao: true, render: d => moedaGlobal(d.valor_mercado) },
-        { campo: 'pl', render: d => numeroGlobal(d.pl) },
-        { campo: 'pvp', render: d => numeroGlobal(d.pvp) },
-        { campo: 'dy_pct', render: d => percentualGlobal(d.dy_pct) },
-        { campo: 'margem_liquida_pct', render: d => percentualGlobal(d.margem_liquida_pct) },
-        { campo: 'roe_pct', render: d => percentualGlobal(d.roe_pct) },
-        { campo: 'setor', classe: 'lm-setor-tag', render: d => d.setor || '—' },
+        { campo: 'ativo', rotulo: 'Ativo', fixa: true },
+        { campo: 'preco', rotulo: 'Preço', grupo: 'Cotação', visivel: false, render: d => moedaGlobal(d.preco) },
+        { campo: 'variacao_dia_pct', rotulo: 'Variação do dia', grupo: 'Cotação', visivel: false, render: d => variacaoColoridaGlobal(d.variacao_dia_pct) },
+        { campo: 'valor_mercado', rotulo: 'Valor de Mercado', grupo: 'Cotação', padrao: true, render: d => moedaGlobal(d.valor_mercado) },
+        { campo: 'pl', rotulo: 'P/L', grupo: 'Valuation', render: d => numeroGlobal(d.pl) },
+        { campo: 'pvp', rotulo: 'P/VP', grupo: 'Valuation', render: d => numeroGlobal(d.pvp) },
+        { campo: 'vpa', rotulo: 'VPA', grupo: 'Valuation', visivel: false, render: d => moedaGlobal(d.vpa) },
+        { campo: 'lpa', rotulo: 'LPA', grupo: 'Valuation', visivel: false, render: d => moedaGlobal(d.lpa) },
+        { campo: 'p_receita', rotulo: 'P/Receita', grupo: 'Valuation', visivel: false, render: d => numeroGlobal(d.p_receita) },
+        { campo: 'ev_ebitda', rotulo: 'EV/EBITDA', grupo: 'Valuation', visivel: false, render: d => numeroGlobal(d.ev_ebitda) },
+        { campo: 'dy_pct', rotulo: 'Dividend Yield', grupo: 'Proventos', render: d => percentualGlobal(d.dy_pct) },
+        { campo: 'margem_bruta_pct', rotulo: 'Margem Bruta', grupo: 'Rentabilidade', visivel: false, render: d => percentualGlobal(d.margem_bruta_pct) },
+        { campo: 'margem_liquida_pct', rotulo: 'Margem Líquida', grupo: 'Rentabilidade', render: d => percentualGlobal(d.margem_liquida_pct) },
+        { campo: 'margem_ebitda_pct', rotulo: 'Margem EBITDA', grupo: 'Rentabilidade', visivel: false, render: d => percentualGlobal(d.margem_ebitda_pct) },
+        { campo: 'roe_pct', rotulo: 'ROE', grupo: 'Rentabilidade', render: d => percentualGlobal(d.roe_pct) },
+        { campo: 'roa_pct', rotulo: 'ROA', grupo: 'Rentabilidade', visivel: false, render: d => percentualGlobal(d.roa_pct) },
+        { campo: 'roic_pct', rotulo: 'ROIC', grupo: 'Rentabilidade', visivel: false, render: d => percentualGlobal(d.roic_pct) },
+        { campo: 'div_liq_ebitda', rotulo: 'Dív. Líq/EBITDA', grupo: 'Endividamento', visivel: false, render: d => numeroGlobal(d.div_liq_ebitda) },
+        { campo: 'divida_patrimonio', rotulo: 'Dívida/Patrimônio', grupo: 'Endividamento', visivel: false, render: d => numeroGlobal(d.divida_patrimonio) },
+        { campo: 'liquidez_corrente', rotulo: 'Liquidez Corrente', grupo: 'Endividamento', visivel: false, render: d => numeroGlobal(d.liquidez_corrente) },
+        { campo: 'setor', rotulo: 'Setor', grupo: 'Classificação', classe: 'lm-setor-tag', render: d => d.setor || '—' },
       ],
     });
 
@@ -12151,12 +12503,13 @@
       paginacaoContainerId: 'paginacaoListaFiis',
       campoFiltro: 'segmento',
       colunas: [
-        { campo: 'ativo' },
-        { campo: 'patrimonio_liquido', padrao: true, render: d => moedaGlobal(d.patrimonio_liquido) },
-        { campo: 'pvp', render: d => numeroGlobal(d.pvp) },
-        { campo: 'dy_pct', render: d => percentualGlobal(d.dy_pct) },
-        { campo: 'variacao_dia_pct', render: d => variacaoColoridaGlobal(d.variacao_dia_pct) },
-        { campo: 'segmento', classe: 'lm-setor-tag', render: d => d.segmento || '—' },
+        { campo: 'ativo', rotulo: 'Ativo', fixa: true },
+        { campo: 'preco', rotulo: 'Cotação', grupo: 'Cotação', visivel: false, render: d => moedaGlobal(d.preco) },
+        { campo: 'patrimonio_liquido', rotulo: 'Patrimônio Líquido', grupo: 'Cotação', padrao: true, render: d => moedaGlobal(d.patrimonio_liquido) },
+        { campo: 'pvp', rotulo: 'P/VP', grupo: 'Valuation', render: d => numeroGlobal(d.pvp) },
+        { campo: 'dy_pct', rotulo: 'Dividend Yield', grupo: 'Proventos', render: d => percentualGlobal(d.dy_pct) },
+        { campo: 'variacao_dia_pct', rotulo: 'Variação do dia', grupo: 'Cotação', render: d => variacaoColoridaGlobal(d.variacao_dia_pct) },
+        { campo: 'segmento', rotulo: 'Segmento', grupo: 'Classificação', classe: 'lm-setor-tag', render: d => d.segmento || '—' },
       ],
     });
 

@@ -283,7 +283,9 @@ def buscar_universo_acoes():
 
 
 # ---------------------------------------------------------------------------
-# 2) FUNDAMENTOS DAS AÇÕES — P/L, P/VP, Margem Líquida, DY, Valor de Mercado
+# 2) FUNDAMENTOS DAS AÇÕES — P/L, P/VP, VPA, LPA, P/Receita, EV/EBITDA,
+#    Margens (bruta, líquida, EBITDA), ROE, ROA, ROIC, Dív.Líq/EBITDA,
+#    Dívida/Patrimônio, Liquidez Corrente, DY e Valor de Mercado
 # ---------------------------------------------------------------------------
 def enriquecer_acoes_com_fundamentals(universo):
     log(f"Buscando fundamentos de {len(universo)} ações em lotes de {LOTE_FUNDAMENTALS}...")
@@ -330,13 +332,35 @@ def enriquecer_acoes_com_fundamentals(universo):
                 margens = ttm.get("margins") or {}
                 dividendos = ttm.get("dividends") or {}
                 rentabilidade = ttm.get("profitability") or {}
+                alavancagem = ttm.get("leverage") or {}
                 registro["pl"] = valuation.get("price_to_earnings_ratio")
                 registro["pvp"] = valuation.get("price_to_book_ratio")
                 registro["margem_liquida_pct"] = margens.get("net_profit_margin")
                 registro["dy_pct"] = dividendos.get("yield_percent")
                 registro["roe_pct"] = rentabilidade.get("return_on_equity")
+                # Indicadores extras do botão "Customizar" da lista de ações
+                # no site (o visitante liga/desliga cada coluna). Vêm todos
+                # do mesmo TTM que já era lido acima — nenhuma requisição a
+                # mais na HG Brasil.
+                registro["vpa"] = valuation.get("book_value_per_share")
+                registro["lpa"] = valuation.get("earnings_per_share")
+                registro["p_receita"] = valuation.get("price_to_sales_ratio")
+                registro["ev_ebitda"] = valuation.get("ev_to_ebitda")
+                registro["margem_bruta_pct"] = margens.get("gross_profit_margin")
+                registro["margem_ebitda_pct"] = margens.get("ebitda_margin")
+                registro["roa_pct"] = rentabilidade.get("return_on_assets")
+                registro["roic_pct"] = rentabilidade.get("return_on_invested_capital")
+                registro["div_liq_ebitda"] = alavancagem.get("net_debt_to_ebitda_ratio")
+                registro["divida_patrimonio"] = alavancagem.get("debt_to_equity_ratio")
+                registro["liquidez_corrente"] = alavancagem.get("current_ratio")
             else:
-                registro["pl"] = registro["pvp"] = registro["margem_liquida_pct"] = registro["dy_pct"] = registro["roe_pct"] = None
+                for campo_vazio in (
+                    "pl", "pvp", "margem_liquida_pct", "dy_pct", "roe_pct",
+                    "vpa", "lpa", "p_receita", "ev_ebitda", "margem_bruta_pct",
+                    "margem_ebitda_pct", "roa_pct", "roic_pct", "div_liq_ebitda",
+                    "divida_patrimonio", "liquidez_corrente",
+                ):
+                    registro[campo_vazio] = None
 
         log(f"  lote {i}-{i+len(lote)} ok ({len(dados.get('results', []))} retornados)")
         time.sleep(PAUSA_ENTRE_LOTES)
