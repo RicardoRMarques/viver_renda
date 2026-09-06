@@ -847,31 +847,35 @@
          e por isso também NÃO estica até a borda da tela: fica do
          mesmo tamanho do cartão da tabela abaixo, alinhado com ele. */
       .lista-mercado-topo {
-        position: sticky; top: 0; z-index: 8; background: var(--card);
+        position: static; z-index: 8; background: var(--card);
         padding: 10px 0 8px;
       }
       .lista-mercado-filtros {
-        position: sticky; top: 0; z-index: 7; background: var(--card);
+        position: static; z-index: 7; background: var(--card);
         padding-bottom: 12px; margin-bottom: 0;
         box-shadow: 0 6px 10px -6px rgba(0,0,0,0.35);
       }
-      /* position:sticky só "gruda" enquanto o elemento ANCESTRAL que o
-         contém (no caso da th, a própria <table>) for mais alto que a
-         pilha de cabeçalhos grudados — senão ele fica preso quase no
-         mesmo instante em que gruda (sem corda pra rolar), o que na
-         prática parece que "não gruda, sobe junto". Forçar uma altura
-         mínima na tabela pra sempre sobrar corda criava um vão vazio feio
-         quando a página/filtro tinha só 1-2 linhas. Em vez disso, quando
-         a página.querySelectorAll('.lm-sem-fixar') é aplicada pelo JS
-         (`atualizarCabecalhoFixoListaMercado`) — ou seja, quando dá pra
-         ver a tabela inteira (linhas + paginação) numa tela só, sem
-         precisar rolar — o cabeçalho simplesmente não tenta grudar: fica
-         estático, rolando junto com o resto do cartão. Não faz falta
-         grudar algo que já cabe inteiro na tela. */
-      .lista-mercado.lm-sem-fixar .lista-mercado-topo,
-      .lista-mercado.lm-sem-fixar .lista-mercado-filtros,
-      .lista-mercado.lm-sem-fixar .lista-mercado-tabela thead th {
-        position: static;
+      /* .lm-fixo é ligado/desligado via JS (função
+         aplicarFixacaoListaMercado, mais abaixo no arquivo) conforme a
+         posição do scroll — ver o comentário grande lá pra entender por
+         que isso não é feito só com position:sticky. top/left/width vêm
+         todos como estilo inline calculado no momento de fixar. */
+      /* margin:0 é essencial aqui: "top" num elemento position:fixed
+         posiciona a borda da MARGEM, não a borda visível do elemento —
+         a .lista-mercado-filtros tem margin-top:4px no estado normal
+         (linha ~787), então sem isso ela sempre renderizava 4px MAIS
+         PRA BAIXO do que o JS calculou, abrindo uma frincha entre ela e
+         o bloco de cima por onde dava pra ver a linha da tabela que
+         ficou por baixo (era isso, e não um bug de composição/GPU, que
+         causava o "fantasma" de linha visto entre o título e os chips). */
+      .lista-mercado-topo.lm-fixo,
+      .lista-mercado-filtros.lm-fixo {
+        position: fixed;
+        margin: 0;
+      }
+      .lista-mercado-tabela thead th.lm-fixo {
+        position: fixed;
+        margin: 0;
       }
     }
     table.lista-mercado-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; min-width: 680px; }
@@ -883,8 +887,14 @@
       background: var(--card);
       z-index: 4;
     }
+    /* Em telas estreitas a th usa position:sticky de verdade (top:0
+       relativo à própria .lista-mercado-tabela-wrap, que tem seu próprio
+       scroll — max-height:70vh acima), sem o problema de altura do
+       ancestral porque o próprio wrap É o container de scroll. Em telas
+       largas a th fica estática por padrão; o JS liga position:fixed
+       (via .lm-fixo) só quando a seção está passando pela faixa certa. */
     @media (max-width: 1199px) { .lista-mercado-tabela thead th { top: 0; } }
-    @media (min-width: 1200px) { .lista-mercado-tabela thead th { top: 64px; } }
+    @media (min-width: 1200px) { .lista-mercado-tabela thead th { position: static; } }
     .lista-mercado-tabela thead th:hover { color: var(--text); }
     .lista-mercado-tabela thead th.lm-col-ordenavel::after { content: ' ⇅'; opacity: 0.45; font-size: 0.7em; }
     .lista-mercado-tabela thead th.ordenado-asc::after { content: ' ▲'; color: var(--primary); font-size: 0.65em; }
@@ -11709,52 +11719,138 @@
     // com [hidden] pra não aparecer sozinhas embaixo da consulta rápida
     // toda vez que a home carrega.
     // ============================================================
-    // Empilha o "cabeçalho fixo" de uma lista de mercado (título+fechar,
-    // chips de filtro e linha de colunas da tabela) medindo as alturas de
-    // verdade em vez de chutar valores em px — ver comentário no CSS
-    // (".lista-mercado-tabela thead th"). Em telas estreitas (<1200px) a
-    // tabela já tem sua própria caixa com scroll e cabeçalho grudado
-    // (top:0 relativo a ELA), então aqui só limpamos qualquer `top`
-    // deixado por uma medição anterior em tela larga.
-    function atualizarCabecalhoFixoListaMercado(secao) {
-      if (!secao || secao.hidden) return;
+    // Cabeçalho fixo das listas de mercado (título+fechar, chips de
+    // filtro e linha de colunas da tabela) em telas >=1200px.
+    //
+    // Isto NÃO é feito com position:sticky. O motivo: um elemento sticky
+    // só "gruda" enquanto o ancestral que serve de referência pra ele
+    // tiver altura sobrando — no caso da <th>, especificamente a própria
+    // <table> (não a <section> ao redor, nem a div que embrulha a
+    // tabela: testado e confirmado). Com poucas linhas na página/filtro
+    // atual (ex.: só 1-5 ativos depois de filtrar), a tabela fica curta
+    // demais e o cabeçalho solta quase no mesmo instante em que gruda —
+    // dá a impressão de "não gruda, sobe junto" ao rolar. Forçar uma
+    // altura mínima artificial na tabela até resolvia o "grudar", mas
+    // deixava um vão vazio feio embaixo da última linha. E simplesmente
+    // desistir de grudar quando cabe pouca linha (tentativa anterior)
+    // também não serve: o cabeçalho ainda deveria ficar visível enquanto
+    // QUALQUER parte da seção estiver na tela, mesmo que ela caiba
+    // inteira numa tela só — o usuário ainda está "dentro" da lista
+    // rolando por cima dela.
+    //
+    // Por isso o cabeçalho usa position:fixed calculado à mão: a cada
+    // scroll, decide se a seção está "passando" pela faixa onde o
+    // cabeçalho deveria ficar por cima (do topo do site até o fim da
+    // seção) e, só nesse intervalo, tira topo/filtros/colunas do fluxo
+    // normal e fixa cada um exatamente no lugar — com a MESMA
+    // largura/posição horizontal que teriam no fluxo normal, medida
+    // sempre que o conteúdo muda (render/resize), nunca a cada scroll.
+    // position:fixed não depende da altura de nenhum ancestral, então
+    // funciona igual não importa quantas linhas a página atual tenha.
+
+    // Mede topo/filtros/colunas no fluxo NORMAL (sem position:fixed) —
+    // precisa ser chamado sempre que o conteúdo muda de tamanho (troca
+    // de página/filtro/ordenação, resize, fontes carregando), nunca a
+    // cada scroll.
+    function medirListaMercado(secao) {
       const topo = secao.querySelector('.lista-mercado-topo');
       const filtros = secao.querySelector('.lista-mercado-filtros');
-      const ths = secao.querySelectorAll('.lista-mercado-tabela thead th');
-      if (window.innerWidth < 1200) {
-        if (topo) topo.style.top = '';
-        if (filtros) filtros.style.top = '';
-        ths.forEach(th => { th.style.top = ''; });
-        secao.classList.remove('lm-sem-fixar');
-        return;
-      }
+      const ths = [...secao.querySelectorAll('.lista-mercado-tabela thead th')];
+      // Limpa qualquer fixação/medida anterior antes de medir de novo —
+      // senão a medição pegaria a própria caixa já fixada (largura
+      // "encolhida" ao conteúdo, em vez da largura real da coluna).
+      [topo, filtros, ...ths].forEach(el => {
+        if (!el) return;
+        el.classList.remove('lm-fixo');
+        el.style.top = ''; el.style.left = ''; el.style.width = '';
+      });
+      secao.classList.remove('lm-fixando');
+      if (window.innerWidth < 1200) return null;
+
       const cabecalho = document.querySelector('header');
       const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 64;
-      if (topo) topo.style.top = alturaCabecalho + 'px';
-      const alturaTopo = topo ? topo.getBoundingClientRect().height : 0;
-      if (filtros) filtros.style.top = (alturaCabecalho + alturaTopo) + 'px';
-      const alturaFiltros = filtros ? filtros.getBoundingClientRect().height : 0;
-      const topoDaTabela = alturaCabecalho + alturaTopo + alturaFiltros;
-      ths.forEach(th => { th.style.top = topoDaTabela + 'px'; });
-      // position:sticky só "gruda" enquanto o ancestral que serve de
-      // referência pra ele (no caso da th, a própria <table>) for mais
-      // alto que essa pilha de cabeçalhos — com poucas linhas na página
-      // atual (ex.: 1 ativo depois de filtrar) a tabela fica curta demais
-      // e o cabeçalho solta quase no mesmo instante em que gruda, dando a
-      // impressão de "não gruda, sobe junto" ao rolar. Ver comentário
-      // completo no CSS (".lm-sem-fixar"). Em vez de forçar altura
-      // artificial na tabela (deixava um vão vazio feio), só ativamos o
-      // grudado quando o corpo da tabela + paginação são mais altos do
-      // que a tela sobrando abaixo da pilha de cabeçalhos — ou seja, só
-      // quando realmente sobra algo pra rolar por baixo do cabeçalho.
-      const alturaThead = ths[0] ? ths[0].getBoundingClientRect().height : 44;
-      const tbody = secao.querySelector('.lista-mercado-tabela tbody');
-      const paginacao = secao.querySelector('.lista-mercado-paginacao');
-      const alturaCorpo = tbody ? tbody.getBoundingClientRect().height : 0;
-      const alturaPaginacao = paginacao ? paginacao.getBoundingClientRect().height : 0;
-      const espacoDisponivel = window.innerHeight - (topoDaTabela + alturaThead);
-      const cabeInteiraNaTela = (alturaCorpo + alturaPaginacao) <= espacoDisponivel;
-      secao.classList.toggle('lm-sem-fixar', cabeInteiraNaTela);
+      const topoRect = topo ? topo.getBoundingClientRect() : null;
+      const alturaTopo = topoRect ? topoRect.height : 0;
+      const filtrosRect = filtros ? filtros.getBoundingClientRect() : null;
+      const alturaFiltros = filtrosRect ? filtrosRect.height : 0;
+      const alturaThead = ths[0] ? ths[0].getBoundingClientRect().height : 0;
+      // Altura NATURAL da seção inteira, medida com tudo em fluxo normal
+      // (nada fixado ainda, por causa da limpeza lá em cima). Importante
+      // usar essa altura em cache, e não reconsultar ao vivo depois de
+      // fixar — quando topo/filtros/th viram position:fixed, eles somem
+      // do fluxo e a seção "encolhe", o que bagunçava a própria conta que
+      // decide se deve fixar (loop: fixa → encolhe → some a condição que
+      // fixou → desfixa → volta a crescer → fixa nulo → repete, piscando).
+      const alturaSecaoNatural = secao.getBoundingClientRect().height;
+      return {
+        topo, filtros,
+        topoLeft: topoRect ? topoRect.left : 0, topoWidth: topoRect ? topoRect.width : 0,
+        filtrosLeft: filtrosRect ? filtrosRect.left : 0, filtrosWidth: filtrosRect ? filtrosRect.width : 0,
+        ths: ths.map(th => { const r = th.getBoundingClientRect(); return { el: th, left: r.left, width: r.width }; }),
+        alturaCabecalho, alturaTopo, alturaFiltros, alturaThead, alturaSecaoNatural,
+        topoDaTabela: alturaCabecalho + alturaTopo + alturaFiltros,
+      };
+    }
+
+    // Aplica (ou remove) a fixação usando as medidas em cache — chamado a
+    // cada scroll, por isso não faz NENHUMA medição aqui, só lê números
+    // já calculados e decide/aplica. secao.getBoundingClientRect().top é
+    // a única leitura de layout aqui (o topo da seção não se move quando
+    // os filhos dela viram fixed — só a altura dela encolheria, por isso
+    // usamos a altura em CACHE pra achar o "fim" da seção, não a altura
+    // ao vivo).
+    function aplicarFixacaoListaMercado(secao, medidas) {
+      if (!medidas) return;
+      const topoDaSecao = secao.getBoundingClientRect().top;
+      const fimDaSecao = topoDaSecao + medidas.alturaSecaoNatural;
+      const alturaPilha = medidas.alturaCabecalho + medidas.alturaTopo + medidas.alturaFiltros + medidas.alturaThead;
+      // "Dentro da faixa" = o topo da seção já passou por baixo do
+      // cabeçalho do site, mas o fim da seção ainda não passou por cima
+      // de onde a pilha de cabeçalhos fixos terminaria.
+      const deveFixar = topoDaSecao <= medidas.alturaCabecalho && fimDaSecao > alturaPilha;
+      secao.classList.toggle('lm-fixando', deveFixar);
+      // As alturas medidas (getBoundingClientRect) vêm com casas
+      // decimais (ex.: 119.27px). Se encostarmos cada bloco exatamente
+      // na borda calculada do anterior, o arredondamento de subpixel do
+      // navegador às vezes deixa uma frestinha de menos de 1px entre um
+      // bloco fixo e o próximo — por ela dava pra ver uma "sombra" da
+      // linha da tabela que ficou por baixo (rolada pra cima, já que o
+      // <thead> encolhe a 0 quando os <th> viram fixed). Por isso cada
+      // bloco sobrepõe 1px o de cima: como topo/filtros/th já têm
+      // z-index decrescente nessa ordem (e o <header> do site, por cima
+      // de todos, com z-index 1000), a sobreposição fica escondida atrás
+      // do bloco de cima e fecha a frincha.
+      const SOBREPOSICAO = 1;
+      const topoTop = medidas.alturaCabecalho - SOBREPOSICAO;
+      const filtrosTop = medidas.alturaCabecalho + medidas.alturaTopo - SOBREPOSICAO * 2;
+      const theadTop = medidas.alturaCabecalho + medidas.alturaTopo + medidas.alturaFiltros - SOBREPOSICAO * 3;
+      if (medidas.topo) {
+        medidas.topo.classList.toggle('lm-fixo', deveFixar);
+        medidas.topo.style.top = deveFixar ? topoTop + 'px' : '';
+        medidas.topo.style.left = deveFixar ? medidas.topoLeft + 'px' : '';
+        medidas.topo.style.width = deveFixar ? medidas.topoWidth + 'px' : '';
+      }
+      if (medidas.filtros) {
+        medidas.filtros.classList.toggle('lm-fixo', deveFixar);
+        medidas.filtros.style.top = deveFixar ? filtrosTop + 'px' : '';
+        medidas.filtros.style.left = deveFixar ? medidas.filtrosLeft + 'px' : '';
+        medidas.filtros.style.width = deveFixar ? medidas.filtrosWidth + 'px' : '';
+      }
+      medidas.ths.forEach(m => {
+        m.el.classList.toggle('lm-fixo', deveFixar);
+        m.el.style.top = deveFixar ? theadTop + 'px' : '';
+        m.el.style.left = deveFixar ? m.left + 'px' : '';
+        m.el.style.width = deveFixar ? m.width + 'px' : '';
+      });
+    }
+
+    // Remede e já reaplica de imediato (cobre o caso de reabrir/trocar
+    // filtro/página enquanto o scroll já está no meio da seção).
+    function atualizarCabecalhoFixoListaMercado(secao) {
+      if (!secao || secao.hidden) return;
+      const medidas = medirListaMercado(secao);
+      secao._lmMedidas = medidas;
+      if (medidas) aplicarFixacaoListaMercado(secao, medidas);
     }
     function atualizarTodosCabecalhosFixosMercado() {
       atualizarCabecalhoFixoListaMercado(document.getElementById('lista-acoes'));
@@ -11767,6 +11863,21 @@
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(atualizarTodosCabecalhosFixosMercado);
     }
+    // No scroll só REAPLICA com as medidas já em cache (nada de medir de
+    // novo aqui — mediria com custo alto a cada frame). Throttle via
+    // requestAnimationFrame pra não empilhar trabalho a cada pixel.
+    let lmScrollTicking = false;
+    function lmChecarFixacaoTodas() {
+      ['lista-acoes', 'lista-fiis'].forEach(id => {
+        const secao = document.getElementById(id);
+        if (secao && !secao.hidden && secao._lmMedidas) aplicarFixacaoListaMercado(secao, secao._lmMedidas);
+      });
+    }
+    window.addEventListener('scroll', () => {
+      if (lmScrollTicking) return;
+      lmScrollTicking = true;
+      requestAnimationFrame(() => { lmChecarFixacaoTodas(); lmScrollTicking = false; });
+    }, { passive: true });
 
     function revelarSecaoMercado(id) {
       const secao = document.getElementById(id);
