@@ -855,6 +855,24 @@
         padding-bottom: 12px; margin-bottom: 0;
         box-shadow: 0 6px 10px -6px rgba(0,0,0,0.35);
       }
+      /* position:sticky só "gruda" enquanto o elemento ANCESTRAL que o
+         contém (no caso da th, a própria <table>) for mais alto que a
+         pilha de cabeçalhos grudados — senão ele fica preso quase no
+         mesmo instante em que gruda (sem corda pra rolar), o que na
+         prática parece que "não gruda, sobe junto". Forçar uma altura
+         mínima na tabela pra sempre sobrar corda criava um vão vazio feio
+         quando a página/filtro tinha só 1-2 linhas. Em vez disso, quando
+         a página.querySelectorAll('.lm-sem-fixar') é aplicada pelo JS
+         (`atualizarCabecalhoFixoListaMercado`) — ou seja, quando dá pra
+         ver a tabela inteira (linhas + paginação) numa tela só, sem
+         precisar rolar — o cabeçalho simplesmente não tenta grudar: fica
+         estático, rolando junto com o resto do cartão. Não faz falta
+         grudar algo que já cabe inteiro na tela. */
+      .lista-mercado.lm-sem-fixar .lista-mercado-topo,
+      .lista-mercado.lm-sem-fixar .lista-mercado-filtros,
+      .lista-mercado.lm-sem-fixar .lista-mercado-tabela thead th {
+        position: static;
+      }
     }
     table.lista-mercado-tabela { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.86rem; min-width: 680px; }
     .lista-mercado-tabela thead th {
@@ -11707,6 +11725,7 @@
         if (topo) topo.style.top = '';
         if (filtros) filtros.style.top = '';
         ths.forEach(th => { th.style.top = ''; });
+        secao.classList.remove('lm-sem-fixar');
         return;
       }
       const cabecalho = document.querySelector('header');
@@ -11717,6 +11736,25 @@
       const alturaFiltros = filtros ? filtros.getBoundingClientRect().height : 0;
       const topoDaTabela = alturaCabecalho + alturaTopo + alturaFiltros;
       ths.forEach(th => { th.style.top = topoDaTabela + 'px'; });
+      // position:sticky só "gruda" enquanto o ancestral que serve de
+      // referência pra ele (no caso da th, a própria <table>) for mais
+      // alto que essa pilha de cabeçalhos — com poucas linhas na página
+      // atual (ex.: 1 ativo depois de filtrar) a tabela fica curta demais
+      // e o cabeçalho solta quase no mesmo instante em que gruda, dando a
+      // impressão de "não gruda, sobe junto" ao rolar. Ver comentário
+      // completo no CSS (".lm-sem-fixar"). Em vez de forçar altura
+      // artificial na tabela (deixava um vão vazio feio), só ativamos o
+      // grudado quando o corpo da tabela + paginação são mais altos do
+      // que a tela sobrando abaixo da pilha de cabeçalhos — ou seja, só
+      // quando realmente sobra algo pra rolar por baixo do cabeçalho.
+      const alturaThead = ths[0] ? ths[0].getBoundingClientRect().height : 44;
+      const tbody = secao.querySelector('.lista-mercado-tabela tbody');
+      const paginacao = secao.querySelector('.lista-mercado-paginacao');
+      const alturaCorpo = tbody ? tbody.getBoundingClientRect().height : 0;
+      const alturaPaginacao = paginacao ? paginacao.getBoundingClientRect().height : 0;
+      const espacoDisponivel = window.innerHeight - (topoDaTabela + alturaThead);
+      const cabeInteiraNaTela = (alturaCorpo + alturaPaginacao) <= espacoDisponivel;
+      secao.classList.toggle('lm-sem-fixar', cabeInteiraNaTela);
     }
     function atualizarTodosCabecalhosFixosMercado() {
       atualizarCabecalhoFixoListaMercado(document.getElementById('lista-acoes'));
@@ -11946,6 +11984,11 @@
         if (lista.length === 0) {
           tbody.innerHTML = `<tr><td colspan="${colunas.length}" class="lista-mercado-carregando">Nenhum ativo encontrado nesse filtro.</td></tr>`;
           if (paginacaoEl) paginacaoEl.innerHTML = '';
+          // Reavalia com o conteúdo já atualizado (a 1ª chamada, lá no
+          // início de render(), ainda viu o corpo da renderização
+          // anterior) — ver comentário grande em
+          // atualizarCabecalhoFixoListaMercado().
+          atualizarCabecalhoFixoListaMercado(thead.closest('.lista-mercado'));
           return;
         }
 
@@ -11974,6 +12017,10 @@
         });
 
         renderPaginacao(lista.length);
+        // Reavalia com o corpo/paginação já no tamanho final desta
+        // renderização — ver comentário grande em
+        // atualizarCabecalhoFixoListaMercado().
+        atualizarCabecalhoFixoListaMercado(thead.closest('.lista-mercado'));
       }
 
       thead.addEventListener('click', (e) => {
