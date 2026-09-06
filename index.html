@@ -11836,26 +11836,46 @@
       // de todos, com z-index 1000), a sobreposição fica escondida atrás
       // do bloco de cima e fecha a frincha.
       const SOBREPOSICAO = 1;
-      const topoTop = medidas.alturaCabecalho - SOBREPOSICAO;
-      const filtrosTop = medidas.alturaCabecalho + medidas.alturaTopo - SOBREPOSICAO * 2;
-      const theadTop = medidas.alturaCabecalho + medidas.alturaTopo + medidas.alturaFiltros - SOBREPOSICAO * 3;
+      // Arredonda o "top" sempre pra BAIXO (menor): garante que o bloco
+      // comece no máximo onde devia, nunca depois — se arredondasse pra
+      // cima, o subpixel perdido criaria de novo a frestinha do
+      // comentário acima. Isso importa em monitores com escala
+      // fracionária do Windows (125%/150%), onde os valores decimais do
+      // getBoundingClientRect() são muito mais comuns do que em telas
+      // sem escala.
+      const topoTop = Math.floor(medidas.alturaCabecalho - SOBREPOSICAO);
+      const filtrosTop = Math.floor(medidas.alturaCabecalho + medidas.alturaTopo - SOBREPOSICAO * 2);
+      const theadTop = Math.floor(medidas.alturaCabecalho + medidas.alturaTopo + medidas.alturaFiltros - SOBREPOSICAO * 3);
+      // Pelo mesmo motivo, left/width não podem só truncar cada número
+      // separado — precisam "arredondar pra fora" o intervalo [esquerda,
+      // esquerda+largura] inteiro, senão o lado direito do bloco pode
+      // ficar 1px mais estreito que o necessário (mesmo efeito de
+      // frestinha, só que na borda direita em vez de embaixo).
+      const cobrirFaixa = (inicio, tamanho) => {
+        const fim = Math.ceil(inicio + tamanho);
+        const novoInicio = Math.floor(inicio);
+        return { inicio: novoInicio, tamanho: fim - novoInicio };
+      };
       if (medidas.topo) {
+        const faixa = cobrirFaixa(medidas.topoLeft, medidas.topoWidth);
         medidas.topo.classList.toggle('lm-fixo', deveFixar);
         medidas.topo.style.top = deveFixar ? topoTop + 'px' : '';
-        medidas.topo.style.left = deveFixar ? medidas.topoLeft + 'px' : '';
-        medidas.topo.style.width = deveFixar ? medidas.topoWidth + 'px' : '';
+        medidas.topo.style.left = deveFixar ? faixa.inicio + 'px' : '';
+        medidas.topo.style.width = deveFixar ? faixa.tamanho + 'px' : '';
       }
       if (medidas.filtros) {
+        const faixa = cobrirFaixa(medidas.filtrosLeft, medidas.filtrosWidth);
         medidas.filtros.classList.toggle('lm-fixo', deveFixar);
         medidas.filtros.style.top = deveFixar ? filtrosTop + 'px' : '';
-        medidas.filtros.style.left = deveFixar ? medidas.filtrosLeft + 'px' : '';
-        medidas.filtros.style.width = deveFixar ? medidas.filtrosWidth + 'px' : '';
+        medidas.filtros.style.left = deveFixar ? faixa.inicio + 'px' : '';
+        medidas.filtros.style.width = deveFixar ? faixa.tamanho + 'px' : '';
       }
       medidas.ths.forEach(m => {
+        const faixa = cobrirFaixa(m.left, m.width);
         m.el.classList.toggle('lm-fixo', deveFixar);
         m.el.style.top = deveFixar ? theadTop + 'px' : '';
-        m.el.style.left = deveFixar ? m.left + 'px' : '';
-        m.el.style.width = deveFixar ? m.width + 'px' : '';
+        m.el.style.left = deveFixar ? faixa.inicio + 'px' : '';
+        m.el.style.width = deveFixar ? faixa.tamanho + 'px' : '';
       });
     }
 
