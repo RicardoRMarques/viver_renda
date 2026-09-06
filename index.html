@@ -1695,7 +1695,12 @@
       100% { background-position: -200% 0; }
     }
     .indice-info { display: flex; flex-direction: row; align-items: baseline; gap: 8px; min-width: 0; flex: 1 1 auto; overflow: hidden; }
-    .indice-label { font-weight: 700; color: var(--text); font-size: 0.92rem; white-space: nowrap; }
+    /* min-width/overflow aqui porque nem todo .indice-label está dentro do
+       .indice-info (que já trata disso): a mensagem de estado vazio
+       ("Índices ainda não gerados — aguarde o robô rodar.") é filha direta
+       do .indice-row e, sendo nowrap, esticava a linha além da largura da
+       tela no celular — o que fazia a PÁGINA INTEIRA rolar de lado. */
+    .indice-label { font-weight: 700; color: var(--text); font-size: 0.92rem; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
     .indice-value { font-family: "Courier New", monospace; color: var(--muted); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .indice-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
     .indice-change {
@@ -2795,6 +2800,56 @@
       .hg-busca-compacta .hg-chip { padding: 2px 6px; font-size: 0.6rem; }
       .cmp-btn-abrir { font-size: 0.64rem; padding: 4px 9px; }
       .cmp-btn-abrir span, .cmp-btn-abrir { white-space: nowrap; }
+    }
+
+    /* ---------- Aproveitamento das laterais no celular ----------
+       No celular sobravam três "molduras" somadas de cada lado: o
+       .container (94% da largura ≈ 12px de folga), o painel da seção
+       (24px) e o cartão do resultado dentro dele (22px) — ~58px de cada
+       lado numa tela de 412px, quase 30% da largura gasta só em
+       espaçamento, com o conteúdo espremido no meio (ex.: "Nome
+       completo" do FII cortado com reticências).
+
+       Aqui essas folgas encolhem em dois degraus (≤640px e ≤430px),
+       mantendo respiro suficiente pro conteúdo não encostar na borda.
+       As variantes mais específicas que já existiam (ex.:
+       ".hg-busca-compacta .hg-painel" e "#consulta-rapida .hg-painel")
+       continuam vencendo por especificidade — de propósito, porque já
+       estavam ajustadas à mão pra esses casos. */
+    @media (max-width: 640px) {
+      .container { width: min(1200px, 96%); }
+      .hg-painel { padding: 14px; }
+      .hg-card { padding: 14px; }
+      .card { padding: 16px; }
+      .search-container { padding: 16px; }
+      .boletim-panel { padding: 14px; }
+      .calc-corpo { padding: 14px; }
+      .calc-modal-topo { padding: 14px; }
+    }
+    @media (max-width: 430px) {
+      .container { width: min(1200px, 97.5%); }
+      .hg-painel, .hg-card { padding: 11px; }
+      .card, .search-container { padding: 13px; }
+      .boletim-panel, .calc-corpo, .sim-visual-painel { padding: 11px; }
+    }
+    /* Com a largura recuperada acima, os campos da consulta cabem em 2
+       colunas no celular (antes só cabia 1, porque sobravam ~250px de
+       conteúdo e cada coluna pede 130px) — mesma informação em metade da
+       rolagem. E como agora há espaço, os valores longos passam a quebrar
+       linha em vez de serem cortados com "…" (era o caso do "Nome
+       completo" do fundo, que aparecia truncado). */
+    @media (max-width: 640px) {
+      /* No celular a mensagem de estado dos índices quebra linha em vez de
+         virar "…", já que aqui ela é um aviso e não um rótulo curto. */
+      .indice-label { white-space: normal; }
+      .hg-grid-dados { gap: 12px 12px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+      .hg-grid-dados strong {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        overflow-wrap: break-word;
+        line-height: 1.25;
+      }
     }
     .financ-resumo-grid {
       display: grid;
