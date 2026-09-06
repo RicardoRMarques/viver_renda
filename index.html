@@ -11803,11 +11803,26 @@
       if (!medidas) return;
       const topoDaSecao = secao.getBoundingClientRect().top;
       const fimDaSecao = topoDaSecao + medidas.alturaSecaoNatural;
-      const alturaPilha = medidas.alturaCabecalho + medidas.alturaTopo + medidas.alturaFiltros + medidas.alturaThead;
       // "Dentro da faixa" = o topo da seção já passou por baixo do
-      // cabeçalho do site, mas o fim da seção ainda não passou por cima
-      // de onde a pilha de cabeçalhos fixos terminaria.
-      const deveFixar = topoDaSecao <= medidas.alturaCabecalho && fimDaSecao > alturaPilha;
+      // cabeçalho do site, e a seção inteira (até o fim da paginação)
+      // ainda não passou inteira por cima dele.
+      //
+      // ATENÇÃO: a versão anterior comparava fimDaSecao com a altura da
+      // PILHA inteira (título+filtros+colunas), não com a altura do
+      // cabeçalho do site. Isso parecia razoável ("só fixa se sobrar
+      // conteúdo pra rolar por baixo da pilha"), mas quebrava exatamente
+      // o caso relatado: quando a seção tem poucas linhas (ex.: 1 linha
+      // + paginação), a altura natural dela pode ser MENOR que a altura
+      // da pilha de cabeçalhos — e nesse caso fimDaSecao > alturaPilha
+      // NUNCA era verdadeiro, então deveFixar ficava sempre falso e a
+      // fixação nunca ligava, voltando ao bug original (tudo rola junto
+      // e sobe). O correto é comparar só com a altura do cabeçalho do
+      // site: fixa enquanto QUALQUER parte da seção ainda estiver visível
+      // abaixo dele, solta só quando a seção inteira (linha(s) +
+      // paginação) já passou por cima. Isso é igual ao comportamento
+      // normal de um cabeçalho "sticky" — funciona com 1 linha, 5 linhas
+      // ou 50.
+      const deveFixar = topoDaSecao <= medidas.alturaCabecalho && fimDaSecao > medidas.alturaCabecalho;
       secao.classList.toggle('lm-fixando', deveFixar);
       // As alturas medidas (getBoundingClientRect) vêm com casas
       // decimais (ex.: 119.27px). Se encostarmos cada bloco exatamente
