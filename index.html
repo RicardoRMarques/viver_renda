@@ -803,6 +803,34 @@
     }
     .lm-btn-customizar:hover { color: var(--primary); border-color: var(--primary); }
     .lm-btn-customizar svg { width: 14px; height: 14px; flex-shrink: 0; max-height: none; }
+
+    /* Botão "Meus Favoritos" (ao lado de Customizar) */
+    .lm-btn-favoritos {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--border); background: var(--card); color: var(--muted);
+      border-radius: 999px; padding: 6px 13px; font-size: 0.78rem; font-family: inherit;
+      cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .lm-btn-favoritos svg { width: 14px; height: 14px; flex-shrink: 0; max-height: none; fill: none; stroke: currentColor; stroke-width: 2; }
+    .lm-btn-favoritos:hover { color: var(--gold); border-color: var(--gold); }
+    .lm-btn-favoritos.ativo { color: var(--gold); border-color: var(--gold); background: rgba(224,184,77,0.10); }
+    .lm-btn-favoritos.ativo svg { fill: currentColor; stroke: currentColor; }
+    .lm-fav-contador {
+      background: rgba(224,184,77,0.18); color: var(--gold); border-radius: 999px;
+      padding: 0 6px; font-size: 0.7rem; font-weight: 700; line-height: 1.5;
+    }
+
+    /* Coração de cada linha, na coluna "Ativos" */
+    .lm-favorito {
+      flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; padding: 0; border: none; background: none;
+      color: var(--muted); cursor: pointer; border-radius: 50%;
+      transition: color 0.15s ease, transform 0.12s ease;
+    }
+    .lm-favorito svg { width: 17px; height: 17px; max-height: none; fill: none; stroke: currentColor; stroke-width: 1.8; }
+    .lm-favorito:hover { color: var(--gold); transform: scale(1.12); }
+    .lm-favorito.marcado { color: var(--gold); }
+    .lm-favorito.marcado svg { fill: currentColor; }
     /* Esconder coluna: precisa valer pro <th> e pro <td>, e com !important
        porque outras regras da tabela definem display nas células (ex.: a
        coluna "Ativos" grudada à esquerda no celular). */
@@ -10033,7 +10061,16 @@
     // site) — até 5 ativos, cotação buscada direto na HG Brasil.
     // ============================================================
     const FAVORITOS_CARROSSEL_KEY = 'vrCarrosselFavoritos';
+    // Dois limites diferentes, de propósito:
+    // - FAVORITOS_CARROSSEL_MAX: quantos aparecem NO CARROSSEL do topo.
+    //   Cada um custa uma cotação buscada na HG Brasil, então segue em 5.
+    // - FAVORITOS_MAX: quantos podem ser GUARDADOS. Depois que o coração
+    //   entrou nas tabelas de Ações/FIIs, "favoritos" virou também uma
+    //   lista de acompanhamento (o filtro "Meus Favoritos"), e 5 seria
+    //   pouco demais pra isso. Os que passarem de 5 ficam salvos e
+    //   filtráveis, só não entram no carrossel.
     const FAVORITOS_CARROSSEL_MAX = 5;
+    const FAVORITOS_MAX = 30;
     let hgUltimoAtivoConsultado = null; // { symbol } do último ativo pesquisado em "Consulta Rápida"
     let tickerFavoritosCache = []; // cotações já buscadas dos favoritos, pra não refazer fetch a cada render
 
@@ -10082,7 +10119,10 @@
     }
 
     async function atualizarCarrosselComFavoritos() {
-      tickerFavoritosCache = await buscarQuotesFavoritosCarrossel(obterFavoritosCarrossel());
+      // slice: o carrossel mostra só os primeiros — ver comentário nos
+      // dois limites lá em cima. Sem isso, alguém com 30 favoritos faria
+      // 30 chamadas de cotação a cada carregamento da página.
+      tickerFavoritosCache = await buscarQuotesFavoritosCarrossel(obterFavoritosCarrossel().slice(0, FAVORITOS_CARROSSEL_MAX));
       renderizarTickerCarrossel(window.hgIndicesCache);
     }
 
@@ -10169,23 +10209,16 @@
       });
     }
 
+    // Este botão e o coração das tabelas passam pela MESMA função
+    // (vrAlternarFavorito), que grava, espelha na nuvem e dispara o evento
+    // — quem redesenha o quê fica no listener abaixo, um lugar só.
     document.getElementById('hgBtnFavoritar')?.addEventListener('click', () => {
       const ticker = (hgUltimoAtivoConsultado?.symbol || document.getElementById('hgTickerInput').value.trim().toUpperCase());
       if (!ticker) return;
-      let favoritos = obterFavoritosCarrossel();
-      let adicionando = true;
-      if (favoritos.includes(ticker)) {
-        favoritos = favoritos.filter(t => t !== ticker);
-        adicionando = false;
-      } else {
-        if (favoritos.length >= FAVORITOS_CARROSSEL_MAX) {
-          alert(`Você pode favoritar até ${FAVORITOS_CARROSSEL_MAX} ativos no carrossel. Remova algum antes de adicionar outro.`);
-          return;
-        }
-        favoritos.push(ticker);
-      }
-      salvarFavoritosCarrossel(favoritos);
-      espelharFavoritoNaNuvem(ticker, adicionando);
+      vrAlternarFavorito(ticker);
+    });
+
+    document.addEventListener('vr:favoritos-alterados', () => {
       renderizarChipsFavoritosCarrossel();
       atualizarBotaoFavoritarEstado();
       atualizarCarrosselComFavoritos();
@@ -12107,6 +12140,40 @@
       if (v == null || isNaN(v)) return '—';
       return numeroGlobal(v) + '%';
     }
+    // ---- Favoritos compartilhados -------------------------------------
+    // A lista de favoritos do site é UMA só: a mesma que alimenta o
+    // carrossel do topo (chave 'vrCarrosselFavoritos', espelhada no
+    // Supabase quando a pessoa está logada). O coração das tabelas de
+    // Ações/FIIs mexe nessa mesma lista de propósito — ter duas listas
+    // separadas de "favoritos" no mesmo site seria confuso: a pessoa
+    // favoritaria na tabela e não entenderia por que não aparece no
+    // carrossel. Estas funções são a porta de entrada única, e avisam o
+    // resto da página por evento pra tudo se redesenhar junto.
+    function vrObterFavoritos() {
+      return typeof obterFavoritosCarrossel === 'function' ? obterFavoritosCarrossel() : [];
+    }
+    function vrEhFavorito(ticker) {
+      return vrObterFavoritos().includes(String(ticker || '').toUpperCase());
+    }
+    function vrAlternarFavorito(tickerBruto) {
+      const ticker = String(tickerBruto || '').toUpperCase();
+      if (!ticker) return;
+      let favoritos = vrObterFavoritos();
+      const jaEra = favoritos.includes(ticker);
+      if (jaEra) {
+        favoritos = favoritos.filter(t => t !== ticker);
+      } else {
+        if (typeof FAVORITOS_MAX === 'number' && favoritos.length >= FAVORITOS_MAX) {
+          alert(`Você pode favoritar até ${FAVORITOS_MAX} ativos. Remova algum antes de adicionar outro.`);
+          return;
+        }
+        favoritos.push(ticker);
+      }
+      salvarFavoritosCarrossel(favoritos);
+      espelharFavoritoNaNuvem(ticker, !jaEra);
+      document.dispatchEvent(new CustomEvent('vr:favoritos-alterados'));
+    }
+
     // Preço Justo de Graham: raiz de (22,5 × LPA × VPA). O 22,5 é o produto
     // dos tetos que Graham aceitava numa empresa defensiva (P/L 15 × P/VP
     // 1,5). Retorna null — e não zero — quando a conta não se aplica:
@@ -12211,6 +12278,14 @@
         });
       }
 
+      let soFavoritos = false;
+      // Favoritar em qualquer lugar do site (aqui, ou no "☆ Favoritar" da
+      // Consulta Rápida) mexe na MESMA lista — então esta tabela precisa
+      // se redesenhar quando a mudança vem de fora dela.
+      document.addEventListener('vr:favoritos-alterados', () => {
+        if (carregado) render();
+      });
+
       let colunaOrdenada = colunas.find(c => c.padrao) || colunas[0];
       let direcaoAsc = false;
       let carregado = false;
@@ -12276,6 +12351,23 @@
         btnCustomizar.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"></line><circle cx="10" cy="7" r="2.4" fill="var(--card)"></circle><line x1="4" y1="17" x2="20" y2="17"></line><circle cx="16" cy="17" r="2.4" fill="var(--card)"></circle></svg>Customizar';
         btnCustomizar.addEventListener('click', abrirModalColunas);
         filtrosEl.appendChild(btnCustomizar);
+
+        // "Meus Favoritos" filtra por cima do filtro de setor que estiver
+        // ativo (não substitui) — assim dá pra ver "meus favoritos do
+        // setor Financeiro" sem precisar de uma combinação de botões.
+        const totalFavoritos = vrObterFavoritos().length;
+        const btnFavoritos = document.createElement('button');
+        btnFavoritos.type = 'button';
+        btnFavoritos.className = 'lm-btn-favoritos' + (soFavoritos ? ' ativo' : '');
+        btnFavoritos.setAttribute('aria-pressed', String(soFavoritos));
+        btnFavoritos.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.5-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.5 12c-2 4.3-9.5 9-9.5 9z"/></svg>Meus Favoritos${totalFavoritos ? ` <span class="lm-fav-contador">${totalFavoritos}</span>` : ''}`;
+        btnFavoritos.addEventListener('click', () => {
+          soFavoritos = !soFavoritos;
+          paginaAtual = 1;
+          render();
+          reposicionarListaAposMudanca();
+        });
+        filtrosEl.appendChild(btnFavoritos);
       }
 
       // ---- Modal de escolha de colunas --------------------------------
@@ -12482,6 +12574,7 @@
         // nem sobrepor a linha de colunas.
         atualizarCabecalhoFixoListaMercado(thead.closest('.lista-mercado'));
         let lista = filtroAtivo ? dados.filter(d => d[campoFiltro] === filtroAtivo) : dados;
+        if (soFavoritos) lista = lista.filter(d => vrEhFavorito(d.ticker));
         lista = [...lista].sort((a, b) => {
           const campo = colunaOrdenada.campo;
           if (campo === 'ativo') {
@@ -12504,7 +12597,10 @@
         });
 
         if (lista.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="${colunasAtivas().length}" class="lista-mercado-carregando">Nenhum ativo encontrado nesse filtro.</td></tr>`;
+          const vazio = soFavoritos
+            ? 'Você ainda não favoritou nenhum ativo desta lista. Clique no ♥ ao lado do ativo para favoritar.'
+            : 'Nenhum ativo encontrado nesse filtro.';
+          tbody.innerHTML = `<tr><td colspan="${colunasAtivas().length}" class="lista-mercado-carregando">${vazio}</td></tr>`;
           aplicarVisibilidadeColunas();
           if (paginacaoEl) paginacaoEl.innerHTML = '';
           // Reavalia com o conteúdo já atualizado (a 1ª chamada, lá no
@@ -12523,6 +12619,10 @@
         tbody.innerHTML = paginaDeItens.map(d => `
           <tr data-ticker="${d.ticker}">
             <td class="lm-ativo-cel">
+              <button type="button" class="lm-favorito${vrEhFavorito(d.ticker) ? ' marcado' : ''}" data-fav="${d.ticker}"
+                      aria-pressed="${vrEhFavorito(d.ticker)}" aria-label="${vrEhFavorito(d.ticker) ? 'Remover' : 'Adicionar'} ${d.ticker} dos favoritos" title="">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.5-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.5 12c-2 4.3-9.5 9-9.5 9z"/></svg>
+              </button>
               <div class="lm-ativo-logo">${d.logo ? `<img src="${d.logo}" alt="" loading="lazy" onerror="this.parentElement.textContent='${d.ticker.slice(0, 2)}'">` : d.ticker.slice(0, 2)}</div>
               <div>
                 <div class="lm-ativo-ticker">${d.ticker}</div>
@@ -12538,6 +12638,15 @@
         tbody.querySelectorAll('tr[data-ticker]').forEach(tr => {
           tr.addEventListener('click', () => {
             if (window.hgConsultarAtivo) window.hgConsultarAtivo(tr.dataset.ticker);
+          });
+        });
+
+        // stopPropagation é essencial: clicar na linha abre a consulta do
+        // ativo, e sem isso favoritar abriria a consulta junto.
+        tbody.querySelectorAll('.lm-favorito').forEach(botao => {
+          botao.addEventListener('click', e => {
+            e.stopPropagation();
+            vrAlternarFavorito(botao.dataset.fav);
           });
         });
 
