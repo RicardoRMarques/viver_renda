@@ -12322,10 +12322,14 @@
         const criarChip = (rotulo, valor) => {
           const b = document.createElement('button');
           b.type = 'button';
-          b.className = 'lista-mercado-filtro-chip' + (filtroAtivo === valor ? ' ativo' : '');
+          // "&& !soFavoritos": com o filtro de favoritos ligado, nenhum
+          // chip de setor pode parecer selecionado — senão o "Todos"
+          // ficaria aceso (filtroAtivo é null) mostrando poucos ativos.
+          b.className = 'lista-mercado-filtro-chip' + (filtroAtivo === valor && !soFavoritos ? ' ativo' : '');
           b.textContent = rotulo;
           b.addEventListener('click', () => {
             filtroAtivo = valor;
+            soFavoritos = false;
             paginaAtual = 1;
             render();
             reposicionarListaAposMudanca();
@@ -12352,9 +12356,13 @@
         btnCustomizar.addEventListener('click', abrirModalColunas);
         filtrosEl.appendChild(btnCustomizar);
 
-        // "Meus Favoritos" filtra por cima do filtro de setor que estiver
-        // ativo (não substitui) — assim dá pra ver "meus favoritos do
-        // setor Financeiro" sem precisar de uma combinação de botões.
+        // "Meus Favoritos" se comporta como mais um chip da linha: ligar
+        // ele LIMPA o filtro de setor (e vice-versa). A primeira versão
+        // somava os dois filtros — parecia útil ("meus favoritos do setor
+        // Financeiro"), mas na prática confundia: quem favoritava ativos
+        // de Energia, depois clicava em Financeiro e então em Favoritos,
+        // via lista vazia e concluía que os favoritos tinham sumido.
+        // Favorito é uma lista pessoal, não um recorte do setor aberto.
         const totalFavoritos = vrObterFavoritos().length;
         const btnFavoritos = document.createElement('button');
         btnFavoritos.type = 'button';
@@ -12363,6 +12371,7 @@
         btnFavoritos.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.5-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.5 12c-2 4.3-9.5 9-9.5 9z"/></svg>Meus Favoritos${totalFavoritos ? ` <span class="lm-fav-contador">${totalFavoritos}</span>` : ''}`;
         btnFavoritos.addEventListener('click', () => {
           soFavoritos = !soFavoritos;
+          if (soFavoritos) filtroAtivo = null;
           paginaAtual = 1;
           render();
           reposicionarListaAposMudanca();
