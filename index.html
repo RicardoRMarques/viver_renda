@@ -12218,9 +12218,24 @@
       }
     }
 
-    // Chamado quando a pessoa loga: junta o que está na nuvem com o que
-    // está neste aparelho (união, não substituição — senão favoritar no
-    // celular offline e depois logar no tablet apagaria o do celular).
+    // Sincronização com a nuvem. A regra muda conforme seja a PRIMEIRA vez
+    // que esta conta sincroniza NESTE aparelho ou não:
+    //
+    //   1ª vez  -> UNIÃO (nuvem + o que já estava salvo aqui). Assim quem
+    //             usou o site deslogado e depois criou conta não perde os
+    //             favoritos que tinha marcado neste navegador.
+    //   demais  -> a NUVEM MANDA: a lista local é substituída pela de lá.
+    //
+    // Esse segundo caso é o que faz remoção funcionar entre aparelhos.
+    // Antes era sempre união, e união não sabe representar exclusão:
+    // removendo no notebook, o tablet ainda tinha o ativo no localStorage,
+    // a união trazia ele de volta E reenviava pra nuvem, desfazendo a
+    // remoção em todo lugar. Como toda alteração feita logado já vai pra
+    // nuvem na hora (vrEspelharFavoritoNaNuvem), tratar a nuvem como
+    // verdade a partir da segunda sincronização não perde nada.
+    const VR_FAVORITOS_SYNC_KEY = 'vrFavoritosSyncConta';
+    let vrUltimaSincronizacao = 0;
+
     async function vrSincronizarFavoritosComSupabase(sessao) {
       const cliente = typeof obterSupabaseClient === 'function' ? obterSupabaseClient() : null;
       if (!cliente || !sessao?.user) return;
@@ -12230,25 +12245,64 @@
           .select('ticker')
           .eq('user_id', sessao.user.id);
         if (error) {
+          // Falha de leitura (offline, tabela ausente): NÃO mexe na lista
+          // local — melhor manter o que a pessoa tem do que apagar por
+          // causa de um erro de rede.
           console.warn('Supabase: não foi possível ler favoritos_lista (tabela existe?).', error.message);
           return;
         }
+        vrUltimaSincronizacao = Date.now();
         const naNuvem = (data || []).map(r => String(r.ticker || '').toUpperCase());
         const locais = vrObterFavoritos();
-        const uniao = Array.from(new Set([...naNuvem, ...locais])).slice(0, VR_FAVORITOS_MAX);
 
-        const novosParaSubir = locais.filter(t => !naNuvem.includes(t));
-        if (novosParaSubir.length) {
-          await cliente.from('favoritos_lista').upsert(
-            novosParaSubir.map(ticker => ({ user_id: sessao.user.id, ticker }))
-          );
+        // O marcador guarda QUAL conta já sincronizou neste aparelho. A
+        // união só vale se nunca houve sincronização aqui. Se o marcador
+        // existe mas é de outra conta (aparelho compartilhado, ou troca de
+        // login), a nuvem também manda — senão a lista da pessoa anterior
+        // seria enviada pra conta de quem entrou agora.
+        let marcador = null;
+        try { marcador = localStorage.getItem(VR_FAVORITOS_SYNC_KEY); } catch (e) { /* sem storage */ }
+        const primeiraSincronizacaoNesteAparelho = marcador === null;
+
+        let listaFinal;
+        if (primeiraSincronizacaoNesteAparelho) {
+          listaFinal = Array.from(new Set([...naNuvem, ...locais])).slice(0, VR_FAVORITOS_MAX);
+          const novosParaSubir = locais.filter(t => !naNuvem.includes(t));
+          if (novosParaSubir.length) {
+            await cliente.from('favoritos_lista').upsert(
+              novosParaSubir.map(ticker => ({ user_id: sessao.user.id, ticker }))
+            );
+          }
+        } else {
+          listaFinal = naNuvem.slice(0, VR_FAVORITOS_MAX);
         }
-        vrSalvarFavoritos(uniao);
+        try { localStorage.setItem(VR_FAVORITOS_SYNC_KEY, sessao.user.id); } catch (e) { /* sem storage */ }
+
+        vrSalvarFavoritos(listaFinal);
         document.dispatchEvent(new CustomEvent('vr:favoritos-alterados'));
       } catch (e) {
         console.warn('Supabase: erro ao sincronizar Meus Favoritos.', e);
       }
     }
+
+    // Sem isso, o tablet só se atualizaria ao fazer login de novo: a
+    // pessoa deixa a aba aberta, mexe nos favoritos no notebook, volta
+    // pro tablet e continuaria vendo a lista antiga. Aqui a lista é
+    // conferida sempre que a aba volta a ficar visível (com uma folga de
+    // 20s pra não consultar a nuvem a cada alt-tab).
+    async function vrRessincronizarSeLogado() {
+      const cliente = typeof obterSupabaseClient === 'function' ? obterSupabaseClient() : null;
+      if (!cliente) return;
+      try {
+        const { data: { session } } = await cliente.auth.getSession();
+        if (session?.user) await vrSincronizarFavoritosComSupabase(session);
+      } catch (e) { /* silencioso: é só uma atualização oportunista */ }
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      if (Date.now() - vrUltimaSincronizacao < 20000) return;
+      vrRessincronizarSeLogado();
+    });
     function vrAlternarFavorito(tickerBruto) {
       const ticker = String(tickerBruto || '').toUpperCase();
       if (!ticker) return;
