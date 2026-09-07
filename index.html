@@ -815,6 +815,8 @@
     .lm-btn-favoritos:hover { color: var(--gold); border-color: var(--gold); }
     .lm-btn-favoritos.ativo { color: var(--gold); border-color: var(--gold); background: rgba(224,184,77,0.10); }
     .lm-btn-favoritos.ativo svg { fill: currentColor; stroke: currentColor; }
+    /* O "?" fica alinhado com o botão de favoritos, não colado nele. */
+    .lm-ajuda-favoritos { align-self: center; margin-left: 2px; }
     .lm-fav-contador {
       background: rgba(224,184,77,0.18); color: var(--gold); border-radius: 999px;
       padding: 0 6px; font-size: 0.7rem; font-weight: 700; line-height: 1.5;
@@ -9817,6 +9819,7 @@
         'divida-patrimonio-indicador': 'Dívida / Patrimônio = quanto a empresa deve para cada R$ 1 de patrimônio dos acionistas.\n\nCálculo: dívida total ÷ patrimônio líquido\n\nQuanto maior, mais alavancada a empresa — mais lucro nos bons momentos, mais risco nos ruins.',
         'liquidez-corrente-indicador': 'Liquidez Corrente = capacidade de pagar as contas de curto prazo com o que a empresa tem a receber no mesmo período.\n\nCálculo: ativo circulante ÷ passivo circulante\n\nAcima de 1 significa que há mais a receber do que a pagar nos próximos 12 meses.',
         'graham-indicador': 'Preço Justo de Graham = estimativa de quanto a ação "valeria" segundo a fórmula clássica de Benjamin Graham, usada para comparar com a cotação atual.\n\nCálculo: raiz quadrada de (22,5 × LPA × VPA)\n\nO 22,5 vem dos limites que Graham considerava aceitáveis para uma empresa defensiva: P/L de até 15 e P/VP de até 1,5 (15 × 1,5 = 22,5).\n\nSó faz sentido quando LPA e VPA são positivos — empresa com prejuízo não tem preço justo por essa fórmula. É uma referência de estudo, criada nos anos 1930 para empresas industriais, não uma recomendação de compra nem um valor "correto" da ação.',
+        'favoritos-login': 'Marque o ♥ ao lado do ativo para acompanhá-lo aqui. Clicando em "Meus Favoritos", a lista mostra só os ativos marcados.\n\nEntre na sua conta (botão "Entrar", no topo do site) para que seus favoritos fiquem salvos na sua conta e apareçam também no celular, no tablet e em qualquer outro aparelho.\n\nSem login eles continuam funcionando, mas ficam guardados só neste navegador: se você limpar os dados do navegador ou abrir o site em outro aparelho, a lista não estará lá.',
         'bazin-indicador': 'Preço-teto de Bazin = preço máximo que você pagaria pela ação para ainda receber um dividend yield de 6% ao ano, critério defendido por Décio Bazin.\n\nCálculo: dividendos por ação nos últimos 12 meses ÷ 0,06\n\nO 6% é a exigência de retorno do próprio Bazin — quem quiser outra régua muda o divisor. Aqui usamos os proventos dos últimos 12 meses, então o número muda conforme a empresa aumenta ou corta dividendos, e não garante que ela vá manter o pagamento. É referência de estudo, não recomendação.',
       };
 
@@ -12536,6 +12539,21 @@
           reposicionarListaAposMudanca();
         });
         filtrosEl.appendChild(btnFavoritos);
+
+        // "?" explicando que sem login os favoritos ficam só neste
+        // navegador. Como este botão nasce por JS (a linha de chips é
+        // redesenhada a cada render), o glossário precisa ser ligado à
+        // mão: a varredura de [data-glossario] roda uma vez só, no
+        // carregamento da página.
+        const ajudaFavoritos = document.createElement('button');
+        ajudaFavoritos.type = 'button';
+        ajudaFavoritos.className = 'hg-info-btn lm-ajuda-favoritos';
+        ajudaFavoritos.setAttribute('data-glossario', 'favoritos-login');
+        ajudaFavoritos.setAttribute('aria-label', 'Como funcionam os favoritos?');
+        ajudaFavoritos.setAttribute('title', '');
+        ajudaFavoritos.textContent = '?';
+        filtrosEl.appendChild(ajudaFavoritos);
+        if (typeof window.ligarGlossario === 'function') window.ligarGlossario(filtrosEl);
       }
 
       // ---- Modal de escolha de colunas --------------------------------
