@@ -8078,7 +8078,19 @@
               .filter(s => typeof s.numerador === 'number' && typeof s.denominador === 'number' && s.denominador !== 0)
               .map(s => ({ data: s.data, fator: s.numerador / s.denominador, numerador: s.numerador, denominador: s.denominador }))
           );
-          const resultado = { serie, dividendos, splits, fonte: 'yahoo' };
+          // Desde quando a série de dividendos é confiável. O robô grava
+          // isso em "dividendos_desde" depois de tentar tapar o buraco do
+          // Yahoo com a HG Brasil (ver complementar_dividendos_hg.py);
+          // quando o campo não existe (arquivo antigo), usa o primeiro
+          // pagamento da lista. Serve pra avisar o visitante quando a
+          // simulação começar antes do histórico de proventos — sem isso,
+          // o resultado sai subestimado e parecendo correto.
+          const dividendosDesde = dados.dividendos_desde
+            || (dividendos.length ? dividendos[0].payment_date : null);
+          const resultado = {
+            serie, dividendos, splits, fonte: 'yahoo',
+            dividendosDesde, dividendosFontes: dados.dividendos_fontes || null,
+          };
           _reinvCacheLocal[ticker] = resultado;
           return resultado;
         } catch (e) {
@@ -8090,7 +8102,7 @@
       async function reinvCalcularUmAtivo(ticker, dataCompra, valorInvestido, hoje) {
         const local = await reinvBuscarHistoricoLocal(ticker);
 
-        let precos, truncado, inicioEfetivo, dividendos, fonteDados, splits;
+        let precos, truncado, inicioEfetivo, dividendos, fonteDados, splits, dividendosDesde;
 
         if (local && local.serie.length) {
           precos = local.serie;
@@ -8100,6 +8112,7 @@
           dividendos = local.dividendos;
           splits = local.splits || []; // só o Yahoo traz isso — HG Brasil não tem essa informação
           fonteDados = 'yahoo';
+          dividendosDesde = local.dividendosDesde ? new Date(local.dividendosDesde + 'T00:00:00') : null;
         } else {
           const resultadoHg = await reinvBuscarHistoricoPrecos(ticker, dataCompra, hoje);
           precos = resultadoHg.serie;
@@ -8110,6 +8123,7 @@
           dividendos = await reinvBuscarDividendos(ticker, dataParaBuscarDividendos, hoje);
           splits = [];
           fonteDados = 'hgbrasil';
+          dividendosDesde = dividendos.length ? new Date(dividendos[0].payment_date + 'T00:00:00') : null;
         }
 
         const dataInicioReal = truncado ? inicioEfetivo : dataCompra;
@@ -8155,12 +8169,41 @@
         const rentabilidadePct = ((valorFinalComReinvestimento - valorInvestido) / valorInvestido) * 100;
         const rentabilidadeSemReinvestPct = ((valorFinalSemReinvestimento - valorInvestido) / valorInvestido) * 100;
 
+        // O histórico de PREÇOS pode ir muito mais longe que o de
+        // DIVIDENDOS (acontece com ativo que mudou de ticker: o Yahoo
+        // mantém os preços do código antigo mas perde os proventos). Nesse
+        // caso a simulação roda "sem erro", só que reinvestindo bem menos
+        // do que houve de verdade — resultado subestimado sem nenhum
+        // sinal disso na tela. Aqui a gente detecta e avisa. Um mês de
+        // folga evita alarme falso por diferença de convenção de data.
+        // O limite não pode ser fixo: esperar ~40 dias pelo primeiro
+        // rendimento é NORMAL num FII mensal (quem compra dia 08 só
+        // recebe o pagamento do mês seguinte, porque a data-com já
+        // passou), e esperar ~6 meses é normal numa ação que paga
+        // semestralmente. Um limite fixo daria alarme falso nos dois
+        // casos. Então a régua é a cadência do próprio ativo: só avisa
+        // quando o vazio inicial é bem maior que o intervalo com que ele
+        // costuma pagar — aí sim é buraco de dado, não espera natural.
+        const DIA_MS = 24 * 60 * 60 * 1000;
+        let intervaloTipicoDias = 30;
+        if (dividendos.length >= 3) {
+          const gaps = [];
+          for (let i = 1; i < dividendos.length; i++) {
+            gaps.push((new Date(dividendos[i].payment_date) - new Date(dividendos[i - 1].payment_date)) / DIA_MS);
+          }
+          gaps.sort((a, b) => a - b);
+          intervaloTipicoDias = gaps[Math.floor(gaps.length / 2)] || 30;
+        }
+        const limiteBuracoDias = Math.max(90, intervaloTipicoDias * 3);
+        const dividendosIncompletos = !!dividendosDesde
+          && ((dividendosDesde - dataInicioReal) / DIA_MS) > limiteBuracoDias;
+
         return {
           ticker, truncado, dataInicioReal, precoCompraInfo, precoAtual,
           qtdInicial, qtd, eventosReinvestidos, totalDividendosRecebidos,
           valorFinalComReinvestimento, valorFinalSemReinvestimento,
           rentabilidadePct, rentabilidadeSemReinvestPct, valorInvestido, dataCompra,
-          fonteDados, splitsNoPeriodo,
+          fonteDados, splitsNoPeriodo, dividendosDesde, dividendosIncompletos,
           // Na vida real, FII/ação só se compra em cotas/unidades inteiras
           // (não existe "0,62 cotas"). Esse cálculo trata a quantidade
           // como um número contínuo, de propósito (é o jeito padrão de
@@ -8194,14 +8237,19 @@
               <div class="reinv-card-linha"><span>Valor hoje</span><span>${reinvFormatMoeda(r.valorFinalComReinvestimento)}</span></div>
               ${r.compraImpossivelNaPratica ? `<div class="reinv-card-aviso">⚠️ Com ${reinvFormatMoeda(r.valorInvestido)}, não daria pra comprar nem 1 cota/ação inteira ao preço da época (${reinvFormatMoeda(r.precoCompraInfo.close)}) — essa compra específica não seria possível na prática. O cálculo trata a quantidade como fração, útil pra ver o efeito do reinvestimento, mas não é uma ordem real executável.</div>` : ''}
               ${r.splitsNoPeriodo && r.splitsNoPeriodo.length ? `<div class="reinv-card-aviso">🔀 ${r.splitsNoPeriodo.length === 1 ? 'Este ativo passou por 1 desdobramento/grupamento' : `Este ativo passou por ${r.splitsNoPeriodo.length} desdobramentos/grupamentos`} no período: ${r.splitsNoPeriodo.map(s => `${new Date(s.data + 'T00:00:00').toLocaleDateString('pt-BR')} (proporção ${s.numerador}:${s.denominador})`).join(', ')}. Isso é só um aviso informativo — o preço histórico que usamos já vem ajustado pra esse tipo de evento, então o cálculo não precisa (nem deve) fazer nenhum ajuste extra.</div>` : ''}
+              ${r.dividendosIncompletos ? `<div class="reinv-card-aviso">📉 Só temos histórico de proventos deste ativo a partir de ${r.dividendosDesde.toLocaleDateString('pt-BR')}, mas a simulação começa em ${r.dataInicioReal.toLocaleDateString('pt-BR')}. Os rendimentos pagos antes dessa data não entraram na conta, então o resultado real foi MAIOR que o mostrado aqui. Costuma acontecer com ativo que mudou de código de negociação (o histórico de preços sobrevive à troca, o de proventos nem sempre).</div>` : ''}
               <div class="reinv-card-fonte">Fonte do histórico: ${r.fonteDados === 'yahoo' ? 'Yahoo Finance' : 'HG Brasil'}</div>
             </div>`;
         }).join('');
 
         const truncados = linhas.filter(l => !l.erro && l.resultado.truncado);
-        const avisoTruncamento = truncados.length
+        const semDividendos = linhas.filter(l => !l.erro && l.resultado.dividendosIncompletos);
+        const avisoTruncamento = (truncados.length
           ? `<div class="reinv-comparativo" style="margin-top:10px; color:var(--gold);">⚠️ Histórico de preços limitado para: ${truncados.map(l => `${l.ticker} (a partir de ${l.resultado.dataInicioReal.toLocaleDateString('pt-BR')})`).join(', ')}.</div>`
-          : '';
+          : '')
+          + (semDividendos.length
+          ? `<div class="reinv-comparativo" style="margin-top:10px; color:var(--gold);">⚠️ Proventos anteriores a estas datas não entraram na conta (resultado real foi maior): ${semDividendos.map(l => `${l.ticker} (só desde ${l.resultado.dividendosDesde.toLocaleDateString('pt-BR')})`).join(', ')}.</div>`
+          : '');
 
         const validos = linhas.filter(l => !l.erro).map(l => l.resultado);
         let resumoHtml = '';
@@ -8392,6 +8440,32 @@
           doc.text('Aviso:', 40, y);
           doc.setFont('helvetica', 'normal');
           doc.text(linhasTexto, 68, y);
+          doc.setTextColor(0);
+        }
+
+        // Aviso de histórico de PROVENTOS incompleto (diferente do de
+        // preços acima): a simulação rodou, mas parte dos rendimentos do
+        // período não existe na base, então o número do relatório está
+        // abaixo do que de fato aconteceu. Precisa constar no PDF, que é
+        // justamente a parte que costuma ser compartilhada fora do site.
+        const semDividendosPdf = linhas.filter(l => !l.erro && l.resultado.dividendosIncompletos);
+        if (semDividendosPdf.length) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          const alturaPagina = doc.internal.pageSize.getHeight();
+          const textoAvisoDiv = `Proventos anteriores a estas datas nao entraram na conta, entao o resultado real foi MAIOR que o mostrado: ${semDividendosPdf.map(l => `${l.ticker} (historico so desde ${l.resultado.dividendosDesde.toLocaleDateString('pt-BR')})`).join(', ')}.`;
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(8);
+          const linhasTextoDiv = doc.splitTextToSize(textoAvisoDiv, larguraPagina - 80);
+          let yd = (doc.lastAutoTable ? doc.lastAutoTable.finalY : 96) + (truncados.length ? 40 : 20);
+          if (yd + linhasTextoDiv.length * 11 > alturaPagina - 30) {
+            doc.addPage();
+            yd = 40;
+          }
+          doc.setTextColor(180, 130, 0);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Aviso:', 40, yd);
+          doc.setFont('helvetica', 'normal');
+          doc.text(linhasTextoDiv, 68, yd);
           doc.setTextColor(0);
         }
 
