@@ -10605,10 +10605,12 @@
         clienteAuth.auth.onAuthStateChange((_evento, session) => {
           atualizarUIAuth(session);
           sincronizarFavoritosComSupabase(session);
+          vrSincronizarFavoritosComSupabase(session);
         });
         clienteAuth.auth.getSession().then(({ data }) => {
           atualizarUIAuth(data.session);
           sincronizarFavoritosComSupabase(data.session);
+          vrSincronizarFavoritosComSupabase(data.session);
         });
       } else {
         // Biblioteca ainda não tinha carregado nesse instante (raro, mas
@@ -10619,10 +10621,12 @@
           cliente2.auth.onAuthStateChange((_evento, session) => {
             atualizarUIAuth(session);
             sincronizarFavoritosComSupabase(session);
+          vrSincronizarFavoritosComSupabase(session);
           });
           cliente2.auth.getSession().then(({ data }) => {
             atualizarUIAuth(data.session);
             sincronizarFavoritosComSupabase(data.session);
+          vrSincronizarFavoritosComSupabase(data.session);
           });
         }, 1000);
       }
@@ -12193,6 +12197,58 @@
     function vrEhFavorito(ticker) {
       return vrObterFavoritos().includes(String(ticker || '').toUpperCase());
     }
+
+    // Espelha na nuvem (tabela 'favoritos_lista' do Supabase) pra lista
+    // seguir a pessoa entre celular, tablet e computador. Sem login, ou
+    // sem a tabela criada, segue tudo funcionando só no localStorage —
+    // mesmo comportamento tolerante do espelho do carrossel.
+    async function vrEspelharFavoritoNaNuvem(ticker, adicionando) {
+      const cliente = typeof obterSupabaseClient === 'function' ? obterSupabaseClient() : null;
+      if (!cliente) return;
+      try {
+        const { data: { session } } = await cliente.auth.getSession();
+        if (!session?.user) return;
+        if (adicionando) {
+          await cliente.from('favoritos_lista').upsert({ user_id: session.user.id, ticker });
+        } else {
+          await cliente.from('favoritos_lista').delete().eq('user_id', session.user.id).eq('ticker', ticker);
+        }
+      } catch (e) {
+        console.warn('Supabase: não sincronizou Meus Favoritos na nuvem (tabela favoritos_lista existe?).', e);
+      }
+    }
+
+    // Chamado quando a pessoa loga: junta o que está na nuvem com o que
+    // está neste aparelho (união, não substituição — senão favoritar no
+    // celular offline e depois logar no tablet apagaria o do celular).
+    async function vrSincronizarFavoritosComSupabase(sessao) {
+      const cliente = typeof obterSupabaseClient === 'function' ? obterSupabaseClient() : null;
+      if (!cliente || !sessao?.user) return;
+      try {
+        const { data, error } = await cliente
+          .from('favoritos_lista')
+          .select('ticker')
+          .eq('user_id', sessao.user.id);
+        if (error) {
+          console.warn('Supabase: não foi possível ler favoritos_lista (tabela existe?).', error.message);
+          return;
+        }
+        const naNuvem = (data || []).map(r => String(r.ticker || '').toUpperCase());
+        const locais = vrObterFavoritos();
+        const uniao = Array.from(new Set([...naNuvem, ...locais])).slice(0, VR_FAVORITOS_MAX);
+
+        const novosParaSubir = locais.filter(t => !naNuvem.includes(t));
+        if (novosParaSubir.length) {
+          await cliente.from('favoritos_lista').upsert(
+            novosParaSubir.map(ticker => ({ user_id: sessao.user.id, ticker }))
+          );
+        }
+        vrSalvarFavoritos(uniao);
+        document.dispatchEvent(new CustomEvent('vr:favoritos-alterados'));
+      } catch (e) {
+        console.warn('Supabase: erro ao sincronizar Meus Favoritos.', e);
+      }
+    }
     function vrAlternarFavorito(tickerBruto) {
       const ticker = String(tickerBruto || '').toUpperCase();
       if (!ticker) return;
@@ -12208,6 +12264,7 @@
         favoritos.push(ticker);
       }
       vrSalvarFavoritos(favoritos);
+      vrEspelharFavoritoNaNuvem(ticker, !jaEra);
       document.dispatchEvent(new CustomEvent('vr:favoritos-alterados'));
     }
 
@@ -12406,7 +12463,12 @@
         // de Energia, depois clicava em Financeiro e então em Favoritos,
         // via lista vazia e concluía que os favoritos tinham sumido.
         // Favorito é uma lista pessoal, não um recorte do setor aberto.
-        const totalFavoritos = vrObterFavoritos().length;
+        // Conta só os favoritos QUE EXISTEM NESTA lista, não o total geral:
+        // favoritos são por ticker e valem pro site inteiro, então um FII
+        // favoritado fazia o contador de "Todas as Ações" mostrar 5 com só
+        // 4 linhas aparecendo ao filtrar. O número tem que casar com o que
+        // o clique vai mostrar.
+        const totalFavoritos = dados.filter(d => vrEhFavorito(d.ticker)).length;
         const btnFavoritos = document.createElement('button');
         btnFavoritos.type = 'button';
         btnFavoritos.className = 'lm-btn-favoritos' + (soFavoritos ? ' ativo' : '');
