@@ -10225,7 +10225,6 @@
           return;
         }
         carrossel.push(ticker);
-        vrGarantirNosFavoritos(ticker);
       }
       salvarFavoritosCarrossel(carrossel);
       espelharFavoritoNaNuvem(ticker, !jaEstava);
@@ -12167,13 +12166,16 @@
     //      buscada na HG Brasil a cada carregamento da página, e é uma
     //      faixa estreita na tela: não faz sentido ter 30.
     //
-    // A primeira versão usava uma lista só, e o efeito era esquisito —
-    // favoritar 30 ações na tabela mexia no carrossel do topo. Separar
-    // resolve, mas com uma regra pra não virarem coisas desconexas: o que
-    // está no carrossel está sempre nos favoritos (fixar algo no topo é,
-    // por definição, favoritar), e tirar dos favoritos também tira do
-    // carrossel. O contrário não vale: favoritar 30 ativos na tabela não
-    // enche o carrossel.
+    // As duas listas são INDEPENDENTES: uma não mexe na outra em nenhum
+    // sentido. Marcar o ♥ na tabela não fixa nada no carrossel, e fixar
+    // no carrossel pela Consulta Rápida não marca o ♥ na tabela.
+    //
+    // Houve uma versão intermediária em que fixar no carrossel também
+    // adicionava aos favoritos ("quem está no topo é favorito"), na ideia
+    // de manter as listas coerentes. Na prática confundia: o ativo
+    // consultado aparecia sozinho em "Meus Favoritos" sem a pessoa ter
+    // clicado em nenhum coração. São ações diferentes, com botões
+    // diferentes e nomes diferentes — cada uma cuida da sua lista.
     const VR_FAVORITOS_KEY = 'vrFavoritos';
     const VR_FAVORITOS_MAX = 30;
 
@@ -12198,12 +12200,6 @@
       const jaEra = favoritos.includes(ticker);
       if (jaEra) {
         favoritos = favoritos.filter(t => t !== ticker);
-        // Saiu dos favoritos, sai do carrossel junto — senão ficaria no
-        // topo da tela um ativo que a pessoa acabou de desfavoritar.
-        if (obterFavoritosCarrossel().includes(ticker)) {
-          salvarFavoritosCarrossel(obterFavoritosCarrossel().filter(t => t !== ticker));
-          espelharFavoritoNaNuvem(ticker, false);
-        }
       } else {
         if (favoritos.length >= VR_FAVORITOS_MAX) {
           alert(`Você pode ter até ${VR_FAVORITOS_MAX} ativos em Meus Favoritos. Remova algum antes de adicionar outro.`);
@@ -12214,27 +12210,12 @@
       vrSalvarFavoritos(favoritos);
       document.dispatchEvent(new CustomEvent('vr:favoritos-alterados'));
     }
-    // Garante a regra "quem está no carrossel está nos favoritos".
-    function vrGarantirNosFavoritos(ticker) {
-      const favoritos = vrObterFavoritos();
-      if (favoritos.includes(ticker) || favoritos.length >= VR_FAVORITOS_MAX) return;
-      favoritos.push(ticker);
-      vrSalvarFavoritos(favoritos);
-    }
 
-    // Migração de quem já usava o site antes de "Meus Favoritos" existir:
-    // o que estava fixado no carrossel vira o conteúdo inicial da lista de
-    // favoritos, pra pessoa encontrar seus ativos já com o coração
-    // marcado em vez de uma lista vazia. Roda uma vez só (depois disso a
-    // chave existe, mesmo que vazia, e não sobrescreve escolha nenhuma).
-    (function migrarFavoritosDoCarrossel() {
-      try {
-        if (localStorage.getItem(VR_FAVORITOS_KEY) !== null) return;
-        const doCarrossel = obterFavoritosCarrossel();
-        if (doCarrossel.length) vrSalvarFavoritos(doCarrossel.slice(0, VR_FAVORITOS_MAX));
-        else localStorage.setItem(VR_FAVORITOS_KEY, '[]');
-      } catch (e) { /* sem localStorage: nada a migrar */ }
-    })();
+    // Não existe migração do carrossel pra cá, de propósito: copiar o que
+    // estava fixado no topo faria "Meus Favoritos" nascer com ativos que
+    // a pessoa nunca marcou com o coração — exatamente a confusão que a
+    // separação das duas listas veio resolver. Quem já usava o site
+    // começa com a lista vazia e marca o que quiser.
 
     // Preço Justo de Graham: raiz de (22,5 × LPA × VPA). O 22,5 é o produto
     // dos tetos que Graham aceitava numa empresa defensiva (P/L 15 × P/VP
