@@ -10119,9 +10119,9 @@
     }
 
     async function atualizarCarrosselComFavoritos() {
-      // slice: o carrossel mostra só os primeiros — ver comentário nos
-      // dois limites lá em cima. Sem isso, alguém com 30 favoritos faria
-      // 30 chamadas de cotação a cada carregamento da página.
+      // A lista do carrossel já é limitada a FAVORITOS_CARROSSEL_MAX na
+      // hora de fixar; o slice aqui é só uma trava a mais, caso o
+      // localStorage venha com mais itens de uma versão anterior do site.
       tickerFavoritosCache = await buscarQuotesFavoritosCarrossel(obterFavoritosCarrossel().slice(0, FAVORITOS_CARROSSEL_MAX));
       renderizarTickerCarrossel(window.hgIndicesCache);
     }
@@ -10209,13 +10209,27 @@
       });
     }
 
-    // Este botão e o coração das tabelas passam pela MESMA função
-    // (vrAlternarFavorito), que grava, espelha na nuvem e dispara o evento
-    // — quem redesenha o quê fica no listener abaixo, um lugar só.
+    // Este botão controla o CARROSSEL (limite de 5), não a lista "Meus
+    // Favoritos" — ver o comentário grande nas funções vrAlternarFavorito.
+    // Ao fixar no carrossel, o ativo também entra em Meus Favoritos.
     document.getElementById('hgBtnFavoritar')?.addEventListener('click', () => {
       const ticker = (hgUltimoAtivoConsultado?.symbol || document.getElementById('hgTickerInput').value.trim().toUpperCase());
       if (!ticker) return;
-      vrAlternarFavorito(ticker);
+      let carrossel = obterFavoritosCarrossel();
+      const jaEstava = carrossel.includes(ticker);
+      if (jaEstava) {
+        carrossel = carrossel.filter(t => t !== ticker);
+      } else {
+        if (carrossel.length >= FAVORITOS_CARROSSEL_MAX) {
+          alert(`O carrossel do topo mostra até ${FAVORITOS_CARROSSEL_MAX} ativos. Remova algum antes de fixar outro.\n\nPara acompanhar mais ativos, use o ♥ nas listas de Ações e FIIs — lá cabem ${VR_FAVORITOS_MAX}.`);
+          return;
+        }
+        carrossel.push(ticker);
+        vrGarantirNosFavoritos(ticker);
+      }
+      salvarFavoritosCarrossel(carrossel);
+      espelharFavoritoNaNuvem(ticker, !jaEstava);
+      document.dispatchEvent(new CustomEvent('vr:favoritos-alterados'));
     });
 
     document.addEventListener('vr:favoritos-alterados', () => {
@@ -12140,17 +12154,39 @@
       if (v == null || isNaN(v)) return '—';
       return numeroGlobal(v) + '%';
     }
-    // ---- Favoritos compartilhados -------------------------------------
-    // A lista de favoritos do site é UMA só: a mesma que alimenta o
-    // carrossel do topo (chave 'vrCarrosselFavoritos', espelhada no
-    // Supabase quando a pessoa está logada). O coração das tabelas de
-    // Ações/FIIs mexe nessa mesma lista de propósito — ter duas listas
-    // separadas de "favoritos" no mesmo site seria confuso: a pessoa
-    // favoritaria na tabela e não entenderia por que não aparece no
-    // carrossel. Estas funções são a porta de entrada única, e avisam o
-    // resto da página por evento pra tudo se redesenhar junto.
+    // ---- Meus Favoritos (lista de acompanhamento) ----------------------
+    // São DUAS coisas diferentes, cada uma com sua lista:
+    //
+    //   1. Meus Favoritos  (chave 'vrFavoritos', até 30) — o coração das
+    //      tabelas de Ações/FIIs e o filtro "Meus Favoritos". É uma lista
+    //      de acompanhamento: pode ser grande, não custa nada, não aparece
+    //      em lugar nenhum além do filtro.
+    //
+    //   2. Carrossel do topo ('vrCarrosselFavoritos', até 5) — o "☆
+    //      Favoritar" da Consulta Rápida. Cada item aqui custa uma cotação
+    //      buscada na HG Brasil a cada carregamento da página, e é uma
+    //      faixa estreita na tela: não faz sentido ter 30.
+    //
+    // A primeira versão usava uma lista só, e o efeito era esquisito —
+    // favoritar 30 ações na tabela mexia no carrossel do topo. Separar
+    // resolve, mas com uma regra pra não virarem coisas desconexas: o que
+    // está no carrossel está sempre nos favoritos (fixar algo no topo é,
+    // por definição, favoritar), e tirar dos favoritos também tira do
+    // carrossel. O contrário não vale: favoritar 30 ativos na tabela não
+    // enche o carrossel.
+    const VR_FAVORITOS_KEY = 'vrFavoritos';
+    const VR_FAVORITOS_MAX = 30;
+
     function vrObterFavoritos() {
-      return typeof obterFavoritosCarrossel === 'function' ? obterFavoritosCarrossel() : [];
+      try {
+        const lista = JSON.parse(localStorage.getItem(VR_FAVORITOS_KEY));
+        return Array.isArray(lista) ? lista : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    function vrSalvarFavoritos(lista) {
+      try { localStorage.setItem(VR_FAVORITOS_KEY, JSON.stringify(lista)); } catch (e) { /* sem localStorage: não persiste */ }
     }
     function vrEhFavorito(ticker) {
       return vrObterFavoritos().includes(String(ticker || '').toUpperCase());
@@ -12162,17 +12198,43 @@
       const jaEra = favoritos.includes(ticker);
       if (jaEra) {
         favoritos = favoritos.filter(t => t !== ticker);
+        // Saiu dos favoritos, sai do carrossel junto — senão ficaria no
+        // topo da tela um ativo que a pessoa acabou de desfavoritar.
+        if (obterFavoritosCarrossel().includes(ticker)) {
+          salvarFavoritosCarrossel(obterFavoritosCarrossel().filter(t => t !== ticker));
+          espelharFavoritoNaNuvem(ticker, false);
+        }
       } else {
-        if (typeof FAVORITOS_MAX === 'number' && favoritos.length >= FAVORITOS_MAX) {
-          alert(`Você pode favoritar até ${FAVORITOS_MAX} ativos. Remova algum antes de adicionar outro.`);
+        if (favoritos.length >= VR_FAVORITOS_MAX) {
+          alert(`Você pode ter até ${VR_FAVORITOS_MAX} ativos em Meus Favoritos. Remova algum antes de adicionar outro.`);
           return;
         }
         favoritos.push(ticker);
       }
-      salvarFavoritosCarrossel(favoritos);
-      espelharFavoritoNaNuvem(ticker, !jaEra);
+      vrSalvarFavoritos(favoritos);
       document.dispatchEvent(new CustomEvent('vr:favoritos-alterados'));
     }
+    // Garante a regra "quem está no carrossel está nos favoritos".
+    function vrGarantirNosFavoritos(ticker) {
+      const favoritos = vrObterFavoritos();
+      if (favoritos.includes(ticker) || favoritos.length >= VR_FAVORITOS_MAX) return;
+      favoritos.push(ticker);
+      vrSalvarFavoritos(favoritos);
+    }
+
+    // Migração de quem já usava o site antes de "Meus Favoritos" existir:
+    // o que estava fixado no carrossel vira o conteúdo inicial da lista de
+    // favoritos, pra pessoa encontrar seus ativos já com o coração
+    // marcado em vez de uma lista vazia. Roda uma vez só (depois disso a
+    // chave existe, mesmo que vazia, e não sobrescreve escolha nenhuma).
+    (function migrarFavoritosDoCarrossel() {
+      try {
+        if (localStorage.getItem(VR_FAVORITOS_KEY) !== null) return;
+        const doCarrossel = obterFavoritosCarrossel();
+        if (doCarrossel.length) vrSalvarFavoritos(doCarrossel.slice(0, VR_FAVORITOS_MAX));
+        else localStorage.setItem(VR_FAVORITOS_KEY, '[]');
+      } catch (e) { /* sem localStorage: nada a migrar */ }
+    })();
 
     // Preço Justo de Graham: raiz de (22,5 × LPA × VPA). O 22,5 é o produto
     // dos tetos que Graham aceitava numa empresa defensiva (P/L 15 × P/VP
@@ -12629,7 +12691,7 @@
           <tr data-ticker="${d.ticker}">
             <td class="lm-ativo-cel">
               <button type="button" class="lm-favorito${vrEhFavorito(d.ticker) ? ' marcado' : ''}" data-fav="${d.ticker}"
-                      aria-pressed="${vrEhFavorito(d.ticker)}" aria-label="${vrEhFavorito(d.ticker) ? 'Remover' : 'Adicionar'} ${d.ticker} dos favoritos" title="">
+                      aria-pressed="${vrEhFavorito(d.ticker)}" aria-label="${vrEhFavorito(d.ticker) ? 'Remover' : 'Adicionar'} ${d.ticker} em Meus Favoritos" title="">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.5-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.5 12c-2 4.3-9.5 9-9.5 9z"/></svg>
               </button>
               <div class="lm-ativo-logo">${d.logo ? `<img src="${d.logo}" alt="" loading="lazy" onerror="this.parentElement.textContent='${d.ticker.slice(0, 2)}'">` : d.ticker.slice(0, 2)}</div>
