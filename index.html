@@ -818,6 +818,10 @@
     }
     /* Duas colunas de toggles quando cabe; uma só no celular. */
     .lm-col-lista { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px 20px; }
+    /* Dois grupos curtos dividindo a mesma faixa (ex.: Proventos ao lado de
+       Dados Avançados) — cada um com seus itens em coluna única. */
+    .lm-col-par { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0 20px; }
+    .lm-col-par .lm-col-lista { grid-template-columns: 1fr; }
     .lm-col-item { display: flex; align-items: center; gap: 9px; cursor: pointer; font-size: 0.86rem; }
     .lm-col-item .lm-col-nome { min-width: 0; }
     /* O "?" fica logo depois do nome (não empurrado pra borda da coluna). */
@@ -3300,6 +3304,8 @@
               <th data-col="p_receita" title="Preço sobre Receita" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">P/Receita <button type="button" class="hg-info-btn" data-glossario="p-receita-indicador" aria-label="O que é P/Receita?" title="">?</button></th>
               <th data-col="ev_ebitda" title="Enterprise Value / EBITDA" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">EV/EBITDA <button type="button" class="hg-info-btn" data-glossario="ev-ebitda-indicador" aria-label="O que é EV/EBITDA?" title="">?</button></th>
               <th data-col="dy_pct" title="Dividend Yield" data-tipo="numero" class="lm-col-ordenavel">DY <button type="button" class="hg-info-btn" data-glossario="dy-acoes" aria-label="O que é Dividend Yield?" title="">?</button></th>
+              <th data-col="graham" title="Preço Justo de Graham" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Preço Justo <button type="button" class="hg-info-btn" data-glossario="graham-indicador" aria-label="O que é o Preço Justo de Graham?" title="">?</button></th>
+              <th data-col="bazin" title="Preço-teto de Bazin" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Preço-teto <button type="button" class="hg-info-btn" data-glossario="bazin-indicador" aria-label="O que é o Preço-teto de Bazin?" title="">?</button></th>
               <th data-col="margem_bruta_pct" title="Margem Bruta" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Marg. Bruta <button type="button" class="hg-info-btn" data-glossario="margem-bruta-indicador" aria-label="O que é Margem Bruta?" title="">?</button></th>
               <th data-col="margem_liquida_pct" title="Margem Líquida" data-tipo="numero" class="lm-col-ordenavel">Marg. Líq. <button type="button" class="hg-info-btn" data-glossario="margem-liquida-indicador" aria-label="O que é Margem Líquida?" title="">?</button></th>
               <th data-col="margem_ebitda_pct" title="Margem EBITDA" data-tipo="numero" data-opcional="1" class="lm-col-ordenavel">Marg. EBITDA <button type="button" class="hg-info-btn" data-glossario="margem-ebitda-indicador" aria-label="O que é Margem EBITDA?" title="">?</button></th>
@@ -9782,6 +9788,8 @@
         'div-liq-ebitda-indicador': 'Dívida Líquida / EBITDA = quantos anos de geração de caixa atual seriam necessários para quitar toda a dívida líquida da empresa.\n\nCálculo: (dívida total − caixa) ÷ EBITDA\n\nQuanto menor, mais folgada a situação. Valor negativo significa caixa maior que a dívida (caixa líquido), o que é positivo. Não se aplica a bancos.',
         'divida-patrimonio-indicador': 'Dívida / Patrimônio = quanto a empresa deve para cada R$ 1 de patrimônio dos acionistas.\n\nCálculo: dívida total ÷ patrimônio líquido\n\nQuanto maior, mais alavancada a empresa — mais lucro nos bons momentos, mais risco nos ruins.',
         'liquidez-corrente-indicador': 'Liquidez Corrente = capacidade de pagar as contas de curto prazo com o que a empresa tem a receber no mesmo período.\n\nCálculo: ativo circulante ÷ passivo circulante\n\nAcima de 1 significa que há mais a receber do que a pagar nos próximos 12 meses.',
+        'graham-indicador': 'Preço Justo de Graham = estimativa de quanto a ação "valeria" segundo a fórmula clássica de Benjamin Graham, usada para comparar com a cotação atual.\n\nCálculo: raiz quadrada de (22,5 × LPA × VPA)\n\nO 22,5 vem dos limites que Graham considerava aceitáveis para uma empresa defensiva: P/L de até 15 e P/VP de até 1,5 (15 × 1,5 = 22,5).\n\nSó faz sentido quando LPA e VPA são positivos — empresa com prejuízo não tem preço justo por essa fórmula. É uma referência de estudo, criada nos anos 1930 para empresas industriais, não uma recomendação de compra nem um valor "correto" da ação.',
+        'bazin-indicador': 'Preço-teto de Bazin = preço máximo que você pagaria pela ação para ainda receber um dividend yield de 6% ao ano, critério defendido por Décio Bazin.\n\nCálculo: dividendos por ação nos últimos 12 meses ÷ 0,06\n\nO 6% é a exigência de retorno do próprio Bazin — quem quiser outra régua muda o divisor. Aqui usamos os proventos dos últimos 12 meses, então o número muda conforme a empresa aumenta ou corta dividendos, e não garante que ela vá manter o pagamento. É referência de estudo, não recomendação.',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
@@ -12099,6 +12107,30 @@
       if (v == null || isNaN(v)) return '—';
       return numeroGlobal(v) + '%';
     }
+    // Preço Justo de Graham: raiz de (22,5 × LPA × VPA). O 22,5 é o produto
+    // dos tetos que Graham aceitava numa empresa defensiva (P/L 15 × P/VP
+    // 1,5). Retorna null — e não zero — quando a conta não se aplica:
+    // com LPA ou VPA negativo (prejuízo ou patrimônio negativo) a raiz não
+    // existe, e mostrar "R$ 0,00" aí seria pior que mostrar "—".
+    function calcularGraham(d) {
+      const lpa = d.lpa, vpa = d.vpa;
+      if (typeof lpa !== 'number' || typeof vpa !== 'number') return null;
+      if (lpa <= 0 || vpa <= 0) return null;
+      return Math.sqrt(22.5 * lpa * vpa);
+    }
+
+    // Preço-teto de Bazin: dividendo por ação dos últimos 12 meses ÷ 6%.
+    // O robô guarda o DY em percentual, não o valor em reais do provento —
+    // então o dividendo é reconstruído a partir do preço (preço × DY%).
+    // Sem preço ou sem dividendo não há teto a calcular.
+    const BAZIN_YIELD_EXIGIDO = 0.06;
+    function calcularBazin(d) {
+      const preco = d.preco, dy = d.dy_pct;
+      if (typeof preco !== 'number' || typeof dy !== 'number') return null;
+      if (preco <= 0 || dy <= 0) return null;
+      return (preco * (dy / 100)) / BAZIN_YIELD_EXIGIDO;
+    }
+
     function variacaoColoridaGlobal(v) {
       if (v == null || isNaN(v)) return '<span class="lm-setor-tag">—</span>';
       const cor = v >= 0 ? 'lm-variacao-pos' : 'lm-variacao-neg';
@@ -12276,7 +12308,24 @@
           if (btn) chaveGlossarioPorCampo[th.dataset.col] = btn.getAttribute('data-glossario');
         });
 
-        const html = grupos.map(g => `
+        // Grupo curto (1 ou 2 itens) desperdiça meia largura do modal: o
+        // "Proventos", com um item só, deixava a coluna da direita vazia e
+        // empurrava tudo pra baixo. Quando dois grupos curtos são vizinhos,
+        // eles passam a dividir a mesma faixa — o painel encurta sem que
+        // nenhum indicador mude de grupo.
+        const MAX_ITENS_PRA_PAREAR = 2;
+        const blocos = [];
+        for (let i = 0; i < grupos.length; i++) {
+          const atual = grupos[i], proximo = grupos[i + 1];
+          if (atual.itens.length <= MAX_ITENS_PRA_PAREAR && proximo && proximo.itens.length <= MAX_ITENS_PRA_PAREAR) {
+            blocos.push([atual, proximo]);
+            i++;
+          } else {
+            blocos.push([atual]);
+          }
+        }
+
+        const montarGrupo = g => `
           <div class="lm-col-grupo">
             <h4>${g.nome}</h4>
             <div class="lm-col-lista">
@@ -12291,7 +12340,15 @@
                 </label>`;
               }).join('')}
             </div>
-          </div>`).join('');
+          </div>`;
+
+        // Um grupo sozinho ocupa a faixa inteira (e distribui os itens em
+        // duas colunas); dois grupos pareados dividem a faixa, cada um com
+        // seus itens empilhados.
+        const html = blocos.map(bloco => bloco.length === 2
+          ? `<div class="lm-col-par">${bloco.map(montarGrupo).join('')}</div>`
+          : montarGrupo(bloco[0])
+        ).join('');
 
         overlay.innerHTML = `
           <div class="calc-modal lm-colunas-modal">
@@ -12430,7 +12487,10 @@
           if (campo === 'ativo') {
             return direcaoAsc ? a.ticker.localeCompare(b.ticker) : b.ticker.localeCompare(a.ticker);
           }
-          const va = a[campo], vb = b[campo];
+          // Coluna calculada (ex.: Preço Justo/Preço-teto) ordena pelo
+          // valor que ela mostra, não por um campo que não existe no JSON.
+          const ler = d => (colunaOrdenada.valor ? colunaOrdenada.valor(d) : d[campo]);
+          const va = ler(a), vb = ler(b);
           if (va == null && vb == null) return 0;
           if (va == null) return 1;   // valores ausentes sempre por último
           if (vb == null) return -1;
@@ -12554,7 +12614,19 @@
         { campo: 'lpa', rotulo: 'LPA', grupo: 'Valuation', visivel: false, render: d => moedaGlobal(d.lpa) },
         { campo: 'p_receita', rotulo: 'P/Receita', grupo: 'Valuation', visivel: false, render: d => numeroGlobal(d.p_receita) },
         { campo: 'ev_ebitda', rotulo: 'EV/EBITDA', grupo: 'Valuation', visivel: false, render: d => numeroGlobal(d.ev_ebitda) },
+        // Preço Justo (Graham) e Preço-teto (Bazin) não vêm de API nenhuma:
+        // são contas em cima do que o robô já coleta (LPA/VPA no caso do
+        // Graham; preço e DY no caso do Bazin). Por isso ficam num grupo
+        // próprio no "Customizar" — são estimativas de referência, não dado
+        // divulgado pela empresa. Ambas devolvem null quando a conta não faz
+        // sentido (prejuízo, sem dividendo), e aí a célula mostra "—" em vez
+        // de um número inventado.
         { campo: 'dy_pct', rotulo: 'Dividend Yield', grupo: 'Proventos', render: d => percentualGlobal(d.dy_pct) },
+        // "valor" existe porque estas duas colunas são calculadas: o campo
+        // não está no JSON, então a ordenação (que lê d[campo]) veria tudo
+        // como vazio e não ordenaria nada sem isso.
+        { campo: 'graham', rotulo: 'Preço Justo de Graham', grupo: 'Dados Avançados', visivel: false, valor: calcularGraham, render: d => moedaGlobal(calcularGraham(d)) },
+        { campo: 'bazin', rotulo: 'Preço-teto de Bazin', grupo: 'Dados Avançados', visivel: false, valor: calcularBazin, render: d => moedaGlobal(calcularBazin(d)) },
         { campo: 'margem_bruta_pct', rotulo: 'Margem Bruta', grupo: 'Rentabilidade', visivel: false, render: d => percentualGlobal(d.margem_bruta_pct) },
         { campo: 'margem_liquida_pct', rotulo: 'Margem Líquida', grupo: 'Rentabilidade', render: d => percentualGlobal(d.margem_liquida_pct) },
         { campo: 'margem_ebitda_pct', rotulo: 'Margem EBITDA', grupo: 'Rentabilidade', visivel: false, render: d => percentualGlobal(d.margem_ebitda_pct) },
