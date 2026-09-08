@@ -1,0 +1,40 @@
+name: Atualizar Índice de Basileia (IF.data / BCB)
+
+# O IF.data publica por trimestre, com uns 2-3 meses de defasagem depois do
+# fechamento. Rodar toda segunda às 9h BR é folgado o bastante pra pegar a
+# publicação na semana em que ela sai, e barato: quando não há nada novo o
+# robô nem toca no arquivo, então não gera commit.
+on:
+  schedule:
+    - cron: '0 12 * * 1'      # segunda-feira, 12h UTC = 9h BR
+  workflow_dispatch:           # botão "Run workflow" pra rodar na mão
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Sem pip install: o robô usa só biblioteca padrão, e o IF.data é
+      # aberto (não precisa de chave/secret).
+      - name: Coletar Basileia
+        run: python3 coletar_basileia.py
+
+      - name: Commitar se mudou
+        run: |
+          if [ -n "$(git status --porcelain data/basileia.json)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add data/basileia.json
+            git commit -m "Basileia: atualiza data/basileia.json (IF.data/BCB)"
+            git push
+          else
+            echo "Nada mudou — nenhum commit."
+          fi
