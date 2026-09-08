@@ -21,10 +21,13 @@ O QUE ELE FAZ
 -------------
   1. Descobre o trimestre mais recente publicado (anda pra trás a partir
      do trimestre atual até achar dado).
-  2. Baixa o cadastro de instituições e os valores do relatório.
-  3. Acha a coluna de Basileia PELO NOME (qualquer chave cujo nome
-     normalizado contenha "basileia"), em vez de depender da grafia
-     exata — assim uma renomeação no lado do BC não quebra tudo.
+  2. SONDA os relatórios um a um, puxando poucas linhas de cada com $top,
+     até achar aquele que contém a Basileia. Não dá pra fixar o número:
+     na primeira execução real o relatório 1 devolveu 14 mil linhas sem
+     nenhuma coluna de Basileia.
+  3. Aceita os dois feitios em que o IF.data devolve o dado — coluna
+     própria ("largo") ou linha rotulada ("longo") — e acha o campo pelo
+     NOME/RÓTULO, não por grafia fixa, pra sobreviver a renomeação.
   4. Casa cada instituição com o ticker da B3 pela razão social.
   5. Insere o período novo no topo de `data/basileia.json`, preservando
      os períodos anteriores. O site monta o seletor a partir desse
@@ -41,12 +44,9 @@ Sem chave de API: o IF.data é aberto.
 
 SE ALGO NÃO BATER
 -----------------
-Rode com --explorar e mande a saída. Ela imprime os nomes de relatório,
-as chaves que vieram e uma amostra das instituições — que é exatamente o
-que falta para acertar os detalhes (o ambiente onde este script foi
-escrito não tem saída de rede para olinda.bcb.gov.br, então os nomes de
-parâmetro abaixo são a forma documentada, mas não foram exercitados
-contra o servidor real).
+Rode com --explorar: ele imprime as chaves de CADA relatório sondado, e
+o diagnóstico com linhas de amostra. É isso que permite acertar um
+fragmento de razão social ou um campo novo sem adivinhação.
 """
 
 import json
@@ -70,12 +70,15 @@ ARQUIVO = os.environ.get("ARQUIVO_BASILEIA", "data/basileia.json")
 # PRUDENCIAL, por isso o padrão é 1.
 TIPO_INSTITUICAO = int(os.environ.get("BASILEIA_TIPO", "1"))
 
-# Relatório do IF.data que traz o Índice de Basileia. "Resumo" é onde ele
-# aparece; o código é confirmado em tempo de execução pela lista de
-# relatórios (ver escolher_relatorio()).
-RELATORIO_PADRAO = os.environ.get("BASILEIA_RELATORIO", "1")
+# Relatórios sondados em busca da Basileia. Em vez de fixar um número, o
+# robô espia cada um com $top e vê qual traz o dado (ver procurar_relatorio).
+# Motivo: na primeira execução real o relatório 1 devolveu 14 mil linhas
+# SEM coluna de Basileia — chutar o número não funciona.
+RELATORIOS_PARA_SONDAR = [int(n) for n in
+                          os.environ.get("BASILEIA_RELATORIOS", "1,2,3,4,5,6,7,8,9,10,11,12").split(",")]
+LINHAS_PARA_ESPIAR = 400   # amostra por relatório na sondagem
 
-TEMPO_LIMITE = 60
+TEMPO_LIMITE = 90
 TRIMESTRES_PARA_TRAS = 6   # ~1,5 ano de tentativas antes de desistir
 
 # Bancos da tabela do site. 'busca' são pedaços da razão social como ela
@@ -174,55 +177,138 @@ def trimestres_recentes(quantidade):
     return saida
 
 
-def escolher_relatorio(anomes):
-    """
-    Procura, na lista de relatórios do período, aquele cujo nome sugere
-    Basileia/Capital. Se não achar, volta o padrão.
-    """
-    lista = pedir("ListaDeRelatorios", {"AnoMes": anomes, "TipoInstituicao": TIPO_INSTITUICAO},
-                  silencioso=True)
-    if not lista:
-        lista = pedir("ListaDeRelatorios", {"AnoMes": anomes}, silencioso=True)
-    if not lista:
-        return RELATORIO_PADRAO, []
-
-    preferidos = ("BASILEIA", "CAPITAL", "RESUMO")
-    melhor = None
-    for item in lista:
-        nome = normalizar(" ".join(str(v) for v in item.values()))
-        for peso, alvo in enumerate(preferidos):
-            if alvo in nome and (melhor is None or peso < melhor[0]):
-                numero = (item.get("numeroRelatorio") or item.get("NumeroRelatorio")
-                          or item.get("relatorio") or item.get("Relatorio"))
-                if numero is not None:
-                    melhor = (peso, str(numero), item)
-    if melhor:
-        return melhor[1], lista
-    return RELATORIO_PADRAO, lista
+def espiar(anomes, relatorio, quantas=LINHAS_PARA_ESPIAR):
+    """Puxa só as primeiras linhas de um relatório, pra ver o formato sem
+    baixar as ~14 mil que ele tem inteiro."""
+    return pedir("IfDataValores", {
+        "AnoMes": anomes,
+        "TipoInstituicao": TIPO_INSTITUICAO,
+        "Relatorio": str(relatorio),
+    }, top=quantas, silencioso=True)
 
 
-def achar_campo_basileia(linhas):
+def campos_numericos(linha):
+    return [k for k, v in linha.items() if converter_numero(v) is not None]
+
+
+def detectar_basileia(linhas):
     """
-    Acha a chave da Basileia pelo NOME, não por grafia fixa. Prefere a que
-    for exatamente o índice, evitando 'basileiaAmpliado'/'nivel1' quando
-    houver mais de uma candidata.
+    Descobre ONDE está o Índice de Basileia. O IF.data pode devolver em
+    dois feitios, e o robô aceita os dois:
+
+      LARGO  — uma linha por instituição, uma COLUNA chamada algo como
+               'indiceDeBasileia'.
+      LONGO  — uma linha por instituição × indicador, com uma coluna de
+               rótulo (cujo VALOR é "Índice de Basileia") e outra com o
+               número. É o feitio que explica um relatório com 14 mil
+               linhas para pouco mais de mil instituições.
+
+    Devolve um dicionário descrevendo o achado, ou None.
     """
     if not linhas:
         return None
+
+    # --- LARGO: o nome da coluna entrega ---
     candidatas = [k for k in linhas[0] if "BASILEIA" in normalizar(k)]
-    if not candidatas:
-        return None
-    candidatas.sort(key=lambda k: (len(normalizar(k)), normalizar(k)))
-    return candidatas[0]
+    if candidatas:
+        # a mais curta é o índice em si; as maiores são variações
+        # ('...Ampliado', '...Nivel1'), que não é o que a tabela mostra.
+        candidatas.sort(key=lambda k: (len(normalizar(k)), normalizar(k)))
+        return {"formato": "largo", "campo_valor": candidatas[0]}
+
+    # --- LONGO: o VALOR de alguma coluna é que diz "Basileia" ---
+    for chave in linhas[0]:
+        rotulos_vistos = set()
+        for linha in linhas:
+            valor = linha.get(chave)
+            if isinstance(valor, str) and "BASILEIA" in normalizar(valor):
+                rotulos_vistos.add(valor)
+        if rotulos_vistos:
+            # mesmo critério: o rótulo mais curto é o índice puro
+            alvo = sorted(rotulos_vistos, key=lambda r: (len(r), r))[0]
+            exemplo = next(l for l in linhas
+                           if isinstance(l.get(chave), str) and normalizar(l[chave]) == normalizar(alvo))
+            numericos = [k for k in campos_numericos(exemplo)
+                         if not any(t in normalizar(k) for t in ("CODIGO", "COD", "ANO", "TIPO", "CNPJ", "ORDEM"))]
+            if not numericos:
+                continue
+            numericos.sort(key=lambda k: (0 if "VALOR" in normalizar(k) or "SALDO" in normalizar(k) else 1, len(k)))
+            return {"formato": "longo", "campo_rotulo": chave,
+                    "rotulo": alvo, "outros_rotulos": sorted(rotulos_vistos),
+                    "campo_valor": numericos[0]}
+    return None
 
 
 def achar_campo_nome(linhas):
+    """
+    A coluna da razão social. Precisa excluir explicitamente 'TipoInstituicao'
+    e afins: a primeira versão casava com ela por conter 'Instituicao', e o
+    robô saía procurando banco dentro de um campo que só diz o tipo.
+    """
     if not linhas:
         return None
+    proibidos = ("TIPO", "COD", "CNPJ", "ANO", "MES", "SEGMENTO", "UF", "CIDADE", "ORDEM")
+    candidatas = []
     for chave in linhas[0]:
         n = normalizar(chave)
-        if "NOMEINSTITUICAO" in n or "INSTITUICAO" in n or n == "NOME":
-            return chave
+        if any(t in n for t in proibidos):
+            continue
+        if not isinstance(linhas[0].get(chave), str):
+            continue
+        if "NOMEINSTITUICAO" in n:
+            peso = 0
+        elif n.startswith("NOME"):
+            peso = 1
+        elif "INSTITUICAO" in n or "CONGLOMERADO" in n:
+            peso = 2
+        else:
+            continue
+        candidatas.append((peso, len(n), chave))
+    candidatas.sort()
+    return candidatas[0][2] if candidatas else None
+
+
+def diagnosticar(linhas, quantas=3):
+    """O que eu preciso ver quando algo não bate. Vai pro log do Actions."""
+    log("  --- DIAGNÓSTICO (mande isto se pedir ajuda) ---")
+    log(f"  chaves: {json.dumps(list(linhas[0].keys()), ensure_ascii=False)}")
+    for linha in linhas[:quantas]:
+        log(f"  linha: {json.dumps(linha, ensure_ascii=False)[:700]}")
+    log("  --- fim do diagnóstico ---")
+
+
+def procurar_relatorio(anomes):
+    """
+    Sonda os relatórios um por um com $top, em vez de confiar num número
+    fixo. Custa algumas requisições minúsculas e dispensa a lista de
+    relatórios do BC (cujo nome de recurso variou entre as versões da API).
+    """
+    vazios_seguidos = 0
+    for indice, numero in enumerate(RELATORIOS_PARA_SONDAR):
+        linhas = espiar(anomes, numero)
+        if not linhas:
+            log(f"  relatório {numero}: sem dados")
+            vazios_seguidos += 1
+            # Trimestre ainda não publicado: os primeiros relatórios vêm
+            # todos vazios. Desiste cedo em vez de gastar 12 requisições
+            # por período pra descobrir a mesma coisa.
+            if indice + 1 == vazios_seguidos and vazios_seguidos >= 2:
+                log("  (período parece não publicado — parando a sondagem)")
+                return None
+            continue
+        vazios_seguidos = 0
+        achado = detectar_basileia(linhas)
+        campo_nome = achar_campo_nome(linhas)
+        marca = "<-- TEM BASILEIA" if achado else ""
+        log(f"  relatório {numero}: {len(linhas)} linhas espiadas, "
+            f"nome={campo_nome or '?'} {marca}")
+        if EXPLORAR:
+            log(f"    chaves: {json.dumps(list(linhas[0].keys()), ensure_ascii=False)}")
+        if achado and campo_nome:
+            achado["relatorio"] = numero
+            achado["campo_nome"] = campo_nome
+            achado["amostra"] = linhas
+            return achado
     return None
 
 
@@ -235,15 +321,43 @@ def casar_banco(nome_normalizado):
 
 
 def converter_numero(valor):
+    if isinstance(valor, bool):
+        return None
     if isinstance(valor, (int, float)):
         return round(float(valor), 2)
     if isinstance(valor, str):
-        limpo = valor.strip().replace(".", "").replace(",", ".")
+        limpo = valor.strip()
+        if not limpo:
+            return None
+        # "15,31" e "1.234,56" vêm assim do BC; "15.31" também aparece
+        if "," in limpo:
+            limpo = limpo.replace(".", "").replace(",", ".")
         try:
             return round(float(limpo), 2)
         except ValueError:
             return None
     return None
+
+
+def extrair_valores(linhas, achado):
+    """Percorre o relatório inteiro e devolve {ticker: indice}."""
+    campo_nome = achado["campo_nome"]
+    valores, casados = {}, []
+    for linha in linhas:
+        if achado["formato"] == "longo":
+            rotulo = linha.get(achado["campo_rotulo"])
+            if not isinstance(rotulo, str) or normalizar(rotulo) != normalizar(achado["rotulo"]):
+                continue
+        nome_bc = linha.get(campo_nome)
+        banco = casar_banco(normalizar(nome_bc))
+        if not banco or banco["ticker"] in valores:
+            continue
+        numero = converter_numero(linha.get(achado["campo_valor"]))
+        if numero is None:
+            continue
+        valores[banco["ticker"]] = numero
+        casados.append((banco["ticker"], nome_bc, numero))
+    return valores, casados
 
 
 # ----------------------------------------------------------------------
@@ -312,50 +426,35 @@ def main():
             forcado = int(sys.argv[i + 1])
 
     periodos = [forcado] if forcado else trimestres_recentes(TRIMESTRES_PARA_TRAS)
-    log(f"IF.data — tentando os períodos: {', '.join(str(p) for p in periodos)}")
+    log(f"IF.data — períodos a tentar: {', '.join(str(p) for p in periodos)}")
 
     for anomes in periodos:
         log(f"\n=== {anomes} ===")
-        relatorio, lista_relatorios = escolher_relatorio(anomes)
-        if EXPLORAR and lista_relatorios:
-            log(f"  relatórios disponíveis ({len(lista_relatorios)}):")
-            for item in lista_relatorios[:40]:
-                log(f"    {json.dumps(item, ensure_ascii=False)}")
-        log(f"  relatório escolhido: {relatorio}")
+        achado = procurar_relatorio(anomes)
+        if not achado:
+            log("  nenhum relatório desse período tem Basileia — tentando o período anterior...")
+            continue
+
+        log(f"\n  ACHADO no relatório {achado['relatorio']} (formato {achado['formato']})")
+        log(f"    coluna do valor: {achado['campo_valor']}")
+        log(f"    coluna do nome:  {achado['campo_nome']}")
+        if achado["formato"] == "longo":
+            log(f"    rótulo usado:    {achado['rotulo']!r}")
+            outros = [r for r in achado.get("outros_rotulos", []) if r != achado["rotulo"]]
+            if outros:
+                log(f"    (outros rótulos com 'basileia', ignorados: {outros})")
 
         linhas = pedir("IfDataValores", {
             "AnoMes": anomes,
             "TipoInstituicao": TIPO_INSTITUICAO,
-            "Relatorio": str(relatorio),
+            "Relatorio": str(achado["relatorio"]),
         })
         if not linhas:
-            log("  sem dados nesse período, tentando o anterior...")
+            log("  o relatório inteiro não veio; tentando o período anterior...")
             continue
+        log(f"    {len(linhas)} linhas no relatório completo")
 
-        log(f"  {len(linhas)} linhas recebidas")
-        if EXPLORAR:
-            log(f"  chaves da primeira linha:\n    {json.dumps(list(linhas[0].keys()), ensure_ascii=False)}")
-            log(f"  amostra:\n    {json.dumps(linhas[0], ensure_ascii=False)[:900]}")
-
-        campo_basileia = achar_campo_basileia(linhas)
-        campo_nome = achar_campo_nome(linhas)
-        log(f"  campo de Basileia: {campo_basileia or 'NÃO ENCONTRADO'}")
-        log(f"  campo de nome:     {campo_nome or 'NÃO ENCONTRADO'}")
-        if not campo_basileia or not campo_nome:
-            log("  >> rode com --explorar e me mande a saída: as chaves acima é que faltam.")
-            return 1
-
-        valores, casados = {}, []
-        for linha in linhas:
-            nome = normalizar(linha.get(campo_nome))
-            banco = casar_banco(nome)
-            if not banco or banco["ticker"] in valores:
-                continue
-            numero = converter_numero(linha.get(campo_basileia))
-            if numero is None:
-                continue
-            valores[banco["ticker"]] = numero
-            casados.append((banco["ticker"], linha.get(campo_nome), numero))
+        valores, casados = extrair_valores(linhas, achado)
 
         log("\n  Casamento ticker <-> instituição:")
         for ticker, nome_bc, numero in sorted(casados):
@@ -363,11 +462,23 @@ def main():
         faltando = [b["ticker"] for b in BANCOS if b["ticker"] not in valores]
         if faltando:
             log(f"\n  NÃO ENCONTRADOS: {', '.join(faltando)}")
-            log("  (aparecem como '—' no site; ajustar 'busca' desses bancos aqui no script)")
+            log("  (ficam como '—' no site; ajustar a lista 'busca' desses bancos no topo do script)")
+            # ajuda a acertar o fragmento: mostra nomes parecidos que existem
+            amostra = sorted({str(l.get(achado["campo_nome"])) for l in linhas[:4000]
+                              if isinstance(l.get(achado["campo_nome"]), str)})
+            for ticker in faltando:
+                banco = next(b for b in BANCOS if b["ticker"] == ticker)
+                # tenta cada palavra do nome e dos fragmentos de busca: é o
+                # bastante pra revelar como o BC escreve aquela instituição
+                termos = {palavra for texto in [banco["nome"]] + banco["busca"]
+                          for palavra in normalizar(texto).split() if len(palavra) >= 4}
+                parecidos = sorted({n for n in amostra
+                                    for t in termos if t in normalizar(n)})[:5]
+                log(f"    {ticker}: parecidos no IF.data -> {parecidos or 'nada parecido'}")
 
         if not valores:
             log("\n  Nenhum banco casou — não vou gravar um período vazio.")
-            log("  Rode com --explorar pra ver como as razões sociais vêm escritas.")
+            diagnosticar(achado["amostra"])
             return 1
 
         if EXPLORAR or DRY_RUN:
@@ -376,7 +487,8 @@ def main():
         gravar(anomes, valores)
         return 0
 
-    log("\nNenhum período retornou dados. Rode com --explorar.")
+    log("\nNenhum período retornou Basileia.")
+    log("Rode com --explorar: ele imprime as chaves de cada relatório sondado.")
     return 1
 
 
