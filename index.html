@@ -2606,6 +2606,13 @@
       background: var(--deep); border: 1px solid var(--border); color: var(--text);
       border-radius: 8px; padding: 5px 8px; font-size: 0.8rem; font-family: inherit; cursor: pointer;
     }
+    .bas-referencia {
+      margin: 8px 0 0; font-size: 0.75rem; color: var(--muted);
+      border-left: 2px solid var(--border); padding-left: 8px; line-height: 1.45;
+    }
+    /* mesmo truque usado na Consulta Rápida: enquanto não há mensagem, o
+       .hg-status não deve abrir um buraco entre o texto e a tabela. */
+    .bas-modal .hg-status:empty { margin: 6px 0 0; min-height: 0; }
     .bas-tabela th { cursor: pointer; user-select: none; white-space: nowrap; }
     .bas-tabela th:hover { color: var(--primary); }
     .bas-tabela th .bas-seta { opacity: 0.5; font-size: 0.7rem; margin-left: 3px; }
@@ -4563,18 +4570,18 @@
         <div class="calc-modal-topo">
           <h3 id="basTitulo">📊 Tabela do Índice de Basileia</h3>
           <div style="display:flex; align-items:center; gap:10px;">
-            <select id="basAnoSelect" class="bas-ano-select">
-              <option value="2026" selected>2026</option>
-              <option value="2025">2025</option>
+            <select id="basAnoSelect" class="bas-ano-select" aria-label="Período do Índice de Basileia">
+              <!-- opções montadas a partir de data/basileia.json -->
             </select>
             <button id="basFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
           </div>
         </div>
         <div class="calc-corpo">
           <p class="calc-ajuda" style="margin:-6px 0 0;">
-            Índice de Basileia: medida regulatória de solidez financeira dos bancos, atualizada trimestralmente
+            Índice de Basileia: medida regulatória de solidez financeira dos bancos, divulgada a cada trimestre
             (dado publicado pelos próprios bancos/BC, sem API de mercado — os demais indicadores são calculados em tempo real).
           </p>
+          <p class="bas-referencia" id="basReferencia" hidden></p>
           <div id="basStatus" class="hg-status"></div>
           <div class="cmp-tabela-wrap"><table class="cmp-tabela bas-tabela" id="basTabela"></table></div>
         </div>
@@ -9888,9 +9895,16 @@
 
     // ============================================================
     // TABELA DO ÍNDICE DE BASILEIA DOS BANCOS
-    // O Índice de Basileia é um dado regulatório (publicado trimestralmente
-    // pelos próprios bancos/Banco Central) — não existe em nenhuma API de
-    // mercado gratuita, por isso essa lista é curada manualmente aqui.
+    // O Índice de Basileia é um dado regulatório (divulgado a cada
+    // trimestre pelos próprios bancos e consolidado pelo Banco Central) —
+    // não existe em nenhuma API de mercado: a HG Brasil, que alimenta o
+    // resto do site, não traz capital regulatório para nenhum ticker.
+    // Por isso ele vem de 'data/basileia.json', um arquivo curado.
+    //
+    // O JSON manda em tudo: a lista de bancos e os períodos do seletor
+    // saem de lá. Para publicar um trimestre novo basta acrescentá-lo no
+    // topo de 'periodos' — nada muda aqui.
+    //
     // Os demais indicadores (Valor de mercado, P/L, P/VP, ROE, DY) são
     // buscados ao vivo na mesma API já usada no resto do site.
     // ============================================================
@@ -9901,40 +9915,81 @@
       const anoSelect = document.getElementById('basAnoSelect');
       const statusEl = document.getElementById('basStatus');
       const tabelaEl = document.getElementById('basTabela');
+      const referenciaEl = document.getElementById('basReferencia');
       if (!btnAbrir || !overlay) return;
 
-      // Índice de Basileia por banco/ano — ATUALIZAR MANUALMENTE a cada
-      // divulgação trimestral (fonte: releases de resultados dos bancos).
-      const BASILEIA_POR_ANO = {
-        2026: {
-          BRBI11: 20.63, BRSR6: 17.35, ABCB4: 16.87, ITUB4: 15.20, BBDC4: 14.90,
-          BBAS3: 16.10, SANB11: 15.60, BPAN4: 13.80, BPAC11: 17.90,
-        },
-        2025: {
-          BRBI11: 19.80, BRSR6: 16.90, ABCB4: 16.40, ITUB4: 14.80, BBDC4: 14.50,
-          BBAS3: 15.70, SANB11: 15.10, BPAN4: 13.40, BPAC11: 17.40,
-        },
-      };
-
-      const BANCOS = [
-        { ticker: 'BRBI11', nome: 'BR Partners' },
-        { ticker: 'BRSR6', nome: 'Banco Banrisul' },
-        { ticker: 'ABCB4', nome: 'Banco ABC Brasil' },
-        { ticker: 'ITUB4', nome: 'Itaú Unibanco' },
-        { ticker: 'BBDC4', nome: 'Bradesco' },
-        { ticker: 'BBAS3', nome: 'Banco do Brasil' },
-        { ticker: 'SANB11', nome: 'Santander Brasil' },
-        { ticker: 'BPAN4', nome: 'Banco Pan' },
-        { ticker: 'BPAC11', nome: 'BTG Pactual' },
-      ];
-
-      let linhasCache = null; // [{ticker, nome, basileia, marketCap, pl, pvp, roe, dy, logo}]
+      const BASILEIA_URL = 'data/basileia.json';
+      let basileiaJson = null;      // conteúdo do arquivo, buscado uma vez por sessão
+      let linhasCache = null;       // [{ticker, nome, basileia, marketCap, pl, pvp, roe, dy, logo}]
       let ordem = { chave: 'basileia', asc: false };
 
-      function abrirModal() {
+      // Se o arquivo não carregar (rede, deploy pela metade), o modal abre
+      // com uma mensagem clara em vez de tabela vazia. A lista de bancos
+      // mora no JSON de propósito — uma cópia dela aqui voltaria a ser
+      // dado duplicado, que é justamente o que essa mudança elimina.
+      async function carregarBasileiaJson() {
+        if (basileiaJson) return basileiaJson;
+        try {
+          const resp = await fetch(BASILEIA_URL, { cache: 'no-store' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          const dados = await resp.json();
+          if (!Array.isArray(dados?.periodos) || !dados.periodos.length) throw new Error('sem períodos');
+          basileiaJson = dados;
+        } catch (e) {
+          console.warn('Basileia: não foi possível ler ' + BASILEIA_URL, e);
+          basileiaJson = null;
+        }
+        return basileiaJson;
+      }
+
+      function bancosDoJson() {
+        const lista = basileiaJson?.bancos;
+        return Array.isArray(lista) && lista.length ? lista : [];
+      }
+
+      function periodoSelecionado() {
+        const periodos = basileiaJson?.periodos || [];
+        return periodos.find(p => String(p.id) === anoSelect.value) || periodos[0] || null;
+      }
+
+      function montarSeletorPeriodos() {
+        const periodos = basileiaJson?.periodos || [];
+        anoSelect.innerHTML = periodos
+          .map(p => `<option value="${p.id}">${p.rotulo || p.id}</option>`)
+          .join('');
+        anoSelect.hidden = periodos.length === 0;
+        if (periodos.length) anoSelect.value = String(periodos[0].id);
+      }
+
+      function mostrarReferencia() {
+        if (!referenciaEl) return;
+        const periodo = periodoSelecionado();
+        if (!periodo) {
+          referenciaEl.hidden = false;
+          referenciaEl.textContent = 'Não foi possível carregar os dados de Basileia agora. Os demais indicadores continuam ao vivo.';
+          return;
+        }
+        const partes = [];
+        if (periodo.referencia) partes.push(periodo.referencia);
+        if (basileiaJson?.fonte) partes.push('Fonte: ' + basileiaJson.fonte);
+        if (basileiaJson?.atualizado_em) {
+          const [a, m, d] = String(basileiaJson.atualizado_em).split('-');
+          if (a && m && d) partes.push(`Atualizado em ${d}/${m}/${a}`);
+        }
+        referenciaEl.textContent = partes.join(' · ');
+        referenciaEl.hidden = partes.length === 0;
+      }
+
+      async function abrirModal() {
         overlay.hidden = false;
         document.body.style.overflow = 'hidden';
-        if (!linhasCache) carregarDados();
+        if (!linhasCache) {
+          statusEl.className = 'hg-status';
+          statusEl.textContent = 'Carregando indicadores dos bancos...';
+          await carregarBasileiaJson();
+          montarSeletorPeriodos();
+          carregarDados();
+        }
       }
       function fecharModal() {
         overlay.hidden = true;
@@ -9971,14 +10026,24 @@
         statusEl.className = 'hg-status';
         statusEl.textContent = 'Carregando indicadores dos bancos...';
         tabelaEl.innerHTML = '';
+        mostrarReferencia();
 
-        const resultados = await Promise.all(BANCOS.map(async (b) => {
+        const bancos = bancosDoJson();
+        if (!bancos.length) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Não foi possível carregar a lista de bancos. Tente novamente em instantes.';
+          return;
+        }
+
+        const valores = periodoSelecionado()?.valores || {};
+
+        const resultados = await Promise.all(bancos.map(async (b) => {
           const dados = await buscarDadosBanco(b.ticker);
-          const anoAtual = Number(anoSelect.value);
+          const basileia = valores[b.ticker];
           return {
             ticker: b.ticker,
             nome: b.nome,
-            basileia: BASILEIA_POR_ANO[anoAtual]?.[b.ticker] ?? null,
+            basileia: typeof basileia === 'number' ? basileia : null,
             marketCap: dados?.marketCap ?? null,
             logo: dados?.logo ?? null,
             pl: dados?.pl ?? null,
@@ -10053,7 +10118,19 @@
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
-      anoSelect.addEventListener('change', carregarDados);
+      // Trocar de período só muda a coluna de Basileia — os indicadores de
+      // mercado são os mesmos. Reaproveita o cache em vez de refazer as
+      // 18 requisições à HG Brasil.
+      anoSelect.addEventListener('change', () => {
+        if (!linhasCache) { carregarDados(); return; }
+        const valores = periodoSelecionado()?.valores || {};
+        linhasCache = linhasCache.map(l => ({
+          ...l,
+          basileia: typeof valores[l.ticker] === 'number' ? valores[l.ticker] : null,
+        }));
+        mostrarReferencia();
+        renderizarTabela();
+      });
     })();
 
     // ============================================================
