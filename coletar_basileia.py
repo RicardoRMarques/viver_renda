@@ -75,8 +75,11 @@ TIPO_INSTITUICAO = int(os.environ.get("BASILEIA_TIPO", "1"))
 # robô espia cada um com $top e vê qual traz o dado (ver procurar_relatorio).
 # Motivo: na primeira execução real o relatório 1 devolveu 14 mil linhas
 # SEM coluna de Basileia — chutar o número não funciona.
+# O relatório 1 vem primeiro porque a execução real de 08/09/2026 provou
+# que é ele quem traz a Basileia (formato longo, NomeColuna/Saldo). Os
+# outros só são sondados se o 1 vier VAZIO — nunca se ele falhar.
 RELATORIOS_PARA_SONDAR = [int(n) for n in
-                          os.environ.get("BASILEIA_RELATORIOS", "1,2,3,4,5,6,7,8,9,10,11,12").split(",")]
+                          os.environ.get("BASILEIA_RELATORIOS", "1,2,3,4,5,6,7,8").split(",")]
 LINHAS_PARA_ESPIAR = 400   # amostra por relatório na sondagem
 
 TEMPO_LIMITE = 90
@@ -84,7 +87,13 @@ ESPERAS_ENTRE_TENTATIVAS = [2, 5]       # segundos entre as tentativas
 # Freio: se o servidor está fora do ar, insistir em 12 relatórios x 6
 # trimestres x 3 tentativas faz o job rodar meia hora pra nada. Depois
 # desta quantidade de falhas SEGUIDAS, a execução para e avisa.
-FALHAS_SEGUIDAS_PARA_DESISTIR = 6
+FALHAS_SEGUIDAS_PARA_DESISTIR = 10
+
+# O Olinda limita requisições: numa execução real, depois de ~13 chamadas
+# em sequência ele passou a devolver 500 em TUDO, inclusive numa consulta
+# que tinha funcionado segundos antes. Uma pausa entre chamadas custa
+# alguns segundos e evita queimar a cota logo no primeiro trimestre.
+PAUSA_ENTRE_CHAMADAS = float(os.environ.get("BASILEIA_PAUSA", "1.5"))
 TRIMESTRES_PARA_TRAS = 6   # ~1,5 ano de tentativas antes de desistir
 
 # Bancos da tabela do site. 'busca' são pedaços da razão social como ela
@@ -197,6 +206,8 @@ def pedir(recurso, parametros=None, top=None, silencioso=False):
     """
     global falhas_seguidas
     url = montar_url(recurso, parametros, top)
+    if PAUSA_ENTRE_CHAMADAS:
+        time.sleep(PAUSA_ENTRE_CHAMADAS)
     try:
         dados = buscar_json(url)
     except urllib.error.HTTPError as e:
@@ -420,7 +431,15 @@ def procurar_relatorio(anomes):
         linhas, inteiro = espiar(anomes, numero)
         if linhas is None:
             log(f"  relatório {numero}: a consulta FALHOU (veja o erro acima)")
-            continue      # falha de chamada não é prova de trimestre vazio
+            # O IF.data devolve 500 (não lista vazia) para trimestre que
+            # ainda não existe: 202606 falhou nos 12 relatórios enquanto
+            # 202603 respondia. Insistir nos outros relatórios do mesmo
+            # trimestre só queima cota — e foi assim que a execução real
+            # esgotou o limite antes de chegar num período publicado.
+            if indice == 0:
+                log("  (o primeiro relatório falhou — tratando como trimestre indisponível)")
+                return None
+            continue
         if not linhas:
             log(f"  relatório {numero}: sem dados")
             vazios_seguidos += 1

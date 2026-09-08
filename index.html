@@ -2606,6 +2606,44 @@
       background: var(--deep); border: 1px solid var(--border); color: var(--text);
       border-radius: 8px; padding: 5px 8px; font-size: 0.8rem; font-family: inherit; cursor: pointer;
     }
+    /* --- Medidor do Índice de Basileia -------------------------------
+       Um "ratio contra um limite" pede MEDIDOR, não gráfico. Escolhi
+       barra em vez do ponteiro/velocímetro porque aqui são 9 bancos lado
+       a lado: barras alinhadas na mesma escala dão comparação num
+       relance, que é o que serve a quem escolhe onde comprar renda fixa.
+       Nove ponteiros ocupariam a tela inteira e ainda assim seriam
+       difíceis de comparar entre si.
+
+       A cor NUNCA carrega o recado sozinha: cada faixa tem símbolo e
+       palavra. Não é preciosismo — no tema claro, o vermelho (#e0233f) e
+       o dourado (#a8781a) da marca ficam a ΔE 2,5 sob deuteranopia, ou
+       seja, indistinguíveis pra quem tem daltonismo vermelho-verde. */
+    .bas-medidor { display: flex; flex-direction: column; gap: 5px; min-width: 148px; }
+    .bas-medidor-topo { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    .bas-valor { font-family: 'IBM Plex Mono', monospace; font-size: 0.95rem; font-weight: 600; }
+    .bas-tag { font-size: 0.68rem; font-weight: 600; white-space: nowrap; letter-spacing: 0.01em; }
+    .bas-tag-bom { color: var(--accent); }
+    .bas-tag-limite { color: var(--gold); }
+    .bas-tag-baixo { color: var(--danger); }
+    .bas-trilho {
+      position: relative; height: 7px; border-radius: 4px;
+      background: var(--zebra); border: 1px solid var(--border); overflow: hidden;
+    }
+    .bas-preenchido { height: 100%; border-radius: 4px 0 0 4px; background: var(--accent); }
+    .bas-preenchido.limite { background: var(--gold); }
+    .bas-preenchido.baixo { background: var(--danger); }
+    /* Marca do mínimo regulatório: a barra sozinha não diz o que é "muito". */
+    .bas-limite-marca {
+      position: absolute; top: 0; bottom: 0; width: 2px;
+      background: var(--text); opacity: 0.9;
+      box-shadow: 0 0 0 1px var(--card);   /* separa a marca do preenchimento */
+    }
+    .bas-legenda {
+      margin: 14px 0 0; font-size: 0.74rem; color: var(--muted); line-height: 1.6;
+      border-top: 1px solid var(--border); padding-top: 10px;
+    }
+    .bas-legenda strong { color: var(--text); font-weight: 600; }
+    .bas-legenda-faixas { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
     .bas-referencia {
       margin: 8px 0 0; font-size: 0.75rem; color: var(--muted);
       border-left: 2px solid var(--border); padding-left: 8px; line-height: 1.45;
@@ -4578,12 +4616,30 @@
         </div>
         <div class="calc-corpo">
           <p class="calc-ajuda" style="margin:-6px 0 0;">
-            Índice de Basileia: medida regulatória de solidez financeira dos bancos, divulgada a cada trimestre
-            (dado publicado pelos próprios bancos/BC, sem API de mercado — os demais indicadores são calculados em tempo real).
+            <strong>Para que serve:</strong> antes de comprar um CDB, LCI ou LCA, vale olhar quanto
+            capital próprio o banco tem para absorver perdas. É isso que o Índice de Basileia mede —
+            quanto maior, mais folga o banco tem. Divulgado a cada trimestre pelo Banco Central
+            (os demais indicadores da tabela são calculados em tempo real).
           </p>
           <p class="bas-referencia" id="basReferencia" hidden></p>
           <div id="basStatus" class="hg-status"></div>
           <div class="cmp-tabela-wrap"><table class="cmp-tabela bas-tabela" id="basTabela"></table></div>
+          <p class="bas-legenda">
+            <span class="bas-legenda-faixas">
+              <span class="bas-tag bas-tag-baixo">▼ Abaixo do exigido</span>
+              <span class="bas-tag bas-tag-limite">■ No limite (até 13%)</span>
+              <span class="bas-tag bas-tag-bom">▲ Confortável (13% ou mais)</span>
+            </span>
+            O traço na barra marca o <strong>mínimo exigido: 10,5%</strong> — são 8% de Patrimônio de
+            Referência (Res. CMN 4.958/2021) mais o adicional de conservação de 2,5%. Bancos
+            sistêmicos precisam de mais. Os 11% que muita fonte ainda cita são da regra antiga,
+            de 1994.<br>
+            <strong>Importante:</strong> Basileia alta não é garantia, e Basileia baixa não significa
+            quebra iminente — é um sinal entre outros. Para quem compra renda fixa, a proteção que
+            vale é o <strong>FGC</strong>, que cobre até R$ 250 mil por CPF em cada instituição
+            (teto de R$ 1 milhão a cada 4 anos). Aplicar dentro desse limite protege mais do que
+            qualquer indicador.
+          </p>
         </div>
       </div>
     </div>
@@ -10061,6 +10117,41 @@
       function fmtPct(v) { return typeof v === 'number' ? `${v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` : '—'; }
       function fmtNum(v) { return typeof v === 'number' ? v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'; }
 
+      // Réguas do medidor. O mínimo de 8% é o requerimento de Patrimônio de
+      // Referência (Res. CMN 4.958/2021); com o Adicional de Capital
+      // Principal de conservação (2,5%) o piso prático vira 10,5%. Os 11%
+      // que muito site ainda repete são da regra ANTIGA (Res. 2.099/1994).
+      // Bancos sistêmicos têm exigência maior — daí "no limite" começar
+      // acima do piso, e não nele.
+      const BAS_MINIMO_LEGAL = 10.5;
+      const BAS_ESCALA_MAX = 24;     // acomoda os ~21% do banco mais capitalizado
+
+      function situacaoBasileia(v) {
+        if (typeof v !== 'number') return null;
+        if (v < BAS_MINIMO_LEGAL) return { classe: 'baixo',  glifo: '▼', rotulo: 'Abaixo do exigido' };
+        if (v < 13)               return { classe: 'limite', glifo: '■', rotulo: 'No limite' };
+        return { classe: 'bom', glifo: '▲', rotulo: 'Confortável' };
+      }
+
+      function medidorBasileia(v) {
+        const situacao = situacaoBasileia(v);
+        if (!situacao) return '—';
+        const largura = Math.min(100, (v / BAS_ESCALA_MAX) * 100);
+        const marca = (BAS_MINIMO_LEGAL / BAS_ESCALA_MAX) * 100;
+        return `
+          <div class="bas-medidor">
+            <div class="bas-medidor-topo">
+              <span class="bas-valor">${fmtPct(v)}</span>
+              <span class="bas-tag bas-tag-${situacao.classe}">${situacao.glifo} ${situacao.rotulo}</span>
+            </div>
+            <div class="bas-trilho" role="img"
+                 aria-label="${fmtPct(v)} — ${situacao.rotulo}. Mínimo exigido: 10,5%.">
+              <div class="bas-preenchido ${situacao.classe}" style="width:${largura.toFixed(1)}%"></div>
+              <div class="bas-limite-marca" style="left:${marca.toFixed(1)}%"></div>
+            </div>
+          </div>`;
+      }
+
       const COLUNAS = [
         { chave: 'nome', label: 'Banco' },
         { chave: 'basileia', label: 'Índice de Basileia', fmt: fmtPct },
@@ -10095,7 +10186,7 @@
                 <span><span class="bas-banco-nome">${l.ticker}</span><br><span class="bas-banco-sub">${l.nome}</span></span>
               </div>
             </td>
-            <td>${fmtPct(l.basileia)}</td>
+            <td>${medidorBasileia(l.basileia)}</td>
             <td>${hgFormatCompacto(l.marketCap) ?? '—'}</td>
             <td>${fmtNum(l.pl)}</td>
             <td>${fmtNum(l.pvp)}</td>
