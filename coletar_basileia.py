@@ -53,6 +53,7 @@ import json
 import os
 import re
 import sys
+import time
 import unicodedata
 import urllib.error
 import urllib.parse
@@ -79,6 +80,11 @@ RELATORIOS_PARA_SONDAR = [int(n) for n in
 LINHAS_PARA_ESPIAR = 400   # amostra por relatório na sondagem
 
 TEMPO_LIMITE = 90
+ESPERAS_ENTRE_TENTATIVAS = [2, 5]       # segundos entre as tentativas
+# Freio: se o servidor está fora do ar, insistir em 12 relatórios x 6
+# trimestres x 3 tentativas faz o job rodar meia hora pra nada. Depois
+# desta quantidade de falhas SEGUIDAS, a execução para e avisa.
+FALHAS_SEGUIDAS_PARA_DESISTIR = 6
 TRIMESTRES_PARA_TRAS = 6   # ~1,5 ano de tentativas antes de desistir
 
 # Bancos da tabela do site. 'busca' são pedaços da razão social como ela
@@ -112,12 +118,32 @@ def normalizar(texto):
 
 
 def buscar_json(url):
+    """
+    O Olinda devolve HTTP 500 "Erro desconhecido" de forma intermitente —
+    a MESMA consulta falha e, segundos depois, responde. Sem repetição o
+    robô desistia de um trimestre que existe. Espera crescente entre as
+    tentativas pra não insistir em cima de um servidor que está sofrendo.
+    """
     req = urllib.request.Request(url, headers={
         "Accept": "application/json",
         "User-Agent": "viverderenda-basileia/1.0 (+https://viverderenda.dev.br)",
     })
-    with urllib.request.urlopen(req, timeout=TEMPO_LIMITE) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    ultimo_erro = None
+    for tentativa, espera in enumerate(ESPERAS_ENTRE_TENTATIVAS, start=1):
+        try:
+            with urllib.request.urlopen(req, timeout=TEMPO_LIMITE) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            ultimo_erro = e
+            if e.code < 500 or tentativa == len(ESPERAS_ENTRE_TENTATIVAS):
+                raise            # 4xx é erro nosso: repetir não adianta
+        except Exception as e:  # noqa: BLE001
+            ultimo_erro = e
+            if tentativa == len(ESPERAS_ENTRE_TENTATIVAS):
+                raise
+        time.sleep(espera)
+    if ultimo_erro:
+        raise ultimo_erro
 
 
 def montar_url(recurso, parametros=None, top=None):
@@ -139,6 +165,25 @@ def montar_url(recurso, parametros=None, top=None):
     return f"{BASE}/{recurso}?" + urllib.parse.urlencode(query, safe="'@$")
 
 
+class ServidorInstavel(Exception):
+    """O IF.data está fora do ar agora — não adianta continuar."""
+
+
+falhas_seguidas = 0
+
+
+def conferir_freio():
+    """
+    Só conta falha de consulta de verdade. A sonda do $top é silenciosa e
+    fica de fora: o servidor rejeitá-la é resposta esperada, e contá-la
+    disparava o freio num servidor saudável que apenas não aceita $top.
+    """
+    if falhas_seguidas >= FALHAS_SEGUIDAS_PARA_DESISTIR:
+        raise ServidorInstavel(
+            f"{falhas_seguidas} consultas seguidas falharam — o IF.data parece "
+            "fora do ar. Nada foi gravado; a proxima execucao tenta de novo.")
+
+
 def pedir(recurso, parametros=None, top=None, silencioso=False):
     """
     Devolve a lista de 'value'. A distinção abaixo importa:
@@ -150,6 +195,7 @@ def pedir(recurso, parametros=None, top=None, silencioso=False):
     consulta, o erro era engolido e o robô concluía "trimestre ainda não
     publicado" para todos os períodos.
     """
+    global falhas_seguidas
     url = montar_url(recurso, parametros, top)
     try:
         dados = buscar_json(url)
@@ -164,12 +210,19 @@ def pedir(recurso, parametros=None, top=None, silencioso=False):
             log(f"    URL: {url}")
             if corpo:
                 log(f"    resposta: {corpo}")
+        if not silencioso:
+            falhas_seguidas += 1
+            conferir_freio()
         return None
     except Exception as e:  # noqa: BLE001
         if not silencioso:
             log(f"  falhou {recurso}: {e}")
             log(f"    URL: {url}")
+        if not silencioso:
+            falhas_seguidas += 1
+            conferir_freio()
         return None
+    falhas_seguidas = 0
     valor = dados.get("value")
     return valor if isinstance(valor, list) else None
 
@@ -207,8 +260,13 @@ def parametros_valores(anomes, relatorio):
 
 def espiar(anomes, relatorio, quantas=LINHAS_PARA_ESPIAR):
     """
-    Puxa as primeiras linhas de um relatório pra ver o formato. Tenta com
-    $top (barato); se o servidor não aceitar, baixa inteiro e recorta.
+    Puxa linhas de um relatório pra ver o formato. Tenta com $top (barato);
+    se o servidor não aceitar, baixa inteiro.
+
+    Devolve (linhas, veio_inteiro). O segundo item importa: quando o
+    relatório já veio completo aqui, não faz sentido baixá-lo de novo
+    depois — além do desperdício, era exatamente aí que o 500 intermitente
+    derrubava a execução DEPOIS de já ter encontrado o dado.
     """
     global USAR_TOP
     parametros = parametros_valores(anomes, relatorio)
@@ -216,7 +274,7 @@ def espiar(anomes, relatorio, quantas=LINHAS_PARA_ESPIAR):
     if USAR_TOP:
         linhas = pedir("IfDataValores", parametros, top=quantas, silencioso=True)
         if linhas:
-            return linhas
+            return linhas, False
         # Pode ser relatório vazio OU $top rejeitado — só dá pra saber
         # repetindo sem ele.
 
@@ -225,8 +283,8 @@ def espiar(anomes, relatorio, quantas=LINHAS_PARA_ESPIAR):
         USAR_TOP = False
         log("  ($top não funcionou neste servidor — seguindo sem ele)")
     if linhas is None:
-        return None
-    return linhas[:quantas]
+        return None, False
+    return linhas, True
 
 
 def campos_numericos(linha):
@@ -289,7 +347,12 @@ def achar_campo_nome(linhas):
     """
     if not linhas:
         return None
-    proibidos = ("TIPO", "COD", "CNPJ", "ANO", "MES", "SEGMENTO", "UF", "CIDADE", "ORDEM")
+    # 'TIPO' porque TipoInstituicao contém "Instituicao" e casava por engano.
+    # 'COLUNA'/'RELATORIO'/'GRUPO' porque no formato longo existe uma
+    # NomeColuna, que é o rótulo do indicador ("Índice de Basileia") e não
+    # a razão social — foi o que o robô pegou na execução anterior.
+    proibidos = ("TIPO", "COD", "CNPJ", "ANO", "MES", "SEGMENTO", "UF", "CIDADE",
+                 "ORDEM", "COLUNA", "RELATORIO", "GRUPO", "SALDO", "MOEDA", "DOCUMENTO")
     candidatas = []
     for chave in linhas[0]:
         n = normalizar(chave)
@@ -297,17 +360,43 @@ def achar_campo_nome(linhas):
             continue
         if not isinstance(linhas[0].get(chave), str):
             continue
-        if "NOMEINSTITUICAO" in n:
+        if "INSTITUICAO" in n or "CONGLOMERADO" in n:
             peso = 0
-        elif n.startswith("NOME"):
+        elif n.startswith("NOME") or n == "RAZAOSOCIAL":
             peso = 1
-        elif "INSTITUICAO" in n or "CONGLOMERADO" in n:
-            peso = 2
         else:
             continue
         candidatas.append((peso, len(n), chave))
     candidatas.sort()
     return candidatas[0][2] if candidatas else None
+
+
+def achar_campo_codigo(linhas):
+    """A chave do código da instituição (pra juntar com o cadastro)."""
+    if not linhas:
+        return None
+    for preferido in ("CODINST", "CODIGOINSTITUICAO", "CODCONGLOMERADO", "CODIGO"):
+        for chave in linhas[0]:
+            if normalizar(chave) == preferido:
+                return chave
+    for chave in linhas[0]:
+        if normalizar(chave).startswith("COD"):
+            return chave
+    return None
+
+
+def carregar_cadastro(anomes):
+    """
+    IfDataCadastro traz a razão social de cada instituição. É necessário
+    quando o relatório de valores identifica a instituição só por código —
+    que é justamente o desenho do formato longo.
+    """
+    for parametros in ({"AnoMes": anomes, "TipoInstituicao": TIPO_INSTITUICAO},
+                       {"AnoMes": anomes}):
+        linhas = pedir("IfDataCadastro", parametros, silencioso=True)
+        if linhas:
+            return linhas
+    return None
 
 
 def diagnosticar(linhas, quantas=3):
@@ -321,14 +410,14 @@ def diagnosticar(linhas, quantas=3):
 
 def procurar_relatorio(anomes):
     """
-    Sonda os relatórios um por um com $top, em vez de confiar num número
-    fixo. Custa algumas requisições minúsculas e dispensa a lista de
-    relatórios do BC (cujo nome de recurso variou entre as versões da API).
+    Sonda os relatórios um por um até achar o que traz a Basileia. Em vez
+    de confiar num número fixo: na primeira execução real o relatório 1
+    devolveu 14 mil linhas e a lista de relatórios do BC veio vazia.
     """
     vazios_seguidos = 0
     vistos = []          # (numero, chaves, linha de exemplo) — pro diagnóstico
     for indice, numero in enumerate(RELATORIOS_PARA_SONDAR):
-        linhas = espiar(anomes, numero)
+        linhas, inteiro = espiar(anomes, numero)
         if linhas is None:
             log(f"  relatório {numero}: a consulta FALHOU (veja o erro acima)")
             continue      # falha de chamada não é prova de trimestre vazio
@@ -343,22 +432,27 @@ def procurar_relatorio(anomes):
                 return None
             continue
         vazios_seguidos = 0
-        achado = detectar_basileia(linhas)
-        campo_nome = achar_campo_nome(linhas)
+
+        amostra = linhas[:LINHAS_PARA_ESPIAR]
+        achado = detectar_basileia(amostra)
+        campo_nome = achar_campo_nome(amostra)
         marca = "<-- TEM BASILEIA" if achado else ""
-        log(f"  relatório {numero}: {len(linhas)} linhas espiadas, "
-            f"nome={campo_nome or '?'} {marca}")
-        if EXPLORAR:
-            log(f"    chaves: {json.dumps(list(linhas[0].keys()), ensure_ascii=False)}")
-        vistos.append((numero, list(linhas[0].keys()), linhas[0]))
-        if achado and campo_nome:
+        log(f"  relatório {numero}: {len(linhas)} linhas, nome={campo_nome or 'nenhum'} {marca}")
+        # As chaves saem SEMPRE, não só no --explorar: numa rotina agendada,
+        # pedir pra rerodar custa um dia.
+        log(f"    chaves: {json.dumps(list(amostra[0].keys()), ensure_ascii=False)}")
+
+        vistos.append((numero, list(amostra[0].keys()), amostra[0]))
+        if achado:
             achado["relatorio"] = numero
             achado["campo_nome"] = campo_nome
-            achado["amostra"] = linhas
+            achado["campo_codigo"] = achar_campo_codigo(amostra)
+            achado["amostra"] = amostra
+            achado["completo"] = linhas if inteiro else None
             return achado
 
     # Nada encontrado: imprime o que veio de cada relatório SEM precisar
-    # rerodar com --explorar. Numa execução agendada, rerodar custa um dia.
+    # rerodar com --explorar.
     if vistos:
         log("\n  --- DIAGNÓSTICO: relatórios que responderam ---")
         for numero, chaves, exemplo in vistos:
@@ -395,16 +489,53 @@ def converter_numero(valor):
     return None
 
 
-def extrair_valores(linhas, achado):
+def resolver_nomes(anomes, achado):
+    """
+    Define COMO descobrir a razão social de cada linha do relatório.
+
+    No formato longo o relatório costuma identificar a instituição só pelo
+    código; a razão social mora no IfDataCadastro. Devolve uma função que
+    recebe a linha e devolve o nome (ou None).
+    """
+    campo_nome = achado.get("campo_nome")
+    if campo_nome:
+        log(f"    nomes: direto da coluna {campo_nome}")
+        return lambda linha: linha.get(campo_nome)
+
+    campo_codigo = achado.get("campo_codigo")
+    if not campo_codigo:
+        log("    nomes: SEM coluna de nome e SEM coluna de código — impossível identificar")
+        return None
+
+    cadastro = carregar_cadastro(anomes)
+    if not cadastro:
+        log("    nomes: IfDataCadastro não respondeu — impossível identificar")
+        return None
+
+    cad_codigo = achar_campo_codigo(cadastro)
+    cad_nome = achar_campo_nome(cadastro)
+    log(f"    cadastro: {len(cadastro)} instituições "
+        f"(código={cad_codigo}, nome={cad_nome})")
+    log(f"    chaves do cadastro: {json.dumps(list(cadastro[0].keys()), ensure_ascii=False)}")
+    if not cad_codigo or not cad_nome:
+        return None
+
+    mapa = {str(linha.get(cad_codigo)): linha.get(cad_nome) for linha in cadastro}
+    log(f"    nomes: juntando {campo_codigo} (valores) com {cad_codigo} (cadastro)")
+    return lambda linha: mapa.get(str(linha.get(campo_codigo)))
+
+
+def extrair_valores(linhas, achado, obter_nome):
     """Percorre o relatório inteiro e devolve {ticker: indice}."""
-    campo_nome = achado["campo_nome"]
     valores, casados = {}, []
     for linha in linhas:
         if achado["formato"] == "longo":
             rotulo = linha.get(achado["campo_rotulo"])
             if not isinstance(rotulo, str) or normalizar(rotulo) != normalizar(achado["rotulo"]):
                 continue
-        nome_bc = linha.get(campo_nome)
+        nome_bc = obter_nome(linha)
+        if not nome_bc:
+            continue
         banco = casar_banco(normalizar(nome_bc))
         if not banco or banco["ticker"] in valores:
             continue
@@ -493,24 +624,34 @@ def main():
 
         log(f"\n  ACHADO no relatório {achado['relatorio']} (formato {achado['formato']})")
         log(f"    coluna do valor: {achado['campo_valor']}")
-        log(f"    coluna do nome:  {achado['campo_nome']}")
+        log(f"    coluna do nome:  {achado['campo_nome'] or 'nenhuma (vai juntar com o cadastro)'}")
+        log(f"    coluna do código: {achado['campo_codigo'] or 'nenhuma'}")
         if achado["formato"] == "longo":
             log(f"    rótulo usado:    {achado['rotulo']!r}")
             outros = [r for r in achado.get("outros_rotulos", []) if r != achado["rotulo"]]
             if outros:
                 log(f"    (outros rótulos com 'basileia', ignorados: {outros})")
 
-        linhas = pedir("IfDataValores", {
-            "AnoMes": anomes,
-            "TipoInstituicao": TIPO_INSTITUICAO,
-            "Relatorio": str(achado["relatorio"]),
-        })
-        if not linhas:
-            log("  o relatório inteiro não veio; tentando o período anterior...")
-            continue
-        log(f"    {len(linhas)} linhas no relatório completo")
+        # Se a sondagem já baixou o relatório inteiro, reaproveita. Baixar
+        # de novo desperdiçava a maior requisição da execução e dava outra
+        # chance pro 500 intermitente derrubar tudo depois de já ter achado.
+        linhas = achado.get("completo")
+        if linhas:
+            log(f"    reaproveitando as {len(linhas)} linhas já baixadas")
+        else:
+            linhas = pedir("IfDataValores", parametros_valores(anomes, achado["relatorio"]))
+            if not linhas:
+                log("  o relatório inteiro não veio; tentando o período anterior...")
+                continue
+            log(f"    {len(linhas)} linhas no relatório completo")
 
-        valores, casados = extrair_valores(linhas, achado)
+        obter_nome = resolver_nomes(anomes, achado)
+        if obter_nome is None:
+            log("\n  Não consegui identificar as instituições.")
+            diagnosticar(achado["amostra"])
+            return 1
+
+        valores, casados = extrair_valores(linhas, achado, obter_nome)
 
         log("\n  Casamento ticker <-> instituição:")
         for ticker, nome_bc, numero in sorted(casados):
@@ -520,8 +661,7 @@ def main():
             log(f"\n  NÃO ENCONTRADOS: {', '.join(faltando)}")
             log("  (ficam como '—' no site; ajustar a lista 'busca' desses bancos no topo do script)")
             # ajuda a acertar o fragmento: mostra nomes parecidos que existem
-            amostra = sorted({str(l.get(achado["campo_nome"])) for l in linhas[:4000]
-                              if isinstance(l.get(achado["campo_nome"]), str)})
+            amostra = sorted({str(obter_nome(l)) for l in linhas[:6000] if obter_nome(l)})
             for ticker in faltando:
                 banco = next(b for b in BANCOS if b["ticker"] == ticker)
                 # tenta cada palavra do nome e dos fragmentos de busca: é o
@@ -549,4 +689,8 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except ServidorInstavel as e:
+        log(f"\nPARANDO: {e}")
+        sys.exit(1)
