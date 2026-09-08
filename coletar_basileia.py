@@ -140,17 +140,35 @@ def montar_url(recurso, parametros=None, top=None):
 
 
 def pedir(recurso, parametros=None, top=None, silencioso=False):
-    """Devolve a lista em 'value', ou None se a chamada falhar."""
+    """
+    Devolve a lista de 'value'. A distinção abaixo importa:
+
+        None  -> a CHAMADA falhou (HTTP, rede, JSON inválido)
+        []    -> a chamada deu certo e não veio nada
+
+    Misturar os dois foi o que escondeu um erro real: o $top derrubava a
+    consulta, o erro era engolido e o robô concluía "trimestre ainda não
+    publicado" para todos os períodos.
+    """
     url = montar_url(recurso, parametros, top)
     try:
         dados = buscar_json(url)
     except urllib.error.HTTPError as e:
+        corpo = ""
+        try:
+            corpo = e.read().decode("utf-8", "replace")[:300]
+        except Exception:  # noqa: BLE001
+            pass
         if not silencioso:
-            log(f"  HTTP {e.code} em {recurso} — {url}")
+            log(f"  HTTP {e.code} em {recurso}")
+            log(f"    URL: {url}")
+            if corpo:
+                log(f"    resposta: {corpo}")
         return None
     except Exception as e:  # noqa: BLE001
         if not silencioso:
             log(f"  falhou {recurso}: {e}")
+            log(f"    URL: {url}")
         return None
     valor = dados.get("value")
     return valor if isinstance(valor, list) else None
@@ -177,14 +195,38 @@ def trimestres_recentes(quantidade):
     return saida
 
 
+# O Olinda pode não aceitar $top nesses recursos. Quando isso aparece, o
+# robô desliga a otimização pro resto da execução e passa a baixar o
+# relatório inteiro (recortando as primeiras linhas aqui mesmo).
+USAR_TOP = True
+
+
+def parametros_valores(anomes, relatorio):
+    return {"AnoMes": anomes, "TipoInstituicao": TIPO_INSTITUICAO, "Relatorio": str(relatorio)}
+
+
 def espiar(anomes, relatorio, quantas=LINHAS_PARA_ESPIAR):
-    """Puxa só as primeiras linhas de um relatório, pra ver o formato sem
-    baixar as ~14 mil que ele tem inteiro."""
-    return pedir("IfDataValores", {
-        "AnoMes": anomes,
-        "TipoInstituicao": TIPO_INSTITUICAO,
-        "Relatorio": str(relatorio),
-    }, top=quantas, silencioso=True)
+    """
+    Puxa as primeiras linhas de um relatório pra ver o formato. Tenta com
+    $top (barato); se o servidor não aceitar, baixa inteiro e recorta.
+    """
+    global USAR_TOP
+    parametros = parametros_valores(anomes, relatorio)
+
+    if USAR_TOP:
+        linhas = pedir("IfDataValores", parametros, top=quantas, silencioso=True)
+        if linhas:
+            return linhas
+        # Pode ser relatório vazio OU $top rejeitado — só dá pra saber
+        # repetindo sem ele.
+
+    linhas = pedir("IfDataValores", parametros)
+    if linhas and USAR_TOP:
+        USAR_TOP = False
+        log("  ($top não funcionou neste servidor — seguindo sem ele)")
+    if linhas is None:
+        return None
+    return linhas[:quantas]
 
 
 def campos_numericos(linha):
@@ -284,8 +326,12 @@ def procurar_relatorio(anomes):
     relatórios do BC (cujo nome de recurso variou entre as versões da API).
     """
     vazios_seguidos = 0
+    vistos = []          # (numero, chaves, linha de exemplo) — pro diagnóstico
     for indice, numero in enumerate(RELATORIOS_PARA_SONDAR):
         linhas = espiar(anomes, numero)
+        if linhas is None:
+            log(f"  relatório {numero}: a consulta FALHOU (veja o erro acima)")
+            continue      # falha de chamada não é prova de trimestre vazio
         if not linhas:
             log(f"  relatório {numero}: sem dados")
             vazios_seguidos += 1
@@ -304,11 +350,21 @@ def procurar_relatorio(anomes):
             f"nome={campo_nome or '?'} {marca}")
         if EXPLORAR:
             log(f"    chaves: {json.dumps(list(linhas[0].keys()), ensure_ascii=False)}")
+        vistos.append((numero, list(linhas[0].keys()), linhas[0]))
         if achado and campo_nome:
             achado["relatorio"] = numero
             achado["campo_nome"] = campo_nome
             achado["amostra"] = linhas
             return achado
+
+    # Nada encontrado: imprime o que veio de cada relatório SEM precisar
+    # rerodar com --explorar. Numa execução agendada, rerodar custa um dia.
+    if vistos:
+        log("\n  --- DIAGNÓSTICO: relatórios que responderam ---")
+        for numero, chaves, exemplo in vistos:
+            log(f"  relatório {numero}: {json.dumps(chaves, ensure_ascii=False)}")
+            log(f"    exemplo: {json.dumps(exemplo, ensure_ascii=False)[:500]}")
+        log("  --- fim do diagnóstico ---")
     return None
 
 
