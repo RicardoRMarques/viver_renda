@@ -2601,7 +2601,56 @@
     }
     .cmp-tabela td.cmp-ativo-col strong { display: block; }
     .cmp-tabela .cmp-melhor { color: var(--primary); font-weight: 700; }
-    .bas-modal { max-width: 760px; }
+    /* Largura suficiente pras 7 colunas caberem sem rolagem lateral no
+       desktop. 760px cortava em "P/VP" e obrigava a arrastar de lado. */
+    .bas-modal {
+      max-width: 1080px;
+      display: flex; flex-direction: column;
+      overflow: hidden;            /* quem rola é a área de baixo, não o modal */
+    }
+    .bas-modal .calc-modal-topo { position: static; flex: 0 0 auto; }
+    .bas-fixo {
+      flex: 0 0 auto; padding: 14px 20px 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    /* UM único container com rolagem, nos dois eixos. Isso não é
+       detalhe de estilo: um elemento com overflow vira o contexto do
+       position:sticky. Com o .cmp-tabela-wrap de dentro tendo
+       overflow-x, o cabeçalho grudava NELE — que não rola na vertical —
+       e sumia junto com as linhas. */
+    .bas-rolagem { flex: 1 1 auto; overflow: auto; padding: 0 0 18px; }
+    .bas-rolagem .cmp-tabela-wrap { overflow: visible; }
+    .bas-legenda { margin-left: 20px; margin-right: 20px; }
+    .bas-tabela th:first-child, .bas-tabela td:first-child { padding-left: 20px; }
+    .bas-tabela th:last-child, .bas-tabela td:last-child { padding-right: 20px; }
+    /* Cabeçalho das colunas grudado no topo da área que rola. */
+    .bas-tabela th { position: sticky; top: 0; z-index: 3; background: var(--bg); }
+
+    /* No celular não há como caber 7 colunas: a rolagem lateral acontece
+       DENTRO da tabela (nunca na página) e a coluna do banco fica parada,
+       senão a pessoa arrasta de lado e perde de vista de quem é a linha. */
+    /* No celular o bloco fixo tem que ser econômico: cada linha dele é
+       uma linha de banco a menos na tela. Fonte menor, respiro menor, e
+       a frase entre parênteses sai — ela é contexto, não instrução. */
+    @media (max-width: 640px) {
+      .bas-fixo { padding: 10px 14px 8px; gap: 6px; }
+      .bas-fixo .calc-ajuda { font-size: 0.76rem; line-height: 1.4; }
+      .bas-referencia { font-size: 0.67rem; padding-left: 7px; }
+      .bas-so-tela-grande { display: none; }
+      .bas-tabela th:first-child, .bas-tabela td:first-child { padding-left: 14px; }
+      .bas-legenda { margin-left: 14px; margin-right: 14px; }
+    }
+
+    @media (max-width: 900px) {
+      .bas-tabela th:first-child,
+      .bas-tabela td:first-child {
+        position: sticky; left: 0; z-index: 2; background: var(--bg);
+        box-shadow: 1px 0 0 var(--border);
+      }
+      .bas-tabela thead th:first-child { z-index: 4; }
+      .bas-secao td { position: static; box-shadow: none; }
+    }
     .bas-ano-select {
       background: var(--deep); border: 1px solid var(--border); color: var(--text);
       border-radius: 8px; padding: 5px 8px; font-size: 0.8rem; font-family: inherit; cursor: pointer;
@@ -4627,15 +4676,22 @@
             <button id="basFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
           </div>
         </div>
-        <div class="calc-corpo">
-          <p class="calc-ajuda" style="margin:-6px 0 0;">
+        <!-- Duas áreas de propósito: 'bas-fixo' não rola (título, para que
+             serve e referência ficam sempre à vista) e 'bas-rolagem' é o
+             único lugar com rolagem vertical. Antes o modal inteiro rolava
+             e o cabeçalho das colunas sumia depois da terceira linha. -->
+        <div class="bas-fixo">
+          <p class="calc-ajuda" style="margin:0;">
             <strong>Para que serve:</strong> antes de comprar um CDB, LCI ou LCA, vale olhar quanto
             capital próprio o banco tem para absorver perdas. É isso que o Índice de Basileia mede —
-            quanto maior, mais folga o banco tem. Divulgado a cada trimestre pelo Banco Central
-            (os demais indicadores da tabela são calculados em tempo real).
+            quanto maior, mais folga o banco tem. Divulgado a cada trimestre pelo Banco Central<span
+            class="bas-so-tela-grande"> (os demais indicadores da tabela são calculados em tempo
+            real)</span>.
           </p>
           <p class="bas-referencia" id="basReferencia" hidden></p>
           <div id="basStatus" class="hg-status"></div>
+        </div>
+        <div class="bas-rolagem">
           <div class="cmp-tabela-wrap"><table class="cmp-tabela bas-tabela" id="basTabela"></table></div>
           <p class="bas-legenda">
             <span class="bas-legenda-faixas">
@@ -10040,7 +10096,12 @@
         }
         const partes = [];
         if (periodo.referencia) partes.push(periodo.referencia);
-        if (basileiaJson?.fonte) partes.push('Fonte: ' + basileiaJson.fonte);
+        // Não repetir a fonte quando a própria referência já a nomeia:
+        // "Base 31/03/2026 — IF.data/Banco Central · Fonte: IF.data — Banco
+        // Central do Brasil" dizia a mesma coisa duas vezes e custava uma
+        // linha inteira no celular.
+        const jaCitaFonte = /IF\.?data/i.test(periodo.referencia || '');
+        if (basileiaJson?.fonte && !jaCitaFonte) partes.push('Fonte: ' + basileiaJson.fonte);
         if (basileiaJson?.atualizado_em) {
           const [a, m, d] = String(basileiaJson.atualizado_em).split('-');
           if (a && m && d) partes.push(`Atualizado em ${d}/${m}/${a}`);
