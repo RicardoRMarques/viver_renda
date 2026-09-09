@@ -280,33 +280,70 @@ def parametros_valores(anomes, relatorio):
     return {"AnoMes": anomes, "TipoInstituicao": TIPO_INSTITUICAO, "Relatorio": str(relatorio)}
 
 
+# Rótulo do indicador dentro do relatório, confirmado em execução real.
+# Usado pra pedir ao servidor SÓ as linhas que interessam.
+ROTULO_BASILEIA = os.environ.get("BASILEIA_ROTULO", "Índice de Basileia")
+
+
+def variantes_valores(anomes, relatorio):
+    """
+    Formas de pedir o mesmo relatório, da mais enxuta para a mais pesada.
+
+    POR QUE ISSO EXISTE: numa execução de 09/09/2026 o trimestre 202606
+    respondeu 200 com lista vazia enquanto o 202603 — o mesmo endpoint,
+    mesmos parâmetros — deu 500. A diferença entre os dois não é o
+    servidor estar fora do ar: é o TAMANHO da resposta. 202606 não tem
+    dado; 202603 tem 14.030 linhas com uma coluna de fórmula longa
+    (DescricaoColuna). O gateway do Olinda parece engasgar ao montar
+    respostas grandes, de forma intermitente.
+
+    Então, em vez de insistir na resposta gigante, o robô pede primeiro a
+    versão pequena: só as linhas do índice (≈1/10 das linhas) e só as
+    três colunas que ele usa. Se o servidor não aceitar essas opções de
+    consulta, cai para a íntegra, que é o que vinha fazendo.
+    """
+    base = (f"IfDataValores(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao,Relatorio=@Relatorio)"
+            f"?$format=json&@AnoMes={anomes}&@TipoInstituicao={TIPO_INSTITUICAO}"
+            f"&@Relatorio='{relatorio}'")
+    filtro = urllib.parse.quote(f"NomeColuna eq '{ROTULO_BASILEIA}'", safe="")
+    colunas = urllib.parse.quote("CodInst,NomeColuna,Saldo", safe=",")
+    # O terceiro item diz se a variante é FILTRADA. Isso muda como ler uma
+    # resposta vazia: sem filtro, vazio é conclusivo (trimestre não
+    # publicado); com filtro, vazio pode ser só o rótulo não batendo, e aí
+    # é preciso tentar a variante seguinte antes de concluir qualquer coisa.
+    return [
+        (f"{base}&$filter={filtro}&$select={colunas}",
+         "só as linhas do índice, só as colunas usadas", True),
+        (f"{base}&$filter={filtro}", "só as linhas do índice", True),
+        (f"{base}&$select={colunas}", "todas as linhas, só as colunas usadas", False),
+        (base, "relatório inteiro (o mais pesado)", False),
+    ]
+
+
 def espiar(anomes, relatorio, quantas=LINHAS_PARA_ESPIAR):
     """
-    Puxa linhas de um relatório pra ver o formato. Tenta com $top (barato);
-    se o servidor não aceitar, baixa inteiro.
+    Traz as linhas do relatório, da forma mais leve que o servidor aceitar.
 
     Devolve (linhas, veio_inteiro). O segundo item importa: quando o
     relatório já veio completo aqui, não faz sentido baixá-lo de novo
-    depois — além do desperdício, era exatamente aí que o 500 intermitente
-    derrubava a execução DEPOIS de já ter encontrado o dado.
+    depois — era exatamente aí que o 500 intermitente derrubava a
+    execução DEPOIS de já ter encontrado o dado.
     """
-    global USAR_TOP
-    parametros = parametros_valores(anomes, relatorio)
-
-    if USAR_TOP:
-        linhas = pedir("IfDataValores", parametros, top=quantas, silencioso=True)
+    vazio_confirmado = False
+    for caminho, rotulo, filtrada in variantes_valores(anomes, relatorio):
+        # uma repetição curta: o 500 do Olinda é intermitente
+        linhas = pedir_caminho(caminho, rotulo, esperas=(4, 0))
         if linhas:
-            return linhas, False
-        # Pode ser relatório vazio OU $top rejeitado — só dá pra saber
-        # repetindo sem ele.
-
-    linhas = pedir("IfDataValores", parametros)
-    if linhas and USAR_TOP:
-        USAR_TOP = False
-        log("  ($top não funcionou neste servidor — seguindo sem ele)")
-    if linhas is None:
-        return None, False
-    return linhas, True
+            return linhas, True
+        if linhas is not None and not filtrada:
+            # 200 com lista vazia numa consulta SEM filtro: o servidor
+            # respondeu e disse que não há dado nesse trimestre. Aí sim é
+            # conclusivo, e não adianta pedir a variante mais pesada.
+            vazio_confirmado = True
+            break
+        if linhas is not None:
+            log(f"      (vazio com filtro — pode ser o rótulo; tentando sem filtrar)")
+    return ([], True) if vazio_confirmado else (None, False)
 
 
 def campos_numericos(linha):
@@ -407,7 +444,7 @@ def achar_campo_codigo(linhas):
     return None
 
 
-def pedir_caminho(caminho, rotulo):
+def pedir_caminho(caminho, rotulo, esperas=(0,)):
     """
     Faz uma consulta a partir do caminho já montado (para recursos cuja
     assinatura não segue o padrão de function import).
@@ -417,10 +454,11 @@ def pedir_caminho(caminho, rotulo):
     if PAUSA_ENTRE_CHAMADAS:
         time.sleep(PAUSA_ENTRE_CHAMADAS)
     try:
-        # UMA tentativa: aqui o 500 quase sempre quer dizer "assinatura
-        # errada", não instabilidade. Repetir gastava 25 segundos por
-        # variação e estourava o tempo antes de testar todas.
-        dados = buscar_json(url, esperas=[0])
+        # Por padrão UMA tentativa: numa sonda de assinatura, 500 quase
+        # sempre quer dizer "não é essa a forma", não instabilidade, e
+        # repetir gastava 25s por variação. Quem sabe que vale repetir
+        # (a busca dos valores) passa 'esperas'.
+        dados = buscar_json(url, esperas=list(esperas))
     except urllib.error.HTTPError as e:
         log(f"      [{e.code}] {rotulo}")
         return None
