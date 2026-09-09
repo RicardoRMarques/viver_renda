@@ -1,12 +1,20 @@
 name: Atualizar Índice de Basileia (IF.data / BCB)
 
-# O IF.data publica por trimestre, com uns 2-3 meses de defasagem depois do
-# fechamento. Rodar toda segunda às 9h BR é folgado o bastante pra pegar a
-# publicação na semana em que ela sai, e barato: quando não há nada novo o
-# robô nem toca no arquivo, então não gera commit.
+# DIÁRIO, não semanal — e o motivo é o servidor, não o dado.
+#
+# O dado muda uma vez por trimestre, então uma execução bem-sucedida a
+# cada três meses basta. Só que o Olinda (a API do BC) responde de forma
+# muito intermitente: em oito execuções observadas, duas trouxeram dado e
+# seis devolveram HTTP 500 em tudo. Semanal com ~25% de sucesso arrisca
+# passar um trimestre inteiro sem atualizar; diário torna quase certo
+# pegar uma janela boa em poucos dias.
+#
+# Custa pouco: quando não há nada novo (ou o servidor está fora), o robô
+# não toca no arquivo e não gera commit. Execução malsucedida termina em
+# menos de um minuto, por causa do freio.
 on:
   schedule:
-    - cron: '0 12 * * 1'      # segunda-feira, 12h UTC = 9h BR
+    - cron: '0 12 * * *'      # todo dia, 12h UTC = 9h BR
   workflow_dispatch:
     inputs:
       modo:
