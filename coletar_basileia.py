@@ -120,6 +120,7 @@ BANCOS = [
 ]
 
 EXPLORAR = "--explorar" in sys.argv
+DIAGNOSTICO = "--diagnostico" in sys.argv
 DRY_RUN = "--dry-run" in sys.argv
 
 
@@ -572,6 +573,72 @@ def extrair_valores(linhas, achado, obter_nome):
 
 
 # ----------------------------------------------------------------------
+# Diagnóstico
+# ----------------------------------------------------------------------
+
+def bater_cru(rotulo, caminho):
+    """
+    Uma requisição, SEM repetição e SEM freio, só pra registrar o que o
+    servidor responde. Serve pra separar duas hipóteses que o log normal
+    não distingue: "esta consulta específica quebrou" e "o IF.data inteiro
+    está recusando este cliente".
+    """
+    url = f"{BASE}/{caminho}"
+    req = urllib.request.Request(url, headers={
+        "Accept": "application/json",
+        "User-Agent": "viverderenda-basileia/1.0 (+https://viverderenda.dev.br)",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            corpo = resp.read(400).decode("utf-8", "replace").replace("\n", " ")
+            log(f"  [{resp.status}] {rotulo}")
+            log(f"        {corpo[:220]}")
+    except urllib.error.HTTPError as e:
+        corpo = ""
+        try:
+            corpo = e.read().decode("utf-8", "replace").replace("\n", " ")[:220]
+        except Exception:  # noqa: BLE001
+            pass
+        log(f"  [{e.code}] {rotulo}")
+        if corpo:
+            log(f"        {corpo}")
+    except Exception as e:  # noqa: BLE001
+        log(f"  [---] {rotulo} -> {e}")
+    time.sleep(2)
+
+
+def diagnosticar_servico():
+    log("DIAGNÓSTICO DO IF.data — uma tentativa por variação, sem repetir.\n")
+    log(f"Base: {BASE}\n")
+
+    v = "IfDataValores(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao,Relatorio=@Relatorio)"
+    c = "IfDataCadastro(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao)"
+
+    bater_cru("raiz do serviço", "?$format=json")
+    bater_cru("$metadata", "$metadata")
+    bater_cru("Valores 202603 tipo=1 rel='1'  (a que JÁ funcionou)",
+              v + "?$format=json&@AnoMes=202603&@TipoInstituicao=1&@Relatorio='1'")
+    bater_cru("Valores 202603 tipo=1 rel=1    (sem aspas)",
+              v + "?$format=json&@AnoMes=202603&@TipoInstituicao=1&@Relatorio=1")
+    bater_cru("Valores 202603 tipo=2 rel='1'  (conglomerado financeiro)",
+              v + "?$format=json&@AnoMes=202603&@TipoInstituicao=2&@Relatorio='1'")
+    bater_cru("Valores 202512 tipo=1 rel='1'",
+              v + "?$format=json&@AnoMes=202512&@TipoInstituicao=1&@Relatorio='1'")
+    bater_cru("Cadastro 202603 tipo=1         (outra função do MESMO serviço)",
+              c + "?$format=json&@AnoMes=202603&@TipoInstituicao=1")
+    bater_cru("Valores em CSV                  (outro formato de saída)",
+              v + "?$format=text/csv&@AnoMes=202603&@TipoInstituicao=1&@Relatorio='1'")
+
+    log("\nCOMO LER:")
+    log("  Tudo 500, inclusive a raiz e o Cadastro -> o serviço está recusando")
+    log("     ESTE cliente (rede do GitHub Actions). Rodar do seu computador")
+    log("     é o teste decisivo: se lá funcionar, é bloqueio por origem.")
+    log("  Só o Valores em 500, com Cadastro e raiz em 200 -> a função quebrou")
+    log("     no lado do BC; esperar e tentar de novo é o certo.")
+    log("  Alguma variação em 200 -> é ela que o robô passa a usar.")
+
+
+# ----------------------------------------------------------------------
 # Gravação
 # ----------------------------------------------------------------------
 
@@ -631,6 +698,10 @@ def gravar(anomes, valores):
 # ----------------------------------------------------------------------
 
 def main():
+    if DIAGNOSTICO:
+        diagnosticar_servico()
+        return 0
+
     forcado = None
     for i, arg in enumerate(sys.argv):
         if arg == "--anomes" and i + 1 < len(sys.argv):
