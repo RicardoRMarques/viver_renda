@@ -86,14 +86,14 @@ CABECALHOS = {
 # no cadastro do IF.data — que usa nome CURTO ("BRADESCO", "ITAU"), não a
 # razão social completa.
 BANCOS = [
-    {"ticker": "ITUB4",  "nome": "Itaú Unibanco",    "busca": ["ITAU UNIBANCO", "ITAU"]},
+    {"ticker": "ITUB4",  "nome": "Itaú Unibanco",    "busca": ["ITAU", "ITAU UNIBANCO"]},
     {"ticker": "BBDC4",  "nome": "Bradesco",         "busca": ["BRADESCO"]},
-    {"ticker": "BBAS3",  "nome": "Banco do Brasil",  "busca": ["BANCO DO BRASIL", "BB"]},
+    {"ticker": "BBAS3",  "nome": "Banco do Brasil",  "busca": ["BB", "BANCO DO BRASIL"]},
     {"ticker": "SANB11", "nome": "Santander Brasil", "busca": ["SANTANDER"]},
     {"ticker": "BPAC11", "nome": "BTG Pactual",      "busca": ["BTG PACTUAL", "BTG"]},
-    {"ticker": "BRSR6",  "nome": "Banco Banrisul",   "busca": ["BANRISUL", "ESTADO DO RIO GRANDE DO SUL"]},
-    {"ticker": "ABCB4",  "nome": "Banco ABC Brasil", "busca": ["ABC BRASIL", "ABC-BRASIL", "ABC"]},
-    {"ticker": "BPAN4",  "nome": "Banco Pan",        "busca": ["BANCO PAN", "PAN"]},
+    {"ticker": "BRSR6",  "nome": "Banco Banrisul",   "busca": ["BANRISUL"]},
+    {"ticker": "ABCB4",  "nome": "Banco ABC Brasil", "busca": ["ABC-BRASIL", "ABC BRASIL"]},
+    {"ticker": "BPAN4",  "nome": "Banco Pan",        "busca": ["PAN", "BANCO PAN"]},
     {"ticker": "BRBI11", "nome": "BR Partners",      "busca": ["BR PARTNERS", "BRPARTNERS"]},
 ]
 
@@ -105,6 +105,10 @@ TERMOS_NAO_BANCO = (
     "SEGURO", "SEGURADORA", "CAPITALIZACAO", "PREVIDENCIA",
     "LEASING", "ARRENDAMENTO", "CONSORCIO", "ADMINISTRADORA",
     "CARTOES", "FACTORING", "IMOBILIARIA", "ASSET", "GESTORA",
+    # as cooperativas dominam o cadastro (mais de mil): sem elas na lista,
+    # "PAN", "ABC" e "BB" casavam com SICREDI/SICOOB/UNICRED da vida.
+    "COOPERATIVA", "SICREDI", "SICOOB", "UNICRED", "UNIPRIME", "CRESOL",
+    "CREDITO MUTUO", "ECONOMIA E CREDITO",
 )
 
 DRY_RUN = "--dry-run" in sys.argv
@@ -151,10 +155,16 @@ def baixar_arquivo(caminho):
 
 
 def converter_numero(valor):
+    """
+    Devolve o número CRU, sem arredondar. Arredondar aqui foi um erro
+    real: o IF.data entrega a Basileia como fração (0,1531 = 15,31%) e o
+    round(2) transformava isso em 0,15 — perdendo os centésimos ANTES de
+    a escala ser corrigida. O arredondamento acontece só no fim.
+    """
     if isinstance(valor, bool):
         return None
     if isinstance(valor, (int, float)):
-        return round(float(valor), 2)
+        return float(valor)
     if isinstance(valor, str):
         limpo = valor.strip()
         if not limpo:
@@ -162,7 +172,7 @@ def converter_numero(valor):
         if "," in limpo:
             limpo = limpo.replace(".", "").replace(",", ".")
         try:
-            return round(float(limpo), 2)
+            return float(limpo)
         except ValueError:
             return None
     return None
@@ -272,26 +282,90 @@ def mapear_nomes(cadastro, codigos_dos_dados):
 # Casamento com os tickers
 # ----------------------------------------------------------------------
 
+SUFIXO_CONGLOMERADO = "- PRUDENCIAL"
+
+
 def parece_nao_banco(nome_normalizado):
     return any(t in nome_normalizado for t in TERMOS_NAO_BANCO)
 
 
-def pontuar_candidato(banco, nome_normalizado):
+def nome_base(nome):
+    """
+    ("BRADESCO", True) para "BRADESCO - PRUDENCIAL".
+
+    O cadastro mistura razão social completa de mil e poucas instituições
+    com os conglomerados, e SÓ os conglomerados levam esse sufixo. É a
+    marca mais confiável do arquivo: o que a gente quer é sempre o
+    "<NOME> - PRUDENCIAL".
+    """
+    n = normalizar(nome)
+    if n.endswith(SUFIXO_CONGLOMERADO):
+        return n[:-len(SUFIXO_CONGLOMERADO)].strip(), True
+    return n, False
+
+
+def contem_palavra(texto, fragmento):
+    """
+    Fragmento como PALAVRA inteira, não pedaço solto.
+
+    Isto existe por causa de um erro que quase publicou número de
+    cooperativa como se fosse do Banco Pan: "PAN" está DENTRO de
+    "EXPANSÃO" (EXPANSAO), e a busca por substring casava.
+    """
+    return re.search(rf"(?<![A-Z0-9]){re.escape(fragmento)}(?![A-Z0-9])", texto) is not None
+
+
+def pontuar_candidato(banco, nome):
     """
     Quão bem este nome corresponde a este banco. Menor é melhor; None se
-    não corresponde. O IF.data tem mais de mil instituições e o grupo do
-    banco aparece várias vezes — pegar o primeiro que batesse publicaria
-    o índice da empresa errada, que é pior do que não publicar nada.
+    não corresponde.
+
+    A ordem dos critérios importa e foi acertada apanhando:
+      1. não parecer cooperativa/corretora/seguradora;
+      2. TER o sufixo "- PRUDENCIAL" (é o conglomerado, o que queremos);
+      3. bater EXATO com o nome curto, antes de bater como palavra solta;
+      4. nome mais enxuto.
+
+    A versão anterior premiava o fragmento mais LONGO, e por isso escolheu
+    "...DO ESTADO DO RIO GRANDE DO SUL - SICREDI AJURIS RS" em vez de
+    "BANRISUL - PRUDENCIAL", que estava ali na mesma lista.
     """
+    base, prudencial = nome_base(nome)
+    fora = 1 if parece_nao_banco(base) else 0
     melhor = None
-    fora = 1 if parece_nao_banco(nome_normalizado) else 0
     for fragmento in banco["busca"]:
-        if fragmento not in nome_normalizado:
+        if base == fragmento:
+            precisao = 0
+        elif contem_palavra(base, fragmento):
+            precisao = 1
+        else:
             continue
-        pontos = (fora, -len(fragmento), len(nome_normalizado))
+        pontos = (fora, 0 if prudencial else 1, precisao, len(base))
         if melhor is None or pontos < melhor:
             melhor = pontos
     return melhor
+
+
+def ajustar_escala(valores):
+    """
+    O IF.data entrega o Índice de Basileia como FRAÇÃO (0,1531), não como
+    percentual (15,31). Descobrimos isso na primeira coleta real: a tabela
+    saiu com "0,15%" no lugar de "15,31%".
+
+    Em vez de multiplicar por 100 e torcer, o robô OLHA os números: se a
+    mediana dos bancos escolhidos for menor que 1, é fração e vira
+    percentual. Assim, se o BC um dia passar a entregar já em percentual,
+    nada quebra — e nem precisa de alguém lembrar de mexer aqui.
+    """
+    if not valores:
+        return valores, False
+    ordenados = sorted(valores.values())
+    mediana = ordenados[len(ordenados) // 2]
+    if mediana >= 1:
+        return {t: round(v, 2) for t, v in valores.items()}, False
+    log(f"    valores vieram como fração (mediana {mediana:.4f}) — "
+        f"convertendo para percentual")
+    return {t: round(v * 100, 2) for t, v in valores.items()}, True
 
 
 def casar(mapa_nomes, mapa_valores):
@@ -300,27 +374,31 @@ def casar(mapa_nomes, mapa_valores):
         nome = mapa_nomes.get(codigo)
         if not nome:
             continue
-        normalizado = normalizar(nome)
         for banco in BANCOS:
-            pontos = pontuar_candidato(banco, normalizado)
+            pontos = pontuar_candidato(banco, nome)
             if pontos is not None:
                 candidatos.setdefault(banco["ticker"], []).append((pontos, nome, valor))
 
-    valores, casados = {}, []
+    escolhidos = {}
     for ticker, lista in candidatos.items():
         lista.sort()
         _, nome, valor = lista[0]
-        valores[ticker] = valor
-        casados.append((ticker, nome, valor))
+        escolhidos[ticker] = (nome, valor)
         if len(lista) > 1:
-            outros = [f"{n} ({v:.2f}%)" for _, n, v in lista[1:6]]
+            outros = [f"{n} ({v:g})" for _, n, v in lista[1:6]]
             log(f"    ATENÇÃO {ticker}: {len(lista)} instituições casaram. "
                 f"Escolhida: {nome}. Descartadas: {outros}")
-        if parece_nao_banco(normalizar(nome)):
+        if parece_nao_banco(nome_base(nome)[0]):
             log(f"    ATENÇÃO {ticker}: '{nome}' não parece ser o banco em si.")
-        if not (0 < valor < 100):
-            log(f"    ATENÇÃO {ticker}: {valor} está fora da faixa esperada de "
-                f"um percentual — pode ser a coluna errada.")
+
+    brutos = {t: v for t, (_, v) in escolhidos.items()}
+    valores, _ = ajustar_escala(brutos)
+
+    casados = [(t, escolhidos[t][0], valores[t]) for t in valores]
+    for ticker, _, valor in casados:
+        if not (5 < valor < 60):
+            log(f"    ATENÇÃO {ticker}: {valor}% está fora da faixa plausível "
+                f"para um banco (5% a 60%) — conferir a coluna.")
     return valores, casados
 
 
