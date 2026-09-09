@@ -458,7 +458,7 @@ def rotulos(dt):
                           f"(conglomerado prudencial)"}
 
 
-def gravar(dt, valores):
+def gravar(dt, valores, notas=None):
     if os.path.exists(ARQUIVO):
         with open(ARQUIVO, encoding="utf-8") as f:
             dados = json.load(f)
@@ -473,12 +473,14 @@ def gravar(dt, valores):
     marcas = rotulos(dt)
     periodo = {"id": marcas["id"], "rotulo": marcas["rotulo"],
                "referencia": marcas["referencia"], "valores": valores}
+    if notas:
+        periodo["notas"] = notas
 
     # Se nada mudou, não reescreve: rodando diariamente, o campo
     # 'atualizado_em' viraria um commit por dia só pra trocar uma data.
     atual = next((p for p in dados.get("periodos", [])
                   if str(p.get("id")) == periodo["id"]), None)
-    if atual and atual.get("valores") == valores:
+    if atual and atual.get("valores") == valores and atual.get("notas", {}) == (notas or {}):
         log(f"\nNada mudou no período {periodo['rotulo']} — arquivo mantido como está.")
         return False
 
@@ -574,14 +576,16 @@ def processar(bloco):
     for ticker, nome, valor in sorted(casados):
         log(f"    {ticker:7s} {valor:6.2f}%   {nome}")
     faltando = [b["ticker"] for b in BANCOS if b["ticker"] not in valores]
+    notas = {}
     if faltando:
         log(f"\n  NÃO ENCONTRADOS: {', '.join(faltando)}")
-        investigar_faltantes(faltando, bloco, dt, arquivos, mapa_valores, mapa_nomes)
+        notas = investigar_faltantes(faltando, bloco, dt, arquivos, mapa_valores, mapa_nomes)
 
-    return (dt, valores) if valores else None
+    return (dt, valores, notas) if valores else None
 
 
 def investigar_faltantes(faltando, bloco, dt, arquivos, mapa_valores, mapa_nomes):
+    """(ver docstring abaixo) — devolve {ticker: motivo} pro JSON."""
     """
     Diz POR QUE um banco não apareceu, em vez de só constatar que faltou.
 
@@ -596,7 +600,9 @@ def investigar_faltantes(faltando, bloco, dt, arquivos, mapa_valores, mapa_nomes
     reportar dentro do conglomerado da controladora. Nesse caso o número
     existe, mas em outro escopo — e é isso que este diagnóstico revela.
     """
-    def procurar(nomes_por_codigo, rotulo):
+    situacao = {t: {"prudencial": False, "outro": False} for t in faltando}
+
+    def procurar(nomes_por_codigo, rotulo, eh_prudencial):
         for ticker in faltando:
             banco = next(b for b in BANCOS if b["ticker"] == ticker)
             achados = []
@@ -607,10 +613,11 @@ def investigar_faltantes(faltando, bloco, dt, arquivos, mapa_valores, mapa_nomes
                     achados.append(f"{nome}"
                                    + (f" [Basileia {valor:g}]" if valor is not None
                                       else " [sem valor de Basileia]"))
+                    situacao[ticker]["prudencial" if eh_prudencial else "outro"] = True
             log(f"    {ticker} em {rotulo}: {achados[:6] or 'nenhuma correspondência'}")
 
     log("    procurando nos conglomerados prudenciais (o que já foi lido):")
-    procurar(mapa_nomes, "prudenciais")
+    procurar(mapa_nomes, "prudenciais", True)
 
     # os outros tipos: 1005 = Conglomerados Financeiros, 1006 = Individuais
     outros = [a for a in arquivos
@@ -621,10 +628,25 @@ def investigar_faltantes(faltando, bloco, dt, arquivos, mapa_valores, mapa_nomes
         if not isinstance(cadastro, list) or not cadastro:
             continue
         mapa, _ = mapear_nomes(cadastro, set(mapa_valores))
-        procurar(mapa, caminho.split("/")[-1])
+        procurar(mapa, caminho.split("/")[-1], False)
 
-    log("    (se o banco aparecer em outro tipo COM valor, dá pra usar esse número")
-    log("     marcando o escopo; se não aparecer em lugar nenhum, a célula fica '—')")
+    # O motivo vai pro JSON e aparece na tabela. Uma célula vazia sem
+    # explicação parece falha do site; com a frase, o visitante entende
+    # que é característica da instituição — e isso é informação útil pra
+    # quem vai comprar CDB dela.
+    notas = {}
+    for ticker, onde in situacao.items():
+        # Frases curtas de propósito: elas ocupam a célula da Basileia,
+        # que é estreita. Texto longo empurrava a coluna e invadia a
+        # vizinha.
+        if onde["prudencial"]:
+            notas[ticker] = "Sem Basileia divulgada neste trimestre"
+        elif onde["outro"]:
+            notas[ticker] = "Sem conglomerado prudencial próprio"
+        else:
+            notas[ticker] = "Não consta no IF.data deste trimestre"
+        log(f"    nota para {ticker}: {notas[ticker]}")
+    return notas
 
 
 def main():
@@ -653,11 +675,11 @@ def main():
         if not resultado:
             log("    seguindo para a data-base anterior...")
             continue
-        dt, valores = resultado
+        dt, valores, notas = resultado
         if DRY_RUN:
             log("\n  (--dry-run: nada gravado)")
             return 0
-        gravar(dt, valores)
+        gravar(dt, valores, notas)
         return 0
 
     log("\nNenhuma data-base rendeu o Índice de Basileia. Nada foi gravado.")

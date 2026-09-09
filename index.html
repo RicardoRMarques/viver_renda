@@ -2653,6 +2653,10 @@
       text-transform: uppercase; color: var(--primary);
     }
     .bas-secao-sub { font-size: 0.72rem; color: var(--muted); margin-left: 8px; }
+    .bas-sem-dado {
+      display: block; width: 150px; font-size: 0.72rem; line-height: 1.35;
+      color: var(--muted); font-style: italic; white-space: normal;
+    }
     .bas-referencia {
       margin: 8px 0 0; font-size: 0.75rem; color: var(--muted);
       border-left: 2px solid var(--border); padding-left: 8px; line-height: 1.45;
@@ -10101,6 +10105,7 @@
         }
 
         const valores = periodoSelecionado()?.valores || {};
+        const notas = periodoSelecionado()?.notas || {};
 
         const resultados = await Promise.all(bancos.map(async (b) => {
           // Banco sem ação na B3 não tem cotação: pedir à HG seria uma
@@ -10112,6 +10117,7 @@
             nome: b.nome,
             grupo: b.grupo || 'listado',
             basileia: typeof basileia === 'number' ? basileia : null,
+            nota: notas[b.ticker] || null,
             marketCap: dados?.marketCap ?? null,
             logo: dados?.logo ?? null,
             pl: dados?.pl ?? null,
@@ -10145,9 +10151,13 @@
         return { classe: 'bom', glifo: '▲', rotulo: 'Confortável' };
       }
 
-      function medidorBasileia(v) {
+      function medidorBasileia(v, nota) {
         const situacao = situacaoBasileia(v);
-        if (!situacao) return '—';
+        // Célula vazia sem explicação parece falha do site. Quando o robô
+        // sabe POR QUE não há número, a frase vale mais que o traço — e
+        // "não tem conglomerado prudencial próprio" é, em si, informação
+        // sobre quem está por trás daquele CDB.
+        if (!situacao) return nota ? `<span class="bas-sem-dado">${nota}</span>` : '—';
         const largura = Math.min(100, (v / BAS_ESCALA_MAX) * 100);
         const marca = (BAS_MINIMO_LEGAL / BAS_ESCALA_MAX) * 100;
         return `
@@ -10217,7 +10227,7 @@
                     : `<span class="bas-banco-nome">${l.ticker}</span><br><span class="bas-banco-sub">${l.nome}</span>`}</span>
               </div>
             </td>
-            <td>${medidorBasileia(l.basileia)}</td>
+            <td>${medidorBasileia(l.basileia, l.nota)}</td>
             <td>${hgFormatCompacto(l.marketCap) ?? '—'}</td>
             <td>${fmtNum(l.pl)}</td>
             <td>${fmtNum(l.pvp)}</td>
@@ -10254,10 +10264,13 @@
       // 18 requisições à HG Brasil.
       anoSelect.addEventListener('change', () => {
         if (!linhasCache) { carregarDados(); return; }
-        const valores = periodoSelecionado()?.valores || {};
+        const periodo = periodoSelecionado();
+        const valores = periodo?.valores || {};
+        const notas = periodo?.notas || {};
         linhasCache = linhasCache.map(l => ({
           ...l,
           basileia: typeof valores[l.ticker] === 'number' ? valores[l.ticker] : null,
+          nota: notas[l.ticker] || null,
         }));
         mostrarReferencia();
         renderizarTabela();
