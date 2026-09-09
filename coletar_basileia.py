@@ -135,7 +135,7 @@ def normalizar(texto):
     return re.sub(r"\s+", " ", t).upper().strip()
 
 
-def buscar_json(url):
+def buscar_json(url, esperas=None):
     """
     O Olinda devolve HTTP 500 "Erro desconhecido" de forma intermitente —
     a MESMA consulta falha e, segundos depois, responde. Sem repetição o
@@ -146,18 +146,19 @@ def buscar_json(url):
         "Accept": "application/json",
         "User-Agent": "viverderenda-basileia/1.0 (+https://viverderenda.dev.br)",
     })
+    esperas = ESPERAS_ENTRE_TENTATIVAS if esperas is None else esperas
     ultimo_erro = None
-    for tentativa, espera in enumerate(ESPERAS_ENTRE_TENTATIVAS, start=1):
+    for tentativa, espera in enumerate(esperas, start=1):
         try:
             with urllib.request.urlopen(req, timeout=TEMPO_LIMITE) as resp:
                 return json.loads(resp.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
             ultimo_erro = e
-            if e.code < 500 or tentativa == len(ESPERAS_ENTRE_TENTATIVAS):
+            if e.code < 500 or tentativa == len(esperas):
                 raise            # 4xx é erro nosso: repetir não adianta
         except Exception as e:  # noqa: BLE001
             ultimo_erro = e
-            if tentativa == len(ESPERAS_ENTRE_TENTATIVAS):
+            if tentativa == len(esperas):
                 raise
         time.sleep(espera)
     if ultimo_erro:
@@ -406,17 +407,71 @@ def achar_campo_codigo(linhas):
     return None
 
 
+def pedir_caminho(caminho, rotulo):
+    """
+    Faz uma consulta a partir do caminho já montado (para recursos cuja
+    assinatura não segue o padrão de function import).
+    """
+    global falhas_seguidas
+    url = f"{BASE}/{caminho}"
+    if PAUSA_ENTRE_CHAMADAS:
+        time.sleep(PAUSA_ENTRE_CHAMADAS)
+    try:
+        # UMA tentativa: aqui o 500 quase sempre quer dizer "assinatura
+        # errada", não instabilidade. Repetir gastava 25 segundos por
+        # variação e estourava o tempo antes de testar todas.
+        dados = buscar_json(url, esperas=[0])
+    except urllib.error.HTTPError as e:
+        log(f"      [{e.code}] {rotulo}")
+        return None
+    except Exception as e:  # noqa: BLE001
+        log(f"      [erro] {rotulo}: {e}")
+        return None
+    falhas_seguidas = 0
+    valor = dados.get("value")
+    if not isinstance(valor, list):
+        log(f"      [sem 'value'] {rotulo}")
+        return None
+    log(f"      [200] {rotulo} -> {len(valor)} linhas")
+    return valor
+
+
 def carregar_cadastro(anomes):
     """
-    IfDataCadastro traz a razão social de cada instituição. É necessário
-    quando o relatório de valores identifica a instituição só por código —
-    que é justamente o desenho do formato longo.
+    IfDataCadastro traz a razão social de cada instituição — indispensável,
+    porque o relatório de valores identifica a instituição só por CodInst.
+
+    Tenta várias assinaturas porque a documentação do BC mostra este
+    recurso SEM os parênteses de function import
+    ("IfDataCadastro?$format=json&[Outros Parâmetros]"), diferente do
+    IfDataValores. Em vez de eu escolher uma e torcer, o robô tenta todas
+    e usa a primeira que responder — e agora IMPRIME o resultado de cada
+    tentativa. A versão anterior tentava em silêncio: quando falhou, o log
+    dizia só "não respondeu", sem dizer por quê, e custou uma execução.
     """
-    for parametros in ({"AnoMes": anomes, "TipoInstituicao": TIPO_INSTITUICAO},
-                       {"AnoMes": anomes}):
-        linhas = pedir("IfDataCadastro", parametros, silencioso=True)
+    a = str(anomes)
+    tentativas = [
+        (f"IfDataCadastro(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao)"
+         f"?$format=json&@AnoMes={a}&@TipoInstituicao={TIPO_INSTITUICAO}",
+         "function import, AnoMes numérico"),
+        (f"IfDataCadastro(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao)"
+         f"?$format=json&@AnoMes='{a}'&@TipoInstituicao={TIPO_INSTITUICAO}",
+         "function import, AnoMes entre aspas"),
+        (f"IfDataCadastro(AnoMes=@AnoMes)?$format=json&@AnoMes={a}",
+         "function import, só AnoMes"),
+        (f"IfDataCadastro?$format=json&$filter=AnoMes%20eq%20{a}"
+         f"%20and%20TipoInstituicao%20eq%20{TIPO_INSTITUICAO}",
+         "entity set + $filter numérico"),
+        (f"IfDataCadastro?$format=json&$filter=AnoMes%20eq%20'{a}'",
+         "entity set + $filter com aspas"),
+        ("IfDataCadastro?$format=json", "entity set sem filtro"),
+    ]
+    log("    procurando o cadastro das instituições:")
+    for caminho, rotulo in tentativas:
+        linhas = pedir_caminho(caminho, rotulo)
         if linhas:
             return linhas
+    log("    nenhuma assinatura do IfDataCadastro respondeu.")
     return None
 
 
@@ -550,9 +605,65 @@ def resolver_nomes(anomes, achado):
     return lambda linha: mapa.get(str(linha.get(campo_codigo)))
 
 
+# Empresas do mesmo grupo que NÃO são o banco. O índice de uma corretora
+# ou seguradora não diz nada sobre a solidez do banco — e costuma ser bem
+# mais alto, porque a base de risco é outra. Publicar um no lugar do
+# outro seria pior do que não publicar.
+TERMOS_NAO_BANCO = (
+    "CORRETORA", "DISTRIBUIDORA", "CCTVM", "DTVM", "CVMC",
+    "SEGURO", "SEGURADORA", "CAPITALIZACAO", "PREVIDENCIA",
+    "LEASING", "ARRENDAMENTO", "CONSORCIO", "ADMINISTRADORA",
+    "CARTOES", "FACTORING", "IMOBILIARIA", "ASSET", "GESTORA",
+)
+
+
+def parece_nao_banco(nome_normalizado):
+    return any(t in nome_normalizado for t in TERMOS_NAO_BANCO)
+
+
+def pontuar_candidato(banco, nome_normalizado):
+    """
+    Quão bem esta razão social corresponde a este banco. Menor é melhor;
+    None quando não corresponde.
+
+    Existe porque o IF.data tem mais de mil instituições e um fragmento
+    curto pega gente demais. Pegar a primeira linha que batesse — como a
+    versão anterior fazia — publicaria em silêncio o índice da empresa
+    errada, que é pior do que não publicar nada.
+
+    A ordem dos critérios foi corrigida depois de um teste: com
+    "começa com o fragmento" em primeiro lugar, o BPAC11 escolhia
+    "BTG PACTUAL CORRETORA" (41,2%) em vez de "BANCO BTG PACTUAL"
+    (16,4%), porque a corretora começa com o fragmento e o banco não
+    (começa com "BANCO"). Razão social de banco brasileiro quase sempre
+    começa com "BANCO", então essa preferência estava exatamente ao
+    contrário do que deveria.
+    """
+    melhor = None
+    fora = 1 if parece_nao_banco(nome_normalizado) else 0
+    for fragmento in banco["busca"]:
+        if fragmento not in nome_normalizado:
+            continue
+        pontos = (
+            fora,                       # corretora/seguradora por último
+            -len(fragmento),            # fragmento mais específico primeiro
+            0 if nome_normalizado.startswith("BANCO") else 1,
+            len(nome_normalizado),      # desempate: o nome mais enxuto
+        )
+        if melhor is None or pontos < melhor:
+            melhor = pontos
+    return melhor
+
+
 def extrair_valores(linhas, achado, obter_nome):
-    """Percorre o relatório inteiro e devolve {ticker: indice}."""
-    valores, casados = {}, []
+    """
+    Percorre o relatório inteiro e devolve {ticker: indice}.
+
+    Junta TODOS os candidatos de cada banco antes de escolher, em vez de
+    parar no primeiro que aparecer — e avisa no log quando houve mais de
+    um, pra dar pra conferir a escolha.
+    """
+    candidatos = {}   # ticker -> [(pontos, nome, valor)]
     for linha in linhas:
         if achado["formato"] == "longo":
             rotulo = linha.get(achado["campo_rotulo"])
@@ -561,14 +672,30 @@ def extrair_valores(linhas, achado, obter_nome):
         nome_bc = obter_nome(linha)
         if not nome_bc:
             continue
-        banco = casar_banco(normalizar(nome_bc))
-        if not banco or banco["ticker"] in valores:
-            continue
         numero = converter_numero(linha.get(achado["campo_valor"]))
         if numero is None:
             continue
-        valores[banco["ticker"]] = numero
-        casados.append((banco["ticker"], nome_bc, numero))
+        normalizado = normalizar(nome_bc)
+        for banco in BANCOS:
+            pontos = pontuar_candidato(banco, normalizado)
+            if pontos is not None:
+                candidatos.setdefault(banco["ticker"], []).append((pontos, nome_bc, numero))
+
+    valores, casados = {}, []
+    for ticker, lista in candidatos.items():
+        lista.sort()
+        _, nome_bc, numero = lista[0]
+        valores[ticker] = numero
+        casados.append((ticker, nome_bc, numero))
+        if len(lista) > 1:
+            outros = [f"{n} ({v:.2f}%)" for _, n, v in lista[1:6]]
+            log(f"    ATENÇÃO {ticker}: {len(lista)} instituições casaram. "
+                f"Escolhida: {nome_bc}. Descartadas: {outros}")
+        if parece_nao_banco(normalizar(nome_bc)):
+            # candidato único, mas com cara de corretora/seguradora: o
+            # aviso de ambiguidade acima não pegaria esse caso.
+            log(f"    ATENÇÃO {ticker}: '{nome_bc}' não parece ser o banco em si. "
+                f"Conferir antes de confiar neste número.")
     return valores, casados
 
 
