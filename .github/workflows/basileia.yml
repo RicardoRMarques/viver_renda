@@ -18,10 +18,10 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'normal = coleta e grava | diagnostico = só testa o servidor'
+        description: 'normal = coleta e grava | diagnostico = testa o Olinda | descobrir-web = investiga a interface web'
         type: choice
         default: normal
-        options: [normal, diagnostico]
+        options: [normal, diagnostico, descobrir-web]
 
 permissions:
   contents: write
@@ -39,7 +39,7 @@ jobs:
       # Sem pip install: o robô usa só biblioteca padrão, e o IF.data é
       # aberto (não precisa de chave/secret).
       - name: Coletar Basileia
-        if: inputs.modo != 'diagnostico'
+        if: inputs.modo == 'normal' || inputs.modo == ''
         run: python3 coletar_basileia.py
 
       # Uma requisição por variação, sem repetir: serve pra descobrir se o
@@ -50,8 +50,15 @@ jobs:
         if: inputs.modo == 'diagnostico'
         run: python3 coletar_basileia.py --diagnostico
 
+      # Só olha e imprime: procura uma API REST por trás da interface web
+      # do IF.data (www3), que é outro serviço e não sofre da instabilidade
+      # do Olinda. Não grava nada.
+      - name: Investigar a interface web do IF.data
+        if: inputs.modo == 'descobrir-web'
+        run: python3 descobrir_ifdata_web.py
+
       - name: Commitar se mudou
-        if: inputs.modo != 'diagnostico'
+        if: inputs.modo == 'normal' || inputs.modo == ''
         run: |
           if [ -n "$(git status --porcelain data/basileia.json)" ]; then
             git config user.name  "github-actions[bot]"
