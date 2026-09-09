@@ -1,56 +1,51 @@
 #!/usr/bin/env python3
 """
-Fase 3 da investigação da interface web do IF.data (www3.bcb.gov.br/ifdata).
+Fase 4 — ÚLTIMA investigação. Depois desta eu escrevo o robô definitivo.
 
-O QUE JÁ SABEMOS (fases 1 e 2, execuções reais de 09/09/2026)
---------------------------------------------------------------
-  GET rest/relatorios2025a2030  -> 200, catálogo com 5 data-bases.
-      A mais recente é 202603 (1º tri/2026) — ou seja, 202606 realmente
-      ainda não saiu, e o seletor do site deve mostrar "1T26".
+O CAMINHO COMPLETO, JÁ DESCOBERTO
+----------------------------------
+    catálogo:  GET /ifdata/rest/relatorios2025a2030
+    arquivo:   GET /ifdata/rest/arquivos?nomeArquivo=<f>
 
-  Cada data-base lista 33 arquivos, com caminho no formato
-      "ifdata_2025_2030//202603/cadastro202603_1009.json"   (barra dupla!)
+O parâmetro é 'nomeArquivo' — veio do JavaScript embutido na página:
 
-  sel202603.json revelou os tipos de instituição, e AQUI corrigimos um
-  engano que vinha do Olinda:
-      1009 = Conglomerados Prudenciais e Instituições Independentes  <- o nosso
-      1005 = Conglomerados Financeiros e Instituições Independentes
-      1006 = Instituições Individuais
+    $.ajax({ url: urlArquivos + "?nomeArquivo=" + dadosFile[i].f,
+             type: "GET", dataType: "json" })
 
-  trel<dt>_<id>.json descreve cada relatório (105 = "Ativo", etc.).
-  dados<dt>_1..5.json devem ser os valores.
+Repare que a página concatena o caminho CRU, sem codificar. Por isso a
+barra dupla de "ifdata_2025_2030//202603/..." vai literal — este script
+faz igual, pra não inventar diferença onde o site não faz.
 
-O QUE FALTA
------------
-A rota de download. Os seis prefixos óbvios deram 404. Mas o HTML da
-página cita /ifdata/rest/arquivos e /ifdata/rest/pdf — então a resposta
-está no JavaScript embutido na própria página, não nos arquivos .js
-externos (esses são só jQuery, bootstrap e menu).
+Data-base mais recente: 202603 (1º tri/2026).
+Tipo de instituição: 1009 = Conglomerados Prudenciais (o que os bancos
+divulgam). 1005 = Financeiros, 1006 = Individuais.
 
-Este script mostra o TRECHO do HTML em volta dessas citações — é ali que
-vai estar a forma exata da chamada — e testa um leque de variações,
-inclusive POST, que é o formato provável para "me entregue este arquivo".
+O QUE FALTA — e é só isto
+--------------------------
+Saber onde, dentro dos arquivos, estão (a) a razão social por código e
+(b) o Índice de Basileia. Há cinco arquivos 'dados' e não se sabe qual
+traz o quê. Este script baixa todos, imprime a forma de cada um e
+PROCURA a palavra "Basileia", dizendo em que caminho do JSON ela aparece.
 
-Não grava nada. Só olha e imprime.
+Não grava nada.
 
     python3 descobrir_ifdata_web.py
 """
 
 import json
 import os
-import re
 import sys
 import urllib.error
-import urllib.parse
 import urllib.request
 
 BASE = os.environ.get("IFDATA_BASE", "https://www3.bcb.gov.br/ifdata/")
-TEMPO_LIMITE = 60
+CATALOGO = BASE + "rest/relatorios2025a2030"
+ARQUIVOS = BASE + "rest/arquivos?nomeArquivo="
+TEMPO_LIMITE = 90
 CABECALHOS = {
     "User-Agent": ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
                    "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"),
     "Accept": "application/json, text/plain, */*",
-    "Accept-Language": "pt-BR,pt;q=0.9",
     "Referer": BASE,
     "X-Requested-With": "XMLHttpRequest",
 }
@@ -60,100 +55,132 @@ def log(m):
     print(m, flush=True)
 
 
-def bater(url, corpo=None, tipo=None, metodo=None):
-    """(status, texto). Erro vira resultado, não exceção."""
-    cabecalhos = dict(CABECALHOS)
-    if tipo:
-        cabecalhos["Content-Type"] = tipo
-    dados = corpo.encode("utf-8") if isinstance(corpo, str) else corpo
-    req = urllib.request.Request(url, data=dados, headers=cabecalhos,
-                                 method=metodo or ("POST" if dados is not None else "GET"))
+def buscar(url):
+    req = urllib.request.Request(url, headers=CABECALHOS)
     try:
         with urllib.request.urlopen(req, timeout=TEMPO_LIMITE) as r:
-            return r.status, r.read().decode("utf-8", "replace")
+            bruto = r.read().decode("utf-8", "replace")
+            try:
+                return r.status, json.loads(bruto), len(bruto)
+            except Exception:  # noqa: BLE001
+                return r.status, None, len(bruto)
     except urllib.error.HTTPError as e:
-        try:
-            return e.code, e.read().decode("utf-8", "replace")
-        except Exception:  # noqa: BLE001
-            return e.code, ""
+        return e.code, None, 0
     except Exception as e:  # noqa: BLE001
-        return None, str(e)
+        log(f"        erro: {e}")
+        return None, None, 0
 
 
-def parece_json(texto):
-    t = (texto or "").lstrip()
-    return t.startswith("{") or t.startswith("[")
+def arquivo(f):
+    # sem codificar, igual à página
+    return buscar(ARQUIVOS + f)
+
+
+def forma(valor, prefixo="", nivel=0):
+    """Descreve a estrutura sem despejar o conteúdo inteiro."""
+    tab = "    " + "  " * nivel
+    if isinstance(valor, list):
+        log(f"{tab}{prefixo}lista[{len(valor)}]")
+        if valor:
+            amostra = json.dumps(valor[0], ensure_ascii=False)
+            log(f"{tab}  1º item: {amostra[:400]}")
+            if len(valor) > 1:
+                log(f"{tab}  2º item: {json.dumps(valor[1], ensure_ascii=False)[:200]}")
+    elif isinstance(valor, dict):
+        log(f"{tab}{prefixo}objeto{list(valor.keys())[:15]}")
+        if nivel < 2:
+            for chave, dentro in list(valor.items())[:6]:
+                if isinstance(dentro, (list, dict)):
+                    forma(dentro, f"'{chave}': ", nivel + 1)
+                else:
+                    log(f"{tab}  '{chave}': {str(dentro)[:100]}")
+    else:
+        log(f"{tab}{prefixo}{str(valor)[:120]}")
+
+
+def caçar(valor, alvo, caminho="raiz", achados=None, limite=6):
+    """Onde, na árvore do JSON, aparece o texto procurado."""
+    if achados is None:
+        achados = []
+    if len(achados) >= limite:
+        return achados
+    if isinstance(valor, str):
+        if alvo.lower() in valor.lower():
+            achados.append((caminho, valor[:150]))
+    elif isinstance(valor, list):
+        for i, item in enumerate(valor[:400]):
+            caçar(item, alvo, f"{caminho}[{i}]", achados, limite)
+    elif isinstance(valor, dict):
+        for chave, dentro in valor.items():
+            caçar(dentro, alvo, f"{caminho}.{chave}", achados, limite)
+    return achados
 
 
 def main():
-    log("=" * 70)
-    log("1) COMO O HTML USA 'rest/arquivos' — a forma da chamada está aqui")
-    log("=" * 70)
-    status, html = bater(BASE)
-    log(f"  página: status {status}, {len(html)} caracteres\n")
-    if status != 200:
+    status, catalogo, _ = buscar(CATALOGO)
+    log(f"catálogo: [{status}]")
+    if not isinstance(catalogo, list) or not catalogo:
         return 1
 
-    for termo in ("rest/arquivos", "rest/pdf", "rest/relatorios"):
-        posicoes = [m.start() for m in re.finditer(re.escape(termo), html)]
-        log(f"  '{termo}': {len(posicoes)} ocorrência(s)")
-        for pos in posicoes[:4]:
-            trecho = html[max(0, pos - 320): pos + 320]
-            trecho = re.sub(r"\s+", " ", trecho)
-            log(f"    ...{trecho}...")
-        log("")
+    catalogo.sort(key=lambda b: int(b.get("dt", 0)), reverse=True)
+    bloco = catalogo[0]
+    dt = bloco.get("dt")
+    arquivos = [x.get("f") for x in bloco.get("files", []) if x.get("f")]
+    log(f"data-base mais recente: {dt}\n")
 
-    # qualquer função JS que monte URL de arquivo
-    for padrao, rotulo in [
-        (r"function\s+(\w*[Aa]rquivo\w*)\s*\([^)]*\)\s*\{[^}]{0,400}\}", "função com 'arquivo' no nome"),
-        (r"\$\.(?:get|post|ajax)\(\s*\{?[^)]{0,320}", "chamada jQuery"),
-        (r"(?:url|href|src)\s*[:=]\s*[^,;\n]{0,160}rest[^,;\n]{0,160}", "montagem de URL com 'rest'"),
-    ]:
-        achados = re.findall(padrao, html)
-        if achados:
-            log(f"  {rotulo}: {len(achados)} achado(s)")
-            for a in achados[:6]:
-                texto = re.sub(r"\s+", " ", a if isinstance(a, str) else str(a))
-                log(f"    {texto[:300]}")
-            log("")
-
+    # --- os relatórios disponíveis (trel = tipo de relatório) ---
     log("=" * 70)
-    log("2) TESTANDO ROTAS DE DOWNLOAD")
+    log("RELATÓRIOS DISPONÍVEIS (id -> nome)")
     log("=" * 70)
-    bruto = "ifdata_2025_2030//202603/info202603.json"
-    simples = bruto.replace("//", "/")
-    so_nome = bruto.split("/")[-1]
-    codificado = urllib.parse.quote(bruto, safe="")
+    for f in [a for a in arquivos if "/trel" in a]:
+        st, dados, _ = arquivo(f)
+        nome = "?"
+        if isinstance(dados, dict):
+            nome = dados.get("n") or dados.get("nome") or "?"
+        elif isinstance(dados, list) and dados and isinstance(dados[0], dict):
+            nome = dados[0].get("n", "?")
+        log(f"  [{st}] {f.split('/')[-1]:28s} -> {nome}")
 
-    tentativas = [
-        ("GET", BASE + "rest/arquivos", None, None),
-        ("GET", BASE + "rest/arquivos/" + simples, None, None),
-        ("GET", BASE + "rest/arquivos?f=" + codificado, None, None),
-        ("GET", BASE + "rest/arquivos?arquivo=" + codificado, None, None),
-        ("GET", BASE + "rest/arquivos?nome=" + codificado, None, None),
-        ("GET", BASE + simples, None, None),
-        ("GET", BASE + "dados/" + simples, None, None),
-        ("GET", BASE + "json/" + simples, None, None),
-        ("GET", BASE + "rest/arquivos/" + so_nome, None, None),
-        ("POST", BASE + "rest/arquivos", json.dumps({"f": bruto}), "application/json"),
-        ("POST", BASE + "rest/arquivos", json.dumps([{"f": bruto}]), "application/json"),
-        ("POST", BASE + "rest/arquivos", "f=" + codificado,
-         "application/x-www-form-urlencoded"),
-        ("POST", BASE + "rest/arquivos", bruto, "text/plain"),
-    ]
-    for metodo, url, corpo, tipo in tentativas:
-        st, texto = bater(url, corpo, tipo, metodo)
-        marca = " <<< JSON!" if st == 200 and parece_json(texto) else ""
-        log(f"  [{st}] {metodo} {url}{marca}")
-        if corpo:
-            log(f"        corpo enviado: {str(corpo)[:90]}")
-        if st == 200 and texto:
-            log(f"        resposta: {texto[:260]}".replace("\n", " "))
-
+    # --- cadastro do tipo 1009 (Conglomerados Prudenciais) ---
     log("\n" + "=" * 70)
-    log("COMO LER: a linha marcada com '<<< JSON!' é a rota boa. Se nenhuma")
-    log("marcar, o trecho de HTML da seção 1 mostra como a página monta a")
-    log("chamada — me mande essa parte que eu leio e acerto.")
+    log("CADASTRO (razão social por código)")
+    log("=" * 70)
+    for f in [a for a in arquivos if "/cadastro" in a]:
+        st, dados, tamanho = arquivo(f)
+        log(f"\n  {f.split('/')[-1]}  [{st}]  {tamanho} bytes")
+        if dados is not None:
+            forma(dados)
+
+    # --- os arquivos de dados: qual deles tem a Basileia? ---
+    log("\n" + "=" * 70)
+    log("DADOS — e onde está a Basileia")
+    log("=" * 70)
+    for f in [a for a in arquivos if "/dados" in a]:
+        st, dados, tamanho = arquivo(f)
+        log(f"\n  {f.split('/')[-1]}  [{st}]  {tamanho} bytes")
+        if dados is None:
+            continue
+        forma(dados)
+        achados = caçar(dados, "Basileia")
+        if achados:
+            log("    >>> ACHOU 'Basileia' em:")
+            for caminho, texto in achados:
+                log(f"          {caminho}  =  {texto}")
+        else:
+            log("    (sem 'Basileia' neste arquivo)")
+
+    # --- sel e info, pra fechar o entendimento ---
+    log("\n" + "=" * 70)
+    log("SEL e INFO")
+    log("=" * 70)
+    for f in [a for a in arquivos if "/sel" in a or "/info" in a]:
+        st, dados, _ = arquivo(f)
+        log(f"\n  {f.split('/')[-1]}  [{st}]")
+        if dados is not None:
+            forma(dados)
+
+    log("\nCom isto eu escrevo o robô definitivo: dois arquivos estáticos por")
+    log("trimestre, sem Olinda.")
     return 0
 
 
