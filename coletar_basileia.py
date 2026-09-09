@@ -85,16 +85,59 @@ CABECALHOS = {
 # Bancos da tabela do site. 'busca' são pedaços do nome como ele aparece
 # no cadastro do IF.data — que usa nome CURTO ("BRADESCO", "ITAU"), não a
 # razão social completa.
+# Os bancos da tabela, em dois grupos.
+#
+# 'listado'  -> tem ação na B3: o site busca valor de mercado, P/L, P/VP,
+#               ROE e DY na HG Brasil, além da Basileia.
+# 'emissor'  -> não tem ação, mas emite CDB/LCI/LCA no varejo. São
+#               justamente os que pagam mais (e onde o Basileia mais
+#               importa); só a coluna de Basileia é preenchida.
+#
+# A chave dos que não têm ação é um apelido, não um ticker.
+#
+# NÃO ESTÁ AQUI, de propósito: Banco Master. Teve LIQUIDAÇÃO
+# EXTRAJUDICIAL decretada pelo Banco Central. Era o nome mais citado em
+# "CDB que paga mais" e, num site que orienta quem compra renda fixa,
+# listá-lo como emissor seria pior do que não ter a tabela.
+#
+# 'busca' são pedaços do nome como o cadastro do IF.data escreve os
+# CONGLOMERADOS: nome curto seguido de " - PRUDENCIAL" ("BRADESCO -
+# PRUDENCIAL", "BB - PRUDENCIAL"). Vários fragmentos por banco porque a
+# grafia varia; o robô avisa no log quando um não é encontrado.
 BANCOS = [
-    {"ticker": "ITUB4",  "nome": "Itaú Unibanco",    "busca": ["ITAU", "ITAU UNIBANCO"]},
-    {"ticker": "BBDC4",  "nome": "Bradesco",         "busca": ["BRADESCO"]},
-    {"ticker": "BBAS3",  "nome": "Banco do Brasil",  "busca": ["BB", "BANCO DO BRASIL"]},
-    {"ticker": "SANB11", "nome": "Santander Brasil", "busca": ["SANTANDER"]},
-    {"ticker": "BPAC11", "nome": "BTG Pactual",      "busca": ["BTG PACTUAL", "BTG"]},
-    {"ticker": "BRSR6",  "nome": "Banco Banrisul",   "busca": ["BANRISUL"]},
-    {"ticker": "ABCB4",  "nome": "Banco ABC Brasil", "busca": ["ABC-BRASIL", "ABC BRASIL"]},
-    {"ticker": "BPAN4",  "nome": "Banco Pan",        "busca": ["PAN", "BANCO PAN"]},
-    {"ticker": "BRBI11", "nome": "BR Partners",      "busca": ["BR PARTNERS", "BRPARTNERS"]},
+    # --- com ação na B3 ---
+    {"ticker": "ITUB4",  "nome": "Itaú Unibanco",        "grupo": "listado", "busca": ["ITAU", "ITAU UNIBANCO"]},
+    {"ticker": "BBDC4",  "nome": "Bradesco",             "grupo": "listado", "busca": ["BRADESCO"]},
+    {"ticker": "BBAS3",  "nome": "Banco do Brasil",      "grupo": "listado", "busca": ["BB", "BANCO DO BRASIL"]},
+    {"ticker": "SANB11", "nome": "Santander Brasil",     "grupo": "listado", "busca": ["SANTANDER"]},
+    {"ticker": "BPAC11", "nome": "BTG Pactual",          "grupo": "listado", "busca": ["BTG PACTUAL", "BTG"]},
+    {"ticker": "BRSR6",  "nome": "Banrisul",             "grupo": "listado", "busca": ["BANRISUL"]},
+    {"ticker": "ABCB4",  "nome": "Banco ABC Brasil",     "grupo": "listado", "busca": ["ABC-BRASIL", "ABC BRASIL"]},
+    {"ticker": "BPAN4",  "nome": "Banco Pan",            "grupo": "listado", "busca": ["PAN", "BANCO PAN"]},
+    {"ticker": "BRBI11", "nome": "BR Partners",          "grupo": "listado", "busca": ["BR PARTNERS", "BRPARTNERS"]},
+    {"ticker": "BMGB4",  "nome": "Banco BMG",            "grupo": "listado", "busca": ["BMG"]},
+    {"ticker": "SFSA4",  "nome": "Banco Sofisa",         "grupo": "listado", "busca": ["SOFISA"]},
+    {"ticker": "PINE4",  "nome": "Banco Pine",           "grupo": "listado", "busca": ["PINE"]},
+    {"ticker": "BMEB4",  "nome": "Mercantil do Brasil",  "grupo": "listado", "busca": ["MERCANTIL DO BRASIL", "MERCANTIL"]},
+    {"ticker": "BSLI4",  "nome": "BRB — Banco de Brasília", "grupo": "listado", "busca": ["BRB"]},
+    {"ticker": "BEES3",  "nome": "Banestes",             "grupo": "listado", "busca": ["BANESTES"]},
+    {"ticker": "BAZA3",  "nome": "Banco da Amazônia",    "grupo": "listado", "busca": ["AMAZONIA", "BASA"]},
+
+    # --- sem ação na B3, mas emitem no varejo ---
+    {"ticker": "CAIXA",    "nome": "Caixa Econômica Federal", "grupo": "emissor", "busca": ["CAIXA ECONOMICA FEDERAL", "CAIXA", "CEF"]},
+    {"ticker": "SAFRA",    "nome": "Banco Safra",         "grupo": "emissor", "busca": ["SAFRA"]},
+    {"ticker": "DAYCOVAL", "nome": "Banco Daycoval",      "grupo": "emissor", "busca": ["DAYCOVAL"]},
+    {"ticker": "BV",       "nome": "Banco BV",            "grupo": "emissor", "busca": ["BV", "VOTORANTIM"]},
+    {"ticker": "INTER",    "nome": "Banco Inter",         "grupo": "emissor", "busca": ["INTER"]},
+    {"ticker": "NUBANK",   "nome": "Nubank",              "grupo": "emissor", "busca": ["NU", "NUBANK", "NU PAGAMENTOS"]},
+    {"ticker": "C6",       "nome": "C6 Bank",             "grupo": "emissor", "busca": ["C6"]},
+    {"ticker": "ORIGINAL", "nome": "Banco Original",      "grupo": "emissor", "busca": ["ORIGINAL"]},
+    {"ticker": "AGIBANK",  "nome": "Agibank",             "grupo": "emissor", "busca": ["AGIBANK"]},
+    {"ticker": "PAGBANK",  "nome": "PagBank",             "grupo": "emissor", "busca": ["PAGSEGURO", "PAGBANK"]},
+    {"ticker": "PICPAY",   "nome": "PicPay",              "grupo": "emissor", "busca": ["PICPAY"]},
+    {"ticker": "NEON",     "nome": "Neon",                "grupo": "emissor", "busca": ["NEON"]},
+    {"ticker": "FIBRA",    "nome": "Banco Fibra",         "grupo": "emissor", "busca": ["FIBRA"]},
+    {"ticker": "XP",       "nome": "Banco XP",            "grupo": "emissor", "busca": ["XP"]},
 ]
 
 # Empresas do mesmo grupo que NÃO são o banco. O índice de uma corretora
@@ -420,8 +463,12 @@ def gravar(dt, valores):
         with open(ARQUIVO, encoding="utf-8") as f:
             dados = json.load(f)
     else:
-        dados = {"bancos": [{"ticker": b["ticker"], "nome": b["nome"]} for b in BANCOS],
-                 "periodos": []}
+        dados = {"bancos": [], "periodos": []}
+
+    # a lista de bancos é sempre reescrita a partir daqui: assim, incluir
+    # ou tirar um banco é mexer só neste arquivo, e o site acompanha.
+    dados["bancos"] = [{"ticker": b["ticker"], "nome": b["nome"], "grupo": b["grupo"]}
+                       for b in BANCOS]
 
     marcas = rotulos(dt)
     periodo = {"id": marcas["id"], "rotulo": marcas["rotulo"],
@@ -529,16 +576,55 @@ def processar(bloco):
     faltando = [b["ticker"] for b in BANCOS if b["ticker"] not in valores]
     if faltando:
         log(f"\n  NÃO ENCONTRADOS: {', '.join(faltando)}")
-        amostra = sorted({mapa_nomes[c] for c in mapa_valores if c in mapa_nomes})
-        for ticker in faltando:
-            banco = next(b for b in BANCOS if b["ticker"] == ticker)
-            termos = {p for texto in [banco["nome"]] + banco["busca"]
-                      for p in normalizar(texto).split() if len(p) >= 3}
-            parecidos = sorted({n for n in amostra
-                                for t in termos if t in normalizar(n)})[:5]
-            log(f"    {ticker}: parecidos no IF.data -> {parecidos or 'nada parecido'}")
+        investigar_faltantes(faltando, bloco, dt, arquivos, mapa_valores, mapa_nomes)
 
     return (dt, valores) if valores else None
+
+
+def investigar_faltantes(faltando, bloco, dt, arquivos, mapa_valores, mapa_nomes):
+    """
+    Diz POR QUE um banco não apareceu, em vez de só constatar que faltou.
+
+    A primeira versão desta dica listava qualquer instituição que
+    contivesse alguma palavra do nome do banco — como "Banco Pan" tem
+    "Banco", ela devolveu "BANCO AFINZ", "BANCO B3", "BANCO C6"...
+    inútil. Agora procura só pelos fragmentos de busca, como palavra
+    inteira, e olha TAMBÉM os outros tipos de instituição.
+
+    Existe um motivo real e comum para um banco sumir da lista de
+    conglomerados prudenciais: ele pode ser controlado por outro grupo e
+    reportar dentro do conglomerado da controladora. Nesse caso o número
+    existe, mas em outro escopo — e é isso que este diagnóstico revela.
+    """
+    def procurar(nomes_por_codigo, rotulo):
+        for ticker in faltando:
+            banco = next(b for b in BANCOS if b["ticker"] == ticker)
+            achados = []
+            for codigo, nome in nomes_por_codigo.items():
+                base, _ = nome_base(nome)
+                if any(base == f or contem_palavra(base, f) for f in banco["busca"]):
+                    valor = mapa_valores.get(codigo)
+                    achados.append(f"{nome}"
+                                   + (f" [Basileia {valor:g}]" if valor is not None
+                                      else " [sem valor de Basileia]"))
+            log(f"    {ticker} em {rotulo}: {achados[:6] or 'nenhuma correspondência'}")
+
+    log("    procurando nos conglomerados prudenciais (o que já foi lido):")
+    procurar(mapa_nomes, "prudenciais")
+
+    # os outros tipos: 1005 = Conglomerados Financeiros, 1006 = Individuais
+    outros = [a for a in arquivos
+              if "cadastro" in a.split("/")[-1]
+              and f"_{TIPO_PRUDENCIAL}." not in a.split("/")[-1]]
+    for caminho in outros:
+        cadastro = baixar_arquivo(caminho)
+        if not isinstance(cadastro, list) or not cadastro:
+            continue
+        mapa, _ = mapear_nomes(cadastro, set(mapa_valores))
+        procurar(mapa, caminho.split("/")[-1])
+
+    log("    (se o banco aparecer em outro tipo COM valor, dá pra usar esse número")
+    log("     marcando o escopo; se não aparecer em lugar nenhum, a célula fica '—')")
 
 
 def main():
