@@ -75,15 +75,23 @@ TIPO_INSTITUICAO = int(os.environ.get("BASILEIA_TIPO", "1"))
 # robô espia cada um com $top e vê qual traz o dado (ver procurar_relatorio).
 # Motivo: na primeira execução real o relatório 1 devolveu 14 mil linhas
 # SEM coluna de Basileia — chutar o número não funciona.
-# O relatório 1 vem primeiro porque a execução real de 08/09/2026 provou
-# que é ele quem traz a Basileia (formato longo, NomeColuna/Saldo). Os
-# outros só são sondados se o 1 vier VAZIO — nunca se ele falhar.
+# SÓ o relatório 1, e isso foi aprendido apanhando. Três execuções reais
+# mostraram o padrão:
+#   - relatório 1 responde: ora com dados (14 mil linhas em 202603), ora
+#     com lista VAZIA (202606, trimestre ainda não publicado);
+#   - relatórios 2 em diante respondem HTTP 500 SEMPRE, em qualquer
+#     trimestre — o Olinda devolve 500 no lugar de 404 para número de
+#     relatório que não existe.
+# Ou seja: a "sondagem" que eu tinha montado gerava 7 erros por trimestre
+# em troca de nada, e era ela que derrubava a execução antes de chegar no
+# período que tem o dado. Quem quiser sondar de novo (se o BC mudar a
+# numeração) pode passar BASILEIA_RELATORIOS="1,2,3".
 RELATORIOS_PARA_SONDAR = [int(n) for n in
-                          os.environ.get("BASILEIA_RELATORIOS", "1,2,3,4,5,6,7,8").split(",")]
+                          os.environ.get("BASILEIA_RELATORIOS", "1").split(",")]
 LINHAS_PARA_ESPIAR = 400   # amostra por relatório na sondagem
 
 TEMPO_LIMITE = 90
-ESPERAS_ENTRE_TENTATIVAS = [2, 5]       # segundos entre as tentativas
+ESPERAS_ENTRE_TENTATIVAS = [5, 20]      # segundos entre as tentativas
 # Freio: se o servidor está fora do ar, insistir em 12 relatórios x 6
 # trimestres x 3 tentativas faz o job rodar meia hora pra nada. Depois
 # desta quantidade de falhas SEGUIDAS, a execução para e avisa.
@@ -93,7 +101,7 @@ FALHAS_SEGUIDAS_PARA_DESISTIR = 10
 # em sequência ele passou a devolver 500 em TUDO, inclusive numa consulta
 # que tinha funcionado segundos antes. Uma pausa entre chamadas custa
 # alguns segundos e evita queimar a cota logo no primeiro trimestre.
-PAUSA_ENTRE_CHAMADAS = float(os.environ.get("BASILEIA_PAUSA", "1.5"))
+PAUSA_ENTRE_CHAMADAS = float(os.environ.get("BASILEIA_PAUSA", "3"))
 TRIMESTRES_PARA_TRAS = 6   # ~1,5 ano de tentativas antes de desistir
 
 # Bancos da tabela do site. 'busca' são pedaços da razão social como ela
@@ -259,10 +267,11 @@ def trimestres_recentes(quantidade):
     return saida
 
 
-# O Olinda pode não aceitar $top nesses recursos. Quando isso aparece, o
-# robô desliga a otimização pro resto da execução e passa a baixar o
-# relatório inteiro (recortando as primeiras linhas aqui mesmo).
-USAR_TOP = True
+# O Olinda NAO aceita $top nesses recursos: devolve 400. Comprovado em
+# execucao real. Fica desligado por padrao pra nao gastar uma requisicao
+# inutil por trimestre; BASILEIA_USAR_TOP=1 reativa a tentativa caso o BC
+# passe a suportar (o robo desliga sozinho de novo se levar 400).
+USAR_TOP = os.environ.get("BASILEIA_USAR_TOP", "") == "1"
 
 
 def parametros_valores(anomes, relatorio):
@@ -425,32 +434,28 @@ def procurar_relatorio(anomes):
     de confiar num número fixo: na primeira execução real o relatório 1
     devolveu 14 mil linhas e a lista de relatórios do BC veio vazia.
     """
-    vazios_seguidos = 0
     vistos = []          # (numero, chaves, linha de exemplo) — pro diagnóstico
     for indice, numero in enumerate(RELATORIOS_PARA_SONDAR):
         linhas, inteiro = espiar(anomes, numero)
         if linhas is None:
+            # FALHA não é prova de nada sobre o trimestre. Eu tinha
+            # codificado o contrário — "falhou no relatório 1, então o
+            # trimestre não existe" — e a regra descartou justamente o
+            # 202603, o único período que já tinha respondido com 14 mil
+            # linhas numa execução anterior. Agora falha só desiste DESTE
+            # relatório; o trimestre segue sendo candidato.
             log(f"  relatório {numero}: a consulta FALHOU (veja o erro acima)")
-            # O IF.data devolve 500 (não lista vazia) para trimestre que
-            # ainda não existe: 202606 falhou nos 12 relatórios enquanto
-            # 202603 respondia. Insistir nos outros relatórios do mesmo
-            # trimestre só queima cota — e foi assim que a execução real
-            # esgotou o limite antes de chegar num período publicado.
-            if indice == 0:
-                log("  (o primeiro relatório falhou — tratando como trimestre indisponível)")
-                return None
             continue
         if not linhas:
-            log(f"  relatório {numero}: sem dados")
-            vazios_seguidos += 1
-            # Trimestre ainda não publicado: os primeiros relatórios vêm
-            # todos vazios. Desiste cedo em vez de gastar 12 requisições
-            # por período pra descobrir a mesma coisa.
-            if indice + 1 == vazios_seguidos and vazios_seguidos >= 2:
-                log("  (período parece não publicado — parando a sondagem)")
+            # VAZIO, sim, é resposta conclusiva: o servidor respondeu 200 e
+            # disse que não há dado. O relatório 1 existe em todo trimestre
+            # publicado, então lista vazia nele significa trimestre ainda
+            # não divulgado — é o caso do 202606.
+            log(f"  relatório {numero}: sem dados (200 + lista vazia)")
+            if indice == 0:
+                log("  (trimestre ainda não publicado — indo para o anterior)")
                 return None
             continue
-        vazios_seguidos = 0
 
         amostra = linhas[:LINHAS_PARA_ESPIAR]
         achado = detectar_basileia(amostra)
