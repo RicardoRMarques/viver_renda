@@ -95,7 +95,10 @@ ESPERAS_ENTRE_TENTATIVAS = [5, 20]      # segundos entre as tentativas
 # Freio: se o servidor está fora do ar, insistir em 12 relatórios x 6
 # trimestres x 3 tentativas faz o job rodar meia hora pra nada. Depois
 # desta quantidade de falhas SEGUIDAS, a execução para e avisa.
-FALHAS_SEGUIDAS_PARA_DESISTIR = 10
+# 12 = três trimestres inteiros (4 variantes cada) tentados sem nenhuma
+# resposta. Passou disso, o serviço está fora do ar e insistir só queima
+# minutos de runner.
+FALHAS_SEGUIDAS_PARA_DESISTIR = 12
 
 # O Olinda limita requisições: numa execução real, depois de ~13 chamadas
 # em sequência ele passou a devolver 500 em TUDO, inclusive numa consulta
@@ -461,9 +464,13 @@ def pedir_caminho(caminho, rotulo, esperas=(0,)):
         dados = buscar_json(url, esperas=list(esperas))
     except urllib.error.HTTPError as e:
         log(f"      [{e.code}] {rotulo}")
+        falhas_seguidas += 1
+        conferir_freio()
         return None
     except Exception as e:  # noqa: BLE001
         log(f"      [erro] {rotulo}: {e}")
+        falhas_seguidas += 1
+        conferir_freio()
         return None
     falhas_seguidas = 0
     valor = dados.get("value")
