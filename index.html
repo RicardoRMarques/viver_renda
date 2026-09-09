@@ -2644,6 +2644,15 @@
     }
     .bas-legenda strong { color: var(--text); font-weight: 600; }
     .bas-legenda-faixas { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+    .bas-secao td {
+      padding: 16px 10px 6px; border-bottom: 1px solid var(--border);
+      background: transparent; cursor: default;
+    }
+    .bas-secao-titulo {
+      font-weight: 700; font-size: 0.82rem; letter-spacing: 0.02em;
+      text-transform: uppercase; color: var(--primary);
+    }
+    .bas-secao-sub { font-size: 0.72rem; color: var(--muted); margin-left: 8px; }
     .bas-referencia {
       margin: 8px 0 0; font-size: 0.75rem; color: var(--muted);
       border-left: 2px solid var(--border); padding-left: 8px; line-height: 1.45;
@@ -10094,11 +10103,14 @@
         const valores = periodoSelecionado()?.valores || {};
 
         const resultados = await Promise.all(bancos.map(async (b) => {
-          const dados = await buscarDadosBanco(b.ticker);
+          // Banco sem ação na B3 não tem cotação: pedir à HG seria uma
+          // requisição garantidamente vazia. Só a Basileia vale pra eles.
+          const dados = b.grupo === 'emissor' ? null : await buscarDadosBanco(b.ticker);
           const basileia = valores[b.ticker];
           return {
             ticker: b.ticker,
             nome: b.nome,
+            grupo: b.grupo || 'listado',
             basileia: typeof basileia === 'number' ? basileia : null,
             marketCap: dados?.marketCap ?? null,
             logo: dados?.logo ?? null,
@@ -10162,28 +10174,47 @@
         { chave: 'dy', label: 'DY', fmt: fmtPct },
       ];
 
-      function renderizarTabela() {
-        if (!linhasCache) return;
-        const linhasOrdenadas = [...linhasCache].sort((a, b) => {
+      function ordenar(linhas) {
+        return [...linhas].sort((a, b) => {
           const va = a[ordem.chave], vb = b[ordem.chave];
           if (va == null && vb == null) return 0;
-          if (va == null) return 1;
+          if (va == null) return 1;   // sem dado vai pro fim, sempre
           if (vb == null) return -1;
           if (typeof va === 'string') return ordem.asc ? va.localeCompare(vb) : vb.localeCompare(va);
           return ordem.asc ? va - vb : vb - va;
         });
+      }
+
+      function renderizarTabela() {
+        if (!linhasCache) return;
+        // Dois grupos, ordenados separadamente. Misturar seria pior: as
+        // linhas sem ação na bolsa ficariam intercaladas com colunas
+        // vazias, parecendo falha de dado em vez de escolha.
+        const listados = ordenar(linhasCache.filter(l => l.grupo !== 'emissor'));
+        const emissores = ordenar(linhasCache.filter(l => l.grupo === 'emissor'));
+        const linhasOrdenadas = listados;
 
         const thead = `<thead><tr>${COLUNAS.map(c => `
           <th data-chave="${c.chave}" class="${ordem.chave === c.chave ? 'bas-ordenado' : ''}">
             ${c.label}<span class="bas-seta">${ordem.chave === c.chave ? (ordem.asc ? '▲' : '▼') : '⇅'}</span>
           </th>`).join('')}</tr></thead>`;
 
-        const tbody = `<tbody>${linhasOrdenadas.map(l => `
+        const linhaSecao = (texto, sub) => `
+          <tr class="bas-secao"><td colspan="${COLUNAS.length}">
+            <span class="bas-secao-titulo">${texto}</span>
+            <span class="bas-secao-sub">${sub}</span>
+          </td></tr>`;
+
+        const desenharLinha = l => `
           <tr>
             <td>
               <div class="bas-banco-cel">
                 <span class="bas-banco-logo">${l.logo ? `<img src="${l.logo}" alt="" loading="lazy" onerror="this.parentElement.textContent='${l.ticker.slice(0, 2)}'">` : l.ticker.slice(0, 2)}</span>
-                <span><span class="bas-banco-nome">${l.ticker}</span><br><span class="bas-banco-sub">${l.nome}</span></span>
+                <span>${l.grupo === 'emissor'
+                    /* sem ação na bolsa não tem ticker: repetir o apelido
+                       ("SAFRA" em cima de "Banco Safra") só polui. */
+                    ? `<span class="bas-banco-nome">${l.nome}</span>`
+                    : `<span class="bas-banco-nome">${l.ticker}</span><br><span class="bas-banco-sub">${l.nome}</span>`}</span>
               </div>
             </td>
             <td>${medidorBasileia(l.basileia)}</td>
@@ -10192,7 +10223,16 @@
             <td>${fmtNum(l.pvp)}</td>
             <td>${fmtPct(l.roe)}</td>
             <td>${fmtPct(l.dy)}</td>
-          </tr>`).join('')}</tbody>`;
+          </tr>`;
+
+        const tbody = `<tbody>`
+          + (emissores.length ? linhaSecao('Com ação na B3',
+              'valor de mercado e múltiplos ao vivo') : '')
+          + linhasOrdenadas.map(desenharLinha).join('')
+          + (emissores.length ? linhaSecao('Outros emissores de renda fixa',
+              'não têm ação na bolsa — só o Índice de Basileia se aplica')
+              + emissores.map(desenharLinha).join('') : '')
+          + `</tbody>`;
 
         tabelaEl.innerHTML = thead + tbody;
 
