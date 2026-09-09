@@ -779,7 +779,10 @@ def main():
         return 0
 
     log("\nNenhum período retornou Basileia.")
-    log("Rode com --explorar: ele imprime as chaves de cada relatório sondado.")
+    log("Se TODOS falharam com HTTP 500, o problema não é de dado: rode")
+    log("  python3 coletar_basileia.py --diagnostico")
+    log("que mede o servidor em vez de procurar o dado. (--explorar só ajuda")
+    log("quando o servidor RESPONDE e o conteúdo é que não bate.)")
     return 1
 
 
