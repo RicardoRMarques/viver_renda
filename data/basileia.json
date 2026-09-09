@@ -1,21 +1,62 @@
 {
   "_leia_me": "Índice de Basileia dos bancos, usado na tabela 'Índice de Basileia dos Bancos' do site. Enquanto o robô do IF.data (Banco Central) não existe, este arquivo é atualizado à mão a cada divulgação trimestral. O site monta o seletor a partir de 'periodos': basta acrescentar um período novo no TOPO da lista que ele aparece sozinho, sem mexer no index.html.",
-  "atualizado_em": "2026-09-08",
-  "fonte": "Divulgação de resultados dos próprios bancos",
-
+  "atualizado_em": "2026-09-09",
+  "fonte": "IF.data — Banco Central do Brasil",
   "bancos": [
-    { "ticker": "BRBI11", "nome": "BR Partners" },
-    { "ticker": "BRSR6",  "nome": "Banco Banrisul" },
-    { "ticker": "ABCB4",  "nome": "Banco ABC Brasil" },
-    { "ticker": "ITUB4",  "nome": "Itaú Unibanco" },
-    { "ticker": "BBDC4",  "nome": "Bradesco" },
-    { "ticker": "BBAS3",  "nome": "Banco do Brasil" },
-    { "ticker": "SANB11", "nome": "Santander Brasil" },
-    { "ticker": "BPAN4",  "nome": "Banco Pan" },
-    { "ticker": "BPAC11", "nome": "BTG Pactual" }
+    {
+      "ticker": "BRBI11",
+      "nome": "BR Partners"
+    },
+    {
+      "ticker": "BRSR6",
+      "nome": "Banco Banrisul"
+    },
+    {
+      "ticker": "ABCB4",
+      "nome": "Banco ABC Brasil"
+    },
+    {
+      "ticker": "ITUB4",
+      "nome": "Itaú Unibanco"
+    },
+    {
+      "ticker": "BBDC4",
+      "nome": "Bradesco"
+    },
+    {
+      "ticker": "BBAS3",
+      "nome": "Banco do Brasil"
+    },
+    {
+      "ticker": "SANB11",
+      "nome": "Santander Brasil"
+    },
+    {
+      "ticker": "BPAN4",
+      "nome": "Banco Pan"
+    },
+    {
+      "ticker": "BPAC11",
+      "nome": "BTG Pactual"
+    }
   ],
-
   "periodos": [
+    {
+      "id": "2026T1",
+      "rotulo": "1T26",
+      "referencia": "Base 31/03/2026 — IF.data/Banco Central (conglomerado prudencial)",
+      "valores": {
+        "BPAN4": 0.27,
+        "BRSR6": 0.31,
+        "ABCB4": 0.16,
+        "ITUB4": 0.15,
+        "BBDC4": 0.15,
+        "SANB11": 0.15,
+        "BBAS3": 0.14,
+        "BPAC11": 0.16,
+        "BRBI11": 0.22
+      }
+    },
     {
       "id": "2026",
       "rotulo": "2026",
@@ -24,12 +65,12 @@
         "BRBI11": 20.63,
         "BRSR6": 17.35,
         "ABCB4": 16.87,
-        "ITUB4": 15.20,
-        "BBDC4": 14.90,
-        "BBAS3": 16.10,
-        "SANB11": 15.60,
-        "BPAN4": 13.80,
-        "BPAC11": 17.90
+        "ITUB4": 15.2,
+        "BBDC4": 14.9,
+        "BBAS3": 16.1,
+        "SANB11": 15.6,
+        "BPAN4": 13.8,
+        "BPAC11": 17.9
       }
     },
     {
@@ -37,15 +78,15 @@
       "rotulo": "2025",
       "referencia": "Trimestre de referência não registrado — número herdado da versão anterior do site",
       "valores": {
-        "BRBI11": 19.80,
-        "BRSR6": 16.90,
-        "ABCB4": 16.40,
-        "ITUB4": 14.80,
-        "BBDC4": 14.50,
-        "BBAS3": 15.70,
-        "SANB11": 15.10,
-        "BPAN4": 13.40,
-        "BPAC11": 17.40
+        "BRBI11": 19.8,
+        "BRSR6": 16.9,
+        "ABCB4": 16.4,
+        "ITUB4": 14.8,
+        "BBDC4": 14.5,
+        "BBAS3": 15.7,
+        "SANB11": 15.1,
+        "BPAN4": 13.4,
+        "BPAC11": 17.4
       }
     }
   ]
