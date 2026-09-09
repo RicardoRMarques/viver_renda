@@ -1,7 +1,7 @@
 {
   "_leia_me": "Índice de Basileia dos bancos, usado na tabela do site. Os bancos vêm em dois grupos: 'listado' (tem ação na B3 — o site busca também valor de mercado, P/L, P/VP, ROE e DY) e 'emissor' (não tem ação, mas emite CDB/LCI/LCA — só a coluna de Basileia é preenchida). Enquanto não houver coleta automática, este arquivo é atualizado à mão a cada divulgação trimestral. O site monta o seletor a partir de 'periodos': basta acrescentar um período novo no TOPO da lista que ele aparece sozinho, sem mexer no index.html.",
-  "atualizado_em": "2026-09-08",
-  "fonte": "Divulgação de resultados dos próprios bancos",
+  "atualizado_em": "2026-09-09",
+  "fonte": "IF.data — Banco Central do Brasil",
   "bancos": [
     {
       "ticker": "ITUB4",
@@ -155,6 +155,41 @@
     }
   ],
   "periodos": [
+    {
+      "id": "2026T1",
+      "rotulo": "1T26",
+      "referencia": "Base 31/03/2026 — IF.data/Banco Central (conglomerado prudencial)",
+      "valores": {
+        "BAZA3": 13.0,
+        "ITUB4": 14.77,
+        "BV": 15.01,
+        "ORIGINAL": 16.02,
+        "BRSR6": 17.47,
+        "BBDC4": 14.9,
+        "SAFRA": 17.35,
+        "BMEB4": 16.03,
+        "BEES3": 14.04,
+        "BMGB4": 12.1,
+        "SANB11": 15.15,
+        "SFSA4": 17.31,
+        "ABCB4": 15.83,
+        "BBAS3": 14.23,
+        "BPAC11": 15.91,
+        "PINE4": 13.22,
+        "CAIXA": 15.13,
+        "BRBI11": 22.44,
+        "INTER": 13.98,
+        "FIBRA": 11.49,
+        "DAYCOVAL": 13.55,
+        "XP": 11.93,
+        "AGIBANK": 14.68,
+        "NUBANK": 15.1,
+        "PAGBANK": 14.19,
+        "C6": 12.95,
+        "NEON": 13.93,
+        "PICPAY": 16.9
+      }
+    },
     {
       "id": "2026",
       "rotulo": "2026",
