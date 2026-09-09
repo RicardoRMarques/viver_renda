@@ -1,27 +1,23 @@
 name: Atualizar Índice de Basileia (IF.data / BCB)
 
-# DIÁRIO, não semanal — e o motivo é o servidor, não o dado.
+# Semanal já basta agora. A fonte mudou: em vez da API OData do Olinda
+# (que devolveu HTTP 500 em seis de oito execuções, porque monta a
+# resposta na hora), o robô lê os arquivos JSON estáticos da interface
+# web do IF.data. Arquivo pronto não engasga.
 #
-# O dado muda uma vez por trimestre, então uma execução bem-sucedida a
-# cada três meses basta. Só que o Olinda (a API do BC) responde de forma
-# muito intermitente: em oito execuções observadas, duas trouxeram dado e
-# seis devolveram HTTP 500 em tudo. Semanal com ~25% de sucesso arrisca
-# passar um trimestre inteiro sem atualizar; diário torna quase certo
-# pegar uma janela boa em poucos dias.
-#
-# Custa pouco: quando não há nada novo (ou o servidor está fora), o robô
-# não toca no arquivo e não gera commit. Execução malsucedida termina em
-# menos de um minuto, por causa do freio.
+# O dado sai uma vez por trimestre e leva ~3 meses pra ser publicado, então
+# segunda-feira de manhã é folga de sobra. Quando não há novidade, o robô
+# não toca no arquivo e não gera commit.
 on:
   schedule:
-    - cron: '0 12 * * *'      # todo dia, 12h UTC = 9h BR
+    - cron: '0 12 * * 1'      # segunda-feira, 12h UTC = 9h BR
   workflow_dispatch:
     inputs:
       modo:
-        description: 'normal = coleta e grava | diagnostico = testa o Olinda | descobrir-web = investiga a interface web'
+        description: 'normal = coleta e grava | descobrir-web = reinvestiga a interface web'
         type: choice
         default: normal
-        options: [normal, diagnostico, descobrir-web]
+        options: [normal, descobrir-web]
 
 permissions:
   contents: write
@@ -46,10 +42,6 @@ jobs:
       # IF.data está fora do ar pra todo mundo ou só recusando a rede do
       # GitHub Actions. Rodar o MESMO comando no seu computador e comparar
       # é o que responde essa pergunta.
-      - name: Diagnóstico do servidor
-        if: inputs.modo == 'diagnostico'
-        run: python3 coletar_basileia.py --diagnostico
-
       # Só olha e imprime: procura uma API REST por trás da interface web
       # do IF.data (www3), que é outro serviço e não sofre da instabilidade
       # do Olinda. Não grava nada.
