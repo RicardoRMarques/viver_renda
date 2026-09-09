@@ -4,49 +4,50 @@ Coleta o Índice de Basileia dos bancos no IF.data do Banco Central e
 atualiza `data/basileia.json`, que alimenta a tabela "Índice de Basileia
 dos Bancos" do site.
 
-POR QUE ISSO EXISTE
--------------------
-O Índice de Basileia não existe em API de mercado. Foi conferido o
-inventário completo de campos do /v2/finance/fundamentals da HG Brasil
-(que alimenta o resto do site): há valuation, leverage, margins,
-profitability e dividends — nenhum campo de capital regulatório, para
-nenhum ticker. É esperado: a HG é API de mercado; Basileia é dado
-prudencial de instituição financeira.
+POR QUE ESTA FONTE, E NÃO A API OFICIAL
+----------------------------------------
+A API OData do BC (olinda.bcb.gov.br) foi a primeira tentativa e não se
+sustentou: em oito execuções reais, DUAS responderam e seis devolveram
+HTTP 500 "Erro desconhecido" em tudo — a mesma consulta que trazia 14 mil
+linhas falhava minutos depois. Ela MONTA a resposta a cada chamada, e é
+isso que engasga.
 
-Antes deste robô, os números ficavam digitados à mão dentro do
-index.html. A fonte primária é pública e gratuita: o IF.data do Banco
-Central, o mesmo lugar de onde saem os números que os bancos publicam.
+A interface web do IF.data usa outro caminho: arquivos JSON estáticos,
+já prontos no servidor. Servidor de arquivo não engasga como gerador de
+consulta. O robô agora fala com ela, exatamente como o navegador fala:
 
-O QUE ELE FAZ
--------------
-  1. Descobre o trimestre mais recente publicado (anda pra trás a partir
-     do trimestre atual até achar dado).
-  2. SONDA os relatórios um a um, puxando poucas linhas de cada com $top,
-     até achar aquele que contém a Basileia. Não dá pra fixar o número:
-     na primeira execução real o relatório 1 devolveu 14 mil linhas sem
-     nenhuma coluna de Basileia.
-  3. Aceita os dois feitios em que o IF.data devolve o dado — coluna
-     própria ("largo") ou linha rotulada ("longo") — e acha o campo pelo
-     NOME/RÓTULO, não por grafia fixa, pra sobreviver a renomeação.
-  4. Casa cada instituição com o ticker da B3 pela razão social.
-  5. Insere o período novo no topo de `data/basileia.json`, preservando
-     os períodos anteriores. O site monta o seletor a partir desse
-     arquivo, então nada muda no index.html.
+    catálogo:  GET /ifdata/rest/relatorios2025a2030
+    arquivo:   GET /ifdata/rest/arquivos?nomeArquivo=<caminho>
+
+O nome do parâmetro ('nomeArquivo') e o método (GET) vieram do próprio
+JavaScript da página. Ela concatena o caminho CRU, sem codificar — a
+barra dupla de "ifdata_2025_2030//202603/..." vai literal, e aqui vai
+igual, pra não inventar diferença onde o site não faz.
+
+COMO OS ARQUIVOS SE ENCAIXAM
+-----------------------------
+    info<dt>.json       dicionário das colunas: id, nome e 'lid', que é a
+                        chave usada nos dados. É AQUI que está a palavra
+                        "Índice de Basileia" — os arquivos de dados só
+                        carregam números e ids, nenhum texto.
+    dados<dt>_N.json    {"id": N, "values": [{"e": <cod instituição>,
+                                              "v": [{"i": <lid>, "v": <valor>}]}]}
+    cadastro<dt>_<tipo>.json   lista de instituições com campos c0..c25;
+                        c0 é o código que aparece como "e" nos dados e c2
+                        é o nome curto ("BRADESCO", "ITAU").
+    sel<dt>.json        tipos de instituição:
+                          1009 = Conglomerados Prudenciais  <- o nosso
+                          1005 = Conglomerados Financeiros
+                          1006 = Instituições Individuais
+
+O número que os bancos divulgam no release é o do conglomerado
+PRUDENCIAL, por isso 1009.
 
 COMO USAR
 ---------
-    python3 coletar_basileia.py --explorar     # só investiga a API e mostra o que achou
-    python3 coletar_basileia.py --dry-run      # faz tudo, mostra o resultado, NÃO grava
-    python3 coletar_basileia.py                # grava data/basileia.json
-    python3 coletar_basileia.py --anomes 202606   # força um trimestre específico
-
-Sem chave de API: o IF.data é aberto.
-
-SE ALGO NÃO BATER
------------------
-Rode com --explorar: ele imprime as chaves de CADA relatório sondado, e
-o diagnóstico com linhas de amostra. É isso que permite acertar um
-fragmento de razão social ou um campo novo sem adivinhação.
+    python3 coletar_basileia.py              # grava data/basileia.json
+    python3 coletar_basileia.py --dry-run    # faz tudo e mostra, sem gravar
+    python3 coletar_basileia.py --anomes 202603   # força uma data-base
 """
 
 import json
@@ -60,539 +61,93 @@ import urllib.parse
 import urllib.request
 from datetime import date
 
-BASE = os.environ.get("BASILEIA_BASE", "https://olinda.bcb.gov.br/olinda/servico/IFDATA/versao/v1/odata")
+BASE = os.environ.get("IFDATA_BASE", "https://www3.bcb.gov.br/ifdata/")
+CATALOGO_URL = BASE + "rest/relatorios2025a2030"
+ARQUIVO_URL = BASE + "rest/arquivos?nomeArquivo="
 ARQUIVO = os.environ.get("ARQUIVO_BASILEIA", "data/basileia.json")
 
-# TipoInstituicao no IF.data:
-#   1 = Conglomerados Prudenciais e Instituições Independentes  <- o que os bancos divulgam
-#   2 = Conglomerados Financeiros e Instituições Independentes
-#   3 = Instituições Individuais
-# O número que aparece no release de resultados é o do conglomerado
-# PRUDENCIAL, por isso o padrão é 1.
-TIPO_INSTITUICAO = int(os.environ.get("BASILEIA_TIPO", "1"))
+TIPO_PRUDENCIAL = int(os.environ.get("BASILEIA_TIPO", "1009"))
+ROTULO_BASILEIA = os.environ.get("BASILEIA_ROTULO", "Índice de Basileia")
 
-# Relatórios sondados em busca da Basileia. Em vez de fixar um número, o
-# robô espia cada um com $top e vê qual traz o dado (ver procurar_relatorio).
-# Motivo: na primeira execução real o relatório 1 devolveu 14 mil linhas
-# SEM coluna de Basileia — chutar o número não funciona.
-# SÓ o relatório 1, e isso foi aprendido apanhando. Três execuções reais
-# mostraram o padrão:
-#   - relatório 1 responde: ora com dados (14 mil linhas em 202603), ora
-#     com lista VAZIA (202606, trimestre ainda não publicado);
-#   - relatórios 2 em diante respondem HTTP 500 SEMPRE, em qualquer
-#     trimestre — o Olinda devolve 500 no lugar de 404 para número de
-#     relatório que não existe.
-# Ou seja: a "sondagem" que eu tinha montado gerava 7 erros por trimestre
-# em troca de nada, e era ela que derrubava a execução antes de chegar no
-# período que tem o dado. Quem quiser sondar de novo (se o BC mudar a
-# numeração) pode passar BASILEIA_RELATORIOS="1,2,3".
-RELATORIOS_PARA_SONDAR = [int(n) for n in
-                          os.environ.get("BASILEIA_RELATORIOS", "1").split(",")]
-LINHAS_PARA_ESPIAR = 400   # amostra por relatório na sondagem
+TEMPO_LIMITE = 120          # dados<dt>_1.json tem 16 MB
+ESPERAS_ENTRE_TENTATIVAS = [3, 10]
+PAUSA_ENTRE_CHAMADAS = float(os.environ.get("BASILEIA_PAUSA", "1"))
+DATAS_PARA_TRAS = 4         # quantas data-bases tentar antes de desistir
 
-TEMPO_LIMITE = 90
-ESPERAS_ENTRE_TENTATIVAS = [5, 20]      # segundos entre as tentativas
-# Freio: se o servidor está fora do ar, insistir em 12 relatórios x 6
-# trimestres x 3 tentativas faz o job rodar meia hora pra nada. Depois
-# desta quantidade de falhas SEGUIDAS, a execução para e avisa.
-# 12 = três trimestres inteiros (4 variantes cada) tentados sem nenhuma
-# resposta. Passou disso, o serviço está fora do ar e insistir só queima
-# minutos de runner.
-FALHAS_SEGUIDAS_PARA_DESISTIR = 12
+CABECALHOS = {
+    "User-Agent": ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                   "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"),
+    "Accept": "application/json, text/plain, */*",
+    "Referer": BASE,
+    "X-Requested-With": "XMLHttpRequest",
+}
 
-# O Olinda limita requisições: numa execução real, depois de ~13 chamadas
-# em sequência ele passou a devolver 500 em TUDO, inclusive numa consulta
-# que tinha funcionado segundos antes. Uma pausa entre chamadas custa
-# alguns segundos e evita queimar a cota logo no primeiro trimestre.
-PAUSA_ENTRE_CHAMADAS = float(os.environ.get("BASILEIA_PAUSA", "3"))
-TRIMESTRES_PARA_TRAS = 6   # ~1,5 ano de tentativas antes de desistir
-
-# Bancos da tabela do site. 'busca' são pedaços da razão social como ela
-# aparece no IF.data (já normalizada: sem acento, maiúscula). Vários
-# fragmentos por banco porque o BC muda a grafia de tempos em tempos.
+# Bancos da tabela do site. 'busca' são pedaços do nome como ele aparece
+# no cadastro do IF.data — que usa nome CURTO ("BRADESCO", "ITAU"), não a
+# razão social completa.
 BANCOS = [
-    {"ticker": "ITUB4",  "nome": "Itaú Unibanco",     "busca": ["ITAU UNIBANCO", "ITAU"]},
-    {"ticker": "BBDC4",  "nome": "Bradesco",          "busca": ["BRADESCO"]},
-    {"ticker": "BBAS3",  "nome": "Banco do Brasil",   "busca": ["BANCO DO BRASIL", "BB "]},
-    {"ticker": "SANB11", "nome": "Santander Brasil",  "busca": ["SANTANDER"]},
-    {"ticker": "BPAC11", "nome": "BTG Pactual",       "busca": ["BTG PACTUAL", "BTG"]},
-    {"ticker": "BRSR6",  "nome": "Banco Banrisul",    "busca": ["BANRISUL", "ESTADO DO RIO GRANDE DO SUL"]},
-    {"ticker": "ABCB4",  "nome": "Banco ABC Brasil",  "busca": ["ABC BRASIL", "ABC-BRASIL"]},
-    {"ticker": "BPAN4",  "nome": "Banco Pan",         "busca": ["BANCO PAN", "PAN "]},
-    {"ticker": "BRBI11", "nome": "BR Partners",       "busca": ["BR PARTNERS", "BRPARTNERS"]},
+    {"ticker": "ITUB4",  "nome": "Itaú Unibanco",    "busca": ["ITAU UNIBANCO", "ITAU"]},
+    {"ticker": "BBDC4",  "nome": "Bradesco",         "busca": ["BRADESCO"]},
+    {"ticker": "BBAS3",  "nome": "Banco do Brasil",  "busca": ["BANCO DO BRASIL", "BB"]},
+    {"ticker": "SANB11", "nome": "Santander Brasil", "busca": ["SANTANDER"]},
+    {"ticker": "BPAC11", "nome": "BTG Pactual",      "busca": ["BTG PACTUAL", "BTG"]},
+    {"ticker": "BRSR6",  "nome": "Banco Banrisul",   "busca": ["BANRISUL", "ESTADO DO RIO GRANDE DO SUL"]},
+    {"ticker": "ABCB4",  "nome": "Banco ABC Brasil", "busca": ["ABC BRASIL", "ABC-BRASIL", "ABC"]},
+    {"ticker": "BPAN4",  "nome": "Banco Pan",        "busca": ["BANCO PAN", "PAN"]},
+    {"ticker": "BRBI11", "nome": "BR Partners",      "busca": ["BR PARTNERS", "BRPARTNERS"]},
 ]
 
-EXPLORAR = "--explorar" in sys.argv
-DIAGNOSTICO = "--diagnostico" in sys.argv
+# Empresas do mesmo grupo que NÃO são o banco. O índice de uma corretora
+# não diz nada sobre a solidez do banco e costuma ser bem mais alto —
+# publicar um no lugar do outro passaria despercebido.
+TERMOS_NAO_BANCO = (
+    "CORRETORA", "DISTRIBUIDORA", "CCTVM", "DTVM", "CVMC",
+    "SEGURO", "SEGURADORA", "CAPITALIZACAO", "PREVIDENCIA",
+    "LEASING", "ARRENDAMENTO", "CONSORCIO", "ADMINISTRADORA",
+    "CARTOES", "FACTORING", "IMOBILIARIA", "ASSET", "GESTORA",
+)
+
 DRY_RUN = "--dry-run" in sys.argv
 
 
-def log(msg):
-    print(msg, flush=True)
+def log(m):
+    print(m, flush=True)
 
 
 def normalizar(texto):
-    """Sem acento, maiúscula, espaços colapsados — pra casar razão social."""
     t = unicodedata.normalize("NFKD", str(texto or ""))
     t = "".join(c for c in t if not unicodedata.combining(c))
     return re.sub(r"\s+", " ", t).upper().strip()
 
 
-def buscar_json(url, esperas=None):
-    """
-    O Olinda devolve HTTP 500 "Erro desconhecido" de forma intermitente —
-    a MESMA consulta falha e, segundos depois, responde. Sem repetição o
-    robô desistia de um trimestre que existe. Espera crescente entre as
-    tentativas pra não insistir em cima de um servidor que está sofrendo.
-    """
-    req = urllib.request.Request(url, headers={
-        "Accept": "application/json",
-        "User-Agent": "viverderenda-basileia/1.0 (+https://viverderenda.dev.br)",
-    })
-    esperas = ESPERAS_ENTRE_TENTATIVAS if esperas is None else esperas
-    ultimo_erro = None
-    for tentativa, espera in enumerate(esperas, start=1):
+def buscar(url, rotulo):
+    """(dados, tamanho) — None quando falha. Erro vira log, não exceção."""
+    if PAUSA_ENTRE_CHAMADAS:
+        time.sleep(PAUSA_ENTRE_CHAMADAS)
+    req = urllib.request.Request(url, headers=CABECALHOS)
+    for tentativa, espera in enumerate(ESPERAS_ENTRE_TENTATIVAS, start=1):
         try:
-            with urllib.request.urlopen(req, timeout=TEMPO_LIMITE) as resp:
-                return json.loads(resp.read().decode("utf-8"))
+            with urllib.request.urlopen(req, timeout=TEMPO_LIMITE) as r:
+                bruto = r.read().decode("utf-8", "replace")
+            return json.loads(bruto), len(bruto)
         except urllib.error.HTTPError as e:
-            ultimo_erro = e
-            if e.code < 500 or tentativa == len(esperas):
-                raise            # 4xx é erro nosso: repetir não adianta
+            log(f"    [{e.code}] {rotulo}")
+            if e.code < 500 or tentativa == len(ESPERAS_ENTRE_TENTATIVAS):
+                return None, 0
         except Exception as e:  # noqa: BLE001
-            ultimo_erro = e
-            if tentativa == len(esperas):
-                raise
+            log(f"    [erro] {rotulo}: {e}")
+            if tentativa == len(ESPERAS_ENTRE_TENTATIVAS):
+                return None, 0
         time.sleep(espera)
-    if ultimo_erro:
-        raise ultimo_erro
+    return None, 0
 
 
-def montar_url(recurso, parametros=None, top=None):
-    """
-    Monta a URL no formato de function import do OData, que é como o
-    Olinda expõe os recursos do IF.data:
-
-      .../IfDataValores(AnoMes=@AnoMes,...)?@AnoMes=202606&$format=json
-    """
-    query = {"$format": "json"}
-    if parametros:
-        assinatura = ",".join(f"{k}=@{k}" for k in parametros)
-        recurso = f"{recurso}({assinatura})"
-        for chave, valor in parametros.items():
-            # texto vai entre aspas simples no OData; número vai cru
-            query[f"@{chave}"] = f"'{valor}'" if isinstance(valor, str) else str(valor)
-    if top:
-        query["$top"] = str(top)
-    return f"{BASE}/{recurso}?" + urllib.parse.urlencode(query, safe="'@$")
-
-
-class ServidorInstavel(Exception):
-    """O IF.data está fora do ar agora — não adianta continuar."""
-
-
-falhas_seguidas = 0
-
-
-def conferir_freio():
-    """
-    Só conta falha de consulta de verdade. A sonda do $top é silenciosa e
-    fica de fora: o servidor rejeitá-la é resposta esperada, e contá-la
-    disparava o freio num servidor saudável que apenas não aceita $top.
-    """
-    if falhas_seguidas >= FALHAS_SEGUIDAS_PARA_DESISTIR:
-        raise ServidorInstavel(
-            f"{falhas_seguidas} consultas seguidas falharam — o IF.data parece "
-            "fora do ar. Nada foi gravado; a proxima execucao tenta de novo.")
-
-
-def pedir(recurso, parametros=None, top=None, silencioso=False):
-    """
-    Devolve a lista de 'value'. A distinção abaixo importa:
-
-        None  -> a CHAMADA falhou (HTTP, rede, JSON inválido)
-        []    -> a chamada deu certo e não veio nada
-
-    Misturar os dois foi o que escondeu um erro real: o $top derrubava a
-    consulta, o erro era engolido e o robô concluía "trimestre ainda não
-    publicado" para todos os períodos.
-    """
-    global falhas_seguidas
-    url = montar_url(recurso, parametros, top)
-    if PAUSA_ENTRE_CHAMADAS:
-        time.sleep(PAUSA_ENTRE_CHAMADAS)
-    try:
-        dados = buscar_json(url)
-    except urllib.error.HTTPError as e:
-        corpo = ""
-        try:
-            corpo = e.read().decode("utf-8", "replace")[:300]
-        except Exception:  # noqa: BLE001
-            pass
-        if not silencioso:
-            log(f"  HTTP {e.code} em {recurso}")
-            log(f"    URL: {url}")
-            if corpo:
-                log(f"    resposta: {corpo}")
-        if not silencioso:
-            falhas_seguidas += 1
-            conferir_freio()
-        return None
-    except Exception as e:  # noqa: BLE001
-        if not silencioso:
-            log(f"  falhou {recurso}: {e}")
-            log(f"    URL: {url}")
-        if not silencioso:
-            falhas_seguidas += 1
-            conferir_freio()
-        return None
-    falhas_seguidas = 0
-    valor = dados.get("value")
-    return valor if isinstance(valor, list) else None
-
-
-# ----------------------------------------------------------------------
-# Descoberta
-# ----------------------------------------------------------------------
-
-def trimestres_recentes(quantidade):
-    """Fins de trimestre (AAAAMM) do mais recente pro mais antigo."""
-    hoje = date.today()
-    mes = ((hoje.month - 1) // 3) * 3    # 0, 3, 6 ou 9 = último fim de trimestre já completo
-    ano = hoje.year
-    if mes == 0:                          # jan/fev/mar -> o trimestre fechado é dez do ano passado
-        mes, ano = 12, ano - 1
-    saida = []
-    for _ in range(quantidade):
-        saida.append(ano * 100 + mes)
-        mes -= 3
-        if mes <= 0:
-            mes += 12
-            ano -= 1
-    return saida
-
-
-# O Olinda NAO aceita $top nesses recursos: devolve 400. Comprovado em
-# execucao real. Fica desligado por padrao pra nao gastar uma requisicao
-# inutil por trimestre; BASILEIA_USAR_TOP=1 reativa a tentativa caso o BC
-# passe a suportar (o robo desliga sozinho de novo se levar 400).
-USAR_TOP = os.environ.get("BASILEIA_USAR_TOP", "") == "1"
-
-
-def parametros_valores(anomes, relatorio):
-    return {"AnoMes": anomes, "TipoInstituicao": TIPO_INSTITUICAO, "Relatorio": str(relatorio)}
-
-
-# Rótulo do indicador dentro do relatório, confirmado em execução real.
-# Usado pra pedir ao servidor SÓ as linhas que interessam.
-ROTULO_BASILEIA = os.environ.get("BASILEIA_ROTULO", "Índice de Basileia")
-
-
-def variantes_valores(anomes, relatorio):
-    """
-    Formas de pedir o mesmo relatório, da mais enxuta para a mais pesada.
-
-    POR QUE ISSO EXISTE: numa execução de 09/09/2026 o trimestre 202606
-    respondeu 200 com lista vazia enquanto o 202603 — o mesmo endpoint,
-    mesmos parâmetros — deu 500. A diferença entre os dois não é o
-    servidor estar fora do ar: é o TAMANHO da resposta. 202606 não tem
-    dado; 202603 tem 14.030 linhas com uma coluna de fórmula longa
-    (DescricaoColuna). O gateway do Olinda parece engasgar ao montar
-    respostas grandes, de forma intermitente.
-
-    Então, em vez de insistir na resposta gigante, o robô pede primeiro a
-    versão pequena: só as linhas do índice (≈1/10 das linhas) e só as
-    três colunas que ele usa. Se o servidor não aceitar essas opções de
-    consulta, cai para a íntegra, que é o que vinha fazendo.
-    """
-    base = (f"IfDataValores(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao,Relatorio=@Relatorio)"
-            f"?$format=json&@AnoMes={anomes}&@TipoInstituicao={TIPO_INSTITUICAO}"
-            f"&@Relatorio='{relatorio}'")
-    filtro = urllib.parse.quote(f"NomeColuna eq '{ROTULO_BASILEIA}'", safe="")
-    colunas = urllib.parse.quote("CodInst,NomeColuna,Saldo", safe=",")
-    # O terceiro item diz se a variante é FILTRADA. Isso muda como ler uma
-    # resposta vazia: sem filtro, vazio é conclusivo (trimestre não
-    # publicado); com filtro, vazio pode ser só o rótulo não batendo, e aí
-    # é preciso tentar a variante seguinte antes de concluir qualquer coisa.
-    return [
-        (f"{base}&$filter={filtro}&$select={colunas}",
-         "só as linhas do índice, só as colunas usadas", True),
-        (f"{base}&$filter={filtro}", "só as linhas do índice", True),
-        (f"{base}&$select={colunas}", "todas as linhas, só as colunas usadas", False),
-        (base, "relatório inteiro (o mais pesado)", False),
-    ]
-
-
-def espiar(anomes, relatorio, quantas=LINHAS_PARA_ESPIAR):
-    """
-    Traz as linhas do relatório, da forma mais leve que o servidor aceitar.
-
-    Devolve (linhas, veio_inteiro). O segundo item importa: quando o
-    relatório já veio completo aqui, não faz sentido baixá-lo de novo
-    depois — era exatamente aí que o 500 intermitente derrubava a
-    execução DEPOIS de já ter encontrado o dado.
-    """
-    vazio_confirmado = False
-    for caminho, rotulo, filtrada in variantes_valores(anomes, relatorio):
-        # uma repetição curta: o 500 do Olinda é intermitente
-        linhas = pedir_caminho(caminho, rotulo, esperas=(4, 0))
-        if linhas:
-            return linhas, True
-        if linhas is not None and not filtrada:
-            # 200 com lista vazia numa consulta SEM filtro: o servidor
-            # respondeu e disse que não há dado nesse trimestre. Aí sim é
-            # conclusivo, e não adianta pedir a variante mais pesada.
-            vazio_confirmado = True
-            break
-        if linhas is not None:
-            log(f"      (vazio com filtro — pode ser o rótulo; tentando sem filtrar)")
-    return ([], True) if vazio_confirmado else (None, False)
-
-
-def campos_numericos(linha):
-    return [k for k, v in linha.items() if converter_numero(v) is not None]
-
-
-def detectar_basileia(linhas):
-    """
-    Descobre ONDE está o Índice de Basileia. O IF.data pode devolver em
-    dois feitios, e o robô aceita os dois:
-
-      LARGO  — uma linha por instituição, uma COLUNA chamada algo como
-               'indiceDeBasileia'.
-      LONGO  — uma linha por instituição × indicador, com uma coluna de
-               rótulo (cujo VALOR é "Índice de Basileia") e outra com o
-               número. É o feitio que explica um relatório com 14 mil
-               linhas para pouco mais de mil instituições.
-
-    Devolve um dicionário descrevendo o achado, ou None.
-    """
-    if not linhas:
-        return None
-
-    # --- LARGO: o nome da coluna entrega ---
-    candidatas = [k for k in linhas[0] if "BASILEIA" in normalizar(k)]
-    if candidatas:
-        # a mais curta é o índice em si; as maiores são variações
-        # ('...Ampliado', '...Nivel1'), que não é o que a tabela mostra.
-        candidatas.sort(key=lambda k: (len(normalizar(k)), normalizar(k)))
-        return {"formato": "largo", "campo_valor": candidatas[0]}
-
-    # --- LONGO: o VALOR de alguma coluna é que diz "Basileia" ---
-    for chave in linhas[0]:
-        rotulos_vistos = set()
-        for linha in linhas:
-            valor = linha.get(chave)
-            if isinstance(valor, str) and "BASILEIA" in normalizar(valor):
-                rotulos_vistos.add(valor)
-        if rotulos_vistos:
-            # mesmo critério: o rótulo mais curto é o índice puro
-            alvo = sorted(rotulos_vistos, key=lambda r: (len(r), r))[0]
-            exemplo = next(l for l in linhas
-                           if isinstance(l.get(chave), str) and normalizar(l[chave]) == normalizar(alvo))
-            numericos = [k for k in campos_numericos(exemplo)
-                         if not any(t in normalizar(k) for t in ("CODIGO", "COD", "ANO", "TIPO", "CNPJ", "ORDEM"))]
-            if not numericos:
-                continue
-            numericos.sort(key=lambda k: (0 if "VALOR" in normalizar(k) or "SALDO" in normalizar(k) else 1, len(k)))
-            return {"formato": "longo", "campo_rotulo": chave,
-                    "rotulo": alvo, "outros_rotulos": sorted(rotulos_vistos),
-                    "campo_valor": numericos[0]}
-    return None
-
-
-def achar_campo_nome(linhas):
-    """
-    A coluna da razão social. Precisa excluir explicitamente 'TipoInstituicao'
-    e afins: a primeira versão casava com ela por conter 'Instituicao', e o
-    robô saía procurando banco dentro de um campo que só diz o tipo.
-    """
-    if not linhas:
-        return None
-    # 'TIPO' porque TipoInstituicao contém "Instituicao" e casava por engano.
-    # 'COLUNA'/'RELATORIO'/'GRUPO' porque no formato longo existe uma
-    # NomeColuna, que é o rótulo do indicador ("Índice de Basileia") e não
-    # a razão social — foi o que o robô pegou na execução anterior.
-    proibidos = ("TIPO", "COD", "CNPJ", "ANO", "MES", "SEGMENTO", "UF", "CIDADE",
-                 "ORDEM", "COLUNA", "RELATORIO", "GRUPO", "SALDO", "MOEDA", "DOCUMENTO")
-    candidatas = []
-    for chave in linhas[0]:
-        n = normalizar(chave)
-        if any(t in n for t in proibidos):
-            continue
-        if not isinstance(linhas[0].get(chave), str):
-            continue
-        if "INSTITUICAO" in n or "CONGLOMERADO" in n:
-            peso = 0
-        elif n.startswith("NOME") or n == "RAZAOSOCIAL":
-            peso = 1
-        else:
-            continue
-        candidatas.append((peso, len(n), chave))
-    candidatas.sort()
-    return candidatas[0][2] if candidatas else None
-
-
-def achar_campo_codigo(linhas):
-    """A chave do código da instituição (pra juntar com o cadastro)."""
-    if not linhas:
-        return None
-    for preferido in ("CODINST", "CODIGOINSTITUICAO", "CODCONGLOMERADO", "CODIGO"):
-        for chave in linhas[0]:
-            if normalizar(chave) == preferido:
-                return chave
-    for chave in linhas[0]:
-        if normalizar(chave).startswith("COD"):
-            return chave
-    return None
-
-
-def pedir_caminho(caminho, rotulo, esperas=(0,)):
-    """
-    Faz uma consulta a partir do caminho já montado (para recursos cuja
-    assinatura não segue o padrão de function import).
-    """
-    global falhas_seguidas
-    url = f"{BASE}/{caminho}"
-    if PAUSA_ENTRE_CHAMADAS:
-        time.sleep(PAUSA_ENTRE_CHAMADAS)
-    try:
-        # Por padrão UMA tentativa: numa sonda de assinatura, 500 quase
-        # sempre quer dizer "não é essa a forma", não instabilidade, e
-        # repetir gastava 25s por variação. Quem sabe que vale repetir
-        # (a busca dos valores) passa 'esperas'.
-        dados = buscar_json(url, esperas=list(esperas))
-    except urllib.error.HTTPError as e:
-        log(f"      [{e.code}] {rotulo}")
-        falhas_seguidas += 1
-        conferir_freio()
-        return None
-    except Exception as e:  # noqa: BLE001
-        log(f"      [erro] {rotulo}: {e}")
-        falhas_seguidas += 1
-        conferir_freio()
-        return None
-    falhas_seguidas = 0
-    valor = dados.get("value")
-    if not isinstance(valor, list):
-        log(f"      [sem 'value'] {rotulo}")
-        return None
-    log(f"      [200] {rotulo} -> {len(valor)} linhas")
-    return valor
-
-
-def carregar_cadastro(anomes):
-    """
-    IfDataCadastro traz a razão social de cada instituição — indispensável,
-    porque o relatório de valores identifica a instituição só por CodInst.
-
-    Tenta várias assinaturas porque a documentação do BC mostra este
-    recurso SEM os parênteses de function import
-    ("IfDataCadastro?$format=json&[Outros Parâmetros]"), diferente do
-    IfDataValores. Em vez de eu escolher uma e torcer, o robô tenta todas
-    e usa a primeira que responder — e agora IMPRIME o resultado de cada
-    tentativa. A versão anterior tentava em silêncio: quando falhou, o log
-    dizia só "não respondeu", sem dizer por quê, e custou uma execução.
-    """
-    a = str(anomes)
-    tentativas = [
-        (f"IfDataCadastro(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao)"
-         f"?$format=json&@AnoMes={a}&@TipoInstituicao={TIPO_INSTITUICAO}",
-         "function import, AnoMes numérico"),
-        (f"IfDataCadastro(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao)"
-         f"?$format=json&@AnoMes='{a}'&@TipoInstituicao={TIPO_INSTITUICAO}",
-         "function import, AnoMes entre aspas"),
-        (f"IfDataCadastro(AnoMes=@AnoMes)?$format=json&@AnoMes={a}",
-         "function import, só AnoMes"),
-        (f"IfDataCadastro?$format=json&$filter=AnoMes%20eq%20{a}"
-         f"%20and%20TipoInstituicao%20eq%20{TIPO_INSTITUICAO}",
-         "entity set + $filter numérico"),
-        (f"IfDataCadastro?$format=json&$filter=AnoMes%20eq%20'{a}'",
-         "entity set + $filter com aspas"),
-        ("IfDataCadastro?$format=json", "entity set sem filtro"),
-    ]
-    log("    procurando o cadastro das instituições:")
-    for caminho, rotulo in tentativas:
-        linhas = pedir_caminho(caminho, rotulo)
-        if linhas:
-            return linhas
-    log("    nenhuma assinatura do IfDataCadastro respondeu.")
-    return None
-
-
-def diagnosticar(linhas, quantas=3):
-    """O que eu preciso ver quando algo não bate. Vai pro log do Actions."""
-    log("  --- DIAGNÓSTICO (mande isto se pedir ajuda) ---")
-    log(f"  chaves: {json.dumps(list(linhas[0].keys()), ensure_ascii=False)}")
-    for linha in linhas[:quantas]:
-        log(f"  linha: {json.dumps(linha, ensure_ascii=False)[:700]}")
-    log("  --- fim do diagnóstico ---")
-
-
-def procurar_relatorio(anomes):
-    """
-    Sonda os relatórios um por um até achar o que traz a Basileia. Em vez
-    de confiar num número fixo: na primeira execução real o relatório 1
-    devolveu 14 mil linhas e a lista de relatórios do BC veio vazia.
-    """
-    vistos = []          # (numero, chaves, linha de exemplo) — pro diagnóstico
-    for indice, numero in enumerate(RELATORIOS_PARA_SONDAR):
-        linhas, inteiro = espiar(anomes, numero)
-        if linhas is None:
-            # FALHA não é prova de nada sobre o trimestre. Eu tinha
-            # codificado o contrário — "falhou no relatório 1, então o
-            # trimestre não existe" — e a regra descartou justamente o
-            # 202603, o único período que já tinha respondido com 14 mil
-            # linhas numa execução anterior. Agora falha só desiste DESTE
-            # relatório; o trimestre segue sendo candidato.
-            log(f"  relatório {numero}: a consulta FALHOU (veja o erro acima)")
-            continue
-        if not linhas:
-            # VAZIO, sim, é resposta conclusiva: o servidor respondeu 200 e
-            # disse que não há dado. O relatório 1 existe em todo trimestre
-            # publicado, então lista vazia nele significa trimestre ainda
-            # não divulgado — é o caso do 202606.
-            log(f"  relatório {numero}: sem dados (200 + lista vazia)")
-            if indice == 0:
-                log("  (trimestre ainda não publicado — indo para o anterior)")
-                return None
-            continue
-
-        amostra = linhas[:LINHAS_PARA_ESPIAR]
-        achado = detectar_basileia(amostra)
-        campo_nome = achar_campo_nome(amostra)
-        marca = "<-- TEM BASILEIA" if achado else ""
-        log(f"  relatório {numero}: {len(linhas)} linhas, nome={campo_nome or 'nenhum'} {marca}")
-        # As chaves saem SEMPRE, não só no --explorar: numa rotina agendada,
-        # pedir pra rerodar custa um dia.
-        log(f"    chaves: {json.dumps(list(amostra[0].keys()), ensure_ascii=False)}")
-
-        vistos.append((numero, list(amostra[0].keys()), amostra[0]))
-        if achado:
-            achado["relatorio"] = numero
-            achado["campo_nome"] = campo_nome
-            achado["campo_codigo"] = achar_campo_codigo(amostra)
-            achado["amostra"] = amostra
-            achado["completo"] = linhas if inteiro else None
-            return achado
-
-    # Nada encontrado: imprime o que veio de cada relatório SEM precisar
-    # rerodar com --explorar.
-    if vistos:
-        log("\n  --- DIAGNÓSTICO: relatórios que responderam ---")
-        for numero, chaves, exemplo in vistos:
-            log(f"  relatório {numero}: {json.dumps(chaves, ensure_ascii=False)}")
-            log(f"    exemplo: {json.dumps(exemplo, ensure_ascii=False)[:500]}")
-        log("  --- fim do diagnóstico ---")
-    return None
-
-
-def casar_banco(nome_normalizado):
-    for banco in BANCOS:
-        for fragmento in banco["busca"]:
-            if fragmento in nome_normalizado:
-                return banco
-    return None
+def baixar_arquivo(caminho):
+    nome = caminho.split("/")[-1]
+    dados, tamanho = buscar(ARQUIVO_URL + caminho, nome)
+    if dados is not None:
+        log(f"    {nome}: {tamanho:,} bytes".replace(",", "."))
+    return dados
 
 
 def converter_numero(valor):
@@ -604,7 +159,6 @@ def converter_numero(valor):
         limpo = valor.strip()
         if not limpo:
             return None
-        # "15,31" e "1.234,56" vêm assim do BC; "15.31" também aparece
         if "," in limpo:
             limpo = limpo.replace(".", "").replace(",", ".")
         try:
@@ -614,53 +168,109 @@ def converter_numero(valor):
     return None
 
 
-def resolver_nomes(anomes, achado):
+# ----------------------------------------------------------------------
+# Descoberta dentro dos arquivos
+# ----------------------------------------------------------------------
+
+def achar_coluna_basileia(info):
     """
-    Define COMO descobrir a razão social de cada linha do relatório.
+    Acha, no dicionário de colunas, a entrada do Índice de Basileia.
 
-    No formato longo o relatório costuma identificar a instituição só pelo
-    código; a razão social mora no IfDataCadastro. Devolve uma função que
-    recebe a linha e devolve o nome (ou None).
+    Procura pelo NOME, não por id fixo: os ids são internos do BC e podem
+    mudar entre trimestres. Se houver mais de uma coluna com "Basileia"
+    (existe também "Basileia Ampliado" e variações de Nível I), fica com o
+    nome mais curto, que é o índice puro.
     """
-    campo_nome = achado.get("campo_nome")
-    if campo_nome:
-        log(f"    nomes: direto da coluna {campo_nome}")
-        return lambda linha: linha.get(campo_nome)
-
-    campo_codigo = achado.get("campo_codigo")
-    if not campo_codigo:
-        log("    nomes: SEM coluna de nome e SEM coluna de código — impossível identificar")
+    if not isinstance(info, list):
         return None
-
-    cadastro = carregar_cadastro(anomes)
-    if not cadastro:
-        log("    nomes: IfDataCadastro não respondeu — impossível identificar")
+    alvo = normalizar(ROTULO_BASILEIA)
+    candidatas = []
+    for entrada in info:
+        if not isinstance(entrada, dict):
+            continue
+        for campo in ("n", "d"):
+            nome = entrada.get(campo)
+            if isinstance(nome, str) and "BASILEIA" in normalizar(nome):
+                exato = 0 if normalizar(nome) == alvo else 1
+                candidatas.append((exato, len(nome), nome, entrada))
+                break
+    if not candidatas:
         return None
-
-    cad_codigo = achar_campo_codigo(cadastro)
-    cad_nome = achar_campo_nome(cadastro)
-    log(f"    cadastro: {len(cadastro)} instituições "
-        f"(código={cad_codigo}, nome={cad_nome})")
-    log(f"    chaves do cadastro: {json.dumps(list(cadastro[0].keys()), ensure_ascii=False)}")
-    if not cad_codigo or not cad_nome:
-        return None
-
-    mapa = {str(linha.get(cad_codigo)): linha.get(cad_nome) for linha in cadastro}
-    log(f"    nomes: juntando {campo_codigo} (valores) com {cad_codigo} (cadastro)")
-    return lambda linha: mapa.get(str(linha.get(campo_codigo)))
+    candidatas.sort(key=lambda c: (c[0], c[1]))
+    log(f"    colunas com 'Basileia' encontradas: {[c[2] for c in candidatas][:6]}")
+    escolhida = candidatas[0][3]
+    log(f"    usando: {candidatas[0][2]!r}  (lid={escolhida.get('lid')}, "
+        f"id={escolhida.get('id')}, td={escolhida.get('td')})")
+    return escolhida
 
 
-# Empresas do mesmo grupo que NÃO são o banco. O índice de uma corretora
-# ou seguradora não diz nada sobre a solidez do banco — e costuma ser bem
-# mais alto, porque a base de risco é outra. Publicar um no lugar do
-# outro seria pior do que não publicar.
-TERMOS_NAO_BANCO = (
-    "CORRETORA", "DISTRIBUIDORA", "CCTVM", "DTVM", "CVMC",
-    "SEGURO", "SEGURADORA", "CAPITALIZACAO", "PREVIDENCIA",
-    "LEASING", "ARRENDAMENTO", "CONSORCIO", "ADMINISTRADORA",
-    "CARTOES", "FACTORING", "IMOBILIARIA", "ASSET", "GESTORA",
-)
+def valores_por_instituicao(dados, lid):
+    """
+    Extrai {codigo_instituicao: valor} de um arquivo de dados.
 
+    Formato: {"id": N, "values": [{"e": <cod>, "v": [{"i": <lid>, "v": <n>}]}]}
+    """
+    if not isinstance(dados, dict):
+        return {}
+    saida = {}
+    for linha in dados.get("values", []):
+        if not isinstance(linha, dict):
+            continue
+        codigo = linha.get("e")
+        for celula in linha.get("v", []):
+            if isinstance(celula, dict) and celula.get("i") == lid:
+                numero = converter_numero(celula.get("v"))
+                if numero is not None:
+                    # normaliza zeros à esquerda: o mesmo código aparece
+                    # como 10045 nos dados e "00010045" em alguns campos
+                    # do cadastro.
+                    saida[str(codigo).lstrip("0") or "0"] = numero
+                break
+    return saida
+
+
+CAMPOS_NOME = ("c2", "c22", "c23")
+
+
+def mapear_nomes(cadastro, codigos_dos_dados):
+    """
+    {codigo: nome} a partir do cadastro.
+
+    Os campos vêm como c0..c25, SEM cabeçalho — o BC não diz o que é cada
+    um. A investigação sugere c0 = código e c2 = nome curto ("BRADESCO",
+    "ITAU"), mas isso é leitura de amostra, não contrato. Em vez de fixar
+    o palpite, o robô testa cada campo como candidato a código e fica com
+    o que mais casa com os códigos que vieram nos dados. Se um dia o BC
+    reordenar as colunas, ele se ajusta sozinho em vez de devolver tabela
+    vazia.
+    """
+    if not isinstance(cadastro, list) or not cadastro:
+        return {}, None
+
+    campos = [c for c in cadastro[0] if isinstance(cadastro[0].get(c), (str, int))]
+    melhor = (0, None, {})
+    for campo in campos:
+        mapa = {}
+        for item in cadastro:
+            if not isinstance(item, dict):
+                continue
+            codigo = item.get(campo)
+            nome = next((item.get(n) for n in CAMPOS_NOME if item.get(n)), None)
+            if codigo not in (None, "") and nome:
+                mapa[str(codigo).lstrip("0") or "0"] = str(nome)
+        acertos = len(set(mapa) & codigos_dos_dados)
+        if acertos > melhor[0]:
+            melhor = (acertos, campo, mapa)
+
+    if melhor[1]:
+        log(f"    campo de código do cadastro: {melhor[1]} "
+            f"({melhor[0]} códigos em comum com os dados)")
+    return melhor[2], melhor[1]
+
+
+# ----------------------------------------------------------------------
+# Casamento com os tickers
+# ----------------------------------------------------------------------
 
 def parece_nao_banco(nome_normalizado):
     return any(t in nome_normalizado for t in TERMOS_NAO_BANCO)
@@ -668,164 +278,66 @@ def parece_nao_banco(nome_normalizado):
 
 def pontuar_candidato(banco, nome_normalizado):
     """
-    Quão bem esta razão social corresponde a este banco. Menor é melhor;
-    None quando não corresponde.
-
-    Existe porque o IF.data tem mais de mil instituições e um fragmento
-    curto pega gente demais. Pegar a primeira linha que batesse — como a
-    versão anterior fazia — publicaria em silêncio o índice da empresa
-    errada, que é pior do que não publicar nada.
-
-    A ordem dos critérios foi corrigida depois de um teste: com
-    "começa com o fragmento" em primeiro lugar, o BPAC11 escolhia
-    "BTG PACTUAL CORRETORA" (41,2%) em vez de "BANCO BTG PACTUAL"
-    (16,4%), porque a corretora começa com o fragmento e o banco não
-    (começa com "BANCO"). Razão social de banco brasileiro quase sempre
-    começa com "BANCO", então essa preferência estava exatamente ao
-    contrário do que deveria.
+    Quão bem este nome corresponde a este banco. Menor é melhor; None se
+    não corresponde. O IF.data tem mais de mil instituições e o grupo do
+    banco aparece várias vezes — pegar o primeiro que batesse publicaria
+    o índice da empresa errada, que é pior do que não publicar nada.
     """
     melhor = None
     fora = 1 if parece_nao_banco(nome_normalizado) else 0
     for fragmento in banco["busca"]:
         if fragmento not in nome_normalizado:
             continue
-        pontos = (
-            fora,                       # corretora/seguradora por último
-            -len(fragmento),            # fragmento mais específico primeiro
-            0 if nome_normalizado.startswith("BANCO") else 1,
-            len(nome_normalizado),      # desempate: o nome mais enxuto
-        )
+        pontos = (fora, -len(fragmento), len(nome_normalizado))
         if melhor is None or pontos < melhor:
             melhor = pontos
     return melhor
 
 
-def extrair_valores(linhas, achado, obter_nome):
-    """
-    Percorre o relatório inteiro e devolve {ticker: indice}.
-
-    Junta TODOS os candidatos de cada banco antes de escolher, em vez de
-    parar no primeiro que aparecer — e avisa no log quando houve mais de
-    um, pra dar pra conferir a escolha.
-    """
-    candidatos = {}   # ticker -> [(pontos, nome, valor)]
-    for linha in linhas:
-        if achado["formato"] == "longo":
-            rotulo = linha.get(achado["campo_rotulo"])
-            if not isinstance(rotulo, str) or normalizar(rotulo) != normalizar(achado["rotulo"]):
-                continue
-        nome_bc = obter_nome(linha)
-        if not nome_bc:
+def casar(mapa_nomes, mapa_valores):
+    candidatos = {}
+    for codigo, valor in mapa_valores.items():
+        nome = mapa_nomes.get(codigo)
+        if not nome:
             continue
-        numero = converter_numero(linha.get(achado["campo_valor"]))
-        if numero is None:
-            continue
-        normalizado = normalizar(nome_bc)
+        normalizado = normalizar(nome)
         for banco in BANCOS:
             pontos = pontuar_candidato(banco, normalizado)
             if pontos is not None:
-                candidatos.setdefault(banco["ticker"], []).append((pontos, nome_bc, numero))
+                candidatos.setdefault(banco["ticker"], []).append((pontos, nome, valor))
 
     valores, casados = {}, []
     for ticker, lista in candidatos.items():
         lista.sort()
-        _, nome_bc, numero = lista[0]
-        valores[ticker] = numero
-        casados.append((ticker, nome_bc, numero))
+        _, nome, valor = lista[0]
+        valores[ticker] = valor
+        casados.append((ticker, nome, valor))
         if len(lista) > 1:
             outros = [f"{n} ({v:.2f}%)" for _, n, v in lista[1:6]]
             log(f"    ATENÇÃO {ticker}: {len(lista)} instituições casaram. "
-                f"Escolhida: {nome_bc}. Descartadas: {outros}")
-        if parece_nao_banco(normalizar(nome_bc)):
-            # candidato único, mas com cara de corretora/seguradora: o
-            # aviso de ambiguidade acima não pegaria esse caso.
-            log(f"    ATENÇÃO {ticker}: '{nome_bc}' não parece ser o banco em si. "
-                f"Conferir antes de confiar neste número.")
+                f"Escolhida: {nome}. Descartadas: {outros}")
+        if parece_nao_banco(normalizar(nome)):
+            log(f"    ATENÇÃO {ticker}: '{nome}' não parece ser o banco em si.")
+        if not (0 < valor < 100):
+            log(f"    ATENÇÃO {ticker}: {valor} está fora da faixa esperada de "
+                f"um percentual — pode ser a coluna errada.")
     return valores, casados
-
-
-# ----------------------------------------------------------------------
-# Diagnóstico
-# ----------------------------------------------------------------------
-
-def bater_cru(rotulo, caminho):
-    """
-    Uma requisição, SEM repetição e SEM freio, só pra registrar o que o
-    servidor responde. Serve pra separar duas hipóteses que o log normal
-    não distingue: "esta consulta específica quebrou" e "o IF.data inteiro
-    está recusando este cliente".
-    """
-    url = f"{BASE}/{caminho}"
-    req = urllib.request.Request(url, headers={
-        "Accept": "application/json",
-        "User-Agent": "viverderenda-basileia/1.0 (+https://viverderenda.dev.br)",
-    })
-    try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
-            corpo = resp.read(400).decode("utf-8", "replace").replace("\n", " ")
-            log(f"  [{resp.status}] {rotulo}")
-            log(f"        {corpo[:220]}")
-    except urllib.error.HTTPError as e:
-        corpo = ""
-        try:
-            corpo = e.read().decode("utf-8", "replace").replace("\n", " ")[:220]
-        except Exception:  # noqa: BLE001
-            pass
-        log(f"  [{e.code}] {rotulo}")
-        if corpo:
-            log(f"        {corpo}")
-    except Exception as e:  # noqa: BLE001
-        log(f"  [---] {rotulo} -> {e}")
-    time.sleep(2)
-
-
-def diagnosticar_servico():
-    log("DIAGNÓSTICO DO IF.data — uma tentativa por variação, sem repetir.\n")
-    log(f"Base: {BASE}\n")
-
-    v = "IfDataValores(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao,Relatorio=@Relatorio)"
-    c = "IfDataCadastro(AnoMes=@AnoMes,TipoInstituicao=@TipoInstituicao)"
-
-    bater_cru("raiz do serviço", "?$format=json")
-    bater_cru("$metadata", "$metadata")
-    bater_cru("Valores 202603 tipo=1 rel='1'  (a que JÁ funcionou)",
-              v + "?$format=json&@AnoMes=202603&@TipoInstituicao=1&@Relatorio='1'")
-    bater_cru("Valores 202603 tipo=1 rel=1    (sem aspas)",
-              v + "?$format=json&@AnoMes=202603&@TipoInstituicao=1&@Relatorio=1")
-    bater_cru("Valores 202603 tipo=2 rel='1'  (conglomerado financeiro)",
-              v + "?$format=json&@AnoMes=202603&@TipoInstituicao=2&@Relatorio='1'")
-    bater_cru("Valores 202512 tipo=1 rel='1'",
-              v + "?$format=json&@AnoMes=202512&@TipoInstituicao=1&@Relatorio='1'")
-    bater_cru("Cadastro 202603 tipo=1         (outra função do MESMO serviço)",
-              c + "?$format=json&@AnoMes=202603&@TipoInstituicao=1")
-    bater_cru("Valores em CSV                  (outro formato de saída)",
-              v + "?$format=text/csv&@AnoMes=202603&@TipoInstituicao=1&@Relatorio='1'")
-
-    log("\nCOMO LER:")
-    log("  Tudo 500, inclusive a raiz e o Cadastro -> o serviço está recusando")
-    log("     ESTE cliente (rede do GitHub Actions). Rodar do seu computador")
-    log("     é o teste decisivo: se lá funcionar, é bloqueio por origem.")
-    log("  Só o Valores em 500, com Cadastro e raiz em 200 -> a função quebrou")
-    log("     no lado do BC; esperar e tentar de novo é o certo.")
-    log("  Alguma variação em 200 -> é ela que o robô passa a usar.")
 
 
 # ----------------------------------------------------------------------
 # Gravação
 # ----------------------------------------------------------------------
 
-def rotulos(anomes):
-    ano, mes = divmod(int(anomes), 100)
+def rotulos(dt):
+    ano, mes = divmod(int(dt), 100)
     trimestre = (mes + 2) // 3
     ultimo_dia = {3: "31/03", 6: "30/06", 9: "30/09", 12: "31/12"}.get(mes, f"--/{mes:02d}")
-    return {
-        "id": f"{ano}T{trimestre}",
-        "rotulo": f"{trimestre}T{str(ano)[2:]}",
-        "referencia": f"Base {ultimo_dia}/{ano} — IF.data/Banco Central (conglomerado prudencial)",
-    }
+    return {"id": f"{ano}T{trimestre}", "rotulo": f"{trimestre}T{str(ano)[2:]}",
+            "referencia": f"Base {ultimo_dia}/{ano} — IF.data/Banco Central "
+                          f"(conglomerado prudencial)"}
 
 
-def gravar(anomes, valores):
+def gravar(dt, valores):
     if os.path.exists(ARQUIVO):
         with open(ARQUIVO, encoding="utf-8") as f:
             dados = json.load(f)
@@ -833,24 +345,18 @@ def gravar(anomes, valores):
         dados = {"bancos": [{"ticker": b["ticker"], "nome": b["nome"]} for b in BANCOS],
                  "periodos": []}
 
-    marcas = rotulos(anomes)
-    periodo = {
-        "id": marcas["id"],
-        "rotulo": marcas["rotulo"],
-        "referencia": marcas["referencia"],
-        "valores": valores,
-    }
+    marcas = rotulos(dt)
+    periodo = {"id": marcas["id"], "rotulo": marcas["rotulo"],
+               "referencia": marcas["referencia"], "valores": valores}
 
-    # Se nada mudou, não reescreve o arquivo. Sem isso, rodando semanalmente,
-    # o campo 'atualizado_em' viraria um commit novo toda semana só pra
-    # trocar uma data — sujando o histórico do repositório à toa.
-    atual = next((p for p in dados.get("periodos", []) if str(p.get("id")) == periodo["id"]), None)
+    # Se nada mudou, não reescreve: rodando diariamente, o campo
+    # 'atualizado_em' viraria um commit por dia só pra trocar uma data.
+    atual = next((p for p in dados.get("periodos", [])
+                  if str(p.get("id")) == periodo["id"]), None)
     if atual and atual.get("valores") == valores:
         log(f"\nNada mudou no período {periodo['rotulo']} — arquivo mantido como está.")
         return False
 
-    # Substitui o período se já existir; senão entra no topo (o site usa a
-    # ordem da lista, e o primeiro é o que abre selecionado).
     periodos = [p for p in dados.get("periodos", []) if str(p.get("id")) != periodo["id"]]
     periodos.insert(0, periodo)
     dados["periodos"] = periodos
@@ -862,105 +368,137 @@ def gravar(anomes, valores):
     with open(temporario, "w", encoding="utf-8") as f:
         json.dump(dados, f, ensure_ascii=False, indent=2)
         f.write("\n")
-    os.replace(temporario, ARQUIVO)   # troca atômica: nunca deixa o site ler meio arquivo
+    os.replace(temporario, ARQUIVO)   # troca atômica: o site nunca lê meio arquivo
     log(f"\nGravado {ARQUIVO} — período {periodo['rotulo']} ({len(valores)} bancos).")
     return True
 
 
 # ----------------------------------------------------------------------
 
-def main():
-    if DIAGNOSTICO:
-        diagnosticar_servico()
-        return 0
+def processar(bloco):
+    dt = bloco.get("dt")
+    arquivos = [x.get("f") for x in bloco.get("files", []) if x.get("f")]
+    log(f"\n=== data-base {dt} ===")
 
+    def achar(trecho):
+        return [a for a in arquivos if trecho in a.split("/")[-1]]
+
+    caminhos_info = achar("info")
+    if not caminhos_info:
+        log("    sem arquivo 'info' — não dá pra saber o nome das colunas.")
+        return None
+    info = baixar_arquivo(caminhos_info[0])
+    if info is None:
+        return None
+
+    coluna = achar_coluna_basileia(info)
+    if coluna is None:
+        log("    nenhuma coluna com 'Basileia' neste dicionário.")
+        return None
+    lid = coluna.get("lid")
+    if lid is None:
+        log("    a coluna encontrada não tem 'lid' — sem chave pra buscar nos dados.")
+        return None
+
+    # 'td' costuma apontar o arquivo de dados; se não bater, varre os outros.
+    caminhos_dados = achar("dados")
+    preferido = [a for a in caminhos_dados
+                 if a.rstrip(".json").endswith(f"_{coluna.get('td')}")]
+    ordem = preferido + [a for a in caminhos_dados if a not in preferido]
+
+    mapa_valores = {}
+    for caminho in ordem:
+        dados = baixar_arquivo(caminho)
+        if dados is None:
+            continue
+        mapa_valores = valores_por_instituicao(dados, lid)
+        if mapa_valores:
+            log(f"    lid {lid} encontrado em {caminho.split('/')[-1]}: "
+                f"{len(mapa_valores)} instituições com valor")
+            break
+        log(f"    (lid {lid} não está em {caminho.split('/')[-1]})")
+
+    if not mapa_valores:
+        log("    o lid da Basileia não apareceu em nenhum arquivo de dados.")
+        return None
+
+    caminhos_cadastro = achar(f"cadastro{dt}_{TIPO_PRUDENCIAL}")
+    if not caminhos_cadastro:
+        log(f"    sem cadastro do tipo {TIPO_PRUDENCIAL} nesta data-base; "
+            f"disponíveis: {[a.split('/')[-1] for a in achar('cadastro')]}")
+        return None
+    cadastro = baixar_arquivo(caminhos_cadastro[0])
+    if cadastro is None:
+        return None
+
+    mapa_nomes, campo_codigo = mapear_nomes(cadastro, set(mapa_valores))
+    log(f"    cadastro: {len(mapa_nomes)} instituições")
+    if mapa_nomes:
+        log(f"    exemplos: {list(mapa_nomes.items())[:3]}")
+
+    if not mapa_nomes or campo_codigo is None:
+        log("    ATENÇÃO: nenhum campo do cadastro casou com os códigos dos dados.")
+        log(f"    campos disponíveis: {list(cadastro[0].keys()) if cadastro else []}")
+        log(f"    exemplo de linha do cadastro: "
+            f"{json.dumps(cadastro[0], ensure_ascii=False)[:400] if cadastro else ''}")
+        log(f"    códigos vindos dos dados (amostra): {list(mapa_valores)[:8]}")
+        return None
+
+    valores, casados = casar(mapa_nomes, mapa_valores)
+    log("\n  Casamento ticker <-> instituição:")
+    for ticker, nome, valor in sorted(casados):
+        log(f"    {ticker:7s} {valor:6.2f}%   {nome}")
+    faltando = [b["ticker"] for b in BANCOS if b["ticker"] not in valores]
+    if faltando:
+        log(f"\n  NÃO ENCONTRADOS: {', '.join(faltando)}")
+        amostra = sorted({mapa_nomes[c] for c in mapa_valores if c in mapa_nomes})
+        for ticker in faltando:
+            banco = next(b for b in BANCOS if b["ticker"] == ticker)
+            termos = {p for texto in [banco["nome"]] + banco["busca"]
+                      for p in normalizar(texto).split() if len(p) >= 3}
+            parecidos = sorted({n for n in amostra
+                                for t in termos if t in normalizar(n)})[:5]
+            log(f"    {ticker}: parecidos no IF.data -> {parecidos or 'nada parecido'}")
+
+    return (dt, valores) if valores else None
+
+
+def main():
     forcado = None
     for i, arg in enumerate(sys.argv):
         if arg == "--anomes" and i + 1 < len(sys.argv):
             forcado = int(sys.argv[i + 1])
 
-    periodos = [forcado] if forcado else trimestres_recentes(TRIMESTRES_PARA_TRAS)
-    log(f"IF.data — períodos a tentar: {', '.join(str(p) for p in periodos)}")
+    log(f"IF.data (interface web) — {CATALOGO_URL}")
+    catalogo, _ = buscar(CATALOGO_URL, "catálogo")
+    if not isinstance(catalogo, list) or not catalogo:
+        log("Não consegui ler o catálogo. Nada foi gravado.")
+        return 1
 
-    for anomes in periodos:
-        log(f"\n=== {anomes} ===")
-        achado = procurar_relatorio(anomes)
-        if not achado:
-            log("  nenhum relatório desse período tem Basileia — tentando o período anterior...")
+    catalogo.sort(key=lambda b: int(b.get("dt", 0)), reverse=True)
+    log(f"data-bases publicadas: {[b.get('dt') for b in catalogo[:8]]}")
+
+    blocos = ([b for b in catalogo if int(b.get("dt", 0)) == forcado] if forcado
+              else catalogo[:DATAS_PARA_TRAS])
+    if not blocos:
+        log(f"data-base {forcado} não está no catálogo.")
+        return 1
+
+    for bloco in blocos:
+        resultado = processar(bloco)
+        if not resultado:
+            log("    seguindo para a data-base anterior...")
             continue
-
-        log(f"\n  ACHADO no relatório {achado['relatorio']} (formato {achado['formato']})")
-        log(f"    coluna do valor: {achado['campo_valor']}")
-        log(f"    coluna do nome:  {achado['campo_nome'] or 'nenhuma (vai juntar com o cadastro)'}")
-        log(f"    coluna do código: {achado['campo_codigo'] or 'nenhuma'}")
-        if achado["formato"] == "longo":
-            log(f"    rótulo usado:    {achado['rotulo']!r}")
-            outros = [r for r in achado.get("outros_rotulos", []) if r != achado["rotulo"]]
-            if outros:
-                log(f"    (outros rótulos com 'basileia', ignorados: {outros})")
-
-        # Se a sondagem já baixou o relatório inteiro, reaproveita. Baixar
-        # de novo desperdiçava a maior requisição da execução e dava outra
-        # chance pro 500 intermitente derrubar tudo depois de já ter achado.
-        linhas = achado.get("completo")
-        if linhas:
-            log(f"    reaproveitando as {len(linhas)} linhas já baixadas")
-        else:
-            linhas = pedir("IfDataValores", parametros_valores(anomes, achado["relatorio"]))
-            if not linhas:
-                log("  o relatório inteiro não veio; tentando o período anterior...")
-                continue
-            log(f"    {len(linhas)} linhas no relatório completo")
-
-        obter_nome = resolver_nomes(anomes, achado)
-        if obter_nome is None:
-            log("\n  Não consegui identificar as instituições.")
-            diagnosticar(achado["amostra"])
-            return 1
-
-        valores, casados = extrair_valores(linhas, achado, obter_nome)
-
-        log("\n  Casamento ticker <-> instituição:")
-        for ticker, nome_bc, numero in sorted(casados):
-            log(f"    {ticker:7s} {numero:6.2f}%   {nome_bc}")
-        faltando = [b["ticker"] for b in BANCOS if b["ticker"] not in valores]
-        if faltando:
-            log(f"\n  NÃO ENCONTRADOS: {', '.join(faltando)}")
-            log("  (ficam como '—' no site; ajustar a lista 'busca' desses bancos no topo do script)")
-            # ajuda a acertar o fragmento: mostra nomes parecidos que existem
-            amostra = sorted({str(obter_nome(l)) for l in linhas[:6000] if obter_nome(l)})
-            for ticker in faltando:
-                banco = next(b for b in BANCOS if b["ticker"] == ticker)
-                # tenta cada palavra do nome e dos fragmentos de busca: é o
-                # bastante pra revelar como o BC escreve aquela instituição
-                termos = {palavra for texto in [banco["nome"]] + banco["busca"]
-                          for palavra in normalizar(texto).split() if len(palavra) >= 4}
-                parecidos = sorted({n for n in amostra
-                                    for t in termos if t in normalizar(n)})[:5]
-                log(f"    {ticker}: parecidos no IF.data -> {parecidos or 'nada parecido'}")
-
-        if not valores:
-            log("\n  Nenhum banco casou — não vou gravar um período vazio.")
-            diagnosticar(achado["amostra"])
-            return 1
-
-        if EXPLORAR or DRY_RUN:
-            log("\n  (sem gravar)")
+        dt, valores = resultado
+        if DRY_RUN:
+            log("\n  (--dry-run: nada gravado)")
             return 0
-        gravar(anomes, valores)
+        gravar(dt, valores)
         return 0
 
-    log("\nNenhum período retornou Basileia.")
-    log("Se TODOS falharam com HTTP 500, o problema não é de dado: rode")
-    log("  python3 coletar_basileia.py --diagnostico")
-    log("que mede o servidor em vez de procurar o dado. (--explorar só ajuda")
-    log("quando o servidor RESPONDE e o conteúdo é que não bate.)")
+    log("\nNenhuma data-base rendeu o Índice de Basileia. Nada foi gravado.")
     return 1
 
 
 if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    except ServidorInstavel as e:
-        log(f"\nPARANDO: {e}")
-        sys.exit(1)
+    sys.exit(main())
