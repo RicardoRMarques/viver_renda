@@ -1,33 +1,35 @@
 #!/usr/bin/env python3
 """
-Fase 2 da investigação da interface web do IF.data (www3.bcb.gov.br/ifdata).
+Fase 3 da investigação da interface web do IF.data (www3.bcb.gov.br/ifdata).
 
-O QUE JÁ SABEMOS (fase 1, execução real de 09/09/2026)
-------------------------------------------------------
-    GET https://www3.bcb.gov.br/ifdata/rest/relatorios   -> 200
+O QUE JÁ SABEMOS (fases 1 e 2, execuções reais de 09/09/2026)
+--------------------------------------------------------------
+  GET rest/relatorios2025a2030  -> 200, catálogo com 5 data-bases.
+      A mais recente é 202603 (1º tri/2026) — ou seja, 202606 realmente
+      ainda não saiu, e o seletor do site deve mostrar "1T26".
 
-devolve um CATÁLOGO de arquivos JSON estáticos, um bloco por data-base:
+  Cada data-base lista 33 arquivos, com caminho no formato
+      "ifdata_2025_2030//202603/cadastro202603_1009.json"   (barra dupla!)
 
-    [{"dt":200003,"files":[{"f":"200003/cadastro200003_1005.json"},
-                           {"f":"200003/dados200003_1.json"},
-                           {"f":"200003/filtro200003.json"},
-                           {"f":"200003/info200003.json"},
-                           {"f":"200003/sel200003.json","sel":[{"id":1005,
-                              "n":"Conglomerados ..."}]}]}, ...]
+  sel202603.json revelou os tipos de instituição, e AQUI corrigimos um
+  engano que vinha do Olinda:
+      1009 = Conglomerados Prudenciais e Instituições Independentes  <- o nosso
+      1005 = Conglomerados Financeiros e Instituições Independentes
+      1006 = Instituições Individuais
 
-Isso muda o jogo: em vez da API OData do Olinda — que monta a resposta na
-hora e devolveu HTTP 500 em seis de oito execuções — aqui são ARQUIVOS
-PRONTOS. Servidor de arquivo estático não engasga como gerador de
-consulta, e o HTML da página ainda citava /ifdata/rest/arquivos e
-/ifdata/rest/relatorios2025a2030.
+  trel<dt>_<id>.json descreve cada relatório (105 = "Ativo", etc.).
+  dados<dt>_1..5.json devem ser os valores.
 
-O QUE FALTA DESCOBRIR (é o que este script faz)
-------------------------------------------------
-  1. Qual a data-base mais recente publicada.
-  2. Por qual caminho se baixa um arquivo listado em "files".
-  3. O que tem dentro de cada tipo (info, sel, filtro, cadastro, dados):
-     onde está a razão social, onde está o Índice de Basileia, e como os
-     dois se ligam.
+O QUE FALTA
+-----------
+A rota de download. Os seis prefixos óbvios deram 404. Mas o HTML da
+página cita /ifdata/rest/arquivos e /ifdata/rest/pdf — então a resposta
+está no JavaScript embutido na própria página, não nos arquivos .js
+externos (esses são só jQuery, bootstrap e menu).
+
+Este script mostra o TRECHO do HTML em volta dessas citações — é ali que
+vai estar a forma exata da chamada — e testa um leque de variações,
+inclusive POST, que é o formato provável para "me entregue este arquivo".
 
 Não grava nada. Só olha e imprime.
 
@@ -36,8 +38,10 @@ Não grava nada. Só olha e imprime.
 
 import json
 import os
+import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 
 BASE = os.environ.get("IFDATA_BASE", "https://www3.bcb.gov.br/ifdata/")
@@ -48,6 +52,7 @@ CABECALHOS = {
     "Accept": "application/json, text/plain, */*",
     "Accept-Language": "pt-BR,pt;q=0.9",
     "Referer": BASE,
+    "X-Requested-With": "XMLHttpRequest",
 }
 
 
@@ -55,134 +60,100 @@ def log(m):
     print(m, flush=True)
 
 
-def baixar(url):
+def bater(url, corpo=None, tipo=None, metodo=None):
     """(status, texto). Erro vira resultado, não exceção."""
-    req = urllib.request.Request(url, headers=CABECALHOS)
+    cabecalhos = dict(CABECALHOS)
+    if tipo:
+        cabecalhos["Content-Type"] = tipo
+    dados = corpo.encode("utf-8") if isinstance(corpo, str) else corpo
+    req = urllib.request.Request(url, data=dados, headers=cabecalhos,
+                                 method=metodo or ("POST" if dados is not None else "GET"))
     try:
         with urllib.request.urlopen(req, timeout=TEMPO_LIMITE) as r:
             return r.status, r.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as e:
-        return e.code, ""
+        try:
+            return e.code, e.read().decode("utf-8", "replace")
+        except Exception:  # noqa: BLE001
+            return e.code, ""
     except Exception as e:  # noqa: BLE001
         return None, str(e)
 
 
-def baixar_json(url):
-    status, texto = baixar(url)
-    if status != 200:
-        return status, None
-    try:
-        return status, json.loads(texto)
-    except Exception:  # noqa: BLE001
-        return status, None
-
-
-def resumir(valor, profundidade=0, max_itens=2):
-    """Descreve a forma de um JSON sem despejar megabytes no log."""
-    espaco = "  " * (profundidade + 1)
-    if isinstance(valor, list):
-        log(f"{espaco}lista com {len(valor)} itens")
-        for item in valor[:max_itens]:
-            texto = json.dumps(item, ensure_ascii=False)
-            log(f"{espaco}  {texto[:300]}")
-        return
-    if isinstance(valor, dict):
-        log(f"{espaco}objeto com as chaves: {list(valor.keys())[:20]}")
-        for chave, dentro in list(valor.items())[:4]:
-            if isinstance(dentro, (list, dict)):
-                log(f"{espaco}  '{chave}':")
-                resumir(dentro, profundidade + 2, max_itens)
-            else:
-                log(f"{espaco}  '{chave}': {str(dentro)[:120]}")
-        return
-    log(f"{espaco}{str(valor)[:200]}")
+def parece_json(texto):
+    t = (texto or "").lstrip()
+    return t.startswith("{") or t.startswith("[")
 
 
 def main():
     log("=" * 70)
-    log("1) CATÁLOGO — quais data-bases existem e que arquivos cada uma tem")
+    log("1) COMO O HTML USA 'rest/arquivos' — a forma da chamada está aqui")
     log("=" * 70)
-
-    catalogo = None
-    for caminho in ("rest/relatorios2025a2030", "rest/relatorios"):
-        url = BASE + caminho
-        status, dados = baixar_json(url)
-        log(f"  [{status}] {url}")
-        if isinstance(dados, list) and dados:
-            catalogo = dados
-            log(f"        {len(dados)} data-bases")
-            break
-
-    if not catalogo:
-        log("\n  Não consegui ler o catálogo. Fim.")
+    status, html = bater(BASE)
+    log(f"  página: status {status}, {len(html)} caracteres\n")
+    if status != 200:
         return 1
 
-    # a mais recente é a que interessa
-    def numero_dt(bloco):
-        try:
-            return int(bloco.get("dt", 0))
-        except Exception:  # noqa: BLE001
-            return 0
+    for termo in ("rest/arquivos", "rest/pdf", "rest/relatorios"):
+        posicoes = [m.start() for m in re.finditer(re.escape(termo), html)]
+        log(f"  '{termo}': {len(posicoes)} ocorrência(s)")
+        for pos in posicoes[:4]:
+            trecho = html[max(0, pos - 320): pos + 320]
+            trecho = re.sub(r"\s+", " ", trecho)
+            log(f"    ...{trecho}...")
+        log("")
 
-    catalogo.sort(key=numero_dt, reverse=True)
-    log(f"\n  Data-bases mais recentes: {[b.get('dt') for b in catalogo[:8]]}")
+    # qualquer função JS que monte URL de arquivo
+    for padrao, rotulo in [
+        (r"function\s+(\w*[Aa]rquivo\w*)\s*\([^)]*\)\s*\{[^}]{0,400}\}", "função com 'arquivo' no nome"),
+        (r"\$\.(?:get|post|ajax)\(\s*\{?[^)]{0,320}", "chamada jQuery"),
+        (r"(?:url|href|src)\s*[:=]\s*[^,;\n]{0,160}rest[^,;\n]{0,160}", "montagem de URL com 'rest'"),
+    ]:
+        achados = re.findall(padrao, html)
+        if achados:
+            log(f"  {rotulo}: {len(achados)} achado(s)")
+            for a in achados[:6]:
+                texto = re.sub(r"\s+", " ", a if isinstance(a, str) else str(a))
+                log(f"    {texto[:300]}")
+            log("")
 
-    bloco = catalogo[0]
-    dt = bloco.get("dt")
-    log(f"\n  MAIS RECENTE: {dt}")
-    log(f"  bloco completo:")
-    log(f"    {json.dumps(bloco, ensure_ascii=False)[:1500]}")
-
-    arquivos = [f.get("f") for f in bloco.get("files", []) if f.get("f")]
-    log(f"\n  {len(arquivos)} arquivos nessa data-base:")
-    for a in arquivos:
-        log(f"    {a}")
-
-    log("\n" + "=" * 70)
-    log("2) POR QUAL CAMINHO SE BAIXA UM DESSES ARQUIVOS")
     log("=" * 70)
-
-    # 'info' costuma ser o menor: bom pra testar sem puxar megabytes
-    alvo = next((a for a in arquivos if "info" in a), arquivos[0] if arquivos else None)
-    if not alvo:
-        log("  Nenhum arquivo listado. Fim.")
-        return 1
-
-    prefixos = ["rest/arquivos/", "rest/", "", "arquivos/", "rest/arquivo/",
-                "rest/relatorios/"]
-    prefixo_bom = None
-    for prefixo in prefixos:
-        url = BASE + prefixo + alvo
-        status, dados = baixar_json(url)
-        log(f"  [{status}] {url}")
-        if dados is not None:
-            prefixo_bom = prefixo
-            log(f"        -> FUNCIONOU")
-            break
-
-    if prefixo_bom is None:
-        log("\n  Nenhum prefixo serviu. Os arquivos devem estar atrás de outra rota.")
-        return 1
-
-    log("\n" + "=" * 70)
-    log(f"3) O QUE TEM DENTRO (prefixo '{prefixo_bom}')")
+    log("2) TESTANDO ROTAS DE DOWNLOAD")
     log("=" * 70)
+    bruto = "ifdata_2025_2030//202603/info202603.json"
+    simples = bruto.replace("//", "/")
+    so_nome = bruto.split("/")[-1]
+    codificado = urllib.parse.quote(bruto, safe="")
 
-    for arquivo in arquivos:
-        url = BASE + prefixo_bom + arquivo
-        status, dados = baixar_json(url)
-        nome = arquivo.split("/")[-1]
-        if dados is None:
-            log(f"\n  --- {nome} --- [{status}] não veio como JSON")
-            continue
-        log(f"\n  --- {nome} --- [{status}]")
-        resumir(dados)
+    tentativas = [
+        ("GET", BASE + "rest/arquivos", None, None),
+        ("GET", BASE + "rest/arquivos/" + simples, None, None),
+        ("GET", BASE + "rest/arquivos?f=" + codificado, None, None),
+        ("GET", BASE + "rest/arquivos?arquivo=" + codificado, None, None),
+        ("GET", BASE + "rest/arquivos?nome=" + codificado, None, None),
+        ("GET", BASE + simples, None, None),
+        ("GET", BASE + "dados/" + simples, None, None),
+        ("GET", BASE + "json/" + simples, None, None),
+        ("GET", BASE + "rest/arquivos/" + so_nome, None, None),
+        ("POST", BASE + "rest/arquivos", json.dumps({"f": bruto}), "application/json"),
+        ("POST", BASE + "rest/arquivos", json.dumps([{"f": bruto}]), "application/json"),
+        ("POST", BASE + "rest/arquivos", "f=" + codificado,
+         "application/x-www-form-urlencoded"),
+        ("POST", BASE + "rest/arquivos", bruto, "text/plain"),
+    ]
+    for metodo, url, corpo, tipo in tentativas:
+        st, texto = bater(url, corpo, tipo, metodo)
+        marca = " <<< JSON!" if st == 200 and parece_json(texto) else ""
+        log(f"  [{st}] {metodo} {url}{marca}")
+        if corpo:
+            log(f"        corpo enviado: {str(corpo)[:90]}")
+        if st == 200 and texto:
+            log(f"        resposta: {texto[:260]}".replace("\n", " "))
 
     log("\n" + "=" * 70)
-    log("COMO LER: preciso identificar, entre os arquivos acima, (a) qual traz")
-    log("a razão social por código de instituição e (b) qual traz o Índice de")
-    log("Basileia. Com isso o robô passa a baixar dois arquivos estáticos por")
-    log("trimestre, e o Olinda instável sai de cena.")
+    log("COMO LER: a linha marcada com '<<< JSON!' é a rota boa. Se nenhuma")
+    log("marcar, o trecho de HTML da seção 1 mostra como a página monta a")
+    log("chamada — me mande essa parte que eu leio e acerto.")
     return 0
 
 
