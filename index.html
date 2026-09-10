@@ -4775,8 +4775,16 @@
           <div class="conv-iof-card" id="convIofCard" hidden>
             <div class="conv-iof-topo">
               <span>💳 Se for comprar/converter de verdade</span>
+              <!-- A alíquota depende da OPERAÇÃO, nunca da moeda ou do país
+                   de destino. Comprar peso argentino em espécie paga o mesmo
+                   3,5% de comprar dólar. Antes só havia duas linhas genéricas
+                   ("espécie / cartão" e "investimento"), o que dava a impressão
+                   de que a diferença tinha a ver com o destino. -->
               <select id="convIofTipo" class="conv-iof-select">
-                <option value="0.035">Espécie / cartão internacional (IOF 3,5%)</option>
+                <option value="0.035">Compra de moeda em espécie (IOF 3,5%)</option>
+                <option value="0.035">Cartão de crédito ou débito internacional (IOF 3,5%)</option>
+                <option value="0.035">Transferência para conta própria no exterior (IOF 3,5%)</option>
+                <option value="0.035">Manutenção de residente, curso ou intercâmbio (IOF 3,5%)</option>
                 <option value="0.011">Remessa para investimento no exterior (IOF 1,1%)</option>
               </select>
             </div>
@@ -4797,7 +4805,8 @@
             <p class="conv-iof-aviso">
               O valor grande acima é a conversão pela cotação de mercado, <strong>sem</strong> impostos — é o
               número que Google e Wise mostram. Aqui embaixo entra o IOF, que só existe quando se compra moeda
-              estrangeira de verdade. Estimativa só do IOF (Decreto 6.306/2007, alíquotas vigentes em 2026);
+              estrangeira de verdade. A alíquota depende da <strong>operação</strong>, não da moeda nem do país:
+              comprar peso argentino em espécie paga os mesmos 3,5% de comprar dólar. Estimativa só do IOF (Decreto 6.306/2007, alíquotas vigentes em 2026);
               não inclui o <strong>spread</strong>
               (a diferença que bancos/casas de câmbio cobram em cima da cotação — costuma variar de 2% a 6% a mais,
               dependendo de onde você converte). Confira sempre o custo total antes de fechar a operação.
