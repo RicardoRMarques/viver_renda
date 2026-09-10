@@ -4782,20 +4782,23 @@
             </div>
             <div class="conv-iof-linhas">
               <div class="conv-iof-linha">
-                <span>Valor convertido (sem taxas)</span>
-                <strong id="convIofBase">—</strong>
-              </div>
-              <div class="conv-iof-linha">
                 <span>IOF (<span id="convIofPct">3,5</span>%)</span>
                 <strong id="convIofValor">—</strong>
               </div>
+              <div class="conv-iof-linha">
+                <span>Vai para o câmbio</span>
+                <strong id="convIofBase">—</strong>
+              </div>
               <div class="conv-iof-linha conv-iof-total">
-                <span>Total estimado com IOF</span>
+                <span>Você recebe</span>
                 <strong id="convIofTotal">—</strong>
               </div>
             </div>
             <p class="conv-iof-aviso">
-              Estimativa só do IOF (Decreto 6.306/2007, alíquotas vigentes em 2026). Não inclui o <strong>spread</strong>
+              O valor grande acima é a conversão pela cotação de mercado, <strong>sem</strong> impostos — é o
+              número que Google e Wise mostram. Aqui embaixo entra o IOF, que só existe quando se compra moeda
+              estrangeira de verdade. Estimativa só do IOF (Decreto 6.306/2007, alíquotas vigentes em 2026);
+              não inclui o <strong>spread</strong>
               (a diferença que bancos/casas de câmbio cobram em cima da cotação — costuma variar de 2% a 6% a mais,
               dependendo de onde você converte). Confira sempre o custo total antes de fechar a operação.
             </p>
@@ -9926,7 +9929,7 @@
         resultadoTaxaEl.textContent = `1 ${estado.de} = ${formatarValor(taxaDe / taxaPara, estado.para)}`;
         taxaLinhaEl.hidden = false;
 
-        atualizarIof(resultado);
+        atualizarIof(emBrl, taxaPara);
       }
 
       // O IOF de câmbio (Decreto 6.306/2007) incide sobre a compra de moeda
@@ -9935,19 +9938,31 @@
       // estrangeira). Não se aplica do mesmo jeito nos outros sentidos
       // (vender moeda estrangeira, ou converter entre duas moedas
       // estrangeiras), então o card fica escondido nesses casos.
-      function atualizarIof(valorConvertido) {
+      function atualizarIof(valorEmReais, taxaPara) {
         if (estado.de !== 'BRL' || estado.para === 'BRL') {
           iofCardEl.hidden = true;
           return;
         }
         const aliquota = parseFloat(iofTipoSelect.value);
-        const iof = valorConvertido * aliquota;
-        const total = valorConvertido + iof;
 
-        iofBaseEl.textContent = formatarValor(valorConvertido, estado.para);
+        // O IOF incide sobre o valor EM REAIS da operação de câmbio, e o
+        // imposto entra POR CIMA do câmbio: se você desembolsa R$ 1.000,
+        // então câmbio × (1 + alíquota) = 1.000. Daí a divisão.
+        //
+        // A versão anterior fazia duas coisas erradas ao mesmo tempo:
+        // calculava o IOF sobre o valor JÁ CONVERTIDO (em dólar, euro...)
+        // e SOMAVA ao resultado — mostrando que você receberia MAIS moeda
+        // estrangeira por causa do imposto. É o contrário: o imposto come
+        // parte dos reais, e sobra menos para comprar moeda. Era isso que
+        // fazia o número aqui ficar acima do Google e do Wise.
+        const cambio = valorEmReais / (1 + aliquota);
+        const iof = valorEmReais - cambio;
+        const recebe = cambio / taxaPara;
+
         iofPctEl.textContent = (aliquota * 100).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
-        iofValorEl.textContent = formatarValor(iof, estado.para);
-        iofTotalEl.textContent = formatarValor(total, estado.para);
+        iofValorEl.textContent = formatarValor(iof, 'BRL');
+        iofBaseEl.textContent = formatarValor(cambio, 'BRL');
+        iofTotalEl.textContent = formatarValor(recebe, estado.para);
         iofCardEl.hidden = false;
       }
 
