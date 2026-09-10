@@ -9837,19 +9837,60 @@
       let cacheEm = 0;
       const CACHE_VALIDADE_MS = 5 * 60 * 1000; // 5 minutos
 
-      async function buscarCotacoes() {
-        const agora = Date.now();
-        if (cotacoesCache && (agora - cacheEm) < CACHE_VALIDADE_MS) return cotacoesCache;
+      // Duas fontes, nesta ordem. A HG Brasil arredonda as cotações em 4
+      // casas decimais, o que é inofensivo no dólar (5,1009) e destrutivo
+      // no peso argentino: 0,0031 contra 0,003374 reais por peso dá 9% de
+      // erro — a tabela mostrava AR$ 322 por real quando o mercado estava
+      // em AR$ 296. Moeda de valor unitário muito baixo (ARS, JPY) não
+      // sobrevive a 4 casas.
+      //
+      // A AwesomeAPI devolve mais casas e é aberta (sem chave). Se ela
+      // falhar por qualquer motivo, cai na HG — que continua boa para as
+      // moedas de valor "normal" e já estava aqui.
+      const PARES_AWESOME = MOEDAS.filter(m => m.codigo !== 'BRL').map(m => `${m.codigo}-BRL`).join(',');
 
+      async function buscarNaAwesomeApi() {
+        const url = `https://economia.awesomeapi.com.br/json/last/${PARES_AWESOME}`;
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error('AwesomeAPI HTTP ' + resp.status);
+        const data = await resp.json();
+        const taxas = { BRL: 1 };
+        for (const info of Object.values(data || {})) {
+          const codigo = info?.code;
+          const compra = parseFloat(info?.bid);
+          const venda = parseFloat(info?.ask);
+          if (!codigo || !isFinite(compra)) continue;
+          // média entre compra e venda: é a "cotação de mercado" que
+          // Google e Wise mostram, e o que o visitante usa de referência.
+          taxas[codigo] = isFinite(venda) && venda > 0 ? (compra + venda) / 2 : compra;
+        }
+        if (Object.keys(taxas).length < 3) throw new Error('AwesomeAPI devolveu pouca coisa');
+        return taxas;
+      }
+
+      async function buscarNaHgBrasil() {
         const url = `https://api.hgbrasil.com/finance?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}`;
         const resp = await fetch(url);
         const data = await resp.json();
         const currencies = data?.results?.currencies;
         if (!currencies) throw new Error('sem dados de moedas');
-
         const taxas = { BRL: 1 };
         for (const [codigo, info] of Object.entries(currencies)) {
           if (typeof info?.buy === 'number') taxas[codigo] = info.buy;
+        }
+        return taxas;
+      }
+
+      async function buscarCotacoes() {
+        const agora = Date.now();
+        if (cotacoesCache && (agora - cacheEm) < CACHE_VALIDADE_MS) return cotacoesCache;
+
+        let taxas;
+        try {
+          taxas = await buscarNaAwesomeApi();
+        } catch (e) {
+          console.warn('Conversor: AwesomeAPI indisponível, usando HG Brasil.', e);
+          taxas = await buscarNaHgBrasil();
         }
         cotacoesCache = taxas;
         cacheEm = agora;
