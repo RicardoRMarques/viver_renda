@@ -1931,32 +1931,32 @@
 
     /* Tabela de amortização (f AMORT) — fica fora do aparelho, porque é
        relatório, não tecla. */
-    .rpn-amort { margin-top: 14px; }
-    .rpn-amort[hidden] { display: none; }
-    .rpn-amort-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
-    .rpn-amort-topo h4 { margin: 0; font-size: 0.9rem; }
-    .rpn-amort-fechar { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 0.78rem; text-decoration: underline; }
-    .rpn-amort-aviso {
+    .rpn-painel { margin-top: 14px; }
+    .rpn-painel[hidden] { display: none; }
+    .rpn-painel-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+    .rpn-painel-topo h4 { margin: 0; font-size: 0.9rem; }
+    .rpn-painel-fechar { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 0.78rem; text-decoration: underline; }
+    .rpn-painel-aviso {
       background: rgba(224,184,77,0.12); border: 1px solid rgba(224,184,77,0.35);
       border-radius: 8px; padding: 9px 11px; font-size: 0.8rem; color: var(--text);
     }
-    .rpn-amort-resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
-    .rpn-amort-resumo div {
+    .rpn-painel-resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+    .rpn-painel-resumo div {
       background: var(--deep); border: 1px solid var(--border);
       border-radius: 8px; padding: 7px 6px; text-align: center; min-width: 0;
     }
-    .rpn-amort-resumo b { display: block; font-size: 0.64rem; color: var(--muted); font-weight: 700; }
-    .rpn-amort-resumo span { display: block; font-family: "Courier New", monospace; font-size: 0.76rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .rpn-amort-rolagem { max-height: 260px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; }
-    .rpn-amort-tabela { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
-    .rpn-amort-tabela th, .rpn-amort-tabela td { padding: 5px 7px; text-align: right; white-space: nowrap; }
-    .rpn-amort-tabela th {
+    .rpn-painel-resumo b { display: block; font-size: 0.64rem; color: var(--muted); font-weight: 700; }
+    .rpn-painel-resumo span { display: block; font-family: "Courier New", monospace; font-size: 0.76rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rpn-painel-rolagem { max-height: 260px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; }
+    .rpn-painel-tabela { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+    .rpn-painel-tabela th, .rpn-painel-tabela td { padding: 5px 7px; text-align: right; white-space: nowrap; }
+    .rpn-painel-tabela th {
       position: sticky; top: 0; background: var(--bg); z-index: 1;
       font-size: 0.68rem; color: var(--muted); border-bottom: 1px solid var(--border);
     }
-    .rpn-amort-tabela th:first-child, .rpn-amort-tabela td:first-child { text-align: left; }
-    .rpn-amort-tabela td { font-family: "Courier New", monospace; border-bottom: 1px solid var(--border); }
-    .rpn-amort-tabela tbody tr:nth-child(odd) td { background: var(--zebra); }
+    .rpn-painel-tabela th:first-child, .rpn-painel-tabela td:first-child { text-align: left; }
+    .rpn-painel-tabela td { font-family: "Courier New", monospace; border-bottom: 1px solid var(--border); }
+    .rpn-painel-tabela tbody tr:nth-child(odd) td { background: var(--zebra); }
 
     .rpn-legenda { margin-top: 14px; font-size: 0.75rem; color: var(--muted); line-height: 1.55; }
     .rpn-legenda b { color: var(--text); }
@@ -1971,7 +1971,7 @@
       .rpn-numero { font-size: 1.5rem; }
       .rpn-reg b { font-size: 0.58rem; }
       .rpn-reg span { font-size: 0.64rem; }
-      .rpn-amort-resumo span { font-size: 0.7rem; }
+      .rpn-painel-resumo span { font-size: 0.7rem; }
     }
 
     .indice-periodo { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
@@ -3931,10 +3931,10 @@
 
           <div class="rpn-teclado" id="rpnTeclado">
             <button type="button" class="rpn-tecla rpn-fin" data-tecla="n"><span class="rpn-sub"><span class="rpn-sub-f">AMORT</span> <span class="rpn-sub-g">12×</span></span>n</button>
-            <button type="button" class="rpn-tecla rpn-fin" data-tecla="i"><span class="rpn-sub rpn-sub-g">12÷</span>i</button>
-            <button type="button" class="rpn-tecla rpn-fin" data-tecla="pv"><span class="rpn-sub rpn-sub-g">BEG</span>PV</button>
-            <button type="button" class="rpn-tecla rpn-fin" data-tecla="pmt"><span class="rpn-sub rpn-sub-g">END</span>PMT</button>
-            <button type="button" class="rpn-tecla rpn-fin" data-tecla="fv">FV</button>
+            <button type="button" class="rpn-tecla rpn-fin" data-tecla="i"><span class="rpn-sub"><span class="rpn-sub-f">VPL</span> <span class="rpn-sub-g">12÷</span></span>i</button>
+            <button type="button" class="rpn-tecla rpn-fin" data-tecla="pv"><span class="rpn-sub"><span class="rpn-sub-f">CF0</span> <span class="rpn-sub-g">BEG</span></span>PV</button>
+            <button type="button" class="rpn-tecla rpn-fin" data-tecla="pmt"><span class="rpn-sub"><span class="rpn-sub-f">CFj</span> <span class="rpn-sub-g">END</span></span>PMT</button>
+            <button type="button" class="rpn-tecla rpn-fin" data-tecla="fv"><span class="rpn-sub"><span class="rpn-sub-f">TIR</span> <span class="rpn-sub-g">Nj</span></span>FV</button>
 
             <button type="button" class="rpn-tecla" data-tecla="ypx"><span class="rpn-sub rpn-sub-g">LN</span>yˣ</button>
             <button type="button" class="rpn-tecla" data-tecla="inv"><span class="rpn-sub rpn-sub-g">√x</span>1/x</button>
@@ -3973,19 +3973,30 @@
           </div>
           </div>
 
-          <div class="rpn-amort" id="rpnAmort" hidden>
-            <div class="rpn-amort-topo">
+          <div class="rpn-painel" id="rpnAmort" hidden>
+            <div class="rpn-painel-topo">
               <h4>Tabela de amortização</h4>
-              <button type="button" class="rpn-amort-fechar" id="rpnAmortFechar">fechar</button>
+              <button type="button" class="rpn-painel-fechar" id="rpnAmortFechar">fechar</button>
             </div>
             <div id="rpnAmortConteudo"></div>
+          </div>
+
+          <div class="rpn-painel" id="rpnFluxo" hidden>
+            <div class="rpn-painel-topo">
+              <h4>Fluxo de caixa</h4>
+              <span>
+                <button type="button" class="rpn-painel-fechar" id="rpnFluxoApagar">apagar último</button>
+                <button type="button" class="rpn-painel-fechar" id="rpnFluxoFechar" style="margin-left:10px;">fechar</button>
+              </span>
+            </div>
+            <div id="rpnFluxoConteudo"></div>
           </div>
 
           <div class="rpn-legenda">
             <p style="margin:0 0 8px;"><b>Como funciona.</b> Primeiro os números, depois a operação: <code>12 ENTER 3 ÷</code> dá 4. Não existe tecla de igual — o resultado aparece assim que você aperta a operação.</p>
             <p style="margin:0 0 8px;"><b>Dinheiro no tempo.</b> Informe quatro valores entre <code>n</code>, <code>i</code>, <code>PV</code>, <code>PMT</code> e <code>FV</code>, e aperte a tecla do quinto para descobri-lo. Digitou um número antes de apertar a tecla? Ela <b>guarda</b>. Apertou sem digitar nada? Ela <b>calcula</b>.</p>
             <p style="margin:0 0 8px;"><b>Atenção ao sinal.</b> O que sai do seu bolso entra negativo (use <code>CHS</code>), o que volta para você entra positivo. Sem isso a conta não fecha — é a regra de toda financeira, não uma escolha nossa.</p>
-            <p style="margin:0 0 8px;"><b>Teclas <span style="color:var(--gold);font-weight:700;">f</span> e <span style="color:var(--primary);font-weight:700;">g</span>.</b> <code>g n</code> multiplica por 12 (anos → meses), <code>g i</code> divide por 12 (taxa anual → mensal), <code>g PV</code> e <code>g PMT</code> trocam entre parcela no início (BEGIN) e no fim (END) do período. <code>g ENTER</code> devolve o último x. <code>f n</code> abre a <b>tabela de amortização</b>: quanto de cada parcela é juro, quanto abate a dívida e qual o saldo devedor. <code>f CLx</code> limpa só os registradores financeiros, <code>f ←</code> limpa tudo, e <code>f</code> seguido de um número de 0 a 9 muda as casas decimais.</p>
+            <p style="margin:0 0 8px;"><b>Teclas <span style="color:var(--gold);font-weight:700;">f</span> e <span style="color:var(--primary);font-weight:700;">g</span>.</b> <code>g n</code> multiplica por 12 (anos → meses), <code>g i</code> divide por 12 (taxa anual → mensal), <code>g PV</code> e <code>g PMT</code> trocam entre parcela no início (BEGIN) e no fim (END) do período. <code>g ENTER</code> devolve o último x. <code>f i</code> calcula o <b>VPL</b> e <code>f FV</code> a <b>TIR</b> de um fluxo de caixa montado com <code>f PV</code> (CF0), <code>f PMT</code> (cada fluxo) e <code>g FV</code> (repetir o último N vezes). <code>f n</code> abre a <b>tabela de amortização</b>: quanto de cada parcela é juro, quanto abate a dívida e qual o saldo devedor. <code>f CLx</code> limpa só os registradores financeiros, <code>f ←</code> limpa tudo, e <code>f</code> seguido de um número de 0 a 9 muda as casas decimais.</p>
             <p style="margin:0 0 8px;"><b>Teclado do computador.</b> Números, vírgula e ponto, <code>Enter</code>, <code>Backspace</code>, <code>Delete</code> (CLx), <code>+ − * /</code> e <code>%</code> funcionam direto. As letras <code>n</code>, <code>i</code>, <code>p</code> (PV), <code>t</code> (PMT) e <code>v</code> (FV) acionam as teclas financeiras.</p>
             <p style="margin:0;"><b>Exemplo.</b> Financiamento de R$ 300.000 em 30 anos a 11,5% ao ano: <code>30 g n</code>, <code>11,5 g i</code>, <code>300000 CHS PV</code>, <code>0 FV</code>, <code>PMT</code> → a parcela. Um detalhe honesto: quando você calcula <code>n</code>, mostramos o prazo exato (7,27 períodos, por exemplo) em vez de arredondar para cima, como fazem as máquinas físicas — é mais informativo para estudar.</p>
           </div>
@@ -15204,6 +15215,7 @@
           liftHabilitado: true,
           decimais: 2,
           fin: { n: null, i: null, pv: null, pmt: null, fv: null },
+          fluxos: [],
           begin: false,
           erro: null,
           ultimoCalculado: null,
@@ -15417,9 +15429,21 @@
         }
 
         function guardarFin(nome, valor) { est.fin[nome] = valor; }
-        function limparFin() { est.fin = { n: null, i: null, pv: null, pmt: null, fv: null }; est.erro = null; est.ultimoCalculado = null; }
+        // Põe um resultado no visor como se a máquina tivesse calculado:
+        // sobe a pilha (se for o caso) e encerra qualquer digitação.
+        function guardarNoX(valor) {
+          finalizarEntrada();
+          if (est.liftHabilitado) empilhar();
+          est.lastx = est.x;
+          est.x = valor;
+          est.entrada = null;
+          est.erro = null;
+          est.liftHabilitado = true;
+        }
+        function limparFin() { est.fin = { n: null, i: null, pv: null, pmt: null, fv: null }; est.fluxos = []; est.erro = null; est.ultimoCalculado = null; }
         function limparTudo() {
           limparFin();
+          est.fluxos = [];
           est.x = est.y = est.z = est.t = est.lastx = 0;
           est.entrada = null; est.liftHabilitado = true; est.begin = false;
         }
@@ -15427,8 +15451,101 @@
         function vezes12() { finalizarEntrada(); est.lastx = est.x; est.x = est.x * 12; est.fin.n = est.x; est.liftHabilitado = true; }
         function divide12() { finalizarEntrada(); est.lastx = est.x; est.x = est.x / 12; est.fin.i = est.x; est.liftHabilitado = true; }
 
+    // ---------- Fluxo de caixa (VPL e TIR) ----------
+    // A máquina de mesa guarda os fluxos numa lista invisível; aqui a lista
+    // fica na tela, porque errar o 40º lançamento e não ter como conferir é o
+    // que faz as pessoas desistirem desse bloco.
+    function limparFluxos() { est.fluxos = []; est.erro = null; }
+
+    function definirCF0() {
+      finalizarEntrada();
+      est.fluxos = [{ valor: est.x, vezes: 1 }];
+      est.liftHabilitado = true;
+      return true;
+    }
+
+    function adicionarCFj() {
+      finalizarEntrada();
+      if (est.fluxos.length === 0) return false; // exige CF0 primeiro
+      est.fluxos.push({ valor: est.x, vezes: 1 });
+      est.liftHabilitado = true;
+      return true;
+    }
+
+    function definirNj() {
+      finalizarEntrada();
+      const vezes = Math.round(est.x);
+      if (est.fluxos.length < 2 || !(vezes >= 1) || vezes > 1200) return false;
+      est.fluxos[est.fluxos.length - 1].vezes = vezes;
+      est.liftHabilitado = true;
+      return true;
+    }
+
+    function apagarUltimoFluxo() {
+      est.fluxos.pop();
+      est.erro = null;
+    }
+
+    function fluxosExpandidos() {
+      const lista = [];
+      est.fluxos.forEach((f, indice) => {
+        const vezes = indice === 0 ? 1 : Math.max(1, Math.round(f.vezes || 1));
+        for (let k = 0; k < vezes; k++) lista.push(f.valor);
+      });
+      return lista;
+    }
+
+    function vplNaTaxa(taxa) {
+      const lista = fluxosExpandidos();
+      let soma = 0;
+      for (let j = 0; j < lista.length; j++) soma += lista[j] / Math.pow(1 + taxa, j);
+      return soma;
+    }
+
+    function calcularVPL() {
+      if (est.fluxos.length < 2) return null;
+      const v = vplNaTaxa((est.fin.i ?? 0) / 100);
+      return isFinite(v) ? v : null;
+    }
+
+    // Quantas vezes a série troca de sinal. Pela regra de Descartes, é o teto
+    // do número de taxas que zeram o VPL: mais de uma troca significa que a
+    // TIR pode não ser única, e quem lê o número precisa saber disso.
+    function trocasDeSinal() {
+      const lista = fluxosExpandidos().filter((v) => v !== 0);
+      let trocas = 0;
+      for (let k = 1; k < lista.length; k++) {
+        if (Math.sign(lista[k]) !== Math.sign(lista[k - 1])) trocas++;
+      }
+      return trocas;
+    }
+
+    function calcularTIR() {
+      const lista = fluxosExpandidos();
+      if (lista.length < 2) return null;
+      if (trocasDeSinal() === 0) return null; // só entradas ou só saídas: não existe TIR
+      const g = (taxa) => vplNaTaxa(taxa);
+      let a = null, b = null, anterior = null, taxaAnterior = null;
+      for (let k = 0; k <= 4000; k++) {
+        const taxa = -0.9999 + k * (10.9999 / 4000);
+        const valor = g(taxa);
+        if (!isFinite(valor)) { anterior = null; continue; }
+        if (Math.abs(valor) < 1e-12) return taxa * 100;
+        if (anterior !== null && Math.sign(valor) !== Math.sign(anterior)) { a = taxaAnterior; b = taxa; break; }
+        anterior = valor; taxaAnterior = taxa;
+      }
+      if (a === null) return null;
+      for (let k = 0; k < 200; k++) {
+        const m = (a + b) / 2;
+        if (Math.sign(g(m)) === Math.sign(g(a))) a = m; else b = m;
+      }
+      return (a + b) / 2 * 100;
+    }
+
         return {
           est, digito, ponto: () => digito('.'), chs, backspace, clx, enter,
+          limparFluxos, definirCF0, adicionarCFj, definirNj, apagarUltimoFluxo,
+          fluxosExpandidos, calcularVPL, calcularTIR, trocasDeSinal, vplNaTaxa,
           somar: () => binaria((a, b) => a + b),
           subtrair: () => binaria((a, b) => a - b),
           multiplicar: () => binaria((a, b) => a * b),
@@ -15439,7 +15556,7 @@
           ln: () => unaria((a) => a <= 0 ? NaN : Math.log(a)),
           exp: () => unaria((a) => Math.exp(a)),
           porcento, deltaPorcento, porcentoTotal, lastx, trocarXY, rolarPilha,
-          teclaFin, guardarFin, limparFin, limparTudo, vezes12, divide12,
+          teclaFin, guardarFin, guardarNoX, limparFin, limparTudo, vezes12, divide12,
           valorX, resolver,
           definirBegin: (v) => { est.begin = !!v; },
           definirDecimais: (d) => { est.decimais = d; },
@@ -15513,7 +15630,7 @@
         return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
       function avisoAmort(texto) {
-        amortConteudoEl.innerHTML = `<div class="rpn-amort-aviso">${texto}</div>`;
+        amortConteudoEl.innerHTML = `<div class="rpn-painel-aviso">${texto}</div>`;
         amortEl.hidden = false;
       }
 
@@ -15583,13 +15700,13 @@
           </tr>`).join('');
 
         amortConteudoEl.innerHTML = `
-          <div class="rpn-amort-resumo">
+          <div class="rpn-painel-resumo">
             <div title="Soma de todas as parcelas"><b>Total pago</b><span>${moeda(totalPago)}</span></div>
             <div title="Quanto do total foi só juros"><b>Só de juros</b><span>${moeda(totalJuros)}</span></div>
             <div title="Valor original da dívida"><b>Dívida</b><span>${moeda(divida)}</span></div>
           </div>
-          <div class="rpn-amort-rolagem">
-            <table class="rpn-amort-tabela">
+          <div class="rpn-painel-rolagem">
+            <table class="rpn-painel-tabela">
               <thead><tr><th>#</th><th>Parcela</th><th>Juros</th><th>Amortização</th><th>Saldo devedor</th></tr></thead>
               <tbody>${corpo}</tbody>
             </table>
@@ -15600,6 +15717,105 @@
       }
 
       document.getElementById('rpnAmortFechar').addEventListener('click', () => { amortEl.hidden = true; });
+
+
+      // ---------- Fluxo de caixa: VPL e TIR (f i / f FV) ----------
+      const fluxoEl = document.getElementById('rpnFluxo');
+      const fluxoConteudoEl = document.getElementById('rpnFluxoConteudo');
+      let ultimoResultadoFluxo = null; // { tipo: 'vpl'|'tir', valor }
+
+      function desenharFluxo(mensagem) {
+        const fluxos = motor.est.fluxos;
+        if (fluxos.length === 0 && !mensagem) { fluxoEl.hidden = true; return; }
+
+        let posicao = 0;
+        const linhas = fluxos.map((f, indice) => {
+          const vezes = indice === 0 ? 1 : Math.max(1, Math.round(f.vezes || 1));
+          const de = posicao;
+          posicao += vezes;
+          const periodo = indice === 0 ? '0' : (vezes > 1 ? `${de} a ${posicao - 1}` : String(de));
+          const repeticao = vezes > 1 ? `<td>${vezes}×</td>` : '<td>—</td>';
+          return `<tr><td>${periodo}</td><td>${moeda(f.valor)}</td>${repeticao}</tr>`;
+        }).join('');
+
+        const trocas = motor.trocasDeSinal();
+        const avisos = [];
+        if (mensagem) avisos.push(mensagem);
+        if (fluxos.length >= 2 && trocas === 0) {
+          avisos.push('Todos os valores têm o mesmo sinal — dinheiro que só entra ou só sai. Nesse caso <b>não existe TIR</b>: falta o investimento (negativo) ou o retorno (positivo).');
+        } else if (trocas > 1) {
+          avisos.push(`A série troca de sinal <b>${trocas} vezes</b>, então pode haver mais de uma taxa que zera o VPL. O valor mostrado é <b>uma</b> delas — com fluxo assim, o VPL numa taxa de referência é uma decisão mais confiável que a TIR.`);
+        }
+
+        let resultadoHtml = '';
+        if (ultimoResultadoFluxo) {
+          const { tipo, valor } = ultimoResultadoFluxo;
+          const taxa = motor.est.fin.i;
+          resultadoHtml = tipo === 'vpl'
+            ? `<div class="rpn-painel-resumo"><div><b>VPL</b><span>${moeda(valor)}</span></div><div><b>na taxa de</b><span>${taxa === null ? '—' : moeda(taxa) + '%'}</span></div><div><b>períodos</b><span>${motor.fluxosExpandidos().length - 1}</span></div></div>`
+            : `<div class="rpn-painel-resumo"><div><b>TIR</b><span>${moeda(valor)}%</span></div><div><b>por período</b><span>${motor.fluxosExpandidos().length - 1}</span></div><div><b>guardada em i</b><span>sim</span></div></div>`;
+        }
+
+        fluxoConteudoEl.innerHTML = `
+          ${resultadoHtml}
+          ${avisos.map((a) => `<div class="rpn-painel-aviso" style="margin-bottom:8px;">${a}</div>`).join('')}
+          <div class="rpn-painel-rolagem">
+            <table class="rpn-painel-tabela">
+              <thead><tr><th>Período</th><th>Valor</th><th>Repete</th></tr></thead>
+              <tbody>${linhas || '<tr><td colspan="3">Nenhum fluxo lançado ainda.</td></tr>'}</tbody>
+            </table>
+          </div>
+          <p class="calc-ajuda" style="margin:8px 0 0; font-size:0.73rem;">Monte com <b>f PV</b> (CF0, o investimento — normalmente negativo), <b>f PMT</b> para cada fluxo seguinte e <b>g FV</b> para repetir o último N vezes. Depois <b>f i</b> dá o VPL na taxa que estiver em <b>i</b>, e <b>f FV</b> dá a TIR. A taxa é <b>por período</b>: fluxo mensal pede taxa mensal.</p>`;
+        fluxoEl.hidden = false;
+      }
+
+      function lancarCF0() {
+        motor.definirCF0();
+        ultimoResultadoFluxo = null;
+        desenharFluxo();
+      }
+      function lancarCFj() {
+        if (!motor.adicionarCFj()) { desenharFluxo('Comece pelo <b>CF0</b> (<b>f PV</b>): é o valor no período zero, o investimento inicial.'); return; }
+        ultimoResultadoFluxo = null;
+        desenharFluxo();
+      }
+      function lancarNj() {
+        if (!motor.definirNj()) { desenharFluxo('Digite quantas vezes o <b>último fluxo</b> se repete (número inteiro, de 1 a 1.200) e aperte <b>g FV</b>. Só vale depois de lançar um fluxo com <b>f PMT</b>.'); return; }
+        ultimoResultadoFluxo = null;
+        desenharFluxo();
+      }
+
+      function calcularVPL() {
+        if (motor.est.fluxos.length < 2) { desenharFluxo('Lance ao menos o <b>CF0</b> (<b>f PV</b>) e um fluxo (<b>f PMT</b>) antes de pedir o VPL.'); return; }
+        if (motor.est.fin.i === null) { desenharFluxo('Informe a <b>taxa de desconto</b> em <b>i</b> antes: é ela que traz os valores futuros para hoje.'); return; }
+        const valor = motor.calcularVPL();
+        if (valor === null) { desenharFluxo('Não deu para calcular o VPL com esses valores.'); return; }
+        motor.guardarNoX(valor);
+        ultimoResultadoFluxo = { tipo: 'vpl', valor };
+        desenharFluxo();
+        atualizar();
+      }
+
+      function calcularTIR() {
+        if (motor.est.fluxos.length < 2) { desenharFluxo('Lance ao menos o <b>CF0</b> (<b>f PV</b>) e um fluxo (<b>f PMT</b>) antes de pedir a TIR.'); return; }
+        const valor = motor.calcularTIR();
+        if (valor === null) {
+          desenharFluxo('Não existe uma taxa que zere esse fluxo. Confira se há pelo menos um valor negativo (o que você investe) e um positivo (o que recebe de volta).');
+          return;
+        }
+        motor.guardarNoX(valor);
+        motor.guardarFin('i', valor);
+        ultimoResultadoFluxo = { tipo: 'tir', valor };
+        desenharFluxo();
+        atualizar();
+      }
+
+      document.getElementById('rpnFluxoFechar').addEventListener('click', () => { fluxoEl.hidden = true; });
+      document.getElementById('rpnFluxoApagar').addEventListener('click', () => {
+        motor.apagarUltimoFluxo();
+        ultimoResultadoFluxo = null;
+        desenharFluxo();
+      });
 
       function acionar(codigo) {
         const modificador = shift;
@@ -15614,8 +15830,12 @@
         if (modificador === 'f') {
           if (DIGITOS[codigo] !== undefined) motor.definirDecimais(parseInt(DIGITOS[codigo], 10));
           else if (codigo === 'n') montarAmortizacao();
-          else if (codigo === 'clx') { motor.limparFin(); amortEl.hidden = true; }
-          else if (codigo === 'back') { motor.limparTudo(); amortEl.hidden = true; }
+          else if (codigo === 'i') calcularVPL();
+          else if (codigo === 'pv') lancarCF0();
+          else if (codigo === 'pmt') lancarCFj();
+          else if (codigo === 'fv') calcularTIR();
+          else if (codigo === 'clx') { motor.limparFin(); amortEl.hidden = true; fluxoEl.hidden = true; ultimoResultadoFluxo = null; }
+          else if (codigo === 'back') { motor.limparTudo(); amortEl.hidden = true; fluxoEl.hidden = true; ultimoResultadoFluxo = null; }
           atualizar();
           return;
         }
@@ -15625,6 +15845,7 @@
           else if (codigo === 'i') motor.divide12();
           else if (codigo === 'pv') motor.definirBegin(true);
           else if (codigo === 'pmt') motor.definirBegin(false);
+          else if (codigo === 'fv') lancarNj();
           else if (codigo === 'ypx') motor.ln();
           else if (codigo === 'inv') motor.raiz();
           else if (codigo === 'enter') motor.lastx();
