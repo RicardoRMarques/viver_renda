@@ -1830,6 +1830,150 @@
        linha, então ganha o mesmo peso visual que o número das cotações, e o
        período de referência vai na coluna da direita, discreto. */
     .indice-value.taxa { color: var(--text); font-weight: 700; }
+    /* ---------- Calculadora Financeira (RPN) ---------- */
+    .calc-modal.rpn-modal { max-width: 486px; }
+
+    /* O teclado vive dentro de um "aparelho" com paleta PRÓPRIA e fixa, que
+       não segue o tema da página: é um objeto na tela, não mais um painel do
+       site. Isso resolve de quebra o contraste — as teclas não clareiam
+       junto com a página, então os rótulos minúsculos de f/g mantêm a mesma
+       legibilidade nos dois temas. Desenho, cores e marca são do Viver de
+       Renda; o que vem do padrão de mercado é só a lógica das teclas. */
+    .rpn-aparelho {
+      --rpn-face-a: #262d3a;
+      --rpn-face-b: #151a23;
+      --rpn-tecla-a: #3c4453;
+      --rpn-tecla-b: #262d39;
+      --rpn-texto: #f2f6fc;
+      --rpn-borda: rgba(255,255,255,0.10);
+      --rpn-f: #e6b955;
+      --rpn-g: #5cc8ff;
+      background: linear-gradient(160deg, var(--rpn-face-a), var(--rpn-face-b));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 12px 12px 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .rpn-marca {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; padding: 0 2px 9px;
+      font-size: 0.6rem; letter-spacing: 1.6px; text-transform: uppercase;
+      color: rgba(242,246,252,0.55); font-weight: 700;
+    }
+    .rpn-marca b { color: var(--rpn-f); letter-spacing: 1.6px; }
+
+    /* Visor: fundo quase preto com dígitos dourados, na cor da marca —
+       de propósito diferente do verde-acinzentado das máquinas de mesa. */
+    .rpn-visor {
+      background: linear-gradient(180deg, #060a10, #0a1017);
+      border: 1px solid rgba(0,0,0,0.6);
+      border-radius: 10px;
+      padding: 9px 13px 11px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.75);
+    }
+    .rpn-visor-topo {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      font-family: "Courier New", monospace; font-size: 0.67rem;
+      color: rgba(230,185,85,0.55); min-height: 15px;
+    }
+    .rpn-pilha { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rpn-indicadores { display: flex; gap: 6px; flex-shrink: 0; }
+    /* Indicador nunca depende só de cor: cada um carrega o próprio texto. */
+    .rpn-indicadores span { border-radius: 4px; padding: 1px 5px; font-weight: 700; letter-spacing: 0.5px; }
+    .rpn-ind-f { background: var(--rpn-f); color: #2a1f00; }
+    .rpn-ind-g { background: var(--rpn-g); color: #04202e; }
+    .rpn-ind-beg { border: 1px solid rgba(230,185,85,0.6); color: #e6b955; }
+    .rpn-numero {
+      font-family: "Courier New", monospace; font-size: 1.9rem; font-weight: 700;
+      text-align: right; color: #f0cf82; margin-top: 3px;
+      text-shadow: 0 0 12px rgba(230,185,85,0.28);
+      overflow-x: auto; white-space: nowrap;
+    }
+    .rpn-numero.rpn-erro { color: #ff8f8f; font-size: 1.15rem; text-shadow: none; }
+
+    .rpn-registradores { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 9px; }
+    .rpn-reg {
+      background: rgba(0,0,0,0.28); border: 1px solid var(--rpn-borda);
+      border-radius: 7px; padding: 4px 3px; text-align: center; min-width: 0;
+    }
+    .rpn-reg b { display: block; font-size: 0.63rem; color: rgba(242,246,252,0.6); font-weight: 700; }
+    .rpn-reg span {
+      display: block; font-family: "Courier New", monospace; font-size: 0.7rem;
+      font-weight: 700; color: var(--rpn-texto);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    /* Quem acabou de ser calculado ganha borda E seta — não só realce de cor. */
+    .rpn-reg.rpn-calculado { border-color: var(--rpn-f); }
+    .rpn-reg.rpn-calculado b::after { content: " ◂"; color: var(--rpn-f); }
+
+    .rpn-teclado { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 11px; }
+    .rpn-tecla {
+      position: relative;
+      background: linear-gradient(180deg, var(--rpn-tecla-a), var(--rpn-tecla-b));
+      border: 1px solid rgba(0,0,0,0.45);
+      border-radius: 8px; color: var(--rpn-texto);
+      font-weight: 700; font-size: 0.86rem; font-family: inherit;
+      padding: 15px 2px 9px; cursor: pointer; min-width: 0; line-height: 1.1;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), 0 2px 3px rgba(0,0,0,0.4);
+    }
+    .rpn-tecla:hover { filter: brightness(1.16); }
+    .rpn-tecla:active { transform: translateY(1px); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+    .rpn-tecla .rpn-sub { position: absolute; top: 3px; left: 0; right: 0; font-size: 0.55rem; font-weight: 700; }
+    .rpn-tecla .rpn-sub-g, .rpn-tecla .rpn-sub .rpn-sub-g { color: var(--rpn-g); }
+    .rpn-tecla .rpn-sub-f, .rpn-tecla .rpn-sub .rpn-sub-f { color: var(--rpn-f); }
+    .rpn-tecla.rpn-fin { background: linear-gradient(180deg, #454d5d, #2e3542); }
+    .rpn-tecla.rpn-op { color: var(--rpn-g); font-size: 1rem; }
+    .rpn-tecla.rpn-shift-f { color: var(--rpn-f); }
+    .rpn-tecla.rpn-shift-g { color: var(--rpn-g); }
+    .rpn-tecla.rpn-shift-f.rpn-ativo { background: var(--rpn-f); color: #2a1f00; }
+    .rpn-tecla.rpn-shift-g.rpn-ativo { background: var(--rpn-g); color: #04202e; }
+    .rpn-tecla.rpn-enter { grid-column: 5; grid-row: 5 / 8; }
+
+    /* Tabela de amortização (f AMORT) — fica fora do aparelho, porque é
+       relatório, não tecla. */
+    .rpn-amort { margin-top: 14px; }
+    .rpn-amort[hidden] { display: none; }
+    .rpn-amort-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+    .rpn-amort-topo h4 { margin: 0; font-size: 0.9rem; }
+    .rpn-amort-fechar { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 0.78rem; text-decoration: underline; }
+    .rpn-amort-aviso {
+      background: rgba(224,184,77,0.12); border: 1px solid rgba(224,184,77,0.35);
+      border-radius: 8px; padding: 9px 11px; font-size: 0.8rem; color: var(--text);
+    }
+    .rpn-amort-resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+    .rpn-amort-resumo div {
+      background: var(--deep); border: 1px solid var(--border);
+      border-radius: 8px; padding: 7px 6px; text-align: center; min-width: 0;
+    }
+    .rpn-amort-resumo b { display: block; font-size: 0.64rem; color: var(--muted); font-weight: 700; }
+    .rpn-amort-resumo span { display: block; font-family: "Courier New", monospace; font-size: 0.76rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rpn-amort-rolagem { max-height: 260px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; }
+    .rpn-amort-tabela { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+    .rpn-amort-tabela th, .rpn-amort-tabela td { padding: 5px 7px; text-align: right; white-space: nowrap; }
+    .rpn-amort-tabela th {
+      position: sticky; top: 0; background: var(--bg); z-index: 1;
+      font-size: 0.68rem; color: var(--muted); border-bottom: 1px solid var(--border);
+    }
+    .rpn-amort-tabela th:first-child, .rpn-amort-tabela td:first-child { text-align: left; }
+    .rpn-amort-tabela td { font-family: "Courier New", monospace; border-bottom: 1px solid var(--border); }
+    .rpn-amort-tabela tbody tr:nth-child(odd) td { background: var(--zebra); }
+
+    .rpn-legenda { margin-top: 14px; font-size: 0.75rem; color: var(--muted); line-height: 1.55; }
+    .rpn-legenda b { color: var(--text); }
+    .rpn-legenda code {
+      font-family: "Courier New", monospace; background: var(--deep);
+      border: 1px solid var(--border); border-radius: 4px; padding: 0 4px;
+    }
+    @media (max-width: 430px) {
+      .rpn-aparelho { padding: 10px 9px 12px; border-radius: 15px; }
+      .rpn-teclado { gap: 4px; }
+      .rpn-tecla { font-size: 0.78rem; padding: 13px 1px 8px; }
+      .rpn-numero { font-size: 1.5rem; }
+      .rpn-reg b { font-size: 0.58rem; }
+      .rpn-reg span { font-size: 0.64rem; }
+      .rpn-amort-resumo span { font-size: 0.7rem; }
+    }
+
     .indice-periodo { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
     .indice-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
     .indice-change {
@@ -3206,6 +3350,9 @@
             <button type="button" class="nav-dropdown-item" id="navAbrirGlossario">
               📖 Glossário do Investidor
             </button>
+            <button type="button" class="nav-dropdown-item" id="rpnBtnAbrir">
+              🧮 Calculadora Financeira (RPN)
+            </button>
             <button type="button" class="nav-dropdown-item" id="basBtnAbrir">
               🏦 Índice de Basileia dos Bancos
             </button>
@@ -3262,6 +3409,7 @@
     <div class="mobile-menu-separador">Simuladores</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário do Investidor</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="rpnBtnAbrir">🧮 Calculadora Financeira (RPN)</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="quizBtnAbrir">❓ Descubra seu Perfil de Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="carteiraBtnAbrir">💰 Carteira de Rendimentos</button>
@@ -3375,6 +3523,10 @@
         <button type="button" class="atalho-simulador" id="navAbrirFinanciamento">
           <span class="atalho-icone-bg" style="background:#ff7ab0;"><svg viewBox="0 0 24 24" fill="none" stroke="#4b1528" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"></path></svg></span>
           Calculadora Financiamento Imobiliário
+        </button>
+        <button type="button" class="atalho-simulador" id="rpnBtnAbrirAtalho">
+          <span class="atalho-icone-bg" style="background:#e0b84d;"><svg viewBox="0 0 24 24" fill="none" stroke="#412402" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg></span>
+          Calculadora Financeira (RPN)
         </button>
         <button type="button" class="atalho-simulador" id="irBtnAbrir">
           <span class="atalho-icone-bg" style="background:#4dd0e1;"><svg viewBox="0 0 24 24" fill="none" stroke="#04303a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l3 3v17H6z"></path><path d="M15 2v3h3"></path><line x1="9" y1="10" x2="15" y2="10"></line><line x1="9" y1="14" x2="15" y2="14"></line><line x1="9" y1="18" x2="12" y2="18"></line></svg></span>
@@ -3752,6 +3904,94 @@
       </div>
     </div>
 
+
+    <!-- CALCULADORA FINANCEIRA (RPN) — notação polonesa reversa, no padrão
+         das financeiras clássicas: primeiro os números, depois a operação.
+         Não imita marca nem aparelho nenhum; é o método de entrada que é
+         padrão de mercado há décadas. -->
+    <div class="calc-overlay" id="rpnOverlay" role="dialog" aria-modal="true" aria-labelledby="rpnTitulo" hidden>
+      <div class="calc-modal rpn-modal">
+        <div class="calc-modal-topo">
+          <h3 id="rpnTitulo">🧮 Calculadora Financeira (RPN)</h3>
+          <button type="button" class="calc-fechar" id="rpnFechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+        </div>
+
+        <div class="calc-corpo">
+          <div class="rpn-aparelho">
+          <div class="rpn-marca"><span>Financeira RPN</span><b>Viver de Renda</b></div>
+          <div class="rpn-visor">
+            <div class="rpn-visor-topo">
+              <span class="rpn-pilha" id="rpnPilha"></span>
+              <span class="rpn-indicadores" id="rpnIndicadores"></span>
+            </div>
+            <div class="rpn-numero" id="rpnNumero" aria-live="polite">0,00</div>
+          </div>
+
+          <div class="rpn-registradores" id="rpnRegistradores"></div>
+
+          <div class="rpn-teclado" id="rpnTeclado">
+            <button type="button" class="rpn-tecla rpn-fin" data-tecla="n"><span class="rpn-sub"><span class="rpn-sub-f">AMORT</span> <span class="rpn-sub-g">12×</span></span>n</button>
+            <button type="button" class="rpn-tecla rpn-fin" data-tecla="i"><span class="rpn-sub rpn-sub-g">12÷</span>i</button>
+            <button type="button" class="rpn-tecla rpn-fin" data-tecla="pv"><span class="rpn-sub rpn-sub-g">BEG</span>PV</button>
+            <button type="button" class="rpn-tecla rpn-fin" data-tecla="pmt"><span class="rpn-sub rpn-sub-g">END</span>PMT</button>
+            <button type="button" class="rpn-tecla rpn-fin" data-tecla="fv">FV</button>
+
+            <button type="button" class="rpn-tecla" data-tecla="ypx"><span class="rpn-sub rpn-sub-g">LN</span>yˣ</button>
+            <button type="button" class="rpn-tecla" data-tecla="inv"><span class="rpn-sub rpn-sub-g">√x</span>1/x</button>
+            <button type="button" class="rpn-tecla" data-tecla="pctT">%T</button>
+            <button type="button" class="rpn-tecla" data-tecla="dpct">Δ%</button>
+            <button type="button" class="rpn-tecla" data-tecla="pct">%</button>
+
+            <button type="button" class="rpn-tecla rpn-shift-f" data-tecla="f" id="rpnTeclaF">f</button>
+            <button type="button" class="rpn-tecla rpn-shift-g" data-tecla="g" id="rpnTeclaG">g</button>
+            <button type="button" class="rpn-tecla" data-tecla="swap">x≷y</button>
+            <button type="button" class="rpn-tecla" data-tecla="roll">R↓</button>
+            <button type="button" class="rpn-tecla" data-tecla="back"><span class="rpn-sub rpn-sub-f">TUDO</span>←</button>
+
+            <button type="button" class="rpn-tecla" data-tecla="d7">7</button>
+            <button type="button" class="rpn-tecla" data-tecla="d8">8</button>
+            <button type="button" class="rpn-tecla" data-tecla="d9">9</button>
+            <button type="button" class="rpn-tecla rpn-op" data-tecla="div">÷</button>
+            <button type="button" class="rpn-tecla" data-tecla="clx"><span class="rpn-sub rpn-sub-f">FIN</span>CLx</button>
+
+            <button type="button" class="rpn-tecla rpn-enter" data-tecla="enter"><span class="rpn-sub rpn-sub-g">LSTx</span>ENTER</button>
+
+            <button type="button" class="rpn-tecla" data-tecla="d4">4</button>
+            <button type="button" class="rpn-tecla" data-tecla="d5">5</button>
+            <button type="button" class="rpn-tecla" data-tecla="d6">6</button>
+            <button type="button" class="rpn-tecla rpn-op" data-tecla="mul">×</button>
+
+            <button type="button" class="rpn-tecla" data-tecla="d1">1</button>
+            <button type="button" class="rpn-tecla" data-tecla="d2">2</button>
+            <button type="button" class="rpn-tecla" data-tecla="d3">3</button>
+            <button type="button" class="rpn-tecla rpn-op" data-tecla="sub">−</button>
+
+            <button type="button" class="rpn-tecla" data-tecla="d0">0</button>
+            <button type="button" class="rpn-tecla" data-tecla="dot">,</button>
+            <button type="button" class="rpn-tecla" data-tecla="chs">CHS</button>
+            <button type="button" class="rpn-tecla rpn-op" data-tecla="add">+</button>
+          </div>
+          </div>
+
+          <div class="rpn-amort" id="rpnAmort" hidden>
+            <div class="rpn-amort-topo">
+              <h4>Tabela de amortização</h4>
+              <button type="button" class="rpn-amort-fechar" id="rpnAmortFechar">fechar</button>
+            </div>
+            <div id="rpnAmortConteudo"></div>
+          </div>
+
+          <div class="rpn-legenda">
+            <p style="margin:0 0 8px;"><b>Como funciona.</b> Primeiro os números, depois a operação: <code>12 ENTER 3 ÷</code> dá 4. Não existe tecla de igual — o resultado aparece assim que você aperta a operação.</p>
+            <p style="margin:0 0 8px;"><b>Dinheiro no tempo.</b> Informe quatro valores entre <code>n</code>, <code>i</code>, <code>PV</code>, <code>PMT</code> e <code>FV</code>, e aperte a tecla do quinto para descobri-lo. Digitou um número antes de apertar a tecla? Ela <b>guarda</b>. Apertou sem digitar nada? Ela <b>calcula</b>.</p>
+            <p style="margin:0 0 8px;"><b>Atenção ao sinal.</b> O que sai do seu bolso entra negativo (use <code>CHS</code>), o que volta para você entra positivo. Sem isso a conta não fecha — é a regra de toda financeira, não uma escolha nossa.</p>
+            <p style="margin:0 0 8px;"><b>Teclas <span style="color:var(--gold);font-weight:700;">f</span> e <span style="color:var(--primary);font-weight:700;">g</span>.</b> <code>g n</code> multiplica por 12 (anos → meses), <code>g i</code> divide por 12 (taxa anual → mensal), <code>g PV</code> e <code>g PMT</code> trocam entre parcela no início (BEGIN) e no fim (END) do período. <code>g ENTER</code> devolve o último x. <code>f n</code> abre a <b>tabela de amortização</b>: quanto de cada parcela é juro, quanto abate a dívida e qual o saldo devedor. <code>f CLx</code> limpa só os registradores financeiros, <code>f ←</code> limpa tudo, e <code>f</code> seguido de um número de 0 a 9 muda as casas decimais.</p>
+            <p style="margin:0 0 8px;"><b>Teclado do computador.</b> Números, vírgula e ponto, <code>Enter</code>, <code>Backspace</code>, <code>Delete</code> (CLx), <code>+ − * /</code> e <code>%</code> funcionam direto. As letras <code>n</code>, <code>i</code>, <code>p</code> (PV), <code>t</code> (PMT) e <code>v</code> (FV) acionam as teclas financeiras.</p>
+            <p style="margin:0;"><b>Exemplo.</b> Financiamento de R$ 300.000 em 30 anos a 11,5% ao ano: <code>30 g n</code>, <code>11,5 g i</code>, <code>300000 CHS PV</code>, <code>0 FV</code>, <code>PMT</code> → a parcela. Um detalhe honesto: quando você calcula <code>n</code>, mostramos o prazo exato (7,27 períodos, por exemplo) em vez de arredondar para cima, como fazem as máquinas físicas — é mais informativo para estudar.</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Modal da calculadora (abre dentro da própria página, sem sair dela) -->
     <div id="aposOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="aposTitulo" hidden>
@@ -14941,6 +15181,533 @@
         estadoAmortizacao = { lista: [] };
         simular();
       });
+    })();
+
+
+    // ============================================================
+    // CALCULADORA FINANCEIRA (RPN)
+    // Notação polonesa reversa: os números entram primeiro, a operação
+    // depois, e não existe tecla de igual. É o padrão das calculadoras
+    // financeiras usadas no mercado há décadas — o método, não o aparelho
+    // de nenhuma marca: layout, cores e nome aqui são os do site.
+    // O motor é testado à parte (aritmética, pilha, percentuais e as cinco
+    // variáveis do dinheiro no tempo); a interface abaixo só desenha estado.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('rpnOverlay');
+      if (!overlay) return;
+
+      function criarMotorRPN() {
+        const est = {
+          x: 0, y: 0, z: 0, t: 0, lastx: 0,
+          entrada: null,
+          liftHabilitado: true,
+          decimais: 2,
+          fin: { n: null, i: null, pv: null, pmt: null, fv: null },
+          begin: false,
+          erro: null,
+          ultimoCalculado: null,
+        };
+
+        function valorX() {
+          return est.entrada !== null ? (parseFloat(est.entrada.replace(',', '.')) || 0) : est.x;
+        }
+        function finalizarEntrada() {
+          if (est.entrada !== null) { est.x = parseFloat(est.entrada.replace(',', '.')) || 0; est.entrada = null; }
+        }
+        function empilhar() { est.t = est.z; est.z = est.y; est.y = est.x; }
+        function desempilhar() { est.y = est.z; est.z = est.t; }
+
+        function digito(d) {
+          est.erro = null;
+          if (est.entrada === null) {
+            if (est.liftHabilitado) empilhar();
+            est.entrada = (d === '.') ? '0.' : String(d);
+            est.liftHabilitado = true;
+            return;
+          }
+          if (d === '.') { if (!est.entrada.includes('.')) est.entrada += '.'; return; }
+          if (est.entrada === '0') { est.entrada = String(d); return; }
+          est.entrada += String(d);
+        }
+
+        function chs() {
+          est.erro = null;
+          if (est.entrada !== null) {
+            est.entrada = est.entrada.startsWith('-') ? est.entrada.slice(1) : '-' + est.entrada;
+            return;
+          }
+          est.x = -est.x;
+        }
+
+        function backspace() {
+          est.erro = null;
+          if (est.entrada === null) { est.x = 0; return; }
+          est.entrada = est.entrada.slice(0, -1);
+          if (est.entrada === '' || est.entrada === '-') est.entrada = null, est.x = 0;
+        }
+
+        function clx() { est.erro = null; est.entrada = null; est.x = 0; est.liftHabilitado = false; }
+
+        function enter() {
+          est.erro = null;
+          finalizarEntrada();
+          empilhar();
+          est.liftHabilitado = false;
+        }
+
+        function binaria(fn) {
+          est.erro = null;
+          finalizarEntrada();
+          const a = est.y, b = est.x;
+          const r = fn(a, b);
+          if (!isFinite(r)) { est.erro = 'Erro'; return; }
+          est.lastx = b;
+          est.x = r;
+          desempilhar();
+          est.liftHabilitado = true;
+        }
+
+        function unaria(fn) {
+          est.erro = null;
+          finalizarEntrada();
+          const r = fn(est.x);
+          if (!isFinite(r)) { est.erro = 'Erro'; return; }
+          est.lastx = est.x;
+          est.x = r;
+          est.liftHabilitado = true;
+        }
+
+        // Percentuais no padrão das financeiras: a base é sempre Y, que continua
+        // na pilha (por isso não usam `binaria`, que derruba um nível).
+        function porcento() {
+          est.erro = null; finalizarEntrada();
+          est.lastx = est.x;
+          est.x = est.y * est.x / 100;
+          est.liftHabilitado = true;
+        }
+        function deltaPorcento() {
+          est.erro = null; finalizarEntrada();
+          if (est.y === 0) { est.erro = 'Erro'; return; }
+          est.lastx = est.x;
+          est.x = (est.x - est.y) / est.y * 100;
+          est.liftHabilitado = true;
+        }
+        function porcentoTotal() {
+          est.erro = null; finalizarEntrada();
+          if (est.y === 0) { est.erro = 'Erro'; return; }
+          est.lastx = est.x;
+          est.x = est.x / est.y * 100;
+          est.liftHabilitado = true;
+        }
+
+        function lastx() {
+          est.erro = null; finalizarEntrada();
+          if (est.liftHabilitado) empilhar();
+          est.x = est.lastx;
+          est.liftHabilitado = true;
+        }
+
+        function trocarXY() {
+          est.erro = null; finalizarEntrada();
+          const tmp = est.x; est.x = est.y; est.y = tmp;
+          est.liftHabilitado = true;
+        }
+
+        function rolarPilha() {
+          est.erro = null; finalizarEntrada();
+          const tmp = est.x; est.x = est.y; est.y = est.z; est.z = est.t; est.t = tmp;
+          est.liftHabilitado = true;
+        }
+
+        // ---------- Bloco financeiro (TVM) ----------
+        // Equação do valor do dinheiro no tempo, no mesmo sinal-convenção das
+        // financeiras clássicas: entrada e saída têm sinais opostos.
+        //   PV + (1 + i·S)·PMT·[(1 − (1+i)^−n)/i] + FV·(1+i)^−n = 0
+        // S = 1 no modo BEGIN (parcela no início do período), 0 no END.
+        function fator(i, n) {
+          if (i === 0) return n;
+          return (1 - Math.pow(1 + i, -n)) / i;
+        }
+        function residuo(n, i, pv, pmt, fv, begin) {
+          const S = begin ? 1 : 0;
+          if (i === 0) return pv + pmt * n + fv;
+          return pv + (1 + i * S) * pmt * fator(i, n) + fv * Math.pow(1 + i, -n);
+        }
+
+        function resolver(alvo) {
+          const f = est.fin;
+          const n = f.n ?? 0, taxa = (f.i ?? 0) / 100, pv = f.pv ?? 0, pmt = f.pmt ?? 0, fv = f.fv ?? 0;
+          const S = est.begin ? 1 : 0;
+
+          if (alvo === 'pv') {
+            return -((1 + taxa * S) * pmt * fator(taxa, n) + fv * Math.pow(1 + taxa, -n));
+          }
+          if (alvo === 'fv') {
+            if (taxa === 0) return -(pv + pmt * n);
+            return -(pv + (1 + taxa * S) * pmt * fator(taxa, n)) * Math.pow(1 + taxa, n);
+          }
+          if (alvo === 'pmt') {
+            if (taxa === 0) { if (n === 0) return null; return -(pv + fv) / n; }
+            const den = (1 + taxa * S) * fator(taxa, n);
+            if (den === 0) return null;
+            return -(pv + fv * Math.pow(1 + taxa, -n)) / den;
+          }
+          if (alvo === 'n') {
+            // n negativo ou zero não é resposta: significa que os sinais informados
+            // não fecham no tempo (ex.: PV, PMT e FV todos positivos, dinheiro que
+            // só entra e nunca sai). Sem esse corte a conta devolvia um número
+            // aparentemente válido, como -2,1 períodos.
+            let prazo;
+            if (taxa === 0) {
+              if (pmt === 0) return null;
+              prazo = -(pv + fv) / pmt;
+            } else {
+              const k = pmt * (1 + taxa * S) / taxa;
+              const num = k - fv, den = k + pv;
+              if (den === 0 || num / den <= 0) return null;
+              prazo = Math.log(num / den) / Math.log(1 + taxa);
+            }
+            return prazo > 0 ? prazo : null;
+          }
+          if (alvo === 'i') {
+            if (!(n > 0)) return null;
+            const g = (taxaTeste) => residuo(n, taxaTeste, pv, pmt, fv, est.begin);
+            // Varre em busca de troca de sinal e refina por bisseção: mais lento
+            // que Newton puro, porém não diverge nem depende de chute inicial —
+            // o que importa mais aqui do que microssegundos.
+            let a = null, b = null, anterior = null, taxaAnterior = null;
+            for (let k = 0; k <= 4000; k++) {
+              const taxaTeste = -0.9999 + k * (10.9999 / 4000);
+              const valor = g(taxaTeste);
+              if (!isFinite(valor)) { anterior = null; continue; }
+              if (Math.abs(valor) < 1e-12) return taxaTeste * 100;
+              if (anterior !== null && Math.sign(valor) !== Math.sign(anterior)) { a = taxaAnterior; b = taxaTeste; break; }
+              anterior = valor; taxaAnterior = taxaTeste;
+            }
+            if (a === null) return null;
+            for (let k = 0; k < 200; k++) {
+              const m = (a + b) / 2, valor = g(m);
+              if (Math.sign(valor) === Math.sign(g(a))) a = m; else b = m;
+            }
+            return (a + b) / 2 * 100;
+          }
+          return null;
+        }
+
+        // Regra das financeiras: se o número acabou de ser digitado, a tecla
+        // GUARDA o valor; se não há digitação em curso, ela CALCULA a variável.
+        function teclaFin(nome) {
+          est.erro = null;
+          est.ultimoCalculado = null;
+          if (est.entrada !== null) {
+            finalizarEntrada();
+            est.fin[nome] = est.x;
+            est.liftHabilitado = true;
+            return { acao: 'guardou', valor: est.x };
+          }
+          const r = resolver(nome);
+          if (r === null || !isFinite(r)) { est.erro = 'Sem solução'; return { acao: 'erro' }; }
+          est.fin[nome] = r;
+          if (est.liftHabilitado) empilhar();
+          est.x = r;
+          est.liftHabilitado = true;
+          est.ultimoCalculado = nome;
+          return { acao: 'calculou', valor: r };
+        }
+
+        function guardarFin(nome, valor) { est.fin[nome] = valor; }
+        function limparFin() { est.fin = { n: null, i: null, pv: null, pmt: null, fv: null }; est.erro = null; est.ultimoCalculado = null; }
+        function limparTudo() {
+          limparFin();
+          est.x = est.y = est.z = est.t = est.lastx = 0;
+          est.entrada = null; est.liftHabilitado = true; est.begin = false;
+        }
+        // g 12× sobre n (anos → meses) e g 12÷ sobre i (taxa anual → mensal)
+        function vezes12() { finalizarEntrada(); est.lastx = est.x; est.x = est.x * 12; est.fin.n = est.x; est.liftHabilitado = true; }
+        function divide12() { finalizarEntrada(); est.lastx = est.x; est.x = est.x / 12; est.fin.i = est.x; est.liftHabilitado = true; }
+
+        return {
+          est, digito, ponto: () => digito('.'), chs, backspace, clx, enter,
+          somar: () => binaria((a, b) => a + b),
+          subtrair: () => binaria((a, b) => a - b),
+          multiplicar: () => binaria((a, b) => a * b),
+          dividir: () => binaria((a, b) => b === 0 ? NaN : a / b),
+          potencia: () => binaria((a, b) => Math.pow(a, b)),
+          inverso: () => unaria((a) => a === 0 ? NaN : 1 / a),
+          raiz: () => unaria((a) => a < 0 ? NaN : Math.sqrt(a)),
+          ln: () => unaria((a) => a <= 0 ? NaN : Math.log(a)),
+          exp: () => unaria((a) => Math.exp(a)),
+          porcento, deltaPorcento, porcentoTotal, lastx, trocarXY, rolarPilha,
+          teclaFin, guardarFin, limparFin, limparTudo, vezes12, divide12,
+          valorX, resolver,
+          definirBegin: (v) => { est.begin = !!v; },
+          definirDecimais: (d) => { est.decimais = d; },
+        };
+      }
+
+      const motor = criarMotorRPN();
+      const numeroEl = document.getElementById('rpnNumero');
+      const pilhaEl = document.getElementById('rpnPilha');
+      const indEl = document.getElementById('rpnIndicadores');
+      const regsEl = document.getElementById('rpnRegistradores');
+      const teclado = document.getElementById('rpnTeclado');
+      const btnFechar = document.getElementById('rpnFechar');
+
+      const REGISTRADORES = [
+        { chave: 'n', rotulo: 'n' },
+        { chave: 'i', rotulo: 'i %' },
+        { chave: 'pv', rotulo: 'PV' },
+        { chave: 'pmt', rotulo: 'PMT' },
+        { chave: 'fv', rotulo: 'FV' },
+      ];
+      const DIGITOS = { d0: '0', d1: '1', d2: '2', d3: '3', d4: '4', d5: '5', d6: '6', d7: '7', d8: '8', d9: '9' };
+
+      let shift = null;
+
+      function formatar(v) {
+        if (v === null || v === undefined || !isFinite(v)) return '—';
+        const d = motor.est.decimais;
+        return v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d });
+      }
+
+      function atualizar() {
+        const est = motor.est;
+
+        if (est.erro) {
+          numeroEl.textContent = est.erro;
+          numeroEl.classList.add('rpn-erro');
+        } else {
+          numeroEl.classList.remove('rpn-erro');
+          numeroEl.textContent = est.entrada !== null
+            ? est.entrada.replace('.', ',')
+            : formatar(est.x);
+        }
+
+        pilhaEl.textContent = `T ${formatar(est.t)}  ·  Z ${formatar(est.z)}  ·  Y ${formatar(est.y)}`;
+
+        const marcas = [];
+        if (shift === 'f') marcas.push('<span class="rpn-ind-f">f</span>');
+        if (shift === 'g') marcas.push('<span class="rpn-ind-g">g</span>');
+        if (est.begin) marcas.push('<span class="rpn-ind-beg">BEGIN</span>');
+        indEl.innerHTML = marcas.join('');
+
+        regsEl.innerHTML = REGISTRADORES.map(({ chave, rotulo }) => {
+          const valor = est.fin[chave];
+          const texto = valor === null ? '—' : formatar(valor);
+          const destaque = est.ultimoCalculado === chave ? ' rpn-calculado' : '';
+          const titulo = valor === null ? `${rotulo} ainda não informado` : `${rotulo} = ${texto}`;
+          return `<div class="rpn-reg${destaque}" title="${titulo}"><b>${rotulo}</b><span>${texto}</span></div>`;
+        }).join('');
+
+        document.getElementById('rpnTeclaF').classList.toggle('rpn-ativo', shift === 'f');
+        document.getElementById('rpnTeclaG').classList.toggle('rpn-ativo', shift === 'g');
+      }
+
+
+      // ---------- Tabela de amortização (f n) ----------
+      const amortEl = document.getElementById('rpnAmort');
+      const amortConteudoEl = document.getElementById('rpnAmortConteudo');
+
+      function moeda(v) {
+        return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      function avisoAmort(texto) {
+        amortConteudoEl.innerHTML = `<div class="rpn-amort-aviso">${texto}</div>`;
+        amortEl.hidden = false;
+      }
+
+      function montarAmortizacao() {
+        const est = motor.est;
+
+        // Parcela vencida é o regime de praticamente todo financiamento e
+        // empréstimo no Brasil, e é o único em que "juros do período" e
+        // "amortização" têm leitura única. Em vez de inventar uma convenção
+        // para o modo BEGIN, a tabela pede que ele seja desligado.
+        if (est.begin) {
+          avisoAmort('A tabela de amortização trabalha com <b>parcela vencida</b> (pagamento no fim do período), que é o caso de financiamentos e empréstimos no Brasil. Aperte <b>g PMT</b> para sair do modo BEGIN e tente de novo.');
+          return;
+        }
+
+        const n = Math.round(est.fin.n ?? 0);
+        const taxa = (est.fin.i ?? 0) / 100;
+        if (!(n > 0)) { avisoAmort('Informe antes o prazo em <b>n</b> (número de parcelas).'); return; }
+        if (n > 1200) { avisoAmort('Prazo acima de 1.200 parcelas — confira o valor de <b>n</b>.'); return; }
+        if (est.fin.pv === null || est.fin.pv === 0) { avisoAmort('Informe antes o valor da dívida em <b>PV</b> (normalmente negativo, com <b>CHS</b>).'); return; }
+
+        let pmt = est.fin.pmt;
+        if (pmt === null || pmt === 0) {
+          const calculado = motor.resolver('pmt');
+          if (calculado === null || !isFinite(calculado)) { avisoAmort('Não deu para descobrir a parcela com os valores informados. Confira <b>n</b>, <b>i</b> e <b>PV</b>.'); return; }
+          pmt = calculado;
+          motor.guardarFin('pmt', calculado);
+        }
+
+        // A tabela trabalha em módulo: o sinal serve para a equação fechar,
+        // não para a leitura de "quanto entrou de juros neste mês".
+        const divida = Math.abs(est.fin.pv);
+        const parcela = Math.abs(pmt);
+
+        if (taxa > 0 && parcela <= divida * taxa) {
+          avisoAmort(`A parcela de <b>${moeda(parcela)}</b> não cobre nem os juros do primeiro período (<b>${moeda(divida * taxa)}</b>): a dívida cresceria em vez de diminuir. Confira <b>i</b>, <b>n</b> e <b>PMT</b>.`);
+          return;
+        }
+
+        const linhas = [];
+        let saldo = divida, totalJuros = 0, totalPago = 0;
+        for (let k = 1; k <= n; k++) {
+          let juros = saldo * taxa;
+          let amortizacao = parcela - juros;
+          let pago = parcela;
+          // Última parcela: quita o que sobrou. Sem esse acerto, o
+          // arredondamento de centavos deixaria um saldo residual de alguns
+          // centavos na linha final — que é justamente onde todo mundo olha.
+          if (k === n || amortizacao >= saldo) {
+            amortizacao = saldo;
+            pago = juros + amortizacao;
+          }
+          saldo = saldo - amortizacao;
+          totalJuros += juros;
+          totalPago += pago;
+          linhas.push({ k, pago, juros, amortizacao, saldo: Math.abs(saldo) < 0.005 ? 0 : saldo });
+          if (saldo <= 0) break;
+        }
+
+        const corpo = linhas.map((l) => `
+          <tr>
+            <td>${l.k}</td>
+            <td>${moeda(l.pago)}</td>
+            <td>${moeda(l.juros)}</td>
+            <td>${moeda(l.amortizacao)}</td>
+            <td>${moeda(l.saldo)}</td>
+          </tr>`).join('');
+
+        amortConteudoEl.innerHTML = `
+          <div class="rpn-amort-resumo">
+            <div title="Soma de todas as parcelas"><b>Total pago</b><span>${moeda(totalPago)}</span></div>
+            <div title="Quanto do total foi só juros"><b>Só de juros</b><span>${moeda(totalJuros)}</span></div>
+            <div title="Valor original da dívida"><b>Dívida</b><span>${moeda(divida)}</span></div>
+          </div>
+          <div class="rpn-amort-rolagem">
+            <table class="rpn-amort-tabela">
+              <thead><tr><th>#</th><th>Parcela</th><th>Juros</th><th>Amortização</th><th>Saldo devedor</th></tr></thead>
+              <tbody>${corpo}</tbody>
+            </table>
+          </div>
+          <p class="calc-ajuda" style="margin:8px 0 0; font-size:0.73rem;">Regime de parcela vencida (Tabela Price), a ${(taxa * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}% ao período. A última parcela é ajustada para quitar o saldo, como fazem os contratos. Não inclui seguros, taxa de administração nem correção monetária.</p>`;
+        amortEl.hidden = false;
+        amortEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      document.getElementById('rpnAmortFechar').addEventListener('click', () => { amortEl.hidden = true; });
+
+      function acionar(codigo) {
+        const modificador = shift;
+        shift = null;
+
+        if (codigo === 'f' || codigo === 'g') {
+          shift = (modificador === codigo) ? null : codigo;
+          atualizar();
+          return;
+        }
+
+        if (modificador === 'f') {
+          if (DIGITOS[codigo] !== undefined) motor.definirDecimais(parseInt(DIGITOS[codigo], 10));
+          else if (codigo === 'n') montarAmortizacao();
+          else if (codigo === 'clx') { motor.limparFin(); amortEl.hidden = true; }
+          else if (codigo === 'back') { motor.limparTudo(); amortEl.hidden = true; }
+          atualizar();
+          return;
+        }
+
+        if (modificador === 'g') {
+          if (codigo === 'n') motor.vezes12();
+          else if (codigo === 'i') motor.divide12();
+          else if (codigo === 'pv') motor.definirBegin(true);
+          else if (codigo === 'pmt') motor.definirBegin(false);
+          else if (codigo === 'ypx') motor.ln();
+          else if (codigo === 'inv') motor.raiz();
+          else if (codigo === 'enter') motor.lastx();
+          atualizar();
+          return;
+        }
+
+        if (DIGITOS[codigo] !== undefined) { motor.digito(DIGITOS[codigo]); atualizar(); return; }
+
+        switch (codigo) {
+          case 'dot': motor.ponto(); break;
+          case 'chs': motor.chs(); break;
+          case 'back': motor.backspace(); break;
+          case 'clx': motor.clx(); break;
+          case 'enter': motor.enter(); break;
+          case 'add': motor.somar(); break;
+          case 'sub': motor.subtrair(); break;
+          case 'mul': motor.multiplicar(); break;
+          case 'div': motor.dividir(); break;
+          case 'ypx': motor.potencia(); break;
+          case 'inv': motor.inverso(); break;
+          case 'pct': motor.porcento(); break;
+          case 'dpct': motor.deltaPorcento(); break;
+          case 'pctT': motor.porcentoTotal(); break;
+          case 'swap': motor.trocarXY(); break;
+          case 'roll': motor.rolarPilha(); break;
+          case 'n': case 'i': case 'pv': case 'pmt': case 'fv': motor.teclaFin(codigo); break;
+          default: break;
+        }
+        atualizar();
+      }
+
+      teclado.addEventListener('click', (e) => {
+        const botao = e.target.closest('.rpn-tecla');
+        if (!botao) return;
+        // Tira o foco do botão clicado: sem isso, um Enter no teclado físico
+        // dispararia duas vezes — uma pelo botão focado, outra pelo atalho.
+        botao.blur();
+        acionar(botao.dataset.tecla);
+      });
+
+      const TECLAS_FISICAS = {
+        '0': 'd0', '1': 'd1', '2': 'd2', '3': 'd3', '4': 'd4',
+        '5': 'd5', '6': 'd6', '7': 'd7', '8': 'd8', '9': 'd9',
+        '.': 'dot', ',': 'dot',
+        '+': 'add', '-': 'sub', '*': 'mul', '/': 'div', '%': 'pct',
+        'Enter': 'enter', 'Backspace': 'back', 'Delete': 'clx',
+        'n': 'n', 'i': 'i', 'p': 'pv', 't': 'pmt', 'v': 'fv',
+        'f': 'f', 'g': 'g', 'c': 'clx',
+      };
+
+      function aoTeclar(e) {
+        if (overlay.hidden) return;
+        if (e.key === 'Escape') { fecharModal(); return; }
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        const codigo = TECLAS_FISICAS[e.key] || TECLAS_FISICAS[e.key.toLowerCase()];
+        if (!codigo) return;
+        e.preventDefault();
+        acionar(codigo);
+      }
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        shift = null;
+        atualizar();
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      ['rpnBtnAbrir', 'rpnBtnAbrirAtalho'].forEach((id) => {
+        document.getElementById(id)?.addEventListener('click', () => {
+          if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+          abrirModal();
+        });
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', aoTeclar);
+
+      atualizar();
     })();
 
     // ============================================================
