@@ -1830,6 +1830,13 @@
        linha, então ganha o mesmo peso visual que o número das cotações, e o
        período de referência vai na coluna da direita, discreto. */
     .indice-value.taxa { color: var(--text); font-weight: 700; }
+    /* Ícone de calculadora em SVG, usado no menu e no título do modal:
+       alinhado como se fosse um emoji, mas sem depender de fonte do sistema. */
+    .icone-menu {
+      width: 1.05em; height: 1.05em; vertical-align: -0.18em;
+      margin-right: 2px; flex-shrink: 0;
+    }
+
     /* ---------- Calculadora Financeira (RPN) ---------- */
     .calc-modal.rpn-modal { max-width: 486px; }
 
@@ -3351,7 +3358,7 @@
               📖 Glossário do Investidor
             </button>
             <button type="button" class="nav-dropdown-item" id="rpnBtnAbrir">
-              🧮 Calculadora Financeira (RPN)
+              <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)
             </button>
             <button type="button" class="nav-dropdown-item" id="basBtnAbrir">
               🏦 Índice de Basileia dos Bancos
@@ -3409,7 +3416,7 @@
     <div class="mobile-menu-separador">Simuladores</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário do Investidor</button>
-    <button type="button" class="mobile-menu-item" data-mobile-alvo="rpnBtnAbrir">🧮 Calculadora Financeira (RPN)</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="rpnBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="quizBtnAbrir">❓ Descubra seu Perfil de Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="carteiraBtnAbrir">💰 Carteira de Rendimentos</button>
@@ -3912,7 +3919,7 @@
     <div class="calc-overlay" id="rpnOverlay" role="dialog" aria-modal="true" aria-labelledby="rpnTitulo" hidden>
       <div class="calc-modal rpn-modal">
         <div class="calc-modal-topo">
-          <h3 id="rpnTitulo">🧮 Calculadora Financeira (RPN)</h3>
+          <h3 id="rpnTitulo"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)</h3>
           <button type="button" class="calc-fechar" id="rpnFechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
         </div>
 
