@@ -1825,11 +1825,16 @@
        do .indice-row e, sendo nowrap, esticava a linha além da largura da
        tela no celular — o que fazia a PÁGINA INTEIRA rolar de lado. */
     .indice-label { font-weight: 700; color: var(--text); font-size: 0.92rem; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-    .indice-value { font-family: "Courier New", monospace; color: var(--muted); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    /* Índice do tipo TAXA (Selic, CDI, IPCA, IGP-M, CPI): a taxa É o valor da
-       linha, então ganha o mesmo peso visual que o número das cotações, e o
-       período de referência vai na coluna da direita, discreto. */
-    .indice-value.taxa { color: var(--text); font-weight: 700; }
+    /* O valor é o dado que a pessoa veio ler: mesma cor e mesmo peso em
+       TODAS as linhas. Até 11/09/2026 as cotações ficavam em --muted e só as
+       taxas (que passaram a ocupar essa coluna) vinham em --text e negrito —
+       a coluna alternava claro/escuro linha sim, linha não. No tema claro o
+       --muted ainda dava 4,98:1 contra 14,75:1 do --text, então uniformizar
+       pelo mais forte também ganha legibilidade. O que separa rótulo de
+       valor continua sendo a família da fonte, não o tom. */
+    .indice-value { font-family: "Courier New", monospace; color: var(--text); font-weight: 700; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* .taxa continua existindo como gancho para ajuste futuro das linhas de
+       taxa, mas hoje não muda nada: o estilo do valor é um só. */
     /* Ícone de calculadora em SVG, usado no menu e no título do modal:
        alinhado como se fosse um emoji, mas sem depender de fonte do sistema. */
     .icone-menu {
