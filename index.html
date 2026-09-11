@@ -1826,6 +1826,11 @@
        tela no celular — o que fazia a PÁGINA INTEIRA rolar de lado. */
     .indice-label { font-weight: 700; color: var(--text); font-size: 0.92rem; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
     .indice-value { font-family: "Courier New", monospace; color: var(--muted); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Índice do tipo TAXA (Selic, CDI, IPCA, IGP-M, CPI): a taxa É o valor da
+       linha, então ganha o mesmo peso visual que o número das cotações, e o
+       período de referência vai na coluna da direita, discreto. */
+    .indice-value.taxa { color: var(--text); font-weight: 700; }
+    .indice-periodo { font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
     .indice-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
     .indice-change {
       font-family: "Courier New", monospace;
@@ -7060,6 +7065,51 @@
 
 
 
+    // Índices do tipo TAXA (Selic, CDI, IPCA, IGP-M, CPI) não têm variação do
+    // dia: o "valor_pct" é a própria taxa publicada. Até 11/09/2026 a linha
+    // mostrava "—" no lugar do valor e jogava a taxa na coluna da direita,
+    // com seta e cor de alta/baixa — o que lia errado duas vezes: o número
+    // parecia ausente, e o ▲ verde num IPCA de 0,07% sugeria "subiu", quando
+    // é apenas a inflação do mês (e o ▼ vermelho no IGP-M pintava deflação de
+    // notícia ruim). Agora a taxa ocupa a coluna do valor — igual ao boletim
+    // diário, que já fazia assim — e a direita diz a que período ela se
+    // refere, informação que já vinha no indices.json e não era usada.
+    const INDICE_MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+    const INDICE_MESES_EN = { january: 0, february: 1, march: 2, april: 3, may: 4, june: 5, july: 6, august: 7, september: 8, october: 9, november: 10, december: 11 };
+
+    function indiceMesAnoDaReferencia(referencia) {
+      const ref = String(referencia || '').trim();
+      if (!ref) return '';
+      let mes = null, ano = null;
+      const brasileira = ref.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (brasileira) {
+        mes = parseInt(brasileira[2], 10) - 1;
+        ano = parseInt(brasileira[3], 10);
+      } else if (INDICE_MESES_EN[ref.toLowerCase()] !== undefined) {
+        // O BLS manda só o nome do mês ("July"), sem ano. Assume o ano
+        // corrente e volta um quando isso jogaria a referência no futuro —
+        // em janeiro, o CPI mais recente ainda é de meses do ano passado.
+        const hoje = new Date();
+        mes = INDICE_MESES_EN[ref.toLowerCase()];
+        ano = hoje.getFullYear();
+        if (mes > hoje.getMonth()) ano -= 1;
+      }
+      if (mes === null || mes < 0 || mes > 11) return '';
+      return `${INDICE_MESES_CURTOS[mes]}/${String(ano).slice(-2)}`;
+    }
+
+    function indiceContextoTaxa(item) {
+      const label = (item.label || '').toUpperCase();
+      // Selic e CDI são taxas anualizadas; a data que vem do BCB é o dia da
+      // vigência/apuração, que confunde mais do que ajuda nessa linha.
+      if (label.startsWith('SELIC') || label === 'CDI') return 'ao ano';
+      const mesAno = indiceMesAnoDaReferencia(item.referencia);
+      if (typeof item.meses === 'number' && item.meses > 0) {
+        return mesAno ? `${item.meses}m até ${mesAno}` : `${item.meses} meses`;
+      }
+      return mesAno;
+    }
+
     window.hgIndicesCache = null;
     async function carregarIndices() {
       const rowsEl = document.getElementById('indicesRows');
@@ -7088,16 +7138,30 @@
                 </div>
               </div>`;
           }
-          const variacao = typeof item.valor_pct === 'number' ? item.valor_pct : 0;
-          const emAlta = variacao >= 0;
+          if (typeof item.valor_pct !== 'number') {
+            return `
+              <div class="indice-row">
+                <div class="indice-info">
+                  <span class="indice-label">${item.label}</span>
+                  <span class="indice-value">—</span>
+                </div>
+              </div>`;
+          }
+          const taxaFormatada = item.valor_pct.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          const contexto = indiceContextoTaxa(item);
+          // O robô marca "desatualizado" quando a fonte não respondeu e ele
+          // manteve o último valor conhecido, em vez de deixar a linha sumir.
+          const aviso = item.desatualizado
+            ? ' title="Último dado disponível — a fonte não respondeu na coleta mais recente."'
+            : '';
           return `
-            <div class="indice-row">
+            <div class="indice-row"${aviso}>
               <div class="indice-info">
                 <span class="indice-label">${item.label}</span>
-                <span class="indice-value">—</span>
+                <span class="indice-value taxa">${taxaFormatada}%</span>
               </div>
               <div class="indice-right">
-                <span class="indice-change ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
+                ${contexto ? `<span class="indice-periodo">${contexto}</span>` : ''}
               </div>
             </div>`;
         }).join('');
