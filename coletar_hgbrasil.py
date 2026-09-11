@@ -51,6 +51,13 @@ NOTICIAS_OUTPUT_FILE = "noticias.json"
 INDICES_OUTPUT_FILE = "indices.json"
 RANKING_OUTPUT_FILE = "ranking.json"
 
+# Por quantos dias um índice pode continuar sendo exibido com o último valor
+# conhecido, quando a fonte dele falha (ver _mesclar_com_ultimos_indices).
+# 45 dias cobre com folga um mês inteiro de publicação (IPCA, IGP-M e CPI são
+# mensais) sem deixar um valor congelado no ar para sempre caso a série mude
+# de endereço e ninguém perceba.
+INDICES_RECUPERACAO_MAX_DIAS = 45
+
 # Tenta cada feed nesta ordem até conseguir pelo menos 1 notícia.
 # Alguns provedores (ex: InfoMoney) às vezes bloqueiam requisições vindas
 # de servidores/datacenters (como o do GitHub Actions), então mantemos
@@ -178,6 +185,16 @@ BCB_IPCA_12M_URL = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ulti
 
 # CPI (EUA): índice de preços ao consumidor, via API pública do BLS
 BLS_CPI_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/CUUR0000SA0"
+
+# A API pública do BLS sem chave de registro permite apenas 25 consultas por
+# dia por IP. Este robô roda a cada 15 minutos (~96 execuções/dia), ou seja,
+# a cota acaba antes do meio-dia e o CPI some do arquivo no resto do dia —
+# essa é a causa mais provável de o CPI sumir sozinho. Registrando uma chave
+# gratuita em https://data.bls.gov/registrationEngine/ e guardando-a no
+# secret BLS_API_KEY, o limite sobe para 500 consultas/dia. Sem a chave o
+# robô continua funcionando: a rede de segurança abaixo mantém o último
+# valor conhecido no lugar.
+BLS_API_KEY = os.environ.get("BLS_API_KEY", "").strip()
 
 # Selic (meta definida pelo Copom): via API pública do Banco Central (série
 # SGS 432) em vez do campo "taxes" da HG Brasil — a HG Brasil demora demais
@@ -898,13 +915,25 @@ def coletar_cpi_eua():
     try:
         ano_atual = date.today().year
         params = {"startyear": str(ano_atual - 1), "endyear": str(ano_atual)}
+        if BLS_API_KEY:
+            params["registrationkey"] = BLS_API_KEY
         resp = requests.get(BLS_CPI_URL, params=params, timeout=TIMEOUT,
                              headers={"Content-Type": "application/json"})
         resp.raise_for_status()
         dados = resp.json()
+        # O BLS responde 200 mesmo quando recusa a consulta (cota diária
+        # estourada, série inválida): o motivo vem em "status"/"message", e
+        # "Results" volta vazio. Sem checar isso, a falha era silenciosa —
+        # nenhuma linha no log, e o CPI simplesmente sumia do arquivo.
+        status = str(dados.get("status", ""))
+        if status and status.upper() != "REQUEST_SUCCEEDED":
+            recado = "; ".join(dados.get("message", [])) or status
+            print(f"AVISO: BLS recusou a consulta do CPI ({recado}).", file=sys.stderr)
+            return None
         serie = dados.get("Results", {}).get("series", [])
         pontos = serie[0].get("data", []) if serie else []
         if len(pontos) < 2:
+            print("AVISO: BLS respondeu sem série de CPI utilizável (menos de 2 pontos).", file=sys.stderr)
             return None
 
         # A API retorna do mais recente para o mais antigo
@@ -948,6 +977,112 @@ def coletar_igpm():
     except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
         print(f"AVISO: falha ao buscar IGP-M no Banco Central após tentativas: {exc}", file=sys.stderr)
         return None
+
+
+def _carregar_indices_anteriores(caminho=INDICES_OUTPUT_FILE):
+    """Lê o indices.json da execução anterior. Arquivo ausente ou corrompido
+    não é erro: significa só que não há rede de segurança nesta rodada."""
+    try:
+        with open(caminho, encoding="utf-8") as arq:
+            dados = json.load(arq)
+        return dados if isinstance(dados, list) else []
+    except (OSError, ValueError):
+        return []
+
+
+def _idade_em_dias(item):
+    """Há quantos dias esse valor foi coletado de verdade. Devolve None quando
+    o item é antigo demais para ter carimbo (arquivos gerados antes desta
+    mudança) — nesse caso ele é aceito uma vez e ganha carimbo na sequência."""
+    carimbo = item.get("coletado_em")
+    if not carimbo:
+        return None
+    try:
+        momento = datetime.fromisoformat(carimbo)
+    except (TypeError, ValueError):
+        return None
+    if momento.tzinfo is None:
+        momento = momento.replace(tzinfo=timezone.utc)
+    return (datetime.now(timezone.utc) - momento).days
+
+
+def _mesclar_com_ultimos_indices(indices_novos, caminho=INDICES_OUTPUT_FILE):
+    """Impede que um índice DESAPAREÇA do arquivo quando a fonte dele falha.
+
+    O problema que isso resolve: cada coletor devolve None quando a API não
+    responde, e quem chama simplesmente não acrescenta o item na lista. Como
+    o arquivo é reescrito inteiro a cada 15 minutos, uma instabilidade de
+    dois minutos no Banco Central bastava para IPCA, IPCA 12m e IGP-M
+    sumirem do site de uma vez (as três usam a mesma API), voltando sozinhas
+    na execução seguinte. Pior: a calculadora de Renda Fixa lê o IPCA (12
+    meses) desse arquivo e, sem ele, troca em silêncio por um valor de
+    reserva de 4,5% a.a.
+
+    A recuperação vale só para os índices do tipo TAXA (valor_pct): IPCA,
+    IGP-M, CPI, Selic, CDI. São números publicados em data marcada — repetir
+    o último continua sendo a informação correta até sair o próximo. Cotação
+    (Ibovespa, Dólar, Bitcoin: valor + variação do dia) NÃO é recuperada de
+    propósito — repetir o dólar de meia hora atrás como se fosse o de agora
+    seria mostrar um número errado, o que é pior do que mostrar nada.
+    """
+    if not indices_novos:
+        # Falha geral (sem token, API fora do ar): quem chama já mantém o
+        # arquivo anterior intacto. Recuperar aqui só duplicaria essa regra.
+        return indices_novos
+
+    anteriores = _carregar_indices_anteriores(caminho)
+    if not anteriores:
+        return indices_novos
+
+    resultado = list(indices_novos)
+    presentes = {item.get("label") for item in resultado}
+    recuperados, descartados = [], []
+
+    # Percorre a ordem do arquivo anterior para reinserir cada ausente ao lado
+    # de quem era seu vizinho — assim a lista não embaralha a cada tropeço.
+    vizinho_anterior = None
+    for item in anteriores:
+        label = item.get("label")
+        if not label:
+            continue
+        if label in presentes:
+            vizinho_anterior = label
+            continue
+        if not isinstance(item.get("valor_pct"), (int, float)):
+            continue  # cotação: ver explicação no docstring
+
+        idade = _idade_em_dias(item)
+        if idade is not None and idade > INDICES_RECUPERACAO_MAX_DIAS:
+            descartados.append(f"{label} (último dado há {idade} dias)")
+            continue
+
+        recuperado = dict(item)
+        recuperado["desatualizado"] = True
+        if vizinho_anterior is None:
+            posicao = 0
+        else:
+            posicao = next(
+                (i for i, x in enumerate(resultado) if x.get("label") == vizinho_anterior),
+                len(resultado) - 1,
+            ) + 1
+        resultado.insert(posicao, recuperado)
+        presentes.add(label)
+        vizinho_anterior = label
+        recuperados.append(f"{label} (valor de {idade} dia(s) atrás)" if idade else label)
+
+    if recuperados:
+        print(
+            "AVISO: fonte falhou nesta execução; mantido o último valor conhecido de: "
+            + ", ".join(recuperados),
+            file=sys.stderr,
+        )
+    if descartados:
+        print(
+            f"ERRO: sem atualização há mais de {INDICES_RECUPERACAO_MAX_DIAS} dias, "
+            "removido(s) do arquivo em vez de congelar: " + ", ".join(descartados),
+            file=sys.stderr,
+        )
+    return resultado
 
 
 def coletar_indices(token_brapi):
@@ -1013,7 +1148,15 @@ def coletar_indices(token_brapi):
     if cpi:
         indices.append(cpi)
 
-    return indices
+    # Carimba o que foi coletado AGORA, de verdade. É esse carimbo que
+    # permite, na próxima execução, saber a idade de um valor reaproveitado
+    # (e descartá-lo se a fonte estiver quebrada há tempo demais).
+    agora = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    for item in indices:
+        item["coletado_em"] = agora
+        item.pop("desatualizado", None)
+
+    return _mesclar_com_ultimos_indices(indices)
 
 
 def obter_token_hgbrasil():
