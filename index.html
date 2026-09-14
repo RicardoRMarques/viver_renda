@@ -3217,6 +3217,28 @@
       .boletim-panel { padding: 14px; }
       .calc-corpo { padding: 14px; }
       .calc-modal-topo { padding: 14px; }
+
+      /* ---------- Campos de dinheiro cortados no celular ----------
+         A .calc-grid-2 é `1fr 1fr`, e `1fr` NÃO encolhe abaixo do
+         min-content da coluna. Num campo com prefixo, esse mínimo é o
+         "R$" (~44px) mais a largura natural do <input>, que passa da
+         metade do espaço disponível num modal de ~300px de conteúdo —
+         a segunda coluna vazava para fora e o overflow-x:hidden do
+         .calc-modal a cortava, em vez de mostrar barra de rolagem. Era
+         o que acontecia no "Aporte mensal" (Renda Fixa) e no
+         "Investimento mensal" (Juros Compostos): dava para tocar no
+         campo, mas não para ver o que estava sendo digitado.
+
+         minmax(0,1fr) libera a coluna a encolher (vale para todas as
+         grades, e é a rede de segurança se o :has não existir); as
+         linhas que têm campo de dinheiro passam a ocupar a largura
+         inteira, porque mesmo cabendo sobrariam ~90px para digitar um
+         valor — apertado demais para o que é o campo principal dessas
+         calculadoras. Só afeta o celular; no desktop segue em 2
+         colunas. */
+      .calc-grid-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+      .calc-grid-2 input, .calc-grid-2 select { min-width: 0; }
+      .calc-grid-2:has(.calc-input-prefixado) { grid-template-columns: 1fr; }
     }
     @media (max-width: 430px) {
       .container { width: min(1200px, 97.5%); }
