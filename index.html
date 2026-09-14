@@ -4540,7 +4540,20 @@
             </div>
           </div>
 
-          <button class="hg-btn" id="jcBtnCalcular" style="width:100%; margin-top:6px;">Calcular</button>
+          <div style="display:flex; gap:10px; margin-top:6px;">
+            <button class="hg-btn" id="jcBtnCalcular" style="flex:1;">Calcular</button>
+            <button class="hg-btn" id="jcBtnLimpar" style="flex:1; background:var(--deep); color:var(--text); border:1px solid var(--border);">Limpar</button>
+          </div>
+          <div class="cmp-acoes-linha" style="margin-top:8px;">
+            <button type="button" class="cmp-btn-secundario" id="jcBtnPdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+              Baixar PDF
+            </button>
+            <button type="button" class="cmp-btn-secundario" id="jcBtnCompartilhar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              Compartilhar
+            </button>
+          </div>
 
           <div id="jcResultado"></div>
 
@@ -4628,6 +4641,16 @@
           <div style="display:flex; gap:10px; margin-top:6px;">
             <button class="hg-btn" id="empBtnCalcular" style="flex:1;">Calcular</button>
             <button class="hg-btn" id="empBtnLimpar" style="flex:1; background:var(--deep); color:var(--text); border:1px solid var(--border);">Limpar</button>
+          </div>
+          <div class="cmp-acoes-linha" style="margin-top:8px;">
+            <button type="button" class="cmp-btn-secundario" id="empBtnPdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+              Baixar PDF
+            </button>
+            <button type="button" class="cmp-btn-secundario" id="empBtnCompartilhar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              Compartilhar
+            </button>
           </div>
 
           <div id="empResultado"></div>
@@ -15957,8 +15980,15 @@
       const inPeriodo = document.getElementById('jcPeriodo');
       const selPeriodoUnidade = document.getElementById('jcPeriodoUnidade');
       const btnCalcular = document.getElementById('jcBtnCalcular');
+      const btnLimpar = document.getElementById('jcBtnLimpar');
+      const btnPdf = document.getElementById('jcBtnPdf');
+      const btnCompartilhar = document.getElementById('jcBtnCompartilhar');
       const resultadoEl = document.getElementById('jcResultado');
       const graficoBlocoEl = document.getElementById('jcGraficoBloco');
+
+      // Guarda as variáveis do último cálculo bem-sucedido, para o PDF e
+      // o compartilhamento (mesmo padrão da Aposentadoria Renda Passiva).
+      let ultimoCalculoJc = null;
 
       if (!overlay || !btnAbrirMenu) return;
 
@@ -16080,6 +16110,13 @@
         const totalInvestido = valorInicial + aporteMensal * meses;
         const totalJuros = saldo - totalInvestido;
 
+        ultimoCalculoJc = {
+          valorInicial, aporteMensal, taxaInformada,
+          taxaPeriodo: selTaxaPeriodo.value,
+          periodoInformado, periodoUnidade: selPeriodoUnidade.value,
+          taxaMensal, meses, totalInvestido, totalJuros, valorFinal: saldo,
+        };
+
         resultadoEl.innerHTML = `
           <div class="calc-resultado-card">
             <div class="calc-resultado-linha">
@@ -16102,6 +16139,163 @@
         montarGraficos(valorInicial, aporteMensal, taxaMensal, meses);
       }
 
+
+      function limpar() {
+        inValorInicial.value = (1000).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        inValorInicial.dataset.centavos = '100000';
+        inInvestimentoMensal.value = '';
+        inInvestimentoMensal.dataset.centavos = '0';
+        inTaxa.value = '10';
+        selTaxaPeriodo.value = 'anual';
+        inPeriodo.value = '10';
+        selPeriodoUnidade.value = 'anos';
+        resultadoEl.innerHTML = '';
+        graficoBlocoEl.hidden = true;
+        ultimoCalculoJc = null;
+      }
+
+      function nomeArquivoPdfJc() {
+        return 'juros-compostos.pdf';
+      }
+
+      // Desenha um dos gráficos já renderizados na tela dentro do PDF,
+      // quebrando a página quando não couber no espaço restante.
+      // Devolve o Y logo abaixo da imagem.
+      function desenharGraficoJcNoPdf(doc, canvas, titulo, legendaItens, y) {
+        if (!canvas) return y;
+        const larguraImg = doc.internal.pageSize.getWidth() - 80;
+        const alturaImg = (larguraImg * canvas.height) / canvas.width;
+        const alturaPagina = doc.internal.pageSize.getHeight();
+        let yTitulo = y;
+        if (yTitulo + alturaImg + 60 > alturaPagina) {
+          doc.addPage();
+          yTitulo = 40;
+        }
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text(titulo, 40, yTitulo);
+        const yImg = hgDesenharLegendaPdf(doc, 40, yTitulo + 18, legendaItens);
+        doc.addImage(canvas.toDataURL('image/png', 1), 'PNG', 40, yImg, larguraImg, alturaImg);
+        return yImg + alturaImg + 26;
+      }
+
+      // Monta o PDF com o mesmo cabeçalho padrão dos demais relatórios do
+      // site (título + "Dividendos | Viver de Renda" + data/hora + aviso),
+      // seguido das variáveis informadas e dos dois gráficos da tela.
+      async function montarDocumentoPdfJc() {
+        if (!ultimoCalculoJc) {
+          alert('Faça uma simulação primeiro, clicando em "Calcular".');
+          return null;
+        }
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const c = ultimoCalculoJc;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Simulação — Juros Compostos', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(
+          `Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`,
+          40, 58
+        );
+        doc.setFontSize(8);
+        doc.text(
+          'Aviso: simulação educativa com capitalização mensal composta, sem considerar inflação, taxas ou impostos. Não constitui recomendação de investimento.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        const linhasResumo = [
+          ['Valor inicial', hgFormatMoeda(c.valorInicial)],
+          ['Investimento mensal', hgFormatMoeda(c.aporteMensal)],
+          ['Taxa de juros informada', `${hgFormatNumero(c.taxaInformada)}% ${c.taxaPeriodo === 'anual' ? 'ao ano' : 'ao mês'}`],
+          ['Taxa mensal equivalente usada no cálculo', `${hgFormatNumero(c.taxaMensal * 100, 4)}%`],
+          ['Período', `${hgFormatNumero(c.periodoInformado, 0)} ${c.periodoUnidade === 'anos' ? 'anos' : 'meses'} (${c.meses} meses)`],
+          ['Total investido', hgFormatMoeda(c.totalInvestido)],
+          ['Total em juros', hgFormatMoeda(c.totalJuros)],
+          ['Valor final', hgFormatMoeda(c.valorFinal)],
+        ];
+
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Resultado da simulação']],
+          body: linhasResumo,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        let y = doc.lastAutoTable.finalY + 26;
+        y = desenharGraficoJcNoPdf(
+          doc, document.getElementById('jcChartLinha'),
+          'Evolução do investimento',
+          [
+            { cor: [49, 195, 255], texto: 'Montante total' },
+            { cor: [124, 255, 146], texto: 'Total investido' },
+          ],
+          y
+        );
+        desenharGraficoJcNoPdf(
+          doc, document.getElementById('jcChartBarras'),
+          'Aportes x Juros por período',
+          [
+            { cor: [124, 255, 146], texto: 'Aportes' },
+            { cor: [49, 195, 255], texto: 'Juros' },
+          ],
+          y
+        );
+
+        return doc;
+      }
+
+      async function gerarPdfJc() {
+        const doc = await montarDocumentoPdfJc();
+        if (!doc) return;
+        doc.save(nomeArquivoPdfJc());
+      }
+
+      // Compartilha o PDF como arquivo de verdade (WhatsApp etc, via Web
+      // Share API). Sem suporte a compartilhar arquivos, baixa direto.
+      async function compartilharResultadoJc(botao) {
+        const doc = await montarDocumentoPdfJc();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoPdfJc();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Simulação — Juros Compostos', files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoOriginal = botao.innerHTML;
+        botao.innerHTML = 'PDF baixado!';
+        setTimeout(() => { botao.innerHTML = textoOriginal; }, 2500);
+      }
+
       window.addEventListener('hg-tema-mudou', () => { if (jcChartLinha) calcular(); });
 
       btnAbrirMenu.addEventListener('click', () => {
@@ -16112,6 +16306,9 @@
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
+      btnLimpar.addEventListener('click', limpar);
+      btnPdf.addEventListener('click', gerarPdfJc);
+      btnCompartilhar.addEventListener('click', (e) => compartilharResultadoJc(e.currentTarget));
     })();
 
     // ============================================================
@@ -16917,7 +17114,13 @@
       const inValorFinanciado = document.getElementById('empValorFinanciado');
       const btnCalcular = document.getElementById('empBtnCalcular');
       const btnLimpar = document.getElementById('empBtnLimpar');
+      const btnPdf = document.getElementById('empBtnPdf');
+      const btnCompartilhar = document.getElementById('empBtnCompartilhar');
       const resultadoEl = document.getElementById('empResultado');
+
+      // Guarda as variáveis do último cálculo bem-sucedido, para o PDF e
+      // o compartilhamento (mesmo padrão da Aposentadoria Renda Passiva).
+      let ultimoCalculoEmp = null;
 
       if (!overlay || !btnAbrirMenu) return;
 
@@ -16935,6 +17138,7 @@
 
       function erro(msg) {
         resultadoEl.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a; margin-top:14px;">${msg}</p>`;
+        ultimoCalculoEmp = null; // resultado inválido não vira PDF
       }
 
       // PMT = PV * i(1+i)^n / ((1+i)^n - 1)
@@ -17017,6 +17221,11 @@
         const totalPago = prestacao * meses;
         const totalJuros = totalPago - valorFinanciado;
 
+        ultimoCalculoEmp = {
+          meses, taxa, prestacao, valorFinanciado,
+          totalPago, totalJuros, campoCalculado,
+        };
+
         const rotulos = {
           meses: 'Nº de meses',
           taxa: 'Taxa de juros mensal',
@@ -17058,6 +17267,116 @@
         inValorFinanciado.value = '';
         inValorFinanciado.dataset.centavos = '0';
         resultadoEl.innerHTML = '';
+        ultimoCalculoEmp = null;
+      }
+
+      function nomeArquivoPdfEmp() {
+        return 'emprestimo.pdf';
+      }
+
+      // Monta o PDF com o mesmo cabeçalho padrão dos demais relatórios do
+      // site (título + "Dividendos | Viver de Renda" + data/hora + aviso),
+      // seguido dos 4 campos da Price — com o campo resolvido marcado
+      // como "(calculado)", que é a informação que a pessoa foi buscar.
+      async function montarDocumentoPdfEmp() {
+        if (!ultimoCalculoEmp) {
+          alert('Faça um cálculo primeiro, clicando em "Calcular".');
+          return null;
+        }
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const c = ultimoCalculoEmp;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        const marca = (campo) => (c.campoCalculado === campo ? ' (calculado)' : '');
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Simulação — Calculadora de Empréstimo', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(
+          `Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`,
+          40, 58
+        );
+        doc.setFontSize(8);
+        doc.text(
+          'Aviso: cálculo educativo pela Tabela Price, sem seguros, tarifas ou correção monetária. Não substitui a simulação oficial da instituição financeira.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        const linhasResumo = [
+          ['Nº de meses', `${Math.round(c.meses)} meses${marca('meses')}`],
+          ['Taxa de juros mensal', `${hgFormatNumero(c.taxa)}%${marca('taxa')}`],
+          ['Valor da prestação', `${hgFormatMoeda(c.prestacao)}${marca('prestacao')}`],
+          ['Valor financiado', `${hgFormatMoeda(c.valorFinanciado)}${marca('valorFinanciado')}`],
+          ['Total pago (todas as prestações)', hgFormatMoeda(c.totalPago)],
+          ['Total de juros', hgFormatMoeda(c.totalJuros)],
+        ];
+
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Resultado do cálculo']],
+          body: linhasResumo,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        doc.setFontSize(8);
+        doc.setTextColor(90);
+        doc.text(
+          'Considera-se que a 1ª prestação é paga um mês após a liberação do valor financiado.',
+          40, doc.lastAutoTable.finalY + 18
+        );
+        doc.setTextColor(0);
+
+        return doc;
+      }
+
+      async function gerarPdfEmp() {
+        const doc = await montarDocumentoPdfEmp();
+        if (!doc) return;
+        doc.save(nomeArquivoPdfEmp());
+      }
+
+      // Compartilha o PDF como arquivo de verdade (WhatsApp etc, via Web
+      // Share API). Sem suporte a compartilhar arquivos, baixa direto.
+      async function compartilharResultadoEmp(botao) {
+        const doc = await montarDocumentoPdfEmp();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoPdfEmp();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Simulação — Calculadora de Empréstimo', files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoOriginal = botao.innerHTML;
+        botao.innerHTML = 'PDF baixado!';
+        setTimeout(() => { botao.innerHTML = textoOriginal; }, 2500);
       }
 
       btnAbrirMenu.addEventListener('click', () => {
@@ -17069,6 +17388,8 @@
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
+      btnPdf.addEventListener('click', gerarPdfEmp);
+      btnCompartilhar.addEventListener('click', (e) => compartilharResultadoEmp(e.currentTarget));
     })();
   </script>
 
