@@ -359,6 +359,28 @@
       .carteira-tabela { font-size: 0.72rem; }
       .carteira-tabela th, .carteira-tabela td { padding: 6px 6px; }
     }
+    /* Botão de compartilhar o LINK da ferramenta, na barra de título.
+       Discreto de propósito: é um atalho, não uma ação principal — o
+       destaque da barra continua sendo o título e o X. */
+    .carteira-link-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 999px;
+      padding: 6px 12px; font-size: 0.78rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; white-space: nowrap;
+    }
+    .carteira-link-btn:hover,
+    .carteira-link-btn.copiado { border-color: var(--primary); color: var(--primary); }
+    .carteira-link-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    /* No celular a barra não comporta título + rótulo + X, então fica só
+       o ícone (o aria-label/title seguem descrevendo a ação). O rótulo
+       volta a aparecer no aviso de "Link copiado!", senão a confirmação
+       ficaria invisível justamente onde ela é mais necessária. */
+    @media (max-width: 520px) {
+      .carteira-link-btn { padding: 6px 9px; }
+      .carteira-link-btn span { display: none; }
+      .carteira-link-btn.copiado span { display: inline; }
+    }
     .carteira-add-linha { display: flex; gap: 8px; flex-wrap: wrap; }
     .carteira-add-linha input[type="text"] {
       flex: 2 1 200px; background: var(--deep); border: 1px solid var(--border); color: var(--text);
@@ -460,7 +482,8 @@
       .carteira-modal.carteira-arrastavel .carteira-fixo .calc-modal-topo {
         cursor: move;
       }
-      .carteira-modal.carteira-arrastavel .carteira-fixo .calc-modal-topo #carteiraFechar {
+      .carteira-modal.carteira-arrastavel .carteira-fixo .calc-modal-topo #carteiraFechar,
+      .carteira-modal.carteira-arrastavel .carteira-fixo .calc-modal-topo #carteiraCompartilharLink {
         cursor: pointer;
       }
     }
@@ -5223,7 +5246,15 @@
           <h3 id="carteiraTitulo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>Carteira de Rendimentos
           </h3>
-          <button id="carteiraFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" id="carteiraCompartilharLink" class="carteira-link-btn"
+                    aria-label="Compartilhar o link desta ferramenta"
+                    title="Compartilhar o link desta ferramenta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+            <button id="carteiraFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+          </div>
         </div>
         <div class="carteira-fixo-corpo">
           <p class="calc-ajuda" style="margin-top:0;">
@@ -7882,7 +7913,10 @@
 
       function iniciarArraste(e) {
         if (!podeArrastarRedimensionar()) return;
-        if (e.target.closest('#carteiraFechar')) return; // não arrasta ao clicar no X
+        // Não arrasta ao clicar nos botões da barra (X e compartilhar):
+        // a barra inteira é a alça de arrastar, então sem esse desvio o
+        // clique vira um micro-arraste e o botão não responde direito.
+        if (e.target.closest('#carteiraFechar, #carteiraCompartilharLink')) return;
         const pontoInicial = e.touches ? e.touches[0] : e;
         const xInicial = pontoInicial.clientX;
         const yInicial = pontoInicial.clientY;
@@ -8177,10 +8211,66 @@
         });
       }
 
+      // Compartilha o LINK DA FERRAMENTA, não a carteira. A URL é sempre
+      // a mesma (?view=carteira) e não carrega nada do que está na tela —
+      // nem tickers, nem quantidades, nem valores. Quem abrir o link cai
+      // na ferramenta vazia (ou na própria carteira salva dele, se tiver),
+      // nunca na carteira de quem compartilhou.
+      async function compartilharLinkFerramenta(botao) {
+        const link = `${window.location.origin}${window.location.pathname}?view=carteira`;
+        const titulo = 'Carteira de Rendimentos — Viver de Renda';
+        const texto = 'Monte sua carteira de ações e FIIs e veja o total estimado de proventos por mês.';
+
+        if (navigator.share) {
+          try {
+            await navigator.share({ title: titulo, text: texto, url: link });
+            return;
+          } catch (e) {
+            // Usuário cancelou o compartilhamento nativo — não faz nada.
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        const textoSpan = botao.querySelector('.hg-btn-compartilhar-texto');
+        const textoPadrao = textoSpan ? textoSpan.textContent : null;
+        try {
+          await navigator.clipboard.writeText(link);
+          botao.classList.add('copiado');
+          if (textoSpan) textoSpan.textContent = 'Link copiado!';
+        } catch (e) {
+          // Área de transferência bloqueada (http, permissão negada):
+          // mostra o link pra copiar na mão, em vez de falhar calado.
+          window.prompt('Copie o link da ferramenta:', link);
+          return;
+        }
+
+        setTimeout(() => {
+          botao.classList.remove('copiado');
+          if (textoSpan && textoPadrao) textoSpan.textContent = textoPadrao;
+        }, 2500);
+      }
+
+      const btnLinkFerramenta = document.getElementById('carteiraCompartilharLink');
+      btnLinkFerramenta?.addEventListener('click', (e) => compartilharLinkFerramenta(e.currentTarget));
+
       btnAbrir.addEventListener('click', () => { abrirModal(); carteiraCarregarSalva(); carteiraPopularSugestoes(); });
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+
+      // Chegando por um link compartilhado (?view=carteira), abre a
+      // ferramenta sozinha. Mesmo padrão de espera do ?ticker= da consulta
+      // rápida: só depois do load, senão o modal nasce enquanto notícias e
+      // gráficos ainda empurram o layout.
+      if (new URLSearchParams(window.location.search).get('view') === 'carteira') {
+        const abrirPeloLink = () => setTimeout(() => {
+          abrirModal();
+          carteiraCarregarSalva();
+          carteiraPopularSugestoes();
+        }, 150);
+        if (document.readyState === 'complete') abrirPeloLink();
+        else window.addEventListener('load', abrirPeloLink, { once: true });
+      }
     })();
 
     // ============================================================
