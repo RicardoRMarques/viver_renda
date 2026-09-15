@@ -137,6 +137,7 @@ BANCOS = [
     {"ticker": "PICPAY",   "nome": "PicPay",              "grupo": "emissor", "busca": ["PICPAY"]},
     {"ticker": "NEON",     "nome": "Neon",                "grupo": "emissor", "busca": ["NEON"]},
     {"ticker": "FIBRA",    "nome": "Banco Fibra",         "grupo": "emissor", "busca": ["FIBRA"]},
+    {"ticker": "BARI",     "nome": "Banco Bari",          "grupo": "emissor", "busca": ["BANCO BARI", "BARI"]},
     {"ticker": "XP",       "nome": "Banco XP",            "grupo": "emissor", "busca": ["XP"]},
 ]
 
@@ -148,6 +149,12 @@ TERMOS_NAO_BANCO = (
     "SEGURO", "SEGURADORA", "CAPITALIZACAO", "PREVIDENCIA",
     "LEASING", "ARRENDAMENTO", "CONSORCIO", "ADMINISTRADORA",
     "CARTOES", "FACTORING", "IMOBILIARIA", "ASSET", "GESTORA",
+    # a companhia hipotecária do grupo Bari ("BARI COMPANHIA HIPOTECARIA")
+    # casa com "BARI" como palavra inteira e tem nome MAIS CURTO que
+    # "BANCO BARI DE INVESTIMENTO E FINANCI." — ganharia no desempate por
+    # tamanho se não estivesse bloqueada aqui. Mesmo caso da corretora do
+    # BTG: outra pessoa jurídica, outro balanço.
+    "HIPOTECARIA",
     # as cooperativas dominam o cadastro (mais de mil): sem elas na lista,
     # "PAN", "ABC" e "BB" casavam com SICREDI/SICOOB/UNICRED da vida.
     "COOPERATIVA", "SICREDI", "SICOOB", "UNICRED", "UNIPRIME", "CRESOL",
