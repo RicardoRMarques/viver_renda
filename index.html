@@ -382,6 +382,52 @@
       .modal-link-btn span { display: none; }
       .modal-link-btn.copiado span { display: inline; }
     }
+    /* ---------- Cobertura do FGC ---------- */
+    .calc-modal.fgc-modal { max-width: 760px; }
+    .fgc-add-linha { display: flex; gap: 8px; flex-wrap: wrap; }
+    .fgc-add-linha input { flex: 1 1 200px; min-width: 0; }
+    .fgc-add-linha input.fgc-valor { flex: 0 1 150px; }
+    .fgc-resumo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+    .fgc-resumo-card {
+      background: var(--deep); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px; min-width: 0;
+    }
+    .fgc-resumo-rotulo {
+      font-size: 0.68rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.04em; font-weight: 700;
+    }
+    .fgc-resumo-valor { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1.05rem; margin-top: 4px; }
+    .fgc-grupo {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 10px;
+    }
+    .fgc-grupo-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .fgc-grupo-nome { font-weight: 700; }
+    .fgc-grupo-sub { font-size: 0.72rem; color: var(--muted); }
+    /* Barra na MESMA escala para todos os grupos (0 a R$ 250 mil), como no
+       medidor da Basileia: comparar dois grupos é comparar duas barras. */
+    .fgc-barra { height: 10px; border-radius: 999px; background: var(--border); overflow: hidden; display: flex; margin: 8px 0 6px; }
+    .fgc-barra-coberto { background: var(--accent); }
+    .fgc-barra-exposto { background: #ff5a5a; }
+    .fgc-item { display: flex; justify-content: space-between; gap: 10px; font-size: 0.82rem; padding: 3px 0; }
+    .fgc-item-remover { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem; padding: 0 4px; }
+    .fgc-item-remover:hover { color: #ff5a5a; }
+    /* Faixa + glifo + rótulo, não só cor: o vermelho e o verde da marca
+       ficam próximos demais sob deuteranopia (mesmo motivo do Basileia). */
+    .fgc-aviso {
+      display: flex; gap: 8px; align-items: flex-start;
+      border-left: 3px solid var(--border); padding: 8px 10px;
+      margin-top: 8px; font-size: 0.8rem; color: var(--muted);
+      background: var(--deep); border-radius: 0 8px 8px 0;
+    }
+    .fgc-aviso.risco { border-left-color: #ff5a5a; }
+    .fgc-aviso.atencao { border-left-color: var(--gold, #e0b84d); }
+    .fgc-aviso strong { color: var(--text); }
+    @media (max-width: 640px) {
+      .fgc-resumo { grid-template-columns: 1fr; }
+      .fgc-add-linha input, .fgc-add-linha input.fgc-valor { flex: 1 1 100%; }
+    }
+
     .carteira-add-linha { display: flex; gap: 8px; flex-wrap: wrap; }
     .carteira-add-linha input[type="text"] {
       flex: 2 1 200px; background: var(--deep); border: 1px solid var(--border); color: var(--text);
@@ -3405,6 +3451,9 @@
             <button type="button" class="nav-dropdown-item" id="basBtnAbrir">
               🏦 Índice de Basileia dos Bancos
             </button>
+            <button type="button" class="nav-dropdown-item" id="fgcBtnAbrir">
+              <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC
+            </button>
             <div class="nav-dropdown-separador"></div>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
           </div>
@@ -3478,6 +3527,7 @@
     <div class="mobile-menu-separador">Renda Fixa</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirCalculadoraMenu"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="9" y1="21" x2="9" y2="10"></line><line x1="15" y1="21" x2="15" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Calculadora Renda Fixa</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="fgcBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC</button>
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     <div class="mobile-menu-separador">Simuladores</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
@@ -5253,6 +5303,46 @@
   </div>
 
   <!-- Modal: Carteira de Rendimentos -->
+  <!-- Modal: Cobertura do FGC -->
+  <div id="fgcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="fgcTitulo" hidden>
+    <div class="calc-modal fgc-modal">
+      <div class="calc-modal-topo">
+        <h3 id="fgcTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg>Cobertura do FGC
+        </h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="fgcCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button id="fgcFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+      </div>
+
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          O FGC garante até <strong>R$ 250 mil por CPF em cada conglomerado financeiro</strong> — não por banco.
+          Informe quanto você tem em cada instituição e veja quanto está coberto. Os valores ficam salvos só
+          neste aparelho, não vão para servidor nenhum.
+        </p>
+
+        <div class="fgc-add-linha">
+          <input type="text" id="fgcInstituicao" list="fgcSugestoes" placeholder="Instituição (ex: Nubank, Next, Banco Bari...)" autocomplete="off" />
+          <datalist id="fgcSugestoes"></datalist>
+          <input type="text" id="fgcValor" class="fgc-valor" placeholder="Valor aplicado" inputmode="numeric" />
+          <button type="button" class="hg-btn" id="fgcBtnAdicionar" style="flex:0 0 auto;">+ Adicionar</button>
+        </div>
+
+        <div id="fgcStatus" class="hg-status"></div>
+        <div id="fgcResumo"></div>
+        <div id="fgcLista"></div>
+        <div id="fgcAvisos"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="carteiraOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="carteiraTitulo" hidden>
     <div class="calc-modal carteira-modal">
       <div class="carteira-fixo">
@@ -8299,6 +8389,286 @@
         carteiraCarregarSalva();
         carteiraPopularSugestoes();
       });
+    })();
+
+
+    // ============================================================
+    // COBERTURA DO FGC
+    //
+    // A regra que a ferramenta existe para mostrar: o limite é por
+    // CONGLOMERADO, não por banco. Ter R$ 150 mil no Bradesco e R$ 200
+    // mil no Next não são dois limites de R$ 250 mil — é um só, e R$ 100
+    // mil ficam de fora.
+    //
+    // A lista de conglomerados vem do data/basileia.json, que o robô do
+    // IF.data mantém: cada banco de lá já é um conglomerado prudencial,
+    // então o agrupamento não precisa de tabela nova.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('fgcOverlay');
+      const btnAbrir = document.getElementById('fgcBtnAbrir');
+      const btnFechar = document.getElementById('fgcFechar');
+      const inInstituicao = document.getElementById('fgcInstituicao');
+      const inValor = document.getElementById('fgcValor');
+      const btnAdicionar = document.getElementById('fgcBtnAdicionar');
+      const sugestoesEl = document.getElementById('fgcSugestoes');
+      const statusEl = document.getElementById('fgcStatus');
+      const resumoEl = document.getElementById('fgcResumo');
+      const listaEl = document.getElementById('fgcLista');
+      const avisosEl = document.getElementById('fgcAvisos');
+      if (!overlay || !btnAbrir) return;
+
+      const LIMITE = 250000;          // por CPF, por conglomerado
+      const TETO_GLOBAL = 1000000;    // por CPF, a cada 4 anos
+      const MARGEM_RENDIMENTOS = 230000; // acima disso, o rendimento estoura o teto
+      const CHAVE = 'vrFgcAplicacoes';
+
+      // Marcas de varejo que NÃO têm conglomerado próprio: o dinheiro
+      // aplicado nelas divide o limite com o banco que as controla.
+      // Lista curta de propósito — só o que dá para afirmar com segurança.
+      // O Banco Pan é o caso que a própria coleta do IF.data já registrou:
+      // ele não tem conglomerado prudencial e reporta dentro do BTG.
+      const MARCAS = {
+        'NEXT': { ticker: 'BBDC4', marca: 'Next' },
+        'ITI': { ticker: 'ITUB4', marca: 'iti' },
+        'PAN': { ticker: 'BPAC11', marca: 'Banco Pan' },
+        'BANCO PAN': { ticker: 'BPAC11', marca: 'Banco Pan' },
+        'BPAN4': { ticker: 'BPAC11', marca: 'Banco Pan' },
+      };
+
+      let bancos = [];        // [{ticker, nome, grupo}]
+      let basileiaPorTicker = {};
+      let aplicacoes = [];    // [{id, rotulo, valor, ticker, nome, conhecido}]
+
+      const normalizar = (t) => (t || '')
+        .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase().replace(/\s+/g, ' ').trim();
+
+      function carregarSalvas() {
+        try {
+          const cru = localStorage.getItem(CHAVE);
+          aplicacoes = cru ? JSON.parse(cru) : [];
+          if (!Array.isArray(aplicacoes)) aplicacoes = [];
+        } catch (e) { aplicacoes = []; }
+      }
+      function salvar() {
+        try { localStorage.setItem(CHAVE, JSON.stringify(aplicacoes)); } catch (e) { /* cota cheia */ }
+      }
+
+      async function carregarBancos() {
+        if (bancos.length) return;
+        try {
+          const resp = await fetch('data/basileia.json', { cache: 'no-store' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          const dados = await resp.json();
+          bancos = Array.isArray(dados?.bancos) ? dados.bancos : [];
+          basileiaPorTicker = dados?.periodos?.[0]?.valores || {};
+        } catch (e) {
+          // Sem a lista, a ferramenta ainda funciona: cada instituição
+          // digitada vira um grupo próprio. Pior que isso seria não abrir.
+          console.warn('FGC: não foi possível ler data/basileia.json', e);
+          bancos = [];
+        }
+        sugestoesEl.innerHTML = bancos.map(b => '<option value="' + b.nome + '"></option>').join('')
+          + Object.values(MARCAS).map(m => '<option value="' + m.marca + '"></option>').join('');
+      }
+
+      // Texto digitado -> conglomerado. Devolve `conhecido: false` quando
+      // não está na nossa lista: o valor entra no cálculo como grupo
+      // próprio, com aviso na tela, em vez de ser recusado.
+      function resolverInstituicao(texto) {
+        const alvo = normalizar(texto);
+        if (!alvo) return null;
+
+        const marca = MARCAS[alvo];
+        if (marca) {
+          const banco = bancos.find(b => b.ticker === marca.ticker);
+          return {
+            ticker: marca.ticker,
+            nome: banco ? banco.nome : marca.marca,
+            rotulo: marca.marca,
+            conhecido: true,
+          };
+        }
+
+        const exato = bancos.find(b => normalizar(b.nome) === alvo);
+        const parcial = exato || bancos.find(b => normalizar(b.nome).includes(alvo) || alvo.includes(normalizar(b.nome)));
+        if (parcial) {
+          return { ticker: parcial.ticker, nome: parcial.nome, rotulo: parcial.nome, conhecido: true };
+        }
+
+        return { ticker: 'OUTRA:' + alvo, nome: texto.trim(), rotulo: texto.trim(), conhecido: false };
+      }
+
+      const fmt = (v) => hgFormatMoeda(v);
+
+      function agrupar() {
+        const grupos = new Map();
+        for (const a of aplicacoes) {
+          if (!grupos.has(a.ticker)) {
+            grupos.set(a.ticker, { ticker: a.ticker, nome: a.nome, conhecido: a.conhecido, total: 0, itens: [] });
+          }
+          const g = grupos.get(a.ticker);
+          g.total += a.valor;
+          g.itens.push(a);
+        }
+        for (const g of grupos.values()) {
+          g.coberto = Math.min(LIMITE, g.total);
+          g.exposto = Math.max(0, g.total - LIMITE);
+        }
+        return [...grupos.values()].sort((x, y) => y.total - x.total);
+      }
+
+      function render() {
+        if (!aplicacoes.length) {
+          resumoEl.innerHTML = '';
+          listaEl.innerHTML = '';
+          avisosEl.innerHTML = '';
+          statusEl.textContent = 'Acrescente uma instituição e o valor aplicado nela para começar.';
+          return;
+        }
+        statusEl.textContent = '';
+
+        const grupos = agrupar();
+        const total = grupos.reduce((s, g) => s + g.total, 0);
+        const coberto = grupos.reduce((s, g) => s + g.coberto, 0);
+        const exposto = grupos.reduce((s, g) => s + g.exposto, 0);
+
+        resumoEl.innerHTML =
+          '<div class="fgc-resumo">' +
+          '<div class="fgc-resumo-card"><div class="fgc-resumo-rotulo">Total aplicado</div>' +
+          '<div class="fgc-resumo-valor">' + fmt(total) + '</div></div>' +
+          '<div class="fgc-resumo-card"><div class="fgc-resumo-rotulo">Coberto pelo FGC</div>' +
+          '<div class="fgc-resumo-valor" style="color:var(--accent);">' + fmt(coberto) + '</div></div>' +
+          '<div class="fgc-resumo-card"><div class="fgc-resumo-rotulo">Acima do limite</div>' +
+          '<div class="fgc-resumo-valor" style="color:' + (exposto > 0 ? '#ff5a5a' : 'var(--muted)') + ';">' +
+          fmt(exposto) + '</div></div>' +
+          '</div>';
+
+        listaEl.innerHTML = grupos.map(g => {
+          const pctCoberto = Math.min(100, (g.coberto / LIMITE) * 100);
+          const pctExposto = Math.min(100 - pctCoberto, (g.exposto / LIMITE) * 100);
+          const bas = basileiaPorTicker[g.ticker];
+          const situacao = g.exposto > 0
+            ? '<span style="color:#ff5a5a;">▲ ' + fmt(g.exposto) + ' acima do limite</span>'
+            : (g.total >= MARGEM_RENDIMENTOS
+              ? '<span style="color:var(--gold,#e0b84d);">◆ No limite</span>'
+              : '<span style="color:var(--accent);">✓ Totalmente coberto</span>');
+          const itens = g.itens.map(a =>
+            '<div class="fgc-item"><span>' + a.rotulo + '</span>' +
+            '<span>' + fmt(a.valor) +
+            ' <button type="button" class="fgc-item-remover" data-remover="' + a.id + '" aria-label="Remover">✕</button></span></div>'
+          ).join('');
+          return '<div class="fgc-grupo">' +
+            '<div class="fgc-grupo-topo"><span class="fgc-grupo-nome">' + g.nome + '</span>' +
+            '<span class="fgc-grupo-sub">' + fmt(g.total) + ' &middot; ' + situacao + '</span></div>' +
+            '<div class="fgc-barra">' +
+            '<div class="fgc-barra-coberto" style="width:' + pctCoberto + '%;"></div>' +
+            '<div class="fgc-barra-exposto" style="width:' + pctExposto + '%;"></div>' +
+            '</div>' +
+            (typeof bas === 'number'
+              ? '<div class="fgc-grupo-sub">Índice de Basileia: ' + hgFormatNumero(bas) + '%</div>'
+              : '') +
+            itens +
+            '</div>';
+        }).join('');
+
+        const avisos = [];
+        const noLimite = grupos.filter(g => g.exposto === 0 && g.total >= MARGEM_RENDIMENTOS);
+        if (exposto > 0) {
+          avisos.push(['risco', '▲', 'O que passa de R$ 250 mil num mesmo conglomerado não é coberto. ' +
+            'Nesse caso o investidor entra na fila dos credores da massa liquidanda, sem garantia de receber.']);
+        }
+        if (noLimite.length) {
+          avisos.push(['atencao', '◆', 'O limite cobre principal <strong>mais os rendimentos</strong> acumulados até a ' +
+            'data da liquidação. Por isso o recomendado é parar por volta de R$ 200 a 220 mil por conglomerado, ' +
+            'deixando margem para o que o dinheiro ainda vai render.']);
+        }
+        if (coberto > TETO_GLOBAL) {
+          avisos.push(['risco', '▲', 'Existe um <strong>teto global de R$ 1 milhão por CPF a cada 4 anos</strong>, somando ' +
+            'todas as instituições. Sua cobertura somada passa disso.']);
+        }
+        const desconhecidos = grupos.filter(g => !g.conhecido);
+        if (desconhecidos.length) {
+          avisos.push(['atencao', '◆', 'Não temos ' + desconhecidos.map(g => g.nome).join(', ') +
+            ' na nossa lista de conglomerados, então cada um entrou como grupo separado. ' +
+            'Confira se não pertence ao mesmo grupo de outra instituição da lista — se pertencer, os limites se somam.']);
+        }
+        avisos.push(['', '·', 'Marcas do mesmo grupo dividem o mesmo limite. Em <strong>conta conjunta</strong>, ' +
+          'os R$ 250 mil são divididos entre os titulares, não multiplicados.']);
+        avisos.push(['', '·', 'Têm cobertura: poupança, conta corrente, CDB, RDB, LCI, LCA e letra de câmbio. ' +
+          '<strong>Não têm</strong>: fundos de investimento, debêntures, CRI, CRA, LIG e ações. ' +
+          'Tesouro Direto não precisa: é risco do governo, não de banco.']);
+
+        avisosEl.innerHTML = avisos.map(([tipo, glifo, texto]) =>
+          '<div class="fgc-aviso ' + tipo + '"><span aria-hidden="true">' + glifo + '</span><span>' + texto + '</span></div>'
+        ).join('');
+      }
+
+      function adicionar() {
+        const valor = hgValorMascarado(inValor);
+        const alvo = resolverInstituicao(inInstituicao.value);
+        if (!alvo) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Informe a instituição.';
+          return;
+        }
+        if (!(valor > 0)) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Informe o valor aplicado.';
+          return;
+        }
+        statusEl.className = 'hg-status';
+        aplicacoes.push({
+          id: 'fgc' + Date.now() + Math.random().toString(36).slice(2, 6),
+          rotulo: alvo.rotulo, nome: alvo.nome, ticker: alvo.ticker,
+          conhecido: alvo.conhecido, valor,
+        });
+        salvar();
+        inInstituicao.value = '';
+        inValor.value = '';
+        inValor.dataset.centavos = '0';
+        render();
+        inInstituicao.focus();
+      }
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        carregarBancos().then(render);
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      hgAplicarMascaraMoeda(inValor, 0);
+      carregarSalvas();
+
+      btnAbrir.addEventListener('click', () => { fecharMenusNav(); abrirModal(); });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnAdicionar.addEventListener('click', adicionar);
+      [inInstituicao, inValor].forEach(el => el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); adicionar(); }
+      }));
+      listaEl.addEventListener('click', (e) => {
+        const id = e.target.closest('[data-remover]')?.dataset.remover;
+        if (!id) return;
+        aplicacoes = aplicacoes.filter(a => a.id !== id);
+        salvar();
+        render();
+      });
+
+      document.getElementById('fgcCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'fgc',
+          titulo: 'Cobertura do FGC — Viver de Renda',
+          texto: 'Veja quanto do seu dinheiro está coberto pelo FGC — o limite é por conglomerado, não por banco.',
+        }));
+
+      hgAbrirPorLinkDeFerramenta('fgc', abrirModal);
     })();
 
     // ============================================================
