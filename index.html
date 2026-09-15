@@ -405,8 +405,46 @@
       box-shadow: inset 0 -1px 0 var(--border);
     }
     .tesouro-tabela tbody tr { border-bottom: 1px solid var(--border); }
-    .tesouro-tabela tbody tr:hover { background: var(--deep); }
+    /* Zebrado igual ao das listas de Ações e FIIs, pela mesma variável de
+       tema (--zebra). Fica no <td> e não no <tr> porque a primeira coluna
+       congelada do celular tem fundo próprio e cobriria a faixa. */
+    .tesouro-tabela tbody tr:nth-child(even) td { background: var(--zebra); }
+    .tesouro-tabela tbody tr:hover td { background: var(--deep); }
     .tesouro-nome { font-weight: 700; }
+    /* Nome do título abre o histórico de preço DENTRO do site. Herda a cor
+       do texto em vez de ficar azul: são quase 60 linhas, e uma coluna
+       inteira de links coloridos vira ruído — o ícone de gráfico e o
+       sublinhado no hover já dizem que é clicável. */
+    button.tesouro-nome {
+      color: inherit; background: none; border: none; padding: 0;
+      font: inherit; font-weight: 700; text-align: left; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    button.tesouro-nome:hover { color: var(--primary); text-decoration: underline; }
+    button.tesouro-nome svg { width: 13px; height: 13px; color: var(--muted); flex-shrink: 0; }
+    button.tesouro-nome:hover svg { color: var(--primary); }
+
+    /* ---------- Marcação a mercado ---------- */
+    .calc-modal.tdg-modal { max-width: 720px; }
+    .tdg-resumo { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0; }
+    .tdg-card {
+      background: var(--deep); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 12px; min-width: 0;
+    }
+    .tdg-rotulo {
+      font-size: 0.66rem; color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.04em; font-weight: 700;
+    }
+    .tdg-valor { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1rem; margin-top: 3px; }
+    .tdg-sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .tdg-grafico { position: relative; height: 280px; margin-top: 6px; }
+    .tdg-legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.74rem; color: var(--muted); margin-top: 8px; }
+    .tdg-legenda span { display: inline-flex; align-items: center; gap: 6px; }
+    .tdg-marca { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+    @media (max-width: 640px) {
+      .tdg-resumo { grid-template-columns: 1fr; }
+      .tdg-grafico { height: 230px; }
+    }
     .tesouro-sub { font-size: 0.72rem; color: var(--muted); font-weight: 500; }
     /* A taxa é o número que mais engana nesta tabela, então ela é escrita
        por extenso ("IPCA + 7,22% a.a.", "Selic + 0,08% a.a.") em vez de sair
@@ -447,6 +485,17 @@
         line-height: 1.25;
       }
       .tesouro-tabela thead th:first-child { box-shadow: 1px 0 0 var(--border), inset 0 -1px 0 var(--border); }
+      /* A coluna congelada precisa de fundo OPACO (senão as linhas passam
+         por baixo ao arrastar), mas o zebrado é translúcido. Então aqui a
+         faixa vira imagem por cima da cor sólida, em vez de substituí-la. */
+      .tesouro-tabela tbody tr:nth-child(even) td:first-child {
+        background-color: var(--card);
+        background-image: linear-gradient(var(--zebra), var(--zebra));
+      }
+      .tesouro-tabela tbody tr:hover td:first-child {
+        background-color: var(--deep);
+        background-image: none;
+      }
       /* o canto pertence às duas fixações ao mesmo tempo, então precisa
          ficar acima das duas */
       .tesouro-tabela thead th:first-child { z-index: 3; }
@@ -5405,6 +5454,28 @@
   </div>
 
   <!-- Modal: Carteira de Rendimentos -->
+  <!-- Modal: Marcação a mercado de um título público -->
+  <div id="tdgOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="tdgTitulo" hidden>
+    <div class="calc-modal tdg-modal">
+      <div class="calc-modal-topo">
+        <h3 id="tdgTitulo">Marcação a mercado</h3>
+        <button id="tdgFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          O preço deste título muda todo dia. Se você levar até o vencimento, recebe a taxa combinada na compra —
+          mas se precisar vender antes, recebe o preço de mercado do dia. <strong>Quando a taxa sobe, o preço cai</strong>,
+          e é por isso que um título "seguro" pode aparecer no vermelho na corretora.
+        </p>
+        <div id="tdgResumo"></div>
+        <div id="tdgStatus" class="hg-status"></div>
+        <div class="tdg-grafico"><canvas id="tdgCanvas"></canvas></div>
+        <div class="tdg-legenda" id="tdgLegenda"></div>
+        <p class="calc-ajuda" id="tdgRodape"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Cobertura do FGC -->
   <div id="fgcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="fgcTitulo" hidden>
     <div class="calc-modal fgc-modal">
@@ -8528,6 +8599,193 @@
 
 
 
+
+    // ============================================================
+    // MARCAÇÃO A MERCADO — histórico de preço e taxa de um título
+    //
+    // Por que preço E taxa no mesmo gráfico, em dois eixos: a relação
+    // inversa entre os dois é a coisa que as pessoas não entendem quando
+    // veem o Tesouro IPCA+ no vermelho. Em gráficos separados, dá para
+    // olhar os dois e não perceber que um é o espelho do outro.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('tdgOverlay');
+      const tituloEl = document.getElementById('tdgTitulo');
+      const resumoEl = document.getElementById('tdgResumo');
+      const statusEl = document.getElementById('tdgStatus');
+      const legendaEl = document.getElementById('tdgLegenda');
+      const rodapeEl = document.getElementById('tdgRodape');
+      const canvas = document.getElementById('tdgCanvas');
+      if (!overlay) return;
+
+      let historico = null;
+      let carregando = null;
+      let grafico = null;
+      let tituloAtual = null;
+
+      async function carregarHistorico() {
+        if (historico) return historico;
+        if (carregando) return carregando;
+        carregando = (async () => {
+          const resp = await fetch('data/tesouro-historico.json', { cache: 'no-store' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          const dados = await resp.json();
+          historico = dados.series || {};
+          return historico;
+        })();
+        return carregando;
+      }
+
+      function dataBr(iso) {
+        const [a, m, d] = String(iso).split('-');
+        return `${d}/${m}/${a}`;
+      }
+
+      // Ponto mais próximo de N meses atrás. "Próximo" e não "exato" porque
+      // a série só tem dias úteis: pedir a data cravada devolveria vazio
+      // sempre que ela caísse em fim de semana ou feriado.
+      function pontoMesesAtras(serie, meses) {
+        if (!serie.length) return null;
+        const fim = new Date(serie[serie.length - 1].data);
+        const alvo = new Date(fim);
+        alvo.setMonth(alvo.getMonth() - meses);
+        const alvoIso = alvo.toISOString().slice(0, 10);
+        let melhor = serie[0];
+        for (const p of serie) {
+          if (Math.abs(new Date(p.data) - new Date(alvoIso)) <
+              Math.abs(new Date(melhor.data) - new Date(alvoIso))) melhor = p;
+        }
+        return melhor;
+      }
+
+      function montarResumo(serie) {
+        const hoje = serie[serie.length - 1];
+        const antes = pontoMesesAtras(serie, 12);
+        const variacao = (antes && antes.pu) ? ((hoje.pu / antes.pu) - 1) * 100 : null;
+        const cor = variacao === null ? 'var(--text)' : (variacao >= 0 ? 'var(--accent)' : '#ff5a5a');
+        const sinal = variacao === null ? '' : (variacao >= 0 ? '▲ ' : '▼ ');
+
+        resumoEl.innerHTML =
+          '<div class="tdg-resumo">' +
+          '<div class="tdg-card"><div class="tdg-rotulo">Preço de venda hoje</div>' +
+          '<div class="tdg-valor">' + hgFormatMoeda(hoje.pu) + '</div>' +
+          '<div class="tdg-sub">' + dataBr(hoje.data) + '</div></div>' +
+          '<div class="tdg-card"><div class="tdg-rotulo">Variação em 12 meses</div>' +
+          '<div class="tdg-valor" style="color:' + cor + ';">' +
+          (variacao === null ? '—' : sinal + hgFormatNumero(Math.abs(variacao)) + '%') + '</div>' +
+          '<div class="tdg-sub">' + (antes ? 'desde ' + dataBr(antes.data) : '') + '</div></div>' +
+          '<div class="tdg-card"><div class="tdg-rotulo">Taxa de venda hoje</div>' +
+          '<div class="tdg-valor">' + (hoje.taxa === null ? '—' : hgFormatNumero(hoje.taxa) + '%') + '</div>' +
+          '<div class="tdg-sub">' + (antes && antes.taxa !== null ? 'há 12 meses: ' + hgFormatNumero(antes.taxa) + '%' : '') +
+          '</div></div>' +
+          '</div>';
+      }
+
+      async function desenhar(serie) {
+        await hgCarregarChartJs();
+        if (grafico) grafico.destroy();
+
+        const corPreco = HG_COR_PRIMARIA();
+        const corTaxa = '#e0994d';
+
+        grafico = new Chart(canvas, {
+          type: 'line',
+          data: {
+            labels: serie.map(p => dataBr(p.data)),
+            datasets: [
+              { label: 'Preço (PU)', data: serie.map(p => p.pu), borderColor: corPreco,
+                borderWidth: 2, pointRadius: 0, tension: 0.15, yAxisID: 'y' },
+              { label: 'Taxa (% a.a.)', data: serie.map(p => p.taxa), borderColor: corTaxa,
+                borderWidth: 2, pointRadius: 0, tension: 0.15, yAxisID: 'y1', borderDash: [5, 4] },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (c) => c.datasetIndex === 0
+                    ? 'Preço: ' + hgFormatMoeda(c.parsed.y)
+                    : 'Taxa: ' + hgFormatNumero(c.parsed.y) + '%',
+                },
+              },
+            },
+            scales: {
+              x: { ticks: { autoSkip: true, maxTicksLimit: 7, color: HG_COR_MUTED() }, grid: { display: false } },
+              y: { position: 'left', ticks: { color: HG_COR_MUTED(), callback: hgFormatCompactoEixo },
+                   grid: { color: HG_COR_GRID() } },
+              // Eixo da taxa sem grade própria: duas grades sobrepostas
+              // deixam o fundo riscado e não ajudam a ler nenhuma das duas.
+              y1: { position: 'right', ticks: { color: HG_COR_MUTED(), callback: (v) => hgFormatNumero(v) + '%' },
+                    grid: { drawOnChartArea: false } },
+            },
+          },
+        });
+
+        legendaEl.innerHTML =
+          '<span><i class="tdg-marca" style="background:' + corPreco + ';"></i>Preço (PU), eixo da esquerda</span>' +
+          '<span><i class="tdg-marca" style="background:' + corTaxa + ';"></i>Taxa ao ano, eixo da direita</span>';
+      }
+
+      function abrir() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fechar() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+        if (grafico) { grafico.destroy(); grafico = null; }
+      }
+
+      // Chamada pela tabela do Tesouro Direto.
+      window.vrAbrirMarcacaoMercado = async function (titulo, portal) {
+        tituloAtual = titulo;
+        tituloEl.textContent = titulo.nome;
+        resumoEl.innerHTML = '';
+        legendaEl.innerHTML = '';
+        rodapeEl.innerHTML = '';
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Carregando histórico...';
+        abrir();
+
+        let serie;
+        try {
+          const series = await carregarHistorico();
+          serie = (series[titulo.id] || []).filter(p => typeof p.pu === 'number');
+        } catch (e) {
+          console.warn('Marcação a mercado: falha ao ler o histórico', e);
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Não foi possível carregar o histórico agora.';
+          return;
+        }
+
+        if (serie.length < 2) {
+          statusEl.className = 'hg-status';
+          statusEl.textContent = 'Ainda não há histórico suficiente para este título.';
+          return;
+        }
+
+        statusEl.textContent = '';
+        montarResumo(serie);
+        await desenhar(serie);
+        rodapeEl.innerHTML =
+          'Preço e taxa de venda (o que você receberia vendendo), de ' + dataBr(serie[0].data) +
+          ' a ' + dataBr(serie[serie.length - 1].data) + '. Fonte: Tesouro Transparente. ' +
+          'Comprar e vender pelo portal oficial: <a href="' + (portal || 'https://www.tesourodireto.com.br') +
+          '" target="_blank" rel="noopener noreferrer">https://www.tesourodireto.com.br</a>';
+      };
+
+      document.getElementById('tdgFechar').addEventListener('click', fechar);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fechar(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fechar(); });
+      window.addEventListener('hg-tema-mudou', () => {
+        if (!overlay.hidden && tituloAtual) window.vrAbrirMarcacaoMercado(tituloAtual, PORTAL_PADRAO);
+      });
+      const PORTAL_PADRAO = 'https://www.tesourodireto.com.br';
+    })();
+
     // ============================================================
     // TESOURO DIRETO — tabela de preços e taxas
     //
@@ -8547,6 +8805,11 @@
       let dados = null;
       let carregando = null;
       let familiaAtiva = 'todos';
+
+      const PORTAL = 'https://www.tesourodireto.com.br';
+      const SVG_GRAFICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" '
+        + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+        + '<polyline points="3 17 9 11 13 15 21 7"></polyline></svg>';
 
       // Famílias que fazem sentido pra quem escolhe título — não é o
       // indexador cru: Educa+ e Renda+ são corrigidos pelo IPCA, mas quem
@@ -8627,7 +8890,8 @@
           lista.map(t => {
             const pu = typeof t.pu_compra === 'number' ? t.pu_compra : t.pu_venda;
             return '<tr>' +
-              '<td><div class="tesouro-nome">' + t.nome + '</div>' +
+              '<td><button type="button" class="tesouro-nome" data-titulo="' + t.id + '"' +
+              ' title="Ver o histórico de preço deste título">' + SVG_GRAFICO + '<span>' + t.nome + '</span></button>' +
               '<div class="tesouro-sub">' + (t.cupom === 'semestral' ? 'Paga juros a cada 6 meses' : 'Paga tudo no vencimento') + '</div></td>' +
               '<td>' + dataBr(t.vencimento) + '</td>' +
               '<td><span class="tesouro-taxa" title="' + (t.rotulo_taxa || '') + '">' + taxaPorExtenso(t) + '</span></td>' +
@@ -8671,6 +8935,13 @@
         montarTabela();
         montarRodape();
       }
+
+      tabelaEl.addEventListener('click', (e) => {
+        const id = e.target.closest('[data-titulo]')?.dataset.titulo;
+        if (!id) return;
+        const titulo = (dados?.titulos || []).find(t => t.id === id);
+        if (titulo) window.vrAbrirMarcacaoMercado(titulo, PORTAL);
+      });
 
       filtrosEl.addEventListener('click', (e) => {
         const chave = e.target.closest('[data-familia]')?.dataset.familia;
