@@ -3394,13 +3394,28 @@
             </div>
           </div>
         </div>
-        <a href="#boletins-semana">Boletim de Mercado Diário</a>
-        <a href="#educacao">Educação</a>
         <div class="nav-dropdown" id="navRendaFixaDropdown">
           <button type="button" class="nav-dropdown-btn" id="navRendaFixaBtn" aria-haspopup="true" aria-expanded="false">
-            Simuladores <span class="nav-dropdown-seta">▾</span>
+            Renda Fixa <span class="nav-dropdown-seta">▾</span>
           </button>
           <div class="nav-dropdown-menu" id="navRendaFixaMenu">
+            <button type="button" class="nav-dropdown-item" id="navAbrirCalculadoraMenu">
+              🧮 Calculadora Renda Fixa
+            </button>
+            <button type="button" class="nav-dropdown-item" id="basBtnAbrir">
+              🏦 Índice de Basileia dos Bancos
+            </button>
+            <div class="nav-dropdown-separador"></div>
+            <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
+          </div>
+        </div>
+        <a href="#boletins-semana">Boletim de Mercado Diário</a>
+        <a href="#educacao">Educação</a>
+        <div class="nav-dropdown" id="navSimuladoresDropdown">
+          <button type="button" class="nav-dropdown-btn" id="navSimuladoresBtn" aria-haspopup="true" aria-expanded="false">
+            Simuladores <span class="nav-dropdown-seta">▾</span>
+          </button>
+          <div class="nav-dropdown-menu" id="navSimuladoresMenu">
             <a class="nav-dropdown-item" href="#alertas-preco" id="navAbrirAlertasPreco">🔔 Meus Alertas de Preço</a>
             <button type="button" class="nav-dropdown-item" id="navAbrirConversor">
               💱 Conversor de Moedas
@@ -3410,9 +3425,6 @@
             </button>
             <button type="button" class="nav-dropdown-item" id="rpnBtnAbrir">
               <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)
-            </button>
-            <button type="button" class="nav-dropdown-item" id="basBtnAbrir">
-              🏦 Índice de Basileia dos Bancos
             </button>
             <button type="button" class="nav-dropdown-item" id="quizBtnAbrir">
               ❓ Descubra seu Perfil de Investidor
@@ -3426,7 +3438,6 @@
             <button type="button" class="nav-dropdown-item" id="agendaBtnAbrir">
               📅 Agenda de Proventos
             </button>
-            <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
           </div>
         </div>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
@@ -3464,16 +3475,18 @@
     <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Papel">↳ Papel</button>
     <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Logístico">↳ Logístico</button>
     <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Híbrido">↳ Híbrido</button>
+    <div class="mobile-menu-separador">Renda Fixa</div>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirCalculadoraMenu">🧮 Calculadora Renda Fixa</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
+    <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     <div class="mobile-menu-separador">Simuladores</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário do Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="rpnBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)</button>
-    <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="quizBtnAbrir">❓ Descubra seu Perfil de Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="carteiraBtnAbrir">💰 Carteira de Rendimentos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="reinvBtnAbrir">🔁 Reinvestimento de Dividendos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="agendaBtnAbrir">📅 Agenda de Proventos</button>
-    <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
   </div>
 
   <!-- LOGIN / PERFIL — Magic Link via Supabase Auth. Sem senha: a pessoa
@@ -12918,73 +12931,56 @@
     })();
 
     // ============================================================
-    // DROPDOWN "Renda Fixa" (Calculadora / Yubb Busca Investimento)
+    // MENUS DA BARRA DO TOPO (Mercado, Renda Fixa, Simuladores)
+    //
+    // Um motor só para os três. Antes eram duas IIFEs quase idênticas;
+    // com o menu "Renda Fixa" seriam três cópias da mesma coisa, e é
+    // assim que uma delas acaba com um comportamento diferente das
+    // outras sem ninguém perceber.
     // ============================================================
-    function fecharDropdownRendaFixa() {
-      const dropdown = document.getElementById('navRendaFixaDropdown');
-      const botao = document.getElementById('navRendaFixaBtn');
-      if (dropdown) dropdown.classList.remove('aberto');
-      if (botao) botao.setAttribute('aria-expanded', 'false');
+
+    // Fecha TODOS os menus da barra. Chamada por cada modal ao abrir —
+    // com os itens divididos em dois menus, fechar só um deixaria o
+    // outro aberto por cima do modal. (Era 'fecharDropdownRendaFixa',
+    // nome que sobrou de quando havia um único dropdown.)
+    function fecharMenusNav() {
+      document.querySelectorAll('.nav-dropdown').forEach(d => {
+        d.classList.remove('aberto');
+        d.querySelector('.nav-dropdown-btn')?.setAttribute('aria-expanded', 'false');
+      });
     }
-    (function () {
-      const dropdown = document.getElementById('navRendaFixaDropdown');
-      const botao = document.getElementById('navRendaFixaBtn');
-      if (!dropdown || !botao) return;
 
-      botao.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const abrindo = !dropdown.classList.contains('aberto');
-        dropdown.classList.toggle('aberto', abrindo);
-        botao.setAttribute('aria-expanded', String(abrindo));
+    (function () {
+      // Abrir um menu fecha os outros: sem isso, dois menus vizinhos
+      // ficavam abertos ao mesmo tempo, sobrepostos.
+      document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+        const botao = dropdown.querySelector('.nav-dropdown-btn');
+        if (!botao) return;
+
+        botao.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const abrindo = !dropdown.classList.contains('aberto');
+          fecharMenusNav();
+          dropdown.classList.toggle('aberto', abrindo);
+          botao.setAttribute('aria-expanded', String(abrindo));
+        });
+
+        // Os itens fecham o menu ao clicar. Vale tanto para os links de
+        // âncora (sem isso o menu ficava aberto por cima da seção depois
+        // do salto — bug reportado no mobile) quanto para os botões de
+        // setor/segmento do submenu.
+        dropdown.querySelectorAll('.nav-dropdown-item, .nav-submenu-item').forEach(item => {
+          item.addEventListener('click', fecharMenusNav);
+        });
       });
 
       document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target)) fecharDropdownRendaFixa();
+        if (!e.target.closest('.nav-dropdown')) fecharMenusNav();
       });
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') fecharDropdownRendaFixa();
+        if (e.key === 'Escape') fecharMenusNav();
       });
-
-      // Diferente dos outros itens (que abrem modal por cima, cobrindo o
-      // dropdown de qualquer forma), este é um link de âncora pra uma
-      // seção da própria página — sem fechar explicitamente, o menu
-      // ficaria aberto por cima da seção depois do salto.
-      document.getElementById('navAbrirAlertasPreco')?.addEventListener('click', fecharDropdownRendaFixa);
-    })();
-
-    // ============================================================
-    // DROPDOWN "Mercado" (Consulta / Lista de Ações / Lista de FIIs)
-    // ============================================================
-    (function () {
-      const dropdown = document.getElementById('navMercadoDropdown');
-      const botao = document.getElementById('navMercadoBtn');
-      if (!dropdown || !botao) return;
-
-      const fechar = () => {
-        dropdown.classList.remove('aberto');
-        botao.setAttribute('aria-expanded', 'false');
-      };
-
-      botao.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const abrindo = !dropdown.classList.contains('aberto');
-        dropdown.classList.toggle('aberto', abrindo);
-        botao.setAttribute('aria-expanded', String(abrindo));
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target)) fechar();
-      });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') fechar();
-      });
-      // Os itens (links E os botões de setor/segmento do submenu) fecham o
-      // menu ao clicar — sem isso, ele ficava aberto por cima da lista
-      // depois do salto/filtro (bug reportado no mobile).
-      dropdown.querySelectorAll('.nav-dropdown-item, .nav-submenu-item').forEach(item => {
-        item.addEventListener('click', fechar);
-      });
-      document.getElementById('navMercadoFechar')?.addEventListener('click', fechar);
+      document.getElementById('navMercadoFechar')?.addEventListener('click', fecharMenusNav);
     })();
 
     // ============================================================
@@ -14458,9 +14454,14 @@
         document.body.style.overflow = '';
       }
 
-      btnAbrir.addEventListener('click', () => {
-        fecharDropdownRendaFixa();
-        abrirModal();
+      // Dois pontos de entrada para o mesmo modal: o atalho do hero
+      // ('navAbrirCalculadora') e o item do menu Renda Fixa. Mesma
+      // solução já usada pela Calculadora Financeira (RPN).
+      ['navAbrirCalculadora', 'navAbrirCalculadoraMenu'].forEach((id) => {
+        document.getElementById(id)?.addEventListener('click', () => {
+          fecharMenusNav();
+          abrirModal();
+        });
       });
       btnFechar.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
@@ -15383,7 +15384,7 @@
       }
 
       btnAbrirMenu.addEventListener('click', () => {
-        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
@@ -16121,7 +16122,7 @@
 
       ['rpnBtnAbrir', 'rpnBtnAbrirAtalho'].forEach((id) => {
         document.getElementById(id)?.addEventListener('click', () => {
-          if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+          if (typeof fecharMenusNav === 'function') fecharMenusNav();
           abrirModal();
         });
       });
@@ -16465,7 +16466,7 @@
       window.addEventListener('hg-tema-mudou', () => { if (jcChartLinha) calcular(); });
 
       btnAbrirMenu.addEventListener('click', () => {
-        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
@@ -16724,7 +16725,7 @@
       }
 
       btnAbrirMenu.addEventListener('click', () => {
-        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
@@ -17253,7 +17254,7 @@
       }
 
       btnAbrirMenu.addEventListener('click', () => {
-        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
@@ -17546,7 +17547,7 @@
       }
 
       btnAbrirMenu.addEventListener('click', () => {
-        if (typeof fecharDropdownRendaFixa === 'function') fecharDropdownRendaFixa();
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
