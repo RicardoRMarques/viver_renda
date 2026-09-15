@@ -1,6 +1,6 @@
 {
   "_leia_me": "Índice de Basileia dos bancos, usado na tabela do site. Os bancos vêm em dois grupos: 'listado' (tem ação na B3 — o site busca também valor de mercado, P/L, P/VP, ROE e DY) e 'emissor' (não tem ação, mas emite CDB/LCI/LCA — só a coluna de Basileia é preenchida). Enquanto não houver coleta automática, este arquivo é atualizado à mão a cada divulgação trimestral. O site monta o seletor a partir de 'periodos': basta acrescentar um período novo no TOPO da lista que ele aparece sozinho, sem mexer no index.html.",
-  "atualizado_em": "2026-09-14",
+  "atualizado_em": "2026-09-15",
   "fonte": "IF.data — Banco Central do Brasil",
   "bancos": [
     {
@@ -182,6 +182,7 @@
         "BPAC11": 16.04,
         "PINE4": 14.31,
         "CAIXA": 15.45,
+        "BARI": 20.98,
         "BRBI11": 21.59,
         "INTER": 14.4,
         "FIBRA": 11.23,
