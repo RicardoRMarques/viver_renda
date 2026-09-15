@@ -8518,8 +8518,14 @@
           console.warn('FGC: não foi possível ler data/basileia.json', e);
           bancos = [];
         }
-        sugestoesEl.innerHTML = bancos.map(b => '<option value="' + b.nome + '"></option>').join('')
-          + Object.values(MARCAS).map(m => '<option value="' + m.marca + '"></option>').join('');
+        // As MARCAS têm mais chaves do que marcas (o Banco Pan responde por
+        // 'PAN', 'BANCO PAN' e 'BPAN4'), e o Pan também já vem na lista de
+        // bancos. Sem remover repetidos, ele aparecia quatro vezes no
+        // autocompletar.
+        const rotulos = [...new Set(
+          bancos.map(b => b.nome).concat(Object.values(MARCAS).map(m => m.marca))
+        )];
+        sugestoesEl.innerHTML = rotulos.map(r => '<option value="' + r + '"></option>').join('');
       }
 
       // Texto digitado -> conglomerado. Devolve `conhecido: false` quando
