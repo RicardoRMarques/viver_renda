@@ -382,6 +382,42 @@
       .modal-link-btn span { display: none; }
       .modal-link-btn.copiado span { display: inline; }
     }
+    /* ---------- Tesouro Direto ----------
+       Seção própria, NÃO reaproveita .lista-mercado: aquela classe carrega
+       junto o mecanismo de cabeçalho fixo que está congelado por decisão do
+       Ricardo (06/09/2026). Aqui a tabela é curta e rola dentro da própria
+       caixa, sem cabeçalho grudado. */
+    .tesouro-topo { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .tesouro-tabela-wrap { overflow-x: auto; margin-top: 10px; }
+    .tesouro-tabela { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    .tesouro-tabela th, .tesouro-tabela td { padding: 9px 10px; text-align: left; white-space: nowrap; }
+    .tesouro-tabela th {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--muted); font-weight: 700; border-bottom: 1px solid var(--border);
+    }
+    .tesouro-tabela tbody tr { border-bottom: 1px solid var(--border); }
+    .tesouro-tabela tbody tr:hover { background: var(--deep); }
+    .tesouro-nome { font-weight: 700; }
+    .tesouro-sub { font-size: 0.72rem; color: var(--muted); font-weight: 500; }
+    /* A taxa é o número que mais engana nesta tabela, então ela é escrita
+       por extenso ("IPCA + 7,22% a.a.", "Selic + 0,08% a.a.") em vez de sair
+       como um percentual solto. Ver comentário no JS. */
+    .tesouro-taxa { font-family: 'IBM Plex Mono', monospace; font-weight: 700; }
+    .tesouro-num { font-family: 'IBM Plex Mono', monospace; text-align: right; }
+    .tesouro-tabela th.num { text-align: right; }
+    .tesouro-rodape { font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
+    @media (max-width: 700px) {
+      .tesouro-tabela { font-size: 0.8rem; }
+      .tesouro-tabela th, .tesouro-tabela td { padding: 8px 7px; }
+      /* Primeira coluna congelada: sem isso o nome do título sai da tela
+         assim que a pessoa rola pro lado e ela perde a referência de qual
+         linha está lendo. Mesmo tratamento da tabela de Basileia. */
+      .tesouro-tabela th:first-child, .tesouro-tabela td:first-child {
+        position: sticky; left: 0; background: var(--card);
+      }
+      .tesouro-tabela th:first-child { z-index: 2; }
+    }
+
     /* ---------- Cobertura do FGC ---------- */
     .calc-modal.fgc-modal { max-width: 760px; }
     .fgc-add-linha { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -3460,6 +3496,7 @@
             <button type="button" class="nav-dropdown-item" id="basBtnAbrir">
               🏦 Índice de Basileia dos Bancos
             </button>
+            <a class="nav-dropdown-item" href="#tesouro-direto"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="12" y1="21" x2="12" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Tesouro Direto</a>
             <button type="button" class="nav-dropdown-item" id="fgcBtnAbrir">
               <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC
             </button>
@@ -3536,6 +3573,7 @@
     <div class="mobile-menu-separador">Renda Fixa</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirCalculadoraMenu"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="9" y1="21" x2="9" y2="10"></line><line x1="15" y1="21" x2="15" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Calculadora Renda Fixa</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
+    <a class="mobile-menu-item" href="#tesouro-direto"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="12" y1="21" x2="12" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Tesouro Direto</a>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="fgcBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC</button>
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     <div class="mobile-menu-separador">Simuladores</div>
@@ -3790,6 +3828,27 @@
     <!-- NOTÍCIAS DO MERCADO ECONÔMICO — logo abaixo das calculadoras.
          Alimentada por noticias.json, gerado pelo robô (GitHub Actions) a
          partir de feeds RSS públicos (Investing.com / InfoMoney). -->
+    <section class="hg-busca" id="tesouro-direto" hidden>
+      <div class="tesouro-topo">
+        <h2 class="hg-titulo">
+          <svg class="hg-titulo-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="12" y1="21" x2="12" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg>Tesouro Direto
+        </h2>
+        <button type="button" class="lista-mercado-fechar" data-fechar-secao="tesouro-direto" aria-label="Fechar Tesouro Direto">✕</button>
+      </div>
+
+      <p class="calc-ajuda" style="margin-top:0;">
+        Preços e taxas de referência dos títulos públicos, do Tesouro Transparente.
+        A taxa quer dizer coisas diferentes conforme o título — por isso ela aparece escrita por extenso.
+      </p>
+
+      <div class="hg-chips" id="tesouroFiltros"></div>
+      <div id="tesouroStatus" class="hg-status"></div>
+      <div class="tesouro-tabela-wrap">
+        <table class="tesouro-tabela" id="tesouroTabela"></table>
+      </div>
+      <p class="tesouro-rodape" id="tesouroRodape"></p>
+    </section>
+
     <section class="section-noticias-mercado" id="noticias-mercado">
       <h2 class="hg-titulo">📰 Notícias do Mercado Econômico</h2>
       <p class="noticias-mercado-sub">As últimas notícias de mercado, direto das fontes, atualizadas automaticamente.</p>
@@ -8433,6 +8492,161 @@
       });
     })();
 
+
+
+    // ============================================================
+    // TESOURO DIRETO — tabela de preços e taxas
+    //
+    // Fonte: data/tesouro.json, escrito pelo robô coletar_tesouro.py a
+    // partir do CSV do Tesouro Transparente (o JSON do site do Tesouro
+    // está atrás de Cloudflare e recusa requisição automatizada; a API da
+    // brapi exige plano Pro). Detalhes no cabeçalho do robô.
+    // ============================================================
+    (function () {
+      const secao = document.getElementById('tesouro-direto');
+      const tabelaEl = document.getElementById('tesouroTabela');
+      const filtrosEl = document.getElementById('tesouroFiltros');
+      const statusEl = document.getElementById('tesouroStatus');
+      const rodapeEl = document.getElementById('tesouroRodape');
+      if (!secao || !tabelaEl) return;
+
+      let dados = null;
+      let carregando = null;
+      let familiaAtiva = 'todos';
+
+      // Famílias que fazem sentido pra quem escolhe título — não é o
+      // indexador cru: Educa+ e Renda+ são corrigidos pelo IPCA, mas quem
+      // procura um deles não quer ver a lista inteira de IPCA+.
+      const FAMILIAS = [
+        ['todos', 'Todos'],
+        ['selic', 'Selic'],
+        ['prefixado', 'Prefixado'],
+        ['ipca', 'IPCA+'],
+        ['educa', 'Educa+'],
+        ['renda', 'Renda+'],
+      ];
+
+      function familiaDe(t) {
+        const nome = (t.nome || '').toUpperCase();
+        if (nome.includes('EDUCA')) return 'educa';
+        if (nome.includes('RENDA+')) return 'renda';
+        return t.indexador;
+      }
+
+      // A taxa é o número que mais engana nesta tabela. No Tesouro Selic ela
+      // é o SPREAD sobre a Selic (fica em torno de 0,1%), no IPCA+ é a taxa
+      // REAL acima da inflação, e só no Prefixado é a rentabilidade cheia.
+      // Mostrar "0,08%" ao lado de "14,05%" faria o Selic parecer lixo. Por
+      // isso a taxa vai escrita por extenso, com o indexador na frente.
+      function taxaPorExtenso(t) {
+        if (typeof t.taxa_compra !== 'number') return '—';
+        const n = hgFormatNumero(t.taxa_compra) + '% a.a.';
+        if (t.indexador === 'selic') return 'Selic + ' + n;
+        if (t.indexador === 'ipca') return 'IPCA + ' + n;
+        if (t.indexador === 'igpm') return 'IGP-M + ' + n;
+        return n;
+      }
+
+      function dataBr(iso) {
+        if (!iso) return '—';
+        const [a, m, d] = String(iso).split('-');
+        return `${d}/${m}/${a}`;
+      }
+
+      async function carregar() {
+        if (dados) return dados;
+        if (carregando) return carregando;
+        carregando = (async () => {
+          const resp = await fetch('data/tesouro.json', { cache: 'no-store' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          dados = await resp.json();
+          return dados;
+        })();
+        return carregando;
+      }
+
+      function montarFiltros() {
+        const presentes = new Set((dados.titulos || []).map(familiaDe));
+        filtrosEl.innerHTML = FAMILIAS
+          .filter(([chave]) => chave === 'todos' || presentes.has(chave))
+          .map(([chave, rotulo]) =>
+            `<span class="hg-chip${chave === familiaAtiva ? ' ativo' : ''}" data-familia="${chave}">${rotulo}</span>`)
+          .join('');
+      }
+
+      function montarTabela() {
+        const lista = (dados.titulos || [])
+          .filter(t => familiaAtiva === 'todos' || familiaDe(t) === familiaAtiva);
+
+        if (!lista.length) {
+          tabelaEl.innerHTML = '';
+          statusEl.textContent = 'Nenhum título nesta categoria.';
+          return;
+        }
+        statusEl.textContent = '';
+
+        tabelaEl.innerHTML =
+          '<thead><tr>' +
+          '<th>Título</th><th>Vencimento</th><th>Rentabilidade</th>' +
+          '<th class="num">Preço unitário</th><th class="num">Investimento mínimo</th>' +
+          '</tr></thead><tbody>' +
+          lista.map(t => {
+            const pu = typeof t.pu_compra === 'number' ? t.pu_compra : t.pu_venda;
+            return '<tr>' +
+              '<td><div class="tesouro-nome">' + t.nome + '</div>' +
+              '<div class="tesouro-sub">' + (t.cupom === 'semestral' ? 'Paga juros a cada 6 meses' : 'Paga tudo no vencimento') + '</div></td>' +
+              '<td>' + dataBr(t.vencimento) + '</td>' +
+              '<td><span class="tesouro-taxa" title="' + (t.rotulo_taxa || '') + '">' + taxaPorExtenso(t) + '</span></td>' +
+              '<td class="tesouro-num">' + (typeof pu === 'number' ? hgFormatMoeda(pu) : '—') + '</td>' +
+              '<td class="tesouro-num">' + (typeof t.investimento_minimo === 'number' ? hgFormatMoeda(t.investimento_minimo) : '—') + '</td>' +
+              '</tr>';
+          }).join('') +
+          '</tbody>';
+      }
+
+      function montarRodape() {
+        const partes = [];
+        if (dados.data_base) partes.push('Posição de ' + dataBr(dados.data_base));
+        if (dados.fonte) partes.push('Fonte: ' + dados.fonte);
+        partes.push('Preços e taxas de referência do dia, incluindo títulos que podem não estar à venda no momento. ' +
+                    'Confirme na sua corretora ou no site do Tesouro antes de investir.');
+        rodapeEl.textContent = partes.join(' · ');
+      }
+
+      async function render() {
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Carregando títulos públicos...';
+        try {
+          await carregar();
+        } catch (e) {
+          console.warn('Tesouro: não foi possível ler data/tesouro.json', e);
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Não foi possível carregar os títulos agora. Tente novamente em instantes.';
+          tabelaEl.innerHTML = '';
+          rodapeEl.textContent = '';
+          return;
+        }
+        montarFiltros();
+        montarTabela();
+        montarRodape();
+      }
+
+      filtrosEl.addEventListener('click', (e) => {
+        const chave = e.target.closest('[data-familia]')?.dataset.familia;
+        if (!chave || chave === familiaAtiva) return;
+        familiaAtiva = chave;
+        montarFiltros();
+        montarTabela();
+      });
+
+      // Só busca o JSON quando a seção é realmente revelada — ela nasce
+      // [hidden] e a maior parte das visitas nunca abre essa parte do site.
+      const observador = new MutationObserver(() => {
+        if (!secao.hidden && !dados) render();
+      });
+      observador.observe(secao, { attributes: true, attributeFilter: ['hidden'] });
+      if (!secao.hidden) render();
+    })();
 
     // ============================================================
     // COBERTURA DO FGC
@@ -13662,14 +13876,14 @@
         atualizarCabecalhoFixoListaMercado(secao);
       });
     }
-    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"]').forEach(link => {
+    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#tesouro-direto"]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         revelarSecaoMercado(link.getAttribute('href').slice(1));
       });
     });
     // Link direto (compartilhado ou digitado na barra de endereço)
-    if (window.location.hash === '#lista-acoes' || window.location.hash === '#lista-fiis') {
+    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto'].includes(window.location.hash)) {
       revelarSecaoMercado(window.location.hash.slice(1));
     }
     // Botão "✕" no topo de cada lista — esconde a seção de novo e rola
