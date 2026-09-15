@@ -427,9 +427,26 @@
       /* Primeira coluna congelada: sem isso o nome do título sai da tela
          assim que a pessoa rola pro lado e ela perde a referência de qual
          linha está lendo. Mesmo tratamento da tabela de Basileia. */
+      /* A coluna do título é congelada à esquerda E tinha nowrap: o nome
+         mais longo ("Tesouro IPCA+ com Juros Semestrais 2032") definia a
+         largura dela, que comia quase a tela inteira e não sobrava espaço
+         para as outras colunas nem arrastando. Aqui ela passa a quebrar em
+         duas linhas e tem largura máxima. O max-width vai nos filhos, e não
+         na célula: em tabela de layout automático o navegador trata
+         max-width de <td> como sugestão e costuma ignorar. */
       .tesouro-tabela th:first-child, .tesouro-tabela td:first-child {
         position: sticky; left: 0; background: var(--card);
+        white-space: normal;
+        /* marca onde a coluna congelada termina, para ficar claro que o
+           conteúdo continua para o lado */
+        box-shadow: 1px 0 0 var(--border);
       }
+      .tesouro-tabela td:first-child .tesouro-nome,
+      .tesouro-tabela td:first-child .tesouro-sub {
+        max-width: 43vw;
+        line-height: 1.25;
+      }
+      .tesouro-tabela thead th:first-child { box-shadow: 1px 0 0 var(--border), inset 0 -1px 0 var(--border); }
       /* o canto pertence às duas fixações ao mesmo tempo, então precisa
          ficar acima das duas */
       .tesouro-tabela thead th:first-child { z-index: 3; }
