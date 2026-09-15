@@ -419,6 +419,8 @@
     .tesouro-tabela td.tesouro-num { font-family: 'IBM Plex Mono', monospace; text-align: right; }
     .tesouro-tabela thead th.num { text-align: right; }
     .tesouro-rodape { font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
+    .tesouro-rodape a { color: var(--primary); font-weight: 700; text-decoration: none; }
+    .tesouro-rodape a:hover { text-decoration: underline; }
     @media (max-width: 700px) {
       .tesouro-tabela { font-size: 0.8rem; }
       .tesouro-tabela th, .tesouro-tabela td { padding: 8px 7px; }
@@ -8624,8 +8626,15 @@
         if (dados.data_base) partes.push('Posição de ' + dataBr(dados.data_base));
         if (dados.fonte) partes.push('Fonte: ' + dados.fonte);
         partes.push('Preços e taxas de referência do dia, incluindo títulos que podem não estar à venda no momento. ' +
-                    'Confirme na sua corretora ou no site do Tesouro antes de investir.');
-        rodapeEl.textContent = partes.join(' · ');
+                    'Confirme antes de investir.');
+        // Endereço por extenso, e não "clique aqui": o rodapé também é lido
+        // impresso e em print de tela compartilhado no WhatsApp, onde um
+        // link sem o endereço não leva a lugar nenhum.
+        partes.push('Compra pelo portal oficial: ' +
+                    '<a href="https://www.tesourodireto.com.br" target="_blank" rel="noopener noreferrer">' +
+                    'https://www.tesourodireto.com.br</a> ' +
+                    '(é preciso ter cadastro em um agente de custódia — corretora, banco ou distribuidora)');
+        rodapeEl.innerHTML = partes.join(' · ');
       }
 
       async function render() {
