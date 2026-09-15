@@ -1,0 +1,44 @@
+name: Atualizar Tesouro Direto
+
+# O Tesouro publica as taxas uma vez por dia útil. 12h UTC = 9h BR, depois da
+# abertura. Segunda a sexta apenas — fim de semana não tem data-base nova e
+# o download é pesado (o CSV é o histórico inteiro desde 2009).
+on:
+  schedule:
+    - cron: '0 12 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tesouro
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20   # o download costuma dominar o tempo
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Sem dependência externa de propósito: o robô usa só a biblioteca
+      # padrão (urllib + csv), lendo o arquivo em fluxo.
+      - name: Coletar preços e taxas
+        run: python coletar_tesouro.py
+
+      - name: Publicar se mudou
+        run: |
+          if [ -z "$(git status --porcelain data/tesouro.json data/tesouro-historico.json)" ]; then
+            echo "Nada mudou — sem commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/tesouro.json data/tesouro-historico.json
+          git commit -m "Tesouro Direto: atualiza preços e taxas"
+          git push
