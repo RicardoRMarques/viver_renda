@@ -7833,20 +7833,50 @@
         return window.innerWidth >= 640;
       }
 
-      // Na primeira vez que abre em tela grande, "congela" a posição
-      // centralizada natural (a que o flex do .calc-overlay já calculou)
-      // em top/left absolutos e troca pra position:fixed — assim o modal
-      // some da centralização automática, mas começa exatamente onde já
-      // estava, sem pulo nenhum, e a partir daí pode ser arrastado livre.
+      // Na primeira vez que abre em tela grande, fixa largura/posição do
+      // modal em valores absolutos e troca pra position:fixed, pra que ele
+      // possa ser arrastado livremente a partir dali.
+      //
+      // Antes isso era feito medindo o próprio modal (getBoundingClientRect)
+      // logo depois de mostrá-lo, e saía errado por dois motivos:
+      //
+      // 1) LARGURA — a medição acontece DEPOIS de entrar a classe
+      //    .carteira-arrastavel, e ela traz `max-width: 96vw`, que vence a
+      //    regra de leitura (.calc-modal.carteira-modal, 1260px) por vir
+      //    declarada depois com a mesma especificidade. Num monitor de
+      //    2560px o modal nascia com ~2460px de largura — os 96vw são o
+      //    teto ao REDIMENSIONAR, não a largura de abertura.
+      // 2) ALTURA/TOPO — o modal abre VAZIO; a carteira salva (local +
+      //    Supabase) só chega depois, de forma assíncrona. O `top`
+      //    centralizado era calculado para a altura do modal vazio e ficava
+      //    congelado; quando as linhas chegavam, o modal crescia para baixo
+      //    a partir daquele ponto e passava da borda inferior da tela.
+      //
+      // Agora a geometria é calculada a partir da janela, sem medir o
+      // conteúdo: largura de leitura centralizada e topo posicionado
+      // considerando a ALTURA MÁXIMA que o modal pode alcançar (92vh do
+      // CSS), então ele cresce dentro da tela por mais ativos que entrem. A
+      // altura fica sem valor inline de propósito — quem manda é o
+      // max-height do CSS, e o redimensionar continua funcionando.
       function centralizarModalSeNecessario() {
         if (!podeArrastarRedimensionar()) return;
         modal.classList.add('carteira-arrastavel');
         if (posicaoInicializada) return;
-        const r = modal.getBoundingClientRect();
-        modal.style.top = r.top + 'px';
-        modal.style.left = r.left + 'px';
-        modal.style.width = r.width + 'px';
-        modal.style.height = r.height + 'px';
+
+        const larguraJanela = window.innerWidth;
+        const alturaJanela = window.innerHeight;
+        // Mesmo teto de leitura do CSS: 1260px, ou 96vw na faixa
+        // intermediária (900-1500px), onde a tabela precisa de mais espaço.
+        const tetoLeitura = (larguraJanela >= 900 && larguraJanela <= 1500)
+          ? larguraJanela * 0.96
+          : 1260;
+        const largura = Math.min(tetoLeitura, larguraJanela * 0.96);
+        const alturaMaxima = alturaJanela * 0.92; // igual ao max-height do CSS
+
+        modal.style.width = largura + 'px';
+        modal.style.height = '';
+        modal.style.left = Math.max(0, (larguraJanela - largura) / 2) + 'px';
+        modal.style.top = Math.max(0, (alturaJanela - alturaMaxima) / 2) + 'px';
         posicaoInicializada = true;
       }
 
