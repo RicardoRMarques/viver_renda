@@ -3916,7 +3916,15 @@
         <h2 class="hg-titulo">
           <svg class="hg-titulo-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="12" y1="21" x2="12" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg>Tesouro Direto
         </h2>
-        <button type="button" class="lista-mercado-fechar" data-fechar-secao="tesouro-direto" aria-label="Fechar Tesouro Direto">✕</button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="tesouroCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button type="button" class="lista-mercado-fechar" data-fechar-secao="tesouro-direto" aria-label="Fechar Tesouro Direto">✕</button>
+        </div>
       </div>
 
       <p class="calc-ajuda" style="margin-top:0;">
@@ -6179,8 +6187,12 @@
     // tickers, nem quantidades, nem valores. Quem abre o link cai na
     // ferramenta com os próprios dados (ou vazia), nunca com os de quem
     // compartilhou.
-    async function hgCompartilharLinkFerramenta(botao, { view, titulo, texto }) {
-      const link = `${window.location.origin}${window.location.pathname}?view=${view}`;
+    async function hgCompartilharLinkFerramenta(botao, { view, hash, titulo, texto }) {
+      // Modal usa ?view=<nome>; seção da própria página usa âncora, que é a
+      // convenção que #lista-acoes e #lista-fiis já seguem e que o site já
+      // sabe abrir sozinho.
+      const base = `${window.location.origin}${window.location.pathname}`;
+      const link = hash ? `${base}#${hash}` : `${base}?view=${view}`;
 
       if (navigator.share) {
         try {
@@ -8942,6 +8954,13 @@
         const titulo = (dados?.titulos || []).find(t => t.id === id);
         if (titulo) window.vrAbrirMarcacaoMercado(titulo, PORTAL);
       });
+
+      document.getElementById('tesouroCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          hash: 'tesouro-direto',
+          titulo: 'Tesouro Direto — Viver de Renda',
+          texto: 'Preços e taxas dos títulos públicos, com a rentabilidade escrita por extenso.',
+        }));
 
       filtrosEl.addEventListener('click', (e) => {
         const chave = e.target.closest('[data-familia]')?.dataset.familia;
