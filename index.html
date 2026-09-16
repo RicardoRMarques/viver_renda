@@ -2043,6 +2043,9 @@
     }
 
     /* ---------- Calculadora Financeira (RPN) ---------- */
+    /* Este modal tem duas colunas de campos E uma tabela comparativa de
+       três colunas; nos 480px padrão os dois ficavam apertados. */
+    .calc-modal.calc-invest-modal { max-width: 620px; }
     .calc-modal.rpn-modal { max-width: 486px; }
 
     /* O teclado vive dentro de um "aparelho" com paleta PRÓPRIA e fixa, que
@@ -2611,7 +2614,14 @@
       font-size: 0.95rem;
       font-family: inherit;
     }
-    .calc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    /* minmax(0,1fr), e não 1fr: `1fr` não encolhe abaixo do min-content da
+       coluna, e num campo com prefixo esse mínimo é o "R$" mais a largura
+       natural do <input>. Quando isso não cabe, a segunda coluna vaza para
+       fora e o overflow-x:hidden do .calc-modal a CORTA, em vez de mostrar
+       barra. Isso acontecia no celular (corrigido antes) e também no
+       desktop, sempre que o modal era estreito — que era o caso deste. */
+    .calc-grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+    .calc-grid-2 input, .calc-grid-2 select { min-width: 0; }
     .amort-historico-lista { display: flex; flex-direction: column; gap: 6px; }
     .amort-historico-item {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
@@ -3453,8 +3463,9 @@
          valor — apertado demais para o que é o campo principal dessas
          calculadoras. Só afeta o celular; no desktop segue em 2
          colunas. */
-      .calc-grid-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-      .calc-grid-2 input, .calc-grid-2 select { min-width: 0; }
+      /* (as duas regras que estavam aqui viraram padrão, acima) No celular
+         as linhas com campo de dinheiro ainda passam a uma coluna só:
+         mesmo cabendo, sobrariam ~90px para digitar o valor. */
       .calc-grid-2:has(.calc-input-prefixado) { grid-template-columns: 1fr; }
     }
     @media (max-width: 430px) {
@@ -4464,7 +4475,7 @@
     </div>
 
     <div id="calcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="calcTitulo" hidden>
-      <div class="calc-modal">
+      <div class="calc-modal calc-invest-modal">
         <div class="calc-modal-topo">
           <h3 id="calcTitulo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="8" y1="10" x2="8" y2="10"></line><line x1="12" y1="10" x2="12" y2="10"></line><line x1="16" y1="10" x2="16" y2="10"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="18" x2="8" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line><line x1="16" y1="18" x2="16" y2="18"></line></svg>Calculadora de Investimentos
@@ -15490,10 +15501,13 @@
         const produtoLci = produtos.find(p => p.id === 'lci');
         const produtoCdb = produtos.find(p => p.id === 'cdb');
         let blocoEquivalencia = '';
+        let equivalenciaPdf = null;
         if (produtoLci && lciTaxaTela > 0 && lciIndexadorTela === 'cdi') {
           const pctEquivalente = pctCdiEquivalente(produtoLci.valorLiquido, valorInicial, aporteMensal, prazoMeses);
           if (pctEquivalente) {
             const aliq = aliquotaIR(Math.round(prazoMeses * 30.44)) * 100;
+            equivalenciaPdf = { lci: lciTaxaTela, cdbEquivalente: pctEquivalente, aliquota: aliq,
+                                cdbInformado: (cdbTaxaTela > 0 && cdbIndexadorTela === 'cdi') ? cdbTaxaTela : null };
             const comparacao = (cdbTaxaTela > 0 && cdbIndexadorTela === 'cdi')
               ? (cdbTaxaTela >= pctEquivalente
                 ? `<div class="calc-leitura-nota">O CDB de ${hgFormatNumero(cdbTaxaTela)}% que você informou <span class="calc-leitura-destaque">supera</span> essa marca — ele rende mais que a LCI neste prazo.</div>`
@@ -15618,7 +15632,16 @@
           selicUsada: selicAnualPct(),
           cdiUsado: cdiAnualPct(),
           ipcaUsado: ipcaAnualPct(),
+          // As duas leituras da tela vão junto para o PDF — é o PDF que
+          // costuma ser compartilhado, e sem elas o arquivo diria menos
+          // do que a pessoa viu.
+          taxaLiquidaAnual,
+          ganhoRealAnual: taxaLiquidaAnual === null ? null
+            : ((1 + taxaLiquidaAnual / 100) / (1 + ipcaAnualPct() / 100) - 1) * 100,
+          equivalencia: equivalenciaPdf,
         };
+        // Espelho para os testes automatizados lerem o que vai no PDF.
+        window.__ultimoCalculoRF = ultimoCalculo;
 
         if (acoesWrap) acoesWrap.style.display = 'flex';
       }
@@ -15713,6 +15736,51 @@
             }
           },
         });
+
+        // As duas leituras da tela. Vão como tabela, e não como parágrafo
+        // solto, porque são os números que a pessoa vai querer reencontrar
+        // no papel depois.
+        const linhasLeitura = [];
+        if (c.equivalencia) {
+          linhasLeitura.push([
+            'Quanto a LCI vale em CDB',
+            `LCI de ${hgFormatNumero(c.equivalencia.lci)}% do CDI (isenta) equivale a um CDB de ` +
+            `${hgFormatNumero(c.equivalencia.cdbEquivalente)}% do CDI neste prazo ` +
+            `(IR de ${hgFormatNumero(c.equivalencia.aliquota)}%)` +
+            (c.equivalencia.cdbInformado === null ? ''
+              : c.equivalencia.cdbInformado >= c.equivalencia.cdbEquivalente
+                ? `. O CDB informado, de ${hgFormatNumero(c.equivalencia.cdbInformado)}%, supera essa marca.`
+                : `. O CDB informado, de ${hgFormatNumero(c.equivalencia.cdbInformado)}%, fica abaixo dessa marca.`),
+          ]);
+        }
+        if (typeof c.ganhoRealAnual === 'number') {
+          linhasLeitura.push([
+            'O que sobra depois da inflação',
+            `Rendimento líquido de ${hgFormatNumero(c.taxaLiquidaAnual)}% a.a. com IPCA de ` +
+            `${hgFormatNumero(c.ipcaUsado)}% a.a. — ganho real de ${hgFormatNumero(c.ganhoRealAnual)}% a.a. ` +
+            (c.ganhoRealAnual <= 0
+              ? 'Nesse cenário o dinheiro perde poder de compra.'
+              : 'Pela fórmula de Fisher, não pela subtração das duas taxas.'),
+          ]);
+        }
+
+        if (linhasLeitura.length) {
+          const yLeitura = doc.lastAutoTable.finalY + 24;
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(11);
+          doc.setTextColor(0);
+          doc.text('Como ler esse resultado', 40, yLeitura);
+          doc.autoTable({
+            startY: yLeitura + 10,
+            body: linhasLeitura,
+            theme: 'grid',
+            styles: { fontSize: 8.5, cellPadding: 6, valign: 'middle' },
+            columnStyles: {
+              0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255, cellWidth: 150 },
+              1: { cellWidth: 'auto' },
+            },
+          });
+        }
 
         const yTaxas = doc.lastAutoTable.finalY + 20;
         doc.setFont('helvetica', 'italic');
