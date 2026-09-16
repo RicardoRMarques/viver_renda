@@ -32,14 +32,26 @@ FORMATO DO CSV (conferido)
 - as linhas NÃO vêm em ordem de data: estão agrupadas por tipo de título.
   Por isso não dá para ler só o fim do arquivo.
 
-LIMITAÇÃO QUE PRECISA APARECER NA TELA
---------------------------------------
-Este CSV é a referência de preços de TODOS os títulos vivos, inclusive os que
-não estão mais à venda (quem já tem na carteira precisa do preço para marcação
-a mercado). Ele não tem um campo "está sendo vendido hoje".
-A heurística usada: **título sem PU de compra não está sendo ofertado** — é o
-mesmo comportamento do JSON do site, onde `untrInvstmtVal` vem 0 nesse caso.
-Vale conferir contra a tela do Tesouro na primeira execução real.
+DUAS COISAS QUE ESTE CSV **NÃO** RESPONDE
+-----------------------------------------
+1) "Está à venda hoje?" — não tem resposta aqui, e não por falta de campo.
+   O Tesouro SUSPENDE E RETOMA a venda DURANTE o dia (quando os preços
+   oscilam muito, a plataforma passa a oferecer só o Selic). O CSV é um
+   retrato da manhã, um por dia útil. Uma heurística de "PU de compra
+   vazio" foi tentada e marcou 58 de 58 como à venda, o que é falso — o
+   IGPM+ 2031, por exemplo, não é emitido há anos. O campo foi REMOVIDO:
+   melhor não ter do que ter mentindo em silêncio. A tabela do site se
+   apresenta como "preços e taxas de referência".
+
+2) O ANO DO NOME. Em Educa+ e Renda+, o ano que o Tesouro usa no nome
+   comercial NÃO é o do vencimento — é a data de CONVERSÃO, quando os
+   pagamentos começam:
+       Tesouro Educa+ 2026  -> vencimento 15/12/2030  (+4 anos)
+       Tesouro Renda+ 2030  -> vencimento 15/12/2049  (+19 anos)
+   O Educa+ paga por 5 anos e o Renda+ por 20, e a "Data Vencimento" do
+   CSV é o ÚLTIMO pagamento. Sem esse desconto, o site anunciava
+   "Renda+ 2049" para o título que o Tesouro vende como "Renda+ 2030" —
+   ninguém encontraria o papel que estava procurando.
 
 Uso:
     python coletar_tesouro.py                  # baixa e grava
@@ -148,6 +160,33 @@ def normalizar(texto):
     t = unicodedata.normalize("NFKD", str(texto or ""))
     t = "".join(c for c in t if not unicodedata.combining(c))
     return re.sub(r"\s+", " ", t).upper().strip()
+
+
+# Quantos anos separam o nome comercial do vencimento. Ver docstring: no
+# Educa+ e no Renda+ o ano do nome é o da CONVERSÃO (início dos pagamentos),
+# e o vencimento é o último pagamento.
+DESLOCAMENTO_ANOS = {"educa": 4, "renda": 19}
+
+
+def familia_de(tipo):
+    t = normalizar(tipo)
+    if "EDUCA" in t:
+        return "educa"
+    if "RENDA+" in t or "RENDA +" in t or "APOSENTADORIA" in t:
+        return "renda"
+    return "comum"
+
+
+def forma_de_pagamento(tipo):
+    """Como o título paga — o site escreve isso embaixo do nome."""
+    familia = familia_de(tipo)
+    if familia == "educa":
+        return "mensal-5anos"
+    if familia == "renda":
+        return "mensal-20anos"
+    if "SEMESTRA" in normalizar(tipo):
+        return "semestral"
+    return "vencimento"
 
 
 def indexador_de(tipo):
@@ -276,6 +315,20 @@ def conferir_escala(valores):
     return 1.0
 
 
+def avisar_indexador_desconhecido(titulos):
+    """
+    O Tesouro cria produto novo de tempos em tempos (Renda+ em 2023,
+    Educa+ em 2023, Reserva em 2026). Um tipo que não casa com nenhum
+    indexador conhecido cai em "outro" e o site mostraria a taxa SEM o
+    indexador na frente, como se fosse rentabilidade cheia — que é
+    justamente o erro que a coluna existe para evitar.
+    """
+    for t in titulos:
+        if t["indexador"] == "outro":
+            log(f"    ATENÇÃO: '{t['tipo']}' não casou com nenhum indexador "
+                f"conhecido. Acrescente a regra em indexador_de().")
+
+
 def avisar_fora_da_faixa(titulos):
     for t in titulos:
         taxa = t.get("taxa_compra")
@@ -296,9 +349,14 @@ def avisar_fora_da_faixa(titulos):
 # Montagem
 # ----------------------------------------------------------------------
 
+def ano_de_referencia(tipo, vencimento):
+    """O ano que aparece no nome comercial do título."""
+    return vencimento.year - DESLOCAMENTO_ANOS.get(familia_de(tipo), 0)
+
+
 def nome_comercial(tipo, vencimento):
-    """'Tesouro IPCA+ com Juros Semestrais' + 2029 -> nome com o ano."""
-    return f"{tipo} {vencimento.year}"
+    """Nome como o Tesouro vende. Ver DESLOCAMENTO_ANOS."""
+    return f"{tipo} {ano_de_referencia(tipo, vencimento)}"
 
 
 def montar(series, data_max):
@@ -324,10 +382,13 @@ def montar(series, data_max):
         titulos.append({
             "id": s["id"],
             "nome": nome_comercial(s["tipo"], s["vencimento"]),
+            "ano_referencia": ano_de_referencia(s["tipo"], s["vencimento"]),
             "tipo": s["tipo"],
+            "familia": familia_de(s["tipo"]),
             "indexador": s["indexador"],
             "rotulo_taxa": rotulo_taxa(s["indexador"]),
             "cupom": s["cupom"],
+            "pagamento": forma_de_pagamento(s["tipo"]),
             "vencimento": s["vencimento"].isoformat(),
             "taxa_compra": None if taxa_compra is None else round(taxa_compra * fator, 2),
             "taxa_venda": None if dia.get("taxa_venda") is None else round(dia["taxa_venda"] * fator, 2),
@@ -335,10 +396,9 @@ def montar(series, data_max):
             "pu_venda": dia.get("pu_venda"),
             # 1% do PU é o mínimo de compra no Tesouro Direto.
             "investimento_minimo": None if not pu_compra else round(pu_compra * 0.01, 2),
-            # Heurística: sem PU de compra, não está sendo vendido hoje.
-            "disponivel_compra": bool(pu_compra),
         })
 
+    avisar_indexador_desconhecido(titulos)
     avisar_fora_da_faixa(titulos)
 
     historico = {}
@@ -409,15 +469,18 @@ def main():
     if not titulos:
         raise SystemExit("ERRO: nenhum título na data-base mais recente.")
 
-    a_venda = sum(1 for t in titulos if t["disponivel_compra"])
+    from collections import Counter
+    por_familia = Counter(t["familia"] for t in titulos)
     log(f"\nData-base {data_max.strftime('%d/%m/%Y')}: {len(titulos)} títulos "
-        f"({a_venda} à venda, {len(titulos) - a_venda} só com preço de referência)")
+        f"({', '.join(f'{v} {k}' for k, v in sorted(por_familia.items()))})")
 
     dados = {
         "_leia_me": ("Preços e taxas do Tesouro Direto, usados na tabela do site. "
                      "Fonte: CSV do Tesouro Transparente (histórico completo), lido em "
-                     "fluxo pelo robô coletar_tesouro.py. 'disponivel_compra' é "
-                     "heurística: título sem PU de compra não está sendo ofertado. "
+                     "fluxo pelo robô coletar_tesouro.py. NÃO diz o que está à venda: "
+                     "o Tesouro suspende e retoma a venda durante o dia, e este arquivo é "
+                     "um retrato da manhã. Em Educa+ e Renda+, 'nome' usa o ano da CONVERSÃO "
+                     "(como o Tesouro vende) e 'vencimento' é o último pagamento. "
                      "A taxa significa coisa diferente por indexador — ver 'rotulo_taxa'."),
         "fonte": "Tesouro Transparente — Tesouro Nacional",
         "data_base": data_max.isoformat(),

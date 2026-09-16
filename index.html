@@ -9094,6 +9094,28 @@
         return `${d}/${m}/${a}`;
       }
 
+      // Como o título paga. Vem do robô no campo `pagamento`; o `cupom` é o
+      // caminho antigo, mantido só para o site não quebrar entre a
+      // publicação desta versão e a próxima execução do robô.
+      //
+      // Educa+ e Renda+ NÃO pagam tudo no vencimento — pagam renda mensal
+      // por 5 e por 20 anos. Dizer "paga tudo no vencimento" neles, como o
+      // site fazia, é errado sobre a mecânica central do produto.
+      function descricaoPagamento(t) {
+        const forma = t.pagamento || (t.cupom === 'semestral' ? 'semestral' : 'vencimento');
+        if (forma === 'semestral') return 'Paga juros a cada 6 meses';
+        if (forma === 'mensal-5anos') {
+          return 'Paga renda mensal por 5 anos' + (t.ano_referencia ? `, a partir de ${t.ano_referencia}` : '');
+        }
+        if (forma === 'mensal-20anos') {
+          return 'Paga renda mensal por 20 anos' + (t.ano_referencia ? `, a partir de ${t.ano_referencia}` : '');
+        }
+        return 'Paga tudo no vencimento';
+      }
+
+      const pagaEmParcelas = (t) =>
+        String(t.pagamento || '').startsWith('mensal');
+
       async function carregar() {
         if (dados) return dados;
         if (carregando) return carregando;
@@ -9136,8 +9158,13 @@
             return '<tr>' +
               '<td><button type="button" class="tesouro-nome" data-titulo="' + t.id + '"' +
               ' title="Ver o histórico de preço deste título">' + SVG_GRAFICO + '<span>' + t.nome + '</span></button>' +
-              '<div class="tesouro-sub">' + (t.cupom === 'semestral' ? 'Paga juros a cada 6 meses' : 'Paga tudo no vencimento') + '</div></td>' +
-              '<td>' + dataBr(t.vencimento) + '</td>' +
+              '<div class="tesouro-sub">' + descricaoPagamento(t) + '</div></td>' +
+              '<td>' + dataBr(t.vencimento) +
+              // Nesses títulos a data não é "quando você recebe", é quando
+              // acaba de receber — sem esse rótulo, um Renda+ 2030 com
+              // vencimento em 2049 parece um papel de 23 anos parado.
+              (pagaEmParcelas(t) ? '<div class="tesouro-sub">último pagamento</div>' : '') +
+              '</td>' +
               '<td><span class="tesouro-taxa" title="' + (t.rotulo_taxa || '') + '">' + taxaPorExtenso(t) + '</span></td>' +
               '<td class="tesouro-num">' + (typeof pu === 'number' ? hgFormatMoeda(pu) : '—') + '</td>' +
               '<td class="tesouro-num">' + (typeof t.investimento_minimo === 'number' ? hgFormatMoeda(t.investimento_minimo) : '—') + '</td>' +
