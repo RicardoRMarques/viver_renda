@@ -2030,6 +2030,8 @@
        --muted ainda dava 4,98:1 contra 14,75:1 do --text, então uniformizar
        pelo mais forte também ganha legibilidade. O que separa rótulo de
        valor continua sendo a família da fonte, não o tom. */
+    .indice-row-clicavel { cursor: pointer; }
+    .indice-row-clicavel:hover .indice-label { color: var(--primary); }
     .indice-value { font-family: "Courier New", monospace; color: var(--text); font-weight: 700; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     /* .taxa continua existindo como gancho para ajuste futuro das linhas de
        taxa, mas hoje não muda nada: o estilo do valor é um só. */
@@ -3108,6 +3110,23 @@
     }
     .cmp-btn-secundario:hover { border-color: var(--primary); color: var(--primary); }
     .cmp-btn-secundario svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    /* Blocos de leitura do resultado: equivalência e ganho real. Ficam
+       depois da tabela de comparação, porque respondem perguntas que só
+       aparecem depois de ver os números. */
+    .calc-leitura {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; margin-top: 12px; background: var(--deep);
+    }
+    .calc-leitura-titulo {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--muted); font-weight: 700; margin-bottom: 6px;
+    }
+    .calc-leitura-frase { font-size: 0.92rem; line-height: 1.5; }
+    .calc-leitura-frase strong { font-family: 'IBM Plex Mono', monospace; }
+    .calc-leitura-nota { font-size: 0.74rem; color: var(--muted); margin-top: 6px; }
+    .calc-leitura-destaque { color: var(--primary); font-weight: 700; }
+    .calc-leitura-alerta { color: #ff5a5a; font-weight: 700; }
 
     .calc-resultado-card {
       margin-top: 8px;
@@ -7891,6 +7910,78 @@
       }
     }
     carregarIndices();
+
+    // ------------------------------------------------------------------
+    // Três linhas de Tesouro Direto no painel "Índices e Taxas".
+    //
+    // Entram DEPOIS do carregarIndices() de propósito: ele reescreve o
+    // painel inteiro a cada carga, e o Tesouro vem de outro arquivo, com
+    // outra cadência (uma vez por dia útil, contra 15 em 15 minutos).
+    // Misturar os dois no mesmo JSON ataria a atualização do câmbio à do
+    // Tesouro sem necessidade.
+    //
+    // São linhas de TAXA: sem seta e sem cor, pelo mesmo motivo já
+    // documentado para Selic, CDI e IPCA — a cor ali não representa
+    // direção nenhuma.
+    // ------------------------------------------------------------------
+    async function acrescentarTesouroAosIndices() {
+      const rowsEl = document.getElementById('indicesRows');
+      if (!rowsEl) return;
+
+      let dados;
+      try {
+        const resp = await fetch('data/tesouro.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        dados = await resp.json();
+      } catch (e) {
+        // Sem Tesouro o painel continua como sempre foi. Nada de linha
+        // vazia ou de mensagem de erro no meio dos índices.
+        console.warn('Índices: Tesouro Direto indisponível', e);
+        return;
+      }
+
+      const titulos = Array.isArray(dados?.titulos) ? dados.titulos : [];
+      // Só os títulos "puros": sem juros semestrais e sem os produtos de
+      // finalidade específica (Educa+, Renda+), que têm regra própria de
+      // resgate e não servem de referência de taxa do indexador.
+      const simples = titulos.filter(t =>
+        t.cupom === 'zero' &&
+        !/educa|renda\+/i.test(t.nome || '') &&
+        typeof t.taxa_compra === 'number');
+
+      // O mais longo de cada indexador: é onde a taxa aparece "cheia" e
+      // onde o mercado olha para ler prêmio de risco.
+      const maisLongo = (ind) => simples
+        .filter(t => t.indexador === ind)
+        .sort((a, b) => String(b.vencimento).localeCompare(String(a.vencimento)))[0];
+
+      const destaques = ['selic', 'prefixado', 'ipca'].map(maisLongo).filter(Boolean);
+      if (!destaques.length) return;
+
+      const comIndexador = (t) => {
+        const n = t.taxa_compra.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+        if (t.indexador === 'selic') return 'Selic + ' + n;
+        if (t.indexador === 'ipca') return 'IPCA + ' + n;
+        return n;
+      };
+
+      rowsEl.insertAdjacentHTML('beforeend', destaques.map(t => `
+        <div class="indice-row indice-row-clicavel" data-abrir-tesouro="1"
+             title="Ver todos os títulos do Tesouro Direto">
+          <div class="indice-info">
+            <span class="indice-label">${t.nome}</span>
+            <span class="indice-value taxa">${comIndexador(t)}</span>
+          </div>
+          <div class="indice-right">
+            <span class="indice-periodo">ao ano</span>
+          </div>
+        </div>`).join(''));
+
+      rowsEl.querySelectorAll('[data-abrir-tesouro]').forEach(linha => {
+        linha.addEventListener('click', () => revelarSecaoMercado('tesouro-direto'));
+      });
+    }
+    acrescentarTesouroAosIndices();
 
     // Clique na lupa "Consultar Ações e FIIs" do topo: rola até a seção
     // considerando a altura do cabeçalho fixo (senão o topo do card fica
@@ -15186,6 +15277,47 @@
         ];
       }
 
+      // Taxa líquida anual que a pessoa de fato ganhou, considerando os
+      // aportes. Não dá para usar (valorFinal / totalInvestido): com aporte
+      // mensal, cada real fica aplicado por um tempo diferente, e essa
+      // divisão subestima o resultado. É a TIR do fluxo, achada por
+      // bisseção — mais lenta que Newton, mas não diverge nem depende de
+      // chute inicial (mesma escolha já feita no motor da RPN).
+      function taxaLiquidaAnualDoFluxo(valorInicial, aporteMensal, prazoMeses, valorLiquido) {
+        if (!(prazoMeses > 0) || !(valorLiquido > 0)) return null;
+        const vpl = (i) => {
+          let v = -valorInicial;
+          for (let t = 1; t <= prazoMeses; t++) v -= aporteMensal / Math.pow(1 + i, t);
+          return v + valorLiquido / Math.pow(1 + i, prazoMeses);
+        };
+        let baixo = -0.9, alto = 1.0;
+        if (vpl(baixo) * vpl(alto) > 0) return null;
+        for (let k = 0; k < 200; k++) {
+          const meio = (baixo + alto) / 2;
+          if (vpl(baixo) * vpl(meio) <= 0) alto = meio; else baixo = meio;
+        }
+        const mensal = (baixo + alto) / 2;
+        return (Math.pow(1 + mensal, 12) - 1) * 100;
+      }
+
+      // Qual % do CDI um CDB precisa pagar para empatar, LÍQUIDO, com a
+      // LCI informada. Resolvido por bisseção sobre o resultado real das
+      // duas simulações, e não pela conta de padaria taxa/(1-IR): com
+      // aporte mensal e IR incidindo só sobre o rendimento, as duas
+      // respostas não são iguais.
+      function pctCdiEquivalente(valorLiquidoAlvo, valorInicial, aporteMensal, prazoMeses) {
+        const liquidoDoCdb = (pct) => simularProduto(
+          { taxaAnualPct: taxaEfetivaPorIndexador(pct, 'cdi'), tributado: true, custodia: false },
+          valorInicial, aporteMensal, prazoMeses).valorLiquido;
+        let baixo = 0, alto = 400;
+        if (liquidoDoCdb(alto) < valorLiquidoAlvo) return null; // fora de qualquer realidade
+        for (let k = 0; k < 120; k++) {
+          const meio = (baixo + alto) / 2;
+          if (liquidoDoCdb(meio) < valorLiquidoAlvo) baixo = meio; else alto = meio;
+        }
+        return (baixo + alto) / 2;
+      }
+
       function aliquotaIR(dias) {
         if (dias <= 180) return 0.225;
         if (dias <= 360) return 0.20;
@@ -15351,6 +15483,64 @@
           </tr>`;
         }).join('');
 
+        // ---- Leitura 1: a LCI informada equivale a um CDB de quanto? ----
+        // Pergunta de quem chega na corretora com uma oferta na mão. A
+        // resposta MUDA COM O PRAZO, por causa do IR regressivo — é por
+        // isso que ela não cabe numa tabela fixa.
+        const produtoLci = produtos.find(p => p.id === 'lci');
+        const produtoCdb = produtos.find(p => p.id === 'cdb');
+        let blocoEquivalencia = '';
+        if (produtoLci && lciTaxaTela > 0 && lciIndexadorTela === 'cdi') {
+          const pctEquivalente = pctCdiEquivalente(produtoLci.valorLiquido, valorInicial, aporteMensal, prazoMeses);
+          if (pctEquivalente) {
+            const aliq = aliquotaIR(Math.round(prazoMeses * 30.44)) * 100;
+            const comparacao = (cdbTaxaTela > 0 && cdbIndexadorTela === 'cdi')
+              ? (cdbTaxaTela >= pctEquivalente
+                ? `<div class="calc-leitura-nota">O CDB de ${hgFormatNumero(cdbTaxaTela)}% que você informou <span class="calc-leitura-destaque">supera</span> essa marca — ele rende mais que a LCI neste prazo.</div>`
+                : `<div class="calc-leitura-nota">O CDB de ${hgFormatNumero(cdbTaxaTela)}% que você informou <span class="calc-leitura-alerta">fica abaixo</span> dessa marca — a LCI rende mais neste prazo.</div>`)
+              : '';
+            blocoEquivalencia = `
+              <div class="calc-leitura">
+                <div class="calc-leitura-titulo">Quanto a LCI vale em CDB</div>
+                <div class="calc-leitura-frase">
+                  Uma LCI de <strong>${hgFormatNumero(lciTaxaTela)}% do CDI</strong> (isenta de IR) rende o mesmo, no líquido,
+                  que um CDB de <strong class="calc-leitura-destaque">${hgFormatNumero(pctEquivalente)}% do CDI</strong> neste prazo.
+                </div>
+                ${comparacao}
+                <div class="calc-leitura-nota">
+                  Vale só para ${prazoMeses} ${prazoMeses === 1 ? 'mês' : 'meses'}: nesta faixa o IR do CDB é de
+                  ${hgFormatNumero(aliq)}%, e quanto mais curto o prazo, mais alta a marca que o CDB precisa bater.
+                </div>
+              </div>`;
+          }
+        }
+
+        // ---- Leitura 2: quanto sobra depois da inflação ----
+        const taxaLiquidaAnual = taxaLiquidaAnualDoFluxo(
+          valorInicial, aporteMensal, prazoMeses, resultadoPrincipal.valorLiquido);
+        let blocoGanhoReal = '';
+        if (taxaLiquidaAnual !== null) {
+          const ipca = ipcaAnualPct();
+          const real = ((1 + taxaLiquidaAnual / 100) / (1 + ipca / 100) - 1) * 100;
+          const perdendo = real <= 0;
+          blocoGanhoReal = `
+            <div class="calc-leitura">
+              <div class="calc-leitura-titulo">O que sobra depois da inflação</div>
+              <div class="calc-leitura-frase">
+                Rendimento líquido de <strong>${hgFormatNumero(taxaLiquidaAnual)}% a.a.</strong>,
+                com IPCA de <strong>${hgFormatNumero(ipca)}% a.a.</strong> — o ganho real é de
+                <strong class="${perdendo ? 'calc-leitura-alerta' : 'calc-leitura-destaque'}">${hgFormatNumero(real)}% a.a.</strong>
+              </div>
+              <div class="calc-leitura-nota">
+                ${perdendo
+                  ? 'Nesse cenário o dinheiro perde poder de compra: rende menos que a alta dos preços.'
+                  : 'É esse número que diz quanto o seu poder de compra realmente cresce.'}
+                Conta pela fórmula de Fisher, (1 + rendimento) ÷ (1 + inflação) − 1, e não pela subtração simples
+                das duas taxas, que superestima o resultado. IPCA dos últimos 12 meses, usado como estimativa do futuro.
+              </div>
+            </div>`;
+        }
+
         resultadoEl.innerHTML = `
           <div class="calc-resultado-card">
             <div class="calc-resultado-linha">
@@ -15377,6 +15567,9 @@
               <tbody>${linhasTabela}</tbody>
             </table>
           </div>
+          ${blocoEquivalencia}
+          ${blocoGanhoReal}
+
           <p class="calc-ajuda" style="margin-top:10px;">
             Simulação aproximada (capitalização mensal composta), com base em Selic ≈ ${selicAnualPct().toFixed(2)}% a.a.,
             CDI ≈ ${cdiAnualPct().toFixed(2)}% a.a. (Selic − 0,10 p.p. de spread) e IPCA anualizado ≈ ${ipcaAnualPct().toFixed(2)}% a.a.
