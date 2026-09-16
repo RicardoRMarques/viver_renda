@@ -2,82 +2,71 @@
   {
     "label": "Ibovespa",
     "prefixo": "pontos",
-    "valor": 185957.4,
-    "variacao_pct": -0.29,
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "valor": 186036.58,
+    "variacao_pct": -0.25,
+    "coletado_em": "2026-09-16T18:08:42+00:00"
   },
   {
     "label": "Selic (meta)",
     "valor_pct": 14.0,
     "referencia": "16/09/2026",
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "coletado_em": "2026-09-16T15:45:56+00:00",
+    "desatualizado": true
   },
   {
     "label": "CDI",
     "valor_pct": 13.9,
     "referencia": "09/09/2026",
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "coletado_em": "2026-09-16T15:45:56+00:00",
+    "desatualizado": true
   },
   {
     "label": "IFIX",
     "prefixo": "pontos",
-    "valor": 3744.61,
-    "variacao_pct": -0.01,
-    "coletado_em": "2026-09-16T15:45:56+00:00"
-  },
-  {
-    "label": "Dólar",
-    "prefixo": "R$ ",
-    "valor": 5.149,
-    "variacao_pct": -0.3984834416589282,
-    "referencia": "15/09/2026",
-    "coletado_em": "2026-09-16T15:45:56+00:00"
-  },
-  {
-    "label": "Euro",
-    "prefixo": "R$ ",
-    "valor": 5.943,
-    "variacao_pct": -0.45893072490955533,
-    "referencia": "15/09/2026",
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "valor": 3740.24,
+    "variacao_pct": -0.12,
+    "coletado_em": "2026-09-16T18:08:42+00:00"
   },
   {
     "label": "Bitcoin",
     "prefixo": "US$ ",
-    "valor": 75711.0,
-    "variacao_pct": -0.8969095808355813,
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "valor": 76033.0,
+    "variacao_pct": -1.1279316629238303,
+    "coletado_em": "2026-09-16T18:08:42+00:00"
   },
   {
     "label": "Ethereum",
     "prefixo": "US$ ",
-    "valor": 2390.99,
-    "variacao_pct": -1.4582123091858843,
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "valor": 2410.49,
+    "variacao_pct": -1.1273123681355945,
+    "coletado_em": "2026-09-16T18:08:42+00:00"
   },
   {
     "label": "IPCA (mensal)",
     "valor_pct": -0.32,
     "referencia": "01/08/2026",
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "coletado_em": "2026-09-16T15:45:56+00:00",
+    "desatualizado": true
   },
   {
     "label": "IPCA (12 meses)",
     "valor_pct": 4.223452737068278,
     "referencia": "01/08/2026",
     "meses": 12,
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "coletado_em": "2026-09-16T15:45:56+00:00",
+    "desatualizado": true
   },
   {
     "label": "IGP-M (mensal)",
     "valor_pct": -0.22,
     "referencia": "01/08/2026",
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "coletado_em": "2026-09-16T15:45:56+00:00",
+    "desatualizado": true
   },
   {
     "label": "CPI (EUA, mensal)",
     "valor_pct": 0.3180421540617792,
     "referencia": "August",
-    "coletado_em": "2026-09-16T15:45:56+00:00"
+    "coletado_em": "2026-09-16T18:08:42+00:00"
   }
 ]
