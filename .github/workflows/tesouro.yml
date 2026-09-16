@@ -20,9 +20,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20   # o download costuma dominar o tempo
     steps:
-      - uses: actions/checkout@v4
+      # v5+ roda em Node 24; a v4 ainda aponta para o Node 20, que o
+      # GitHub marcou como obsoleto (set/2025) e hoje força para o 24
+      # com um aviso em toda execução.
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      # mesma coisa: a setup-python só passou para o Node 24 na v6.
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
