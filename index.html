@@ -426,7 +426,7 @@
     .tesouro-tabela th, .tesouro-tabela td { padding: 9px 10px; text-align: left; white-space: nowrap; }
     .tesouro-tabela thead th {
       font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;
-      color: var(--muted); font-weight: 700;
+      color: var(--primary); font-weight: 700;
       position: sticky; top: 0; z-index: 2; background: var(--card);
       /* borda por dentro: um border-bottom comum rola junto e some quando
          o cabeçalho está grudado */
@@ -485,6 +485,13 @@
     .tesouro-tabela td.tesouro-num { font-family: 'IBM Plex Mono', monospace; text-align: right; }
     .tesouro-tabela thead th.num { text-align: right; }
     .tesouro-rodape { font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
+    /* Nos temas claros o azul da marca fica em ~3,6:1 sobre branco, abaixo
+       do mínimo para texto pequeno — e este cabeçalho é 0,68rem. Mesmo tom
+       mais fechado (5,6:1) já usado nos rótulos da Calculadora Financeira.
+       Não trocar por var(--primary) "para padronizar". */
+    html[data-theme="light"] .tesouro-tabela thead th,
+    html[data-theme="white"] .tesouro-tabela thead th { color: #0a6d9e; }
+
     .tesouro-rodape a { color: var(--primary); font-weight: 700; text-decoration: none; }
     .tesouro-rodape a:hover { text-decoration: underline; }
     @media (max-width: 700px) {
