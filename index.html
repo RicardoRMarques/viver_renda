@@ -382,6 +382,34 @@
       .modal-link-btn span { display: none; }
       .modal-link-btn.copiado span { display: inline; }
     }
+    /* ---------- Próximas reuniões do Copom ---------- */
+    .copom-bloco {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; margin: 12px 0 16px; background: var(--deep);
+    }
+    .copom-titulo {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--muted); font-weight: 700; margin-bottom: 8px;
+    }
+    .copom-linha {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 10px; padding: 5px 0; font-size: 0.86rem; flex-wrap: wrap;
+    }
+    .copom-linha + .copom-linha { border-top: 1px solid var(--border); }
+    .copom-data { font-weight: 700; }
+    .copom-detalhe { font-size: 0.74rem; color: var(--muted); }
+    /* Glifo além da cor: a próxima reunião é destacada por texto, não só
+       por tom, pelo mesmo motivo já documentado na tabela de Basileia. */
+    .copom-proxima .copom-data { color: var(--primary); }
+    .copom-etiqueta {
+      font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.05em;
+      font-weight: 700; color: var(--primary); border: 1px solid var(--primary);
+      border-radius: 999px; padding: 1px 7px; margin-left: 6px;
+    }
+    .copom-nota { font-size: 0.72rem; color: var(--muted); margin-top: 8px; }
+    .copom-nota a { color: var(--primary); font-weight: 700; text-decoration: none; }
+    .copom-nota a:hover { text-decoration: underline; }
+
     /* ---------- Tesouro Direto ----------
        Seção própria, NÃO reaproveita .lista-mercado: aquela classe carrega
        junto o mecanismo de cabeçalho fixo que está congelado por decisão do
@@ -5827,6 +5855,16 @@
           como "previsto" ainda podem mudar até a empresa/fundo confirmar oficialmente.
         </p>
 
+        <div class="copom-bloco" id="copomBloco" hidden>
+          <div class="copom-titulo">Próximas reuniões do Copom</div>
+          <div id="copomLista"></div>
+          <div class="copom-nota">
+            A decisão da Selic sai no fim do segundo dia, depois do fechamento do mercado; a ata vem na terça
+            seguinte. Calendário oficial em
+            <a href="https://www.bcb.gov.br/controleinflacao/calendarioreunioes" target="_blank" rel="noopener noreferrer">bcb.gov.br</a>.
+          </div>
+        </div>
+
         <div id="agendaSemAtivos" class="agenda-vazio" style="display:none;">
           Nenhum ativo encontrado nos seus favoritos ⭐ ou na Carteira de Rendimentos ainda. Favorite um ativo na
           Consulta Rápida ou adicione algo à Carteira pra essa agenda se preencher sozinha.
@@ -8713,6 +8751,98 @@
 
 
 
+
+
+    // ============================================================
+    // PRÓXIMAS REUNIÕES DO COPOM
+    //
+    // Lista chumbada de propósito: são 8 datas por ano, divulgadas pelo BC
+    // com um ano de antecedência (o calendário de 2027 saiu em junho/2026).
+    // Um robô para buscar isso custaria mais manutenção do que acrescentar
+    // oito linhas por ano.
+    //
+    // >>> QUANDO O BC PUBLICAR O CALENDÁRIO DO ANO SEGUINTE (costuma sair
+    // >>> em junho), ACRESCENTE O BLOCO NOVO AQUI. Quando a lista acabar, o
+    // >>> site mostra um aviso apontando para o calendário oficial, em vez
+    // >>> de sumir com a seção calada.
+    // ============================================================
+    (function () {
+      const bloco = document.getElementById('copomBloco');
+      const listaEl = document.getElementById('copomLista');
+      if (!bloco || !listaEl) return;
+
+      // [primeiro dia, segundo dia] — a decisão sai no segundo.
+      const REUNIOES_COPOM = [
+        ['2026-01-27', '2026-01-28'],
+        ['2026-03-17', '2026-03-18'],
+        ['2026-04-28', '2026-04-29'],
+        ['2026-06-16', '2026-06-17'],
+        ['2026-08-04', '2026-08-05'],
+        ['2026-09-15', '2026-09-16'],
+        ['2026-11-03', '2026-11-04'],
+        ['2026-12-08', '2026-12-09'],
+        ['2027-01-26', '2027-01-27'],
+        ['2027-03-16', '2027-03-17'],
+        ['2027-04-27', '2027-04-28'],
+        ['2027-06-15', '2027-06-16'],
+        ['2027-08-03', '2027-08-04'],
+        ['2027-09-21', '2027-09-22'],
+        ['2027-10-26', '2027-10-27'],
+        ['2027-12-07', '2027-12-08'],
+      ];
+
+      const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+                     'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+      // Datas tratadas como local, não UTC: `new Date('2026-09-16')` vira
+      // meia-noite UTC e, no fuso do Brasil, volta para o dia 15.
+      function dataLocal(iso) {
+        const [a, m, d] = iso.split('-').map(Number);
+        return new Date(a, m - 1, d);
+      }
+
+      function porExtenso(inicioIso, fimIso) {
+        const i = dataLocal(inicioIso), f = dataLocal(fimIso);
+        const mesmoMes = i.getMonth() === f.getMonth();
+        return mesmoMes
+          ? `${i.getDate()} e ${f.getDate()} de ${MESES[f.getMonth()]} de ${f.getFullYear()}`
+          : `${i.getDate()} de ${MESES[i.getMonth()]} e ${f.getDate()} de ${MESES[f.getMonth()]} de ${f.getFullYear()}`;
+      }
+
+      function render() {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        const futuras = REUNIOES_COPOM.filter(([, fim]) => dataLocal(fim) >= hoje).slice(0, 3);
+
+        if (!futuras.length) {
+          listaEl.innerHTML =
+            '<div class="copom-detalhe">O calendário publicado aqui chegou ao fim. ' +
+            'Consulte as próximas datas no site do Banco Central.</div>';
+          bloco.hidden = false;
+          return;
+        }
+
+        listaEl.innerHTML = futuras.map(([inicio, fim], indice) => {
+          const f = dataLocal(fim);
+          // A ata sai na terça seguinte: o segundo dia é quarta, então +6.
+          const ata = new Date(f);
+          ata.setDate(ata.getDate() + 6);
+          const ehHoje = dataLocal(inicio) <= hoje && hoje <= f;
+          return `
+            <div class="copom-linha${indice === 0 ? ' copom-proxima' : ''}">
+              <span class="copom-data">${porExtenso(inicio, fim)}${
+                ehHoje ? '<span class="copom-etiqueta">acontecendo agora</span>'
+                       : (indice === 0 ? '<span class="copom-etiqueta">próxima</span>' : '')}</span>
+              <span class="copom-detalhe">decisão dia ${f.getDate()} &middot; ata em ${
+                String(ata.getDate()).padStart(2, '0')}/${String(ata.getMonth() + 1).padStart(2, '0')}</span>
+            </div>`;
+        }).join('');
+        bloco.hidden = false;
+      }
+
+      render();
+    })();
 
     // ============================================================
     // MARCAÇÃO A MERCADO — histórico de preço e taxa de um título
