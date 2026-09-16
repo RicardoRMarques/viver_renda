@@ -6127,10 +6127,16 @@
       return isClaro ? 'rgba(15,143,206,0.15)' : 'rgba(49,195,255,0.12)';
     }
 
+    // Rótulo curto de eixo. O arredondamento para inteiro fazia o eixo
+    // repetir o mesmo texto: numa escala de R$ 1.000 a R$ 2.600, as nove
+    // marcas saíam como 1k, 1k, 1k, 2k, 2k, 2k, 2k, 3k, 3k — um eixo que
+    // não dá para ler. Abaixo de 10k o número vai por extenso (cabe), e
+    // entre 10k e 1M usa uma casa decimal, que separa 1,2k de 1,4k.
     function hgFormatCompactoEixo(v) {
       if (Math.abs(v) >= 1e6) return (v / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'M';
-      if (Math.abs(v) >= 1e3) return (v / 1e3).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) + 'k';
-      return String(v);
+      if (Math.abs(v) >= 1e4) return (v / 1e3).toLocaleString('pt-BR', { maximumFractionDigits: 0 }) + 'k';
+      if (Math.abs(v) >= 1e3) return (v / 1e3).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'k';
+      return v.toLocaleString('pt-BR', { maximumFractionDigits: 0 });
     }
 
     // Desenha, no PDF, a legenda colorida de um gráfico (quadradinho + texto),
@@ -15406,9 +15412,12 @@
       // Formata a taxa informada de um jeito legível, conforme o indexador
       // escolhido — usado no resumo e na tabela comparativa do PDF.
       function rotuloTaxaIndexador(taxa, indexador) {
-        if (indexador === 'cdi') return `${taxa.toFixed(2)}% do CDI`;
-        if (indexador === 'pre') return `${taxa.toFixed(2)}% a.a. (prefixado)`;
-        if (indexador === 'ipca') return `IPCA + ${taxa.toFixed(2)}% a.a.`;
+        // hgFormatNumero e não toFixed: o PDF é em português e tinha
+        // "13.90% a.a." na mesma linha de "R$ 1.114,68" — duas convenções
+        // decimais no mesmo documento.
+        if (indexador === 'cdi') return `${hgFormatNumero(taxa)}% do CDI`;
+        if (indexador === 'pre') return `${hgFormatNumero(taxa)}% a.a. (prefixado)`;
+        if (indexador === 'ipca') return `IPCA + ${hgFormatNumero(taxa)}% a.a.`;
         return `${taxa}%`;
       }
 
@@ -15614,7 +15623,7 @@
         );
 
         const irTexto = tipoInfo.tributado
-          ? `<div class="calc-resultado-linha"><span>IR (${(resultadoPrincipal.aliquota * 100).toFixed(1)}% sobre o rendimento)</span><strong>- ${hgFormatMoeda(resultadoPrincipal.ir)}</strong></div>`
+          ? `<div class="calc-resultado-linha"><span>IR (${hgFormatNumero(resultadoPrincipal.aliquota * 100)}% sobre o rendimento)</span><strong>- ${hgFormatMoeda(resultadoPrincipal.ir)}</strong></div>`
           : `<div class="calc-resultado-linha"><span>Imposto de Renda</span><strong>Isento</strong></div>`;
 
         const custodiaTexto = tipoInfo.custodia
@@ -15742,8 +15751,8 @@
           ${blocoGanhoReal}
 
           <p class="calc-ajuda" style="margin-top:10px;">
-            Simulação aproximada (capitalização mensal composta), com base em Selic ≈ ${selicAnualPct().toFixed(2)}% a.a.,
-            CDI ≈ ${cdiAnualPct().toFixed(2)}% a.a. (Selic − 0,10 p.p. de spread) e IPCA anualizado ≈ ${ipcaAnualPct().toFixed(2)}% a.a.
+            Simulação aproximada (capitalização mensal composta), com base em Selic ≈ ${hgFormatNumero(selicAnualPct())}% a.a.,
+            CDI ≈ ${hgFormatNumero(cdiAnualPct())}% a.a. (Selic − 0,10 p.p. de spread) e IPCA anualizado ≈ ${hgFormatNumero(ipcaAnualPct())}% a.a.
             Os demais produtos da tabela usam taxas de mercado estimadas para efeito de comparação.
             Não substitui o cálculo oficial da sua corretora.
           </p>`;
@@ -15849,13 +15858,13 @@
           ['Valor inicial', hgFormatMoeda(c.valorInicial)],
           ['Aporte mensal', hgFormatMoeda(c.aporteMensal)],
           ['Prazo', c.prazoTexto],
-          ['Taxa anual efetiva', `${c.taxaAnual.toFixed(2)}% a.a.`],
-          ...(c.taxaRealInformada !== null ? [['Taxa real (% ao ano, acima da inflação)', `${c.taxaRealInformada.toFixed(2)}% a.a.`]] : []),
-          ...(c.pctCdiInformado !== null ? [['% do CDI', `${c.pctCdiInformado.toFixed(2)}%`]] : []),
+          ['Taxa anual efetiva', `${hgFormatNumero(c.taxaAnual)}% a.a.`],
+          ...(c.taxaRealInformada !== null ? [['Taxa real (% ao ano, acima da inflação)', `${hgFormatNumero(c.taxaRealInformada)}% a.a.`]] : []),
+          ...(c.pctCdiInformado !== null ? [['% do CDI', `${hgFormatNumero(c.pctCdiInformado)}%`]] : []),
           ['Total investido', hgFormatMoeda(c.totalInvestido)],
           ['Rendimento bruto', hgFormatMoeda(c.rendimentoBruto)],
           ...(c.tipoCustodia ? [['Taxa de custódia B3 (aprox.)', '- ' + hgFormatMoeda(c.custodiaValor)]] : []),
-          [c.tipoTributado ? `IR (${(c.aliquotaIR * 100).toFixed(1)}% sobre o rendimento)` : 'Imposto de Renda', c.tipoTributado ? '- ' + hgFormatMoeda(c.ir) : 'Isento'],
+          [c.tipoTributado ? `IR (${hgFormatNumero(c.aliquotaIR * 100)}% sobre o rendimento)` : 'Imposto de Renda', c.tipoTributado ? '- ' + hgFormatMoeda(c.ir) : 'Isento'],
           ['Valor líquido final', hgFormatMoeda(c.valorLiquido)],
           ['Rentabilidade do CDB usada na comparação', c.cdbRotulo],
           ['Rentabilidade da LCI/LCA usada na comparação', c.lciRotulo],
@@ -15944,7 +15953,7 @@
         doc.setFontSize(8);
         doc.setTextColor(90);
         doc.text(
-          `Taxas de referência usadas: Selic aprox. ${c.selicUsada.toFixed(2)}% a.a. · CDI aprox. ${c.cdiUsado.toFixed(2)}% a.a. · IPCA anualizado aprox. ${c.ipcaUsado.toFixed(2)}% a.a.`,
+          `Taxas de referência usadas: Selic aprox. ${hgFormatNumero(c.selicUsada)}% a.a. · CDI aprox. ${hgFormatNumero(c.cdiUsado)}% a.a. · IPCA anualizado aprox. ${hgFormatNumero(c.ipcaUsado)}% a.a.`,
           40, yTaxas
         );
 
