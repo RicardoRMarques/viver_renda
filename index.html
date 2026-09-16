@@ -464,6 +464,19 @@
       letter-spacing: 0.04em; font-weight: 700;
     }
     .tdg-valor { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 1rem; margin-top: 3px; }
+    /* Preço e taxa saem na MESMA cor das respectivas linhas do gráfico —
+       é o que liga o cartão à curva sem precisar de legenda extra.
+       Nos temas claros as duas cores do gráfico reprovam no contraste
+       sobre branco (azul 2,0:1 e laranja 2,4:1, contra 4,5:1 exigidos para
+       texto deste tamanho), então o TEXTO usa um tom mais fechado da mesma
+       família. A linha do gráfico continua na cor original: objeto gráfico
+       tem exigência menor que texto. */
+    .tdg-valor.preco { color: var(--primary); }
+    .tdg-valor.taxa { color: #e0994d; }
+    html[data-theme="light"] .tdg-valor.preco,
+    html[data-theme="white"] .tdg-valor.preco { color: #0a6d9e; }
+    html[data-theme="light"] .tdg-valor.taxa,
+    html[data-theme="white"] .tdg-valor.taxa { color: #a8620a; }
     .tdg-sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
     .tdg-grafico { position: relative; height: 280px; margin-top: 6px; }
     .tdg-legenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.74rem; color: var(--muted); margin-top: 8px; }
@@ -8938,14 +8951,14 @@
         resumoEl.innerHTML =
           '<div class="tdg-resumo">' +
           '<div class="tdg-card"><div class="tdg-rotulo">Preço de venda hoje</div>' +
-          '<div class="tdg-valor">' + hgFormatMoeda(hoje.pu) + '</div>' +
+          '<div class="tdg-valor preco">' + hgFormatMoeda(hoje.pu) + '</div>' +
           '<div class="tdg-sub">' + dataBr(hoje.data) + '</div></div>' +
           '<div class="tdg-card"><div class="tdg-rotulo">Variação em 12 meses</div>' +
           '<div class="tdg-valor" style="color:' + cor + ';">' +
           (variacao === null ? '—' : sinal + hgFormatNumero(Math.abs(variacao)) + '%') + '</div>' +
           '<div class="tdg-sub">' + (antes ? 'desde ' + dataBr(antes.data) : '') + '</div></div>' +
           '<div class="tdg-card"><div class="tdg-rotulo">Taxa de venda hoje</div>' +
-          '<div class="tdg-valor">' + (hoje.taxa === null ? '—' : hgFormatNumero(hoje.taxa) + '%') + '</div>' +
+          '<div class="tdg-valor taxa">' + (hoje.taxa === null ? '—' : hgFormatNumero(hoje.taxa) + '%') + '</div>' +
           '<div class="tdg-sub">' + (antes && antes.taxa !== null ? 'há 12 meses: ' + hgFormatNumero(antes.taxa) + '%' : '') +
           '</div></div>' +
           '</div>';
