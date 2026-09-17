@@ -13,10 +13,15 @@
  *   - ranking.json    → rankings de ações e FIIs (DY, valor de mercado...)
  *
  * Esses 3 arquivos são lidos diretamente da raiz do repositório — este
- * script NÃO chama nenhuma API externa. Ele só formata e monta o HTML.
- * Por isso, o workflow do GitHub Actions precisa rodar DEPOIS que esses
- * 3 arquivos já tiverem sido atualizados no dia (veja o comentário no
- * arquivo do workflow sobre ajustar o horário/ordem se necessário).
+ * script NÃO chama nenhuma API de dados de mercado. Ele só formata e
+ * monta o HTML. Por isso, o workflow do GitHub Actions precisa rodar
+ * DEPOIS que esses 3 arquivos já tiverem sido atualizados no dia (veja o
+ * comentário no arquivo do workflow sobre ajustar o horário/ordem).
+ *
+ * Única ressalva: o script confere o carimbo `coletado_em` do
+ * indices.json e, se o checkout tiver entregado uma cópia velha, busca o
+ * mesmo arquivo publicado no site antes de desistir (ver o bloco
+ * "Frescor do indices.json"). É rede, mas não é fonte nova de dado.
  *
  * Saída:
  *   - boletins/Boletim_de_Mercado_DD-MM-AAAA.html   (o boletim do dia)
@@ -97,6 +102,117 @@ function lerJsonSeExistir(caminho, fallback) {
     console.warn(`[boletim] Aviso: não consegui ler ${path.basename(caminho)} (${e.message}). Usando fallback vazio.`);
     return fallback;
   }
+}
+
+// ---------- Frescor do indices.json ----------
+// Em 17/09/2026 o boletim saiu com a Selic em 14,00% depois de o Copom já
+// ter cortado para 13,75% — e não só a Selic: o boletim do dia 17 era
+// cópia exata do dia 16, número por número (Ibovespa 186.502,64 ▲0,54%,
+// que era o fechamento do dia 15).
+//
+// O gerador estava certo. Rodando ele à mão contra o indices.json real do
+// repositório, ele produz 13,75% e o fechamento do dia 16. O que falhou
+// foi o que chegou ao runner: o `actions/checkout` entregou uma árvore
+// velha. Isso acontece porque, em evento `schedule`, o checkout se fixa no
+// SHA do momento em que o GitHub CRIOU a execução, não no momento em que
+// ela de fato rodou — e a fila do Actions atrasa esse intervalo em horas
+// (medido nos próprios boletins: cron às 3h05, execuções às 6h10, 8h24,
+// 9h36, 10h19...). Nesse intervalo o robô de coleta commita várias vezes,
+// e o boletim não enxerga nada disso.
+//
+// Daí duas defesas, nesta ordem:
+//
+//   1. o workflow agora faz `git reset --hard origin/main` antes de gerar
+//      (é a correção de raiz — ver boletim.yml);
+//   2. este arquivo confere o carimbo `coletado_em` que o robô de coleta
+//      grava em cada item. Se o que veio no checkout estiver velho, ele
+//      busca a cópia publicada no site; se ela também estiver velha,
+//      ABORTA em vez de publicar números errados.
+//
+// O item 2 é o cinto de segurança: mesmo que o checkout volte a falhar por
+// um motivo que ninguém previu, o pior caso vira "workflow falhou e me
+// avisou por e-mail", não "boletim errado no WhatsApp dos assinantes".
+
+// Idade máxima tolerada. O robô de coleta roda a cada 15 min, dia e noite
+// (o indices.json das 3h40 da manhã comprova), então na prática o dado
+// nunca passa de ~1h. 6h é folga larga para um soluço pontual da coleta
+// sem disparar alarme falso.
+const HORAS_MAX_INDICES = 6;
+const URL_INDICES_PUBLICADO = 'https://viverderenda.dev.br/indices.json';
+
+// O indices.json é uma lista e cada item traz seu próprio `coletado_em`.
+// Na prática são todos iguais (a coleta grava tudo de uma vez), mas pegar
+// o mais recente é o critério seguro: se um dia a coleta passar a ser
+// parcial, um item atrasado não condena o arquivo inteiro.
+function coletaMaisRecente(indices) {
+  let maisNova = null;
+  for (const item of (indices || [])) {
+    const t = Date.parse((item && item.coletado_em) || '');
+    if (!Number.isNaN(t) && (maisNova === null || t > maisNova)) maisNova = t;
+  }
+  return maisNova;
+}
+
+function horasDesde(ms) {
+  return (Date.now() - ms) / 3600000;
+}
+
+function descreverColeta(ms) {
+  if (ms === null) return 'sem carimbo de coleta';
+  return `${new Date(ms).toISOString()} (${horasDesde(ms).toFixed(1)}h atrás)`;
+}
+
+// Busca a cópia que já está publicada no site. Sim, é uma chamada de rede
+// num script que se orgulha de não fazer nenhuma — mas não é "mais uma
+// API": é o MESMO arquivo, servido pelo próprio site, usado só quando o
+// checkout falhou em entregá-lo. A query `?t=` existe porque sem ela o
+// CDN pode devolver justamente a cópia velha que estamos tentando evitar.
+async function baixarIndicesPublicados() {
+  const resp = await fetch(`${URL_INDICES_PUBLICADO}?t=${Date.now()}`, {
+    cache: 'no-store',
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
+  });
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  const dados = await resp.json();
+  if (!Array.isArray(dados) || dados.length === 0) {
+    throw new Error('resposta vazia ou em formato inesperado');
+  }
+  return dados;
+}
+
+async function carregarIndices() {
+  const local = lerJsonSeExistir(path.join(RAIZ, 'indices.json'), []);
+  const coletaLocal = coletaMaisRecente(local);
+
+  if (coletaLocal !== null && horasDesde(coletaLocal) <= HORAS_MAX_INDICES) {
+    console.log(`[boletim] indices.json do checkout está fresco — coleta de ${descreverColeta(coletaLocal)}.`);
+    return local;
+  }
+
+  console.warn(`[boletim] ATENÇÃO: o indices.json do checkout está velho — ${descreverColeta(coletaLocal)}.`);
+  console.warn(`[boletim] Tentando a cópia publicada em ${URL_INDICES_PUBLICADO} ...`);
+
+  let remoto = null;
+  let coletaRemota = null;
+  try {
+    remoto = await baixarIndicesPublicados();
+    coletaRemota = coletaMaisRecente(remoto);
+  } catch (e) {
+    console.error(`[boletim] Não consegui baixar a cópia publicada (${e.message}).`);
+  }
+
+  if (remoto && coletaRemota !== null && horasDesde(coletaRemota) <= HORAS_MAX_INDICES) {
+    console.log(`[boletim] Usando a cópia publicada — coleta de ${descreverColeta(coletaRemota)}.`);
+    return remoto;
+  }
+
+  throw new Error(
+    'indices.json desatualizado nas duas fontes — boletim NÃO gerado, para não publicar números errados.\n' +
+    `  checkout : ${descreverColeta(coletaLocal)}\n` +
+    `  publicado: ${remoto ? descreverColeta(coletaRemota) : 'indisponível'}\n` +
+    `  tolerância: ${HORAS_MAX_INDICES}h.\n` +
+    '  Confira se o robô "Coletar Mercado (Ações e FIIs)" está rodando e commitando.'
+  );
 }
 
 // ---------- Formatação de números ----------
@@ -1018,7 +1134,7 @@ async function main() {
   const dataArquivo = formatarDataArquivo(agora); // DD-MM-AAAA
   const dataExtenso = formatarDataExtenso(agora);
 
-  const indices = lerJsonSeExistir(path.join(RAIZ, 'indices.json'), []);
+  const indices = await carregarIndices();
   const noticiasRaw = lerJsonSeExistir(path.join(RAIZ, 'noticias.json'), { destaques: [], top3: [] });
   const ranking = lerJsonSeExistir(path.join(RAIZ, 'ranking.json'), {});
 
