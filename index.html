@@ -6580,7 +6580,18 @@
           hgIndicadorTooltipEl.style.left = `${left}px`;
         }
         resultadoEl.querySelectorAll('[data-indicador]').forEach(botao => {
-          const texto = AJUDA_INDICADOR[botao.getAttribute('data-indicador')];
+          // Campos que chegam depois (a Data com, por exemplo, só existe
+          // quando a resposta da API volta) chamam esta função de novo
+          // para ligar o "?" recém-criado. Sem esta marca, os botões que
+          // já estavam ligados ganhariam um SEGUNDO par de listeners — e
+          // o clique abriria e fecharia o balão no mesmo gesto.
+          if (botao.dataset.ajudaLigada === '1') return;
+          botao.dataset.ajudaLigada = '1';
+
+          // data-ajuda vence o dicionário: é para quem tem texto próprio,
+          // montado na hora (ex: a Data com acrescenta a data de
+          // pagamento e o valor por cota daquele provento específico).
+          const texto = botao.getAttribute('data-ajuda') || AJUDA_INDICADOR[botao.getAttribute('data-indicador')];
           if (!texto) return;
           botao.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -6601,8 +6612,14 @@
             if (!hgIndicadorTooltipEl.classList.contains('cmp-info-aberto')) fechar();
           });
         });
-        document.addEventListener('click', fechar);
-        window.addEventListener('scroll', fechar, { passive: true });
+        // Uma vez só: fechar o balão ao clicar fora ou rolar a página é
+        // comportamento global, não por botão. Ligar a cada chamada
+        // acumularia listeners a cada consulta feita na sessão.
+        if (!hgIndicadorTooltipEl.dataset.globaisLigados) {
+          hgIndicadorTooltipEl.dataset.globaisLigados = '1';
+          document.addEventListener('click', fechar);
+          window.addEventListener('scroll', fechar, { passive: true });
+        }
       }
 
       // Restaura a posição de rolagem se algo (ex: inserir uma tabela
@@ -7410,7 +7427,7 @@
         if (!grid) return;
         grid.insertAdjacentHTML('beforeend', `
           <div id="hgDataComCampo">
-            <span id="hgDataComRotulo" title="${HG_DATA_COM_AJUDA}">Data com</span>
+            <span id="hgDataComRotulo">Data com</span>
             <strong id="hgDataComValor" title="Carregando...">Carregando...</strong>
           </div>
         `);
@@ -7437,7 +7454,28 @@
           if (evento.status && evento.status !== 'paid') detalhes.push('Provento anunciado, ainda não pago.');
           const texto = detalhes.join(' ');
           valor.title = texto;
-          rotulo.title = texto;
+
+          // "?" do lado do rótulo, igual ao dos cards de indicadores.
+          // Só aparece agora, junto com o valor: um "?" ao lado de
+          // "Carregando..." prometeria explicação de um dado que ainda
+          // não existe.
+          //
+          // Montado por createElement, não por template literal: o texto
+          // é dinâmico (entra data de pagamento e valor por cota) e
+          // qualquer aspa dupla que aparecesse nele fecharia o atributo
+          // no meio da frase. setAttribute não tem esse problema.
+          const ajuda = document.createElement('button');
+          ajuda.type = 'button';
+          ajuda.className = 'hg-info-btn hg-info-vermelho';
+          ajuda.textContent = '?';
+          ajuda.title = '';
+          ajuda.setAttribute('data-indicador', 'datacom');
+          ajuda.setAttribute('data-ajuda', texto);
+          ajuda.setAttribute('aria-label', 'O que é data com?');
+          rotulo.appendChild(ajuda);
+          // O rótulo NÃO leva title: o balão do site já é a explicação, e
+          // o tooltip nativo do navegador apareceria por cima dele.
+          hgAtivarTooltipsIndicadores();
         }).catch(() => {
           const campo = document.getElementById('hgDataComCampo');
           if (campo) campo.remove();
