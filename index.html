@@ -6991,6 +6991,18 @@
           });
         }
 
+        // Data com — a data de corte do provento. Quem tem a cota no
+        // fechamento desse dia recebe; quem compra no pregão seguinte,
+        // não. É a informação que decide "compro hoje ou espero?", e ela
+        // não vem no /v2/finance/quotes que monta este card: só existe no
+        // /v2/finance/dividends, no campo `com_date`.
+        //
+        // Não dá para aproveitar o histórico da seção de baixo: ele é
+        // preguiçoso (só carrega quando o usuário clica em "Ver histórico
+        // de dividendos") e caro (busca binária pelo limite do plano,
+        // ~12 requisições). Aqui é um pedido único, de janela curta.
+        hgInjetarDataCom(a);
+
         // P/VP e VPA (equity_per_share) só vêm no endpoint mais antigo da HG
         // Brasil, /finance/stock_price (o /v2/finance/quotes usado acima é um
         // payload enxuto e não inclui "financials"). Busca à parte e injeta
@@ -7332,6 +7344,104 @@
         } catch (e) {
           return { ok: false, erro: e.message };
         }
+      }
+
+      // ---------- Data com (data de corte do provento) ----------
+      // Texto do balão de ajuda. Sem aspas duplas de propósito: ele é
+      // injetado dentro de title="..." num template literal, e uma aspa
+      // dupla aqui fecharia o atributo no meio da frase.
+      const HG_DATA_COM_AJUDA = 'Data com é a data de corte do provento: quem tem o ativo no fechamento desse dia recebe o pagamento. Quem compra a partir do pregão seguinte fica de fora daquele provento.';
+
+      // Monta a data como LOCAL. new Date('2026-08-18') seria meia-noite
+      // em UTC e, no fuso do Brasil, voltaria para o dia 17 — o campo
+      // mostraria a data com um dia antes do que a API mandou.
+      function hgDataComParaData(iso) {
+        const p = String(iso || '').split('-');
+        if (p.length !== 3) return null;
+        const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+        return isNaN(d.getTime()) ? null : d;
+      }
+
+      // Qual data com mostrar. Se existe uma no futuro (provento já
+      // anunciado e ainda não cortado), é ela que interessa — é o prazo
+      // de quem quer comprar e receber. Senão, a última que passou, que
+      // conta quando o ativo pagou pela última vez.
+      //
+      // Só eventos category 'cash': bonificação em ações ('stock') tem
+      // amount em proporção de ações, não em dinheiro, e misturar os dois
+      // aqui daria uma data com de um "provento" que ninguém recebe em R$.
+      function hgEscolherDataCom(serie) {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        const eventos = (serie || [])
+          .filter(ev => ev && ev.category === 'cash' && hgDataComParaData(ev.com_date))
+          .sort((x, y) => hgDataComParaData(x.com_date) - hgDataComParaData(y.com_date));
+        if (!eventos.length) return null;
+        const futuros = eventos.filter(ev => hgDataComParaData(ev.com_date) >= hoje);
+        if (futuros.length) return { evento: futuros[0], futura: true };
+        return { evento: eventos[eventos.length - 1], futura: false };
+      }
+
+      // Duas janelas, nessa ordem: 1 ano para trás cobre até ação que
+      // paga uma vez por ano; se o plano recusar por histórico antigo
+      // demais, cai para 4 meses, que sempre passa e já resolve qualquer
+      // FII mensal. Para a frente sempre 120 dias, para pegar provento
+      // anunciado com data com ainda por vir.
+      async function hgBuscarDataCom(symbol) {
+        const hoje = new Date();
+        const fim = new Date(hoje);
+        fim.setDate(fim.getDate() + 120);
+        for (const diasAtras of [370, 120]) {
+          const inicio = new Date(hoje);
+          inicio.setDate(inicio.getDate() - diasAtras);
+          const r = await hgTestarIntervaloDividendos(symbol, inicio, fim);
+          if (r.ok) return hgEscolherDataCom(r.serie);
+        }
+        return null;
+      }
+
+      // Injeta o campo já com "Carregando..." e preenche quando a
+      // resposta chega. Se o ativo não tem provento nenhum na janela
+      // (ação que não paga, fundo recém-listado), o campo é REMOVIDO em
+      // vez de ficar com um travessão: este grid só mostra o que a API
+      // realmente devolveu — é a mesma regra do resto dos campos.
+      function hgInjetarDataCom(a) {
+        const grid = resultadoEl.querySelector('.hg-grid-dados');
+        if (!grid) return;
+        grid.insertAdjacentHTML('beforeend', `
+          <div id="hgDataComCampo">
+            <span id="hgDataComRotulo" title="${HG_DATA_COM_AJUDA}">Data com</span>
+            <strong id="hgDataComValor" title="Carregando...">Carregando...</strong>
+          </div>
+        `);
+
+        hgBuscarDataCom(a.symbol).then(escolha => {
+          // O usuário pode ter consultado outro ativo enquanto isso; aí
+          // este campo já não existe mais e não há nada a preencher.
+          const campo = document.getElementById('hgDataComCampo');
+          if (!campo) return;
+          if (!escolha) { campo.remove(); return; }
+
+          const { evento, futura } = escolha;
+          const rotulo = campo.querySelector('#hgDataComRotulo');
+          const valor = campo.querySelector('#hgDataComValor');
+
+          rotulo.textContent = futura ? 'Data com (próxima)' : 'Data com (última)';
+          valor.textContent = hgFormatDataDividendo(evento.com_date);
+
+          const detalhes = [HG_DATA_COM_AJUDA];
+          if (evento.payment_date) detalhes.push('Pagamento: ' + hgFormatDataDividendo(evento.payment_date) + '.');
+          if (typeof evento.amount === 'number') {
+            detalhes.push('Valor: ' + (hgFormatMoedaPrecisa(evento.amount, a.currency) ?? evento.amount) + ' por cota.');
+          }
+          if (evento.status && evento.status !== 'paid') detalhes.push('Provento anunciado, ainda não pago.');
+          const texto = detalhes.join(' ');
+          valor.title = texto;
+          rotulo.title = texto;
+        }).catch(() => {
+          const campo = document.getElementById('hgDataComCampo');
+          if (campo) campo.remove();
+        });
       }
 
       async function hgCarregarDividendos(symbol, moeda, anos) {
