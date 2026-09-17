@@ -26,10 +26,36 @@ jobs:
       - name: Checkout do repositório
         uses: actions/checkout@v5
         with:
-          # Garante que estamos sempre no HEAD mais recente, evitando
-          # conflito com o robô de indices.json/noticias.json/ranking.json
-          # se ele rodar próximo desse horário.
+          # fetch-depth: 0 traz todo o histórico (o passo seguinte precisa
+          # dele para o reset). Ele NÃO garante, sozinho, que estamos no
+          # commit mais recente — ver o passo abaixo.
           fetch-depth: 0
+
+      # -----------------------------------------------------------------
+      # Por que este passo existe (bug de 17/09/2026):
+      #
+      # Em evento `schedule`, o actions/checkout se fixa no SHA do momento
+      # em que o GitHub CRIOU a execução — não no momento em que ela
+      # rodou. E a fila do Actions atrasa esse intervalo em horas: o cron
+      # aqui é 3h05, mas os boletins reais saíram às 6h10, 8h24, 9h36,
+      # 10h19... Enquanto isso o robô de coleta commita a cada 15 min, e
+      # nada disso chega ao runner.
+      #
+      # Resultado observado: o boletim de 17/09 saiu com a Selic em 14,00%
+      # (o Copom já tinha cortado para 13,75% na véspera) e com o
+      # fechamento do dia 15 — cópia carbono do boletim do dia 16.
+      #
+      # O reset abaixo joga a árvore de trabalho no que main REALMENTE tem
+      # agora, segundos antes de gerar. É `--hard` sem dó porque não há
+      # nada local a preservar: o checkout acabou de acontecer e nenhum
+      # passo escreveu nada ainda.
+      # -----------------------------------------------------------------
+      - name: Sincronizar com o topo do main (indices/noticias/ranking mais recentes)
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          echo "Árvore sincronizada com origin/main em $(git log -1 --format='%h %ci')"
+          echo "Coleta mais recente no indices.json: $(grep -o '"coletado_em": "[^"]*"' indices.json | tail -1)"
 
       - name: Configurar Node.js
         uses: actions/setup-node@v5
@@ -37,12 +63,17 @@ jobs:
           node-version: 'lts/*' # sempre usa a LTS vigente, evitando ficar preso a uma versão depreciada
 
       # -----------------------------------------------------------------
-      # IMPORTANTE: este passo assume que indices.json, noticias.json e
-      # ranking.json já foram atualizados hoje (por outro workflow/robô já
-      # existente no repositório). O robô de índices/notícias roda a cada
-      # 15 min o dia inteiro (sem pausa), então isso vale em qualquer
-      # horário — se um dia ele passar a ter uma janela de silêncio,
-      # ajuste o cron acima para um horário depois dela.
+      # indices.json, noticias.json e ranking.json vêm do robô de coleta,
+      # que roda a cada 15 min o dia inteiro (sem pausa) — então em
+      # qualquer horário há dado fresco disponível. O passo de sincronia
+      # acima garante que é ESSE dado que chega aqui.
+      #
+      # Segunda linha de defesa, dentro do próprio script: ele confere o
+      # `coletado_em` do indices.json e, se ainda assim vier coisa velha,
+      # busca a cópia publicada no site; se ela também estiver velha, o
+      # script ABORTA (exit 1) em vez de publicar números errados. Ou
+      # seja: workflow vermelho e e-mail de falha, nunca um boletim com a
+      # Selic de ontem indo para os assinantes.
       # -----------------------------------------------------------------
       - name: Gerar o boletim do dia
         env:
