@@ -101,17 +101,6 @@
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
-  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .section-com-lyket [data-lyket-type]{
-    font-size:12px;
-    background:#f2f2f2;
-    border-radius:20px;
-    padding:4px 10px;
-    display:inline-flex;
-    align-items:center;
-    box-shadow:0 1px 4px rgba(0,0,0,0.35);
-  }
-  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
   .grupo-whatsapp-card{
     display:flex;align-items:center;gap:12px;margin-top:12px;
     background:var(--card);border:1px solid var(--card-border);border-radius:12px;
@@ -124,7 +113,6 @@
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
-<script src="https://unpkg.com/@lyket/widget@latest/dist/lyket.js?apiKey=pt_d2c19f94733791f2b25c44987dd17e"></script>
 </head>
 <body>
 <div class="wrap">
@@ -139,13 +127,10 @@
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
-  <div class="sub">Boletim de Mercado · Segunda-feira, 17 de Agosto de 2026</div>
+  <div class="sub">Boletim de Mercado · Quinta-feira, 17 de Setembro de 2026</div>
 </header>
 
-<h2 class="section section-com-lyket">
-  <span>Indicadores Principais</span>
-  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-17-08-2026"></div>
-</h2>
+<h2 class="section">Indicadores Principais</h2>
 
 <a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
   <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
@@ -156,23 +141,25 @@
 </a>
 
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value down">166.934,20 pts ▼ 0.10%</div></div>
-  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value down">3.686,33 pts ▼ 0.17%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,22 ▲ 0.73%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 6,05 ▲ 1.17%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">R$ 330.475,00 ▲ 0.43%</div></div>
-  <div class="indicator"><div class="label">Ethereum</div><div class="value up">R$ 9.871,19 ▲ 0.60%</div></div>
+  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value up">186.502,64 pts ▲ 0.54%</div></div>
+  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.744,89 pts ▲ 0.36%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value down">R$ 5,15 ▼ 0.40%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value down">R$ 5,94 ▼ 0.46%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 75.497,00 ▼ 1.81%</div></div>
+  <div class="indicator"><div class="label">Ethereum</div><div class="value down">US$ 2.392,21 ▼ 3.32%</div></div>
   <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">14,00% a.a.</div></div>
   <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,90% a.a.</div></div>
-  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,44%</div></div>
-  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-1,16%</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,22%</div></div>
+  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-0,22%</div></div>
 </div>
+
+
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEE850IL_M.jpg" alt="Indonésia - Ações fecharam o pregão em alta e o Índice IDX Composite avançou 1,59%" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/indonesia--acoes-fecharam-o-pregao-em-alta-e-o-indice-idx-composite-avancou-159-2040923" target="_blank" rel="noopener noreferrer" class="tk-link">Indonésia - Ações fecharam o pregão em alta e o Índice IDX Composite avançou 1,59%</a></span><span class="pct">Investing.com (Ações)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEM5H10K_150x108_S.jpg" alt="Apostas em alta de juros do Fed diminuem; resultados do varejo em foco" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/apostas-em-alta-de-juros-do-fed-diminuem-resultados-do-varejo-em-foco-2040897" target="_blank" rel="noopener noreferrer" class="tk-link">Apostas em alta de juros do Fed diminuem; resultados do varejo em foco</a></span><span class="pct">Investing.com (Economia)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/AshokLeyland_800x533_L_1637570190.jpg" alt="Por que as ações da Ashok Leyland estão subindo hoje?" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-ashok-leyland-estao-subindo-hoje-93CH-2040921" target="_blank" rel="noopener noreferrer" class="tk-link">Por que as ações da Ashok Leyland estão subindo hoje?</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEE850IL_M.jpg" alt="Indonésia - Ações fecharam o pregão em queda e o Índice IDX Composite recuou 0,20%" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/indonesia--acoes-fecharam-o-pregao-em-queda-e-o-indice-idx-composite-recuou-020-2066749" target="_blank" rel="noopener noreferrer" class="tk-link">Indonésia - Ações fecharam o pregão em queda e o Índice IDX Composite recuou 0,20%</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEM4R1OV_1200_L.jpg" alt="Decisão do Fed em foco; Zuckerberg fala sobre riscos da IA" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/decisao-do-fed-em-foco-zuckerberg-fala-sobre-seguranca-em-ia-2066710" target="_blank" rel="noopener noreferrer" class="tk-link">Decisão do Fed em foco; Zuckerberg fala sobre riscos da IA</a></span><span class="pct">Investing.com (Economia)</span></div>
+  <div class="mover-row com-thumb"><img src="https://www.infomoney.com.br/wp-content/uploads/2026/09/Dreamforce-2026.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Hora de frear? No mesmo palco, CEOs de Anthropic e Nvidia divergem sobre futuro da IA" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://www.infomoney.com.br/business/hora-de-frear-no-mesmo-palco-ceos-de-anthropic-e-nvidia-divergem-sobre-futuro-da-ia/" target="_blank" rel="noopener noreferrer" class="tk-link">Hora de frear? No mesmo palco, CEOs de Anthropic e Nvidia divergem sobre futuro da IA</a></span><span class="pct">InfoMoney (geral)</span></div>
 </div>
 
 <h2 class="section">FIIs - Maiores Dividend Yield</h2>
@@ -181,38 +168,38 @@
   
   <tr>
     <td class="name">XPCA11</td>
-    <td>18.39%</td>
-    <td>R$ 7.07</td>
+    <td>17.77%</td>
+    <td>R$ 7.26</td>
     <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
     <td class="name">IRIM11</td>
-    <td>16.72%</td>
-    <td>R$ 60.10</td>
+    <td>16.79%</td>
+    <td>R$ 60.04</td>
     <td class="rationale">FII Irim</td>
   </tr>
   <tr>
-    <td class="name">VGIR11</td>
-    <td>16.47%</td>
-    <td>R$ 9.17</td>
-    <td class="rationale">FII Valreiii</td>
-  </tr>
-  <tr>
     <td class="name">TRXF11</td>
-    <td>14.85%</td>
-    <td>R$ 79.45</td>
+    <td>16.43%</td>
+    <td>R$ 71.81</td>
     <td class="rationale">FII Trx Real</td>
   </tr>
   <tr>
+    <td class="name">VGIR11</td>
+    <td>15.81%</td>
+    <td>R$ 9.55</td>
+    <td class="rationale">FII Valreiii</td>
+  </tr>
+  <tr>
     <td class="name">RECR11</td>
-    <td>14.47%</td>
-    <td>R$ 75.25</td>
+    <td>14.31%</td>
+    <td>R$ 75.79</td>
     <td class="rationale">FII Rec Rece</td>
   </tr>
   <tr>
     <td class="name">BTHF11</td>
-    <td>13.86%</td>
-    <td>R$ 8.52</td>
+    <td>13.89%</td>
+    <td>R$ 8.57</td>
     <td class="rationale">FII BTHF</td>
   </tr>
 </table>
@@ -222,39 +209,39 @@
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
-    <td class="name">SBSP3</td>
-    <td>14.56%</td>
-    <td>R$ 23.88</td>
-    <td class="rationale">Sabesp</td>
-  </tr>
-  <tr>
     <td class="name">CMIG4</td>
-    <td>12.51%</td>
-    <td>R$ 10.24</td>
+    <td>11.38%</td>
+    <td>R$ 11.26</td>
     <td class="rationale">CEMIG</td>
   </tr>
   <tr>
     <td class="name">BBSE3</td>
-    <td>12.43%</td>
-    <td>R$ 36.93</td>
+    <td>11.34%</td>
+    <td>R$ 40.47</td>
     <td class="rationale">BB Seguridade</td>
   </tr>
   <tr>
     <td class="name">ALOS3</td>
-    <td>11.47%</td>
-    <td>R$ 25.63</td>
+    <td>10.99%</td>
+    <td>R$ 28.46</td>
     <td class="rationale">ALLOS</td>
   </tr>
   <tr>
     <td class="name">BBDC4</td>
-    <td>9.40%</td>
-    <td>R$ 16.54</td>
+    <td>8.46%</td>
+    <td>R$ 18.37</td>
     <td class="rationale">Banco Bradesco</td>
   </tr>
   <tr>
+    <td class="name">VALE3</td>
+    <td>7.50%</td>
+    <td>R$ 74.84</td>
+    <td class="rationale">Vale</td>
+  </tr>
+  <tr>
     <td class="name">ITUB4</td>
-    <td>9.09%</td>
-    <td>R$ 38.81</td>
+    <td>7.42%</td>
+    <td>R$ 42.65</td>
     <td class="rationale">Banco Itaú Unibanco</td>
   </tr>
 </table>
@@ -262,25 +249,25 @@
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2025/12/Moedas-de-real.jpg?fit=300%2C172&amp;quality=70&amp;strip=all" alt="Vencimento de títulos do Tesouro e recalibragem de fundos pressionam juros nesta 2ª" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2025/08/2025-08-01T084507Z_1985370783_RC27YFAI0042_RTRMADP_3_INDIA-STOCKS.jpg?fit=300%2C204&amp;quality=70&amp;strip=all" alt="Dow Jones Futuro sobe antes da decisão sobre juros do Fed" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/onde-investir/vencimento-de-titulos-do-tesouro-e-recalibragem-de-fundos-pressionam-juros-nesta-2a/" target="_blank" rel="noopener noreferrer" class="n-link">1. Vencimento de títulos do Tesouro e recalibragem de fundos pressionam juros nesta 2ª</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/dow-jones-futuro-sobe-antes-da-decisao-sobre-juros-do-fed/" target="_blank" rel="noopener noreferrer" class="n-link">1. Dow Jones Futuro sobe antes da decisão sobre juros do Fed</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://content-media.investing.com/news/AshokLeyland_800x533_L_1637570190.jpg" alt="Por que as ações da Ashok Leyland estão subindo hoje?" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/09/Brasil-x-EUA.png?fit=300%2C169&amp;quality=70&amp;strip=all" alt="Super Quarta vai definir rumo de Ibovespa e Nasdaq? Confira os níveis decisivos" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-ashok-leyland-estao-subindo-hoje-93CH-2040921" target="_blank" rel="noopener noreferrer" class="n-link">2. Por que as ações da Ashok Leyland estão subindo hoje?</a></div>
-    <div class="n-body">Fonte: Investing.com (Ações)</div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/super-quarta-vai-definir-rumo-de-ibovespa-e-nasdaq-confira-os-niveis-decisivos/" target="_blank" rel="noopener noreferrer" class="n-link">2. Super Quarta vai definir rumo de Ibovespa e Nasdaq? Confira os níveis decisivos</a></div>
+    <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2024/05/casas-bahia-aricanduva.jpg?fit=300%2C217&amp;quality=70&amp;strip=all" alt="Casas Bahia entra com pedido de recuperação judicial para reestruturar dívidas" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/09/ChatGPT-Image-15-de-set.-de-2026-18_12_15.jpg?fit=300%2C169&amp;quality=70&amp;strip=all" alt="Bolsa e eleições: o que 5 ciclos revelam sobre o Ibovespa entre os turnos" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/casas-bahia-entra-com-pedido-de-recuperacao-judicial-para-reestruturar-dividas/" target="_blank" rel="noopener noreferrer" class="n-link">3. Casas Bahia entra com pedido de recuperação judicial para reestruturar dívidas</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/bolsa-eleicoes-ibovespa-entre-turnos-5-ciclos/" target="_blank" rel="noopener noreferrer" class="n-link">3. Bolsa e eleições: o que 5 ciclos revelam sobre o Ibovespa entre os turnos</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
@@ -292,7 +279,7 @@
 <footer>
   Fonte: HG Brasil · Fontes públicas de mercado — dados sujeitos a variação intradiária.<br>
   Este boletim tem caráter meramente informativo e não constitui recomendação de compra ou venda de ativos.<br>
-  Dividendos | Viver de Renda — viverderenda.dev.br
+  Dividendos | Viver de Renda — suporte@viverderenda.dev.br
 </footer>
 
 </div>
