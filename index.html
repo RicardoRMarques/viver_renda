@@ -7923,11 +7923,46 @@
       return `${INDICE_MESES_CURTOS[mes]}/${String(ano).slice(-2)}`;
     }
 
+    // Dia em que a taxa foi APURADA, quando ele ficou para trás.
+    //
+    // Existe por causa do CDI. A Selic é META: o Copom decide e o BC publica
+    // o número já valendo para os dias seguintes, até a próxima reunião. O
+    // CDI é o oposto — é o que o mercado EFETIVAMENTE praticou, apurado no
+    // fim do dia e publicado com alguns dias de atraso.
+    //
+    // Nos dias seguintes a uma reunião isso produz uma tela que parece
+    // errada e não está: em 16/09/2026 o Copom cortou a Selic de 14,00 para
+    // 13,75 e o painel passou a mostrar "Selic 13,75 / CDI 13,90" — o CDI
+    // ACIMA da Selic, quando o normal é ficar ~0,10 abaixo. O 13,90 era o
+    // apurado de 14/09, sob a meta antiga, e o mais recente que o BC tinha
+    // publicado. O número estava certo; faltava dizer de quando ele era.
+    //
+    // Devolve '' quando a data é de hoje (ou não veio), para o aviso não
+    // virar ruído permanente — ele só aparece enquanto há defasagem.
+    function indiceDataApuracao(referencia) {
+      const m = String(referencia || '').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (!m) return '';
+      const dia = parseInt(m[1], 10), mes = parseInt(m[2], 10), ano = parseInt(m[3], 10);
+      // Montada como data LOCAL: new Date('2026-09-14') seria meia-noite em
+      // UTC e, no fuso do Brasil, voltaria para o dia 13.
+      const data = new Date(ano, mes - 1, dia);
+      if (isNaN(data.getTime())) return '';
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+      if (data >= hoje) return '';
+      return `${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}`;
+    }
+
     function indiceContextoTaxa(item) {
       const label = (item.label || '').toUpperCase();
       // Selic e CDI são taxas anualizadas; a data que vem do BCB é o dia da
-      // vigência/apuração, que confunde mais do que ajuda nessa linha.
-      if (label.startsWith('SELIC') || label === 'CDI') return 'ao ano';
+      // vigência/apuração, que confunde mais do que ajuda nessa linha — com
+      // a exceção documentada em indiceDataApuracao().
+      if (label === 'CDI') {
+        const apurado = indiceDataApuracao(item.referencia);
+        return apurado ? `apurado ${apurado}` : 'ao ano';
+      }
+      if (label.startsWith('SELIC')) return 'ao ano';
       const mesAno = indiceMesAnoDaReferencia(item.referencia);
       if (typeof item.meses === 'number' && item.meses > 0) {
         return mesAno ? `${item.meses}m até ${mesAno}` : `${item.meses} meses`;
@@ -7976,9 +8011,13 @@
           const contexto = indiceContextoTaxa(item);
           // O robô marca "desatualizado" quando a fonte não respondeu e ele
           // manteve o último valor conhecido, em vez de deixar a linha sumir.
+          const apuradoEm = (item.label || '').toUpperCase() === 'CDI'
+            ? indiceDataApuracao(item.referencia) : '';
           const aviso = item.desatualizado
             ? ' title="Último dado disponível — a fonte não respondeu na coleta mais recente."'
-            : '';
+            : (apuradoEm
+              ? ` title="O CDI não é meta: é a taxa que o mercado praticou, apurada em ${apuradoEm} e publicada pelo Banco Central com alguns dias de atraso. Depois de uma reunião do Copom ele pode ficar acima da Selic até sair o apurado sob a taxa nova."`
+              : '');
           return `
             <div class="indice-row"${aviso}>
               <div class="indice-info">

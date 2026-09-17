@@ -705,7 +705,10 @@ def coletar_cambio_bcb():
             print(f"AVISO: Banco Central não retornou dados para {rotulo} (série {serie}).", file=sys.stderr)
             continue
 
-        # O SGS devolve em ordem cronológica: o último item é o mais recente.
+        # A ordem do SGS varia por série (ver _ordenar_bcb_por_data) — aqui
+        # ela decide qual é "atual" e qual é "anterior", então uma inversão
+        # trocaria o SINAL da variação do dia.
+        dados = _ordenar_bcb_por_data(dados)
         atual = _para_float((dados[-1] or {}).get("valor"))
         if atual is None:
             print(f"AVISO: valor inválido para {rotulo} na série {serie} do BCB.", file=sys.stderr)
@@ -844,6 +847,41 @@ def _requisitar_bcb_com_retry(url, tentativas=3):
     raise ultimo_erro
 
 
+def _ordenar_bcb_por_data(dados):
+    """Ordena a resposta do SGS em ordem cronológica CRESCENTE.
+
+    Existe porque a ordem NÃO é a mesma em todas as séries do Banco Central,
+    e o código inteiro assumia que era. Medido em 16/09/2026, com a MESMA
+    chamada `/dados/ultimos/5`:
+
+        série 432  (meta Selic) -> 12/09, 13/09, 14/09, 15/09, 16/09   crescente
+        série 4389 (CDI % a.a.) -> 14/09, 11/09, 10/09, 09/09, 08/09   DECRESCENTE
+
+    Como todo mundo fazia `dados[-1]`, na série do CDI isso pegava o valor
+    MAIS ANTIGO da janela. Dois efeitos, os dois observados no site:
+
+      1. a referência saía errada — o indices.json trazia 09/09 tendo
+         14/09 disponível;
+      2. pior, uma MUDANÇA do CDI só apareceria cinco dias úteis depois,
+         quando o valor novo empurrasse os antigos para fora da janela de 5.
+         Foi o que aconteceu no Copom de 16/09/2026: a Selic caiu para
+         13,75 e o CDI ficaria preso em 13,90 por mais de uma semana.
+
+    No câmbio o risco era outro e maior: `dados[-1]` e `dados[-2]` viram
+    "atual" e "anterior" para calcular a variação do dia — com a ordem
+    invertida, o sinal da variação sai TROCADO.
+
+    Registros sem data legível vão para o começo, para nunca serem
+    escolhidos como "o mais recente".
+    """
+    def _chave(item):
+        try:
+            return datetime.strptime((item or {}).get("data", ""), "%d/%m/%Y")
+        except (ValueError, TypeError, AttributeError):
+            return datetime.min
+    return sorted(dados or [], key=_chave)
+
+
 def coletar_selic_bcb():
     """Meta da Selic definida pelo Copom, via API pública do Banco Central
     (série SGS 432) — atualiza no mesmo dia da decisão, diferente do campo
@@ -855,7 +893,7 @@ def coletar_selic_bcb():
         dados = _requisitar_bcb_com_retry(BCB_SELIC_META_URL)
         if not dados:
             return None
-        item = dados[-1]
+        item = _ordenar_bcb_por_data(dados)[-1]
         valor = float(item["valor"].replace(",", "."))
         print(f"OK: Selic obtida do Banco Central (SGS 432): {valor}% (referência: {item.get('data')}).")
         return {"label": "Selic (meta)", "valor_pct": valor, "referencia": item.get("data")}
@@ -870,7 +908,7 @@ def coletar_ipca():
         dados = _requisitar_bcb_com_retry(BCB_IPCA_URL)
         if not dados:
             return None
-        item = dados[-1]
+        item = _ordenar_bcb_por_data(dados)[-1]
         valor = float(item["valor"].replace(",", "."))
         return {"label": "IPCA (mensal)", "valor_pct": valor, "referencia": item.get("data")}
     except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
@@ -895,7 +933,9 @@ def coletar_ipca_12_meses():
             fator_acumulado *= (1 + valor_mes)
 
         acumulado_pct = (fator_acumulado - 1) * 100
-        ultimo_mes = dados[-1].get("data")
+        # O acumulado é um produto, então independe da ordem; a REFERÊNCIA
+        # não — sem ordenar, ela podia apontar o mês mais antigo da janela.
+        ultimo_mes = _ordenar_bcb_por_data(dados)[-1].get("data")
         return {
             "label": "IPCA (12 meses)",
             "valor_pct": acumulado_pct,
@@ -955,7 +995,7 @@ def coletar_cdi_bcb():
         dados = _requisitar_bcb_com_retry(BCB_CDI_URL)
         if not dados:
             return None
-        item = dados[-1]
+        item = _ordenar_bcb_por_data(dados)[-1]
         valor = float(item["valor"].replace(",", "."))
         print(f"OK: CDI obtido do Banco Central (SGS 4389): {valor}% (referência: {item.get('data')}).")
         return {"label": "CDI", "valor_pct": valor, "referencia": item.get("data")}
@@ -971,7 +1011,7 @@ def coletar_igpm():
         dados = _requisitar_bcb_com_retry(BCB_IGPM_URL)
         if not dados:
             return None
-        item = dados[-1]
+        item = _ordenar_bcb_por_data(dados)[-1]
         valor = float(item["valor"].replace(",", "."))
         return {"label": "IGP-M (mensal)", "valor_pct": valor, "referencia": item.get("data")}
     except (requests.RequestException, ValueError, KeyError, IndexError) as exc:
