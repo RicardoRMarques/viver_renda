@@ -1,0 +1,74 @@
+name: Coletar Debêntures (ANBIMA)
+
+on:
+  schedule:
+    # A ANBIMA publica o arquivo do dia no fim da tarde. Rodar às 20h10
+    # de Brasília dá margem confortável depois da publicação e ainda
+    # entrega o dado a tempo de quem acessa o site à noite.
+    #
+    # Minuto não-redondo de propósito — mesma razão do boletim: horários
+    # "redondos" pegam a fila pesada do GitHub Actions.
+    - cron: '10 20 * * 1-5'
+      timezone: 'America/Sao_Paulo'
+  workflow_dispatch: {}
+
+concurrency:
+  group: debentures-diario
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      # -----------------------------------------------------------------
+      # Mesma lição do boletim de 17/09/2026: em evento `schedule` o
+      # checkout se fixa no SHA de quando o GitHub CRIOU a execução, não
+      # de quando ela rodou — e a fila do Actions atrasa isso em horas.
+      # Aqui o risco é menor (este robô só ESCREVE um arquivo, não lê os
+      # dos outros), mas o push no fim briga com os outros robôs do repo,
+      # e partir do topo real de main evita metade dos conflitos.
+      # -----------------------------------------------------------------
+      - name: Sincronizar com o topo do main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Instalar dependências
+        run: pip install --upgrade requests
+
+      - name: Coletar as taxas do mercado secundário
+        run: python coletar_debentures.py
+
+      - name: Commitar e enviar
+        run: |
+          git config user.name "robo-debentures"
+          git config user.email "robo-debentures@users.noreply.github.com"
+          git add data/debentures.json
+          if git diff --cached --quiet; then
+            echo "Nada novo — a ANBIMA ainda não publicou o arquivo de hoje."
+          else
+            git commit -m "Debêntures: taxas do mercado secundário $(date -u -d '-3 hours' '+%d-%m-%Y')"
+
+            # Retry: outros robôs do repo (índices a cada 15 min, boletim,
+            # tesouro, basileia) podem ter commitado entre o checkout e
+            # agora. Em vez de falhar o job, rebaseia e tenta de novo.
+            for tentativa in 1 2 3; do
+              git pull --rebase origin main && git push && break
+              echo "Tentativa $tentativa falhou, aguardando..."
+              git rebase --abort 2>/dev/null || true
+              sleep $((tentativa * 5))
+            done
+          fi
