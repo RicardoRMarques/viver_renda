@@ -3319,6 +3319,53 @@
       #financPrintArea { display: block; position: absolute; top: 0; left: 0; width: 100%; }
     }
 
+    /* "Vale a Pena?" — análise de uma oferta de renda fixa */
+    .vp-veredito {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 16px; border-radius: 12px; margin: 16px 0 4px;
+      border: 1px solid var(--border); background: var(--card);
+    }
+    .vp-veredito-selo {
+      flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 800;
+    }
+    .vp-veredito-titulo { font-weight: 700; font-size: 1rem; margin-bottom: 2px; }
+    .vp-veredito-texto { font-size: 0.84rem; color: var(--muted); line-height: 1.5; }
+    .vp-bom    { border-color: rgba(34,197,94,0.45); }
+    .vp-bom    .vp-veredito-selo { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .vp-bom    .vp-veredito-titulo { color: #22c55e; }
+    .vp-neutro { border-color: rgba(234,179,8,0.45); }
+    .vp-neutro .vp-veredito-selo { background: rgba(234,179,8,0.15); color: #eab308; }
+    .vp-neutro .vp-veredito-titulo { color: #eab308; }
+    .vp-ruim   { border-color: rgba(239,68,68,0.45); }
+    .vp-ruim   .vp-veredito-selo { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .vp-ruim   .vp-veredito-titulo { color: #ef4444; }
+
+    /* .hg-status tem margem propria e ficava ocupando um bloco vazio
+       entre os botoes e o resultado enquanto nao havia erro nenhum. */
+    #vpStatus:empty { display: none; }
+
+    .vp-tabela { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.85rem; }
+    .vp-tabela th, .vp-tabela td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: right; }
+    .vp-tabela th:first-child, .vp-tabela td:first-child { text-align: left; }
+    .vp-tabela thead th { color: var(--primary); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .vp-tabela td.vp-num { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+    .vp-tabela tr.vp-destaque td { font-weight: 700; background: var(--zebra); }
+
+    .vp-cartoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px; margin-top: 14px; }
+    .vp-cartao { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: var(--card); }
+    .vp-cartao-titulo { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
+    .vp-cartao-valor { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .vp-cartao-nota { font-size: 0.78rem; color: var(--muted); line-height: 1.45; }
+
+    .vp-aviso {
+      display: flex; gap: 8px; align-items: flex-start;
+      font-size: 0.8rem; line-height: 1.5; margin-top: 8px;
+      padding: 9px 12px; border-radius: 9px;
+      background: var(--zebra); border: 1px solid var(--border);
+    }
+
     /* Assistente Viver de Renda (chat com IA) */
     .chat-ia-botao {
       position: fixed;
@@ -3695,6 +3742,9 @@
             <a class="nav-dropdown-item" href="#tesouro-direto"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="12" y1="21" x2="12" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Tesouro Direto</a>
             <button type="button" class="nav-dropdown-item" id="fgcBtnAbrir">
               <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC
+            </button>
+            <button type="button" class="nav-dropdown-item" id="vpBtnAbrir">
+              <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"></path><path d="M5 7h14"></path><path d="M5 7l-3 6a3.5 3.5 0 0 0 6 0z"></path><path d="M19 7l3 6a3.5 3.5 0 0 1-6 0z"></path><path d="M8 21h8"></path></svg> Vale a Pena? — Analise uma oferta
             </button>
             <div class="nav-dropdown-separador"></div>
             <a class="nav-dropdown-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
@@ -5679,6 +5729,104 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="vpOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="vpTitulo" hidden>
+    <div class="calc-modal">
+      <div class="calc-modal-topo">
+        <h3 id="vpTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M12 3v18"></path><path d="M5 7h14"></path><path d="M5 7l-3 6a3.5 3.5 0 0 0 6 0z"></path><path d="M19 7l3 6a3.5 3.5 0 0 1-6 0z"></path><path d="M8 21h8"></path></svg>Vale a Pena?
+        </h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="vpCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button id="vpFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+      </div>
+
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Te ofereceram um CDB, um LCI ou uma debênture? Coloque os dados da oferta aqui e veja
+          <strong>quanto ela rende de verdade</strong> — depois do imposto e da inflação — comparada ao
+          Tesouro Direto de mesmo prazo, que é o piso honesto de qualquer comparação.
+        </p>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="vpTipo">Tipo do título</label>
+            <select id="vpTipo">
+              <option value="cdb">CDB / RDB / LC</option>
+              <option value="lci">LCI / LCA / LIG (isento de IR)</option>
+              <option value="deb">Debênture comum</option>
+              <option value="inc">Debênture incentivada / CRI / CRA (isento de IR)</option>
+            </select>
+          </div>
+          <div class="calc-campo">
+            <label for="vpEmissor">Emissor <span style="color:var(--muted); font-weight:400;">(opcional)</span></label>
+            <input type="text" id="vpEmissor" list="vpSugestoes" placeholder="Ex: Banco Master, Nubank, BTG..." autocomplete="off" />
+            <datalist id="vpSugestoes"></datalist>
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="vpIndexador">Como rende</label>
+            <select id="vpIndexador">
+              <option value="cdi">% do CDI (pós-fixado)</option>
+              <option value="pre">Prefixado (% ao ano)</option>
+              <option value="ipca">IPCA + (% ao ano)</option>
+            </select>
+          </div>
+          <div class="calc-campo">
+            <label for="vpTaxa" id="vpTaxaLabel">Taxa oferecida (% do CDI)</label>
+            <input type="number" id="vpTaxa" min="0" step="0.01" value="110" />
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="vpPrazo">Prazo até o vencimento</label>
+            <input type="number" id="vpPrazo" min="1" step="1" value="24" />
+          </div>
+          <div class="calc-campo">
+            <label for="vpPrazoUnidade">&nbsp;</label>
+            <select id="vpPrazoUnidade">
+              <option value="meses">Meses</option>
+              <option value="anos">Anos</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="vpValor">Quanto você vai aplicar</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="vpValor" placeholder="0,00" />
+            </div>
+          </div>
+          <div class="calc-campo">
+            <label for="vpLiquidez">Resgate</label>
+            <select id="vpLiquidez">
+              <option value="vencimento">Só no vencimento</option>
+              <option value="diaria">Liquidez diária</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="cmp-acoes-linha" style="margin-top:14px;">
+          <button type="button" class="hg-btn" id="vpBtnAnalisar">Analisar oferta</button>
+          <button type="button" class="cmp-btn-secundario" id="vpBtnLimpar">Limpar</button>
+        </div>
+
+        <div id="vpStatus" class="hg-status"></div>
+        <div id="vpResultado"></div>
       </div>
     </div>
   </div>
@@ -9955,7 +10103,467 @@
           texto: 'Veja quanto do seu dinheiro está coberto pelo FGC — o limite é por conglomerado, não por banco.',
         }));
 
+      // Publicado para o "Vale a Pena?", que precisa transformar o mesmo
+      // texto digitado no mesmo conglomerado — inclusive as marcas de
+      // varejo que não têm conglomerado próprio (Next → Bradesco, iti →
+      // Itaú, Pan → BTG). Duplicar a tabela MARCAS em dois lugares seria
+      // a receita para as duas versões divergirem na primeira manutenção.
+      window.vrResolverInstituicao = resolverInstituicao;
+      window.vrCarregarBancos = async () => {
+        await carregarBancos();
+        return { bancos, basileiaPorTicker };
+      };
+
       hgAbrirPorLinkDeFerramenta('fgc', abrirModal);
+    })();
+
+    // ============================================================
+    // "VALE A PENA?" — analisa UMA oferta de renda fixa que o usuário
+    // recebeu e responde a pergunta que ele realmente tem: "me ofereceram
+    // isso, é bom?"
+    //
+    // A régua não é opinião nossa: é o TESOURO DIRETO de mesmo indexador
+    // e vencimento mais próximo, líquido de IR e da taxa de custódia da
+    // B3. Um CDB de banco médio existe para pagar mais que o título
+    // público — é isso que compensa o risco de crédito que o Tesouro não
+    // tem. Se ele não bate o Tesouro, está cobrando o risco sem pagar por
+    // ele, e isso dá para AFIRMAR com dado público, sem recomendar nada a
+    // ninguém (o site é educacional, não é consultoria).
+    //
+    // Não inventa base de taxas: tudo que entra é dado que o usuário
+    // digitou ou que os robôs do site já publicam — indices.json
+    // (Selic/CDI/IPCA), data/tesouro.json (robô do Tesouro) e
+    // data/basileia.json (robô do IF.data, para a saúde do emissor).
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('vpOverlay');
+      const btnAbrir = document.getElementById('vpBtnAbrir');
+      if (!overlay || !btnAbrir) return;
+
+      const btnFechar = document.getElementById('vpFechar');
+      const selTipo = document.getElementById('vpTipo');
+      const inEmissor = document.getElementById('vpEmissor');
+      const sugestoesEl = document.getElementById('vpSugestoes');
+      const selIndexador = document.getElementById('vpIndexador');
+      const inTaxa = document.getElementById('vpTaxa');
+      const lblTaxa = document.getElementById('vpTaxaLabel');
+      const inPrazo = document.getElementById('vpPrazo');
+      const selUnidade = document.getElementById('vpPrazoUnidade');
+      const inValor = document.getElementById('vpValor');
+      const selLiquidez = document.getElementById('vpLiquidez');
+      const btnAnalisar = document.getElementById('vpBtnAnalisar');
+      const btnLimpar = document.getElementById('vpBtnLimpar');
+      const statusEl = document.getElementById('vpStatus');
+      const resultadoEl = document.getElementById('vpResultado');
+
+      // Taxa de custódia da B3, confirmada na tabela oficial de tarifas:
+      // 0,20% a.a. sobre o valor em custódia, com o Tesouro Selic isento
+      // até R$ 10 mil por CPF. Sem isso a comparação favoreceria o
+      // Tesouro indevidamente — é um custo real que o CDB não tem.
+      const CUSTODIA_B3_PCT = 0.20;
+      const CUSTODIA_ISENTA_SELIC = 10000;
+
+      // Basileia: o mínimo regulatório é 8% de capital + 2,5% de colchão
+      // de conservação. Abaixo de ~10,5% o banco está no osso.
+      const BASILEIA_MINIMO = 10.5;
+
+      const TIPOS = {
+        cdb: { rotulo: 'CDB / RDB / LC', tributado: true, fgc: true },
+        lci: { rotulo: 'LCI / LCA / LIG', tributado: false, fgc: true },
+        deb: { rotulo: 'Debênture comum', tributado: true, fgc: false },
+        inc: { rotulo: 'Debênture incentivada / CRI / CRA', tributado: false, fgc: false },
+      };
+
+      const ROTULO_TAXA = {
+        cdi: 'Taxa oferecida (% do CDI)',
+        pre: 'Taxa oferecida (% ao ano)',
+        ipca: 'Taxa oferecida (IPCA + % ao ano)',
+      };
+
+      // Qual título público serve de régua para cada indexador. Pós-fixado
+      // em CDI compara com Tesouro Selic: são os dois que acompanham a
+      // taxa básica, então a diferença entre eles é risco de crédito puro.
+      const FAMILIA_TESOURO = { cdi: 'selic', pre: 'prefixado', ipca: 'ipca' };
+
+      let tesouro = null;
+      let bancosCarregados = false;
+
+      // ---------- Índices vivos ----------
+      function itemIndice(label) {
+        const lista = window.hgIndicesCache;
+        if (!Array.isArray(lista)) return null;
+        return lista.find(i => (i.label || '').toUpperCase() === String(label).toUpperCase()) || null;
+      }
+
+      function selicAnual() {
+        const item = itemIndice('Selic (meta)') || itemIndice('Selic');
+        return typeof item?.valor_pct === 'number' ? item.valor_pct : 13.75;
+      }
+
+      // O CDI é APURADO e publicado com ~2 dias úteis de atraso; a Selic é
+      // META e vale já no dia seguinte à reunião. Na janela logo depois de
+      // um corte do Copom o indices.json mostra um CDI ACIMA da meta, o
+      // que é impossível no mundo real — o CDI anda ~0,10 p.p. ABAIXO
+      // dela. Quando isso acontece, a meta menos o spread é a estimativa
+      // mais fiel do que o dinheiro vai render de fato.
+      const SPREAD_CDI_SELIC = 0.10;
+      function cdiAnual() {
+        const meta = selicAnual();
+        const cdi = itemIndice('CDI');
+        if (typeof cdi?.valor_pct === 'number' && cdi.valor_pct <= meta) return cdi.valor_pct;
+        return meta - SPREAD_CDI_SELIC;
+      }
+
+      // Sempre o acumulado de 12 meses, nunca o IPCA mensal isolado: o
+      // mensal multiplicado por 12 distorce demais em mês atípico.
+      function ipcaAnual() {
+        const item = itemIndice('IPCA (12 meses)');
+        if (item && typeof item.valor_pct === 'number' && typeof item.meses === 'number' && item.meses > 0) {
+          return (Math.pow(1 + item.valor_pct / 100, 12 / item.meses) - 1) * 100;
+        }
+        return 4.5;
+      }
+
+      // ---------- Conta ----------
+      function aliquotaIrRegressiva(dias) {
+        if (dias <= 180) return 22.5;
+        if (dias <= 360) return 20;
+        if (dias <= 720) return 17.5;
+        return 15;
+      }
+
+      function taxaAnualDe(indexador, taxa) {
+        if (indexador === 'cdi') return cdiAnual() * taxa / 100;
+        if (indexador === 'pre') return taxa;
+        // IPCA+ é juro sobre juro, não soma: (1+inflação) × (1+taxa real).
+        return ((1 + ipcaAnual() / 100) * (1 + taxa / 100) - 1) * 100;
+      }
+
+      function simular(valor, taxaAnualPct, dias, tributado) {
+        const bruto = valor * Math.pow(1 + taxaAnualPct / 100, dias / 365);
+        const rendimento = bruto - valor;
+        const aliquota = tributado ? aliquotaIrRegressiva(dias) : 0;
+        const ir = rendimento * aliquota / 100;
+        const liquido = bruto - ir;
+        const rentLiquidaAnual = (Math.pow(liquido / valor, 365 / dias) - 1) * 100;
+        // Ganho real é divisão, não subtração: render 13% com 4% de
+        // inflação não deixa 9% mais rico, deixa 8,65%.
+        const ganhoReal = ((1 + rentLiquidaAnual / 100) / (1 + ipcaAnual() / 100) - 1) * 100;
+        return { bruto, rendimento, aliquota, ir, liquido, rentLiquidaAnual, ganhoReal, taxaAnualPct };
+      }
+
+      function escolherTesouro(indexador, dias) {
+        const desejado = FAMILIA_TESOURO[indexador];
+        const alvo = Date.now() + dias * 86400000;
+        const candidatos = (tesouro?.titulos || []).filter(t =>
+          t && t.familia === 'comum' && t.indexador === desejado && t.vencimento);
+        if (!candidatos.length) return null;
+        const dist = (t) => Math.abs(new Date(t.vencimento + 'T00:00:00').getTime() - alvo);
+        return candidatos.reduce((melhor, t) => (dist(t) < dist(melhor) ? t : melhor));
+      }
+
+      function taxaDoTesouro(titulo) {
+        // No Tesouro Selic o campo taxa_compra NÃO é a rentabilidade: é o
+        // spread somado à Selic (0,01 a 0,07 hoje). Tratar esse número
+        // como se fosse a taxa anual faria o título público render 0,03%
+        // ao ano e o CDB ganhar de lavada em qualquer cenário.
+        if (titulo.indexador === 'selic') return selicAnual() + (titulo.taxa_compra || 0);
+        if (titulo.indexador === 'prefixado') return titulo.taxa_compra || 0;
+        return ((1 + ipcaAnual() / 100) * (1 + (titulo.taxa_compra || 0) / 100) - 1) * 100;
+      }
+
+      // Custódia descontada da taxa anual. É aproximação — ela incide
+      // sobre o saldo, que cresce ao longo do tempo — mas no prazo típico
+      // a diferença é de centavos, e deixar a custódia de fora seria um
+      // erro bem maior: ela é o custo que o Tesouro tem e o CDB não.
+      function custodiaAnualPct(titulo, valor) {
+        if (titulo.indexador === 'selic') {
+          const cobravel = Math.max(0, valor - CUSTODIA_ISENTA_SELIC);
+          return CUSTODIA_B3_PCT * (valor > 0 ? cobravel / valor : 0);
+        }
+        return CUSTODIA_B3_PCT;
+      }
+
+      // ---------- Veredito ----------
+      // A régua é a diferença de rentabilidade LÍQUIDA ANUAL contra o
+      // título público, em pontos percentuais. Os rótulos são
+      // descritivos de propósito ("paga mais que o Tesouro"), nunca
+      // prescritivos ("compre"): o site compara a oferta que o usuário
+      // trouxe, não indica onde investir.
+      function classificar(difPp) {
+        if (difPp >= 1.0) return { classe: 'vp-bom', selo: '✓', titulo: 'Paga bem mais que o Tesouro' };
+        if (difPp >= 0.3) return { classe: 'vp-bom', selo: '✓', titulo: 'Paga mais que o Tesouro' };
+        if (difPp > -0.3) return { classe: 'vp-neutro', selo: '=', titulo: 'Empata com o Tesouro' };
+        return { classe: 'vp-ruim', selo: '✕', titulo: 'Paga menos que o Tesouro' };
+      }
+
+      const pp = (v) => (v >= 0 ? '+' : '\u2212') + hgFormatNumero(Math.abs(v)) + ' p.p.';
+      const pct = (v) => hgFormatNumero(v) + '%';
+
+      function analisar() {
+        const tipo = TIPOS[selTipo.value];
+        const indexador = selIndexador.value;
+        const taxa = parseFloat(inTaxa.value);
+        const prazoNum = parseInt(inPrazo.value, 10);
+        const meses = selUnidade.value === 'anos' ? prazoNum * 12 : prazoNum;
+        const valor = hgValorMascarado(inValor);
+
+        if (!(taxa > 0)) return erro('Informe a taxa que te ofereceram.');
+        if (!(meses >= 1)) return erro('Informe o prazo até o vencimento.');
+        if (!(valor > 0)) return erro('Informe quanto você vai aplicar.');
+
+        statusEl.textContent = '';
+        const dias = Math.round(meses * 30.44);
+
+        const taxaOferta = taxaAnualDe(indexador, taxa);
+        const oferta = simular(valor, taxaOferta, dias, tipo.tributado);
+
+        const titulo = escolherTesouro(indexador, dias);
+        let referencia = null;
+        if (titulo) {
+          const custodia = custodiaAnualPct(titulo, valor);
+          referencia = simular(valor, taxaDoTesouro(titulo) - custodia, dias, true);
+          referencia.nome = titulo.nome;
+          referencia.custodia = custodia;
+          referencia.vencimento = titulo.vencimento;
+        }
+
+        render({ tipo, indexador, taxa, meses, dias, valor, oferta, referencia, titulo });
+      }
+
+      function erro(msg) {
+        statusEl.className = 'hg-status erro';
+        statusEl.textContent = msg;
+        resultadoEl.innerHTML = '';
+      }
+
+      function render(d) {
+        const { tipo, oferta, referencia, valor, dias, meses } = d;
+        const avisos = [];
+
+        let vereditoHtml = '';
+        if (referencia) {
+          const dif = oferta.rentLiquidaAnual - referencia.rentLiquidaAnual;
+          const difReais = oferta.liquido - referencia.liquido;
+          const c = classificar(dif);
+          vereditoHtml = `
+            <div class="vp-veredito ${c.classe}">
+              <div class="vp-veredito-selo">${c.selo}</div>
+              <div>
+                <div class="vp-veredito-titulo">${c.titulo}</div>
+                <div class="vp-veredito-texto">
+                  Depois do imposto, a oferta rende <strong>${pct(oferta.rentLiquidaAnual)} ao ano</strong>
+                  contra <strong>${pct(referencia.rentLiquidaAnual)}</strong> do ${referencia.nome} —
+                  diferença de ${pp(dif)} ao ano, ou <strong>${hgFormatMoeda(Math.abs(difReais))}
+                  ${difReais >= 0 ? 'a mais' : 'a menos'}</strong> no bolso ao fim dos ${meses} meses.
+                </div>
+              </div>
+            </div>`;
+        } else {
+          vereditoHtml = `
+            <div class="vp-veredito vp-neutro">
+              <div class="vp-veredito-selo">!</div>
+              <div>
+                <div class="vp-veredito-titulo">Sem título público para comparar</div>
+                <div class="vp-veredito-texto">
+                  Não consegui ler os dados do Tesouro Direto agora, então mostro só os números da oferta.
+                </div>
+              </div>
+            </div>`;
+        }
+
+        const linha = (rotulo, a, b, destaque) => `
+          <tr${destaque ? ' class="vp-destaque"' : ''}>
+            <td>${rotulo}</td>
+            <td class="vp-num">${a}</td>
+            <td class="vp-num">${referencia ? b : '—'}</td>
+          </tr>`;
+
+        const tabela = `
+          <table class="vp-tabela">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Sua oferta</th>
+                <th>${referencia ? referencia.nome : 'Tesouro'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${linha('Taxa bruta ao ano', pct(oferta.taxaAnualPct), referencia ? pct(referencia.taxaAnualPct) : '')}
+              ${linha('Rende bruto', hgFormatMoeda(oferta.rendimento), referencia ? hgFormatMoeda(referencia.rendimento) : '')}
+              ${linha('Imposto de renda', oferta.aliquota ? '\u2212 ' + hgFormatMoeda(oferta.ir) + ' (' + pct(oferta.aliquota) + ')' : 'isento',
+                      referencia ? '\u2212 ' + hgFormatMoeda(referencia.ir) + ' (' + pct(referencia.aliquota) + ')' : '')}
+              ${linha('Você resgata', hgFormatMoeda(oferta.liquido), referencia ? hgFormatMoeda(referencia.liquido) : '', true)}
+              ${linha('Rentabilidade líquida ao ano', pct(oferta.rentLiquidaAnual), referencia ? pct(referencia.rentLiquidaAnual) : '')}
+              ${linha('Ganho real (acima da inflação)', pct(oferta.ganhoReal), referencia ? pct(referencia.ganhoReal) : '')}
+            </tbody>
+          </table>`;
+
+        // ---- FGC ----
+        let fgcHtml = '';
+        if (tipo.fgc) {
+          const excedente = Math.max(0, valor - 250000);
+          fgcHtml = `
+            <div class="vp-cartao">
+              <div class="vp-cartao-titulo">Garantia do FGC</div>
+              <div class="vp-cartao-valor" style="color:${excedente > 0 ? '#eab308' : '#22c55e'};">
+                ${excedente > 0 ? hgFormatMoeda(excedente) + ' sem garantia' : 'Coberto'}
+              </div>
+              <div class="vp-cartao-nota">
+                O limite é de R$ 250 mil por CPF em cada <strong>conglomerado</strong>, somando tudo que você
+                já tem lá. Use a ferramenta Cobertura do FGC para ver o seu limite inteiro.
+              </div>
+            </div>`;
+        } else {
+          fgcHtml = `
+            <div class="vp-cartao">
+              <div class="vp-cartao-titulo">Garantia do FGC</div>
+              <div class="vp-cartao-valor" style="color:#ef4444;">Não tem</div>
+              <div class="vp-cartao-nota">
+                ${tipo.rotulo} não é coberto pelo FGC. Se o emissor quebrar, não há fundo garantidor —
+                o risco é integralmente seu.
+              </div>
+            </div>`;
+        }
+
+        // ---- Emissor / Basileia ----
+        let emissorHtml = '';
+        const inst = typeof window.vrResolverInstituicao === 'function'
+          ? window.vrResolverInstituicao(inEmissor.value) : null;
+        if (inst && inst.conhecido && window.vrBasileiaPorTicker) {
+          const b = window.vrBasileiaPorTicker[inst.ticker];
+          if (typeof b === 'number') {
+            let cor = '#22c55e', leitura = 'Folgado — bem acima do mínimo regulatório.';
+            if (b < BASILEIA_MINIMO) { cor = '#ef4444'; leitura = 'Abaixo do mínimo regulatório de 10,5%.'; }
+            else if (b < 12) { cor = '#ef4444'; leitura = 'Apertado — pouca folga sobre o mínimo de 10,5%.'; }
+            else if (b < 14) { cor = '#eab308'; leitura = 'Dentro do usual, mas sem grande folga.'; }
+            emissorHtml = `
+              <div class="vp-cartao">
+                <div class="vp-cartao-titulo">Saúde do emissor · ${inst.rotulo}</div>
+                <div class="vp-cartao-valor" style="color:${cor};">Basileia ${hgFormatNumero(b)}%</div>
+                <div class="vp-cartao-nota">${leitura} Fonte: IF.data do Banco Central.</div>
+              </div>`;
+          }
+        }
+        if (!emissorHtml && inEmissor.value.trim()) {
+          emissorHtml = `
+            <div class="vp-cartao">
+              <div class="vp-cartao-titulo">Saúde do emissor</div>
+              <div class="vp-cartao-valor" style="color:var(--muted);">Sem dado</div>
+              <div class="vp-cartao-nota">
+                Não encontrei "${inEmissor.value.trim()}" na tabela do IF.data. Confira o nome na
+                ferramenta Índice de Basileia dos Bancos.
+              </div>
+            </div>`;
+        }
+
+        // ---- Avisos ----
+        // O campo de prazo é em meses, então "dias < 30" nunca dispararia:
+        // 1 mês já vira 30 dias arredondados. A faixa do IOF importa
+        // justamente em aplicação de um mês, onde sair um dia antes
+        // dos 30 dias corridos ainda pega imposto.
+        if (meses <= 1) {
+          avisos.push('Em aplicações de cerca de um mês, resgatar antes de 30 dias corridos ainda paga IOF, que come parte do rendimento e não entra nesta conta.');
+        }
+        if (selLiquidez.value === 'diaria') {
+          avisos.push('A conta assume que você fica até o vencimento. Com liquidez diária, resgatar antes cai numa alíquota de IR maior — e no Tesouro ainda muda o preço pela marcação a mercado.');
+        }
+        if (d.indexador === 'ipca') {
+          avisos.push('Para projetar o IPCA+ usei a inflação dos últimos 12 meses (' + pct(ipcaAnual()) + '). A inflação futura vai ser outra, e isso muda os dois lados da comparação.');
+        }
+        if (d.indexador === 'cdi') {
+          avisos.push('CDI de hoje: ' + pct(cdiAnual()) + ' ao ano. Num pós-fixado o rendimento acompanha a Selic — se o Copom cortar, os dois lados caem juntos.');
+        }
+        if (!tipo.fgc) {
+          avisos.push('Sem FGC, a pergunta que importa não é quanto paga, e sim quem paga: leia o prospecto e veja o rating da emissão.');
+        }
+
+        const avisosHtml = avisos.map(a =>
+          `<div class="vp-aviso"><span aria-hidden="true">•</span><span>${a}</span></div>`).join('');
+
+        resultadoEl.innerHTML = `
+          ${vereditoHtml}
+          ${tabela}
+          <div class="vp-cartoes">${fgcHtml}${emissorHtml}</div>
+          ${avisosHtml}
+          <p class="calc-ajuda" style="margin-top:14px;">
+            Conteúdo educativo. O site analisa a oferta que você trouxe — não indica onde investir,
+            não recebe comissão de nenhuma instituição e não substitui a leitura do contrato.
+          </p>`;
+      }
+
+      // ---------- Carregamento dos dados de apoio ----------
+      async function carregarApoio() {
+        if (!tesouro) {
+          try {
+            const resp = await fetch('data/tesouro.json', { cache: 'no-store' });
+            if (resp.ok) tesouro = await resp.json();
+          } catch (e) {
+            console.warn('Vale a Pena: não consegui ler data/tesouro.json', e);
+          }
+        }
+        if (!bancosCarregados && typeof window.vrCarregarBancos === 'function') {
+          try {
+            const { bancos, basileiaPorTicker } = await window.vrCarregarBancos();
+            window.vrBasileiaPorTicker = basileiaPorTicker;
+            sugestoesEl.innerHTML = (bancos || [])
+              .map(b => '<option value="' + b.nome + '"></option>').join('');
+            bancosCarregados = true;
+          } catch (e) {
+            console.warn('Vale a Pena: não consegui ler a lista de bancos', e);
+          }
+        }
+      }
+
+      function atualizarRotuloTaxa() {
+        lblTaxa.textContent = ROTULO_TAXA[selIndexador.value] || 'Taxa oferecida';
+      }
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        carregarApoio();
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      hgAplicarMascaraMoeda(inValor, 10000);
+      atualizarRotuloTaxa();
+
+      selIndexador.addEventListener('change', () => {
+        atualizarRotuloTaxa();
+        // Trocar de indexador sem trocar o número deixaria "110" virar
+        // "110% ao ano" prefixado, que não existe. Sugere um valor
+        // plausível para o novo indexador; o campo continua editável.
+        inTaxa.value = selIndexador.value === 'cdi' ? '110'
+          : selIndexador.value === 'pre' ? hgFormatNumero(selicAnual()).replace(',', '.')
+          : '7.00';
+      });
+
+      btnAbrir.addEventListener('click', () => { fecharMenusNav(); abrirModal(); });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnAnalisar.addEventListener('click', analisar);
+      btnLimpar.addEventListener('click', () => {
+        resultadoEl.innerHTML = '';
+        statusEl.textContent = '';
+        inEmissor.value = '';
+      });
+      [inTaxa, inPrazo, inValor].forEach(el => el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); analisar(); }
+      }));
+
+      document.getElementById('vpCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'valeapena',
+          titulo: 'Vale a Pena? — Viver de Renda',
+          texto: 'Te ofereceram um CDB ou um LCI? Veja quanto rende de verdade, comparado ao Tesouro de mesmo prazo.',
+        }));
+
+      hgAbrirPorLinkDeFerramenta('valeapena', abrirModal);
     })();
 
     // ============================================================
