@@ -11139,7 +11139,28 @@
         }).join('');
 
         const restantes = ordenada.length - limite;
+
+        // Este aviso mora ANTES da tabela de propósito. Com os 1.278
+        // papéis reais do arquivo, ordenar por taxa decrescente põe no
+        // topo justamente os créditos deteriorados — papel em recuperação
+        // negociando a DI + 30% e a 40% do par. Quem bate o olho na
+        // primeira tela precisa entender isso ali, não no rodapé depois
+        // de rolar a tabela inteira.
+        const quantosComDesagio = ordenada.filter(d => typeof d.pct_par === 'number' && d.pct_par < PAR_ALERTA).length;
+        const aviso = `
+          <div class="vp-aviso" style="margin-top:14px;">
+            <span aria-hidden="true">•</span>
+            <span>Ordenado pela maior taxa de hoje — e é por isso que o topo assusta:
+            taxa alta em papel de crédito quase nunca é generosidade, é desconfiança.
+            ${quantosComDesagio > 0
+              ? `<strong>${quantosComDesagio}</strong> ${quantosComDesagio === 1 ? 'papel está negociando' : 'papéis estão negociando'} abaixo de ${PAR_ALERTA}% do valor de face` +
+                ' (marcados em vermelho na última coluna): o mercado está pedindo desconto para carregá-los.'
+              : 'Nenhum papel deste filtro está negociando com deságio relevante.'}
+            </span>
+          </div>`;
+
         conteudoEl.innerHTML = `
+          ${aviso}
           <div class="tj-scroll" style="margin-top:14px;">
             <table class="deb-tabela">
               <thead>
@@ -11172,8 +11193,7 @@
           <p class="tj-rodape">
             Fonte: ${dados.fonte || 'ANBIMA'} — data-base ${dados.data_base || '—'}.
             "Contratada" é a taxa combinada na emissão; "Taxa hoje" é onde o papel está sendo negociado agora.
-            A diferença entre as duas conta a história do crédito: o papel que foi emitido a DI + 1,75% e hoje
-            negocia a DI + 9% não ficou generoso, ficou arriscado.
+            A diferença entre as duas conta a história do crédito.
             O símbolo ↩ marca papel com cláusula de resgate antecipado — o prazo pode não ser o prazo.
             Conteúdo educativo: o site publica taxa pública, não indica onde investir.
           </p>`;
