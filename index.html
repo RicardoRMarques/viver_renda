@@ -551,6 +551,17 @@
 
     /* ---------- Cobertura do FGC ---------- */
     .calc-modal.fgc-modal { max-width: 760px; }
+    /* O "Vale a Pena?" herdava os 480px do .calc-modal, que é a largura
+       de uma calculadora de coluna única. Aqui dentro moram um
+       formulário de dois campos por linha E uma tabela comparativa de
+       três colunas — com 480px o "R$ 2.440,22" quebrava em duas linhas e
+       os rótulos dos campos idem. */
+    .calc-modal.vp-modal { max-width: 860px; }
+    /* .cmp-btn-secundario tem flex:1 — desenhado para dividir a linha
+       meio a meio com outro botão igual, como no FGC. Aqui a linha é
+       "Analisar oferta" (largura automática) + "Limpar", e o flex:1
+       esticava o Limpar por toda a sobra dos 860px. */
+    .vp-modal .cmp-acoes-linha .cmp-btn-secundario { flex: 0 0 auto; min-width: 120px; }
     .fgc-add-linha { display: flex; gap: 8px; flex-wrap: wrap; }
     .fgc-add-linha input { flex: 1 1 200px; min-width: 0; }
     .fgc-add-linha input.fgc-valor { flex: 0 1 150px; }
@@ -3449,6 +3460,13 @@
     .vp-tabela th:first-child, .vp-tabela td:first-child { text-align: left; }
     .vp-tabela thead th { color: var(--primary); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
     .vp-tabela td.vp-num { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+    /* Números não quebram no meio — mas só a partir da largura em que
+       isso cabe. No celular a quebra continua sendo o comportamento
+       certo: o modal tem overflow-x hidden, então forçar nowrap lá
+       cortaria a coluna da direita em vez de deixá-la rolar. */
+    @media (min-width: 680px) {
+      .vp-tabela th, .vp-tabela td.vp-num { white-space: nowrap; }
+    }
     .vp-tabela tr.vp-destaque td { font-weight: 700; background: var(--zebra); }
 
     .vp-cartoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px; margin-top: 14px; }
@@ -5925,7 +5943,7 @@
   </div>
 
   <div id="vpOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="vpTitulo" hidden>
-    <div class="calc-modal">
+    <div class="calc-modal vp-modal">
       <div class="calc-modal-topo">
         <h3 id="vpTitulo">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M12 3v18"></path><path d="M5 7h14"></path><path d="M5 7l-3 6a3.5 3.5 0 0 0 6 0z"></path><path d="M19 7l3 6a3.5 3.5 0 0 1-6 0z"></path><path d="M8 21h8"></path></svg>Vale a Pena?
