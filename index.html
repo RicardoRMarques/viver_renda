@@ -1393,6 +1393,11 @@
       color: var(--muted);
     }
     .hg-chip:hover { color: var(--primary); border-color: var(--primary); }
+    /* O estado "selecionado" do chip nunca teve estilo: os filtros de
+       familia do Tesouro Direto ja aplicavam a classe .ativo, mas nada
+       no CSS respondia por ela — o usuario nao via qual filtro estava
+       valendo. Mesmo tratamento dos chips da lista de mercado. */
+    .hg-chip.ativo { color: var(--primary); border-color: var(--primary); background: rgba(49,195,255,0.10); }
 
     /* Grid: consultas (esquerda, compactas) + boletim de mercado (canto direito).
        max-width igual ao do .container (1200px) — antes estava em 1100px,
@@ -3319,6 +3324,33 @@
       #financPrintArea { display: block; position: absolute; top: 0; left: 0; width: 100%; }
     }
 
+    /* "Qual é uma taxa justa hoje?" — o piso vindo do Tesouro */
+    .tj-intro { max-width: 900px; }
+    .tj-valor-linha { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+    .tj-valor-rotulo { font-size: 0.82rem; color: var(--muted); }
+    .tj-chip { cursor: pointer; }
+
+    .tj-bloco { margin-top: 22px; }
+    .tj-bloco-titulo { font-weight: 700; font-size: 0.98rem; margin-bottom: 4px; }
+    .tj-bloco-sub { font-size: 0.82rem; color: var(--muted); line-height: 1.5; margin-bottom: 10px; max-width: 900px; }
+
+    .tj-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tj-tabela { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 0.85rem; }
+    .tj-tabela th, .tj-tabela td { padding: 9px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+    .tj-tabela th:first-child, .tj-tabela td:first-child { text-align: left; }
+    .tj-tabela thead th { color: var(--primary); font-weight: 700; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .tj-tabela tbody tr:nth-child(odd) { background: var(--zebra); }
+    .tj-tabela td.tj-num { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
+    .tj-tabela td.tj-piso { font-weight: 700; color: var(--accent); }
+
+    .tj-chamada {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      margin-top: 24px; padding: 14px 16px; border-radius: 12px;
+      border: 1px solid var(--border); background: var(--card);
+    }
+    .tj-chamada span { display: block; font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    .tj-rodape { font-size: 0.78rem; color: var(--muted); line-height: 1.55; margin-top: 14px; }
+
     /* "Vale a Pena?" — análise de uma oferta de renda fixa */
     .vp-veredito {
       display: flex; align-items: flex-start; gap: 12px;
@@ -3743,6 +3775,7 @@
             <button type="button" class="nav-dropdown-item" id="fgcBtnAbrir">
               <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC
             </button>
+            <a class="nav-dropdown-item" href="#taxa-justa"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="16" y1="20" x2="16" y2="14"></line><line x1="22" y1="20" x2="2" y2="20"></line></svg> Qual é uma taxa justa hoje?</a>
             <button type="button" class="nav-dropdown-item" id="vpBtnAbrir">
               <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"></path><path d="M5 7h14"></path><path d="M5 7l-3 6a3.5 3.5 0 0 0 6 0z"></path><path d="M19 7l3 6a3.5 3.5 0 0 1-6 0z"></path><path d="M8 21h8"></path></svg> Vale a Pena? — Analise uma oferta
             </button>
@@ -3819,6 +3852,7 @@
     <div class="mobile-menu-separador">Renda Fixa</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirCalculadoraMenu"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="9" y1="21" x2="9" y2="10"></line><line x1="15" y1="21" x2="15" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Calculadora Renda Fixa</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
+    <a class="mobile-menu-item" href="#taxa-justa"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="16" y1="20" x2="16" y2="14"></line><line x1="22" y1="20" x2="2" y2="20"></line></svg> Qual é uma taxa justa hoje?</a>
     <a class="mobile-menu-item" href="#tesouro-direto"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="12" y1="21" x2="12" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Tesouro Direto</a>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="fgcBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC</button>
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
@@ -4101,6 +4135,48 @@
         <table class="tesouro-tabela" id="tesouroTabela"></table>
       </div>
       <p class="tesouro-rodape" id="tesouroRodape"></p>
+    </section>
+
+    <section class="hg-busca" id="taxa-justa" hidden>
+      <div class="tesouro-topo">
+        <h2 class="hg-titulo">
+          <svg class="hg-titulo-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="16" y1="20" x2="16" y2="14"></line><line x1="22" y1="20" x2="2" y2="20"></line></svg>Qual é uma taxa justa hoje?
+        </h2>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="tjCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta página" title="Compartilhar o link desta página">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button type="button" class="lista-mercado-fechar" data-fechar-secao="taxa-justa" aria-label="Fechar">✕</button>
+        </div>
+      </div>
+
+      <p class="calc-ajuda tj-intro">
+        Todo CDB, LCI ou debênture compete com o mesmo concorrente: o <strong>Tesouro Direto</strong>, que
+        tem risco de governo e está sempre disponível. Se um título privado não paga mais que o público de
+        prazo parecido, ele está cobrando risco de crédito sem remunerar por isso. As tabelas abaixo mostram
+        esse <strong>piso</strong> — calculado com as taxas do Tesouro de hoje, já descontados o imposto de
+        renda e a taxa de custódia da B3.
+      </p>
+
+      <div class="tj-valor-linha">
+        <span class="tj-valor-rotulo">Considerando um aporte de</span>
+        <span class="hg-chip tj-chip ativo" data-valor="10000">R$ 10 mil</span>
+        <span class="hg-chip tj-chip" data-valor="50000">R$ 50 mil</span>
+        <span class="hg-chip tj-chip" data-valor="100000">R$ 100 mil</span>
+      </div>
+
+      <div id="tjStatus" class="hg-status"></div>
+      <div id="tjConteudo"></div>
+
+      <div class="tj-chamada">
+        <div>
+          <strong>Tem uma oferta específica na mão?</strong>
+          <span>O "Vale a Pena?" faz a conta com os números exatos que te ofereceram — e ainda mostra a Basileia do emissor.</span>
+        </div>
+        <button type="button" class="hg-btn" id="tjAbrirValeAPena">Analisar minha oferta</button>
+      </div>
     </section>
 
     <section class="section-noticias-mercado" id="noticias-mercado">
@@ -10563,7 +10639,253 @@
           texto: 'Te ofereceram um CDB ou um LCI? Veja quanto rende de verdade, comparado ao Tesouro de mesmo prazo.',
         }));
 
+      // Publicado para a seção "Qual é uma taxa justa hoje?", que responde
+      // a mesma pergunta na direção contrária: em vez de julgar UMA oferta,
+      // calcula qual é o piso que qualquer oferta precisa bater. As duas
+      // telas PRECISAM concordar — uma oferta exatamente no piso tem que
+      // dar "empata com o Tesouro" aqui. Só há um jeito de garantir isso:
+      // ser literalmente a mesma conta, e não duas cópias que um dia
+      // divergem.
+      window.vrRendaFixa = {
+        selicAnual, cdiAnual, ipcaAnual,
+        aliquotaIrRegressiva, taxaDoTesouro, custodiaAnualPct, escolherTesouro,
+        carregarTesouro: async () => { await carregarApoio(); return tesouro; },
+      };
+
       hgAbrirPorLinkDeFerramenta('valeapena', abrirModal);
+    })();
+
+    // ============================================================
+    // "QUAL É UMA TAXA JUSTA HOJE?" — a Fase 2 do "Vale a Pena?".
+    //
+    // Lá o usuário traz uma oferta e a gente julga. Aqui é a pergunta na
+    // direção contrária, e é a que ele faz ANTES de ligar para a
+    // corretora: "quanto é razoável pedir?". A resposta sai inteira de
+    // dado público — não precisa de base de taxas de CDB nenhuma.
+    //
+    // A conta é toda a MESMA do "Vale a Pena?" (window.vrRendaFixa), de
+    // propósito: uma oferta exatamente no piso desta tabela tem que dar
+    // "empata com o Tesouro" lá. Se fossem duas implementações, um dia
+    // divergiriam e o site passaria a se contradizer sozinho.
+    // ============================================================
+    (function () {
+      const secao = document.getElementById('taxa-justa');
+      const conteudoEl = document.getElementById('tjConteudo');
+      const statusEl = document.getElementById('tjStatus');
+      if (!secao || !conteudoEl) return;
+
+      const PRAZOS = [3, 6, 12, 24, 36, 60];
+      let valorRef = 10000;
+      let jaRenderizou = false;
+
+      const pct = (v) => hgFormatNumero(v) + '%';
+
+      // ---------- O piso ----------
+      // Recebe o título público de referência e devolve o quanto um
+      // título privado precisa render, BRUTO, para o investidor terminar
+      // com o mesmo dinheiro no bolso.
+      //
+      // Duas identidades fazem a conta ficar curta:
+      //
+      // 1. CDB e Tesouro pagam a MESMA alíquota de IR no mesmo prazo, e o
+      //    imposto incide sobre o ganho dos dois. Então o imposto se
+      //    cancela: basta o CDB empatar a taxa BRUTA do título público já
+      //    descontada a custódia da B3.
+      //
+      // 2. O LCI é isento. Para ele empatar, o BRUTO dele precisa igualar
+      //    o LÍQUIDO do Tesouro — que é exatamente a "rentabilidade
+      //    líquida ao ano" da coluna ao lado. Por isso os dois números
+      //    são o mesmo valor visto de dois ângulos.
+      function calcularPiso(titulo, dias) {
+        const RF = window.vrRendaFixa;
+        const custodia = RF.custodiaAnualPct(titulo, valorRef);
+        const taxaBrutaT = RF.taxaDoTesouro(titulo) - custodia;
+        const ir = RF.aliquotaIrRegressiva(dias) / 100;
+        const anos = dias / 365;
+
+        const ganhoBruto = Math.pow(1 + taxaBrutaT / 100, anos) - 1;
+        const ganhoLiquido = ganhoBruto * (1 - ir);
+        // Taxa anual equivalente ao que sobra depois do imposto.
+        const liquidaAnual = (Math.pow(1 + ganhoLiquido, 1 / anos) - 1) * 100;
+
+        return { custodia, taxaBrutaT, ir: ir * 100, liquidaAnual, pisoTributado: taxaBrutaT, pisoIsento: liquidaAnual };
+      }
+
+      // ---------- Tabela A: pós-fixado ----------
+      function tabelaPosFixado() {
+        const RF = window.vrRendaFixa;
+        const cdi = RF.cdiAnual();
+        const linhas = PRAZOS.map(meses => {
+          const dias = Math.round(meses * 30.44);
+          const titulo = RF.escolherTesouro('cdi', dias);
+          if (!titulo) return '';
+          const p = calcularPiso(titulo, dias);
+          const rotulo = meses < 12 ? meses + ' meses' : (meses / 12) + (meses === 12 ? ' ano' : ' anos');
+          return `
+            <tr>
+              <td>${rotulo}</td>
+              <td class="tj-num">${pct(p.ir)}</td>
+              <td>${titulo.nome}</td>
+              <td class="tj-num">${pct(p.liquidaAnual)}</td>
+              <td class="tj-num tj-piso">${pct(p.pisoTributado / cdi * 100)} do CDI</td>
+              <td class="tj-num tj-piso">${pct(p.pisoIsento / cdi * 100)} do CDI</td>
+            </tr>`;
+        }).join('');
+
+        return `
+          <div class="tj-bloco">
+            <div class="tj-bloco-titulo">Pós-fixado — quanto um título privado precisa pagar do CDI</div>
+            <div class="tj-bloco-sub">
+              Abaixo desses números, o título privado rende menos que o Tesouro Selic e ainda carrega risco de
+              crédito. O CDI de hoje é ${pct(cdi)} ao ano. Repare que o piso do LCI/LCA é bem menor: ele é
+              isento de imposto, então precisa de menos taxa bruta para entregar o mesmo dinheiro.
+            </div>
+            <div class="tj-scroll">
+              <table class="tj-tabela">
+                <thead>
+                  <tr>
+                    <th>Prazo</th>
+                    <th>IR no período</th>
+                    <th>Referência</th>
+                    <th>Tesouro líquido a.a.</th>
+                    <th>CDB / RDB precisa</th>
+                    <th>LCI / LCA precisa</th>
+                  </tr>
+                </thead>
+                <tbody>${linhas}</tbody>
+              </table>
+            </div>
+          </div>`;
+      }
+
+      // ---------- Tabela B: prefixado e IPCA+ ----------
+      // Aqui não dá para falar em "% do CDI": o piso É a taxa do título
+      // público de vencimento equivalente. Um título por linha, porque a
+      // taxa do Tesouro muda bastante de um vencimento para o outro.
+      function tabelaPrefixadoEIpca(tesouro) {
+        const RF = window.vrRendaFixa;
+        const ipca = RF.ipcaAnual();
+        const hoje = Date.now();
+
+        const titulos = (tesouro?.titulos || [])
+          .filter(t => t && t.familia === 'comum' && (t.indexador === 'prefixado' || t.indexador === 'ipca') && t.vencimento)
+          .map(t => ({ ...t, dias: Math.round((new Date(t.vencimento + 'T00:00:00').getTime() - hoje) / 86400000) }))
+          .filter(t => t.dias > 30)
+          .sort((a, b) => a.dias - b.dias)
+          .slice(0, 8);
+
+        if (!titulos.length) return '';
+
+        const linhas = titulos.map(t => {
+          const p = calcularPiso(t, t.dias);
+          // No IPCA+ o que se compara é a taxa REAL (o pedaço acima da
+          // inflação), porque a inflação vai ser a mesma nos dois títulos.
+          // Voltar do total para o real é divisão, não subtração.
+          const paraReal = (total) => ((1 + total / 100) / (1 + ipca / 100) - 1) * 100;
+          const ehIpca = t.indexador === 'ipca';
+          const fmt = (v) => ehIpca ? 'IPCA + ' + pct(paraReal(v)) : pct(v);
+          const anos = (t.dias / 365).toFixed(1).replace('.', ',');
+          return `
+            <tr>
+              <td>${t.nome}</td>
+              <td class="tj-num">${anos} anos</td>
+              <td class="tj-num">${ehIpca ? 'IPCA + ' + pct(t.taxa_compra) : pct(t.taxa_compra)}</td>
+              <td class="tj-num tj-piso">${fmt(p.pisoTributado)}</td>
+              <td class="tj-num tj-piso">${fmt(p.pisoIsento)}</td>
+            </tr>`;
+        }).join('');
+
+        return `
+          <div class="tj-bloco">
+            <div class="tj-bloco-titulo">Prefixado e IPCA+ — o piso vem do título público de prazo parecido</div>
+            <div class="tj-bloco-sub">
+              Um CDB prefixado de 3 anos compete com o Tesouro Prefixado de vencimento próximo, não com o CDI.
+              As duas últimas colunas já descontam a custódia da B3 e, no caso do isento, o imposto que o
+              título público paga e o LCI não.
+            </div>
+            <div class="tj-scroll">
+              <table class="tj-tabela">
+                <thead>
+                  <tr>
+                    <th>Título público</th>
+                    <th>Prazo</th>
+                    <th>Taxa hoje</th>
+                    <th>CDB precisa pagar mais que</th>
+                    <th>LCI / CRI / CRA precisa pagar mais que</th>
+                  </tr>
+                </thead>
+                <tbody>${linhas}</tbody>
+              </table>
+            </div>
+          </div>`;
+      }
+
+      async function renderizar() {
+        const RF = window.vrRendaFixa;
+        if (!RF) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Não consegui carregar a base de cálculo. Recarregue a página.';
+          return;
+        }
+        statusEl.textContent = 'Calculando com as taxas do Tesouro de hoje...';
+        let tesouro = null;
+        try {
+          tesouro = await RF.carregarTesouro();
+        } catch (e) { /* tratado abaixo */ }
+
+        if (!tesouro?.titulos?.length) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Os dados do Tesouro Direto não estão disponíveis agora. Tente de novo em instantes.';
+          conteudoEl.innerHTML = '';
+          return;
+        }
+
+        statusEl.textContent = '';
+        statusEl.className = 'hg-status';
+
+        const dataBase = tesouro.data_base || tesouro.atualizado_em || '';
+        conteudoEl.innerHTML = `
+          ${tabelaPosFixado()}
+          ${tabelaPrefixadoEIpca(tesouro)}
+          <p class="tj-rodape">
+            Taxas do Tesouro Direto${dataBase ? ' de ' + dataBase : ''}, Selic e IPCA do Banco Central.
+            A custódia da B3 (0,20% ao ano, isenta no Tesouro Selic até R$ 10 mil por CPF) já está descontada —
+            é por isso que o piso muda conforme o valor do aporte.
+            Conteúdo educativo: o site compara taxas públicas, não indica onde investir e não recebe comissão
+            de nenhuma instituição.
+          </p>`;
+        jaRenderizou = true;
+      }
+
+      // Renderiza só quando a seção aparece — ela nasce hidden, e calcular
+      // tabela para ninguém ver custaria uma leitura do tesouro.json em
+      // toda visita à home.
+      function revelar() {
+        if (!jaRenderizou) renderizar();
+      }
+
+      document.querySelectorAll('a[href="#taxa-justa"]').forEach(link =>
+        link.addEventListener('click', revelar));
+      if (window.location.hash === '#taxa-justa') revelar();
+
+      secao.querySelectorAll('.tj-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          secao.querySelectorAll('.tj-chip').forEach(c => c.classList.toggle('ativo', c === chip));
+          valorRef = Number(chip.dataset.valor) || 10000;
+          if (jaRenderizou) renderizar();
+        });
+      });
+
+      document.getElementById('tjAbrirValeAPena')?.addEventListener('click', () => {
+        document.getElementById('vpBtnAbrir')?.click();
+      });
+
+      document.getElementById('tjCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          hash: 'taxa-justa',
+          titulo: 'Qual é uma taxa justa hoje? — Viver de Renda',
+          texto: 'Quanto um CDB ou LCI precisa pagar hoje para valer mais que o Tesouro Direto.',
+        }));
     })();
 
     // ============================================================
@@ -15493,14 +15815,14 @@
         atualizarCabecalhoFixoListaMercado(secao);
       });
     }
-    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#tesouro-direto"]').forEach(link => {
+    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#tesouro-direto"], a[href="#taxa-justa"]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         revelarSecaoMercado(link.getAttribute('href').slice(1));
       });
     });
     // Link direto (compartilhado ou digitado na barra de endereço)
-    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto'].includes(window.location.hash)) {
+    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#taxa-justa'].includes(window.location.hash)) {
       revelarSecaoMercado(window.location.hash.slice(1));
     }
     // Botão "✕" no topo de cada lista — esconde a seção de novo e rola
