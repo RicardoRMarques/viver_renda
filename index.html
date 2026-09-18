@@ -3336,6 +3336,28 @@
       font-family: inherit; font-size: 0.85rem;
     }
     .deb-busca:focus { outline: none; border-color: var(--primary); }
+    /* O botão de limpar mora DENTRO do campo, então o wrapper precisa ser
+       a referência de posicionamento e o input precisa de espaço à
+       direita para o texto não passar por baixo do ✕. */
+    .deb-busca-wrap { position: relative; flex: 1 1 260px; min-width: 0; display: flex; }
+    .deb-busca-wrap .deb-busca { flex: 1 1 auto; padding-right: 34px; }
+    .deb-busca-limpar {
+      position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+      width: 22px; height: 22px; border-radius: 50%;
+      border: none; background: transparent; color: var(--muted);
+      font-size: 0.72rem; line-height: 1; cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .deb-busca-limpar:hover { color: var(--primary); background: var(--zebra); }
+    .deb-busca-limpar[hidden] { display: none; }
+
+    /* Setas de ordenação — mesmas da lista de mercado, que já são o
+       vocabulário visual do site para "esta coluna ordena". */
+    .deb-tabela thead th.deb-ord { cursor: pointer; user-select: none; }
+    .deb-tabela thead th.deb-ord::after { content: ' ⇅'; opacity: 0.45; font-size: 0.7em; }
+    .deb-tabela thead th.deb-ord.ordenado-asc::after { content: ' ▲'; color: var(--primary); font-size: 0.65em; opacity: 1; }
+    .deb-tabela thead th.deb-ord.ordenado-desc::after { content: ' ▼'; color: var(--primary); font-size: 0.65em; opacity: 1; }
+    .deb-tabela thead th.deb-ord:hover { color: var(--text); }
 
     .deb-resumo { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
     .deb-resumo-item {
@@ -3361,8 +3383,12 @@
        Corta com reticências e o nome inteiro fica no title. */
     .deb-tabela td.deb-emissor { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
     .deb-alerta { color: var(--danger); }
+    .deb-link-acao {
+      border: none; background: none; padding: 0; margin-left: 4px;
+      color: var(--primary); text-decoration: underline; cursor: pointer;
+      font-family: inherit; font-size: inherit;
+    }
 
-    .deb-mais { display: block; margin: 12px auto 0; }
 
     /* "Qual é uma taxa justa hoje?" — o piso vindo do Tesouro */
     .tj-intro { max-width: 900px; }
@@ -4256,7 +4282,10 @@
           <span class="hg-chip deb-chip" data-indexador="di">DI +</span>
           <span class="hg-chip deb-chip" data-indexador="igpm">IGP-M +</span>
         </div>
-        <input type="text" id="debBusca" class="deb-busca" placeholder="Buscar por emissor ou código (ex: Comgás, AALM12)" autocomplete="off" />
+        <div class="deb-busca-wrap">
+          <input type="text" id="debBusca" class="deb-busca" placeholder="Buscar por emissor ou código (ex: Comgás, AALM12)" autocomplete="off" />
+          <button type="button" id="debBuscaLimpar" class="deb-busca-limpar" aria-label="Limpar busca" title="Limpar busca" hidden>✕</button>
+        </div>
       </div>
 
       <div id="debStatus" class="hg-status"></div>
@@ -11001,9 +11030,12 @@
       const statusEl = document.getElementById('debStatus');
       const rodapeEl = document.getElementById('debRodape');
       const buscaEl = document.getElementById('debBusca');
+      const btnLimparBusca = document.getElementById('debBuscaLimpar');
       if (!secao || !conteudoEl) return;
 
-      const LIMITE_INICIAL = 40;
+      // 22 por página: cabe numa tela sem rolagem infinita e deixa a
+      // paginação visível sem precisar rolar até o fim de 1.278 papéis.
+      const POR_PAGINA = 22;
       // Abaixo disso o papel está sendo negociado com deságio relevante
       // sobre o valor de face — quase sempre porque o mercado duvida do
       // emissor, não porque está barato por acaso.
@@ -11011,8 +11043,26 @@
 
       let dados = null;
       let indexador = 'todos';
-      let limite = LIMITE_INICIAL;
+      let pagina = 1;
       let carregando = null;
+
+      // Ordenação corrente. Começa pela taxa de hoje, decrescente, que é
+      // o que a pessoa vem procurar — com a ressalva, no aviso acima da
+      // tabela, de que taxa alta em crédito é desconfiança, não bondade.
+      let ordem = { coluna: 'taxa_indicativa', desc: true };
+
+      // Cada coluna e como ela ordena. 'texto' usa comparação de string
+      // com localeCompare (para "Ãguas" não cair depois de "Zurich");
+      // 'numero' e 'data' comparam direto.
+      const COLUNAS = [
+        { chave: 'codigo',           rotulo: 'Código',     tipo: 'texto'  },
+        { chave: 'emissor',          rotulo: 'Emissor',    tipo: 'texto'  },
+        { chave: 'vencimento',       rotulo: 'Vencimento', tipo: 'data'   },
+        { chave: 'duration_anos',    rotulo: 'Duration',   tipo: 'numero' },
+        { chave: 'taxa_contratada',  rotulo: 'Contratada', tipo: 'numero' },
+        { chave: 'taxa_indicativa',  rotulo: 'Taxa hoje',  tipo: 'numero' },
+        { chave: 'pct_par',          rotulo: '% do par',   tipo: 'numero' },
+      ];
 
       const pct = (v) => hgFormatNumero(v) + '%';
       const normalizar = (t) => (t || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
@@ -11108,22 +11158,90 @@
           </div>`;
       }
 
+      // Ordena SEM tirar da lista quem não tem o dado. Nulo vai sempre
+      // para o fim, nas duas direções: um papel que não negociou hoje não
+      // pode saltar para o topo só porque alguém clicou em "crescente".
+      function ordenar(lista) {
+        const col = COLUNAS.find(c => c.chave === ordem.coluna) || COLUNAS[5];
+        const sinal = ordem.desc ? -1 : 1;
+        return [...lista].sort((a, b) => {
+          const va = a[col.chave], vb = b[col.chave];
+          const va_vazio = va === null || va === undefined || va === '';
+          const vb_vazio = vb === null || vb === undefined || vb === '';
+          if (va_vazio && vb_vazio) return 0;
+          if (va_vazio) return 1;
+          if (vb_vazio) return -1;
+          if (col.tipo === 'texto') return sinal * String(va).localeCompare(String(vb), 'pt-BR');
+          if (col.tipo === 'data') return sinal * (va < vb ? -1 : va > vb ? 1 : 0);
+          return sinal * (va - vb);
+        });
+      }
+
+      function montarPaginacao(total) {
+        const paginas = Math.max(1, Math.ceil(total / POR_PAGINA));
+        if (paginas === 1) return '';
+        // Janela de páginas em volta da atual. Com 1.278 papéis são ~58
+        // páginas — enfileirar todas viraria uma parede de botões.
+        const inicio = Math.max(1, Math.min(pagina - 2, paginas - 4));
+        const fim = Math.min(paginas, Math.max(pagina + 2, 5));
+        const botoes = [];
+        for (let p = inicio; p <= fim; p++) {
+          botoes.push(`<button type="button" data-pagina="${p}"${p === pagina ? ' class="ativo"' : ''}>${p}</button>`);
+        }
+        return `
+          <div class="lista-mercado-paginacao">
+            <button type="button" data-pagina="1" ${pagina === 1 ? 'disabled' : ''} aria-label="Primeira página">«</button>
+            <button type="button" data-pagina="${pagina - 1}" ${pagina === 1 ? 'disabled' : ''} aria-label="Página anterior">‹</button>
+            ${botoes.join('')}
+            <button type="button" data-pagina="${pagina + 1}" ${pagina === paginas ? 'disabled' : ''} aria-label="Próxima página">›</button>
+            <button type="button" data-pagina="${paginas}" ${pagina === paginas ? 'disabled' : ''} aria-label="Última página">»</button>
+            <span class="lm-pagina-info">página ${pagina} de ${paginas} · ${total} ${total === 1 ? 'papel' : 'papéis'}</span>
+          </div>`;
+      }
+
       function montarTabela(lista) {
         if (!lista.length) {
-          conteudoEl.innerHTML = '<p class="hg-status">Nenhum papel encontrado com esse filtro.</p>';
+          // Zero resultado quase sempre é a busca cruzada com um filtro
+          // de indexador que não combina (buscar um papel DI com o chip
+          // IPCA+ ligado). Em vez de um beco sem saída, a mensagem diz o
+          // que aconteceu e oferece a saída em um clique.
+          const busca = buscaEl.value.trim();
+          const chip = { todos: 'Todos', di: 'DI +', ipca: 'IPCA +', igpm: 'IGP-M +' }[indexador] || indexador;
+          conteudoEl.innerHTML = busca && indexador !== 'todos'
+            ? `<p class="hg-status">Nenhum papel com <strong>${busca}</strong> dentro de <strong>${chip}</strong>.
+                 <button type="button" class="deb-link-acao" id="debVerEmTodos">Procurar em todos os indexadores</button></p>`
+            : `<p class="hg-status">Nenhum papel encontrado com esse filtro.</p>`;
+          document.getElementById('debVerEmTodos')?.addEventListener('click', () => {
+            selecionarChip('todos', { manterBusca: true });
+          });
           return;
         }
 
-        // Ordena por taxa do dia, maior primeiro — é o que a pessoa vem
-        // procurar. Quem não negociou hoje vai para o fim, em vez de
-        // sumir: "não teve negócio" também é informação.
-        const ordenada = [...lista].sort((a, b) => {
-          const ta = typeof a.taxa_indicativa === 'number' ? a.taxa_indicativa : -Infinity;
-          const tb = typeof b.taxa_indicativa === 'number' ? b.taxa_indicativa : -Infinity;
-          return tb - ta;
-        });
+        const ordenada = ordenar(lista);
+        const paginas = Math.max(1, Math.ceil(ordenada.length / POR_PAGINA));
+        if (pagina > paginas) pagina = paginas;
+        const daPagina = ordenada.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
 
-        const linhas = ordenada.slice(0, limite).map(d => {
+        const quantosComDesagio = ordenada.filter(d => typeof d.pct_par === 'number' && d.pct_par < PAR_ALERTA).length;
+        const porTaxaDesc = ordem.coluna === 'taxa_indicativa' && ordem.desc;
+        const aviso = porTaxaDesc ? `
+          <div class="vp-aviso" style="margin-top:14px;">
+            <span aria-hidden="true">•</span>
+            <span>Ordenado pela maior taxa de hoje — e é por isso que o topo assusta:
+            taxa alta em papel de crédito quase nunca é generosidade, é desconfiança.
+            ${quantosComDesagio > 0
+              ? `<strong>${quantosComDesagio}</strong> ${quantosComDesagio === 1 ? 'papel está negociando' : 'papéis estão negociando'} abaixo de ${PAR_ALERTA}% do valor de face` +
+                ' (marcados em vermelho na última coluna): o mercado está pedindo desconto para carregá-los.'
+              : 'Nenhum papel deste filtro está negociando com deságio relevante.'}
+            </span>
+          </div>` : '';
+
+        const cabecalho = COLUNAS.map(c => {
+          const classe = 'deb-ord' + (ordem.coluna === c.chave ? (ordem.desc ? ' ordenado-desc' : ' ordenado-asc') : '');
+          return `<th class="${classe}" data-coluna="${c.chave}" title="Ordenar por ${c.rotulo}">${c.rotulo}</th>`;
+        }).join('');
+
+        const linhas = daPagina.map(d => {
           const abaixoDoPar = typeof d.pct_par === 'number' && d.pct_par < PAR_ALERTA;
           const venc = d.vencimento ? d.vencimento.split('-').reverse().join('/') : '—';
           return `
@@ -11138,55 +11256,65 @@
             </tr>`;
         }).join('');
 
-        const restantes = ordenada.length - limite;
-
-        // Este aviso mora ANTES da tabela de propósito. Com os 1.278
-        // papéis reais do arquivo, ordenar por taxa decrescente põe no
-        // topo justamente os créditos deteriorados — papel em recuperação
-        // negociando a DI + 30% e a 40% do par. Quem bate o olho na
-        // primeira tela precisa entender isso ali, não no rodapé depois
-        // de rolar a tabela inteira.
-        const quantosComDesagio = ordenada.filter(d => typeof d.pct_par === 'number' && d.pct_par < PAR_ALERTA).length;
-        const aviso = `
-          <div class="vp-aviso" style="margin-top:14px;">
-            <span aria-hidden="true">•</span>
-            <span>Ordenado pela maior taxa de hoje — e é por isso que o topo assusta:
-            taxa alta em papel de crédito quase nunca é generosidade, é desconfiança.
-            ${quantosComDesagio > 0
-              ? `<strong>${quantosComDesagio}</strong> ${quantosComDesagio === 1 ? 'papel está negociando' : 'papéis estão negociando'} abaixo de ${PAR_ALERTA}% do valor de face` +
-                ' (marcados em vermelho na última coluna): o mercado está pedindo desconto para carregá-los.'
-              : 'Nenhum papel deste filtro está negociando com deságio relevante.'}
-            </span>
-          </div>`;
-
         conteudoEl.innerHTML = `
           ${aviso}
           <div class="tj-scroll" style="margin-top:14px;">
             <table class="deb-tabela">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Emissor</th>
-                  <th>Vencimento</th>
-                  <th>Duration</th>
-                  <th>Contratada</th>
-                  <th>Taxa hoje</th>
-                  <th>% do par</th>
-                </tr>
-              </thead>
+              <thead><tr>${cabecalho}</tr></thead>
               <tbody>${linhas}</tbody>
             </table>
           </div>
-          ${restantes > 0 ? `<button type="button" class="cmp-btn-secundario deb-mais" id="debVerMais">Ver mais ${Math.min(restantes, LIMITE_INICIAL)} (de ${restantes} restantes)</button>` : ''}`;
+          ${montarPaginacao(ordenada.length)}`;
 
-        document.getElementById('debVerMais')?.addEventListener('click', () => {
-          limite += LIMITE_INICIAL;
-          montarTabela(lista);
+        conteudoEl.querySelectorAll('th.deb-ord').forEach(th => {
+          th.addEventListener('click', () => {
+            const chave = th.dataset.coluna;
+            // Reclicar a mesma coluna inverte; trocar de coluna começa
+            // decrescente nas numéricas (maior primeiro é o que se espera
+            // de taxa e duration) e crescente nas de texto e data.
+            if (ordem.coluna === chave) {
+              ordem.desc = !ordem.desc;
+            } else {
+              const col = COLUNAS.find(c => c.chave === chave);
+              ordem = { coluna: chave, desc: col && col.tipo === 'numero' };
+            }
+            pagina = 1;
+            render();
+          });
+        });
+
+        conteudoEl.querySelectorAll('.lista-mercado-paginacao button[data-pagina]').forEach(botao => {
+          botao.addEventListener('click', () => {
+            const alvo = Number(botao.dataset.pagina);
+            if (!alvo || alvo === pagina) return;
+            pagina = alvo;
+            render();
+            // Volta ao topo da tabela: trocar de página e continuar vendo
+            // o rodapé é desorientador.
+            conteudoEl.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+          });
+        });
+      }
+
+      // Contagem em cada chip. Foi o que faltava na tela anterior: com
+      // uma busca ativa, clicar num indexador que não tem aquele papel
+      // devolvia uma tela vazia sem explicação, e parecia filtro
+      // quebrado. Com o número ao lado, "IPCA + (0)" já conta a história
+      // antes do clique.
+      function atualizarContadores() {
+        const base = (dados?.debentures || []);
+        const busca = normalizar(buscaEl.value.trim());
+        const casaBusca = (d) => !busca || normalizar(d.emissor).includes(busca) || normalizar(d.codigo).includes(busca);
+        secao.querySelectorAll('.deb-chip').forEach(chip => {
+          const alvo = chip.dataset.indexador;
+          const quantos = base.filter(d => (alvo === 'todos' || d.indexador === alvo) && casaBusca(d)).length;
+          chip.textContent = `${chip.dataset.rotulo} (${quantos})`;
         });
       }
 
       function render() {
         const lista = filtrar();
+        atualizarContadores();
         montarResumo(lista);
         montarTabela(lista);
         rodapeEl.innerHTML = `
@@ -11237,19 +11365,55 @@
         link.addEventListener('click', carregar));
       if (window.location.hash === '#debentures') carregar();
 
+      // Guarda o rótulo original de cada chip antes de a contagem entrar
+      // nele — senão, na segunda renderização, viraria "IPCA + (659) (12)".
       secao.querySelectorAll('.deb-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          secao.querySelectorAll('.deb-chip').forEach(c => c.classList.toggle('ativo', c === chip));
-          indexador = chip.dataset.indexador;
-          limite = LIMITE_INICIAL;
-          if (dados) render();
-        });
+        chip.dataset.rotulo = chip.textContent.trim();
+      });
+
+      // manterBusca existe para um caso só, e importante: o atalho
+      // "procurar em todos os indexadores" da tela vazia. Ali a pessoa
+      // quer justamente o contrário do clique normal — guardar o que
+      // digitou e soltar o filtro de índice. Limpar a busca ali jogaria
+      // fora a pergunta dela.
+      function selecionarChip(alvo, { manterBusca = false } = {}) {
+        indexador = alvo;
+        secao.querySelectorAll('.deb-chip').forEach(c =>
+          c.classList.toggle('ativo', c.dataset.indexador === alvo));
+        // Clicar num indexador LIMPA a busca. Era a reclamação: com um
+        // código digitado no campo, trocar de indexador não mudava nada
+        // visível (o papel buscado é de um índice só), e os chips
+        // pareciam mortos. Os chips são navegação de primeiro nível;
+        // a busca é uma lupa dentro do que está selecionado. Note a
+        // assimetria: digitar NÃO desmarca o chip, então "escolher
+        // IPCA+ e depois buscar dentro dele" continua funcionando.
+        if (!manterBusca) buscaEl.value = '';
+        atualizarBotaoLimpar();
+        pagina = 1;
+        if (dados) render();
+      }
+
+      function atualizarBotaoLimpar() {
+        if (btnLimparBusca) btnLimparBusca.hidden = !buscaEl.value.trim();
+      }
+
+      secao.querySelectorAll('.deb-chip').forEach(chip => {
+        chip.addEventListener('click', () => selecionarChip(chip.dataset.indexador));
       });
 
       // Digitar refiltra na hora; a lista inteira já está na memória, não
       // há requisição nenhuma por tecla.
       buscaEl?.addEventListener('input', () => {
-        limite = LIMITE_INICIAL;
+        pagina = 1;
+        atualizarBotaoLimpar();
+        if (dados) render();
+      });
+
+      btnLimparBusca?.addEventListener('click', () => {
+        buscaEl.value = '';
+        atualizarBotaoLimpar();
+        pagina = 1;
+        buscaEl.focus();
         if (dados) render();
       });
 
