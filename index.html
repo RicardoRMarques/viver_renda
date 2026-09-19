@@ -3427,7 +3427,12 @@
       /* O código tem 6 a 7 caracteres; sem o teto ele roubava largura da
          parte da tabela que a pessoa está tentando ler. */
       .deb-tabela thead th:first-child,
-      .deb-tabela tbody td:first-child { max-width: 88px; padding-right: 8px; }
+      .deb-tabela tbody td:first-child { max-width: 104px; padding-right: 8px; }
+      /* O "?" do cabeçalho some da coluna congelada no celular: ali o
+         espaço é disputado com o próprio código e com a seta de
+         ordenação, e o alvo de toque ficaria pequeno demais para acertar
+         sem errar o botão de ordenar ao lado. As outras colunas mantêm. */
+      .deb-tabela thead th:first-child .hg-info-btn { display: none; }
       .deb-tabela { font-size: 0.78rem; }
       .deb-tabela th, .deb-tabela td { padding: 8px 7px; }
       .deb-tabela td.deb-emissor { max-width: 150px; }
@@ -11370,13 +11375,13 @@
       // com localeCompare (para "Ãguas" não cair depois de "Zurich");
       // 'numero' e 'data' comparam direto.
       const COLUNAS = [
-        { chave: 'codigo',           rotulo: 'Código',     tipo: 'texto'  },
-        { chave: 'emissor',          rotulo: 'Emissor',    tipo: 'texto'  },
-        { chave: 'vencimento',       rotulo: 'Vencimento', tipo: 'data'   },
-        { chave: 'duration_anos',    rotulo: 'Duration',   tipo: 'numero' },
-        { chave: 'taxa_contratada',  rotulo: 'Contratada', tipo: 'numero' },
-        { chave: 'taxa_indicativa',  rotulo: 'Taxa hoje',  tipo: 'numero' },
-        { chave: 'pct_par',          rotulo: '% do par',   tipo: 'numero' },
+        { chave: 'codigo',           rotulo: 'Código',     tipo: 'texto',  glos: 'deb-codigo' },
+        { chave: 'emissor',          rotulo: 'Emissor',    tipo: 'texto',  glos: 'deb-emissor' },
+        { chave: 'vencimento',       rotulo: 'Vencimento', tipo: 'data',   glos: 'deb-vencimento' },
+        { chave: 'duration_anos',    rotulo: 'Duration',   tipo: 'numero', glos: 'deb-duration' },
+        { chave: 'taxa_contratada',  rotulo: 'Contratada', tipo: 'numero', glos: 'deb-contratada' },
+        { chave: 'taxa_indicativa',  rotulo: 'Taxa hoje',  tipo: 'numero', glos: 'deb-taxa-hoje' },
+        { chave: 'pct_par',          rotulo: '% do par',   tipo: 'numero', glos: 'deb-pct-par' },
       ];
 
       const pct = (v) => hgFormatNumero(v) + '%';
@@ -11551,9 +11556,13 @@
             </span>
           </div>` : '';
 
+        // O "?" mora DENTRO do <th> que também ordena. Não há conflito: o
+        // handler do glossário chama stopPropagation, então clicar na
+        // ajuda não reordena a tabela por baixo do balão.
         const cabecalho = COLUNAS.map(c => {
           const classe = 'deb-ord' + (ordem.coluna === c.chave ? (ordem.desc ? ' ordenado-desc' : ' ordenado-asc') : '');
-          return `<th class="${classe}" data-coluna="${c.chave}" title="Ordenar por ${c.rotulo}">${c.rotulo}</th>`;
+          return `<th class="${classe}" data-coluna="${c.chave}" title="Ordenar por ${c.rotulo}">${c.rotulo}` +
+            `<button type="button" class="hg-info-btn" data-glossario="${c.glos}" aria-label="O que é ${c.rotulo}?" title="">?</button></th>`;
         }).join('');
 
         const linhas = daPagina.map(d => {
@@ -11580,6 +11589,12 @@
             </table>
           </div>
           ${montarPaginacao(ordenada.length)}`;
+
+        // O glossário do site varre [data-glossario] uma vez, no
+        // carregamento da página. Estes "?" nascem a cada render (troca de
+        // filtro, de página, de ordenação), então precisam ser ligados
+        // aqui. A função é idempotente — botão já ligado é ignorado.
+        if (typeof window.ligarGlossario === 'function') window.ligarGlossario(conteudoEl);
 
         conteudoEl.querySelectorAll('th.deb-ord').forEach(th => {
           th.addEventListener('click', () => {
@@ -14210,6 +14225,15 @@
     // ============================================================
     (function () {
       const GLOSSARIO = {
+        // --- Colunas da tabela de debêntures ---
+        'deb-codigo': 'Código da debênture no sistema da ANBIMA. As letras iniciais identificam a empresa emissora e os dígitos finais dizem qual emissão e qual série.\n\nA mesma empresa costuma ter vários papéis negociando ao mesmo tempo, com prazos e taxas diferentes — por isso a comparação é sempre por código, nunca por nome do emissor.',
+        'deb-emissor': 'A empresa que tomou o dinheiro emprestado e que vai pagar.\n\nDiferente de um CDB, aqui não existe FGC: quem honra a dívida é a companhia, e só ela. Antes de olhar a taxa, vale olhar quem é o devedor.\n\nO símbolo ↩ marca papel com cláusula de resgate antecipado — o emissor pode chamar o título de volta antes do vencimento, e aí o seu prazo acaba antes do combinado.',
+        'deb-vencimento': 'Data em que o emissor termina de devolver o valor de face.\n\nMuitas debêntures amortizam em parcelas ao longo do caminho, então você não recebe tudo só nessa data — parte do principal volta antes. É por isso que o prazo que serve para comparar dois papéis é a duration, não o vencimento.',
+        'deb-duration': 'O prazo médio em que você realmente recebe o dinheiro de volta, ponderando todos os pagamentos de juros e amortização — não só a data final.\n\nServe para duas coisas: comparar papéis de estruturas diferentes em pé de igualdade, e medir o quanto o preço balança. Quanto maior a duration, mais o preço sobe ou cai quando os juros mudam.\n\nA ANBIMA informa em dias úteis; aqui está convertido em anos (dividido por 252).',
+        'deb-contratada': 'A taxa combinada na emissão do papel. Está no contrato e não muda.\n\nEx: "DI + 1,75%" significa que o papel paga o CDI acumulado mais 1,75% ao ano sobre o valor de face.\n\nCompare sempre com a coluna "Taxa hoje" ao lado: a distância entre as duas conta o que aconteceu com esse crédito desde que ele foi emitido.',
+        'deb-taxa-hoje': 'A taxa indicativa do mercado secundário — o retorno que o mercado está exigindo HOJE para carregar esse papel.\n\nÉ onde ele negocia entre instituições, e NÃO uma oferta que você consegue comprar na sua corretora.\n\nBem acima da taxa contratada significa que o mercado ficou mais desconfiado do emissor, ou que os juros subiram — nos dois casos o preço do papel caiu. Abaixo dela, aconteceu o contrário.',
+        'deb-pct-par': 'Quanto o papel está sendo negociado em relação ao valor que ele promete pagar.\n\nO "par" é o valor de face: o que o emissor devolve no vencimento, corrigido pelo indexador. A coluna mostra o preço de mercado dividido por esse valor.\n\n• Acima de 100% — ágio: a taxa contratada é melhor que a do mercado hoje, então o papel vale mais que o valor de face.\n• 100% — negocia exatamente ao par.\n• Abaixo de 100% — deságio: o mercado pede desconto para carregar.\n\nO deságio tem duas causas bem diferentes, e a coluna "Taxa hoje" separa as duas. Desconto pequeno, com a taxa de hoje perto da contratada, é só efeito de juros — marcação a mercado, sem nada de errado com a empresa. Desconto grande, com a taxa de hoje muito acima da contratada, é risco de crédito: o mercado duvida que o emissor vá pagar.',
+
         'dy-acoes': 'Dividend Yield (DY) = quanto a empresa pagou em dividendos/proventos nos últimos 12 meses, em relação à cotação atual da ação.\n\nCálculo: dividendos pagos em 12 meses / cotação atual × 100',
         'valor-mercado': 'Valor de Mercado (Market Cap) = valor total da empresa negociado na bolsa.\n\nCálculo: cotação atual × número total de ações em circulação.',
         'receita': 'Receita = valor total que a empresa faturou com a venda de seus produtos/serviços em um determinado período, antes de descontar custos e despesas.',
@@ -14267,11 +14291,31 @@
         let left = rect.left;
         if (left + largura > window.innerWidth - 8) left = window.innerWidth - largura - 8;
         if (left < 8) left = 8;
-        let top = rect.bottom + 6;
-        const altura = glossarioTooltipEl.offsetHeight;
-        if (top + altura > window.innerHeight - 8) top = rect.top - altura - 6;
-        glossarioTooltipEl.style.top = `${top}px`;
+        // Antes de medir, zera a posição anterior. O balão é fixed e
+        // reaproveitado entre todos os "?" do site: com um `top` antigo
+        // ainda aplicado, a altura medida aqui pode não ser a altura que
+        // ele terá na posição nova.
+        glossarioTooltipEl.style.top = '0px';
         glossarioTooltipEl.style.left = `${left}px`;
+
+        // Teto de altura: verbete longo (o de "% do par" tem 436px) não
+        // cabe em tela de celular em direção nenhuma. Em vez de ficar
+        // pendurado para fora, ele rola por dentro.
+        const limite = window.innerHeight - 16;
+        glossarioTooltipEl.style.maxHeight = `${limite}px`;
+        glossarioTooltipEl.style.overflowY = 'auto';
+
+        const altura = Math.min(glossarioTooltipEl.offsetHeight, limite);
+        let top = rect.bottom + 6;
+        // Abaixo do botão se couber; senão acima; e se não couber em
+        // nenhum dos dois, encostado na borda — nunca fora dela. Era o
+        // caso que faltava: a regra antiga só sabia inverter, então um
+        // balão alto demais para os dois lados ficava cortado embaixo.
+        if (top + altura > window.innerHeight - 8) {
+          const acima = rect.top - altura - 6;
+          top = acima >= 8 ? acima : Math.max(8, window.innerHeight - altura - 8);
+        }
+        glossarioTooltipEl.style.top = `${top}px`;
       }
 
       // Exposta em window porque partes da página criam botões "?" depois
