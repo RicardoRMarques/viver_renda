@@ -94,7 +94,10 @@ URL_BASE = "https://www.anbima.com.br/informacoes/merc-sec-debentures/arqs/db{da
 # segue exatamente como antes. Assim a resposta aparece sozinha na
 # primeira execução, e no dia em que a ANBIMA acrescentar a coluna o site
 # passa a marcar as incentivadas sem ninguém precisar mexer aqui.
-URL_XLS = "https://www.anbima.com.br/informacoes/merc-sec-debentures/arqs/d{data}.xls"
+# O "d" inicial faz parte do que nome_xls() devolve ("d26set18"), então
+# NÃO se repete aqui — foi assim que a primeira versão pediu
+# "dd26set18.xls" e levou 404.
+URL_XLS = "https://www.anbima.com.br/informacoes/merc-sec-debentures/arqs/{data}.xls"
 
 MESES_ABREV = ["jan", "fev", "mar", "abr", "mai", "jun",
                "jul", "ago", "set", "out", "nov", "dez"]
