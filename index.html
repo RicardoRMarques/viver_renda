@@ -3438,6 +3438,17 @@
       .deb-tabela td.deb-emissor { max-width: 150px; }
     }
 
+    /* O código leva à ficha do papel na ANBIMA. O sublinhado pontilhado
+       sinaliza "tem mais aqui" sem gritar — a tabela já tem muita cor
+       disputando atenção, e o link não é o protagonista dela. */
+    .deb-link-anbima {
+      color: var(--primary); text-decoration: none;
+      border-bottom: 1px dotted currentColor;
+    }
+    .deb-link-anbima:hover, .deb-link-anbima:focus-visible {
+      border-bottom-style: solid; outline: none;
+    }
+
     .deb-link-acao {
       border: none; background: none; padding: 0; margin-left: 4px;
       color: var(--primary); text-decoration: underline; cursor: pointer;
@@ -4334,7 +4345,7 @@
       <div class="deb-avisos">
         <div class="vp-aviso"><span aria-hidden="true">•</span><span><strong>Não é uma oferta.</strong> É onde o papel negocia entre instituições, não um preço que você consegue comprar hoje na sua corretora.</span></div>
         <div class="vp-aviso"><span aria-hidden="true">•</span><span><strong>Não tem FGC.</strong> Se a empresa quebrar, não existe fundo garantidor. Quem paga é o emissor, e só ele.</span></div>
-        <div class="vp-aviso"><span aria-hidden="true">•</span><span><strong>A lista não separa as incentivadas.</strong> O arquivo da ANBIMA não informa quais papéis são da Lei 12.431 (isentos de IR), então esta tela não afirma isso de nenhum deles. Confirme no prospecto da emissão.</span></div>
+        <div class="vp-aviso"><span aria-hidden="true">•</span><span><strong>A lista não separa as incentivadas.</strong> O arquivo diário da ANBIMA não informa quais papéis são da Lei 12.431 (isentos de IR), então esta tela não afirma isso de nenhum deles — mas a ANBIMA informa na ficha de cada papel. <strong>Clique no código</strong> para abrir a ficha, onde o campo <em>Incentivo · Lei 12.431</em> responde Sim ou Não.</span></div>
       </div>
 
       <div class="deb-controles">
@@ -11570,7 +11581,9 @@
           const venc = d.vencimento ? d.vencimento.split('-').reverse().join('/') : '—';
           return `
             <tr>
-              <td class="deb-num">${d.codigo}</td>
+              <td class="deb-num"><a class="deb-link-anbima" target="_blank" rel="noopener noreferrer"
+                href="https://data.anbima.com.br/debentures/${encodeURIComponent(d.codigo)}/caracteristicas"
+                title="Abrir a ficha de ${d.codigo} na ANBIMA — lá o campo Incentivo diz se o papel é da Lei 12.431">${d.codigo}</a></td>
               <td class="deb-emissor" title="${d.emissor}">${d.emissor}${d.resgate_antecipado ? ' <span style="color:var(--muted);" title="O emissor pode resgatar o papel antes do vencimento">↩</span>' : ''}</td>
               <td class="deb-num">${venc}</td>
               <td class="deb-num">${typeof d.duration_anos === 'number' ? hgFormatNumero(d.duration_anos) + ' a' : '—'}</td>
@@ -14226,7 +14239,7 @@
     (function () {
       const GLOSSARIO = {
         // --- Colunas da tabela de debêntures ---
-        'deb-codigo': 'Código da debênture no sistema da ANBIMA. As letras iniciais identificam a empresa emissora e os dígitos finais dizem qual emissão e qual série.\n\nA mesma empresa costuma ter vários papéis negociando ao mesmo tempo, com prazos e taxas diferentes — por isso a comparação é sempre por código, nunca por nome do emissor.',
+        'deb-codigo': 'Código da debênture no sistema da ANBIMA. As letras iniciais identificam a empresa emissora e os dígitos finais dizem qual emissão e qual série.\n\nA mesma empresa costuma ter vários papéis negociando ao mesmo tempo, com prazos e taxas diferentes — por isso a comparação é sempre por código, nunca por nome do emissor.\n\nCLIQUE NO CÓDIGO para abrir a ficha completa do papel na ANBIMA. É lá que está o campo "Incentivo · Lei 12.431", que diz se aquela debênture é incentivada (isenta de IR para pessoa física) — informação que o arquivo diário não traz e que esta tela, por isso, não afirma.',
         'deb-emissor': 'A empresa que tomou o dinheiro emprestado e que vai pagar.\n\nDiferente de um CDB, aqui não existe FGC: quem honra a dívida é a companhia, e só ela. Antes de olhar a taxa, vale olhar quem é o devedor.\n\nO símbolo ↩ marca papel com cláusula de resgate antecipado — o emissor pode chamar o título de volta antes do vencimento, e aí o seu prazo acaba antes do combinado.',
         'deb-vencimento': 'Data em que o emissor termina de devolver o valor de face.\n\nMuitas debêntures amortizam em parcelas ao longo do caminho, então você não recebe tudo só nessa data — parte do principal volta antes. É por isso que o prazo que serve para comparar dois papéis é a duration, não o vencimento.',
         'deb-duration': 'O prazo médio em que você realmente recebe o dinheiro de volta, ponderando todos os pagamentos de juros e amortização — não só a data final.\n\nServe para duas coisas: comparar papéis de estruturas diferentes em pé de igualdade, e medir o quanto o preço balança. Quanto maior a duration, mais o preço sobe ou cai quando os juros mudam.\n\nA ANBIMA informa em dias úteis; aqui está convertido em anos (dividido por 252).',
