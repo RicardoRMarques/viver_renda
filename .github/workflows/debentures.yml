@@ -47,7 +47,11 @@ jobs:
           python-version: '3.x'
 
       - name: Instalar dependências
-        run: pip install --upgrade requests
+        # pandas + xlrd/openpyxl/lxml são para a inspeção do arquivo .xls
+        # diário (ver o comentário sobre a Lei 12.431 no robô). A coleta
+        # principal usa só o requests — se a leitura do Excel falhar por
+        # falta de alguma dessas, o robô avisa no log e segue com o .txt.
+        run: pip install --upgrade requests pandas xlrd openpyxl lxml
 
       - name: Coletar as taxas do mercado secundário
         run: python coletar_debentures.py
