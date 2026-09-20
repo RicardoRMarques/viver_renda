@@ -79,6 +79,29 @@ import requests
 
 URL_BASE = "https://www.anbima.com.br/informacoes/merc-sec-debentures/arqs/db{data}.txt"
 
+# A MESMA página publica um segundo arquivo, em Excel, com outro padrão de
+# nome: d{AA}{mês}{DD}.xls (ex: d26set18.xls). O .txt tem 15 colunas e NÃO
+# diz quais papéis são debêntures incentivadas da Lei 12.431 — a
+# informação que mais falta aqui, porque é ela que define a isenção de IR.
+#
+# Sabemos que a ANBIMA tem esse dado: a API "Debêntures+" (exclusiva para
+# associados, fora do nosso alcance) expõe um campo `lei_12431` com
+# SIM/NÃO. A pergunta em aberto é se o .xls público já traz as colunas
+# extras dessa base ou se é só o .txt formatado.
+#
+# Em vez de apostar, o robô olha: baixa o .xls, REGISTRA NO LOG as colunas
+# que encontrou e, se houver uma coluna de Lei 12.431, usa. Se não houver,
+# segue exatamente como antes. Assim a resposta aparece sozinha na
+# primeira execução, e no dia em que a ANBIMA acrescentar a coluna o site
+# passa a marcar as incentivadas sem ninguém precisar mexer aqui.
+URL_XLS = "https://www.anbima.com.br/informacoes/merc-sec-debentures/arqs/d{data}.xls"
+
+MESES_ABREV = ["jan", "fev", "mar", "abr", "mai", "jun",
+               "jul", "ago", "set", "out", "nov", "dez"]
+
+# Como reconhecer a coluna do incentivo, sem depender do nome exato.
+PISTAS_INCENTIVO = ("12431", "12431", "incentiv")
+
 # Quantos dias voltar procurando o último arquivo publicado.
 #
 # O arquivo do dia sai no fim da tarde, então rodar de manhã sempre pega
@@ -324,6 +347,144 @@ def avisar_indexadores_desconhecidos(desconhecidos):
 
 
 # ---------------------------------------------------------------------
+# O arquivo Excel — investigação do flag da Lei 12.431
+# ---------------------------------------------------------------------
+
+def nome_xls(dia):
+    """d26set18.xls — dois dígitos do ano, mês abreviado em português, dia."""
+    return "d{ano:02d}{mes}{dia:02d}".format(
+        ano=dia.year % 100, mes=MESES_ABREV[dia.month - 1], dia=dia.day)
+
+
+def ler_planilha(conteudo):
+    """Tenta abrir os bytes como Excel e devolve (colunas, linhas).
+
+    Arquivo com extensão .xls nem sempre é Excel de verdade: é comum
+    servidores antigos publicarem uma TABELA HTML com esse nome, e o
+    pandas só lê isso pelo read_html. Tenta os dois antes de desistir.
+    """
+    try:
+        import pandas as pd
+    except ImportError:
+        print("  (pandas não instalado — pulando a inspeção do .xls)")
+        return None, None
+
+    from io import BytesIO
+    for rotulo, tentativa in (
+        ("read_excel", lambda: pd.read_excel(BytesIO(conteudo))),
+        # Arquivo .xls que na verdade é uma tabela HTML é comum em
+        # servidor antigo. A codificação fica por conta do reparar_acentos
+        # abaixo — passar `encoding` aqui não funciona de forma
+        # consistente quando a entrada é um buffer de bytes.
+        ("read_html", lambda: pd.read_html(BytesIO(conteudo))[0]),
+    ):
+        try:
+            tabela = tentativa()
+            colunas = [reparar_acentos(str(c)) for c in tabela.columns]
+            tabela.columns = colunas
+            return colunas, tabela
+        except Exception as erro:
+            print(f"  .xls via {rotulo}: não deu ({type(erro).__name__}: {str(erro)[:80]})")
+    return None, None
+
+
+def reparar_acentos(texto):
+    """Desfaz o "CÃ³digo" -> "Código" quando a codificação foi lida errada.
+
+    É o sintoma clássico de UTF-8 interpretado como latin-1. Detectar pelo
+    caractere Ã é mais confiável do que adivinhar a codificação do arquivo,
+    e a operação é reversível: se não for mojibake, a conversão falha e o
+    texto original volta intacto.
+    """
+    if "Ã" not in texto and "Â" not in texto:
+        return texto
+    try:
+        return texto.encode("latin-1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return texto
+
+
+def normalizar_rotulo(texto):
+    """Minúsculas, sem acento, sem pontuação e sem espaço.
+
+    Existe porque "Código".lower() é "código", e "cod" NÃO é substring
+    disso — o "ó" acentuado quebra a comparação ingênua. O mesmo vale para
+    "Lei nº 12.431", que precisa casar com "12431".
+    """
+    import unicodedata
+    sem_acento = "".join(
+        c for c in unicodedata.normalize("NFKD", texto or "")
+        if not unicodedata.combining(c)
+    )
+    return "".join(c for c in sem_acento.lower() if c.isalnum())
+
+
+def coluna_do_incentivo(colunas):
+    """Acha a coluna da Lei 12.431 pelo conteúdo do nome, não pelo nome exato."""
+    for coluna in colunas or []:
+        if any(pista in normalizar_rotulo(coluna) for pista in PISTAS_INCENTIVO):
+            return coluna
+    return None
+
+
+def coluna_do_codigo(colunas):
+    """Acha a coluna do código do papel, com ou sem acento no cabeçalho."""
+    for coluna in colunas or []:
+        if "codigo" in normalizar_rotulo(coluna):
+            return coluna
+    return (colunas or [None])[0]
+
+
+def mapear_incentivadas(dia):
+    """Devolve {codigo: True/False} se o .xls trouxer o flag; senão, {}.
+
+    Nunca derruba a coleta: qualquer problema aqui vira aviso no log e o
+    robô segue com o .txt, que é a fonte principal.
+    """
+    url = URL_XLS.format(data=nome_xls(dia))
+    print(f"\n  Investigando o .xls em busca do flag da Lei 12.431...")
+    print(f"    {url}")
+    try:
+        resposta = requests.get(url, headers=CABECALHOS, timeout=TEMPO_LIMITE)
+        if resposta.status_code != 200:
+            print(f"    não disponível (HTTP {resposta.status_code})")
+            return {}
+    except requests.RequestException as erro:
+        print(f"    falha de rede ({erro})")
+        return {}
+
+    colunas, tabela = ler_planilha(resposta.content)
+    if not colunas:
+        print("    não consegui interpretar o arquivo — seguindo só com o .txt")
+        return {}
+
+    # O log é o ponto desta função: é assim que descobrimos, sem adivinhar,
+    # o que esse arquivo realmente contém.
+    print(f"    colunas encontradas ({len(colunas)}):")
+    for coluna in colunas:
+        print(f"      - {coluna}")
+
+    alvo = coluna_do_incentivo(colunas)
+    if not alvo:
+        print("    >> NENHUMA coluna de Lei 12.431/incentivada. O .xls não")
+        print("       acrescenta nada ao .txt; o site segue sem marcar isenção.")
+        return {}
+
+    coluna_codigo = coluna_do_codigo(colunas)
+    print(f"    >> ACHEI: coluna {alvo!r} (código em {coluna_codigo!r})")
+
+    mapa = {}
+    for _, linha in tabela.iterrows():
+        codigo = str(linha.get(coluna_codigo, "")).strip().upper()
+        valor = str(linha.get(alvo, "")).strip().upper()
+        if codigo and codigo != "NAN":
+            mapa[codigo] = valor.startswith("S") or valor in {"SIM", "1", "TRUE", "X"}
+    quantos = sum(1 for v in mapa.values() if v)
+    print(f"    {quantos} de {len(mapa)} papéis marcados como incentivados")
+    return mapa
+
+
+# ---------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------
 
@@ -341,6 +502,15 @@ def main():
         print("\nERRO: o arquivo foi baixado mas nenhuma linha foi interpretada.")
         print("Provável mudança de layout — confira o separador e a ordem das colunas.")
         return 1
+
+    # Se o .xls trouxer o flag da Lei 12.431, cada papel ganha o campo.
+    # Se não trouxer, NENHUM papel ganha — o site não afirma isenção sem
+    # dado que a sustente.
+    incentivadas = mapear_incentivadas(dia)
+    if incentivadas:
+        for p in papeis:
+            if p["codigo"].upper() in incentivadas:
+                p["incentivada"] = incentivadas[p["codigo"].upper()]
 
     por_indexador = {}
     for p in papeis:
@@ -375,6 +545,7 @@ def main():
         "atualizado_em": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "total": len(papeis),
         "por_indexador": por_indexador,
+        "tem_flag_incentivada": bool(incentivadas),
         "debentures": papeis,
     }
 
