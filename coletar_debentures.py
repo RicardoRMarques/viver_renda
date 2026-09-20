@@ -359,12 +359,53 @@ def nome_xls(dia):
         ano=dia.year % 100, mes=MESES_ABREV[dia.month - 1], dia=dia.day)
 
 
+def localizar_cabecalho(tabela, limite=12):
+    """Descobre em que linha estão os nomes das colunas.
+
+    O .xls começa igual ao .txt: primeiro a linha institucional da ANBIMA,
+    só depois o cabeçalho. Lendo com header=0, o pandas batiza as colunas
+    com o título e devolve "1", "Unnamed: 1", "Unnamed: 2"... — foi
+    exatamente o que aconteceu na primeira execução, e a partir daí
+    qualquer busca por nome de coluna responde o que não deve.
+
+    Procura, nas primeiras linhas, aquela que contenha uma célula
+    "Código". Devolve o índice ou None.
+    """
+    for i in range(min(limite, len(tabela))):
+        linha = tabela.iloc[i]
+        for celula in linha:
+            if "codigo" == normalizar_rotulo(reparar_acentos(str(celula))):
+                return i
+    return None
+
+
+def _aplicar_cabecalho(crua):
+    """Recorta a tabela a partir da linha de cabeçalho. None se não achar."""
+    linha = localizar_cabecalho(crua)
+    if linha is None:
+        return None, None
+    colunas = [reparar_acentos(str(c)) for c in crua.iloc[linha]]
+    tabela = crua.iloc[linha + 1:].copy()
+    tabela.columns = colunas
+    return colunas, tabela
+
+
 def ler_planilha(conteudo):
     """Tenta abrir os bytes como Excel e devolve (colunas, linhas).
 
     Arquivo com extensão .xls nem sempre é Excel de verdade: é comum
     servidores antigos publicarem uma TABELA HTML com esse nome, e o
-    pandas só lê isso pelo read_html. Tenta os dois antes de desistir.
+    pandas só lê isso pelo read_html.
+
+    Os dois leitores precisam de tratamentos diferentes:
+
+    - read_excel: lê sem cabeçalho e a linha certa é localizada depois,
+      porque o arquivo da ANBIMA começa com a linha institucional (ver
+      localizar_cabecalho).
+    - read_html: o pandas já separa o <th> como cabeçalho. Passar
+      header=None ali faz ele DESCARTAR essa linha, e os nomes das
+      colunas se perdem — então lê no modo normal e só cai para a busca
+      manual se o que vier não parecer cabeçalho de verdade.
     """
     try:
         import pandas as pd
@@ -373,22 +414,65 @@ def ler_planilha(conteudo):
         return None, None
 
     from io import BytesIO
-    for rotulo, tentativa in (
-        ("read_excel", lambda: pd.read_excel(BytesIO(conteudo))),
-        # Arquivo .xls que na verdade é uma tabela HTML é comum em
-        # servidor antigo. A codificação fica por conta do reparar_acentos
-        # abaixo — passar `encoding` aqui não funciona de forma
-        # consistente quando a entrada é um buffer de bytes.
-        ("read_html", lambda: pd.read_html(BytesIO(conteudo))[0]),
-    ):
-        try:
-            tabela = tentativa()
-            colunas = [reparar_acentos(str(c)) for c in tabela.columns]
-            tabela.columns = colunas
+
+    # --- Excel de verdade ---
+    try:
+        crua = pd.read_excel(BytesIO(conteudo), header=None)
+        colunas, tabela = _aplicar_cabecalho(crua)
+        if colunas:
+            print(f"  .xls lido como Excel; cabeçalho na linha {localizar_cabecalho(crua)}.")
             return colunas, tabela
-        except Exception as erro:
-            print(f"  .xls via {rotulo}: não deu ({type(erro).__name__}: {str(erro)[:80]})")
+        mostrar_primeiras_linhas(crua, "Excel")
+    except Exception as erro:
+        print(f"  .xls via read_excel: não deu ({type(erro).__name__}: {str(erro)[:80]})")
+
+    # --- Tabela HTML disfarçada de .xls ---
+    try:
+        tabela = pd.read_html(BytesIO(conteudo))[0]
+        colunas = [reparar_acentos(str(c)) for c in tabela.columns]
+        if coluna_do_codigo_estrito(colunas):
+            tabela.columns = colunas
+            print("  .xls lido como tabela HTML; cabeçalho veio no <th>.")
+            return colunas, tabela
+        # Cabeçalho não reconhecido: talvez a linha institucional tenha
+        # virado o <th>. Reconstrói incluindo-a como primeira linha.
+        crua = pd.concat(
+            [pd.DataFrame([list(tabela.columns)], columns=range(len(tabela.columns))),
+             pd.DataFrame(tabela.values, columns=range(len(tabela.columns)))],
+            ignore_index=True,
+        )
+        colunas, montada = _aplicar_cabecalho(crua)
+        if colunas:
+            print("  .xls lido como tabela HTML; cabeçalho achado dentro do corpo.")
+            return colunas, montada
+        mostrar_primeiras_linhas(crua, "HTML")
+    except Exception as erro:
+        print(f"  .xls via read_html: não deu ({type(erro).__name__}: {str(erro)[:80]})")
+
     return None, None
+
+
+def coluna_do_codigo_estrito(colunas):
+    """Como coluna_do_codigo, mas SEM o chute na primeira coluna.
+
+    Serve para responder "isto aqui é mesmo um cabeçalho?" — e para essa
+    pergunta, cair na primeira coluna por falta de opção seria justamente
+    a resposta errada.
+    """
+    for coluna in colunas or []:
+        if "codigo" in normalizar_rotulo(coluna):
+            return coluna
+    return None
+
+
+def mostrar_primeiras_linhas(crua, origem):
+    """Despeja o começo do arquivo no log — é o que permite descobrir um
+    formato novo sem ter que adivinhar na próxima execução."""
+    print(f"  .xls lido como {origem}, mas não achei a linha de cabeçalho.")
+    print("  Primeiras linhas, para inspeção:")
+    for i in range(min(4, len(crua))):
+        celulas = [str(c)[:28] for c in crua.iloc[i].tolist()[:8]]
+        print(f"    linha {i}: {celulas}")
 
 
 def reparar_acentos(texto):
