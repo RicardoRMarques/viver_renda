@@ -103,7 +103,23 @@ MESES_ABREV = ["jan", "fev", "mar", "abr", "mai", "jun",
                "jul", "ago", "set", "out", "nov", "dez"]
 
 # Como reconhecer a coluna do incentivo, sem depender do nome exato.
-PISTAS_INCENTIVO = ("12431", "12431", "incentiv")
+PISTAS_INCENTIVO = ("12431", "incentiv")
+
+# As colunas que o .xls tinha em 20/09/2026, conferidas rodando o robô
+# contra o arquivo real (cabeçalho na linha 7). São as MESMAS 15 do .txt:
+# o Excel é o mesmo conteúdo formatado, e o flag da Lei 12.431 não está
+# em nenhum dos dois.
+#
+# Guardar essa assinatura transforma a inspeção diária num DETECTOR DE
+# MUDANÇA: enquanto o arquivo for este, o log resume em uma linha; no dia
+# em que a ANBIMA mexer nas colunas, ele despeja a lista nova e grita.
+# É o que faz a descoberta acontecer sozinha, sem ninguém lembrar de
+# reconferir de tempos em tempos.
+COLUNAS_XLS_CONHECIDAS = (
+    "Código", "Nome", "Repac./  Venc.", "Índice/ Correção", "Taxa de Compra",
+    "Taxa de Venda", "Taxa Indicativa", "Desvio Padrão", "Intervalo Indicativo",
+    "nan", "PU", "% Pu Par", "Duration", "% Reune", "Referência NTN-B",
+)
 
 # Quantos dias voltar procurando o último arquivo publicado.
 #
@@ -545,16 +561,24 @@ def mapear_incentivadas(dia):
         print("    não consegui interpretar o arquivo — seguindo só com o .txt")
         return {}
 
-    # O log é o ponto desta função: é assim que descobrimos, sem adivinhar,
-    # o que esse arquivo realmente contém.
-    print(f"    colunas encontradas ({len(colunas)}):")
-    for coluna in colunas:
-        print(f"      - {coluna}")
-
     alvo = coluna_do_incentivo(colunas)
+    mudou = tuple(colunas) != COLUNAS_XLS_CONHECIDAS
+
+    # Só despeja a lista quando há o que olhar: flag encontrado, ou o
+    # arquivo mudou de formato. Repetir as 15 colunas de sempre todo dia
+    # treinaria qualquer um a ignorar esse trecho do log — que é
+    # justamente onde a novidade apareceria.
+    if alvo or mudou:
+        print(f"    colunas encontradas ({len(colunas)}):")
+        for coluna in colunas:
+            print(f"      - {coluna}")
+
     if not alvo:
-        print("    >> NENHUMA coluna de Lei 12.431/incentivada. O .xls não")
-        print("       acrescenta nada ao .txt; o site segue sem marcar isenção.")
+        if mudou:
+            print("    >> ATENÇÃO: o .xls MUDOU de formato e mesmo assim não tem")
+            print("       coluna de Lei 12.431. Vale reconferir a lista acima.")
+        else:
+            print("    mesmas 15 colunas do .txt, sem flag da Lei 12.431 — como esperado.")
         return {}
 
     coluna_codigo = coluna_do_codigo(colunas)
