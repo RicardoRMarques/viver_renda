@@ -584,6 +584,10 @@
     .ap-tabela-visao td.ap-setor { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
     .ap-tabela-visao .ap-selo { padding: 1px 6px; font-size: 0.6rem; }
     .ap-visao-falta { margin: 0 0 10px; font-size: 0.76rem; }
+    .ap-nuvem { font-size: 0.76rem; color: var(--muted); margin-top: -6px; }
+    .ap-nuvem:empty { display: none; }
+    .ap-nuvem.ok { color: var(--accent); }
+    .ap-nuvem.erro { color: var(--danger); }
     .ap-modal .ap-pvp-max input { width: 64px; padding: 3px 6px; margin: 0 2px; font-size: 0.82rem; border-radius: 6px; display: inline-block; }
     .ap-teto-auto { color: var(--muted); font-size: 0.7em; margin-left: 0; cursor: help; }
     @media (max-width: 1440px) {
@@ -6277,6 +6281,8 @@
           pulando o que está acima do seu preço teto.
         </p>
 
+        <div id="apNuvem" class="ap-nuvem" aria-live="polite"></div>
+
         <div class="calc-grid-2">
           <div class="calc-campo">
             <label for="apValor">Valor do aporte</label>
@@ -11745,6 +11751,7 @@
             })),
           }));
         } catch (e) { /* sem localStorage — segue sem salvar */ }
+        agendarNuvem();
       }
       function carregarSalvo() {
         try {
@@ -12505,6 +12512,144 @@
         setTimeout(() => { if (span && padrao) span.textContent = padrao; }, 2500);
       }
 
+
+      // ---------- Nuvem (Supabase) ----------
+      // Logado: tudo vai também para as tabelas calc_aportes (um ativo por
+      // linha) e calc_aportes_config (aporte e opções), com RLS — cada
+      // pessoa só lê/escreve as próprias linhas. Assim a carteira aparece
+      // em qualquer aparelho. Deslogado: só o localStorage, como antes.
+      // A nuvem é a fonte de verdade ao abrir; o localStorage é o cache.
+      const nuvemEl = $('apNuvem');
+      let nuvemPronta = false;     // só grava depois de ler (senão o local velho sobrescreveria a nuvem)
+      let nuvemTimer = null;
+      let nuvemUsuario = null;
+
+      function mostrarNuvem(texto, classe = '') {
+        if (!nuvemEl) return;
+        nuvemEl.className = 'ap-nuvem' + (classe ? ' ' + classe : '');
+        nuvemEl.innerHTML = texto;
+      }
+      async function sessaoAtual() {
+        const cliente = obterSupabaseClient();
+        if (!cliente) return { cliente: null, user: null };
+        try {
+          const { data: { session } } = await cliente.auth.getSession();
+          return { cliente, user: session?.user || null };
+        } catch (e) { return { cliente, user: null }; }
+      }
+      function linhaNuvem(a, i, uid) {
+        const n = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+        return {
+          user_id: uid, ticker: a.ticker, cotas: Math.max(0, Math.floor(a.cotas || 0)),
+          peso_alvo: a.alvo > 0 ? a.alvo : null, preco_medio: n(a.pm), preco_teto: a.teto > 0 ? a.teto : null,
+          proventos_12m: n(a.prov), setor: a.setor || null,
+          preco_manual: a.precoManual && a.preco > 0 ? a.preco : null,
+          preco_planilha: n(a.precoPlanilha), teto_planilha: n(a.tetoPlanilha),
+          ordem: i, updated_at: new Date().toISOString(),
+        };
+      }
+
+      function agendarNuvem() {
+        if (!nuvemPronta || !nuvemUsuario) return;
+        clearTimeout(nuvemTimer);
+        mostrarNuvem('☁️ Salvando na sua conta…');
+        nuvemTimer = setTimeout(gravarNuvem, 1200);
+      }
+
+      async function gravarNuvem() {
+        const { cliente, user } = await sessaoAtual();
+        if (!cliente || !user) { mostrarNuvem('Salvo só neste navegador — <strong>entre</strong> para guardar na sua conta.'); return; }
+        try {
+          const cfg = await cliente.from('calc_aportes_config').upsert({
+            user_id: user.id, aporte: hgValorMascarado(inValor) || null,
+            respeitar_teto: chkTeto.checked, usar_tudo: chkTudo.checked, pvp_max: pvpMaximo(),
+            updated_at: new Date().toISOString(),
+          });
+          if (cfg.error) throw cfg.error;
+          if (ativos.length) {
+            const up = await cliente.from('calc_aportes').upsert(ativos.map((a, i) => linhaNuvem(a, i, user.id)));
+            if (up.error) throw up.error;
+          }
+          // Remove da nuvem o que saiu da lista.
+          let del = cliente.from('calc_aportes').delete().eq('user_id', user.id);
+          if (ativos.length) del = del.not('ticker', 'in', '(' + ativos.map(a => '"' + a.ticker + '"').join(',') + ')');
+          const rm = await del;
+          if (rm.error) throw rm.error;
+          const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          mostrarNuvem(`☁️ Salvo na sua conta às ${hora}`, 'ok');
+        } catch (e) {
+          console.warn('Calculadora de Aportes: não gravou na nuvem.', e);
+          mostrarNuvem('⚠️ Não consegui salvar na sua conta agora — ficou salvo neste navegador. Tento de novo na próxima alteração.', 'erro');
+        }
+      }
+
+      // Lê da nuvem. Devolve true se trocou os dados da tela.
+      async function carregarNuvem() {
+        const { cliente, user } = await sessaoAtual();
+        nuvemUsuario = user;
+        if (!cliente || !user) {
+          nuvemPronta = true;
+          mostrarNuvem('Salvo só neste navegador — <strong>entre</strong> (botão Entrar, no topo) para guardar na sua conta e ver em qualquer aparelho.');
+          return false;
+        }
+        try {
+          const [rAt, rCfg] = await Promise.all([
+            cliente.from('calc_aportes').select('*').eq('user_id', user.id).order('ordem'),
+            cliente.from('calc_aportes_config').select('*').eq('user_id', user.id).maybeSingle(),
+          ]);
+          if (rAt.error) throw rAt.error;
+          if (rCfg.error) throw rCfg.error;
+          const temNuvem = (rAt.data && rAt.data.length) || rCfg.data;
+          nuvemPronta = true;
+          if (!temNuvem) {
+            // Primeira vez logado: sobe o que já estava neste navegador.
+            if (ativos.length || hgValorMascarado(inValor) > 0) await gravarNuvem();
+            else mostrarNuvem('☁️ Conectado à sua conta — o que você montar aqui fica salvo nela.', 'ok');
+            return false;
+          }
+          const n = (v) => (v === null || v === undefined ? null : Number(v));
+          ativos = (rAt.data || []).map(d => ({
+            ticker: d.ticker, cotas: Number(d.cotas) || 0, alvo: n(d.peso_alvo) || 0,
+            teto: n(d.preco_teto), pm: n(d.preco_medio), prov: n(d.proventos_12m), setor: d.setor || null,
+            precoPlanilha: n(d.preco_planilha), tetoPlanilha: n(d.teto_planilha),
+            preco: d.preco_manual !== null ? n(d.preco_manual) : null, precoManual: d.preco_manual !== null,
+          }));
+          const c = rCfg.data;
+          if (c) {
+            const ap = n(c.aporte) || 0;
+            inValor.dataset.centavos = String(Math.round(ap * 100));
+            inValor.value = ap ? ap.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+            chkTeto.checked = c.respeitar_teto !== false;
+            chkTudo.checked = c.usar_tudo !== false;
+            if (Number(c.pvp_max) > 0) document.getElementById('apPvpMax').value = Number(c.pvp_max).toFixed(2);
+          }
+          // Atualiza o cache local sem disparar nova gravação na nuvem.
+          const pronto = nuvemPronta; nuvemPronta = false; salvar(); nuvemPronta = pronto;
+          mostrarNuvem('☁️ Carregado da sua conta.', 'ok');
+          return true;
+        } catch (e) {
+          console.warn('Calculadora de Aportes: não leu da nuvem.', e);
+          nuvemPronta = false; // não arrisca sobrescrever a nuvem com dado local
+          mostrarNuvem('⚠️ Não consegui ler sua conta agora — mostrando o que está salvo neste navegador (alterações ficam só aqui até recarregar).', 'erro');
+          return false;
+        }
+      }
+
+      // Entrou/saiu da conta com a calculadora já aberta: relê.
+      let nuvemOuvindo = false;
+      function ouvirLogin() {
+        if (nuvemOuvindo) return;
+        const cliente = obterSupabaseClient();
+        if (!cliente) return;
+        nuvemOuvindo = true;
+        cliente.auth.onAuthStateChange((evento) => {
+          if (evento !== 'SIGNED_IN' && evento !== 'SIGNED_OUT') return;
+          if (!jaCarregou) return;
+          nuvemPronta = false;
+          carregarNuvem().then(trocou => { if (trocou) { invalidarResultado(); renderEdicao(); atualizarPrecos(); } });
+        });
+      }
+
       // ---------- Abrir / fechar ----------
       let jaCarregou = false;
       function abrirModal(opcoes = {}) {
@@ -12515,6 +12660,12 @@
           carregarSalvo();
           renderEdicao();
           atualizarPrecos();
+          ouvirLogin();
+          carregarNuvem().then(trocou => {
+            if (trocou) { invalidarResultado(); renderEdicao(); atualizarPrecos(); }
+            if (opcoes.importarCarteira) importarCarteira();
+          });
+          return;
         }
         if (opcoes.importarCarteira) importarCarteira();
       }
