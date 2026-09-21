@@ -565,7 +565,39 @@
        os rótulos dos campos idem. */
     .calc-modal.vp-modal { max-width: 860px; }
     /* ---------- Calculadora de Aportes ---------- */
-    .calc-modal.ap-modal { max-width: 980px; }
+    .calc-modal.ap-modal { max-width: 1280px; }
+    /* Visão da carteira (mesmas colunas da planilha "Minha Carteira") */
+    .ap-visao-titulo { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+    .ap-visao-titulo h4 { margin: 0; font-size: 1rem; }
+    .ap-visao-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .ap-visao-cards .carteira-resumo-card strong { font-size: 1.05rem; }
+    .ap-visao-cards .carteira-resumo-card small { display: block; margin-top: 3px; font-size: 0.72rem; font-weight: 700; }
+    .ap-tabela-visao { font-size: 0.74rem; min-width: 1240px; }
+    .ap-tabela-visao th, .ap-tabela-visao td { padding: 6px 7px; }
+    .ap-tabela-visao thead tr.ap-grupos th { text-align: center; color: #fff; font-size: 0.68rem; letter-spacing: 0.04em; padding: 5px 6px; border-bottom: none; }
+    .ap-tabela-visao .ap-g-carteira { background: #1d7fa8; }
+    .ap-tabela-visao .ap-g-osc { background: #c0504d; }
+    .ap-tabela-visao .ap-g-analise { background: #a8781a; }
+    .ap-tabela-visao .ap-g-prov { background: #2e8b57; }
+    .ap-tabela-visao .ap-g-rent { background: #6a4fb3; }
+    .ap-tabela-visao th.ap-ord { cursor: pointer; user-select: none; }
+    .ap-tabela-visao th.ap-ord::after { content: ' ⇅'; opacity: 0.35; font-size: 0.9em; }
+    .ap-tabela-visao th.ap-ord.asc::after { content: ' ▲'; opacity: 1; }
+    .ap-tabela-visao th.ap-ord.desc::after { content: ' ▼'; opacity: 1; }
+    .ap-pos { color: var(--accent); }
+    .ap-neg { color: var(--danger); }
+    .ap-estimado { color: var(--muted); font-size: 0.85em; margin-left: 2px; cursor: help; }
+    .ap-tabela-visao tfoot td { font-weight: 700; border-top: 1px solid var(--border); }
+    .ap-tabela-visao td:first-child, .ap-tabela-visao th:first-child { position: sticky; left: 0; background: var(--bg); z-index: 1; }
+    /* A faixa de grupo tem colspan: se ficasse fixa (sticky) como a
+       coluna Ativo, cobriria OSCILAÇÃO/ANÁLISES ao rolar para o lado. */
+    .ap-tabela-visao thead tr.ap-grupos th:first-child { position: static; background: #1d7fa8; }
+    /* .carteira-resumo-card span é o rótulo do card (miúdo, maiúsculo,
+       cinza) — os valores com sinal também usam <span>, então desfaz. */
+    .ap-visao-cards .carteira-resumo-card strong span,
+    .ap-visao-cards .carteira-resumo-card small span { font-size: inherit; text-transform: none; letter-spacing: inherit; font-weight: inherit; color: inherit; }
+    .ap-visao-cards .carteira-resumo-card span.ap-pos { color: var(--accent); }
+    .ap-visao-cards .carteira-resumo-card span.ap-neg { color: var(--danger); }
     /* Coluna flex dentro de um modal com altura máxima: sem isto os
        filhos encolhem (o botão Calcular ficava achatado). */
     .ap-modal .calc-corpo > * { flex-shrink: 0; }
@@ -6254,13 +6286,15 @@
           <button type="button" class="cmp-btn-secundario" id="apBtnColar" aria-expanded="false">📋 Colar da planilha</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnIguais" title="Mesmo peso-alvo para todos os ativos">⚖️ Pesos iguais</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnAtuais" title="Usa o peso que cada ativo tem hoje como peso-alvo">📌 Manter pesos atuais</button>
+          <button type="button" class="cmp-btn-secundario" id="apBtnIrVisao" title="Todas as colunas: custo, lucro, proventos, DY on cost...">📊 Ver carteira completa</button>
           <button type="button" class="cmp-btn-secundario ap-btn-perigo" id="apBtnLimpar">Limpar tudo</button>
         </div>
 
         <div id="apColarBox" class="ap-colar" hidden>
-          <label for="apColarTexto">Cole uma linha por ativo, na ordem <strong>Ativo · Cotas · Peso-alvo % · Preço teto</strong>
-            (o preço teto é opcional). Pode copiar direto do Google Sheets ou do Excel — as colunas separadas por tabulação,
-            <code>;</code> ou espaço funcionam.</label>
+          <label for="apColarTexto"><strong>Jeito mais fácil:</strong> selecione na sua planilha a linha de cabeçalho
+            (<em>ATIVO, SETOR, PESO %, POSIÇÃO, PREÇO MÉDIO…</em>) junto com as linhas dos ativos, copie e cole aqui — as colunas
+            são reconhecidas pelo nome (Posição, Preço médio, Preço teto, Proventos, Setor e, se tiver, uma coluna <em>Peso-alvo</em>).
+            Sem cabeçalho, a ordem é <strong>Ativo · Cotas · Peso-alvo % · Preço teto · Preço médio</strong>.</label>
           <textarea id="apColarTexto" rows="5" placeholder="ALZR11	1055	10	10,59&#10;BTLG11	130	12,5	102,51&#10;MXRF11	2428	2,5	9,38"></textarea>
           <div class="cmp-acoes-linha">
             <button type="button" class="hg-btn" id="apBtnColarAplicar">Usar estas linhas</button>
@@ -6273,12 +6307,12 @@
         <div class="cmp-tabela-wrap ap-edicao-wrap" id="apEdicaoWrap" hidden>
           <table class="cmp-tabela ap-tabela ap-tabela-edicao">
             <thead>
-              <tr><th>Ativo</th><th>Cotas</th><th>Preço atual</th><th>Peso-alvo %</th><th>Preço teto</th><th>Peso hoje</th><th></th></tr>
+              <tr><th>Ativo</th><th>Cotas</th><th>Preço médio</th><th>Preço atual</th><th>Peso-alvo %</th><th>Preço teto</th><th title="Proventos que você recebeu nos últimos 12 meses (R$). Em branco = estimativa pelo DY do ativo.">Proventos 12m</th><th>Peso hoje</th><th></th></tr>
             </thead>
             <tbody id="apTbodyEdicao"></tbody>
             <tfoot>
-              <tr><td colspan="3" class="ap-soma-rotulo">Soma dos pesos-alvo</td><td id="apSomaAlvo" class="ap-soma">0%</td>
-                <td colspan="3"><button type="button" class="ap-link-btn" id="apBtnNormalizar" hidden>Ajustar para 100%</button></td></tr>
+              <tr><td colspan="4" class="ap-soma-rotulo">Soma dos pesos-alvo</td><td id="apSomaAlvo" class="ap-soma">0%</td>
+                <td colspan="4"><button type="button" class="ap-link-btn" id="apBtnNormalizar" hidden>Ajustar para 100%</button></td></tr>
             </tfoot>
           </table>
         </div>
@@ -6309,6 +6343,23 @@
           (em proporção), até o dinheiro acabar. Preços do fechamento mais recente coletado pelos robôs do site — confira
           o preço na corretora antes de enviar a ordem. Simulação educativa, não é recomendação de compra.
         </p>
+
+        <div id="apVisao" hidden>
+          <div class="ap-visao-titulo">
+            <h4>📊 Visão da carteira</h4>
+            <span class="calc-ajuda" style="margin:0;">Clique no título de uma coluna para ordenar.</span>
+          </div>
+          <div class="ap-visao-cards carteira-resumo-cards" id="apVisaoCards"></div>
+          <div class="cmp-tabela-wrap">
+            <table class="cmp-tabela ap-tabela ap-tabela-visao" id="apTabelaVisao"></table>
+          </div>
+          <p class="calc-ajuda" style="margin-top:8px;">
+            <strong>Dia %, P/VP e DY 12M</strong> vêm dos robôs do site. <strong>Preço médio</strong> e <strong>proventos recebidos</strong>
+            são seus: preencha na tabela acima ou cole da planilha. Proventos com <span class="ap-estimado">≈</span> são estimativa
+            (cotas × preço × DY 12M), para quando você não informou o valor recebido. <strong>DY (%)</strong> = proventos ÷ valor de mercado;
+            <strong>DY on cost</strong> = proventos ÷ custo.
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -11521,28 +11572,70 @@
         return parseFloat(s);
       }
 
-      // Uma linha por ativo: Ativo · Cotas · Peso-alvo % · Preço teto.
-      // Linha de cabeçalho ("ATIVO  POSIÇÃO ...") é ignorada porque o
-      // primeiro campo não tem cara de ticker.
+      // Duas formas de colar:
+      //  1) COM a linha de cabeçalho da planilha (ATIVO, SETOR, PESO %,
+      //     POSIÇÃO, PREÇO MÉDIO...): cada coluna é achada pelo NOME, então
+      //     a ordem e as colunas extras (Dia %, P/VP, Lucro...) não importam.
+      //  2) SEM cabeçalho: Ativo · Cotas · Peso-alvo % · Preço teto · Preço médio.
+      // "PESO %" da planilha é o peso de HOJE, não o alvo — por isso não é
+      // mapeado para o alvo; só uma coluna chamada Peso-alvo/Alvo/Meta é.
+      const normalizarCab = (t) => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .toUpperCase().replace(/[%()]/g, ' ').replace(/[-_./]/g, ' ').replace(/\s+/g, ' ').trim();
+      const SINONIMOS = {
+        ativo: ['ATIVO', 'TICKER', 'CODIGO', 'ATIVOS', 'PAPEL'],
+        setor: ['SETOR', 'SEGMENTO', 'TIPO'],
+        cotas: ['POSICAO', 'QTD', 'QUANTIDADE', 'COTAS', 'QTDE'],
+        pm: ['PRECO MEDIO', 'PM', 'P MEDIO', 'CUSTO MEDIO'],
+        alvo: ['PESO ALVO', 'ALVO', 'META', 'PESO IDEAL', 'PESO META', '% IDEAL', 'IDEAL'],
+        teto: ['PRECO TETO', 'TETO'],
+        preco: ['PRECO ATUAL', 'COTACAO', 'PRECO'],
+        prov: ['PROVENTOS', 'PROVENTOS 12M', 'PROVENTOS RECEBIDOS', 'RENDIMENTOS', 'DIVIDENDOS'],
+      };
+      const TICKER_RE = /^[A-Z0-9]{4}\d{1,2}[A-Z]?$/;
+      function dividir(bruta) {
+        const linha = bruta.replace(/\s+$/, '');
+        if (linha.includes('\t')) return linha.split('\t').map(c => c.trim());
+        if (linha.includes(';')) return linha.split(';').map(c => c.trim());
+        return linha.trim().split(/\s+/);
+      }
       function lerLinhasColadas(texto) {
         const saida = [];
+        let mapa = null; // campo -> índice da coluna (quando há cabeçalho)
+        const num = (campos, i) => (i === undefined || i < 0 ? NaN : lerNumeroBr(campos[i]));
         String(texto || '').split(/\r?\n/).forEach(bruta => {
-          const linha = bruta.trim();
-          if (!linha) return;
-          const partes = linha.includes('\t') ? linha.split('\t')
-            : linha.includes(';') ? linha.split(';')
-            : linha.split(/\s+/);
-          const campos = partes.map(p => p.trim());
-          const ticker = (campos[0] || '').toUpperCase().replace(/^B3:/, '');
-          if (!/^[A-Z0-9]{4}\d{1,2}[A-Z]?$/.test(ticker)) return;
-          const cotas = lerNumeroBr(campos[1]);
-          const alvo = lerNumeroBr(campos[2]);
-          const teto = lerNumeroBr(campos[3]);
+          if (!bruta.trim()) return;
+          const campos = dividir(bruta);
+          const norm = campos.map(normalizarCab);
+          // Linha de cabeçalho?
+          if (!mapa && norm.some(c => SINONIMOS.ativo.includes(c))) {
+            mapa = {};
+            Object.entries(SINONIMOS).forEach(([campo, nomes]) => {
+              const i = norm.findIndex(c => nomes.includes(c));
+              if (i >= 0) mapa[campo] = i;
+            });
+            return;
+          }
+          const iAtivo = mapa ? mapa.ativo : 0;
+          const ticker = (campos[iAtivo] || '').toUpperCase().replace(/^B3:/, '');
+          if (!TICKER_RE.test(ticker)) return; // linha de título, total, vazia...
+          let cotas, alvo, teto, pm, prov, preco, setor;
+          if (mapa) {
+            cotas = num(campos, mapa.cotas); alvo = num(campos, mapa.alvo); teto = num(campos, mapa.teto);
+            pm = num(campos, mapa.pm); prov = num(campos, mapa.prov); preco = num(campos, mapa.preco);
+            setor = mapa.setor !== undefined ? (campos[mapa.setor] || '').trim() : '';
+          } else {
+            cotas = num(campos, 1); alvo = num(campos, 2); teto = num(campos, 3); pm = num(campos, 4);
+          }
+          const pos = (v) => (Number.isFinite(v) && v > 0 ? v : null);
           saida.push({
             ticker,
-            cotas: Number.isFinite(cotas) ? Math.max(0, Math.round(cotas)) : 0,
+            cotas: Number.isFinite(cotas) ? Math.max(0, Math.round(cotas)) : (mapa && mapa.cotas === undefined ? null : 0),
             alvo: Number.isFinite(alvo) ? Math.max(0, alvo) : 0,
-            teto: Number.isFinite(teto) && teto > 0 ? teto : null,
+            teto: pos(teto),
+            pm: pos(pm),
+            prov: Number.isFinite(prov) && prov >= 0 ? prov : null,
+            precoPlanilha: pos(preco),
+            setor: setor || null,
           });
         });
         return saida;
@@ -11597,6 +11690,7 @@
             // que a pessoa digitou à mão.
             ativos: ativos.map(a => ({
               ticker: a.ticker, cotas: a.cotas, alvo: a.alvo, teto: a.teto,
+              pm: a.pm ?? null, prov: a.prov ?? null, setor: a.setor ?? null, precoPlanilha: a.precoPlanilha ?? null,
               ...(a.precoManual ? { preco: a.preco, precoManual: true } : {}),
             })),
           }));
@@ -11617,6 +11711,10 @@
             cotas: Number(a.cotas) || 0,
             alvo: Number(a.alvo) || 0,
             teto: Number(a.teto) > 0 ? Number(a.teto) : null,
+            pm: Number(a.pm) > 0 ? Number(a.pm) : null,
+            prov: a.prov !== null && a.prov !== undefined && Number(a.prov) >= 0 ? Number(a.prov) : null,
+            setor: a.setor || null,
+            precoPlanilha: Number(a.precoPlanilha) > 0 ? Number(a.precoPlanilha) : null,
             preco: a.precoManual && Number(a.preco) > 0 ? Number(a.preco) : null,
             precoManual: !!(a.precoManual && Number(a.preco) > 0),
           })) : [];
@@ -11629,7 +11727,7 @@
         if (precosPromise) return precosPromise;
         const ler = (url, campoGrupo) => fetch(url, { cache: 'no-store' })
           .then(r => (r.ok ? r.json() : { ativos: [] }))
-          .then(j => (j.ativos || []).map(d => [String(d.ativo || '').toUpperCase(), { preco: d.preco, segmento: d[campoGrupo] || null }]))
+          .then(j => (j.ativos || []).map(d => [String(d.ativo || '').toUpperCase(), { preco: d.preco, segmento: d[campoGrupo] || null, pvp: d.pvp, dy: d.dy_pct, dia: d.variacao_dia_pct }]))
           .catch(() => []);
         precosPromise = Promise.all([ler('mercado-fiis.json', 'segmento'), ler('mercado-acoes.json', 'setor')])
           .then(([f, a]) => {
@@ -11662,10 +11760,17 @@
           if (d) { a.preco = d.preco; a.segmento = d.segmento; a.fonte = 'robo'; }
           else faltando.push(a);
         });
+        // P/VP, DY e variação do dia valem mesmo com preço manual.
+        ativos.forEach(a => {
+          const d = mapa?.get(a.ticker);
+          if (d) { a.pvp = d.pvp; a.dy = d.dy; a.dia = d.dia; if (!a.segmento) a.segmento = d.segmento; }
+        });
         if (faltando.length) {
           await Promise.all(faltando.map(async a => {
             const r = await precoHg(a.ticker);
             if (r) { a.preco = r.preco; a.fonte = 'hg'; }
+            // Último recurso: o preço que veio colado da planilha.
+            else if (a.precoPlanilha) { a.preco = a.precoPlanilha; a.fonte = 'planilha'; }
           }));
         }
         const semPreco = ativos.filter(a => !(a.preco > 0)).map(a => a.ticker);
@@ -11697,16 +11802,19 @@
           <tr data-idx="${i}">
             <td class="ap-ativo"><strong>${escapar(a.ticker)}</strong>${a.segmento ? `<small>${escapar(a.segmento)}</small>` : ''}</td>
             <td><input type="number" min="0" step="1" data-campo="cotas" value="${valorInput(a.cotas, 0)}" aria-label="Cotas de ${escapar(a.ticker)}" /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="pm" value="${valorInput(a.pm, 2)}" placeholder="opcional" aria-label="Preço médio de ${escapar(a.ticker)}" /></td>
             <td><input type="number" min="0" step="0.01" data-campo="preco" value="${valorInput(a.preco, 2)}"
                  class="${a.precoManual ? 'ap-preco-manual' : ''}" placeholder="—"
                  title="${a.precoManual ? 'Preço digitado por você. Apague o campo para voltar ao preço automático.' : 'Preço automático. Pode digitar outro (ex.: o que está no home broker agora).'}"
                  aria-label="Preço de ${escapar(a.ticker)}" /></td>
             <td><input type="number" min="0" step="0.01" data-campo="alvo" value="${valorInput(a.alvo, 2)}" aria-label="Peso-alvo de ${escapar(a.ticker)}" /></td>
             <td><input type="number" min="0" step="0.01" data-campo="teto" value="${valorInput(a.teto, 2)}" placeholder="opcional" aria-label="Preço teto de ${escapar(a.ticker)}" /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="prov" value="${valorInput(a.prov, 2)}" placeholder="${a.preco > 0 && a.dy > 0 && a.cotas > 0 ? '≈ ' + valorInput(a.cotas * a.preco * a.dy / 100, 2) : 'R$'}" title="Proventos recebidos nos últimos 12 meses. Em branco: estimativa pelo DY 12M." aria-label="Proventos 12 meses de ${escapar(a.ticker)}" /></td>
             <td class="ap-num" data-peso-hoje>${pesos.get(a.ticker) === null ? '—' : fmtPct(pesos.get(a.ticker))}</td>
             <td><button type="button" class="ap-remover" data-remover="${i}" title="Remover ${escapar(a.ticker)}" aria-label="Remover ${escapar(a.ticker)}">✕</button></td>
           </tr>`).join('');
         atualizarSoma();
+        renderVisao();
       }
 
       function atualizarSoma() {
@@ -11736,12 +11844,15 @@
         if (campo === 'cotas') a.cotas = v && v > 0 ? Math.floor(v) : 0;
         else if (campo === 'alvo') a.alvo = v && v > 0 ? v : 0;
         else if (campo === 'teto') a.teto = v && v > 0 ? v : null;
+        else if (campo === 'pm') a.pm = v && v > 0 ? v : null;
+        else if (campo === 'prov') a.prov = v !== null && v >= 0 ? v : null;
         else if (campo === 'preco') {
           if (v && v > 0) { a.preco = v; a.precoManual = true; e.target.classList.add('ap-preco-manual'); }
           else { a.precoManual = false; a.preco = null; e.target.classList.remove('ap-preco-manual'); }
         }
         invalidarResultado();
         atualizarSoma();
+        renderVisao();
         salvar();
       });
       // Apagou o preço manual: ao sair do campo, busca o automático de novo.
@@ -11757,6 +11868,156 @@
         salvar();
       });
 
+
+      // ---------- Visão da carteira (colunas da planilha) ----------
+      const visaoEl = $('apVisao');
+      const visaoCardsEl = $('apVisaoCards');
+      const tabelaVisaoEl = $('apTabelaVisao');
+      let ordemVisao = { col: 'peso', dir: 'desc' };
+
+      function linhasVisao() {
+        const base = ativos.filter(a => a.preco > 0);
+        const total = base.reduce((s, a) => s + a.cotas * a.preco, 0);
+        return ativos.map(a => {
+          const tem = a.preco > 0;
+          const vm = tem ? a.cotas * a.preco : null;
+          const custo = a.pm ? a.cotas * a.pm : null;
+          const provEst = a.prov === null || a.prov === undefined;
+          const prov = !provEst ? a.prov : (tem && a.dy > 0 ? a.cotas * a.preco * a.dy / 100 : null);
+          const lucro = vm !== null && custo !== null ? vm - custo : null;
+          return {
+            ticker: a.ticker,
+            setor: a.setor || a.segmento || null,
+            peso: vm !== null && total > 0 ? vm / total * 100 : null,
+            cotas: a.cotas,
+            pm: a.pm || null,
+            custo,
+            dia: typeof a.dia === 'number' ? a.dia : null,
+            pvp: typeof a.pvp === 'number' ? a.pvp : null,
+            teto: a.teto || null,
+            compra: a.teto && tem ? (a.preco <= a.teto ? 'COMPRA' : 'AGUARDE') : null,
+            preco: tem ? a.preco : null,
+            dy12: typeof a.dy === 'number' ? a.dy : null,
+            prov, provEst: provEst && prov !== null,
+            dyPct: prov !== null && vm ? prov / vm * 100 : null,
+            dyCost: prov !== null && custo ? prov / custo * 100 : null,
+            lucro,
+            lucroPct: lucro !== null && custo ? lucro / custo * 100 : null,
+            vm,
+          };
+        });
+      }
+
+      function totaisVisao(ls) {
+        const soma = (k) => ls.reduce((s, l) => s + (typeof l[k] === 'number' ? l[k] : 0), 0);
+        const comCusto = ls.filter(l => l.custo !== null && l.vm !== null);
+        const vm = soma('vm');
+        const custo = comCusto.reduce((s, l) => s + l.custo, 0);
+        const vmComCusto = comCusto.reduce((s, l) => s + l.vm, 0);
+        const prov = soma('prov');
+        const provComCusto = comCusto.reduce((s, l) => s + (l.prov || 0), 0);
+        return {
+          vm, custo, prov,
+          temCusto: comCusto.length > 0,
+          custoCompleto: comCusto.length === ls.filter(l => l.vm !== null).length,
+          lucro: vmComCusto - custo,
+          lucroPct: custo > 0 ? (vmComCusto - custo) / custo * 100 : null,
+          dyCost: custo > 0 ? provComCusto / custo * 100 : null,
+          dyPct: vm > 0 ? prov / vm * 100 : null,
+          rentTotal: custo > 0 ? (vmComCusto - custo + provComCusto) / custo * 100 : null,
+          algumEstimado: ls.some(l => l.provEst),
+        };
+      }
+
+      const sinal = (v, fmt) => (typeof v === 'number'
+        ? `<span class="${v > 0 ? 'ap-pos' : v < 0 ? 'ap-neg' : ''}">${v < 0 ? '−' : ''}${fmt(Math.abs(v))}</span>` : '—');
+      const COLS_VISAO = [
+        { k: 'ticker', r: 'Ativo', g: 'carteira', t: 'txt', f: l => `<strong>${escapar(l.ticker)}</strong>` },
+        { k: 'setor', r: 'Setor', g: 'carteira', t: 'txt', f: l => escapar(l.setor || '—') },
+        { k: 'peso', r: 'Peso %', g: 'carteira', f: l => fmtPct(l.peso) },
+        { k: 'cotas', r: 'Posição', g: 'carteira', f: l => fmtInt(l.cotas) },
+        { k: 'pm', r: 'Preço médio', g: 'carteira', f: l => fmtMoeda(l.pm) },
+        { k: 'custo', r: 'Custo', g: 'carteira', f: l => fmtMoeda(l.custo) },
+        { k: 'dia', r: 'Dia (%)', g: 'osc', f: l => sinal(l.dia, v => fmtNum(v) + '%') },
+        { k: 'pvp', r: 'P/VP', g: 'analise', f: l => fmtNum(l.pvp) },
+        { k: 'teto', r: 'Preço teto', g: 'analise', f: l => fmtMoeda(l.teto) },
+        { k: 'compra', r: 'Compra?', g: 'analise', t: 'txt', f: l => l.compra
+            ? `<span class="ap-selo ${l.compra === 'COMPRA' ? 'ap-selo-compra' : 'ap-selo-aguarde'}">${l.compra}</span>` : '—' },
+        { k: 'preco', r: 'Preço atual', g: 'analise', f: l => fmtMoeda(l.preco) },
+        { k: 'dy12', r: 'DY 12M (%)', g: 'analise', f: l => fmtPct(l.dy12) },
+        { k: 'prov', r: 'Proventos', g: 'prov', f: l => l.prov === null ? '—'
+            : fmtMoeda(l.prov) + (l.provEst ? '<span class="ap-estimado" title="Estimativa: cotas × preço × DY 12M. Informe o valor recebido na tabela acima.">≈</span>' : '') },
+        { k: 'dyPct', r: 'DY (%)', g: 'prov', f: l => fmtPct(l.dyPct) },
+        { k: 'dyCost', r: 'DY on cost (%)', g: 'prov', f: l => fmtPct(l.dyCost) },
+        { k: 'lucro', r: 'Lucro (R$)', g: 'rent', f: l => sinal(l.lucro, fmtMoeda) },
+        { k: 'lucroPct', r: 'Lucro (%)', g: 'rent', f: l => sinal(l.lucroPct, v => fmtNum(v) + '%') },
+      ];
+      const GRUPOS_VISAO = [
+        ['carteira', 'EM CARTEIRA', 'ap-g-carteira'], ['osc', 'OSCILAÇÃO', 'ap-g-osc'], ['analise', 'ANÁLISES', 'ap-g-analise'],
+        ['prov', 'PROVENTOS 12 MESES', 'ap-g-prov'], ['rent', 'RENTABILIDADE', 'ap-g-rent'],
+      ];
+
+      function ordenarVisao(ls) {
+        const c = COLS_VISAO.find(x => x.k === ordemVisao.col);
+        if (!c) return ls;
+        const m = ordemVisao.dir === 'asc' ? 1 : -1;
+        return ls.slice().sort((a, b) => {
+          const va = a[c.k], vb = b[c.k];
+          const na = va === null || va === undefined, nb = vb === null || vb === undefined;
+          if (na || nb) return na === nb ? 0 : na ? 1 : -1; // vazios sempre no fim
+          if (c.t === 'txt') return String(va).localeCompare(String(vb), 'pt-BR') * m;
+          return (va - vb) * m;
+        });
+      }
+
+      function renderVisao() {
+        if (!visaoEl) return;
+        visaoEl.hidden = ativos.length === 0;
+        if (!ativos.length) return;
+        const ls = linhasVisao();
+        const t = totaisVisao(ls);
+        const card = (rot, val, extra = '', destaque = false) =>
+          `<div class="carteira-resumo-card${destaque ? ' carteira-resumo-destaque' : ''}"><span>${rot}</span><strong>${val}</strong>${extra}</div>`;
+        visaoCardsEl.innerHTML = [
+          card('Custo de aquisição', t.temCusto ? fmtMoeda(t.custo) : '—',
+            t.temCusto && !t.custoCompleto ? '<small style="color:var(--muted)">falta preço médio de algum ativo</small>' : ''),
+          card('Valor de mercado', fmtMoeda(t.vm), '', true),
+          card('Valorização', t.temCusto ? sinal(t.lucro, fmtMoeda) : '—',
+            t.lucroPct !== null ? `<small>${sinal(t.lucroPct, v => fmtNum(v) + '%')}</small>` : ''),
+          card('Proventos 12 meses', fmtMoeda(t.prov), t.algumEstimado ? '<small style="color:var(--muted)">inclui estimativas ≈</small>' : ''),
+          card('DY on cost', fmtPct(t.dyCost), t.dyPct !== null ? `<small style="color:var(--muted)">DY sobre o mercado: ${fmtPct(t.dyPct)}</small>` : ''),
+          card('Carteira com proventos', t.rentTotal !== null ? sinal(t.rentTotal, v => fmtNum(v) + '%') : '—',
+            '<small style="color:var(--muted)">valorização + proventos ÷ custo</small>'),
+        ].join('');
+
+        const grupos = GRUPOS_VISAO.map(([g, rot, cls]) =>
+          `<th colspan="${COLS_VISAO.filter(c => c.g === g).length}" class="${cls}">${rot}</th>`).join('');
+        const cab = COLS_VISAO.map(c => {
+          const ord = ordemVisao.col === c.k ? ' ' + ordemVisao.dir : '';
+          return `<th class="ap-ord${ord}${c.t === 'txt' ? '' : ' ap-num'}" data-col="${c.k}">${c.r}</th>`;
+        }).join('');
+        const corpo = ordenarVisao(ls).map(l => `<tr>${COLS_VISAO.map(c =>
+          `<td class="${c.t === 'txt' ? '' : 'ap-num'}">${c.f(l)}</td>`).join('')}</tr>`).join('');
+        const tot = {
+          peso: fmtPct(ls.some(l => l.peso !== null) ? 100 : null), custo: t.temCusto ? fmtMoeda(t.custo) : '—',
+          prov: fmtMoeda(t.prov), dyPct: fmtPct(t.dyPct), dyCost: fmtPct(t.dyCost),
+          lucro: t.temCusto ? sinal(t.lucro, fmtMoeda) : '—',
+          lucroPct: t.lucroPct !== null ? sinal(t.lucroPct, v => fmtNum(v) + '%') : '—',
+        };
+        const rodape = COLS_VISAO.map((c, i) => `<td class="${c.t === 'txt' ? '' : 'ap-num'}">${i === 0 ? 'Total' : (tot[c.k] ?? '')}</td>`).join('');
+        tabelaVisaoEl.innerHTML = `<thead><tr class="ap-grupos">${grupos}</tr><tr>${cab}</tr></thead><tbody>${corpo}</tbody><tfoot><tr>${rodape}</tr></tfoot>`;
+      }
+
+      tabelaVisaoEl?.addEventListener('click', (e) => {
+        const th = e.target.closest('th[data-col]');
+        if (!th) return;
+        const c = COLS_VISAO.find(x => x.k === th.dataset.col);
+        if (ordemVisao.col === c.k) ordemVisao.dir = ordemVisao.dir === 'asc' ? 'desc' : 'asc';
+        else ordemVisao = { col: c.k, dir: c.t === 'txt' ? 'asc' : 'desc' };
+        renderVisao();
+      });
+      window.vrLinhasVisaoAporte = () => ({ linhas: linhasVisao(), totais: totaisVisao(linhasVisao()) });
+
       function invalidarResultado() {
         if (!ultimoResultado) return;
         ultimoResultado = null;
@@ -11769,11 +12030,16 @@
         novos.forEach(n => {
           const existente = ativos.find(a => a.ticker === n.ticker);
           if (existente) {
-            existente.cotas = n.cotas;
+            if (n.cotas !== null && n.cotas !== undefined) existente.cotas = n.cotas;
             if (n.alvo) existente.alvo = n.alvo;
-            if (n.teto) existente.teto = n.teto;
+            ['teto', 'pm', 'setor', 'precoPlanilha'].forEach(k => { if (n[k]) existente[k] = n[k]; });
+            if (n.prov !== null && n.prov !== undefined) existente.prov = n.prov;
           } else {
-            ativos.push({ ticker: n.ticker, cotas: n.cotas || 0, alvo: n.alvo || 0, teto: n.teto || null, preco: null, precoManual: false });
+            ativos.push({
+              ticker: n.ticker, cotas: n.cotas || 0, alvo: n.alvo || 0, teto: n.teto || null,
+              pm: n.pm || null, prov: n.prov ?? null, setor: n.setor || null, precoPlanilha: n.precoPlanilha || null,
+              preco: null, precoManual: false,
+            });
           }
         });
         invalidarResultado();
@@ -12043,6 +12309,60 @@
           y += partes.length * 10 + 2;
         });
         doc.setTextColor(0);
+
+        // Página 2 (paisagem): a carteira com todas as colunas da planilha.
+        const { linhas: lv, totais: tv } = window.vrLinhasVisaoAporte();
+        if (lv.length) {
+          doc.addPage('a4', 'landscape');
+          const largP = doc.internal.pageSize.getWidth();
+          if (logo) doc.addImage(logo, 'PNG', largP - 70, 15, 30, 30);
+          doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+          doc.text('Visão da carteira', 40, 40);
+          doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(90);
+          doc.text('Proventos com "~" são estimativa (cotas x preço x DY 12M). Dia %, P/VP e DY 12M: robôs do site.', 40, 56);
+          doc.setTextColor(0);
+          const semSinal = (v, f) => (typeof v === 'number' ? (v < 0 ? '-' : '') + f(Math.abs(v)) : '-');
+          const pct = (v) => (typeof v === 'number' ? fmtNum(v) + '%' : '-');
+          const din = (v) => (typeof v === 'number' ? fmtMoeda(v) : '-');
+          doc.autoTable({
+            startY: 66,
+            head: [
+              [{ content: 'EM CARTEIRA', colSpan: 6, styles: { fillColor: [29, 127, 168] } },
+               { content: 'OSCIL.', styles: { fillColor: [192, 80, 77] } },
+               { content: 'ANÁLISES', colSpan: 5, styles: { fillColor: [168, 120, 26] } },
+               { content: 'PROVENTOS 12 MESES', colSpan: 3, styles: { fillColor: [46, 139, 87] } },
+               { content: 'RENTABILIDADE', colSpan: 2, styles: { fillColor: [106, 79, 179] } }],
+              ['Ativo', 'Setor', 'Peso %', 'Posição', 'Preço médio', 'Custo', 'Dia %', 'P/VP', 'Teto', 'Compra?', 'Preço atual',
+               'DY 12M', 'Proventos', 'DY %', 'DY on cost', 'Lucro R$', 'Lucro %'],
+            ],
+            body: ordenarVisao(lv).map(l => [
+              l.ticker, l.setor || '-', pct(l.peso), fmtInt(l.cotas), din(l.pm), din(l.custo), semSinal(l.dia, v => fmtNum(v) + '%'),
+              l.pvp !== null ? fmtNum(l.pvp) : '-', din(l.teto), l.compra || '-', din(l.preco), pct(l.dy12),
+              l.prov === null ? '-' : din(l.prov) + (l.provEst ? ' ~' : ''), pct(l.dyPct), pct(l.dyCost),
+              semSinal(l.lucro, fmtMoeda), semSinal(l.lucroPct, v => fmtNum(v) + '%'),
+            ]),
+            foot: [['Total', '', '100%', '', '', tv.temCusto ? din(tv.custo) : '-', '', '', '', '', '', '',
+              din(tv.prov), pct(tv.dyPct), pct(tv.dyCost), tv.temCusto ? semSinal(tv.lucro, fmtMoeda) : '-',
+              tv.lucroPct !== null ? semSinal(tv.lucroPct, v => fmtNum(v) + '%') : '-']],
+            theme: 'grid',
+            styles: { fontSize: 6.8, cellPadding: 3, halign: 'right' },
+            headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center', fontSize: 6.8 },
+            footStyles: { fillColor: [235, 235, 235], textColor: 0, fontStyle: 'bold', halign: 'right' },
+            columnStyles: { 0: { halign: 'left', fontStyle: 'bold' }, 1: { halign: 'left' }, 9: { halign: 'center' } },
+            didParseCell: (d) => {
+              if (d.section !== 'body') return;
+              const v = String(d.cell.raw);
+              if (d.column.index === 9) d.cell.styles.textColor = v === 'COMPRA' ? [14, 158, 70] : v === 'AGUARDE' ? [168, 120, 26] : 0;
+              if ([6, 15, 16].includes(d.column.index) && v !== '-') d.cell.styles.textColor = v.startsWith('-') ? [224, 35, 63] : [14, 158, 70];
+            },
+          });
+          doc.setFontSize(8); doc.setTextColor(60);
+          doc.text(
+            `Custo ${tv.temCusto ? din(tv.custo) : '-'}  ·  Valor de mercado ${din(tv.vm)}  ·  Valorização ${tv.temCusto ? semSinal(tv.lucro, fmtMoeda) : '-'}` +
+            `  ·  Proventos 12m ${din(tv.prov)}  ·  DY on cost ${pct(tv.dyCost)}  ·  Carteira c/ proventos ${tv.rentTotal !== null ? semSinal(tv.rentTotal, v => fmtNum(v) + '%') : '-'}`,
+            40, doc.lastAutoTable.finalY + 14);
+          doc.setTextColor(0);
+        }
         return doc;
       }
 
@@ -12112,6 +12432,10 @@
       $('apBtnIguais').addEventListener('click', pesosIguais);
       $('apBtnAtuais').addEventListener('click', manterPesosAtuais);
       $('apBtnLimpar').addEventListener('click', limparTudo);
+      $('apBtnIrVisao').addEventListener('click', () => {
+        if (!ativos.length) { statusEl.textContent = 'Adicione ou cole seus ativos primeiro.'; return; }
+        visaoEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
       btnNormalizar.addEventListener('click', normalizar);
       btnColar.addEventListener('click', () => {
         colarBox.hidden = !colarBox.hidden;
