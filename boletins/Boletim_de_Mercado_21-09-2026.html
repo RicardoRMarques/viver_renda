@@ -101,17 +101,6 @@
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
-  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .section-com-lyket [data-lyket-type]{
-    font-size:12px;
-    background:#f2f2f2;
-    border-radius:20px;
-    padding:4px 10px;
-    display:inline-flex;
-    align-items:center;
-    box-shadow:0 1px 4px rgba(0,0,0,0.35);
-  }
-  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
   .grupo-whatsapp-card{
     display:flex;align-items:center;gap:12px;margin-top:12px;
     background:var(--card);border:1px solid var(--card-border);border-radius:12px;
@@ -124,7 +113,6 @@
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
-<script src="https://unpkg.com/@lyket/widget@latest/dist/lyket.js?apiKey=pt_d2c19f94733791f2b25c44987dd17e"></script>
 </head>
 <body>
 <div class="wrap">
@@ -139,13 +127,10 @@
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
-  <div class="sub">Boletim de Mercado · Sexta-feira, 21 de Agosto de 2026</div>
+  <div class="sub">Boletim de Mercado · Segunda-feira, 21 de Setembro de 2026</div>
 </header>
 
-<h2 class="section section-com-lyket">
-  <span>Indicadores Principais</span>
-  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-21-08-2026"></div>
-</h2>
+<h2 class="section">Indicadores Principais</h2>
 
 <a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
   <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
@@ -156,23 +141,25 @@
 </a>
 
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value up">167.927,16 pts ▲ 0.06%</div></div>
-  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value down">3.647,48 pts ▼ 0.93%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,19 ▲ 0.29%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 6,06 ▲ 0.41%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">US$ 77.576,00 ▲ 8.59%</div></div>
-  <div class="indicator"><div class="label">Ethereum</div><div class="value up">US$ 2.403,76 ▲ 5.81%</div></div>
-  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">14,00% a.a.</div></div>
-  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,90% a.a.</div></div>
-  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,44%</div></div>
-  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-1,16%</div></div>
+  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value down">185.229,17 pts ▼ 0.41%</div></div>
+  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.750,27 pts ▲ 0.07%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,16 ▲ 0.10%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value down">R$ 5,91 ▼ 0.03%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">US$ 81.614,00 ▲ 1.70%</div></div>
+  <div class="indicator"><div class="label">Ethereum</div><div class="value up">US$ 2.661,31 ▲ 3.48%</div></div>
+  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">13,75% a.a.</div></div>
+  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,65% a.a.</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,22%</div></div>
+  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-0,22%</div></div>
 </div>
+
+
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEB6J0AJ_M.jpg" alt="Por que as ações da NIBE Industrier estão subindo hoje?" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-nibe-industrier-estao-subindo-hoje-93CH-2046197" target="_blank" rel="noopener noreferrer" class="tk-link">Por que as ações da NIBE Industrier estão subindo hoje?</a></span><span class="pct">Investing.com (Ações)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEM5F17R_1200_L.jpg" alt="Dados do PMI à vista; EUA prometem sanções &quot;duras&quot; ao Irã" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/dados-do-pmi-a-vista-eua-prometem-sancoes-duras-ao-ira-2046177" target="_blank" rel="noopener noreferrer" class="tk-link">Dados do PMI à vista; EUA prometem sanções "duras" ao Irã</a></span><span class="pct">Investing.com (Economia)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEE850IL_L.jpg" alt="Indonésia - Ações fecharam o pregão em alta e o Índice IDX Composite avançou 0,57%" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/indonesia--acoes-fecharam-o-pregao-em-alta-e-o-indice-idx-composite-avancou-057-2046194" target="_blank" rel="noopener noreferrer" class="tk-link">Indonésia - Ações fecharam o pregão em alta e o Índice IDX Composite avançou 0,57%</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEC0409P_M.jpg" alt="Vendas de robôs humanoides chegam a 7.000 unidades no mundo em 2025" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/vendas-de-robos-humanoides-chegam-a-7000-unidades-no-mundo-em-2025-93CH-2070274" target="_blank" rel="noopener noreferrer" class="tk-link">Vendas de robôs humanoides chegam a 7.000 unidades no mundo em 2025</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEA6M0QA_M.jpg" alt="Bessent propõe sistema de segurança em IA entre EUA e China" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/bessent-propoe-sistema-de-seguranca-em-ia-entre-eua-e-china-2070235" target="_blank" rel="noopener noreferrer" class="tk-link">Bessent propõe sistema de segurança em IA entre EUA e China</a></span><span class="pct">Investing.com (Economia)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/moved_LYNXNPEG1N006-OCABS_L.jpg" alt="Austrália - Ações fecharam o pregão em alta e o Índice S&P/ASX 200 avançou 0,01%" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/australia--acoes-fecharam-o-pregao-em-alta-e-o-indice-spasx-200-avancou-001-2070272" target="_blank" rel="noopener noreferrer" class="tk-link">Austrália - Ações fecharam o pregão em alta e o Índice S&P/ASX 200 avançou 0,01%</a></span><span class="pct">Investing.com (Ações)</span></div>
 </div>
 
 <h2 class="section">FIIs - Maiores Dividend Yield</h2>
@@ -181,39 +168,39 @@
   
   <tr>
     <td class="name">XPCA11</td>
-    <td>18.23%</td>
-    <td>R$ 7.13</td>
+    <td>17.48%</td>
+    <td>R$ 7.38</td>
     <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
     <td class="name">IRIM11</td>
-    <td>16.70%</td>
-    <td>R$ 60.19</td>
+    <td>16.62%</td>
+    <td>R$ 60.66</td>
     <td class="rationale">FII Irim</td>
   </tr>
   <tr>
-    <td class="name">VGIR11</td>
-    <td>16.08%</td>
-    <td>R$ 9.39</td>
-    <td class="rationale">FII Valreiii</td>
-  </tr>
-  <tr>
     <td class="name">TRXF11</td>
-    <td>15.11%</td>
-    <td>R$ 78.09</td>
+    <td>15.87%</td>
+    <td>R$ 74.37</td>
     <td class="rationale">FII Trx Real</td>
   </tr>
   <tr>
-    <td class="name">CPTS11</td>
-    <td>14.59%</td>
-    <td>R$ 7.37</td>
-    <td class="rationale">FII Capi Sec</td>
+    <td class="name">VGIR11</td>
+    <td>15.62%</td>
+    <td>R$ 9.67</td>
+    <td class="rationale">FII Valreiii</td>
   </tr>
   <tr>
     <td class="name">RECR11</td>
-    <td>14.29%</td>
-    <td>R$ 76.19</td>
+    <td>14.18%</td>
+    <td>R$ 76.49</td>
     <td class="rationale">FII Rec Rece</td>
+  </tr>
+  <tr>
+    <td class="name">BTHF11</td>
+    <td>14.00%</td>
+    <td>R$ 8.50</td>
+    <td class="rationale">FII BTHF</td>
   </tr>
 </table>
 
@@ -222,65 +209,65 @@
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
-    <td class="name">SBSP3</td>
-    <td>14.64%</td>
-    <td>R$ 23.75</td>
-    <td class="rationale">Sabesp</td>
-  </tr>
-  <tr>
     <td class="name">CMIG4</td>
-    <td>12.57%</td>
-    <td>R$ 10.19</td>
+    <td>11.43%</td>
+    <td>R$ 11.21</td>
     <td class="rationale">CEMIG</td>
   </tr>
   <tr>
     <td class="name">BBSE3</td>
-    <td>12.49%</td>
-    <td>R$ 36.76</td>
+    <td>11.23%</td>
+    <td>R$ 40.86</td>
     <td class="rationale">BB Seguridade</td>
   </tr>
   <tr>
     <td class="name">ALOS3</td>
-    <td>11.45%</td>
-    <td>R$ 25.68</td>
+    <td>10.84%</td>
+    <td>R$ 28.87</td>
     <td class="rationale">ALLOS</td>
   </tr>
   <tr>
     <td class="name">BBDC4</td>
-    <td>9.71%</td>
-    <td>R$ 16.02</td>
+    <td>8.64%</td>
+    <td>R$ 17.99</td>
     <td class="rationale">Banco Bradesco</td>
   </tr>
   <tr>
-    <td class="name">ITUB4</td>
-    <td>8.24%</td>
-    <td>R$ 38.43</td>
-    <td class="rationale">Banco Itaú Unibanco</td>
+    <td class="name">VALE3</td>
+    <td>7.65%</td>
+    <td>R$ 73.37</td>
+    <td class="rationale">Vale</td>
+  </tr>
+  <tr>
+    <td class="name">PETR4</td>
+    <td>7.54%</td>
+    <td>R$ 48.50</td>
+    <td class="rationale">Petrobras</td>
   </tr>
 </table>
 
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/temporada-de-balancos-resultados.jpg?fit=300%2C169&amp;quality=70&amp;strip=all" alt="Lucros crescem, ações caem: o paradoxo da temporada de balanços" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://content-media.investing.com/news/moved_LYNXNPEG1N006-OCABS_L.jpg" alt="Austrália - Ações fecharam o pregão em alta e o Índice S&P/ASX 200 avançou 0,01%" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/lucros-crescem-acoes-caem-o-paradoxo-da-temporada-de-balancos/" target="_blank" rel="noopener noreferrer" class="n-link">1. Lucros crescem, ações caem: o paradoxo da temporada de balanços</a></div>
-    <div class="n-body">Fonte: InfoMoney (geral)</div>
+    <div class="n-title"><a href="https://br.investing.com/news/stock-market-news/australia--acoes-fecharam-o-pregao-em-alta-e-o-indice-spasx-200-avancou-001-2070272" target="_blank" rel="noopener noreferrer" class="n-link">1. Austrália - Ações fecharam o pregão em alta e o Índice S&P/ASX 200 avançou 0,01%</a></div>
+    <div class="n-body">Fonte: Investing.com (Ações)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2025/12/2025-12-17T142756Z_490111068_RC2KCBAFJBWF_RTRMADP_3_CENTRALAFRICA-CRYPTO.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Bitcoin ganha força acima de US$ 72 mil: quais são os próximos alvos?" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://content-media.investing.com/news/moved_LYNXMPEJ7U0RP_L.jpg" alt="Trump &quot;aberto&quot; a se reunir com o presidente iraniano Pezeshkian" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/bitcoin-dispara-15-e-supera-us-72-mil-alta-ainda-tem-folego/" target="_blank" rel="noopener noreferrer" class="n-link">2. Bitcoin ganha força acima de US$ 72 mil: quais são os próximos alvos?</a></div>
-    <div class="n-body">Fonte: InfoMoney (geral)</div>
+    <div class="n-title"><a href="https://br.investing.com/news/economy-news/trump-aberto-a-se-reunir-com-o-presidente-iraniano-pezeshkian-2070224" target="_blank" rel="noopener noreferrer" class="n-link">2. Trump "aberto" a se reunir com o presidente iraniano Pezeshkian</a></div>
+    <div class="n-body">Fonte: Investing.com (Economia)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/IN-THIS-ECONOMY-MILLENNIALS-AND-GEN-Z-WOULD-RATHER-BREAK-UP-THAN-DATE-SOMEONE-IN-DEBT-THERES-A-PRETTY-BIG-DIVIDE.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Millennials e geração Z preferem terminar relacionamento a assumir dívida do parceiro" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/09/Captura-de-tela-2026-09-20-164705.png?fit=300%2C199&amp;quality=70&amp;strip=all" alt="Treasuries de curto prazo emergem como aposta popular de controle da inflação por Fed" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/business/global/millennials-e-geracao-z-preferem-terminar-relacionamento-a-assumir-divida-do-parceiro/" target="_blank" rel="noopener noreferrer" class="n-link">3. Millennials e geração Z preferem terminar relacionamento a assumir dívida do parceiro</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/treasuries-de-curto-prazo-emergem-como-aposta-popular-de-controle-da-inflacao-por-fed/" target="_blank" rel="noopener noreferrer" class="n-link">3. Treasuries de curto prazo emergem como aposta popular de controle da inflação por Fed</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
