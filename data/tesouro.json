@@ -1,8 +1,8 @@
 {
   "_leia_me": "Preços e taxas do Tesouro Direto, usados na tabela do site. Fonte: CSV do Tesouro Transparente (histórico completo), lido em fluxo pelo robô coletar_tesouro.py. NÃO diz o que está à venda: o Tesouro suspende e retoma a venda durante o dia, e este arquivo é um retrato da manhã. Em Educa+ e Renda+, 'nome' usa o ano da CONVERSÃO (como o Tesouro vende) e 'vencimento' é o último pagamento. A taxa significa coisa diferente por indexador — ver 'rotulo_taxa'.",
   "fonte": "Tesouro Transparente — Tesouro Nacional",
-  "data_base": "2026-09-17",
-  "atualizado_em": "2026-09-18",
+  "data_base": "2026-09-18",
+  "atualizado_em": "2026-09-21",
   "titulos": [
     {
       "id": "tesouro-igpm-com-juros-semestrais-01012031",
@@ -15,11 +15,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2031-01-01",
-      "taxa_compra": 7.87,
-      "taxa_venda": 7.99,
-      "pu_compra": 7718.89,
-      "pu_venda": 7684.59,
-      "investimento_minimo": 77.19
+      "taxa_compra": 7.83,
+      "taxa_venda": 7.95,
+      "pu_compra": 7738.39,
+      "pu_venda": 7699.19,
+      "investimento_minimo": 77.38
     },
     {
       "id": "tesouro-ipca-15052029",
@@ -32,11 +32,11 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2029-05-15",
-      "taxa_compra": 7.43,
-      "taxa_venda": 7.55,
-      "pu_compra": 3919.56,
-      "pu_venda": 3906.24,
-      "investimento_minimo": 39.2
+      "taxa_compra": 7.37,
+      "taxa_venda": 7.49,
+      "pu_compra": 3928.6,
+      "pu_venda": 3913.82,
+      "investimento_minimo": 39.29
     },
     {
       "id": "tesouro-ipca-com-juros-semestrais-15082030",
@@ -49,11 +49,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2030-08-15",
-      "taxa_compra": 7.55,
-      "taxa_venda": 7.67,
-      "pu_compra": 4530.14,
-      "pu_venda": 4510.42,
-      "investimento_minimo": 45.3
+      "taxa_compra": 7.5,
+      "taxa_venda": 7.62,
+      "pu_compra": 4541.32,
+      "pu_venda": 4519.89,
+      "investimento_minimo": 45.41
     },
     {
       "id": "tesouro-educa-15122030",
@@ -66,11 +66,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2030-12-15",
-      "taxa_compra": 7.37,
-      "taxa_venda": 7.49,
-      "pu_compra": 3467.23,
-      "pu_venda": 3457.74,
-      "investimento_minimo": 34.67
+      "taxa_compra": 7.31,
+      "taxa_venda": 7.43,
+      "pu_compra": 3474.08,
+      "pu_venda": 3463.3,
+      "investimento_minimo": 34.74
     },
     {
       "id": "tesouro-educa-15122031",
@@ -83,11 +83,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2031-12-15",
-      "taxa_compra": 7.44,
-      "taxa_venda": 7.56,
-      "pu_compra": 3902.09,
-      "pu_venda": 3888.9,
-      "investimento_minimo": 39.02
+      "taxa_compra": 7.38,
+      "taxa_venda": 7.5,
+      "pu_compra": 3911.07,
+      "pu_venda": 3896.41,
+      "investimento_minimo": 39.11
     },
     {
       "id": "tesouro-ipca-com-juros-semestrais-15082032",
@@ -100,11 +100,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2032-08-15",
-      "taxa_compra": 7.59,
-      "taxa_venda": 7.71,
-      "pu_compra": 4424.1,
-      "pu_venda": 4397.54,
-      "investimento_minimo": 44.24
+      "taxa_compra": 7.55,
+      "taxa_venda": 7.67,
+      "pu_compra": 4436.04,
+      "pu_venda": 4407.79,
+      "investimento_minimo": 44.36
     },
     {
       "id": "tesouro-ipca-15082032",
@@ -117,11 +117,11 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2032-08-15",
-      "taxa_compra": 7.61,
-      "taxa_venda": 7.73,
-      "pu_compra": 3075.64,
-      "pu_venda": 3054.11,
-      "investimento_minimo": 30.76
+      "taxa_compra": 7.58,
+      "taxa_venda": 7.7,
+      "pu_compra": 3083.29,
+      "pu_venda": 3060.58,
+      "investimento_minimo": 30.83
     },
     {
       "id": "tesouro-educa-15122032",
@@ -134,11 +134,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2032-12-15",
-      "taxa_compra": 7.53,
-      "taxa_venda": 7.65,
-      "pu_compra": 3622.44,
-      "pu_venda": 3606.2,
-      "investimento_minimo": 36.22
+      "taxa_compra": 7.48,
+      "taxa_venda": 7.6,
+      "pu_compra": 3631.58,
+      "pu_venda": 3613.96,
+      "investimento_minimo": 36.32
     },
     {
       "id": "tesouro-educa-15122033",
@@ -151,11 +151,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2033-12-15",
-      "taxa_compra": 7.57,
-      "taxa_venda": 7.69,
-      "pu_compra": 3364.5,
-      "pu_venda": 3345.7,
-      "investimento_minimo": 33.65
+      "taxa_compra": 7.52,
+      "taxa_venda": 7.64,
+      "pu_compra": 3374.54,
+      "pu_venda": 3354.46,
+      "investimento_minimo": 33.75
     },
     {
       "id": "tesouro-educa-15122034",
@@ -168,11 +168,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2034-12-15",
-      "taxa_compra": 7.58,
-      "taxa_venda": 7.7,
-      "pu_compra": 3126.9,
-      "pu_venda": 3105.99,
-      "investimento_minimo": 31.27
+      "taxa_compra": 7.55,
+      "taxa_venda": 7.67,
+      "pu_compra": 3134.43,
+      "pu_venda": 3112.32,
+      "investimento_minimo": 31.34
     },
     {
       "id": "tesouro-ipca-com-juros-semestrais-15052035",
@@ -185,11 +185,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2035-05-15",
-      "taxa_compra": 7.54,
-      "taxa_venda": 7.66,
-      "pu_compra": 4397.17,
-      "pu_venda": 4362.85,
-      "investimento_minimo": 43.97
+      "taxa_compra": 7.55,
+      "taxa_venda": 7.67,
+      "pu_compra": 4398.19,
+      "pu_venda": 4362.27,
+      "investimento_minimo": 43.98
     },
     {
       "id": "tesouro-ipca-15052035",
@@ -202,11 +202,11 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2035-05-15",
-      "taxa_compra": 7.55,
-      "taxa_venda": 7.67,
-      "pu_compra": 2531.08,
-      "pu_venda": 2505.75,
-      "investimento_minimo": 25.31
+      "taxa_compra": 7.57,
+      "taxa_venda": 7.69,
+      "pu_compra": 2529.18,
+      "pu_venda": 2502.95,
+      "investimento_minimo": 25.29
     },
     {
       "id": "tesouro-educa-15122035",
@@ -219,11 +219,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2035-12-15",
-      "taxa_compra": 7.57,
-      "taxa_venda": 7.69,
-      "pu_compra": 2909.25,
-      "pu_venda": 2886.58,
-      "investimento_minimo": 29.09
+      "taxa_compra": 7.56,
+      "taxa_venda": 7.68,
+      "pu_compra": 2913.5,
+      "pu_venda": 2889.73,
+      "investimento_minimo": 29.14
     },
     {
       "id": "tesouro-educa-15122036",
@@ -236,11 +236,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2036-12-15",
-      "taxa_compra": 7.55,
-      "taxa_venda": 7.67,
-      "pu_compra": 2709.35,
-      "pu_venda": 2685.26,
-      "investimento_minimo": 27.09
+      "taxa_compra": 7.56,
+      "taxa_venda": 7.68,
+      "pu_compra": 2709.74,
+      "pu_venda": 2684.65,
+      "investimento_minimo": 27.1
     },
     {
       "id": "tesouro-ipca-com-juros-semestrais-15052037",
@@ -253,11 +253,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2037-05-15",
-      "taxa_compra": 7.46,
-      "taxa_venda": 7.58,
-      "pu_compra": 4354.84,
-      "pu_venda": 4315.74,
-      "investimento_minimo": 43.55
+      "taxa_compra": 7.48,
+      "taxa_venda": 7.6,
+      "pu_compra": 4352.31,
+      "pu_venda": 4311.66,
+      "investimento_minimo": 43.52
     },
     {
       "id": "tesouro-educa-15122037",
@@ -270,10 +270,10 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2037-12-15",
-      "taxa_compra": 7.52,
-      "taxa_venda": 7.64,
-      "pu_compra": 2526.33,
-      "pu_venda": 2501.08,
+      "taxa_compra": 7.53,
+      "taxa_venda": 7.65,
+      "pu_compra": 2526.45,
+      "pu_venda": 2500.29,
       "investimento_minimo": 25.26
     },
     {
@@ -287,11 +287,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2038-12-15",
-      "taxa_compra": 7.47,
-      "taxa_venda": 7.59,
-      "pu_compra": 2361.59,
-      "pu_venda": 2335.4,
-      "investimento_minimo": 23.62
+      "taxa_compra": 7.5,
+      "taxa_venda": 7.62,
+      "pu_compra": 2357.28,
+      "pu_venda": 2330.28,
+      "investimento_minimo": 23.57
     },
     {
       "id": "tesouro-educa-15122039",
@@ -304,11 +304,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2039-12-15",
-      "taxa_compra": 7.42,
-      "taxa_venda": 7.54,
-      "pu_compra": 2209.59,
-      "pu_venda": 2182.66,
-      "investimento_minimo": 22.1
+      "taxa_compra": 7.45,
+      "taxa_venda": 7.57,
+      "pu_compra": 2204.94,
+      "pu_venda": 2177.27,
+      "investimento_minimo": 22.05
     },
     {
       "id": "tesouro-ipca-com-juros-semestrais-15082040",
@@ -321,10 +321,10 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2040-08-15",
-      "taxa_compra": 7.33,
-      "taxa_venda": 7.45,
-      "pu_compra": 4243.61,
-      "pu_venda": 4197.95,
+      "taxa_compra": 7.34,
+      "taxa_venda": 7.46,
+      "pu_compra": 4243.5,
+      "pu_venda": 4196.32,
       "investimento_minimo": 42.44
     },
     {
@@ -338,11 +338,11 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2040-08-15",
-      "taxa_compra": 7.26,
-      "taxa_venda": 7.38,
-      "pu_compra": 1795.0,
-      "pu_venda": 1766.64,
-      "investimento_minimo": 17.95
+      "taxa_compra": 7.27,
+      "taxa_venda": 7.39,
+      "pu_compra": 1794.19,
+      "pu_venda": 1765.19,
+      "investimento_minimo": 17.94
     },
     {
       "id": "tesouro-educa-15122040",
@@ -355,11 +355,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2040-12-15",
-      "taxa_compra": 7.37,
-      "taxa_venda": 7.49,
-      "pu_compra": 2068.82,
-      "pu_venda": 2041.33,
-      "investimento_minimo": 20.69
+      "taxa_compra": 7.39,
+      "taxa_venda": 7.51,
+      "pu_compra": 2066.11,
+      "pu_venda": 2037.9,
+      "investimento_minimo": 20.66
     },
     {
       "id": "tesouro-educa-15122041",
@@ -372,11 +372,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2041-12-15",
-      "taxa_compra": 7.32,
-      "taxa_venda": 7.44,
-      "pu_compra": 1938.75,
-      "pu_venda": 1910.85,
-      "investimento_minimo": 19.39
+      "taxa_compra": 7.35,
+      "taxa_venda": 7.47,
+      "pu_compra": 1933.58,
+      "pu_venda": 1905.06,
+      "investimento_minimo": 19.34
     },
     {
       "id": "tesouro-educa-15122042",
@@ -389,11 +389,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2042-12-15",
-      "taxa_compra": 7.29,
-      "taxa_venda": 7.41,
-      "pu_compra": 1813.98,
-      "pu_venda": 1785.88,
-      "investimento_minimo": 18.14
+      "taxa_compra": 7.31,
+      "taxa_venda": 7.43,
+      "pu_compra": 1810.93,
+      "pu_venda": 1782.22,
+      "investimento_minimo": 18.11
     },
     {
       "id": "tesouro-educa-15122043",
@@ -406,11 +406,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2043-12-15",
-      "taxa_compra": 7.27,
-      "taxa_venda": 7.39,
-      "pu_compra": 1695.74,
-      "pu_venda": 1667.61,
-      "investimento_minimo": 16.96
+      "taxa_compra": 7.28,
+      "taxa_venda": 7.4,
+      "pu_compra": 1694.86,
+      "pu_venda": 1666.13,
+      "investimento_minimo": 16.95
     },
     {
       "id": "tesouro-educa-15122044",
@@ -423,11 +423,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2044-12-15",
-      "taxa_compra": 7.25,
-      "taxa_venda": 7.37,
-      "pu_compra": 1585.92,
-      "pu_venda": 1557.86,
-      "investimento_minimo": 15.86
+      "taxa_compra": 7.27,
+      "taxa_venda": 7.39,
+      "pu_compra": 1582.65,
+      "pu_venda": 1554.09,
+      "investimento_minimo": 15.83
     },
     {
       "id": "tesouro-ipca-com-juros-semestrais-15052045",
@@ -440,11 +440,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2045-05-15",
-      "taxa_compra": 7.31,
-      "taxa_venda": 7.43,
-      "pu_compra": 4235.71,
-      "pu_venda": 4183.52,
-      "investimento_minimo": 42.36
+      "taxa_compra": 7.32,
+      "taxa_venda": 7.44,
+      "pu_compra": 4235.04,
+      "pu_venda": 4181.35,
+      "investimento_minimo": 42.35
     },
     {
       "id": "tesouro-ipca-15052045",
@@ -457,11 +457,11 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2045-05-15",
-      "taxa_compra": 7.24,
-      "taxa_venda": 7.36,
-      "pu_compra": 1294.77,
-      "pu_venda": 1267.61,
-      "investimento_minimo": 12.95
+      "taxa_compra": 7.26,
+      "taxa_venda": 7.38,
+      "pu_compra": 1291.38,
+      "pu_venda": 1263.84,
+      "investimento_minimo": 12.91
     },
     {
       "id": "tesouro-educa-15122045",
@@ -474,11 +474,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2045-12-15",
-      "taxa_compra": 7.25,
-      "taxa_venda": 7.37,
-      "pu_compra": 1479.3,
-      "pu_venda": 1451.52,
-      "investimento_minimo": 14.79
+      "taxa_compra": 7.26,
+      "taxa_venda": 7.38,
+      "pu_compra": 1478.26,
+      "pu_venda": 1449.97,
+      "investimento_minimo": 14.78
     },
     {
       "id": "tesouro-educa-15122046",
@@ -491,11 +491,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2046-12-15",
-      "taxa_compra": 7.24,
-      "taxa_venda": 7.36,
-      "pu_compra": 1382.2,
-      "pu_venda": 1354.74,
-      "investimento_minimo": 13.82
+      "taxa_compra": 7.26,
+      "taxa_venda": 7.38,
+      "pu_compra": 1378.84,
+      "pu_venda": 1350.95,
+      "investimento_minimo": 13.79
     },
     {
       "id": "tesouro-educa-15122047",
@@ -508,11 +508,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2047-12-15",
-      "taxa_compra": 7.24,
-      "taxa_venda": 7.36,
-      "pu_compra": 1289.59,
-      "pu_venda": 1262.56,
-      "investimento_minimo": 12.9
+      "taxa_compra": 7.25,
+      "taxa_venda": 7.37,
+      "pu_compra": 1288.44,
+      "pu_venda": 1260.97,
+      "investimento_minimo": 12.88
     },
     {
       "id": "tesouro-educa-15122048",
@@ -525,11 +525,11 @@
       "cupom": "zero",
       "pagamento": "mensal-5anos",
       "vencimento": "2048-12-15",
-      "taxa_compra": 7.23,
-      "taxa_venda": 7.35,
-      "pu_compra": 1205.38,
-      "pu_venda": 1178.8,
-      "investimento_minimo": 12.05
+      "taxa_compra": 7.24,
+      "taxa_venda": 7.36,
+      "pu_compra": 1204.19,
+      "pu_venda": 1177.21,
+      "investimento_minimo": 12.04
     },
     {
       "id": "tesouro-renda-aposentadoria-extra-15122049",
@@ -542,10 +542,10 @@
       "cupom": "zero",
       "pagamento": "mensal-20anos",
       "vencimento": "2049-12-15",
-      "taxa_compra": 7.35,
-      "taxa_venda": 7.47,
-      "pu_compra": 2012.95,
-      "pu_venda": 1987.61,
+      "taxa_compra": 7.36,
+      "taxa_venda": 7.48,
+      "pu_compra": 2012.58,
+      "pu_venda": 1986.53,
       "investimento_minimo": 20.13
     },
     {
@@ -561,9 +561,9 @@
       "vencimento": "2050-08-15",
       "taxa_compra": 7.28,
       "taxa_venda": 7.4,
-      "pu_compra": 4111.53,
-      "pu_venda": 4054.49,
-      "investimento_minimo": 41.12
+      "pu_compra": 4114.97,
+      "pu_venda": 4056.4,
+      "investimento_minimo": 41.15
     },
     {
       "id": "tesouro-ipca-15082050",
@@ -578,9 +578,9 @@
       "vencimento": "2050-08-15",
       "taxa_compra": 7.19,
       "taxa_venda": 7.31,
-      "pu_compra": 909.06,
-      "pu_venda": 884.81,
-      "investimento_minimo": 9.09
+      "pu_compra": 909.82,
+      "pu_venda": 885.22,
+      "investimento_minimo": 9.1
     },
     {
       "id": "tesouro-renda-aposentadoria-extra-15122054",
@@ -593,11 +593,11 @@
       "cupom": "zero",
       "pagamento": "mensal-20anos",
       "vencimento": "2054-12-15",
-      "taxa_compra": 7.26,
-      "taxa_venda": 7.38,
-      "pu_compra": 1434.0,
-      "pu_venda": 1408.05,
-      "investimento_minimo": 14.34
+      "taxa_compra": 7.27,
+      "taxa_venda": 7.39,
+      "pu_compra": 1433.07,
+      "pu_venda": 1406.63,
+      "investimento_minimo": 14.33
     },
     {
       "id": "tesouro-ipca-com-juros-semestrais-15052055",
@@ -610,11 +610,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2055-05-15",
-      "taxa_compra": 7.19,
-      "taxa_venda": 7.31,
-      "pu_compra": 4184.14,
-      "pu_venda": 4123.32,
-      "investimento_minimo": 41.84
+      "taxa_compra": 7.21,
+      "taxa_venda": 7.33,
+      "pu_compra": 4177.71,
+      "pu_venda": 4115.56,
+      "investimento_minimo": 41.78
     },
     {
       "id": "tesouro-renda-aposentadoria-extra-15122059",
@@ -627,11 +627,11 @@
       "cupom": "zero",
       "pagamento": "mensal-20anos",
       "vencimento": "2059-12-15",
-      "taxa_compra": 7.16,
-      "taxa_venda": 7.28,
-      "pu_compra": 1032.11,
-      "pu_venda": 1007.76,
-      "investimento_minimo": 10.32
+      "taxa_compra": 7.17,
+      "taxa_venda": 7.29,
+      "pu_compra": 1030.95,
+      "pu_venda": 1006.27,
+      "investimento_minimo": 10.31
     },
     {
       "id": "tesouro-ipca-com-juros-semestrais-15082060",
@@ -644,11 +644,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2060-08-15",
-      "taxa_compra": 7.18,
-      "taxa_venda": 7.3,
-      "pu_compra": 4087.0,
-      "pu_venda": 4024.03,
-      "investimento_minimo": 40.87
+      "taxa_compra": 7.19,
+      "taxa_venda": 7.31,
+      "pu_compra": 4085.26,
+      "pu_venda": 4020.88,
+      "investimento_minimo": 40.85
     },
     {
       "id": "tesouro-renda-aposentadoria-extra-15122064",
@@ -661,11 +661,11 @@
       "cupom": "zero",
       "pagamento": "mensal-20anos",
       "vencimento": "2064-12-15",
-      "taxa_compra": 7.09,
-      "taxa_venda": 7.21,
-      "pu_compra": 744.54,
-      "pu_venda": 722.92,
-      "investimento_minimo": 7.45
+      "taxa_compra": 7.11,
+      "taxa_venda": 7.23,
+      "pu_compra": 741.56,
+      "pu_venda": 719.77,
+      "investimento_minimo": 7.42
     },
     {
       "id": "tesouro-renda-aposentadoria-extra-15122069",
@@ -678,11 +678,11 @@
       "cupom": "zero",
       "pagamento": "mensal-20anos",
       "vencimento": "2069-12-15",
-      "taxa_compra": 7.02,
-      "taxa_venda": 7.14,
-      "pu_compra": 540.53,
-      "pu_venda": 521.9,
-      "investimento_minimo": 5.41
+      "taxa_compra": 7.04,
+      "taxa_venda": 7.16,
+      "pu_compra": 537.86,
+      "pu_venda": 519.14,
+      "investimento_minimo": 5.38
     },
     {
       "id": "tesouro-renda-aposentadoria-extra-15122074",
@@ -695,11 +695,11 @@
       "cupom": "zero",
       "pagamento": "mensal-20anos",
       "vencimento": "2074-12-15",
-      "taxa_compra": 6.99,
-      "taxa_venda": 7.11,
-      "pu_compra": 389.71,
-      "pu_venda": 374.18,
-      "investimento_minimo": 3.9
+      "taxa_compra": 7.0,
+      "taxa_venda": 7.12,
+      "pu_compra": 388.72,
+      "pu_venda": 373.1,
+      "investimento_minimo": 3.89
     },
     {
       "id": "tesouro-renda-aposentadoria-extra-15122079",
@@ -712,11 +712,11 @@
       "cupom": "zero",
       "pagamento": "mensal-20anos",
       "vencimento": "2079-12-15",
-      "taxa_compra": 6.98,
-      "taxa_venda": 7.1,
-      "pu_compra": 279.59,
-      "pu_venda": 266.96,
-      "investimento_minimo": 2.8
+      "taxa_compra": 6.99,
+      "taxa_venda": 7.11,
+      "pu_compra": 278.76,
+      "pu_venda": 266.06,
+      "investimento_minimo": 2.79
     },
     {
       "id": "tesouro-renda-aposentadoria-extra-15122084",
@@ -729,11 +729,11 @@
       "cupom": "zero",
       "pagamento": "mensal-20anos",
       "vencimento": "2084-12-15",
-      "taxa_compra": 6.98,
-      "taxa_venda": 7.1,
-      "pu_compra": 199.95,
-      "pu_venda": 189.85,
-      "investimento_minimo": 2.0
+      "taxa_compra": 6.99,
+      "taxa_venda": 7.11,
+      "pu_compra": 199.25,
+      "pu_venda": 189.12,
+      "investimento_minimo": 1.99
     },
     {
       "id": "tesouro-prefixado-01012027",
@@ -746,10 +746,10 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2027-01-01",
-      "taxa_compra": 13.56,
-      "taxa_venda": 13.68,
-      "pu_compra": 964.8,
-      "pu_venda": 964.02,
+      "taxa_compra": 13.54,
+      "taxa_venda": 13.66,
+      "pu_compra": 965.34,
+      "pu_venda": 964.56,
       "investimento_minimo": 9.65
     },
     {
@@ -763,11 +763,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2027-01-01",
-      "taxa_compra": 13.33,
-      "taxa_venda": 13.45,
-      "pu_compra": 1012.47,
-      "pu_venda": 1011.66,
-      "investimento_minimo": 10.12
+      "taxa_compra": 13.32,
+      "taxa_venda": 13.44,
+      "pu_compra": 1013.0,
+      "pu_venda": 1012.19,
+      "investimento_minimo": 10.13
     },
     {
       "id": "tesouro-prefixado-01012028",
@@ -780,10 +780,10 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2028-01-01",
-      "taxa_compra": 13.58,
-      "taxa_venda": 13.7,
-      "pu_compra": 849.83,
-      "pu_venda": 848.26,
+      "taxa_compra": 13.6,
+      "taxa_venda": 13.72,
+      "pu_compra": 850.07,
+      "pu_venda": 848.5,
       "investimento_minimo": 8.5
     },
     {
@@ -797,10 +797,10 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2029-01-01",
-      "taxa_compra": 13.81,
-      "taxa_venda": 13.93,
-      "pu_compra": 746.32,
-      "pu_venda": 744.15,
+      "taxa_compra": 13.85,
+      "taxa_venda": 13.97,
+      "pu_compra": 746.11,
+      "pu_venda": 743.95,
       "investimento_minimo": 7.46
     },
     {
@@ -814,10 +814,10 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2029-01-01",
-      "taxa_compra": 13.59,
-      "taxa_venda": 13.71,
-      "pu_compra": 957.94,
-      "pu_venda": 955.4,
+      "taxa_compra": 13.63,
+      "taxa_venda": 13.75,
+      "pu_compra": 957.74,
+      "pu_venda": 955.2,
       "investimento_minimo": 9.58
     },
     {
@@ -831,10 +831,10 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2031-01-01",
-      "taxa_compra": 14.07,
-      "taxa_venda": 14.19,
-      "pu_compra": 571.5,
-      "pu_venda": 568.65,
+      "taxa_compra": 14.1,
+      "taxa_venda": 14.22,
+      "pu_compra": 571.16,
+      "pu_venda": 568.32,
       "investimento_minimo": 5.71
     },
     {
@@ -848,10 +848,10 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2031-01-01",
-      "taxa_compra": 14.08,
-      "taxa_venda": 14.2,
-      "pu_compra": 902.04,
-      "pu_venda": 898.31,
+      "taxa_compra": 14.11,
+      "taxa_venda": 14.23,
+      "pu_compra": 901.7,
+      "pu_venda": 897.97,
       "investimento_minimo": 9.02
     },
     {
@@ -865,10 +865,10 @@
       "cupom": "zero",
       "pagamento": "vencimento",
       "vencimento": "2032-01-01",
-      "taxa_compra": 14.15,
-      "taxa_venda": 14.27,
-      "pu_compra": 499.17,
-      "pu_venda": 496.16,
+      "taxa_compra": 14.19,
+      "taxa_venda": 14.31,
+      "pu_compra": 498.51,
+      "pu_venda": 495.51,
       "investimento_minimo": 4.99
     },
     {
@@ -882,11 +882,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2033-01-01",
-      "taxa_compra": 14.19,
-      "taxa_venda": 14.31,
-      "pu_compra": 860.88,
-      "pu_venda": 856.32,
-      "investimento_minimo": 8.61
+      "taxa_compra": 14.24,
+      "taxa_venda": 14.36,
+      "pu_compra": 859.62,
+      "pu_venda": 855.07,
+      "investimento_minimo": 8.6
     },
     {
       "id": "tesouro-prefixado-com-juros-semestrais-01012035",
@@ -899,11 +899,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2035-01-01",
-      "taxa_compra": 14.21,
-      "taxa_venda": 14.33,
-      "pu_compra": 831.73,
-      "pu_venda": 826.6,
-      "investimento_minimo": 8.32
+      "taxa_compra": 14.26,
+      "taxa_venda": 14.38,
+      "pu_compra": 830.21,
+      "pu_venda": 825.1,
+      "investimento_minimo": 8.3
     },
     {
       "id": "tesouro-prefixado-com-juros-semestrais-01012037",
@@ -916,11 +916,11 @@
       "cupom": "semestral",
       "pagamento": "semestral",
       "vencimento": "2037-01-01",
-      "taxa_compra": 14.19,
-      "taxa_venda": 14.31,
-      "pu_compra": 810.33,
-      "pu_venda": 804.79,
-      "investimento_minimo": 8.1
+      "taxa_compra": 14.25,
+      "taxa_venda": 14.37,
+      "pu_compra": 808.19,
+      "pu_venda": 802.68,
+      "investimento_minimo": 8.08
     },
     {
       "id": "tesouro-selic-01032027",
@@ -935,9 +935,9 @@
       "vencimento": "2027-03-01",
       "taxa_compra": 0.01,
       "taxa_venda": 0.02,
-      "pu_compra": 19905.12,
-      "pu_venda": 19894.07,
-      "investimento_minimo": 199.05
+      "pu_compra": 19915.15,
+      "pu_venda": 19904.1,
+      "investimento_minimo": 199.15
     },
     {
       "id": "tesouro-selic-01032028",
@@ -952,9 +952,9 @@
       "vencimento": "2028-03-01",
       "taxa_compra": 0.02,
       "taxa_venda": 0.03,
-      "pu_compra": 19901.36,
-      "pu_venda": 19888.32,
-      "investimento_minimo": 199.01
+      "pu_compra": 19911.17,
+      "pu_venda": 19898.12,
+      "investimento_minimo": 199.11
     },
     {
       "id": "tesouro-selic-01032029",
@@ -969,9 +969,9 @@
       "vencimento": "2029-03-01",
       "taxa_compra": 0.03,
       "taxa_venda": 0.04,
-      "pu_compra": 19890.75,
-      "pu_venda": 19875.75,
-      "investimento_minimo": 198.91
+      "pu_compra": 19900.69,
+      "pu_venda": 19885.68,
+      "investimento_minimo": 199.01
     },
     {
       "id": "tesouro-selic-01032031",
@@ -986,9 +986,9 @@
       "vencimento": "2031-03-01",
       "taxa_compra": 0.07,
       "taxa_venda": 0.08,
-      "pu_compra": 19841.46,
-      "pu_venda": 19822.51,
-      "investimento_minimo": 198.41
+      "pu_compra": 19851.5,
+      "pu_venda": 19832.55,
+      "investimento_minimo": 198.52
     }
   ]
 }
