@@ -497,6 +497,13 @@
        alinhamento — o cabeçalho ia pra direita e o valor ficava na esquerda. */
     .tesouro-tabela td.tesouro-num { font-family: 'IBM Plex Mono', monospace; text-align: right; }
     .tesouro-tabela thead th.num { text-align: right; }
+    /* Mesmas setas da lista de mercado e das debêntures — o vocabulário
+       visual do site para "esta coluna ordena". */
+    .tesouro-tabela thead th.tes-ord { cursor: pointer; user-select: none; }
+    .tesouro-tabela thead th.tes-ord::after { content: ' ⇅'; opacity: 0.45; font-size: 0.7em; }
+    .tesouro-tabela thead th.tes-ord.ordenado-asc::after { content: ' ▲'; opacity: 1; font-size: 0.65em; }
+    .tesouro-tabela thead th.tes-ord.ordenado-desc::after { content: ' ▼'; opacity: 1; font-size: 0.65em; }
+    .tesouro-tabela thead th.tes-ord:hover { filter: brightness(1.2); }
     .tesouro-rodape { font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
     /* Nos temas claros o azul da marca fica em ~3,6:1 sobre branco, abaixo
        do mínimo para texto pequeno — e este cabeçalho é 0,68rem. Mesmo tom
@@ -9756,6 +9763,62 @@
       let carregando = null;
       let familiaAtiva = 'todos';
 
+      // Ordenação escolhida pelo clique no cabeçalho. Começa null: até a
+      // pessoa clicar, a tabela mantém a ordem do robô (por família e
+      // vencimento), que já é a leitura natural de quem abre a seção.
+      let ordem = null; // { coluna, desc }
+
+      // Rentabilidade NÃO pode ordenar pelo número cru: no Tesouro Selic a
+      // taxa é o spread (0,03%), no IPCA+ é a taxa real (7,4%) e só no
+      // Prefixado é a rentabilidade cheia (13,5%). Pelo número, o Selic
+      // afundaria para o fim como se rendesse 0,03% ao ano. Então ordena
+      // por indexador primeiro e, dentro de cada um, pela taxa — dentro de
+      // um filtro (ex: só IPCA+) isso vira ordenação pura pela taxa.
+      const ORDEM_INDEXADOR = { selic: 0, prefixado: 1, ipca: 2, igpm: 3 };
+
+      const COLUNAS_TESOURO = [
+        { chave: 'titulo',        rotulo: 'Título',              tipo: 'texto',  num: false },
+        { chave: 'vencimento',    rotulo: 'Vencimento',          tipo: 'data',   num: false },
+        { chave: 'rentabilidade', rotulo: 'Rentabilidade',       tipo: 'taxa',   num: false },
+        { chave: 'pu',            rotulo: 'Preço unitário',      tipo: 'numero', num: true  },
+        { chave: 'minimo',        rotulo: 'Investimento mínimo', tipo: 'numero', num: true  },
+      ];
+
+      const puDe = (t) => (typeof t.pu_compra === 'number' ? t.pu_compra : t.pu_venda);
+
+      function valorPara(t, chave) {
+        if (chave === 'titulo') return t.nome || null;
+        if (chave === 'vencimento') return t.vencimento || null;
+        if (chave === 'pu') return typeof puDe(t) === 'number' ? puDe(t) : null;
+        if (chave === 'minimo') return typeof t.investimento_minimo === 'number' ? t.investimento_minimo : null;
+        return null;
+      }
+
+      function ordenarTitulos(lista) {
+        if (!ordem) return lista;
+        const col = COLUNAS_TESOURO.find(c => c.chave === ordem.coluna);
+        const sinal = ordem.desc ? -1 : 1;
+        return [...lista].sort((a, b) => {
+          if (col.tipo === 'taxa') {
+            const ga = ORDEM_INDEXADOR[a.indexador] ?? 9, gb = ORDEM_INDEXADOR[b.indexador] ?? 9;
+            // O grupo segue sempre a mesma ordem; só a taxa inverte.
+            if (ga !== gb) return ga - gb;
+            const ta = a.taxa_compra, tb = b.taxa_compra;
+            if (typeof ta !== 'number') return 1;
+            if (typeof tb !== 'number') return -1;
+            return sinal * (ta - tb);
+          }
+          const va = valorPara(a, col.chave), vb = valorPara(b, col.chave);
+          // Sem dado vai sempre para o fim, nas duas direções.
+          if (va === null && vb === null) return 0;
+          if (va === null) return 1;
+          if (vb === null) return -1;
+          if (col.tipo === 'texto') return sinal * String(va).localeCompare(String(vb), 'pt-BR', { numeric: true });
+          if (col.tipo === 'data') return sinal * (va < vb ? -1 : va > vb ? 1 : 0);
+          return sinal * (va - vb);
+        });
+      }
+
       const PORTAL = 'https://www.tesourodireto.com.br';
       const SVG_GRAFICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" '
         + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -9844,8 +9907,8 @@
       }
 
       function montarTabela() {
-        const lista = (dados.titulos || [])
-          .filter(t => familiaAtiva === 'todos' || familiaDe(t) === familiaAtiva);
+        const lista = ordenarTitulos((dados.titulos || [])
+          .filter(t => familiaAtiva === 'todos' || familiaDe(t) === familiaAtiva));
 
         if (!lista.length) {
           tabelaEl.innerHTML = '';
@@ -9854,13 +9917,20 @@
         }
         statusEl.textContent = '';
 
+        const cabecalho = COLUNAS_TESOURO.map(c => {
+          const classes = ['tes-ord'];
+          if (c.num) classes.push('num');
+          if (ordem && ordem.coluna === c.chave) classes.push(ordem.desc ? 'ordenado-desc' : 'ordenado-asc');
+          const dica = c.tipo === 'taxa'
+            ? 'Ordenar por rentabilidade — agrupada por indexador, porque Selic, IPCA+ e Prefixado não se comparam pelo número'
+            : 'Ordenar por ' + c.rotulo.toLowerCase();
+          return '<th class="' + classes.join(' ') + '" data-coluna="' + c.chave + '" title="' + dica + '">' + c.rotulo + '</th>';
+        }).join('');
+
         tabelaEl.innerHTML =
-          '<thead><tr>' +
-          '<th>Título</th><th>Vencimento</th><th>Rentabilidade</th>' +
-          '<th class="num">Preço unitário</th><th class="num">Investimento mínimo</th>' +
-          '</tr></thead><tbody>' +
+          '<thead><tr>' + cabecalho + '</tr></thead><tbody>' +
           lista.map(t => {
-            const pu = typeof t.pu_compra === 'number' ? t.pu_compra : t.pu_venda;
+            const pu = puDe(t);
             return '<tr>' +
               '<td><button type="button" class="tesouro-nome" data-titulo="' + t.id + '"' +
               ' title="Ver o histórico de preço deste título">' + SVG_GRAFICO + '<span>' + t.nome + '</span></button>' +
@@ -9914,6 +9984,20 @@
       }
 
       tabelaEl.addEventListener('click', (e) => {
+        const th = e.target.closest('th[data-coluna]');
+        if (th) {
+          const chave = th.dataset.coluna;
+          if (ordem && ordem.coluna === chave) {
+            ordem.desc = !ordem.desc;
+          } else {
+            // Números e taxa começam do maior (é o que se procura: a maior
+            // rentabilidade, o maior preço); texto e data, do começo.
+            const col = COLUNAS_TESOURO.find(c => c.chave === chave);
+            ordem = { coluna: chave, desc: col.tipo === 'numero' || col.tipo === 'taxa' };
+          }
+          montarTabela();
+          return;
+        }
         const id = e.target.closest('[data-titulo]')?.dataset.titulo;
         if (!id) return;
         const titulo = (dados?.titulos || []).find(t => t.id === id);
