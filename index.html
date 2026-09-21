@@ -584,6 +584,8 @@
     .ap-tabela-visao td.ap-setor { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
     .ap-tabela-visao .ap-selo { padding: 1px 6px; font-size: 0.6rem; }
     .ap-visao-falta { margin: 0 0 10px; font-size: 0.76rem; }
+    .ap-modal .ap-pvp-max input { width: 64px; padding: 3px 6px; margin: 0 2px; font-size: 0.82rem; border-radius: 6px; display: inline-block; }
+    .ap-teto-auto { color: var(--muted); font-size: 0.7em; margin-left: 0; cursor: help; }
     @media (max-width: 1440px) {
       .ap-tabela-visao .ap-rs { display: none; }
       .cmp-tabela.ap-tabela.ap-tabela-visao { font-size: 0.65rem; }
@@ -6286,6 +6288,8 @@
           <div class="calc-campo ap-opcoes">
             <label class="ap-check"><input type="checkbox" id="apRespeitarTeto" checked />
               <span>Não comprar ativo acima do preço teto <span class="ap-check-ajuda">(fica como "Aguarde")</span></span></label>
+            <label class="ap-check ap-pvp-max" for="apPvpMax"><span>Preço teto dos FIIs = VP/cota × P/VP máximo de
+              <input type="number" id="apPvpMax" min="0.1" max="3" step="0.01" value="1.00" /> <span class="ap-check-ajuda">(1,00 = pagar no máximo o valor patrimonial, como na planilha)</span></span></label>
             <label class="ap-check"><input type="checkbox" id="apUsarTudo" checked />
               <span>Usar o aporte inteiro <span class="ap-check-ajuda">(pode passar um pouco do peso-alvo para sobrar menos troco)</span></span></label>
           </div>
@@ -11645,8 +11649,15 @@
             cotas = num(campos, 1); alvo = num(campos, 2); teto = num(campos, 3); pm = num(campos, 4);
           }
           const pos = (v) => (Number.isFinite(v) && v > 0 ? v : null);
+          // Com cabeçalho (planilha completa), o teto da planilha é uma
+          // CONTA dela (VP/cota) — guardado só como reserva, para o site
+          // recalcular com o P/VP do dia. Sem cabeçalho, é um teto que a
+          // pessoa escolheu e vale como manual.
+          const tetoPlan = mapa ? pos(teto) : null;
+          if (mapa) teto = NaN;
           saida.push({
             ticker,
+            tetoPlanilha: tetoPlan,
             cotas: Number.isFinite(cotas) ? Math.max(0, Math.round(cotas)) : (mapa && mapa.cotas === undefined ? null : 0),
             alvo: Number.isFinite(alvo) ? Math.max(0, alvo) : 0,
             teto: pos(teto),
@@ -11697,6 +11708,25 @@
       const fmtInt = (v) => (typeof v === 'number' ? v.toLocaleString('pt-BR') : '—');
       const escapar = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+      // ---------- Preço teto ----------
+      // Igual à planilha: o teto de um FII é o VP por cota (preço ÷ P/VP),
+      // isto é, o preço em que o P/VP fica em 1,00 — "COMPRA" quando o FII
+      // está abaixo do patrimonial. O fator (P/VP máximo) é ajustável.
+      // Um teto digitado pela pessoa sempre vale mais que o automático.
+      // Ações ficam sem teto automático: P/VP 1 não é critério para elas.
+      function pvpMaximo() {
+        const v = Number(document.getElementById('apPvpMax')?.value);
+        return v > 0 ? v : 1;
+      }
+      function tetoAuto(a) {
+        if (a.tipo !== 'fii' || !(a.preco > 0) || !(a.pvp > 0)) return null;
+        return Math.round((a.preco / a.pvp) * pvpMaximo() * 100) / 100;
+      }
+      function tetoEfetivo(a) {
+        if (a.teto > 0) return a.teto;
+        return tetoAuto(a) ?? (a.tetoPlanilha > 0 ? a.tetoPlanilha : null);
+      }
+
       // ---------- Persistência ----------
       function salvar() {
         try {
@@ -11704,11 +11734,13 @@
             aporte: hgValorMascarado(inValor),
             respeitarTeto: chkTeto.checked,
             usarTudo: chkTudo.checked,
+            pvpMax: pvpMaximo(),
             // Preço automático NÃO é salvo (volta velho amanhã); só o
             // que a pessoa digitou à mão.
             ativos: ativos.map(a => ({
               ticker: a.ticker, cotas: a.cotas, alvo: a.alvo, teto: a.teto,
               pm: a.pm ?? null, prov: a.prov ?? null, setor: a.setor ?? null, precoPlanilha: a.precoPlanilha ?? null,
+              tetoPlanilha: a.tetoPlanilha ?? null,
               ...(a.precoManual ? { preco: a.preco, precoManual: true } : {}),
             })),
           }));
@@ -11724,6 +11756,7 @@
           }
           if (typeof s.respeitarTeto === 'boolean') chkTeto.checked = s.respeitarTeto;
           if (typeof s.usarTudo === 'boolean') chkTudo.checked = s.usarTudo;
+          if (Number(s.pvpMax) > 0) document.getElementById('apPvpMax').value = Number(s.pvpMax).toFixed(2);
           ativos = Array.isArray(s.ativos) ? s.ativos.filter(a => a && a.ticker).map(a => ({
             ticker: String(a.ticker).toUpperCase(),
             cotas: Number(a.cotas) || 0,
@@ -11733,6 +11766,7 @@
             prov: a.prov !== null && a.prov !== undefined && Number(a.prov) >= 0 ? Number(a.prov) : null,
             setor: a.setor || null,
             precoPlanilha: Number(a.precoPlanilha) > 0 ? Number(a.precoPlanilha) : null,
+            tetoPlanilha: Number(a.tetoPlanilha) > 0 ? Number(a.tetoPlanilha) : null,
             preco: a.precoManual && Number(a.preco) > 0 ? Number(a.preco) : null,
             precoManual: !!(a.precoManual && Number(a.preco) > 0),
           })) : [];
@@ -11743,11 +11777,11 @@
       // ---------- Preços ----------
       function carregarPrecosMercado() {
         if (precosPromise) return precosPromise;
-        const ler = (url, campoGrupo) => fetch(url, { cache: 'no-store' })
+        const ler = (url, campoGrupo, tipo) => fetch(url, { cache: 'no-store' })
           .then(r => (r.ok ? r.json() : { ativos: [] }))
-          .then(j => (j.ativos || []).map(d => [String(d.ticker || d.ativo || '').toUpperCase(), { preco: d.preco, segmento: d[campoGrupo] || null, pvp: d.pvp, dy: d.dy_pct, dia: d.variacao_dia_pct }]))
+          .then(j => (j.ativos || []).map(d => [String(d.ticker || d.ativo || '').toUpperCase(), { preco: d.preco, segmento: d[campoGrupo] || null, pvp: d.pvp, dy: d.dy_pct, dia: d.variacao_dia_pct, tipo }]))
           .catch(() => []);
-        precosPromise = Promise.all([ler('mercado-fiis.json', 'segmento'), ler('mercado-acoes.json', 'setor')])
+        precosPromise = Promise.all([ler('mercado-fiis.json', 'segmento', 'fii'), ler('mercado-acoes.json', 'setor', 'acao')])
           .then(([f, a]) => {
             precosMercado = new Map([...a, ...f].filter(([t, d]) => t && typeof d.preco === 'number' && d.preco > 0));
             return precosMercado;
@@ -11768,6 +11802,7 @@
           return {
             preco: typeof v === 'number' && v > 0 ? v : null,
             nome: a.name || null,
+            tipo: ['fii', 'fiagro', 'fund'].includes(a.kind) ? 'fii' : a.kind === 'stock' ? 'acao' : null,
             dy: num(a.dividends?.yield_12m_percent),
             dia: num(a.quote?.change_percent),
             setor: a.classification?.segment || a.classification?.sector || null,
@@ -11800,7 +11835,7 @@
             if (!a.precoManual) { a.preco = d.preco; a.fonte = 'robo'; }
             a.segmento = d.segmento;
             // P/VP, DY e variação do dia valem mesmo com preço manual.
-            a.pvp = d.pvp; a.dy = d.dy; a.dia = d.dia;
+            a.pvp = d.pvp; a.dy = d.dy; a.dia = d.dia; a.tipo = d.tipo;
           } else {
             foraDoRobo.push(a);
           }
@@ -11814,6 +11849,7 @@
             const [r, pvp] = await Promise.all([precoHg(a.ticker), pvpHg(a.ticker)]);
             if (r) {
               if (!a.precoManual && r.preco) { a.preco = r.preco; a.fonte = 'hg'; }
+              if (r.tipo) a.tipo = r.tipo;
               if (r.dy !== null) a.dy = r.dy;
               if (r.dia !== null) a.dia = r.dia;
               if (r.setor && !a.segmento) a.segmento = r.setor;
@@ -11858,7 +11894,10 @@
                  title="${a.precoManual ? 'Preço digitado por você. Apague o campo para voltar ao preço automático.' : 'Preço automático. Pode digitar outro (ex.: o que está no home broker agora).'}"
                  aria-label="Preço de ${escapar(a.ticker)}" /></td>
             <td><input type="number" min="0" step="0.01" data-campo="alvo" value="${valorInput(a.alvo, 2)}" aria-label="Peso-alvo de ${escapar(a.ticker)}" /></td>
-            <td><input type="number" min="0" step="0.01" data-campo="teto" value="${valorInput(a.teto, 2)}" placeholder="opcional" aria-label="Preço teto de ${escapar(a.ticker)}" /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="teto" value="${valorInput(a.teto, 2)}"
+                 placeholder="${tetoAuto(a) !== null ? 'auto ' + fmtNum(tetoAuto(a)) : a.tetoPlanilha ? 'plan. ' + fmtNum(a.tetoPlanilha) : 'opcional'}"
+                 title="${tetoAuto(a) !== null ? 'Em branco = automático: VP/cota (preço ÷ P/VP) × P/VP máximo. Digite um valor para usar o seu.' : 'Preço teto opcional.'}"
+                 aria-label="Preço teto de ${escapar(a.ticker)}" /></td>
             <td><input type="number" min="0" step="0.01" data-campo="prov" value="${valorInput(a.prov, 2)}" placeholder="${a.preco > 0 && a.dy > 0 && a.cotas > 0 ? '≈ ' + valorInput(a.cotas * a.preco * a.dy / 100, 2) : 'R$'}" title="Proventos recebidos nos últimos 12 meses. Em branco: estimativa pelo DY 12M." aria-label="Proventos 12 meses de ${escapar(a.ticker)}" /></td>
             <td class="ap-num" data-peso-hoje>${pesos.get(a.ticker) === null ? '—' : fmtPct(pesos.get(a.ticker))}</td>
             <td><button type="button" class="ap-remover" data-remover="${i}" title="Remover ${escapar(a.ticker)}" aria-label="Remover ${escapar(a.ticker)}">✕</button></td>
@@ -11944,8 +11983,9 @@
             custo,
             dia: typeof a.dia === 'number' ? a.dia : null,
             pvp: typeof a.pvp === 'number' ? a.pvp : null,
-            teto: a.teto || null,
-            compra: a.teto && tem ? (a.preco <= a.teto ? 'COMPRA' : 'AGUARDE') : null,
+            teto: tetoEfetivo(a),
+            tetoAuto: !(a.teto > 0) && tetoEfetivo(a) !== null,
+            compra: tetoEfetivo(a) && tem ? (a.preco <= tetoEfetivo(a) ? 'COMPRA' : 'AGUARDE') : null,
             preco: tem ? a.preco : null,
             dy12: typeof a.dy === 'number' ? a.dy : null,
             prov, provEst: provEst && prov !== null,
@@ -11994,7 +12034,8 @@
         { k: 'custo', r: 'Custo', g: 'carteira', f: l => moedaV(l.custo) },
         { k: 'dia', r: 'Dia', g: 'osc', f: l => sinal(l.dia, v => fmtNum(v) + '%') },
         { k: 'pvp', r: 'P/VP', g: 'analise', f: l => fmtNum(l.pvp) },
-        { k: 'teto', r: 'Preço teto', g: 'analise', f: l => moedaV(l.teto) },
+        { k: 'teto', r: 'Preço teto', g: 'analise', f: l => moedaV(l.teto) +
+            (l.tetoAuto ? '<span class="ap-teto-auto" title="Calculado: VP por cota (preço ÷ P/VP) × P/VP máximo">ᵛᵖ</span>' : '') },
         { k: 'compra', r: 'Compra?', g: 'analise', t: 'txt', f: l => l.compra
             ? `<span class="ap-selo ${l.compra === 'COMPRA' ? 'ap-selo-compra' : 'ap-selo-aguarde'}">${l.compra}</span>` : '—' },
         { k: 'preco', r: 'Preço atual', g: 'analise', f: l => moedaV(l.preco) },
@@ -12067,7 +12108,7 @@
         const lista = (arr) => arr.length > 6 ? arr.slice(0, 6).join(', ') + ` e mais ${arr.length - 6}` : arr.join(', ');
         const falta = [];
         if (semPm.length) falta.push(`<strong>Preço médio</strong> em branco (${lista(semPm)}) — sem ele ficam vazios <em>Custo, DY on cost e Lucro</em>.`);
-        if (semTeto.length) falta.push(`<strong>Preço teto</strong> em branco (${lista(semTeto)}) — sem ele <em>Compra?</em> fica vazio.`);
+        if (semTeto.length) falta.push(`<strong>Preço teto</strong> sem cálculo automático (${lista(semTeto)}) — o teto automático vale para FIIs com P/VP; para ações, digite o seu. Sem teto, <em>Compra?</em> fica vazio.`);
         if (faltaEl) {
           faltaEl.hidden = falta.length === 0;
           faltaEl.innerHTML = falta.length ? falta.map(f => '• ' + f).join('<br>') +
@@ -12104,12 +12145,13 @@
           if (existente) {
             if (n.cotas !== null && n.cotas !== undefined) existente.cotas = n.cotas;
             if (n.alvo) existente.alvo = n.alvo;
-            ['teto', 'pm', 'setor', 'precoPlanilha'].forEach(k => { if (n[k]) existente[k] = n[k]; });
+            ['teto', 'pm', 'setor', 'precoPlanilha', 'tetoPlanilha'].forEach(k => { if (n[k]) existente[k] = n[k]; });
             if (n.prov !== null && n.prov !== undefined) existente.prov = n.prov;
           } else {
             ativos.push({
               ticker: n.ticker, cotas: n.cotas || 0, alvo: n.alvo || 0, teto: n.teto || null,
               pm: n.pm || null, prov: n.prov ?? null, setor: n.setor || null, precoPlanilha: n.precoPlanilha || null,
+              tetoPlanilha: n.tetoPlanilha || null,
               preco: null, precoManual: false,
             });
           }
@@ -12209,7 +12251,7 @@
       };
       const DICA_SELO = {
         'compra': 'Entra neste aporte.',
-        'aguarde': 'Preço atual acima do seu preço teto.',
+        'aguarde': 'Preço atual acima do preço teto (para FIIs, por padrão: acima do valor patrimonial, P/VP > 1).',
         'no-alvo': 'Já está no peso-alvo ou acima dele.',
         'sem-alvo': 'Sem peso-alvo definido — não entra na conta.',
         'caro': 'Uma cota custa mais que o aporte inteiro.',
@@ -12241,7 +12283,7 @@
         }
         statusEl.textContent = '';
 
-        const r = calcularAporte(ativos, aporte, { respeitarTeto: chkTeto.checked, usarTudo: chkTudo.checked });
+        const r = calcularAporte(ativos.map(a => ({ ...a, teto: tetoEfetivo(a) })), aporte, { respeitarTeto: chkTeto.checked, usarTudo: chkTudo.checked });
         ultimoResultado = { ...r, respeitarTeto: chkTeto.checked, usarTudo: chkTudo.checked, quando: new Date() };
         salvar();
 
@@ -12528,6 +12570,24 @@
         $('apColarTexto').value = '';
       });
       [chkTeto, chkTudo].forEach(c => c.addEventListener('change', () => { salvar(); if (ultimoResultado) calcular(); }));
+      // Mudar o P/VP máximo NÃO redesenha a tabela de edição: o 'change'
+      // dispara quando o foco sai do campo — muitas vezes porque a pessoa
+      // clicou num campo da tabela — e redesenhar trocaria esse campo por
+      // outro, perdendo o que ela começasse a digitar. Só os placeholders
+      // do teto mudam.
+      function atualizarPlaceholdersTeto() {
+        tbodyEdicao.querySelectorAll('tr[data-idx]').forEach(tr => {
+          const a = ativos[Number(tr.dataset.idx)];
+          const inp = tr.querySelector('[data-campo="teto"]');
+          if (!a || !inp) return;
+          const t = tetoAuto(a);
+          inp.placeholder = t !== null ? 'auto ' + fmtNum(t) : a.tetoPlanilha ? 'plan. ' + fmtNum(a.tetoPlanilha) : 'opcional';
+        });
+      }
+      document.getElementById('apPvpMax').addEventListener('change', () => {
+        salvar(); atualizarPlaceholdersTeto(); renderVisao();
+        if (ultimoResultado) calcular();
+      });
       inValor.addEventListener('input', () => { invalidarResultado(); salvar(); });
       inValor.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); calcular(); } });
       $('apBtnCalcular').addEventListener('click', calcular);
