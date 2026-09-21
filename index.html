@@ -564,6 +564,78 @@
        três colunas — com 480px o "R$ 2.440,22" quebrava em duas linhas e
        os rótulos dos campos idem. */
     .calc-modal.vp-modal { max-width: 860px; }
+    /* ---------- Calculadora de Aportes ---------- */
+    .calc-modal.ap-modal { max-width: 980px; }
+    /* Coluna flex dentro de um modal com altura máxima: sem isto os
+       filhos encolhem (o botão Calcular ficava achatado). */
+    .ap-modal .calc-corpo > * { flex-shrink: 0; }
+    /* .hg-btn não tem padding vertical (conta com ser esticado numa linha
+       flex); aqui ele aparece sozinho, então precisa de altura própria. */
+    .ap-modal .hg-btn { padding: 12px 20px; }
+    .ap-modal [hidden] { display: none !important; }
+    .ap-modal #apStatus:empty { margin: 0; min-height: 0; }
+    .ap-opcoes { justify-content: flex-end; gap: 6px; }
+    .ap-modal .ap-check { display: flex; align-items: flex-start; gap: 8px; font-size: 0.82rem; font-weight: 500; color: var(--text); cursor: pointer; line-height: 1.35; }
+    .ap-modal .ap-check input { padding: 0; width: auto; margin-top: 2px; accent-color: var(--primary); flex: 0 0 auto; }
+    .ap-check-ajuda { color: var(--muted); font-size: 0.76rem; }
+    .ap-add-linha { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .ap-add-linha input {
+      flex: 1 1 130px; min-width: 0; background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 10px 12px; font-size: 0.88rem; font-family: inherit;
+    }
+    .ap-add-linha #apTickerInput { flex: 1 1 170px; text-transform: uppercase; }
+    .ap-add-linha .hg-btn { flex: 0 0 auto; }
+    .ap-ferramentas { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .ap-ferramentas .cmp-btn-secundario { flex: 0 0 auto; }
+    .ap-btn-perigo:hover { color: var(--danger); border-color: var(--danger); }
+    .ap-colar { margin-top: 10px; padding: 12px; border: 1px dashed var(--border); border-radius: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .ap-colar label { font-size: 0.8rem; color: var(--muted); line-height: 1.45; }
+    .ap-colar textarea { width: 100%; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 0.8rem; background: var(--deep); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px; resize: vertical; box-sizing: border-box; }
+    .ap-colar .cmp-acoes-linha { align-items: center; flex-wrap: wrap; }
+    .ap-tabela { font-size: 0.8rem; min-width: 640px; }
+    .ap-tabela th, .ap-tabela td { padding: 7px 8px; }
+    .ap-tabela td.ap-num, .ap-tabela th.ap-num { text-align: right; font-variant-numeric: tabular-nums; }
+    .ap-tabela-edicao input {
+      width: 92px; padding: 5px 7px; font-size: 0.8rem; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--deep); color: var(--text);
+    }
+    .ap-tabela-edicao input.ap-preco-manual { border-color: var(--gold); }
+    .ap-ativo strong { display: block; }
+    .ap-ativo small { color: var(--muted); font-size: 0.7rem; }
+    .ap-remover { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.95rem; padding: 2px 6px; }
+    .ap-remover:hover { color: var(--danger); }
+    .ap-soma-rotulo { text-align: right; color: var(--muted); font-weight: 600; }
+    .ap-soma { font-weight: 700; }
+    .ap-soma.ap-soma-ok { color: var(--accent); }
+    .ap-soma.ap-soma-alerta { color: var(--gold); }
+    .ap-link-btn { background: none; border: none; padding: 0; color: var(--primary); cursor: pointer; font-size: 0.78rem; text-decoration: underline; }
+    .ap-tabela tfoot td { border-bottom: none; }
+    .ap-resumo { margin-top: 18px; }
+    .ap-selo { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap; }
+    .ap-selo-compra { background: rgba(124,255,146,0.14); color: var(--accent); }
+    .ap-selo-aguarde { background: rgba(224,184,77,0.16); color: var(--gold); }
+    .ap-selo-neutro { background: var(--zebra); color: var(--muted); }
+    .ap-comprar { font-weight: 700; color: var(--accent); }
+    .ap-barra { position: relative; width: 110px; height: 8px; border-radius: 4px; background: var(--zebra); overflow: visible; }
+    .ap-barra-atual { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--muted); opacity: 0.55; }
+    .ap-barra-depois { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--primary); }
+    .ap-barra-alvo { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--gold); }
+    .ap-legenda { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.72rem; color: var(--muted); margin: 6px 0 2px; }
+    .ap-legenda i { display: inline-block; width: 12px; height: 8px; border-radius: 3px; margin-right: 5px; vertical-align: 0; }
+    .ap-aviso { margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; line-height: 1.45; background: rgba(224,184,77,0.1); border: 1px solid rgba(224,184,77,0.35); color: var(--text); }
+    .ap-tabela tr.ap-linha-parada td { opacity: 0.7; }
+    @media (max-width: 640px) {
+      .calc-modal.ap-modal { max-width: calc(100vw - 16px); }
+      .ap-add-linha input, .ap-add-linha #apTickerInput { flex: 1 1 100%; }
+      .ap-add-linha .hg-btn { flex: 1 1 100%; }
+      .ap-ferramentas .cmp-btn-secundario { flex: 1 1 calc(50% - 8px); }
+      .ap-tabela { font-size: 0.72rem; }
+      .ap-tabela-edicao input { width: 74px; }
+      .ap-tabela td:first-child, .ap-tabela th:first-child { position: sticky; left: 0; background: var(--bg); z-index: 1; }
+      .ap-modal .ap-resumo.carteira-resumo-cards { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .ap-modal .ap-resumo .carteira-resumo-card { padding: 10px 12px; }
+      .ap-modal .ap-resumo .carteira-resumo-card strong { font-size: 0.98rem; }
+    }
     /* .cmp-btn-secundario tem flex:1 — desenhado para dividir a linha
        meio a meio com outro botão igual, como no FGC. Aqui a linha é
        "Analisar oferta" (largura automática) + "Limpar", e o flex:1
@@ -3953,6 +4025,9 @@
             <button type="button" class="nav-dropdown-item" id="carteiraBtnAbrir">
               💰 Carteira de Rendimentos
             </button>
+            <button type="button" class="nav-dropdown-item" id="apBtnAbrir">
+              🧮 Calculadora de Aportes
+            </button>
             <button type="button" class="nav-dropdown-item" id="reinvBtnAbrir">
               🔁 Reinvestimento de Dividendos
             </button>
@@ -4010,6 +4085,7 @@
     <button type="button" class="mobile-menu-item" data-mobile-alvo="rpnBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="quizBtnAbrir">❓ Descubra seu Perfil de Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="carteiraBtnAbrir">💰 Carteira de Rendimentos</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="apBtnAbrir">🧮 Calculadora de Aportes</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="reinvBtnAbrir">🔁 Reinvestimento de Dividendos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="agendaBtnAbrir">📅 Agenda de Proventos</button>
   </div>
@@ -6118,6 +6194,125 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       CALCULADORA DE APORTES — "quanto comprar de cada ativo" com o
+       dinheiro do mês, para a carteira chegar mais perto do peso-alvo
+       que a pessoa definiu. Mesma ideia da aba "Calculadora de Aportes"
+       das planilhas de carteira de FIIs, mas com o preço vindo sozinho
+       dos robôs do site (mercado-fiis.json / mercado-acoes.json).
+       ============================================================ -->
+  <div id="apOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="apTitulo" hidden>
+    <div class="calc-modal ap-modal">
+      <div class="calc-modal-topo">
+        <h3 id="apTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M12 2v6"></path><path d="M9 5l3 3 3-3"></path><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 16h.01"></path><path d="M12 16h.01"></path><path d="M17 16h.01"></path></svg>Calculadora de Aportes
+        </h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="apCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button id="apFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+      </div>
+
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Diga <strong>quanto vai aportar</strong>, quantas cotas você já tem e o <strong>peso-alvo</strong> de cada
+          ativo na carteira. A calculadora diz <strong>quantas cotas comprar de cada um</strong> para a carteira chegar
+          o mais perto possível desses pesos — comprando primeiro o que está mais abaixo do alvo e, se você quiser,
+          pulando o que está acima do seu preço teto.
+        </p>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="apValor">Valor do aporte</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="apValor" placeholder="0,00" />
+            </div>
+          </div>
+          <div class="calc-campo ap-opcoes">
+            <label class="ap-check"><input type="checkbox" id="apRespeitarTeto" checked />
+              <span>Não comprar ativo acima do preço teto <span class="ap-check-ajuda">(fica como "Aguarde")</span></span></label>
+            <label class="ap-check"><input type="checkbox" id="apUsarTudo" checked />
+              <span>Usar o aporte inteiro <span class="ap-check-ajuda">(pode passar um pouco do peso-alvo para sobrar menos troco)</span></span></label>
+          </div>
+        </div>
+
+        <div class="ap-add-linha">
+          <input type="text" id="apTickerInput" placeholder="Ativo (ex: HGLG11)" autocomplete="off" list="sugestoesTickersB3" />
+          <input type="number" id="apCotasInput" placeholder="Cotas que já tem" min="0" step="1" />
+          <input type="number" id="apAlvoInput" placeholder="Peso-alvo %" min="0" step="0.01" />
+          <button type="button" class="hg-btn" id="apBtnAdicionar">+ Adicionar</button>
+        </div>
+
+        <div class="ap-ferramentas">
+          <button type="button" class="cmp-btn-secundario" id="apBtnImportar" title="Traz os ativos e as quantidades que você salvou na Carteira de Rendimentos">💰 Importar da Carteira</button>
+          <button type="button" class="cmp-btn-secundario" id="apBtnColar" aria-expanded="false">📋 Colar da planilha</button>
+          <button type="button" class="cmp-btn-secundario" id="apBtnIguais" title="Mesmo peso-alvo para todos os ativos">⚖️ Pesos iguais</button>
+          <button type="button" class="cmp-btn-secundario" id="apBtnAtuais" title="Usa o peso que cada ativo tem hoje como peso-alvo">📌 Manter pesos atuais</button>
+          <button type="button" class="cmp-btn-secundario ap-btn-perigo" id="apBtnLimpar">Limpar tudo</button>
+        </div>
+
+        <div id="apColarBox" class="ap-colar" hidden>
+          <label for="apColarTexto">Cole uma linha por ativo, na ordem <strong>Ativo · Cotas · Peso-alvo % · Preço teto</strong>
+            (o preço teto é opcional). Pode copiar direto do Google Sheets ou do Excel — as colunas separadas por tabulação,
+            <code>;</code> ou espaço funcionam.</label>
+          <textarea id="apColarTexto" rows="5" placeholder="ALZR11	1055	10	10,59&#10;BTLG11	130	12,5	102,51&#10;MXRF11	2428	2,5	9,38"></textarea>
+          <div class="cmp-acoes-linha">
+            <button type="button" class="hg-btn" id="apBtnColarAplicar">Usar estas linhas</button>
+            <label class="ap-check" style="margin:0;"><input type="checkbox" id="apColarSubstituir" checked /> <span>Substituir a lista atual</span></label>
+          </div>
+        </div>
+
+        <div id="apStatus" class="hg-status"></div>
+
+        <div class="cmp-tabela-wrap ap-edicao-wrap" id="apEdicaoWrap" hidden>
+          <table class="cmp-tabela ap-tabela ap-tabela-edicao">
+            <thead>
+              <tr><th>Ativo</th><th>Cotas</th><th>Preço atual</th><th>Peso-alvo %</th><th>Preço teto</th><th>Peso hoje</th><th></th></tr>
+            </thead>
+            <tbody id="apTbodyEdicao"></tbody>
+            <tfoot>
+              <tr><td colspan="3" class="ap-soma-rotulo">Soma dos pesos-alvo</td><td id="apSomaAlvo" class="ap-soma">0%</td>
+                <td colspan="3"><button type="button" class="ap-link-btn" id="apBtnNormalizar" hidden>Ajustar para 100%</button></td></tr>
+            </tfoot>
+          </table>
+        </div>
+        <div id="apVazio" class="calc-ajuda" style="text-align:center; padding:16px 0;">
+          Nenhum ativo ainda — adicione acima, importe da sua Carteira de Rendimentos ou cole da sua planilha.
+        </div>
+
+        <button type="button" class="hg-btn" id="apBtnCalcular" style="width:100%; margin-top:12px;">Calcular aporte</button>
+
+        <div id="apResultado"></div>
+
+        <div id="apAcoes" hidden>
+          <div class="cmp-acoes-linha" style="margin-top:12px;">
+            <button type="button" class="cmp-btn-secundario" id="apBtnPdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+              Baixar PDF
+            </button>
+            <button type="button" class="cmp-btn-secundario" id="apBtnCompartilhar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="calc-ajuda" style="margin-top:14px;">
+          <strong>Como a conta é feita:</strong> somamos o que você já tem com o aporte e calculamos quanto cada ativo
+          <em>deveria</em> valer pelo peso-alvo. Depois compramos uma cota por vez do ativo que está mais longe do alvo
+          (em proporção), até o dinheiro acabar. Preços do fechamento mais recente coletado pelos robôs do site — confira
+          o preço na corretora antes de enviar a ordem. Simulação educativa, não é recomendação de compra.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <div id="carteiraOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="carteiraTitulo" hidden>
     <div class="calc-modal carteira-modal">
       <div class="carteira-fixo">
@@ -6210,6 +6405,7 @@
         </div>
 
         <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+          <button type="button" class="hg-btn" id="carteiraBtnAporte" style="flex:1 1 140px;" title="Abre a Calculadora de Aportes com os ativos desta carteira">🧮 Calcular próximo aporte</button>
           <button type="button" class="hg-btn" id="carteiraBtnPdf" style="flex:1 1 140px;">📄 Baixar PDF</button>
           <button type="button" class="hg-btn-compartilhar" id="carteiraBtnCompartilhar" style="flex:1 1 140px; justify-content:center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
@@ -11184,6 +11380,781 @@
 
       hgAbrirPorLinkDeFerramenta('valeapena', abrirModal);
     })();
+
+    // ============================================================
+    // CALCULADORA DE APORTES
+    // ------------------------------------------------------------
+    // Pergunta que ela responde: "tenho R$ X este mês — quantas cotas
+    // compro de cada ativo para a carteira ficar mais perto dos pesos que
+    // eu defini?". Cotas são inteiras, então não existe divisão exata: a
+    // conta compra UMA cota por vez do ativo mais longe do alvo (em
+    // proporção ao peso dele) até o dinheiro não pagar mais nenhuma.
+    //
+    // Preço: primeiro dos arquivos que os robôs já publicam
+    // (mercado-fiis.json / mercado-acoes.json — sem gastar cota de API);
+    // o que não estiver lá vai na HG Brasil, igual à Carteira de
+    // Rendimentos. A pessoa pode sobrescrever o preço à mão (ex.: o preço
+    // que está vendo agora no home broker) e esse valor é respeitado.
+    //
+    // O motor de cálculo (window.vrCalcularAporte) é função pura, sem DOM,
+    // para ser testado sozinho e reaproveitado se outra tela precisar.
+    // ============================================================
+    (function () {
+      // ---------- Motor ----------
+      // ativos: [{ ticker, cotas, preco, alvo, teto }]
+      //   alvo = peso-alvo em % (não precisa somar 100 — é normalizado)
+      //   teto = preço teto opcional (0/null = sem teto)
+      function calcularAporte(ativos, aporte, opcoes = {}) {
+        const respeitarTeto = opcoes.respeitarTeto !== false;
+        const usarTudo = opcoes.usarTudo !== false;
+        const EPS = 1e-9;
+
+        const linhas = (ativos || []).map(a => {
+          const preco = Number(a.preco) > 0 ? Number(a.preco) : 0;
+          const cotas = Math.max(0, Math.floor(Number(a.cotas) || 0));
+          const alvo = Math.max(0, Number(a.alvo) || 0);
+          const teto = Number(a.teto) > 0 ? Number(a.teto) : null;
+          return {
+            ticker: a.ticker, preco, cotas, alvo, teto,
+            valorAtual: cotas * preco,
+            semPreco: !(preco > 0),
+            acimaDoTeto: !!(teto && preco > teto),
+            compra: 0,
+          };
+        });
+
+        const comPreco = linhas.filter(l => !l.semPreco);
+        const patrimonioAtual = comPreco.reduce((s, l) => s + l.valorAtual, 0);
+        // Soma com TODOS os pesos, inclusive de quem ficou sem preço: é o
+        // mesmo número que a pessoa vê na tabela de edição, e o peso de
+        // quem não entrou fica reservado (igual ao acima do teto), em vez
+        // de ser redistribuído sem ela saber.
+        const somaAlvo = linhas.reduce((s, l) => s + l.alvo, 0);
+        const valorAporte = Math.max(0, Number(aporte) || 0);
+        const totalFinal = patrimonioAtual + valorAporte;
+
+        comPreco.forEach(l => {
+          l.alvoNorm = somaAlvo > 0 ? l.alvo / somaAlvo : 0;
+          l.meta = l.alvoNorm * totalFinal;
+          l.bloqueado = respeitarTeto && l.acimaDoTeto;
+        });
+
+        const elegiveis = comPreco.filter(l => l.alvoNorm > 0 && !l.bloqueado);
+        let sobra = valorAporte;
+
+        // Fase 1 (atalho para aportes grandes): compra de uma vez o que
+        // claramente cabe no déficit de cada um, sem passar do dinheiro.
+        // Arredonda para baixo — o ajuste fino fica para a fase 2.
+        const deficits = elegiveis.map(l => Math.max(0, l.meta - l.valorAtual));
+        const somaDef = deficits.reduce((s, d) => s + d, 0);
+        if (somaDef > 0) {
+          const escala = Math.min(1, sobra / somaDef);
+          elegiveis.forEach((l, i) => {
+            const n = Math.floor((deficits[i] * escala) / l.preco);
+            if (n > 0) { l.compra += n; sobra -= n * l.preco; }
+          });
+        }
+
+        // Fase 2: uma cota por vez, sempre do ativo mais atrasado em
+        // proporção ao próprio alvo ((meta - valor) / meta). Proporção, e
+        // não reais: senão um ativo de peso 20% sempre "ganharia" de um
+        // de peso 2% mesmo estando mais perto do alvo dele.
+        let guarda = 0;
+        while (guarda++ < 500000) {
+          let melhor = null, melhorGap = -Infinity;
+          for (const l of elegiveis) {
+            if (l.preco > sobra + EPS) continue;
+            const valor = (l.cotas + l.compra) * l.preco;
+            const gap = (l.meta - valor) / l.meta;
+            if (gap > melhorGap) { melhorGap = gap; melhor = l; }
+          }
+          if (!melhor) break;
+          if (!usarTudo) {
+            // Só compra se a cota APROXIMA o ativo do alvo: o déficit
+            // tem de ser maior que meia cota. Senão para e sobra troco.
+            const valor = (melhor.cotas + melhor.compra) * melhor.preco;
+            if (melhor.meta - valor <= melhor.preco / 2) break;
+          }
+          melhor.compra += 1;
+          sobra -= melhor.preco;
+        }
+        if (sobra < 0 && sobra > -0.005) sobra = 0; // ruído de ponto flutuante
+
+        const investido = valorAporte - sobra;
+        comPreco.forEach(l => {
+          l.valorCompra = l.compra * l.preco;
+          l.valorDepois = l.valorAtual + l.valorCompra;
+          l.pesoAtual = patrimonioAtual > 0 ? (l.valorAtual / patrimonioAtual) * 100 : 0;
+          l.pesoAlvo = l.alvoNorm * 100;
+          const totalDepois = patrimonioAtual + investido;
+          l.pesoDepois = totalDepois > 0 ? (l.valorDepois / totalDepois) * 100 : 0;
+          l.status = l.compra > 0 ? 'compra'
+            : l.bloqueado ? 'aguarde'
+            : l.alvoNorm === 0 ? 'sem-alvo'
+            : l.valorAtual >= l.meta ? 'no-alvo'
+            : l.preco > valorAporte ? 'caro'
+            : 'na-fila';
+        });
+
+        return {
+          linhas,
+          patrimonioAtual,
+          aporte: valorAporte,
+          investido,
+          sobra,
+          patrimonioDepois: patrimonioAtual + investido,
+          somaAlvo,
+          semPreco: linhas.filter(l => l.semPreco).map(l => l.ticker),
+          bloqueados: comPreco.filter(l => l.bloqueado).map(l => l.ticker),
+        };
+      }
+      window.vrCalcularAporte = calcularAporte;
+
+      // Converte número colado de planilha: "1.055" → 1055, "10,16%" →
+      // 10.16, "R$ 1.234,56" → 1234.56, "10.5" → 10.5.
+      function lerNumeroBr(txt) {
+        if (txt === null || txt === undefined) return NaN;
+        let s = String(txt).replace(/R\$|%|\s/g, '').trim();
+        if (!s) return NaN;
+        if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+        else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+        return parseFloat(s);
+      }
+
+      // Uma linha por ativo: Ativo · Cotas · Peso-alvo % · Preço teto.
+      // Linha de cabeçalho ("ATIVO  POSIÇÃO ...") é ignorada porque o
+      // primeiro campo não tem cara de ticker.
+      function lerLinhasColadas(texto) {
+        const saida = [];
+        String(texto || '').split(/\r?\n/).forEach(bruta => {
+          const linha = bruta.trim();
+          if (!linha) return;
+          const partes = linha.includes('\t') ? linha.split('\t')
+            : linha.includes(';') ? linha.split(';')
+            : linha.split(/\s+/);
+          const campos = partes.map(p => p.trim());
+          const ticker = (campos[0] || '').toUpperCase().replace(/^B3:/, '');
+          if (!/^[A-Z0-9]{4}\d{1,2}[A-Z]?$/.test(ticker)) return;
+          const cotas = lerNumeroBr(campos[1]);
+          const alvo = lerNumeroBr(campos[2]);
+          const teto = lerNumeroBr(campos[3]);
+          saida.push({
+            ticker,
+            cotas: Number.isFinite(cotas) ? Math.max(0, Math.round(cotas)) : 0,
+            alvo: Number.isFinite(alvo) ? Math.max(0, alvo) : 0,
+            teto: Number.isFinite(teto) && teto > 0 ? teto : null,
+          });
+        });
+        return saida;
+      }
+      window.vrLerLinhasAporte = lerLinhasColadas;
+
+      // ---------- Interface ----------
+      const overlay = document.getElementById('apOverlay');
+      const btnAbrir = document.getElementById('apBtnAbrir');
+      if (!overlay) return;
+
+      const $ = (id) => document.getElementById(id);
+      const btnFechar = $('apFechar');
+      const inValor = $('apValor');
+      const chkTeto = $('apRespeitarTeto');
+      const chkTudo = $('apUsarTudo');
+      const inTicker = $('apTickerInput');
+      const inCotas = $('apCotasInput');
+      const inAlvo = $('apAlvoInput');
+      const statusEl = $('apStatus');
+      const wrapEdicao = $('apEdicaoWrap');
+      const tbodyEdicao = $('apTbodyEdicao');
+      const somaEl = $('apSomaAlvo');
+      const btnNormalizar = $('apBtnNormalizar');
+      const vazioEl = $('apVazio');
+      const resultadoEl = $('apResultado');
+      const acoesEl = $('apAcoes');
+      const colarBox = $('apColarBox');
+      const btnColar = $('apBtnColar');
+
+      const LOCAL_KEY = 'vrCalcAportes';
+      // { ticker, cotas, alvo, teto, preco, precoManual, nome, fonte }
+      let ativos = [];
+      let ultimoResultado = null;
+      let precosMercado = null;   // Map ticker -> { preco, segmento }
+      let precosPromise = null;
+
+      const fmtMoeda = (v) => hgFormatMoeda(v) ?? '—';
+      const fmtNum = (v, c = 2) => hgFormatNumero(v, c) ?? '—';
+      const fmtPct = (v) => (typeof v === 'number' ? hgFormatNumero(v) + '%' : '—');
+      const fmtInt = (v) => (typeof v === 'number' ? v.toLocaleString('pt-BR') : '—');
+      const escapar = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+      // ---------- Persistência ----------
+      function salvar() {
+        try {
+          localStorage.setItem(LOCAL_KEY, JSON.stringify({
+            aporte: hgValorMascarado(inValor),
+            respeitarTeto: chkTeto.checked,
+            usarTudo: chkTudo.checked,
+            // Preço automático NÃO é salvo (volta velho amanhã); só o
+            // que a pessoa digitou à mão.
+            ativos: ativos.map(a => ({
+              ticker: a.ticker, cotas: a.cotas, alvo: a.alvo, teto: a.teto,
+              ...(a.precoManual ? { preco: a.preco, precoManual: true } : {}),
+            })),
+          }));
+        } catch (e) { /* sem localStorage — segue sem salvar */ }
+      }
+      function carregarSalvo() {
+        try {
+          const s = JSON.parse(localStorage.getItem(LOCAL_KEY));
+          if (!s) return false;
+          if (typeof s.aporte === 'number' && s.aporte > 0) {
+            inValor.dataset.centavos = String(Math.round(s.aporte * 100));
+            inValor.value = s.aporte.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          }
+          if (typeof s.respeitarTeto === 'boolean') chkTeto.checked = s.respeitarTeto;
+          if (typeof s.usarTudo === 'boolean') chkTudo.checked = s.usarTudo;
+          ativos = Array.isArray(s.ativos) ? s.ativos.filter(a => a && a.ticker).map(a => ({
+            ticker: String(a.ticker).toUpperCase(),
+            cotas: Number(a.cotas) || 0,
+            alvo: Number(a.alvo) || 0,
+            teto: Number(a.teto) > 0 ? Number(a.teto) : null,
+            preco: a.precoManual && Number(a.preco) > 0 ? Number(a.preco) : null,
+            precoManual: !!(a.precoManual && Number(a.preco) > 0),
+          })) : [];
+          return true;
+        } catch (e) { return false; }
+      }
+
+      // ---------- Preços ----------
+      function carregarPrecosMercado() {
+        if (precosPromise) return precosPromise;
+        const ler = (url, campoGrupo) => fetch(url, { cache: 'no-store' })
+          .then(r => (r.ok ? r.json() : { ativos: [] }))
+          .then(j => (j.ativos || []).map(d => [String(d.ativo || '').toUpperCase(), { preco: d.preco, segmento: d[campoGrupo] || null }]))
+          .catch(() => []);
+        precosPromise = Promise.all([ler('mercado-fiis.json', 'segmento'), ler('mercado-acoes.json', 'setor')])
+          .then(([f, a]) => {
+            precosMercado = new Map([...a, ...f].filter(([t, d]) => t && typeof d.preco === 'number' && d.preco > 0));
+            return precosMercado;
+          })
+          .finally(() => { if (!precosMercado || precosMercado.size === 0) precosPromise = null; });
+        return precosPromise;
+      }
+
+      async function precoHg(ticker) {
+        try {
+          const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const a = data?.results?.[0];
+          const v = a?.quote?.value;
+          return typeof v === 'number' && v > 0 ? { preco: v, nome: a.name || null } : null;
+        } catch (e) { return null; }
+      }
+
+      async function atualizarPrecos() {
+        const pendentes = ativos.filter(a => !a.precoManual);
+        if (pendentes.length === 0) return;
+        statusEl.textContent = 'Buscando preços...';
+        const mapa = await carregarPrecosMercado();
+        const faltando = [];
+        pendentes.forEach(a => {
+          const d = mapa?.get(a.ticker);
+          if (d) { a.preco = d.preco; a.segmento = d.segmento; a.fonte = 'robo'; }
+          else faltando.push(a);
+        });
+        if (faltando.length) {
+          await Promise.all(faltando.map(async a => {
+            const r = await precoHg(a.ticker);
+            if (r) { a.preco = r.preco; a.fonte = 'hg'; }
+          }));
+        }
+        const semPreco = ativos.filter(a => !(a.preco > 0)).map(a => a.ticker);
+        statusEl.textContent = semPreco.length
+          ? `Não achei o preço de ${semPreco.join(', ')} — digite o preço na tabela para ele entrar na conta.`
+          : '';
+        renderEdicao();
+      }
+
+      // ---------- Tabela de edição ----------
+      function pesoHojeMapa() {
+        const total = ativos.reduce((s, a) => s + (a.preco > 0 ? a.cotas * a.preco : 0), 0);
+        const m = new Map();
+        ativos.forEach(a => m.set(a.ticker, total > 0 && a.preco > 0 ? (a.cotas * a.preco / total) * 100 : null));
+        return m;
+      }
+
+      function valorInput(v, casas) {
+        if (v === null || v === undefined || v === '' || !Number.isFinite(Number(v))) return '';
+        return String(Math.round(Number(v) * 10 ** casas) / 10 ** casas);
+      }
+
+      function renderEdicao() {
+        const tem = ativos.length > 0;
+        wrapEdicao.hidden = !tem;
+        vazioEl.hidden = tem;
+        const pesos = pesoHojeMapa();
+        tbodyEdicao.innerHTML = ativos.map((a, i) => `
+          <tr data-idx="${i}">
+            <td class="ap-ativo"><strong>${escapar(a.ticker)}</strong>${a.segmento ? `<small>${escapar(a.segmento)}</small>` : ''}</td>
+            <td><input type="number" min="0" step="1" data-campo="cotas" value="${valorInput(a.cotas, 0)}" aria-label="Cotas de ${escapar(a.ticker)}" /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="preco" value="${valorInput(a.preco, 2)}"
+                 class="${a.precoManual ? 'ap-preco-manual' : ''}" placeholder="—"
+                 title="${a.precoManual ? 'Preço digitado por você. Apague o campo para voltar ao preço automático.' : 'Preço automático. Pode digitar outro (ex.: o que está no home broker agora).'}"
+                 aria-label="Preço de ${escapar(a.ticker)}" /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="alvo" value="${valorInput(a.alvo, 2)}" aria-label="Peso-alvo de ${escapar(a.ticker)}" /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="teto" value="${valorInput(a.teto, 2)}" placeholder="opcional" aria-label="Preço teto de ${escapar(a.ticker)}" /></td>
+            <td class="ap-num" data-peso-hoje>${pesos.get(a.ticker) === null ? '—' : fmtPct(pesos.get(a.ticker))}</td>
+            <td><button type="button" class="ap-remover" data-remover="${i}" title="Remover ${escapar(a.ticker)}" aria-label="Remover ${escapar(a.ticker)}">✕</button></td>
+          </tr>`).join('');
+        atualizarSoma();
+      }
+
+      function atualizarSoma() {
+        const soma = ativos.reduce((s, a) => s + (Number(a.alvo) || 0), 0);
+        somaEl.textContent = fmtPct(soma);
+        const ok = Math.abs(soma - 100) < 0.05;
+        somaEl.classList.toggle('ap-soma-ok', ok);
+        somaEl.classList.toggle('ap-soma-alerta', !ok && soma > 0);
+        btnNormalizar.hidden = ok || soma <= 0;
+        // Peso hoje muda quando cotas/preço mudam — atualiza sem redesenhar
+        // a tabela (redesenhar tiraria o foco do campo sendo digitado).
+        const pesos = pesoHojeMapa();
+        tbodyEdicao.querySelectorAll('tr[data-idx]').forEach(tr => {
+          const a = ativos[Number(tr.dataset.idx)];
+          const cel = tr.querySelector('[data-peso-hoje]');
+          if (a && cel) cel.textContent = pesos.get(a.ticker) === null ? '—' : fmtPct(pesos.get(a.ticker));
+        });
+      }
+
+      tbodyEdicao.addEventListener('input', (e) => {
+        const campo = e.target.dataset?.campo;
+        if (!campo) return;
+        const a = ativos[Number(e.target.closest('tr')?.dataset.idx)];
+        if (!a) return;
+        const bruto = e.target.value;
+        const v = bruto === '' ? null : Number(bruto);
+        if (campo === 'cotas') a.cotas = v && v > 0 ? Math.floor(v) : 0;
+        else if (campo === 'alvo') a.alvo = v && v > 0 ? v : 0;
+        else if (campo === 'teto') a.teto = v && v > 0 ? v : null;
+        else if (campo === 'preco') {
+          if (v && v > 0) { a.preco = v; a.precoManual = true; e.target.classList.add('ap-preco-manual'); }
+          else { a.precoManual = false; a.preco = null; e.target.classList.remove('ap-preco-manual'); }
+        }
+        invalidarResultado();
+        atualizarSoma();
+        salvar();
+      });
+      // Apagou o preço manual: ao sair do campo, busca o automático de novo.
+      tbodyEdicao.addEventListener('change', (e) => {
+        if (e.target.dataset?.campo === 'preco' && e.target.value === '') atualizarPrecos();
+      });
+      tbodyEdicao.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-remover]');
+        if (!b) return;
+        ativos.splice(Number(b.dataset.remover), 1);
+        invalidarResultado();
+        renderEdicao();
+        salvar();
+      });
+
+      function invalidarResultado() {
+        if (!ultimoResultado) return;
+        ultimoResultado = null;
+        resultadoEl.innerHTML = '<p class="calc-ajuda" style="margin-top:14px;">Você mudou os dados — clique em <strong>Calcular aporte</strong> de novo.</p>';
+        acoesEl.hidden = true;
+      }
+
+      function mesclar(novos, substituir) {
+        if (substituir) ativos = [];
+        novos.forEach(n => {
+          const existente = ativos.find(a => a.ticker === n.ticker);
+          if (existente) {
+            existente.cotas = n.cotas;
+            if (n.alvo) existente.alvo = n.alvo;
+            if (n.teto) existente.teto = n.teto;
+          } else {
+            ativos.push({ ticker: n.ticker, cotas: n.cotas || 0, alvo: n.alvo || 0, teto: n.teto || null, preco: null, precoManual: false });
+          }
+        });
+        invalidarResultado();
+        renderEdicao();
+        salvar();
+        return atualizarPrecos();
+      }
+
+      // ---------- Ações da barra ----------
+      function adicionar() {
+        const ticker = inTicker.value.trim().toUpperCase().replace(/^B3:/, '');
+        if (!ticker) { inTicker.focus(); return; }
+        if (!/^[A-Z0-9]{4}\d{1,2}[A-Z]?$/.test(ticker)) {
+          statusEl.textContent = `"${ticker}" não parece um código da B3 (ex.: HGLG11, PETR4).`;
+          return;
+        }
+        const cotas = Number(inCotas.value) > 0 ? Math.floor(Number(inCotas.value)) : 0;
+        const alvo = Number(inAlvo.value) > 0 ? Number(inAlvo.value) : 0;
+        inTicker.value = ''; inCotas.value = ''; inAlvo.value = '';
+        inTicker.focus();
+        mesclar([{ ticker, cotas, alvo }], false);
+      }
+
+      function importarCarteira() {
+        let lista = [];
+        try { lista = JSON.parse(localStorage.getItem('vrCarteiraDividendos')) || []; } catch (e) { lista = []; }
+        // Só B3 (preço em R$). Stock/ETF internacional está em dólar e
+        // misturaria moedas na mesma conta de pesos.
+        const b3 = lista.filter(l => l && l.ticker && l.kind !== 'internacional');
+        if (b3.length === 0) {
+          statusEl.textContent = 'Sua Carteira de Rendimentos está vazia (ou só tem ativos internacionais). Monte ela em Simuladores → Carteira de Rendimentos, ou adicione os ativos aqui mesmo.';
+          return;
+        }
+        const ignorados = lista.length - b3.length;
+        mesclar(b3.map(l => ({ ticker: String(l.ticker).toUpperCase(), cotas: Number(l.qtd) || 0 })), false).then(() => {
+          const falta = ativos.filter(a => !a.alvo).length;
+          const partes = [`${b3.length} ativo(s) importado(s) da Carteira de Rendimentos.`];
+          if (ignorados) partes.push(`${ignorados} internacional(is) ficaram de fora (outra moeda).`);
+          if (falta) partes.push('Agora preencha o peso-alvo de cada um — ou use "Pesos iguais" / "Manter pesos atuais".');
+          // Mantém o aviso de preço não encontrado (se houver) junto.
+          const avisoPreco = statusEl.textContent.startsWith('Não achei') ? ' ' + statusEl.textContent : '';
+          statusEl.textContent = partes.join(' ') + avisoPreco;
+        });
+      }
+
+      function pesosIguais() {
+        if (!ativos.length) return;
+        const p = Math.floor((100 / ativos.length) * 100) / 100;
+        ativos.forEach(a => { a.alvo = p; });
+        // O resto dos centavos vai para o primeiro, para somar 100 exato.
+        ativos[0].alvo = Math.round((100 - p * (ativos.length - 1)) * 100) / 100;
+        invalidarResultado(); renderEdicao(); salvar();
+      }
+
+      function manterPesosAtuais() {
+        const pesos = pesoHojeMapa();
+        if (![...pesos.values()].some(v => v)) {
+          statusEl.textContent = 'Preciso das cotas e dos preços para saber o peso de hoje.';
+          return;
+        }
+        ativos.forEach(a => { a.alvo = Math.round((pesos.get(a.ticker) || 0) * 100) / 100; });
+        invalidarResultado(); renderEdicao(); salvar();
+      }
+
+      function normalizar() {
+        const soma = ativos.reduce((s, a) => s + (Number(a.alvo) || 0), 0);
+        if (soma <= 0) return;
+        ativos.forEach(a => { a.alvo = Math.round((a.alvo / soma) * 10000) / 100; });
+        // O arredondamento deixa 99,99 ou 100,01: a diferença vai para o
+        // maior peso, onde ela pesa menos.
+        const novaSoma = ativos.reduce((s, a) => s + a.alvo, 0);
+        const maior = ativos.reduce((m, a) => (a.alvo > m.alvo ? a : m), ativos[0]);
+        maior.alvo = Math.round((maior.alvo + (100 - novaSoma)) * 100) / 100;
+        invalidarResultado(); renderEdicao(); salvar();
+      }
+
+      function limparTudo() {
+        if (ativos.length && !confirm('Apagar todos os ativos desta calculadora?')) return;
+        ativos = [];
+        ultimoResultado = null;
+        resultadoEl.innerHTML = '';
+        acoesEl.hidden = true;
+        statusEl.textContent = '';
+        renderEdicao(); salvar();
+      }
+
+      // ---------- Resultado ----------
+      const SELO = {
+        'compra': ['COMPRA', 'ap-selo-compra'],
+        'aguarde': ['AGUARDE', 'ap-selo-aguarde'],
+        'no-alvo': ['NO ALVO', 'ap-selo-neutro'],
+        'sem-alvo': ['SEM ALVO', 'ap-selo-neutro'],
+        'caro': ['COTA > APORTE', 'ap-selo-neutro'],
+        'na-fila': ['PRÓXIMO', 'ap-selo-neutro'],
+      };
+      const DICA_SELO = {
+        'compra': 'Entra neste aporte.',
+        'aguarde': 'Preço atual acima do seu preço teto.',
+        'no-alvo': 'Já está no peso-alvo ou acima dele.',
+        'sem-alvo': 'Sem peso-alvo definido — não entra na conta.',
+        'caro': 'Uma cota custa mais que o aporte inteiro.',
+        'na-fila': 'Abaixo do alvo, mas o dinheiro acabou antes. Fica para o próximo aporte.',
+      };
+
+      function barra(l, escala) {
+        const w = (v) => Math.max(0, Math.min(100, (v / escala) * 100));
+        return `<div class="ap-barra" title="Hoje ${fmtPct(l.pesoAtual)} · depois ${fmtPct(l.pesoDepois)} · alvo ${fmtPct(l.pesoAlvo)}">
+          <div class="ap-barra-depois" style="width:${w(l.pesoDepois)}%"></div>
+          <div class="ap-barra-atual" style="width:${w(l.pesoAtual)}%"></div>
+          ${l.pesoAlvo > 0 ? `<div class="ap-barra-alvo" style="left:calc(${w(l.pesoAlvo)}% - 1px)"></div>` : ''}
+        </div>`;
+      }
+
+      function ordemResultado(r) {
+        const rank = { 'compra': 0, 'na-fila': 1, 'caro': 2, 'aguarde': 3, 'no-alvo': 4, 'sem-alvo': 5 };
+        return r.linhas.filter(l => !l.semPreco).slice().sort((a, b) =>
+          (rank[a.status] - rank[b.status]) || (b.valorCompra - a.valorCompra) || a.ticker.localeCompare(b.ticker));
+      }
+
+      function calcular() {
+        const aporte = hgValorMascarado(inValor);
+        if (!ativos.length) { statusEl.textContent = 'Adicione pelo menos um ativo.'; return; }
+        if (!(aporte > 0)) { statusEl.textContent = 'Informe o valor do aporte.'; inValor.focus(); return; }
+        if (!ativos.some(a => a.alvo > 0)) {
+          statusEl.textContent = 'Defina o peso-alvo de pelo menos um ativo (ou use "Pesos iguais").';
+          return;
+        }
+        statusEl.textContent = '';
+
+        const r = calcularAporte(ativos, aporte, { respeitarTeto: chkTeto.checked, usarTudo: chkTudo.checked });
+        ultimoResultado = { ...r, respeitarTeto: chkTeto.checked, usarTudo: chkTudo.checked, quando: new Date() };
+        salvar();
+
+        const linhas = ordemResultado(r);
+        const escala = Math.max(1, ...linhas.map(l => Math.max(l.pesoAtual, l.pesoDepois, l.pesoAlvo))) * 1.1;
+        const totalCotas = linhas.reduce((s, l) => s + l.compra, 0);
+        const qtdAtivosCompra = linhas.filter(l => l.compra > 0).length;
+
+        const avisos = [];
+        if (Math.abs(r.somaAlvo - 100) >= 0.05) {
+          avisos.push(`Os pesos-alvo somam ${fmtPct(r.somaAlvo)}, não 100% — a conta usou a proporção entre eles (ex.: um peso 10 num total de ${fmtNum(r.somaAlvo)} vale ${fmtPct(10 / r.somaAlvo * 100)}).`);
+        }
+        if (r.semPreco.length) avisos.push(`Sem preço, ficaram de fora: <strong>${r.semPreco.map(escapar).join(', ')}</strong>.`);
+        if (r.bloqueados.length) avisos.push(`Acima do preço teto (não comprados): <strong>${r.bloqueados.map(escapar).join(', ')}</strong>. O peso deles fica reservado e o dinheiro vai para os outros.`);
+        if (r.sobra >= 0.01 && linhas.some(l => l.status === 'caro')) avisos.push('Algum ativo tem cota mais cara do que o troco que sobrou.');
+
+        resultadoEl.innerHTML = `
+          <div class="carteira-resumo-cards ap-resumo">
+            <div class="carteira-resumo-card"><span>Patrimônio hoje</span><strong>${fmtMoeda(r.patrimonioAtual)}</strong></div>
+            <div class="carteira-resumo-card carteira-resumo-destaque"><span>Vai investir</span><strong>${fmtMoeda(r.investido)}</strong></div>
+            <div class="carteira-resumo-card"><span>Troco (sobra)</span><strong>${fmtMoeda(r.sobra)}</strong></div>
+            <div class="carteira-resumo-card"><span>Patrimônio depois</span><strong>${fmtMoeda(r.patrimonioDepois)}</strong></div>
+          </div>
+          <p class="calc-ajuda" style="margin:0 0 8px;">
+            ${totalCotas > 0 ? `Comprar <strong>${fmtInt(totalCotas)} cota(s)</strong> em <strong>${qtdAtivosCompra} ativo(s)</strong>.` : 'Com esse valor nenhuma cota entra.'}
+            Ordem: primeiro os que entram neste aporte, do maior valor para o menor.
+          </p>
+          <div class="ap-legenda">
+            <span><i style="background:var(--muted); opacity:.55"></i>Peso hoje</span>
+            <span><i style="background:var(--primary)"></i>Peso depois do aporte</span>
+            <span><i style="background:var(--gold); width:3px"></i>Peso-alvo</span>
+          </div>
+          <div class="cmp-tabela-wrap">
+            <table class="cmp-tabela ap-tabela">
+              <thead><tr>
+                <th>Ativo</th><th>Situação</th><th class="ap-num">Comprar</th><th class="ap-num">Valor</th><th class="ap-num">Preço</th>
+                <th class="ap-num">Peso hoje</th><th class="ap-num">Peso-alvo</th><th class="ap-num">Peso depois</th><th>Hoje → depois</th>
+              </tr></thead>
+              <tbody>
+                ${linhas.map(l => `
+                  <tr class="${l.compra > 0 ? '' : 'ap-linha-parada'}">
+                    <td class="ap-ativo"><strong>${escapar(l.ticker)}</strong></td>
+                    <td><span class="ap-selo ${SELO[l.status][1]}" title="${DICA_SELO[l.status]}">${SELO[l.status][0]}</span></td>
+                    <td class="ap-num ${l.compra > 0 ? 'ap-comprar' : ''}">${l.compra > 0 ? fmtInt(l.compra) : '—'}</td>
+                    <td class="ap-num">${l.compra > 0 ? fmtMoeda(l.valorCompra) : '—'}</td>
+                    <td class="ap-num">${fmtMoeda(l.preco)}${l.teto ? `<br><small style="color:var(--muted)">teto ${fmtMoeda(l.teto)}</small>` : ''}</td>
+                    <td class="ap-num">${fmtPct(l.pesoAtual)}</td>
+                    <td class="ap-num">${fmtPct(l.pesoAlvo)}</td>
+                    <td class="ap-num">${fmtPct(l.pesoDepois)}</td>
+                    <td>${barra(l, escala)}</td>
+                  </tr>`).join('')}
+              </tbody>
+              <tfoot><tr>
+                <td colspan="2" class="ap-soma-rotulo">Total</td>
+                <td class="ap-num ap-comprar">${fmtInt(totalCotas)}</td>
+                <td class="ap-num"><strong>${fmtMoeda(r.investido)}</strong></td>
+                <td colspan="5"></td>
+              </tr></tfoot>
+            </table>
+          </div>
+          ${avisos.length ? `<div class="ap-aviso">${avisos.map(a => '• ' + a).join('<br>')}</div>` : ''}`;
+        acoesEl.hidden = false;
+      }
+
+      // ---------- PDF ----------
+      function nomeArquivoPdf() {
+        const d = new Date();
+        const p = (n) => String(n).padStart(2, '0');
+        return `calculadora-de-aportes-${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}.pdf`;
+      }
+
+      async function montarPdf() {
+        if (!ultimoResultado) { alert('Calcule o aporte antes de gerar o PDF.'); return null; }
+        if (!window.jspdf) { alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.'); return null; }
+        const r = ultimoResultado;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const larg = doc.internal.pageSize.getWidth();
+        const agora = r.quando;
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logo = await carregarLogoSiteBase64();
+        if (logo) doc.addImage(logo, 'PNG', larg - 70, 15, 30, 30);
+
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(15);
+        doc.text('Calculadora de Aportes', 40, 40);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
+        doc.setFontSize(8);
+        doc.text('Simulação educativa com o preço mais recente coletado pelo site. Confira o preço na corretora antes de enviar a ordem.', 40, 70);
+        doc.setTextColor(0);
+
+        const cinza = [119, 119, 119];
+        doc.autoTable({
+          startY: 86,
+          head: [['Patrimônio hoje', 'Aporte', 'Vai investir', 'Troco', 'Patrimônio depois']],
+          body: [[fmtMoeda(r.patrimonioAtual), fmtMoeda(r.aporte), fmtMoeda(r.investido), fmtMoeda(r.sobra), fmtMoeda(r.patrimonioDepois)]],
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6, halign: 'center' },
+          headStyles: { fillColor: cinza, textColor: 255, halign: 'center' },
+        });
+
+        const linhas = ordemResultado(r);
+        const totalCotas = linhas.reduce((s, l) => s + l.compra, 0);
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 16,
+          head: [['Ativo', 'Preço', 'Teto', 'Cotas hoje', 'Peso hoje', 'Peso-alvo', 'Situação', 'Comprar', 'Valor', 'Peso depois']],
+          body: linhas.map(l => [
+            l.ticker, fmtMoeda(l.preco), l.teto ? fmtMoeda(l.teto) : '-', fmtInt(l.cotas),
+            fmtPct(l.pesoAtual), fmtPct(l.pesoAlvo), SELO[l.status][0],
+            l.compra > 0 ? fmtInt(l.compra) : '-', l.compra > 0 ? fmtMoeda(l.valorCompra) : '-', fmtPct(l.pesoDepois),
+          ]),
+          foot: [['Total', '', '', '', '', '', '', fmtInt(totalCotas), fmtMoeda(r.investido), '']],
+          theme: 'grid',
+          styles: { fontSize: 8, cellPadding: 4, halign: 'right' },
+          headStyles: { fillColor: cinza, textColor: 255, halign: 'center' },
+          footStyles: { fillColor: [235, 235, 235], textColor: 0, fontStyle: 'bold', halign: 'right' },
+          columnStyles: { 0: { halign: 'left', fontStyle: 'bold' }, 6: { halign: 'center' } },
+          didParseCell: (d) => {
+            if (d.section !== 'body' || d.column.index !== 6) return;
+            if (d.cell.raw === 'COMPRA') d.cell.styles.textColor = [14, 158, 70];
+            else if (d.cell.raw === 'AGUARDE') d.cell.styles.textColor = [168, 120, 26];
+          },
+        });
+
+        const notas = [
+          `Regras usadas: ${r.respeitarTeto ? 'não comprar acima do preço teto' : 'preço teto ignorado'}; ${r.usarTudo ? 'usar o aporte inteiro' : 'parar quando a próxima cota passaria do alvo'}.`,
+          'Cada cota vai para o ativo mais distante do peso-alvo, em proporção ao próprio alvo, até o dinheiro acabar.',
+        ];
+        if (Math.abs(r.somaAlvo - 100) >= 0.05) notas.push(`Os pesos-alvo informados somavam ${fmtPct(r.somaAlvo)} e foram usados em proporção.`);
+        if (r.semPreco.length) notas.push(`Sem preço (fora da conta): ${r.semPreco.join(', ')}.`);
+        doc.setFontSize(8); doc.setTextColor(90);
+        let y = doc.lastAutoTable.finalY + 16;
+        notas.forEach(n => {
+          const partes = doc.splitTextToSize(n, larg - 80);
+          doc.text(partes, 40, y);
+          y += partes.length * 10 + 2;
+        });
+        doc.setTextColor(0);
+        return doc;
+      }
+
+      async function baixarPdf() {
+        const doc = await montarPdf();
+        if (doc) doc.save(nomeArquivoPdf());
+      }
+
+      async function compartilharPdf(botao) {
+        const doc = await montarPdf();
+        if (!doc) return;
+        const nome = nomeArquivoPdf();
+        const arquivo = new File([doc.output('blob')], nome, { type: 'application/pdf' });
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Calculadora de Aportes — Viver de Renda', files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+        doc.save(nome);
+        const span = botao.querySelector('.hg-btn-compartilhar-texto');
+        const padrao = span ? span.textContent : null;
+        if (span) span.textContent = 'PDF baixado!';
+        setTimeout(() => { if (span && padrao) span.textContent = padrao; }, 2500);
+      }
+
+      // ---------- Abrir / fechar ----------
+      let jaCarregou = false;
+      function abrirModal(opcoes = {}) {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        if (!jaCarregou) {
+          jaCarregou = true;
+          carregarSalvo();
+          renderEdicao();
+          atualizarPrecos();
+        }
+        if (opcoes.importarCarteira) importarCarteira();
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+      window.vrAbrirCalculadoraAportes = abrirModal;
+
+      hgAplicarMascaraMoeda(inValor, 0);
+      btnAbrir?.addEventListener('click', () => { if (typeof fecharMenusNav === 'function') fecharMenusNav(); abrirModal(); });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+
+      $('apBtnAdicionar').addEventListener('click', adicionar);
+      [inTicker, inCotas, inAlvo].forEach(el => el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); adicionar(); }
+      }));
+      if (typeof hgBuscarSugestoesTickers === 'function') {
+        let deb = null;
+        inTicker.addEventListener('input', () => {
+          clearTimeout(deb);
+          const v = inTicker.value;
+          deb = setTimeout(() => hgBuscarSugestoesTickers(v), 300);
+        });
+      }
+      $('apBtnImportar').addEventListener('click', importarCarteira);
+      $('apBtnIguais').addEventListener('click', pesosIguais);
+      $('apBtnAtuais').addEventListener('click', manterPesosAtuais);
+      $('apBtnLimpar').addEventListener('click', limparTudo);
+      btnNormalizar.addEventListener('click', normalizar);
+      btnColar.addEventListener('click', () => {
+        colarBox.hidden = !colarBox.hidden;
+        btnColar.setAttribute('aria-expanded', String(!colarBox.hidden));
+        if (!colarBox.hidden) $('apColarTexto').focus();
+      });
+      $('apBtnColarAplicar').addEventListener('click', () => {
+        const novos = lerLinhasColadas($('apColarTexto').value);
+        if (!novos.length) {
+          statusEl.textContent = 'Não reconheci nenhuma linha. O formato é: Ativo, Cotas, Peso-alvo % e (opcional) Preço teto — uma linha por ativo.';
+          return;
+        }
+        mesclar(novos, $('apColarSubstituir').checked).then(() => {
+          if (!statusEl.textContent) statusEl.textContent = `${novos.length} ativo(s) carregado(s) da planilha.`;
+        });
+        colarBox.hidden = true;
+        btnColar.setAttribute('aria-expanded', 'false');
+        $('apColarTexto').value = '';
+      });
+      [chkTeto, chkTudo].forEach(c => c.addEventListener('change', () => { salvar(); if (ultimoResultado) calcular(); }));
+      inValor.addEventListener('input', () => { invalidarResultado(); salvar(); });
+      inValor.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); calcular(); } });
+      $('apBtnCalcular').addEventListener('click', calcular);
+      $('apBtnPdf').addEventListener('click', baixarPdf);
+      $('apBtnCompartilhar').addEventListener('click', (e) => compartilharPdf(e.currentTarget));
+
+      $('apCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'aportes',
+          titulo: 'Calculadora de Aportes — Viver de Renda',
+          texto: 'Quanto comprar de cada FII ou ação com o aporte do mês para chegar no peso-alvo da carteira.',
+        }));
+
+      // Atalho a partir da Carteira de Rendimentos: fecha ela e abre aqui
+      // já com os ativos importados.
+      document.getElementById('carteiraBtnAporte')?.addEventListener('click', () => {
+        document.getElementById('carteiraFechar')?.click();
+        abrirModal({ importarCarteira: true });
+      });
+
+      hgAbrirPorLinkDeFerramenta('aportes', abrirModal);
+    })();
+
 
     // ============================================================
     // "QUAL É UMA TAXA JUSTA HOJE?" — a Fase 2 do "Vale a Pena?".
