@@ -583,6 +583,7 @@
     .ap-tabela-visao thead tr:last-child th { white-space: normal; line-height: 1.2; font-size: 0.6rem; vertical-align: bottom; letter-spacing: 0.01em; }
     .ap-tabela-visao td.ap-setor { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
     .ap-tabela-visao .ap-selo { padding: 1px 6px; font-size: 0.6rem; }
+    .ap-visao-falta { margin: 0 0 10px; font-size: 0.76rem; }
     @media (max-width: 1440px) {
       .ap-tabela-visao .ap-rs { display: none; }
       .cmp-tabela.ap-tabela.ap-tabela-visao { font-size: 0.65rem; }
@@ -6366,6 +6367,7 @@
             <span class="calc-ajuda" style="margin:0;">Clique no título de uma coluna para ordenar.</span>
           </div>
           <div class="ap-visao-cards carteira-resumo-cards" id="apVisaoCards"></div>
+          <div class="ap-aviso ap-visao-falta" id="apVisaoFalta" hidden></div>
           <div class="cmp-tabela-wrap">
             <table class="cmp-tabela ap-tabela ap-tabela-visao" id="apTabelaVisao"></table>
           </div>
@@ -11760,33 +11762,65 @@
           const resp = await fetch(url);
           const data = await resp.json();
           const a = data?.results?.[0];
+          if (!a) return null;
           const v = a?.quote?.value;
-          return typeof v === 'number' && v > 0 ? { preco: v, nome: a.name || null } : null;
+          const num = (x) => (typeof x === 'number' && Number.isFinite(x) ? x : null);
+          return {
+            preco: typeof v === 'number' && v > 0 ? v : null,
+            nome: a.name || null,
+            dy: num(a.dividends?.yield_12m_percent),
+            dia: num(a.quote?.change_percent),
+            setor: a.classification?.segment || a.classification?.sector || null,
+          };
         } catch (e) { return null; }
       }
 
+      // P/VP não vem no /v2/finance/quotes — é o mesmo endpoint que a
+      // Consulta Rápida usa (financials.price_to_book_ratio).
+      async function pvpHg(ticker) {
+        try {
+          const url = `https://api.hgbrasil.com/finance/stock_price?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&symbol=${encodeURIComponent(ticker)}`;
+          const data = await (await fetch(url)).json();
+          const fin = (data?.results?.[ticker] || data?.results?.[ticker.toUpperCase()])?.financials;
+          const v = fin?.price_to_book_ratio;
+          return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null;
+        } catch (e) { return null; }
+      }
+      // Um ativo só vai à HG uma vez por sessão (a cota da chave é contada).
+      const hgJaBuscado = new Set();
+
       async function atualizarPrecos() {
-        const pendentes = ativos.filter(a => !a.precoManual);
-        if (pendentes.length === 0) return;
+        if (ativos.length === 0) return;
         statusEl.textContent = 'Buscando preços...';
         const mapa = await carregarPrecosMercado();
-        const faltando = [];
-        pendentes.forEach(a => {
-          const d = mapa?.get(a.ticker);
-          if (d) { a.preco = d.preco; a.segmento = d.segmento; a.fonte = 'robo'; }
-          else faltando.push(a);
-        });
-        // P/VP, DY e variação do dia valem mesmo com preço manual.
+        const foraDoRobo = [];
         ativos.forEach(a => {
           const d = mapa?.get(a.ticker);
-          if (d) { a.pvp = d.pvp; a.dy = d.dy; a.dia = d.dia; if (!a.segmento) a.segmento = d.segmento; }
+          if (d) {
+            if (!a.precoManual) { a.preco = d.preco; a.fonte = 'robo'; }
+            a.segmento = d.segmento;
+            // P/VP, DY e variação do dia valem mesmo com preço manual.
+            a.pvp = d.pvp; a.dy = d.dy; a.dia = d.dia;
+          } else {
+            foraDoRobo.push(a);
+          }
         });
-        if (faltando.length) {
-          await Promise.all(faltando.map(async a => {
-            const r = await precoHg(a.ticker);
-            if (r) { a.preco = r.preco; a.fonte = 'hg'; }
-            // Último recurso: o preço que veio colado da planilha.
-            else if (a.precoPlanilha) { a.preco = a.precoPlanilha; a.fonte = 'planilha'; }
+        // Fora dos arquivos do robô (ex.: FI-Infra, Fiagro, ação fora da
+        // lista): a HG Brasil completa preço, DY, variação, setor e P/VP.
+        const buscar = foraDoRobo.filter(a => !hgJaBuscado.has(a.ticker) || (!a.precoManual && !(a.preco > 0)));
+        if (buscar.length) {
+          await Promise.all(buscar.map(async a => {
+            hgJaBuscado.add(a.ticker);
+            const [r, pvp] = await Promise.all([precoHg(a.ticker), pvpHg(a.ticker)]);
+            if (r) {
+              if (!a.precoManual && r.preco) { a.preco = r.preco; a.fonte = 'hg'; }
+              if (r.dy !== null) a.dy = r.dy;
+              if (r.dia !== null) a.dia = r.dia;
+              if (r.setor && !a.segmento) a.segmento = r.setor;
+            }
+            if (pvp !== null) a.pvp = pvp;
+            // Último recurso para o preço: o que veio colado da planilha.
+            if (!a.precoManual && !(a.preco > 0) && a.precoPlanilha) { a.preco = a.precoPlanilha; a.fonte = 'planilha'; }
           }));
         }
         const semPreco = ativos.filter(a => !(a.preco > 0)).map(a => a.ticker);
@@ -12025,9 +12059,27 @@
           lucroPct: t.lucroPct !== null ? sinal(t.lucroPct, v => fmtNum(v) + '%') : '—',
         };
         const rodape = COLS_VISAO.map((c, i) => `<td class="${c.t === 'txt' ? '' : 'ap-num'}">${i === 0 ? 'Total' : (tot[c.k] ?? '')}</td>`).join('');
+        // Colunas com "—" por falta de dado SEU (não do robô): diz qual
+        // dado falta e onde preencher, em vez de deixar parecer defeito.
+        const faltaEl = $('apVisaoFalta');
+        const semPm = ls.filter(l => l.vm !== null && l.pm === null).map(l => l.ticker);
+        const semTeto = ls.filter(l => l.teto === null).map(l => l.ticker);
+        const lista = (arr) => arr.length > 6 ? arr.slice(0, 6).join(', ') + ` e mais ${arr.length - 6}` : arr.join(', ');
+        const falta = [];
+        if (semPm.length) falta.push(`<strong>Preço médio</strong> em branco (${lista(semPm)}) — sem ele ficam vazios <em>Custo, DY on cost e Lucro</em>.`);
+        if (semTeto.length) falta.push(`<strong>Preço teto</strong> em branco (${lista(semTeto)}) — sem ele <em>Compra?</em> fica vazio.`);
+        if (faltaEl) {
+          faltaEl.hidden = falta.length === 0;
+          faltaEl.innerHTML = falta.length ? falta.map(f => '• ' + f).join('<br>') +
+            `<br>Esses dados são seus (não vêm da bolsa): preencha na tabela lá em cima ou use <strong>📋 Colar da planilha</strong> com o cabeçalho da sua planilha. <button type="button" class="ap-link-btn" data-ir-edicao>Ir para a tabela ↑</button>` : '';
+        }
         tabelaVisaoEl.innerHTML = `<thead><tr class="ap-grupos">${grupos}</tr><tr>${cab}</tr></thead><tbody>${corpo}</tbody><tfoot><tr>${rodape}</tr></tfoot>`;
       }
 
+      $('apVisaoFalta')?.addEventListener('click', (e) => {
+        if (!e.target.closest('[data-ir-edicao]')) return;
+        wrapEdicao.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
       tabelaVisaoEl?.addEventListener('click', (e) => {
         const th = e.target.closest('th[data-col]');
         if (!th) return;
