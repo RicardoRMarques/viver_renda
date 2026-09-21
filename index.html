@@ -565,23 +565,39 @@
        os rótulos dos campos idem. */
     .calc-modal.vp-modal { max-width: 860px; }
     /* ---------- Calculadora de Aportes ---------- */
-    .calc-modal.ap-modal { max-width: 1280px; }
+    .calc-modal.ap-modal { max-width: min(1440px, 96vw); }
     /* Visão da carteira (mesmas colunas da planilha "Minha Carteira") */
     .ap-visao-titulo { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
     .ap-visao-titulo h4 { margin: 0; font-size: 1rem; }
-    .ap-visao-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-    .ap-visao-cards .carteira-resumo-card strong { font-size: 1.05rem; }
-    .ap-visao-cards .carteira-resumo-card small { display: block; margin-top: 3px; font-size: 0.72rem; font-weight: 700; }
-    .ap-tabela-visao { font-size: 0.74rem; min-width: 1240px; }
-    .ap-tabela-visao th, .ap-tabela-visao td { padding: 6px 7px; }
-    .ap-tabela-visao thead tr.ap-grupos th { text-align: center; color: #fff; font-size: 0.68rem; letter-spacing: 0.04em; padding: 5px 6px; border-bottom: none; }
+    /* Cards compactos: os 6 numa linha só, sem ocupar meia tela. */
+    .ap-visao-cards.carteira-resumo-cards { grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 8px; margin: 10px 0; }
+    .ap-visao-cards .carteira-resumo-card { padding: 8px 11px; border-radius: 10px; }
+    .ap-visao-cards .carteira-resumo-card > span { font-size: 0.6rem; }
+    .ap-visao-cards .carteira-resumo-card strong { font-size: 0.92rem; margin-top: 2px; }
+    .ap-visao-cards .carteira-resumo-card small { display: block; margin-top: 2px; font-size: 0.64rem; font-weight: 700; line-height: 1.3; }
+    /* Tabela: 17 colunas cabendo na largura, sem rolagem lateral no
+       computador — fonte menor, padding curto e cabeçalho que quebra linha. */
+    .cmp-tabela.ap-tabela.ap-tabela-visao { font-size: 0.68rem; min-width: 0; width: 100%; }
+    .ap-tabela-visao th, .ap-tabela-visao td { padding: 5px 4px; }
+    .ap-tabela-visao td:first-child, .ap-tabela-visao th:first-child { padding-left: 8px; }
+    .ap-tabela-visao thead tr:last-child th { white-space: normal; line-height: 1.2; font-size: 0.6rem; vertical-align: bottom; letter-spacing: 0.01em; }
+    .ap-tabela-visao td.ap-setor { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+    .ap-tabela-visao .ap-selo { padding: 1px 6px; font-size: 0.6rem; }
+    @media (max-width: 1440px) {
+      .ap-tabela-visao .ap-rs { display: none; }
+      .cmp-tabela.ap-tabela.ap-tabela-visao { font-size: 0.65rem; }
+      .ap-tabela-visao th, .ap-tabela-visao td { padding: 5px 3px; }
+      .ap-modal .calc-corpo { padding-left: 14px; padding-right: 14px; }
+    }
+    .ap-tabela-visao thead tr.ap-grupos th { text-align: center; color: #fff; font-size: 0.58rem; letter-spacing: 0.03em; padding: 4px 3px; border-bottom: none; white-space: normal; line-height: 1.15; }
     .ap-tabela-visao .ap-g-carteira { background: #1d7fa8; }
     .ap-tabela-visao .ap-g-osc { background: #c0504d; }
     .ap-tabela-visao .ap-g-analise { background: #a8781a; }
     .ap-tabela-visao .ap-g-prov { background: #2e8b57; }
     .ap-tabela-visao .ap-g-rent { background: #6a4fb3; }
     .ap-tabela-visao th.ap-ord { cursor: pointer; user-select: none; }
-    .ap-tabela-visao th.ap-ord::after { content: ' ⇅'; opacity: 0.35; font-size: 0.9em; }
+    .ap-tabela-visao th.ap-ord::after { content: ''; }
+    .ap-tabela-visao th.ap-ord:hover::after { content: ' ⇅'; opacity: 0.5; }
     .ap-tabela-visao th.ap-ord.asc::after { content: ' ▲'; opacity: 1; }
     .ap-tabela-visao th.ap-ord.desc::after { content: ' ▼'; opacity: 1; }
     .ap-pos { color: var(--accent); }
@@ -11727,7 +11743,7 @@
         if (precosPromise) return precosPromise;
         const ler = (url, campoGrupo) => fetch(url, { cache: 'no-store' })
           .then(r => (r.ok ? r.json() : { ativos: [] }))
-          .then(j => (j.ativos || []).map(d => [String(d.ativo || '').toUpperCase(), { preco: d.preco, segmento: d[campoGrupo] || null, pvp: d.pvp, dy: d.dy_pct, dia: d.variacao_dia_pct }]))
+          .then(j => (j.ativos || []).map(d => [String(d.ticker || d.ativo || '').toUpperCase(), { preco: d.preco, segmento: d[campoGrupo] || null, pvp: d.pvp, dy: d.dy_pct, dia: d.variacao_dia_pct }]))
           .catch(() => []);
         precosPromise = Promise.all([ler('mercado-fiis.json', 'segmento'), ler('mercado-acoes.json', 'setor')])
           .then(([f, a]) => {
@@ -11931,30 +11947,34 @@
 
       const sinal = (v, fmt) => (typeof v === 'number'
         ? `<span class="${v > 0 ? 'ap-pos' : v < 0 ? 'ap-neg' : ''}">${v < 0 ? '−' : ''}${fmt(Math.abs(v))}</span>` : '—');
+      // Na tabela o "R$" fica num <span> próprio: em telas até 1440px ele
+      // some (a coluna já diz que é dinheiro) e as 17 colunas cabem sem
+      // rolagem lateral. Nos cards e no PDF ele continua.
+      const moedaV = (v) => (typeof v === 'number' ? `<span class="ap-rs">R$ </span>${fmtNum(v)}` : '—');
       const COLS_VISAO = [
         { k: 'ticker', r: 'Ativo', g: 'carteira', t: 'txt', f: l => `<strong>${escapar(l.ticker)}</strong>` },
         { k: 'setor', r: 'Setor', g: 'carteira', t: 'txt', f: l => escapar(l.setor || '—') },
         { k: 'peso', r: 'Peso %', g: 'carteira', f: l => fmtPct(l.peso) },
         { k: 'cotas', r: 'Posição', g: 'carteira', f: l => fmtInt(l.cotas) },
-        { k: 'pm', r: 'Preço médio', g: 'carteira', f: l => fmtMoeda(l.pm) },
-        { k: 'custo', r: 'Custo', g: 'carteira', f: l => fmtMoeda(l.custo) },
-        { k: 'dia', r: 'Dia (%)', g: 'osc', f: l => sinal(l.dia, v => fmtNum(v) + '%') },
+        { k: 'pm', r: 'Preço médio', g: 'carteira', f: l => moedaV(l.pm) },
+        { k: 'custo', r: 'Custo', g: 'carteira', f: l => moedaV(l.custo) },
+        { k: 'dia', r: 'Dia', g: 'osc', f: l => sinal(l.dia, v => fmtNum(v) + '%') },
         { k: 'pvp', r: 'P/VP', g: 'analise', f: l => fmtNum(l.pvp) },
-        { k: 'teto', r: 'Preço teto', g: 'analise', f: l => fmtMoeda(l.teto) },
+        { k: 'teto', r: 'Preço teto', g: 'analise', f: l => moedaV(l.teto) },
         { k: 'compra', r: 'Compra?', g: 'analise', t: 'txt', f: l => l.compra
             ? `<span class="ap-selo ${l.compra === 'COMPRA' ? 'ap-selo-compra' : 'ap-selo-aguarde'}">${l.compra}</span>` : '—' },
-        { k: 'preco', r: 'Preço atual', g: 'analise', f: l => fmtMoeda(l.preco) },
-        { k: 'dy12', r: 'DY 12M (%)', g: 'analise', f: l => fmtPct(l.dy12) },
+        { k: 'preco', r: 'Preço atual', g: 'analise', f: l => moedaV(l.preco) },
+        { k: 'dy12', r: 'DY 12M', g: 'analise', f: l => fmtPct(l.dy12) },
         { k: 'prov', r: 'Proventos', g: 'prov', f: l => l.prov === null ? '—'
-            : fmtMoeda(l.prov) + (l.provEst ? '<span class="ap-estimado" title="Estimativa: cotas × preço × DY 12M. Informe o valor recebido na tabela acima.">≈</span>' : '') },
-        { k: 'dyPct', r: 'DY (%)', g: 'prov', f: l => fmtPct(l.dyPct) },
-        { k: 'dyCost', r: 'DY on cost (%)', g: 'prov', f: l => fmtPct(l.dyCost) },
-        { k: 'lucro', r: 'Lucro (R$)', g: 'rent', f: l => sinal(l.lucro, fmtMoeda) },
+            : moedaV(l.prov) + (l.provEst ? '<span class="ap-estimado" title="Estimativa: cotas × preço × DY 12M. Informe o valor recebido na tabela acima.">≈</span>' : '') },
+        { k: 'dyPct', r: 'DY', g: 'prov', f: l => fmtPct(l.dyPct) },
+        { k: 'dyCost', r: 'DY on cost', g: 'prov', f: l => fmtPct(l.dyCost) },
+        { k: 'lucro', r: 'Lucro (R$)', g: 'rent', f: l => sinal(l.lucro, moedaV) },
         { k: 'lucroPct', r: 'Lucro (%)', g: 'rent', f: l => sinal(l.lucroPct, v => fmtNum(v) + '%') },
       ];
       const GRUPOS_VISAO = [
-        ['carteira', 'EM CARTEIRA', 'ap-g-carteira'], ['osc', 'OSCILAÇÃO', 'ap-g-osc'], ['analise', 'ANÁLISES', 'ap-g-analise'],
-        ['prov', 'PROVENTOS 12 MESES', 'ap-g-prov'], ['rent', 'RENTABILIDADE', 'ap-g-rent'],
+        ['carteira', 'EM CARTEIRA', 'ap-g-carteira'], ['osc', 'OSCIL.', 'ap-g-osc'], ['analise', 'ANÁLISES', 'ap-g-analise'],
+        ['prov', 'PROVENTOS 12M', 'ap-g-prov'], ['rent', 'RENTABILIDADE', 'ap-g-rent'],
       ];
 
       function ordenarVisao(ls) {
@@ -11997,7 +12017,7 @@
           return `<th class="ap-ord${ord}${c.t === 'txt' ? '' : ' ap-num'}" data-col="${c.k}">${c.r}</th>`;
         }).join('');
         const corpo = ordenarVisao(ls).map(l => `<tr>${COLS_VISAO.map(c =>
-          `<td class="${c.t === 'txt' ? '' : 'ap-num'}">${c.f(l)}</td>`).join('')}</tr>`).join('');
+          `<td class="${c.k === 'setor' ? 'ap-setor' : c.t === 'txt' ? '' : 'ap-num'}"${c.k === 'setor' && l.setor ? ` title="${escapar(l.setor)}"` : ''}>${c.f(l)}</td>`).join('')}</tr>`).join('');
         const tot = {
           peso: fmtPct(ls.some(l => l.peso !== null) ? 100 : null), custo: t.temCusto ? fmtMoeda(t.custo) : '—',
           prov: fmtMoeda(t.prov), dyPct: fmtPct(t.dyPct), dyCost: fmtPct(t.dyCost),
