@@ -690,6 +690,9 @@
       border: 1px solid var(--border); background: var(--deep); color: var(--text);
     }
     .ap-tabela-edicao input.ap-preco-manual { border-color: var(--gold); }
+    .ap-tabela-edicao input.ap-in-setor { width: 104px; }
+    .ap-tabela-edicao input.ap-in-pvp { width: 70px; }
+    .ap-tabela-edicao input.ap-falta { border-color: var(--gold); border-width: 2px; }
     .ap-ativo strong { display: block; }
     .ap-ativo small { color: var(--muted); font-size: 0.7rem; }
     .ap-remover { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.95rem; padding: 2px 6px; }
@@ -6406,11 +6409,18 @@
         <div class="cmp-tabela-wrap ap-edicao-wrap" id="apEdicaoWrap" hidden>
           <table class="cmp-tabela ap-tabela ap-tabela-edicao">
             <thead>
-              <tr><th>Ativo</th><th>Cotas</th><th>Preço médio</th><th>Preço atual</th><th>Peso-alvo %</th><th>Preço teto</th><th title="Proventos que você recebeu nos últimos 12 meses (R$). Em branco = estimativa pelo DY do ativo.">Proventos 12m</th><th>Peso hoje</th><th></th></tr>
+              <tr><th>Ativo</th><th title="Segmento do fundo / setor da ação. Em branco = o que veio da fonte (robô ou HG).">Setor</th><th>Cotas</th><th>Preço médio</th><th>Preço atual</th><th title="Preço sobre valor patrimonial. Em branco = automático. Digite quando a fonte não tiver (ex.: FI-Infra) — é o que calcula o preço teto.">P/VP</th><th>Peso-alvo %</th><th>Preço teto</th><th title="Proventos que você recebeu nos últimos 12 meses (R$). Em branco = estimativa pelo DY do ativo.">Proventos 12m</th><th>Peso hoje</th><th></th></tr>
             </thead>
             <tbody id="apTbodyEdicao"></tbody>
+            <datalist id="apSetores">
+              <option value="Logística"></option><option value="Papel"></option><option value="Híbrido"></option>
+              <option value="Shoppings"></option><option value="Lajes corporativas"></option><option value="Renda urbana"></option>
+              <option value="Varejo"></option><option value="Infra"></option><option value="Agro"></option>
+              <option value="FOFs"></option><option value="Hotel"></option><option value="Educacional"></option>
+              <option value="Hospitalar"></option><option value="Desenvolvimento"></option>
+            </datalist>
             <tfoot>
-              <tr><td colspan="4" class="ap-soma-rotulo">Soma dos pesos-alvo</td><td id="apSomaAlvo" class="ap-soma">0%</td>
+              <tr><td colspan="6" class="ap-soma-rotulo">Soma dos pesos-alvo</td><td id="apSomaAlvo" class="ap-soma">0%</td>
                 <td colspan="4"><button type="button" class="ap-link-btn" id="apBtnNormalizar" hidden>Ajustar para 100%</button></td></tr>
             </tfoot>
           </table>
@@ -11688,6 +11698,7 @@
         alvo: ['PESO ALVO', 'ALVO', 'META', 'PESO IDEAL', 'PESO META', '% IDEAL', 'IDEAL'],
         teto: ['PRECO TETO', 'TETO'],
         preco: ['PRECO ATUAL', 'COTACAO', 'PRECO'],
+        pvp: ['P VP', 'PVP'],
         prov: ['PROVENTOS', 'PROVENTOS 12M', 'PROVENTOS RECEBIDOS', 'RENDIMENTOS', 'DIVIDENDOS'],
       };
       const TICKER_RE = /^[A-Z0-9]{4}\d{1,2}[A-Z]?$/;
@@ -11717,10 +11728,11 @@
           const iAtivo = mapa ? mapa.ativo : 0;
           const ticker = (campos[iAtivo] || '').toUpperCase().replace(/^B3:/, '');
           if (!TICKER_RE.test(ticker)) return; // linha de título, total, vazia...
-          let cotas, alvo, teto, pm, prov, preco, setor;
+          let cotas, alvo, teto, pm, prov, preco, setor, pvpPlan;
           if (mapa) {
             cotas = num(campos, mapa.cotas); alvo = num(campos, mapa.alvo); teto = num(campos, mapa.teto);
             pm = num(campos, mapa.pm); prov = num(campos, mapa.prov); preco = num(campos, mapa.preco);
+            pvpPlan = num(campos, mapa.pvp);
             setor = mapa.setor !== undefined ? (campos[mapa.setor] || '').trim() : '';
           } else {
             cotas = num(campos, 1); alvo = num(campos, 2); teto = num(campos, 3); pm = num(campos, 4);
@@ -11741,6 +11753,7 @@
             pm: pos(pm),
             prov: Number.isFinite(prov) && prov >= 0 ? prov : null,
             precoPlanilha: pos(preco),
+            pvpPlanilha: pos(pvpPlan),
             setor: setor || null,
           });
         });
@@ -11795,9 +11808,22 @@
         const v = Number(document.getElementById('apPvpMax')?.value);
         return v > 0 ? v : 1;
       }
+      // P/VP: o digitado vale mais; depois o da fonte (robô/HG); por
+      // último o que veio colado da planilha. FI-Infra costuma não ter P/VP
+      // em nenhuma fonte automática — aí só o digitado/colado resolve.
+      function pvpAuto(a) {
+        if (a.pvp > 0) return a.pvp;
+        if (a.pvpPlanilha > 0) return a.pvpPlanilha;
+        return null;
+      }
+      function pvpEfetivo(a) { return a.pvpManual > 0 ? a.pvpManual : pvpAuto(a); }
+      // É fundo? Pela fonte; sem fonte, código terminado em 11 que não está
+      // na lista de ações (units como TAEE11 vêm marcadas como 'acao').
+      const ehFundo = (a) => a.tipo === 'fii' || (!a.tipo && /11$/.test(a.ticker));
       function tetoAuto(a) {
-        if (a.tipo !== 'fii' || !(a.preco > 0) || !(a.pvp > 0)) return null;
-        return Math.round((a.preco / a.pvp) * pvpMaximo() * 100) / 100;
+        const pvp = pvpEfetivo(a);
+        if (!ehFundo(a) || !(a.preco > 0) || !(pvp > 0)) return null;
+        return Math.round((a.preco / pvp) * pvpMaximo() * 100) / 100;
       }
       function tetoEfetivo(a) {
         if (a.teto > 0) return a.teto;
@@ -11817,7 +11843,7 @@
             ativos: ativos.map(a => ({
               ticker: a.ticker, cotas: a.cotas, alvo: a.alvo, teto: a.teto,
               pm: a.pm ?? null, prov: a.prov ?? null, setor: a.setor ?? null, precoPlanilha: a.precoPlanilha ?? null,
-              tetoPlanilha: a.tetoPlanilha ?? null,
+              tetoPlanilha: a.tetoPlanilha ?? null, pvpManual: a.pvpManual ?? null, pvpPlanilha: a.pvpPlanilha ?? null,
               ...(a.precoManual ? { preco: a.preco, precoManual: true } : {}),
             })),
             lancamentos,
@@ -11846,6 +11872,8 @@
             setor: a.setor || null,
             precoPlanilha: Number(a.precoPlanilha) > 0 ? Number(a.precoPlanilha) : null,
             tetoPlanilha: Number(a.tetoPlanilha) > 0 ? Number(a.tetoPlanilha) : null,
+            pvpManual: Number(a.pvpManual) > 0 ? Number(a.pvpManual) : null,
+            pvpPlanilha: Number(a.pvpPlanilha) > 0 ? Number(a.pvpPlanilha) : null,
             preco: a.precoManual && Number(a.preco) > 0 ? Number(a.preco) : null,
             precoManual: !!(a.precoManual && Number(a.preco) > 0),
           })) : [];
@@ -11885,7 +11913,7 @@
             tipo: ['fii', 'fiagro', 'fund'].includes(a.kind) ? 'fii' : a.kind === 'stock' ? 'acao' : null,
             dy: num(a.dividends?.yield_12m_percent),
             dia: num(a.quote?.change_percent),
-            setor: a.classification?.segment || a.classification?.sector || null,
+            setor: [a.classification?.segment, a.classification?.sector].find(x => x && !/indefinid|n[ãa]o classificad|^outros?$/i.test(x)) || null,
           };
         } catch (e) { return null; }
       }
@@ -11900,6 +11928,16 @@
           const v = fin?.price_to_book_ratio;
           return typeof v === 'number' && Number.isFinite(v) && v > 0 ? v : null;
         } catch (e) { return null; }
+      }
+      // A HG classifica muito FI-Infra/Fiagro como "Indefinido". O nome do
+      // fundo quase sempre diz o que ele é.
+      function setorPeloNome(nome) {
+        const n = String(nome || '');
+        if (/infra/i.test(n)) return 'Infra';
+        if (/fiagro|agro/i.test(n)) return 'Agro';
+        if (/log[ií]stic/i.test(n)) return 'Logística';
+        if (/shopping/i.test(n)) return 'Shoppings';
+        return null;
       }
       // Um ativo só vai à HG uma vez por sessão (a cota da chave é contada).
       const hgJaBuscado = new Set();
@@ -11932,7 +11970,7 @@
               if (r.tipo) a.tipo = r.tipo;
               if (r.dy !== null) a.dy = r.dy;
               if (r.dia !== null) a.dia = r.dia;
-              if (r.setor && !a.segmento) a.segmento = r.setor;
+              if (!a.segmento) a.segmento = r.setor || setorPeloNome(r.nome) || null;
             }
             if (pvp !== null) a.pvp = pvp;
             // Último recurso para o preço: o que veio colado da planilha.
@@ -11967,12 +12005,16 @@
         tbodyEdicao.innerHTML = ativos.map((a, i) => `
           <tr data-idx="${i}">
             <td class="ap-ativo"><strong>${escapar(a.ticker)}</strong>${a.segmento ? `<small>${escapar(a.segmento)}</small>` : ''}</td>
+            <td><input type="text" data-campo="setor" class="ap-in-setor" list="apSetores" value="${escapar(a.setor || '')}" placeholder="${escapar(a.segmento || '—')}" aria-label="Setor de ${escapar(a.ticker)}" /></td>
             <td><input type="number" min="0" step="1" data-campo="cotas" value="${valorInput(a.cotas, 0)}" aria-label="Cotas de ${escapar(a.ticker)}"${a.viaLanc ? ' disabled title="Calculado pelas Compras & Vendas"' : ''} /></td>
             <td><input type="number" min="0" step="0.01" data-campo="pm" value="${valorInput(a.pm, 2)}" placeholder="opcional" aria-label="Preço médio de ${escapar(a.ticker)}"${a.viaLanc ? ' disabled title="Calculado pelas Compras & Vendas"' : ''} /></td>
             <td><input type="number" min="0" step="0.01" data-campo="preco" value="${valorInput(a.preco, 2)}"
                  class="${a.precoManual ? 'ap-preco-manual' : ''}" placeholder="—"
                  title="${a.precoManual ? 'Preço digitado por você. Apague o campo para voltar ao preço automático.' : 'Preço automático. Pode digitar outro (ex.: o que está no home broker agora).'}"
                  aria-label="Preço de ${escapar(a.ticker)}" /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="pvp" class="ap-in-pvp${ehFundo(a) && pvpEfetivo(a) === null && !(a.teto > 0) ? ' ap-falta' : ''}" value="${valorInput(a.pvpManual, 2)}" placeholder="${pvpAuto(a) !== null ? fmtNum(pvpAuto(a)) : 'digite'}"
+                 title="${pvpAuto(a) !== null ? 'P/VP da fonte. Digite outro para usar o seu.' : 'A fonte não trouxe o P/VP deste ativo — digite o P/VP (ex.: o da planilha ou do site do fundo) para calcular o preço teto.'}"
+                 aria-label="P/VP de ${escapar(a.ticker)}" /></td>
             <td><input type="number" min="0" step="0.01" data-campo="alvo" value="${valorInput(a.alvo, 2)}" aria-label="Peso-alvo de ${escapar(a.ticker)}" /></td>
             <td><input type="number" min="0" step="0.01" data-campo="teto" value="${valorInput(a.teto, 2)}"
                  placeholder="${tetoAuto(a) !== null ? 'auto ' + fmtNum(tetoAuto(a)) : a.tetoPlanilha ? 'plan. ' + fmtNum(a.tetoPlanilha) : 'opcional'}"
@@ -12014,6 +12056,12 @@
         else if (campo === 'alvo') a.alvo = v && v > 0 ? v : 0;
         else if (campo === 'teto') a.teto = v && v > 0 ? v : null;
         else if (campo === 'pm') a.pm = v && v > 0 ? v : null;
+        else if (campo === 'pvp') {
+          a.pvpManual = v && v > 0 ? v : null;
+          e.target.classList.toggle('ap-falta', ehFundo(a) && pvpEfetivo(a) === null && !(a.teto > 0));
+          atualizarPlaceholdersTeto();
+        }
+        else if (campo === 'setor') a.setor = bruto.trim() || null;
         else if (campo === 'prov') a.prov = v !== null && v >= 0 ? v : null;
         else if (campo === 'preco') {
           if (v && v > 0) { a.preco = v; a.precoManual = true; e.target.classList.add('ap-preco-manual'); }
@@ -12067,7 +12115,7 @@
             pm: a.pm || null,
             custo,
             dia: typeof a.dia === 'number' ? a.dia : null,
-            pvp: typeof a.pvp === 'number' ? a.pvp : null,
+            pvp: pvpEfetivo(a),
             teto: tetoEfetivo(a),
             tetoAuto: !(a.teto > 0) && tetoEfetivo(a) !== null,
             compra: tetoEfetivo(a) && tem ? (a.preco <= tetoEfetivo(a) ? 'COMPRA' : 'AGUARDE') : null,
@@ -12189,10 +12237,12 @@
         // dado falta e onde preencher, em vez de deixar parecer defeito.
         const faltaEl = $('apVisaoFalta');
         const semPm = ls.filter(l => l.vm !== null && l.pm === null).map(l => l.ticker);
-        const semTeto = ls.filter(l => l.teto === null).map(l => l.ticker);
+        const semPvp = ativos.filter(a => ehFundo(a) && !(a.teto > 0) && pvpEfetivo(a) === null).map(a => a.ticker);
+        const semTeto = ls.filter(l => l.teto === null && !semPvp.includes(l.ticker)).map(l => l.ticker);
         const lista = (arr) => arr.length > 6 ? arr.slice(0, 6).join(', ') + ` e mais ${arr.length - 6}` : arr.join(', ');
         const falta = [];
         if (semPm.length) falta.push(`<strong>Preço médio</strong> em branco (${lista(semPm)}) — sem ele ficam vazios <em>Custo, DY on cost e Lucro</em>.`);
+        if (semPvp.length) falta.push(`<strong>P/VP</strong> não encontrado na fonte (${lista(semPvp)}) — comum em FI-Infra. Digite o P/VP na tabela (coluna P/VP) e o <em>Preço teto</em> e o <em>Compra?</em> passam a ser calculados.`);
         if (semTeto.length) falta.push(`<strong>Preço teto</strong> sem cálculo automático (${lista(semTeto)}) — o teto automático vale para FIIs com P/VP; para ações, digite o seu. Sem teto, <em>Compra?</em> fica vazio.`);
         if (faltaEl) {
           faltaEl.hidden = falta.length === 0;
@@ -12230,14 +12280,14 @@
           if (existente) {
             if (n.cotas !== null && n.cotas !== undefined && !existente.viaLanc) existente.cotas = n.cotas;
             if (n.alvo) existente.alvo = n.alvo;
-            ['teto', 'setor', 'precoPlanilha', 'tetoPlanilha'].forEach(k => { if (n[k]) existente[k] = n[k]; });
+            ['teto', 'setor', 'precoPlanilha', 'tetoPlanilha', 'pvpPlanilha'].forEach(k => { if (n[k]) existente[k] = n[k]; });
             if (n.pm && !existente.viaLanc) existente.pm = n.pm;
             if (n.prov !== null && n.prov !== undefined) existente.prov = n.prov;
           } else {
             ativos.push({
               ticker: n.ticker, cotas: n.cotas || 0, alvo: n.alvo || 0, teto: n.teto || null,
               pm: n.pm || null, prov: n.prov ?? null, setor: n.setor || null, precoPlanilha: n.precoPlanilha || null,
-              tetoPlanilha: n.tetoPlanilha || null,
+              tetoPlanilha: n.tetoPlanilha || null, pvpPlanilha: n.pvpPlanilha || null,
               preco: null, precoManual: false,
             });
           }
@@ -12897,6 +12947,7 @@
           proventos_12m: n(a.prov), setor: a.setor || null,
           preco_manual: a.precoManual && a.preco > 0 ? a.preco : null,
           preco_planilha: n(a.precoPlanilha), teto_planilha: n(a.tetoPlanilha),
+          pvp_manual: n(a.pvpManual), pvp_planilha: n(a.pvpPlanilha),
           ordem: i, updated_at: new Date().toISOString(),
         };
       }
@@ -12977,6 +13028,7 @@
             ticker: d.ticker, cotas: Number(d.cotas) || 0, alvo: n(d.peso_alvo) || 0,
             teto: n(d.preco_teto), pm: n(d.preco_medio), prov: n(d.proventos_12m), setor: d.setor || null,
             precoPlanilha: n(d.preco_planilha), tetoPlanilha: n(d.teto_planilha),
+            pvpManual: n(d.pvp_manual), pvpPlanilha: n(d.pvp_planilha),
             preco: d.preco_manual !== null ? n(d.preco_manual) : null, precoManual: d.preco_manual !== null,
           }));
           lancamentos = (rL.data || []).map((d, i) => ({
