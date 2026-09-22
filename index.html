@@ -12396,6 +12396,25 @@
           return;
         }
         const ignorados = lista.length - b3.length;
+
+        // Pergunta antes: importar MEXE na carteira da calculadora — atualiza
+        // a quantidade de quem já está aqui e acrescenta o que falta. Quem
+        // vem das Compras & Vendas não é tocado (a posição é calculada lá).
+        const jaTem = b3.filter(l => ativos.some(a => a.ticker === String(l.ticker).toUpperCase()));
+        const novos = b3.length - jaTem.length;
+        const travados = jaTem.filter(l => ativos.find(a => a.ticker === String(l.ticker).toUpperCase())?.viaLanc).length;
+        const pergunta = [
+          `Importar ${b3.length} ativo(s) da sua Carteira de Rendimentos?`,
+          '',
+          novos ? `• ${novos} ativo(s) novo(s) entram na calculadora.` : '',
+          jaTem.length - travados > 0 ? `• ${jaTem.length - travados} ativo(s) que já estão aqui têm a QUANTIDADE substituída pela da Carteira de Rendimentos.` : '',
+          travados ? `• ${travados} ativo(s) com lançamentos em Compras & Vendas não são alterados (a posição vem de lá).` : '',
+          ignorados ? `• ${ignorados} ativo(s) internacional(is) ficam de fora (outra moeda).` : '',
+          '',
+          'Peso-alvo, preço médio e preço teto que você já preencheu não são apagados.',
+        ].filter(l => l !== '').join('\n');
+        if (!confirm(pergunta)) { statusEl.textContent = 'Importação cancelada — nada foi alterado.'; return; }
+
         mesclar(b3.map(l => ({ ticker: String(l.ticker).toUpperCase(), cotas: Number(l.qtd) || 0 })), false).then(() => {
           const falta = ativos.filter(a => !a.alvo).length;
           const partes = [`${b3.length} ativo(s) importado(s) da Carteira de Rendimentos.`];
