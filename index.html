@@ -585,6 +585,41 @@
     .ap-tabela-visao .ap-selo { padding: 1px 6px; font-size: 0.6rem; }
     .ap-visao-falta { margin: 0 0 10px; font-size: 0.76rem; }
     .ap-nuvem { font-size: 0.76rem; color: var(--muted); margin-top: -6px; }
+    /* Compras & Vendas */
+    .ap-lanc { border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px 12px; background: var(--deep); }
+    .ap-lanc > summary { cursor: pointer; font-weight: 700; font-size: 0.95rem; list-style: revert; }
+    .ap-lanc > summary small { font-weight: 500; color: var(--muted); font-size: 0.76rem; margin-left: 6px; }
+    .ap-lanc-form { display: grid; grid-template-columns: 138px 100px minmax(90px,1.1fr) repeat(4, minmax(80px,1fr)) auto; gap: 6px; }
+    .ap-lanc-form input, .ap-lanc-form select, .ap-lanc-barra select {
+      background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px;
+      padding: 8px 9px; font-size: 0.82rem; font-family: inherit; min-width: 0;
+    }
+    .ap-lanc-form #apLAtivo { text-transform: uppercase; }
+    .ap-lanc-barra { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; align-items: center; }
+    .ap-lanc-barra .cmp-btn-secundario { flex: 0 0 auto; }
+    .ap-lanc-wrap { max-height: 420px; overflow: auto; margin-top: 10px; border-radius: 8px; }
+    .cmp-tabela.ap-tabela.ap-tabela-lanc { font-size: 0.7rem; min-width: 1000px; width: 100%; }
+    /* .cmp-tabela.ap-tabela-lanc: precisa vencer .cmp-tabela th (mais abaixo no CSS). */
+    .cmp-tabela.ap-tabela-lanc th { position: sticky; top: 0; z-index: 2; font-size: 0.58rem; white-space: normal; line-height: 1.2; vertical-align: bottom; background: var(--deep); }
+    .cmp-tabela.ap-tabela-lanc thead tr:last-child th { top: 21px; }
+    .cmp-tabela.ap-tabela-lanc th, .cmp-tabela.ap-tabela-lanc td { padding: 5px 5px; }
+    .cmp-tabela.ap-tabela-lanc thead tr.ap-grupos th { text-align: center; color: #fff; font-size: 0.56rem; letter-spacing: 0.03em; padding: 4px 3px; height: 13px; }
+    .cmp-tabela.ap-tabela-lanc .ap-g-carteira { background: #1d7fa8; }
+    .cmp-tabela.ap-tabela-lanc .ap-g-inv { background: #e8912c; }
+    .cmp-tabela.ap-tabela-lanc .ap-g-custo { background: #6b6b6b; }
+    .cmp-tabela.ap-tabela-lanc .ap-g-acum { background: #2e7d32; }
+    .cmp-tabela.ap-tabela-lanc .ap-g-rent { background: #6a4fb3; }
+    .cmp-tabela.ap-tabela-lanc td { background: transparent; }
+    .ap-op { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 0.62rem; font-weight: 700; }
+    .ap-op-compra { background: rgba(46,125,50,0.16); color: var(--accent); }
+    .ap-op-venda { background: rgba(224,35,63,0.14); color: var(--danger); }
+    .ap-tabela-lanc tr.ap-lanc-erro td { background: rgba(224,35,63,0.08); }
+    .ap-calc { color: var(--muted); }
+    .ap-tabela-edicao input:disabled { opacity: 0.75; cursor: not-allowed; border-style: dashed; }
+    @media (max-width: 900px) {
+      .ap-lanc-form { grid-template-columns: 1fr 1fr; }
+      .ap-lanc-form .hg-btn { grid-column: 1 / -1; }
+    }
     .ap-nuvem:empty { display: none; }
     .ap-nuvem.ok { color: var(--accent); }
     .ap-nuvem.erro { color: var(--danger); }
@@ -6329,6 +6364,43 @@
           </div>
         </div>
 
+        <details class="ap-lanc" id="apLanc" open>
+          <summary><span class="ap-lanc-titulo">🧾 Compras &amp; Vendas</span> <small id="apLancResumo"></small></summary>
+          <p class="calc-ajuda" style="margin:6px 0 10px;">
+            Lance cada compra e venda, como na aba <em>Compras &amp; Vendas</em> da sua planilha. A <strong>quantidade acumulada</strong>
+            e o <strong>preço médio</strong> de cada ativo passam a ser calculados daqui e alimentam a calculadora e a Visão da carteira.
+            <strong>Taxas:</strong> pode lançar o total da nota numa linha só — ele é rateado entre as operações do mesmo dia,
+            proporcional ao valor de cada uma (coluna <em>Taxa rateada</em>).
+          </p>
+          <div class="ap-lanc-form">
+            <input type="date" id="apLData" aria-label="Data" />
+            <select id="apLOp" aria-label="Operação"><option value="compra">Compra</option><option value="venda">Venda</option></select>
+            <input type="text" id="apLAtivo" placeholder="Ativo" autocomplete="off" list="sugestoesTickersB3" aria-label="Ativo" />
+            <input type="number" id="apLQtd" placeholder="Quantidade" min="1" step="1" aria-label="Quantidade" />
+            <input type="number" id="apLPreco" placeholder="Preço unitário" min="0" step="0.01" aria-label="Preço unitário" />
+            <input type="number" id="apLTaxas" placeholder="Taxas/emol." min="0" step="0.01" aria-label="Taxas, ISS e emolumentos" />
+            <input type="number" id="apLIrrf" placeholder="IRRF" min="0" step="0.01" aria-label="IRRF" />
+            <button type="button" class="hg-btn" id="apLBtn">+ Lançar</button>
+          </div>
+          <div class="ap-lanc-barra">
+            <select id="apLFiltro" aria-label="Filtrar por ativo"><option value="">Todos os ativos</option></select>
+            <button type="button" class="cmp-btn-secundario" id="apLBtnColar" aria-expanded="false">📋 Colar da planilha (Compras &amp; Vendas)</button>
+          </div>
+          <div id="apLColarBox" class="ap-colar" hidden>
+            <label for="apLColarTexto">Na aba <strong>Compras &amp; Vendas</strong> da planilha, selecione a linha de cabeçalho
+              (<em>DATA, OPERAÇÃO, ATIVO, SETOR, QUANTIDADE, PREÇO UNITÁRIO, TAXAS…, IRRF</em>) junto com as linhas das operações,
+              copie e cole aqui. As colunas calculadas da planilha (subtotal, preço médio…) são ignoradas — o site refaz as contas.</label>
+            <textarea id="apLColarTexto" rows="5" placeholder="DATA	OPERAÇÃO	ATIVO	SETOR	QUANTIDADE	PREÇO UNITÁRIO	TAXAS / ISS /EMOLUMENTOS	IRRF&#10;01/01/2024	COMPRA	BTAL11	AGRO	226	R$ 90,02		&#10;01/01/2024	COMPRA	MXRF11	PAPEL	514	R$ 10,04		"></textarea>
+            <div class="cmp-acoes-linha">
+              <button type="button" class="hg-btn" id="apLColarAplicar">Lançar estas operações</button>
+              <label class="ap-check" style="margin:0;"><input type="checkbox" id="apLColarSubstituir" /> <span>Substituir todos os lançamentos</span></label>
+            </div>
+          </div>
+          <div class="cmp-tabela-wrap ap-lanc-wrap" id="apLWrap" hidden>
+            <table class="cmp-tabela ap-tabela ap-tabela-lanc" id="apLTabela"></table>
+          </div>
+        </details>
+
         <div id="apStatus" class="hg-status"></div>
 
         <div class="cmp-tabela-wrap ap-edicao-wrap" id="apEdicaoWrap" hidden>
@@ -6484,7 +6556,6 @@
         </div>
 
         <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
-          <button type="button" class="hg-btn" id="carteiraBtnAporte" style="flex:1 1 140px;" title="Abre a Calculadora de Aportes com os ativos desta carteira">🧮 Calcular próximo aporte</button>
           <button type="button" class="hg-btn" id="carteiraBtnPdf" style="flex:1 1 140px;">📄 Baixar PDF</button>
           <button type="button" class="hg-btn-compartilhar" id="carteiraBtnCompartilhar" style="flex:1 1 140px; justify-content:center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
@@ -11749,6 +11820,7 @@
               tetoPlanilha: a.tetoPlanilha ?? null,
               ...(a.precoManual ? { preco: a.preco, precoManual: true } : {}),
             })),
+            lancamentos,
           }));
         } catch (e) { /* sem localStorage — segue sem salvar */ }
         agendarNuvem();
@@ -11777,6 +11849,7 @@
             preco: a.precoManual && Number(a.preco) > 0 ? Number(a.preco) : null,
             precoManual: !!(a.precoManual && Number(a.preco) > 0),
           })) : [];
+          lancamentos = Array.isArray(s.lancamentos) ? s.lancamentos.filter(l => l && l.ticker && l.data && l.qtd > 0) : [];
           return true;
         } catch (e) { return false; }
       }
@@ -11894,8 +11967,8 @@
         tbodyEdicao.innerHTML = ativos.map((a, i) => `
           <tr data-idx="${i}">
             <td class="ap-ativo"><strong>${escapar(a.ticker)}</strong>${a.segmento ? `<small>${escapar(a.segmento)}</small>` : ''}</td>
-            <td><input type="number" min="0" step="1" data-campo="cotas" value="${valorInput(a.cotas, 0)}" aria-label="Cotas de ${escapar(a.ticker)}" /></td>
-            <td><input type="number" min="0" step="0.01" data-campo="pm" value="${valorInput(a.pm, 2)}" placeholder="opcional" aria-label="Preço médio de ${escapar(a.ticker)}" /></td>
+            <td><input type="number" min="0" step="1" data-campo="cotas" value="${valorInput(a.cotas, 0)}" aria-label="Cotas de ${escapar(a.ticker)}"${a.viaLanc ? ' disabled title="Calculado pelas Compras & Vendas"' : ''} /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="pm" value="${valorInput(a.pm, 2)}" placeholder="opcional" aria-label="Preço médio de ${escapar(a.ticker)}"${a.viaLanc ? ' disabled title="Calculado pelas Compras & Vendas"' : ''} /></td>
             <td><input type="number" min="0" step="0.01" data-campo="preco" value="${valorInput(a.preco, 2)}"
                  class="${a.precoManual ? 'ap-preco-manual' : ''}" placeholder="—"
                  title="${a.precoManual ? 'Preço digitado por você. Apague o campo para voltar ao preço automático.' : 'Preço automático. Pode digitar outro (ex.: o que está no home broker agora).'}"
@@ -11958,6 +12031,11 @@
       tbodyEdicao.addEventListener('click', (e) => {
         const b = e.target.closest('[data-remover]');
         if (!b) return;
+        const alvoRm = ativos[Number(b.dataset.remover)];
+        if (alvoRm?.viaLanc && lancamentos.some(l => l.ticker === alvoRm.ticker)) {
+          statusEl.textContent = `${alvoRm.ticker} tem lançamentos em Compras & Vendas — apague os lançamentos dele para tirá-lo da carteira.`;
+          return;
+        }
         ativos.splice(Number(b.dataset.remover), 1);
         invalidarResultado();
         renderEdicao();
@@ -12150,9 +12228,10 @@
         novos.forEach(n => {
           const existente = ativos.find(a => a.ticker === n.ticker);
           if (existente) {
-            if (n.cotas !== null && n.cotas !== undefined) existente.cotas = n.cotas;
+            if (n.cotas !== null && n.cotas !== undefined && !existente.viaLanc) existente.cotas = n.cotas;
             if (n.alvo) existente.alvo = n.alvo;
-            ['teto', 'pm', 'setor', 'precoPlanilha', 'tetoPlanilha'].forEach(k => { if (n[k]) existente[k] = n[k]; });
+            ['teto', 'setor', 'precoPlanilha', 'tetoPlanilha'].forEach(k => { if (n[k]) existente[k] = n[k]; });
+            if (n.pm && !existente.viaLanc) existente.pm = n.pm;
             if (n.prov !== null && n.prov !== undefined) existente.prov = n.prov;
           } else {
             ativos.push({
@@ -12238,8 +12317,10 @@
       }
 
       function limparTudo() {
-        if (ativos.length && !confirm('Apagar todos os ativos desta calculadora?')) return;
+        if ((ativos.length || lancamentos.length) && !confirm('Apagar todos os ativos' + (lancamentos.length ? ` e os ${lancamentos.length} lançamentos de Compras & Vendas` : '') + ' desta calculadora?')) return;
         ativos = [];
+        lancamentos = [];
+        renderLanc();
         ultimoResultado = null;
         resultadoEl.innerHTML = '';
         acoesEl.hidden = true;
@@ -12513,6 +12594,277 @@
       }
 
 
+
+      // ---------- Compras & Vendas (lançamentos) ----------
+      // Mesma lógica da aba "Compras & Vendas" da planilha:
+      //  • Taxa rateada: as taxas lançadas num dia (em geral o total da nota,
+      //    numa linha só) são divididas entre TODAS as operações daquele dia,
+      //    proporcionalmente ao subtotal de cada uma.
+      //  • Compra: custo acumulado += subtotal + taxa rateada; qtd += qtd.
+      //  • Venda: sai pelo preço médio (o PM não muda na venda); o custo
+      //    baixa PM × qtd e o resultado da venda = subtotal − taxa − PM × qtd.
+      //  • Zerou a posição: custo volta a 0, e a próxima compra começa PM novo.
+      //  • IRRF (o "dedo-duro" da venda) é só registrado; não entra no custo.
+      // A calculadora e a Visão da carteira usam a posição e o PM daqui para
+      // os ativos que têm lançamentos (os campos ficam travados na tabela).
+      let lancamentos = []; // { id, data:'AAAA-MM-DD', op:'compra'|'venda', ticker, qtd, preco, taxas, irrf, ordem }
+      const lancTabelaEl = $('apLTabela');
+      const lancWrapEl = $('apLWrap');
+      const lancFiltroEl = $('apLFiltro');
+      const lancResumoEl = $('apLancResumo');
+
+      function novoId() {
+        try { if (crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) { /* segue */ }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+          const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+      }
+      const dataBr = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? `${m[3]}/${m[2]}/${m[1]}` : '—'; };
+
+      function calcularLancamentos(lista) {
+        const ord = lista.slice().sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : (a.ordem || 0) - (b.ordem || 0)));
+        const porDia = new Map();
+        ord.forEach(l => {
+          const d = porDia.get(l.data) || { taxas: 0, base: 0 };
+          d.taxas += Number(l.taxas) || 0;
+          d.base += l.qtd * l.preco;
+          porDia.set(l.data, d);
+        });
+        const pos = new Map(); // ticker -> { qtd, custo }
+        const linhas = ord.map(l => {
+          const subtotal = l.qtd * l.preco;
+          const dia = porDia.get(l.data);
+          const rateada = dia.base > 0 ? dia.taxas * subtotal / dia.base : 0;
+          const p0 = pos.get(l.ticker) || { qtd: 0, custo: 0 };
+          const p = { ...p0 };
+          let totalOp, resultado = null, erro = null;
+          if (l.op === 'compra') {
+            totalOp = subtotal + rateada;
+            p.custo += totalOp; p.qtd += l.qtd;
+          } else {
+            totalOp = subtotal - rateada;
+            const pm = p.qtd > 0 ? p.custo / p.qtd : 0;
+            if (l.qtd > p.qtd + 1e-9) erro = `Venda de ${fmtInt(l.qtd)} cotas com só ${fmtInt(p.qtd)} em carteira nessa data.`;
+            const vendida = Math.min(l.qtd, p.qtd);
+            resultado = totalOp - pm * l.qtd;
+            p.custo -= pm * vendida; p.qtd -= vendida;
+            if (p.qtd <= 1e-9) { p.qtd = 0; p.custo = 0; }
+          }
+          pos.set(l.ticker, p);
+          return { ...l, subtotal, rateada, totalOp, custoAcum: p.custo, qtdAcum: p.qtd, pm: p.qtd > 0 ? p.custo / p.qtd : null, resultado, erro };
+        });
+        return { linhas, posicoes: pos };
+      }
+      window.vrCalcularLancamentos = calcularLancamentos;
+
+      // Leva a posição e o PM dos lançamentos para a lista de ativos.
+      function aplicarLancamentos() {
+        const { posicoes } = calcularLancamentos(lancamentos);
+        ativos.forEach(a => { if (!posicoes.has(a.ticker)) a.viaLanc = false; });
+        posicoes.forEach((p, ticker) => {
+          let a = ativos.find(x => x.ticker === ticker);
+          if (!a) {
+            if (p.qtd <= 0) return; // já vendeu tudo e não estava na lista
+            a = { ticker, cotas: 0, alvo: 0, teto: null, pm: null, prov: null, setor: null, preco: null, precoManual: false };
+            ativos.push(a);
+          }
+          a.cotas = Math.round(p.qtd);
+          // PM exato (sem arredondar): custo da Visão = cotas × PM tem de
+          // bater com o "Valor total acumulado" dos lançamentos.
+          a.pm = p.qtd > 0 ? p.custo / p.qtd : null;
+          a.viaLanc = true;
+        });
+      }
+
+      function renderLanc() {
+        if (!lancTabelaEl) return;
+        const { linhas } = calcularLancamentos(lancamentos);
+        const tickers = [...new Set(lancamentos.map(l => l.ticker))].sort();
+        const filtro = tickers.includes(lancFiltroEl.value) ? lancFiltroEl.value : '';
+        lancFiltroEl.innerHTML = '<option value="">Todos os ativos</option>' + tickers.map(t => `<option value="${escapar(t)}"${t === filtro ? ' selected' : ''}>${escapar(t)}</option>`).join('');
+        const vis = filtro ? linhas.filter(l => l.ticker === filtro) : linhas;
+        lancWrapEl.hidden = lancamentos.length === 0;
+        const nCompras = lancamentos.filter(l => l.op === 'compra').length;
+        lancResumoEl.textContent = lancamentos.length
+          ? `${lancamentos.length} lançamento(s) · ${nCompras} compra(s), ${lancamentos.length - nCompras} venda(s) · ${tickers.length} ativo(s)`
+          : 'nenhum lançamento ainda';
+        if (!lancamentos.length) { lancTabelaEl.innerHTML = ''; return; }
+        const dm = (v) => (typeof v === 'number' ? moedaV(v) : '—');
+        const zeroTraco = (v) => (v > 0.004 ? moedaV(v) : '—');
+        lancTabelaEl.innerHTML = `
+          <thead>
+            <tr class="ap-grupos">
+              <th colspan="3" class="ap-g-carteira">NEGOCIADOS</th>
+              <th colspan="4" class="ap-g-inv">INVESTIMENTOS</th>
+              <th colspan="4" class="ap-g-custo">CUSTO TOTAL</th>
+              <th colspan="2" class="ap-g-acum">QTD ACUMULADA &amp; PREÇO MÉDIO</th>
+              <th colspan="2" class="ap-g-rent">VENDA</th>
+            </tr>
+            <tr>
+              <th>Data</th><th>Operação</th><th>Ativo</th>
+              <th class="ap-num">Quantidade</th><th class="ap-num">Preço unitário</th><th class="ap-num">Taxas / ISS / emol.</th><th class="ap-num">IRRF</th>
+              <th class="ap-num">Taxa rateada</th><th class="ap-num">Subtotal</th><th class="ap-num">Valor total da operação</th><th class="ap-num">Valor total acumulado</th>
+              <th class="ap-num">Qtd acumulada</th><th class="ap-num">Preço médio</th>
+              <th class="ap-num">Resultado</th><th></th>
+            </tr>
+          </thead>
+          <tbody>${vis.map(l => `
+            <tr class="${l.erro ? 'ap-lanc-erro' : ''}"${l.erro ? ` title="${escapar(l.erro)}"` : ''}>
+              <td>${dataBr(l.data)}</td>
+              <td><span class="ap-op ap-op-${l.op}">${l.op === 'compra' ? 'COMPRA' : 'VENDA'}</span></td>
+              <td><strong>${escapar(l.ticker)}</strong></td>
+              <td class="ap-num">${fmtInt(l.qtd)}</td>
+              <td class="ap-num">${dm(l.preco)}</td>
+              <td class="ap-num">${zeroTraco(l.taxas)}</td>
+              <td class="ap-num">${zeroTraco(l.irrf)}</td>
+              <td class="ap-num ap-calc">${zeroTraco(l.rateada)}</td>
+              <td class="ap-num ap-calc">${dm(l.subtotal)}</td>
+              <td class="ap-num ap-calc">${dm(l.totalOp)}</td>
+              <td class="ap-num ap-calc">${dm(l.custoAcum)}</td>
+              <td class="ap-num"><strong>${fmtInt(Math.round(l.qtdAcum))}</strong></td>
+              <td class="ap-num"><strong>${l.pm !== null ? moedaV(Math.round(l.pm * 100) / 100) : '—'}</strong></td>
+              <td class="ap-num">${l.resultado !== null ? sinal(l.resultado, moedaV) : ''}${l.erro ? ' ⚠️' : ''}</td>
+              <td><button type="button" class="ap-remover" data-lanc-remover="${escapar(l.id)}" title="Apagar este lançamento" aria-label="Apagar lançamento de ${escapar(l.ticker)} em ${dataBr(l.data)}">✕</button></td>
+            </tr>`).join('')}
+          </tbody>`;
+        // A lista cresce para baixo, como a planilha: mostra o fim.
+        if (!filtro) lancWrapEl.scrollTop = lancWrapEl.scrollHeight;
+      }
+
+      function aposMudarLanc() {
+        aplicarLancamentos();
+        invalidarResultado();
+        renderLanc();
+        renderEdicao();
+        salvar();
+        return atualizarPrecos();
+      }
+
+      function lancar() {
+        const ticker = $('apLAtivo').value.trim().toUpperCase().replace(/^B3:/, '');
+        const qtd = Math.floor(Number($('apLQtd').value));
+        const preco = Number($('apLPreco').value);
+        const data = $('apLData').value;
+        if (!data) { statusEl.textContent = 'Informe a data da operação.'; $('apLData').focus(); return; }
+        if (!TICKER_RE.test(ticker)) { statusEl.textContent = 'Informe o código do ativo (ex.: HGLG11).'; $('apLAtivo').focus(); return; }
+        if (!(qtd > 0)) { statusEl.textContent = 'Informe a quantidade.'; $('apLQtd').focus(); return; }
+        if (!(preco > 0)) { statusEl.textContent = 'Informe o preço unitário.'; $('apLPreco').focus(); return; }
+        statusEl.textContent = '';
+        lancamentos.push({
+          id: novoId(), data, op: $('apLOp').value === 'venda' ? 'venda' : 'compra', ticker, qtd, preco,
+          taxas: Math.max(0, Number($('apLTaxas').value) || 0), irrf: Math.max(0, Number($('apLIrrf').value) || 0),
+          ordem: lancamentos.length,
+        });
+        ['apLAtivo', 'apLQtd', 'apLPreco', 'apLTaxas', 'apLIrrf'].forEach(id => { $(id).value = ''; });
+        $('apLAtivo').focus();
+        aposMudarLanc();
+      }
+
+      // Colar a aba "Compras & Vendas" (com cabeçalho). Colunas calculadas
+      // da planilha são ignoradas de propósito — o site refaz as contas.
+      function lerDataBr(txt) {
+        const t = String(txt || '').trim();
+        let m = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/.exec(t);
+        if (m) { const a = m[3].length === 2 ? '20' + m[3] : m[3]; return `${a}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`; }
+        m = /^(\d{4})-(\d{2})-(\d{2})/.exec(t);
+        return m ? `${m[1]}-${m[2]}-${m[3]}` : null;
+      }
+      function lerLancamentosColados(texto) {
+        const saida = [];
+        let mapa = null;
+        String(texto || '').split(/\r?\n/).forEach(bruta => {
+          if (!bruta.trim()) return;
+          const campos = dividir(bruta);
+          const norm = campos.map(normalizarCab);
+          if (!mapa && norm.includes('DATA') && norm.some(c => c === 'ATIVO' || c === 'TICKER')) {
+            const idx = (f) => norm.findIndex(f);
+            mapa = {
+              data: idx(c => c === 'DATA'),
+              op: idx(c => c === 'OPERACAO' || c === 'TIPO' || c === 'C V'),
+              ativo: idx(c => c === 'ATIVO' || c === 'TICKER'),
+              qtd: idx(c => c === 'QUANTIDADE' || c === 'QTD' || c === 'QTDE'),
+              preco: idx(c => c === 'PRECO UNITARIO' || c === 'PRECO'),
+              taxas: idx(c => c.startsWith('TAXAS') || c === 'TAXA' || c.startsWith('CUSTOS')),
+              irrf: idx(c => c === 'IRRF'),
+            };
+            return;
+          }
+          let data, op, ticker, qtd, preco, taxas, irrf;
+          if (mapa) {
+            data = lerDataBr(campos[mapa.data]);
+            op = mapa.op >= 0 ? campos[mapa.op] : 'COMPRA';
+            ticker = (campos[mapa.ativo] || '').toUpperCase();
+            qtd = lerNumeroBr(campos[mapa.qtd]); preco = lerNumeroBr(campos[mapa.preco]);
+            taxas = mapa.taxas >= 0 ? lerNumeroBr(campos[mapa.taxas]) : 0;
+            irrf = mapa.irrf >= 0 ? lerNumeroBr(campos[mapa.irrf]) : 0;
+          } else {
+            // Sem cabeçalho: Data · Operação · Ativo · [Setor] · Quantidade · Preço · Taxas · IRRF
+            data = lerDataBr(campos[0]); op = campos[1]; ticker = (campos[2] || '').toUpperCase();
+            let i = 3;
+            if (campos[i] !== undefined && !Number.isFinite(lerNumeroBr(campos[i]))) i++; // pula o setor
+            qtd = lerNumeroBr(campos[i]); preco = lerNumeroBr(campos[i + 1]);
+            taxas = lerNumeroBr(campos[i + 2]); irrf = lerNumeroBr(campos[i + 3]);
+          }
+          ticker = ticker.replace(/^B3:/, '').trim();
+          if (!data || !TICKER_RE.test(ticker) || !(qtd > 0) || !(preco >= 0)) return;
+          const opN = normalizarCab(op);
+          saida.push({
+            data, op: opN.startsWith('V') ? 'venda' : 'compra', ticker, qtd: Math.round(qtd), preco,
+            taxas: Number.isFinite(taxas) && taxas > 0 ? taxas : 0, irrf: Number.isFinite(irrf) && irrf > 0 ? irrf : 0,
+          });
+        });
+        return saida;
+      }
+      window.vrLerLancamentosAporte = lerLancamentosColados;
+
+      function colarLancamentos() {
+        const novos = lerLancamentosColados($('apLColarTexto').value);
+        if (!novos.length) {
+          statusEl.textContent = 'Não reconheci nenhuma operação. Copie junto a linha de cabeçalho (DATA, OPERAÇÃO, ATIVO, QUANTIDADE, PREÇO UNITÁRIO…).';
+          return;
+        }
+        const substituir = $('apLColarSubstituir').checked;
+        if (substituir && lancamentos.length && !confirm(`Apagar os ${lancamentos.length} lançamentos atuais e usar só os colados?`)) return;
+        if (substituir) lancamentos = [];
+        const chave = (l) => [l.data, l.op, l.ticker, l.qtd, Number(l.preco).toFixed(4)].join('|');
+        const existentes = new Set(lancamentos.map(chave));
+        let add = 0, rep = 0;
+        novos.forEach(n => {
+          if (existentes.has(chave(n))) { rep++; return; }
+          lancamentos.push({ id: novoId(), ...n, ordem: lancamentos.length }); add++;
+        });
+        $('apLColarTexto').value = '';
+        $('apLColarBox').hidden = true;
+        $('apLBtnColar').setAttribute('aria-expanded', 'false');
+        const msg = `${add} operação(ões) lançada(s)` + (rep ? `; ${rep} já estavam lançadas e foram ignoradas.` : '.');
+        statusEl.textContent = msg;
+        // A busca de preços termina depois e reescreve o status: repõe.
+        aposMudarLanc().then(() => {
+          statusEl.textContent = statusEl.textContent ? msg + ' ' + statusEl.textContent : msg;
+        });
+      }
+
+      lancTabelaEl?.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-lanc-remover]');
+        if (!b) return;
+        const l = lancamentos.find(x => x.id === b.dataset.lancRemover);
+        if (!l || !confirm(`Apagar a ${l.op} de ${fmtInt(l.qtd)} ${l.ticker} em ${dataBr(l.data)}?`)) return;
+        lancamentos = lancamentos.filter(x => x.id !== l.id);
+        aposMudarLanc();
+      });
+      lancFiltroEl?.addEventListener('change', renderLanc);
+      $('apLBtn')?.addEventListener('click', lancar);
+      ['apLAtivo', 'apLQtd', 'apLPreco', 'apLTaxas', 'apLIrrf'].forEach(id => $(id)?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); lancar(); }
+      }));
+      $('apLBtnColar')?.addEventListener('click', () => {
+        const box = $('apLColarBox'); box.hidden = !box.hidden;
+        $('apLBtnColar').setAttribute('aria-expanded', String(!box.hidden));
+        if (!box.hidden) $('apLColarTexto').focus();
+      });
+      $('apLColarAplicar')?.addEventListener('click', colarLancamentos);
+      try { $('apLData').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10); } catch (e) { /* segue */ }
+
       // ---------- Nuvem (Supabase) ----------
       // Logado: tudo vai também para as tabelas calc_aportes (um ativo por
       // linha) e calc_aportes_config (aporte e opções), com RLS — cada
@@ -12570,6 +12922,17 @@
             const up = await cliente.from('calc_aportes').upsert(ativos.map((a, i) => linhaNuvem(a, i, user.id)));
             if (up.error) throw up.error;
           }
+          if (lancamentos.length) {
+            const ul = await cliente.from('calc_aportes_lancamentos').upsert(lancamentos.map((l, i) => ({
+              id: l.id, user_id: user.id, data: l.data, operacao: l.op, ticker: l.ticker, quantidade: l.qtd,
+              preco: l.preco, taxas: l.taxas || 0, irrf: l.irrf || 0, ordem: i, updated_at: new Date().toISOString(),
+            })));
+            if (ul.error) throw ul.error;
+          }
+          let delL = cliente.from('calc_aportes_lancamentos').delete().eq('user_id', user.id);
+          if (lancamentos.length) delL = delL.not('id', 'in', '(' + lancamentos.map(l => l.id).join(',') + ')');
+          const rmL = await delL;
+          if (rmL.error) throw rmL.error;
           // Remove da nuvem o que saiu da lista.
           let del = cliente.from('calc_aportes').delete().eq('user_id', user.id);
           if (ativos.length) del = del.not('ticker', 'in', '(' + ativos.map(a => '"' + a.ticker + '"').join(',') + ')');
@@ -12593,17 +12956,19 @@
           return false;
         }
         try {
-          const [rAt, rCfg] = await Promise.all([
+          const [rAt, rCfg, rL] = await Promise.all([
             cliente.from('calc_aportes').select('*').eq('user_id', user.id).order('ordem'),
             cliente.from('calc_aportes_config').select('*').eq('user_id', user.id).maybeSingle(),
+            cliente.from('calc_aportes_lancamentos').select('*').eq('user_id', user.id).order('data').order('ordem'),
           ]);
           if (rAt.error) throw rAt.error;
           if (rCfg.error) throw rCfg.error;
-          const temNuvem = (rAt.data && rAt.data.length) || rCfg.data;
+          if (rL.error) throw rL.error;
+          const temNuvem = (rAt.data && rAt.data.length) || rCfg.data || (rL.data && rL.data.length);
           nuvemPronta = true;
           if (!temNuvem) {
             // Primeira vez logado: sobe o que já estava neste navegador.
-            if (ativos.length || hgValorMascarado(inValor) > 0) await gravarNuvem();
+            if (ativos.length || lancamentos.length || hgValorMascarado(inValor) > 0) await gravarNuvem();
             else mostrarNuvem('☁️ Conectado à sua conta — o que você montar aqui fica salvo nela.', 'ok');
             return false;
           }
@@ -12614,6 +12979,12 @@
             precoPlanilha: n(d.preco_planilha), tetoPlanilha: n(d.teto_planilha),
             preco: d.preco_manual !== null ? n(d.preco_manual) : null, precoManual: d.preco_manual !== null,
           }));
+          lancamentos = (rL.data || []).map((d, i) => ({
+            id: d.id, data: String(d.data).slice(0, 10), op: d.operacao === 'venda' ? 'venda' : 'compra', ticker: d.ticker,
+            qtd: Number(d.quantidade), preco: Number(d.preco), taxas: Number(d.taxas) || 0, irrf: Number(d.irrf) || 0,
+            ordem: d.ordem ?? i,
+          }));
+          aplicarLancamentos();
           const c = rCfg.data;
           if (c) {
             const ap = n(c.aporte) || 0;
@@ -12646,7 +13017,7 @@
           if (evento !== 'SIGNED_IN' && evento !== 'SIGNED_OUT') return;
           if (!jaCarregou) return;
           nuvemPronta = false;
-          carregarNuvem().then(trocou => { if (trocou) { invalidarResultado(); renderEdicao(); atualizarPrecos(); } });
+          carregarNuvem().then(trocou => { if (trocou) { invalidarResultado(); renderLanc(); renderEdicao(); atualizarPrecos(); } });
         });
       }
 
@@ -12658,11 +13029,13 @@
         if (!jaCarregou) {
           jaCarregou = true;
           carregarSalvo();
+          aplicarLancamentos();
+          renderLanc();
           renderEdicao();
           atualizarPrecos();
           ouvirLogin();
           carregarNuvem().then(trocou => {
-            if (trocou) { invalidarResultado(); renderEdicao(); atualizarPrecos(); }
+            if (trocou) { invalidarResultado(); renderLanc(); renderEdicao(); atualizarPrecos(); }
             if (opcoes.importarCarteira) importarCarteira();
           });
           return;
@@ -12751,13 +13124,6 @@
           titulo: 'Calculadora de Aportes — Viver de Renda',
           texto: 'Quanto comprar de cada FII ou ação com o aporte do mês para chegar no peso-alvo da carteira.',
         }));
-
-      // Atalho a partir da Carteira de Rendimentos: fecha ela e abre aqui
-      // já com os ativos importados.
-      document.getElementById('carteiraBtnAporte')?.addEventListener('click', () => {
-        document.getElementById('carteiraFechar')?.click();
-        abrirModal({ importarCarteira: true });
-      });
 
       hgAbrirPorLinkDeFerramenta('aportes', abrirModal);
     })();
