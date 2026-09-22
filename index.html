@@ -6551,7 +6551,7 @@
         <div class="cmp-tabela-wrap" id="carteiraWrapAcoes" hidden>
           <table class="cmp-tabela carteira-tabela">
             <thead>
-              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
+              <tr><th>Ativo</th><th>Preço</th><th title="Quanto você pagou, em média, por cota/ação. Opcional: preencha para ver o custo, o lucro e o DY on cost — aqui e na Calculadora de Aportes.">Preço médio</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
             </thead>
             <tbody id="carteiraTbodyAcoes"></tbody>
           </table>
@@ -6561,7 +6561,7 @@
         <div class="cmp-tabela-wrap" id="carteiraWrapFiis" hidden>
           <table class="cmp-tabela carteira-tabela">
             <thead>
-              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
+              <tr><th>Ativo</th><th>Preço</th><th title="Quanto você pagou, em média, por cota/ação. Opcional: preencha para ver o custo, o lucro e o DY on cost — aqui e na Calculadora de Aportes.">Preço médio</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
             </thead>
             <tbody id="carteiraTbodyFiis"></tbody>
           </table>
@@ -6571,7 +6571,7 @@
         <div class="cmp-tabela-wrap" id="carteiraWrapIntl" hidden>
           <table class="cmp-tabela carteira-tabela">
             <thead>
-              <tr><th>Ativo</th><th>Preço</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
+              <tr><th>Ativo</th><th>Preço</th><th title="Quanto você pagou, em média, por cota/ação. Opcional: preencha para ver o custo, o lucro e o DY on cost — aqui e na Calculadora de Aportes.">Preço médio</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
             </thead>
             <tbody id="carteiraTbodyIntl"></tbody>
           </table>
@@ -9372,7 +9372,7 @@
       // guardar cotação velha). ---
       function carteiraSalvarLocal() {
         try {
-          const resumo = carteira.map(l => ({ ticker: l.ticker, kind: l.kind, qtd: l.qtd }));
+          const resumo = carteira.map(l => ({ ticker: l.ticker, kind: l.kind, qtd: l.qtd, pm: l.pm ?? null }));
           localStorage.setItem(CARTEIRA_LOCAL_KEY, JSON.stringify(resumo));
         } catch (e) { /* localStorage indisponível — segue sem persistir */ }
       }
@@ -9398,6 +9398,7 @@
           if (!item) return;
           await cliente.from('carteira_dividendos').upsert({
             user_id: session.user.id, ticker: item.ticker, kind: item.kind, qtd: item.qtd,
+            preco_medio: item.pm > 0 ? item.pm : null,
           });
         } catch (e) {
           console.warn('Supabase: não sincronizou a carteira na nuvem (tabela existe?).', e);
@@ -9431,13 +9432,13 @@
             if (session?.user) {
               const { data, error } = await cliente
                 .from('carteira_dividendos')
-                .select('ticker, kind, qtd')
+                .select('ticker, kind, qtd, preco_medio')
                 .eq('user_id', session.user.id);
               if (!error && data) {
                 // Funde: nuvem tem prioridade sobre o que já existia só
                 // localmente (mais provável de estar atualizado).
                 const tickersNuvem = new Set(data.map(d => d.ticker));
-                salvos = [...data, ...salvos.filter(s => !tickersNuvem.has(s.ticker))];
+                salvos = [...data.map(d => ({ ...d, pm: d.preco_medio })), ...salvos.filter(s => !tickersNuvem.has(s.ticker))];
               }
             }
           } catch (e) {
@@ -9450,7 +9451,13 @@
         statusEl.className = 'hg-status';
         statusEl.textContent = 'Carregando sua carteira salva...';
         for (const item of salvos) {
-          try { await buscarEEmpilhar(item.ticker, item.qtd, item.kind); } catch (e) { /* ignora um ativo que falhar, segue os outros */ }
+          try {
+            await buscarEEmpilhar(item.ticker, item.qtd, item.kind);
+            // O preço médio é do usuário — nenhuma API devolve isso, então
+            // é colado de volta no item depois da busca.
+            const reg = carteira.find(l => l.ticker === String(item.ticker).toUpperCase());
+            if (reg && Number(item.pm) > 0) reg.pm = Number(item.pm);
+          } catch (e) { /* ignora um ativo que falhar, segue os outros */ }
         }
         statusEl.textContent = '';
         renderizar();
@@ -9614,6 +9621,7 @@
           <tr>
             <td class="cmp-label" data-label="Ativo"><strong>${item.ticker}</strong><span style="font-size:0.7rem; color:var(--muted); font-weight:400;">${item.nome}</span></td>
             <td data-label="Preço">${item.preco !== null ? hgFormatMoeda(item.preco, item.moeda) : '—'}</td>
+            <td data-label="Preço médio"><input type="number" class="pm-input-carteira" min="0" step="0.01" value="${item.pm > 0 ? item.pm : ''}" data-idx="${idx}" placeholder="opcional" aria-label="Preço médio de ${item.ticker}" style="width:88px; background:var(--deep); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:5px 6px; text-align:right; font-family:inherit;" /></td>
             <td data-label="DY (12m)">${item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—'}</td>
             <td data-label="Provento méd./mês">${item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—'}</td>
             <td data-label="Qtd."><input type="number" class="qtd-input-carteira" min="1" value="${item.qtd}" data-idx="${idx}" style="width:70px; background:var(--deep); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:5px 6px; text-align:center; font-family:inherit;" /></td>
@@ -9622,6 +9630,29 @@
             <td data-label="Proventos/mês"><strong>${hgFormatMoeda(proventoTotal, item.moeda)}</strong></td>
             <td data-label=""><button type="button" class="carteira-remover" data-idx="${idx}" title="Remover">✕</button></td>
           </tr>`;
+      }
+
+      // Linha extra no card "Total investido": com preço médio preenchido,
+      // mostra quanto custou de verdade e o lucro/prejuízo. Sem ele, some.
+      function atualizarResumoCusto() {
+        let el = document.getElementById('carteiraCusto');
+        if (!el) {
+          const card = elTotalInvestido?.parentElement;
+          if (!card) return;
+          el = document.createElement('small');
+          el.id = 'carteiraCusto';
+          el.style.cssText = 'display:block; margin-top:4px; font-size:0.72rem; font-weight:700;';
+          card.appendChild(el);
+        }
+        const comPm = carteira.filter(i => i.pm > 0 && i.moeda === 'BRL');
+        if (!comPm.length) { el.textContent = ''; return; }
+        const custo = comPm.reduce((s, i) => s + i.pm * i.qtd, 0);
+        const mercado = comPm.reduce((s, i) => s + (i.preco || 0) * i.qtd, 0);
+        const lucro = mercado - custo;
+        const pct = custo > 0 ? lucro / custo * 100 : 0;
+        const todos = comPm.length === carteira.filter(i => i.moeda === 'BRL').length;
+        el.innerHTML = `<span style="color:var(--muted); font-weight:600;">Custo ${hgFormatMoeda(custo)}${todos ? '' : ' (dos que têm preço médio)'} · </span>` +
+          `<span style="color:${lucro >= 0 ? 'var(--accent)' : 'var(--danger)'};">${lucro >= 0 ? '+' : '−'}${hgFormatMoeda(Math.abs(lucro))} (${hgFormatNumero(Math.abs(pct))}%)</span>`;
       }
 
       function renderizar() {
@@ -9648,6 +9679,7 @@
         if (intl.length > 0) tbodyIntl.innerHTML = intl.map(x => linhaHtml(x.item, x.idx, totalInvestido)).join('');
 
         elTotalInvestido.textContent = hgFormatMoeda(totalInvestido) ?? 'R$ 0,00';
+        atualizarResumoCusto();
         elTotalProventos.textContent = hgFormatMoeda(totalProventos) ?? 'R$ 0,00';
         elYieldMedio.textContent = totalInvestido > 0
           ? `${hgFormatNumero((totalProventos * 12 / totalInvestido) * 100)}%`
@@ -9661,6 +9693,19 @@
             const novaQtd = parseInt(input.value, 10) || 1;
             carteira[idx].qtd = novaQtd;
             renderizar();
+            carteiraSalvarLocal();
+            carteiraEspelharNaNuvem(carteira[idx].ticker);
+          });
+        });
+        // Preço médio é opcional e só vale como dado do usuário: não
+        // mexe em preço nem em proventos, mas viaja para a Calculadora
+        // de Aportes (custo, lucro e DY on cost saem dele).
+        document.querySelectorAll('.pm-input-carteira').forEach(input => {
+          input.addEventListener('change', () => {
+            const idx = Number(input.getAttribute('data-idx'));
+            const v = Number(input.value);
+            carteira[idx].pm = v > 0 ? v : null;
+            atualizarResumoCusto();
             carteiraSalvarLocal();
             carteiraEspelharNaNuvem(carteira[idx].ticker);
           });
@@ -12411,13 +12456,20 @@
           travados ? `• ${travados} ativo(s) com lançamentos em Compras & Vendas não são alterados (a posição vem de lá).` : '',
           ignorados ? `• ${ignorados} ativo(s) internacional(is) ficam de fora (outra moeda).` : '',
           '',
-          'Peso-alvo, preço médio e preço teto que você já preencheu não são apagados.',
+          'Vem junto o preço médio que estiver preenchido na Carteira de Rendimentos.',
+          'Peso-alvo, preço médio e preço teto que você já preencheu aqui não são apagados.',
         ].filter(l => l !== '').join('\n');
         if (!confirm(pergunta)) { statusEl.textContent = 'Importação cancelada — nada foi alterado.'; return; }
 
-        mesclar(b3.map(l => ({ ticker: String(l.ticker).toUpperCase(), cotas: Number(l.qtd) || 0 })), false).then(() => {
+        mesclar(b3.map(l => ({
+          ticker: String(l.ticker).toUpperCase(),
+          cotas: Number(l.qtd) || 0,
+          pm: Number(l.pm) > 0 ? Number(l.pm) : null,
+        })), false).then(() => {
           const falta = ativos.filter(a => !a.alvo).length;
+          const semPm = b3.filter(l => !(Number(l.pm) > 0)).length;
           const partes = [`${b3.length} ativo(s) importado(s) da Carteira de Rendimentos.`];
+          if (semPm) partes.push(`${semPm} sem preço médio — preencha aqui ou na Carteira de Rendimentos (coluna "Preço médio") para ter custo, lucro e DY on cost.`);
           if (ignorados) partes.push(`${ignorados} internacional(is) ficaram de fora (outra moeda).`);
           if (falta) partes.push('Agora preencha o peso-alvo de cada um — ou use "Pesos iguais" / "Manter pesos atuais".');
           // Mantém o aviso de preço não encontrado (se houver) junto.
