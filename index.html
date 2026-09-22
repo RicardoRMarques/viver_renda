@@ -585,6 +585,13 @@
     .ap-tabela-visao .ap-selo { padding: 1px 6px; font-size: 0.6rem; }
     .ap-visao-falta { margin: 0 0 10px; font-size: 0.76rem; }
     .ap-nuvem { font-size: 0.76rem; color: var(--muted); margin-top: -6px; }
+    .ap-calc-ajuda { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 10px; background: var(--deep); font-size: 0.8rem; color: var(--text); line-height: 1.5; }
+    .ap-calc-ajuda p { margin: 0 0 6px; }
+    .ap-calc-ajuda ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+    .ap-calc-ajuda li { font-size: 0.78rem; }
+    .ap-calc-ajuda li.ok { color: var(--accent); }
+    .ap-calc-ajuda li.falta { color: var(--gold); font-weight: 600; }
+    .ap-calc-ajuda .ap-link-btn { font-size: 0.78rem; margin-left: 4px; }
     /* Compras & Vendas */
     .ap-lanc { border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px 12px; background: var(--deep); }
     .ap-lanc > summary { cursor: pointer; font-weight: 700; font-size: 0.95rem; list-style: revert; }
@@ -6429,7 +6436,13 @@
           Nenhum ativo ainda — adicione acima, importe da sua Carteira de Rendimentos ou cole da sua planilha.
         </div>
 
-        <button type="button" class="hg-btn" id="apBtnCalcular" style="width:100%; margin-top:12px;">Calcular aporte</button>
+        <div class="ap-calc-ajuda" id="apCalcAjuda">
+          <p><strong>O que o botão faz:</strong> pega o <strong>Valor do aporte</strong> (campo no topo) e diz <strong>quantas cotas comprar
+            de cada ativo</strong> para a carteira chegar o mais perto possível do <strong>peso-alvo</strong> de cada um — compra primeiro o que
+            está mais abaixo do alvo e pula o que está acima do preço teto (fica "Aguarde"). Mostra o valor de cada compra, o peso depois e o troco.</p>
+          <ul id="apCalcRequisitos"></ul>
+        </div>
+        <button type="button" class="hg-btn" id="apBtnCalcular" style="width:100%; margin-top:8px;">Calcular aporte</button>
 
         <div id="apResultado"></div>
 
@@ -12028,7 +12041,40 @@
         renderVisao();
       }
 
+      // Observação acima do botão "Calcular aporte": diz o que falta
+      // (valor do aporte e peso-alvo) com link direto para o campo.
+      function atualizarRequisitosCalc() {
+        const ul = document.getElementById('apCalcRequisitos');
+        if (!ul) return;
+        const aporte = hgValorMascarado(inValor);
+        const soma = ativos.reduce((s, a) => s + (Number(a.alvo) || 0), 0);
+        const comAlvo = ativos.filter(a => a.alvo > 0).length;
+        const itens = [];
+        itens.push(aporte > 0
+          ? `<li class="ok">✓ Valor do aporte: <strong>${fmtMoeda(aporte)}</strong></li>`
+          : `<li class="falta">⚠️ Informe o <strong>Valor do aporte</strong> — quanto você vai investir agora.<button type="button" class="ap-link-btn" data-ir="apValor">preencher ↑</button></li>`);
+        if (!ativos.length) {
+          itens.push(`<li class="falta">⚠️ Adicione os ativos da carteira (acima, ou pelas Compras &amp; Vendas).</li>`);
+        } else if (comAlvo === 0) {
+          itens.push(`<li class="falta">⚠️ Peso-alvo em branco em todos os ativos (soma 0%) — digite na coluna <strong>Peso-alvo %</strong> ou use
+            <button type="button" class="ap-link-btn" data-acao="atuais">📌 Manter pesos atuais</button> /
+            <button type="button" class="ap-link-btn" data-acao="iguais">⚖️ Pesos iguais</button></li>`);
+        } else {
+          const ok = Math.abs(soma - 100) < 0.05;
+          itens.push(`<li class="${ok ? 'ok' : 'falta'}">${ok ? '✓' : '⚠️'} Peso-alvo definido em ${comAlvo} de ${ativos.length} ativo(s) — soma <strong>${fmtPct(soma)}</strong>${ok ? '' : ' (será usado em proporção; se quiser, ajuste para 100%)'}${comAlvo < ativos.length ? ' · ativos sem alvo não recebem aporte' : ''}</li>`);
+        }
+        ul.innerHTML = itens.join('');
+      }
+      document.getElementById('apCalcRequisitos')?.addEventListener('click', (e) => {
+        const b = e.target.closest('button');
+        if (!b) return;
+        if (b.dataset.ir) { const el = document.getElementById(b.dataset.ir); el?.scrollIntoView({ behavior: 'smooth', block: 'center' }); el?.focus(); }
+        if (b.dataset.acao === 'atuais') document.getElementById('apBtnAtuais')?.click();
+        if (b.dataset.acao === 'iguais') document.getElementById('apBtnIguais')?.click();
+      });
+
       function atualizarSoma() {
+        atualizarRequisitosCalc();
         const soma = ativos.reduce((s, a) => s + (Number(a.alvo) || 0), 0);
         somaEl.textContent = fmtPct(soma);
         const ok = Math.abs(soma - 100) < 0.05;
@@ -13164,7 +13210,7 @@
         salvar(); atualizarPlaceholdersTeto(); renderVisao();
         if (ultimoResultado) calcular();
       });
-      inValor.addEventListener('input', () => { invalidarResultado(); salvar(); });
+      inValor.addEventListener('input', () => { invalidarResultado(); salvar(); atualizarRequisitosCalc(); });
       inValor.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); calcular(); } });
       $('apBtnCalcular').addEventListener('click', calcular);
       $('apBtnPdf').addEventListener('click', baixarPdf);
