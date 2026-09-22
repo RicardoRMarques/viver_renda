@@ -6341,6 +6341,8 @@
               <span>Não comprar ativo acima do preço teto <span class="ap-check-ajuda">(fica como "Aguarde")</span></span></label>
             <label class="ap-check ap-pvp-max" for="apPvpMax"><span>Preço teto dos FIIs = VP/cota × P/VP máximo de
               <input type="number" id="apPvpMax" min="0.1" max="3" step="0.01" value="1.00" /> <span class="ap-check-ajuda">(1,00 = pagar no máximo o valor patrimonial, como na planilha)</span></span></label>
+            <label class="ap-check ap-pvp-max" for="apYieldBazin"><span>Preço teto das ações = dividendos 12m ÷ yield mínimo de
+              <input type="number" id="apYieldBazin" min="0.5" max="30" step="0.1" value="6.0" />% <span class="ap-check-ajuda">(método Bazin; 6% é o padrão dele)</span></span></label>
             <label class="ap-check"><input type="checkbox" id="apUsarTudo" checked />
               <span>Usar o aporte inteiro <span class="ap-check-ajuda">(pode passar um pouco do peso-alvo para sobrar menos troco)</span></span></label>
           </div>
@@ -6439,7 +6441,8 @@
         <div class="ap-calc-ajuda" id="apCalcAjuda">
           <p><strong>O que o botão faz:</strong> pega o <strong>Valor do aporte</strong> (campo no topo) e diz <strong>quantas cotas comprar
             de cada ativo</strong> para a carteira chegar o mais perto possível do <strong>peso-alvo</strong> de cada um — compra primeiro o que
-            está mais abaixo do alvo e pula o que está acima do preço teto (fica "Aguarde"). Mostra o valor de cada compra, o peso depois e o troco.</p>
+            está mais abaixo do alvo e pula o que está acima do preço teto (fica "Aguarde"). Mostra o valor de cada compra, o peso depois e o troco.
+            Funciona com <strong>FIIs e ações na mesma carteira</strong>; o teto automático é o valor patrimonial no FII e o de Bazin na ação.</p>
           <ul id="apCalcRequisitos"></ul>
         </div>
         <button type="button" class="hg-btn" id="apBtnCalcular" style="width:100%; margin-top:8px;">Calcular aporte</button>
@@ -11833,11 +11836,27 @@
       // É fundo? Pela fonte; sem fonte, código terminado em 11 que não está
       // na lista de ações (units como TAEE11 vêm marcadas como 'acao').
       const ehFundo = (a) => a.tipo === 'fii' || (!a.tipo && /11$/.test(a.ticker));
-      function tetoAuto(a) {
-        const pvp = pvpEfetivo(a);
-        if (!ehFundo(a) || !(a.preco > 0) || !(pvp > 0)) return null;
-        return Math.round((a.preco / pvp) * pvpMaximo() * 100) / 100;
+      function yieldBazin() {
+        const v = Number(document.getElementById('apYieldBazin')?.value);
+        return v > 0 ? v : 6;
       }
+      // Teto automático:
+      //  • FII  -> VP por cota (preço ÷ P/VP) × P/VP máximo — regra da planilha.
+      //  • Ação -> Bazin: dividendos dos últimos 12 meses ÷ yield mínimo. P/VP 1
+      //    não serve para ação (empresa boa costuma negociar bem acima do
+      //    patrimonial), e quem investe por dividendos decide pelo yield.
+      //    Os dividendos saem do DY 12M da fonte: preço × DY ÷ 100.
+      function tetoAuto(a) {
+        if (!(a.preco > 0)) return null;
+        if (ehFundo(a)) {
+          const pvp = pvpEfetivo(a);
+          return pvp > 0 ? Math.round((a.preco / pvp) * pvpMaximo() * 100) / 100 : null;
+        }
+        if (!(a.dy > 0)) return null;   // sem dividendo não existe teto de Bazin
+        const dividendos = a.preco * a.dy / 100;
+        return Math.round((dividendos / (yieldBazin() / 100)) * 100) / 100;
+      }
+      const origemTeto = (a) => (ehFundo(a) ? 'vp' : 'bazin');
       function tetoEfetivo(a) {
         if (a.teto > 0) return a.teto;
         return tetoAuto(a) ?? (a.tetoPlanilha > 0 ? a.tetoPlanilha : null);
@@ -11851,6 +11870,7 @@
             respeitarTeto: chkTeto.checked,
             usarTudo: chkTudo.checked,
             pvpMax: pvpMaximo(),
+            yieldBazin: yieldBazin(),
             // Preço automático NÃO é salvo (volta velho amanhã); só o
             // que a pessoa digitou à mão.
             ativos: ativos.map(a => ({
@@ -11875,6 +11895,7 @@
           if (typeof s.respeitarTeto === 'boolean') chkTeto.checked = s.respeitarTeto;
           if (typeof s.usarTudo === 'boolean') chkTudo.checked = s.usarTudo;
           if (Number(s.pvpMax) > 0) document.getElementById('apPvpMax').value = Number(s.pvpMax).toFixed(2);
+          if (Number(s.yieldBazin) > 0) document.getElementById('apYieldBazin').value = Number(s.yieldBazin).toFixed(1);
           ativos = Array.isArray(s.ativos) ? s.ativos.filter(a => a && a.ticker).map(a => ({
             ticker: String(a.ticker).toUpperCase(),
             cotas: Number(a.cotas) || 0,
@@ -12164,6 +12185,7 @@
             pvp: pvpEfetivo(a),
             teto: tetoEfetivo(a),
             tetoAuto: !(a.teto > 0) && tetoEfetivo(a) !== null,
+            tetoOrigem: origemTeto(a),
             compra: tetoEfetivo(a) && tem ? (a.preco <= tetoEfetivo(a) ? 'COMPRA' : 'AGUARDE') : null,
             preco: tem ? a.preco : null,
             dy12: typeof a.dy === 'number' ? a.dy : null,
@@ -12214,7 +12236,9 @@
         { k: 'dia', r: 'Dia', g: 'osc', f: l => sinal(l.dia, v => fmtNum(v) + '%') },
         { k: 'pvp', r: 'P/VP', g: 'analise', f: l => fmtNum(l.pvp) },
         { k: 'teto', r: 'Preço teto', g: 'analise', f: l => moedaV(l.teto) +
-            (l.tetoAuto ? '<span class="ap-teto-auto" title="Calculado: VP por cota (preço ÷ P/VP) × P/VP máximo">ᵛᵖ</span>' : '') },
+            (l.tetoAuto ? (l.tetoOrigem === 'vp'
+              ? '<span class="ap-teto-auto" title="Calculado: VP por cota (preço ÷ P/VP) × P/VP máximo">ᵛᵖ</span>'
+              : '<span class="ap-teto-auto" title="Calculado por Bazin: dividendos dos últimos 12 meses ÷ yield mínimo">ᵇᶻ</span>') : '') },
         { k: 'compra', r: 'Compra?', g: 'analise', t: 'txt', f: l => l.compra
             ? `<span class="ap-selo ${l.compra === 'COMPRA' ? 'ap-selo-compra' : 'ap-selo-aguarde'}">${l.compra}</span>` : '—' },
         { k: 'preco', r: 'Preço atual', g: 'analise', f: l => moedaV(l.preco) },
@@ -12284,11 +12308,13 @@
         const faltaEl = $('apVisaoFalta');
         const semPm = ls.filter(l => l.vm !== null && l.pm === null).map(l => l.ticker);
         const semPvp = ativos.filter(a => ehFundo(a) && !(a.teto > 0) && pvpEfetivo(a) === null).map(a => a.ticker);
-        const semTeto = ls.filter(l => l.teto === null && !semPvp.includes(l.ticker)).map(l => l.ticker);
+        const semDy = ativos.filter(a => !ehFundo(a) && !(a.teto > 0) && !(a.dy > 0) && a.preco > 0).map(a => a.ticker);
+        const semTeto = ls.filter(l => l.teto === null && !semPvp.includes(l.ticker) && !semDy.includes(l.ticker)).map(l => l.ticker);
         const lista = (arr) => arr.length > 6 ? arr.slice(0, 6).join(', ') + ` e mais ${arr.length - 6}` : arr.join(', ');
         const falta = [];
         if (semPm.length) falta.push(`<strong>Preço médio</strong> em branco (${lista(semPm)}) — sem ele ficam vazios <em>Custo, DY on cost e Lucro</em>.`);
         if (semPvp.length) falta.push(`<strong>P/VP</strong> não encontrado na fonte (${lista(semPvp)}) — comum em FI-Infra. Digite o P/VP na tabela (coluna P/VP) e o <em>Preço teto</em> e o <em>Compra?</em> passam a ser calculados.`);
+        if (semDy.length) falta.push(`<strong>Ação sem dividendo nos últimos 12 meses</strong> (${lista(semDy)}) — o teto de Bazin precisa de dividendo. Digite um preço teto seu na tabela, se quiser um limite para ela.`);
         if (semTeto.length) falta.push(`<strong>Preço teto</strong> sem cálculo automático (${lista(semTeto)}) — o teto automático vale para FIIs com P/VP; para ações, digite o seu. Sem teto, <em>Compra?</em> fica vazio.`);
         if (faltaEl) {
           faltaEl.hidden = falta.length === 0;
@@ -12595,6 +12621,7 @@
 
         const notas = [
           `Regras usadas: ${r.respeitarTeto ? 'não comprar acima do preço teto' : 'preço teto ignorado'}; ${r.usarTudo ? 'usar o aporte inteiro' : 'parar quando a próxima cota passaria do alvo'}.`,
+          `Preço teto automático: FII = VP por cota (preço / P/VP) x P/VP máximo ${fmtNum(pvpMaximo())}; ação = dividendos 12m / yield mínimo ${fmtNum(yieldBazin())}% (Bazin). Um teto digitado por você vale mais que o automático.`,
           'Cada cota vai para o ativo mais distante do peso-alvo, em proporção ao próprio alvo, até o dinheiro acabar.',
         ];
         if (Math.abs(r.somaAlvo - 100) >= 0.05) notas.push(`Os pesos-alvo informados somavam ${fmtPct(r.somaAlvo)} e foram usados em proporção.`);
@@ -13011,7 +13038,7 @@
         try {
           const cfg = await cliente.from('calc_aportes_config').upsert({
             user_id: user.id, aporte: hgValorMascarado(inValor) || null,
-            respeitar_teto: chkTeto.checked, usar_tudo: chkTudo.checked, pvp_max: pvpMaximo(),
+            respeitar_teto: chkTeto.checked, usar_tudo: chkTudo.checked, pvp_max: pvpMaximo(), yield_bazin: yieldBazin(),
             updated_at: new Date().toISOString(),
           });
           if (cfg.error) throw cfg.error;
@@ -13091,6 +13118,7 @@
             chkTeto.checked = c.respeitar_teto !== false;
             chkTudo.checked = c.usar_tudo !== false;
             if (Number(c.pvp_max) > 0) document.getElementById('apPvpMax').value = Number(c.pvp_max).toFixed(2);
+            if (Number(c.yield_bazin) > 0) document.getElementById('apYieldBazin').value = Number(c.yield_bazin).toFixed(1);
           }
           // Atualiza o cache local sem disparar nova gravação na nuvem.
           const pronto = nuvemPronta; nuvemPronta = false; salvar(); nuvemPronta = pronto;
@@ -13206,10 +13234,10 @@
           inp.placeholder = t !== null ? 'auto ' + fmtNum(t) : a.tetoPlanilha ? 'plan. ' + fmtNum(a.tetoPlanilha) : 'opcional';
         });
       }
-      document.getElementById('apPvpMax').addEventListener('change', () => {
+      ['apPvpMax', 'apYieldBazin'].forEach(id => document.getElementById(id).addEventListener('change', () => {
         salvar(); atualizarPlaceholdersTeto(); renderVisao();
         if (ultimoResultado) calcular();
-      });
+      }));
       inValor.addEventListener('input', () => { invalidarResultado(); salvar(); atualizarRequisitosCalc(); });
       inValor.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); calcular(); } });
       $('apBtnCalcular').addEventListener('click', calcular);
