@@ -585,6 +585,8 @@
     .ap-tabela-visao .ap-selo { padding: 1px 6px; font-size: 0.6rem; }
     .ap-visao-falta { margin: 0 0 10px; font-size: 0.76rem; }
     .ap-nuvem { font-size: 0.76rem; color: var(--muted); margin-top: -6px; }
+    .ap-sim-opcoes { display: flex; flex-direction: column; gap: 6px; }
+    .ap-tabela-edicao input.ap-pm-simulado { border-style: dashed; border-color: var(--gold); }
     .ap-calc-ajuda { margin-top: 14px; padding: 10px 14px; border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 10px; background: var(--deep); font-size: 0.8rem; color: var(--text); line-height: 1.5; }
     .ap-calc-ajuda p { margin: 0 0 6px; }
     .ap-calc-ajuda ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 18px; }
@@ -6360,10 +6362,25 @@
           <button type="button" class="cmp-btn-secundario" id="apBtnColar" aria-expanded="false">📋 Colar da planilha</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnIguais" title="Mesmo peso-alvo para todos os ativos">⚖️ Pesos iguais</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnAtuais" title="Usa o peso que cada ativo tem hoje como peso-alvo">📌 Manter pesos atuais</button>
+          <button type="button" class="cmp-btn-secundario" id="apBtnSimularPm" aria-expanded="false" title="Sem o preço médio real, estima um para a simulação">🎲 Simular preço médio</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnIrVisao" title="Todas as colunas: custo, lucro, proventos, DY on cost...">📊 Ver carteira completa</button>
           <button type="button" class="cmp-btn-secundario ap-btn-perigo" id="apBtnLimpar">Limpar tudo</button>
         </div>
 
+        <div id="apSimPmBox" class="ap-colar" hidden>
+          <label><strong>Não tem o preço médio?</strong> Para simular, o site preenche um valor estimado — você pode corrigir depois.
+            Custo, Lucro e DY on cost calculados com ele ficam marcados como estimativa (<span class="ap-estimado">≈</span>).</label>
+          <div class="ap-sim-opcoes">
+            <label class="ap-check"><input type="radio" name="apSimBase" value="hoje" checked /> <span><strong>Preço de hoje</strong> <span class="ap-check-ajuda">— como se você tivesse comprado agora: custo igual ao valor de mercado e lucro zero</span></span></label>
+            <label class="ap-check"><input type="radio" name="apSimBase" value="12" /> <span><strong>Média dos últimos 12 meses</strong> <span class="ap-check-ajuda">— aproxima quem aporta todo mês (usa o histórico de preços do site)</span></span></label>
+            <label class="ap-check"><input type="radio" name="apSimBase" value="24" /> <span><strong>Média dos últimos 24 meses</strong> <span class="ap-check-ajuda">— para carteira mais antiga</span></span></label>
+            <label class="ap-check"><input type="checkbox" id="apSimSoVazios" checked /> <span>Preencher só onde está em branco <span class="ap-check-ajuda">(desmarque para refazer também os já preenchidos)</span></span></label>
+          </div>
+          <div class="cmp-acoes-linha">
+            <button type="button" class="hg-btn" id="apSimAplicar">Simular</button>
+            <button type="button" class="cmp-btn-secundario" id="apSimLimpar">Apagar os simulados</button>
+          </div>
+        </div>
         <div id="apColarBox" class="ap-colar" hidden>
           <label for="apColarTexto"><strong>Jeito mais fácil:</strong> selecione na sua planilha a linha de cabeçalho
             (<em>ATIVO, SETOR, PESO %, POSIÇÃO, PREÇO MÉDIO…</em>) junto com as linhas dos ativos, copie e cole aqui — as colunas
@@ -11920,7 +11937,7 @@
             // que a pessoa digitou à mão.
             ativos: ativos.map(a => ({
               ticker: a.ticker, cotas: a.cotas, alvo: a.alvo, teto: a.teto,
-              pm: a.pm ?? null, prov: a.prov ?? null, setor: a.setor ?? null, precoPlanilha: a.precoPlanilha ?? null,
+              pm: a.pm ?? null, pmSimulado: !!a.pmSimulado, prov: a.prov ?? null, setor: a.setor ?? null, precoPlanilha: a.precoPlanilha ?? null,
               tetoPlanilha: a.tetoPlanilha ?? null, pvpManual: a.pvpManual ?? null, pvpPlanilha: a.pvpPlanilha ?? null,
               ...(a.precoManual ? { preco: a.preco, precoManual: true } : {}),
             })),
@@ -11947,6 +11964,7 @@
             alvo: Number(a.alvo) || 0,
             teto: Number(a.teto) > 0 ? Number(a.teto) : null,
             pm: Number(a.pm) > 0 ? Number(a.pm) : null,
+            pmSimulado: !!a.pmSimulado,
             prov: a.prov !== null && a.prov !== undefined && Number(a.prov) >= 0 ? Number(a.prov) : null,
             setor: a.setor || null,
             precoPlanilha: Number(a.precoPlanilha) > 0 ? Number(a.precoPlanilha) : null,
@@ -12086,7 +12104,8 @@
             <td class="ap-ativo"><strong>${escapar(a.ticker)}</strong>${a.segmento ? `<small>${escapar(a.segmento)}</small>` : ''}</td>
             <td><input type="text" data-campo="setor" class="ap-in-setor" list="apSetores" value="${escapar(a.setor || '')}" placeholder="${escapar(a.segmento || '—')}" aria-label="Setor de ${escapar(a.ticker)}" /></td>
             <td><input type="number" min="0" step="1" data-campo="cotas" value="${valorInput(a.cotas, 0)}" aria-label="Cotas de ${escapar(a.ticker)}"${a.viaLanc ? ' disabled title="Calculado pelas Compras & Vendas"' : ''} /></td>
-            <td><input type="number" min="0" step="0.01" data-campo="pm" value="${valorInput(a.pm, 2)}" placeholder="opcional" aria-label="Preço médio de ${escapar(a.ticker)}"${a.viaLanc ? ' disabled title="Calculado pelas Compras & Vendas"' : ''} /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="pm" value="${valorInput(a.pm, 2)}" class="${a.pmSimulado ? 'ap-pm-simulado' : ''}"
+                 placeholder="opcional" title="${a.pmSimulado ? 'Preço médio SIMULADO pelo site — corrija quando tiver o valor real.' : 'Quanto você pagou, em média. Em branco, use "Simular preço médio".'}" aria-label="Preço médio de ${escapar(a.ticker)}"${a.viaLanc ? ' disabled title="Calculado pelas Compras & Vendas"' : ''} /></td>
             <td><input type="number" min="0" step="0.01" data-campo="preco" value="${valorInput(a.preco, 2)}"
                  class="${a.precoManual ? 'ap-preco-manual' : ''}" placeholder="—"
                  title="${a.precoManual ? 'Preço digitado por você. Apague o campo para voltar ao preço automático.' : 'Preço automático. Pode digitar outro (ex.: o que está no home broker agora).'}"
@@ -12137,6 +12156,7 @@
         if (b.dataset.ir) { const el = document.getElementById(b.dataset.ir); el?.scrollIntoView({ behavior: 'smooth', block: 'center' }); el?.focus(); }
         if (b.dataset.acao === 'atuais') document.getElementById('apBtnAtuais')?.click();
         if (b.dataset.acao === 'iguais') document.getElementById('apBtnIguais')?.click();
+        if (b.dataset.acao === 'simular') { document.getElementById('apBtnSimularPm')?.click(); document.getElementById('apSimPmBox')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
       });
 
       function atualizarSoma() {
@@ -12167,7 +12187,11 @@
         if (campo === 'cotas') a.cotas = v && v > 0 ? Math.floor(v) : 0;
         else if (campo === 'alvo') a.alvo = v && v > 0 ? v : 0;
         else if (campo === 'teto') a.teto = v && v > 0 ? v : null;
-        else if (campo === 'pm') a.pm = v && v > 0 ? v : null;
+        else if (campo === 'pm') {
+          a.pm = v && v > 0 ? v : null;
+          a.pmSimulado = false;   // digitou: passa a valer como dado real
+          e.target.classList.remove('ap-pm-simulado');
+        }
         else if (campo === 'pvp') {
           a.pvpManual = v && v > 0 ? v : null;
           e.target.classList.toggle('ap-falta', ehFundo(a) && pvpEfetivo(a) === null && !(a.teto > 0));
@@ -12203,6 +12227,82 @@
       });
 
 
+
+      // ---------- Simular preço médio ----------
+      // Quem está só simulando não tem (e não precisa ter) o preço médio
+      // real. Aqui o site estima um, deixa claro que é estimativa (borda
+      // tracejada no campo, ≈ nas colunas que dependem dele e aviso na
+      // Visão) e o valor continua editável.
+      //  • "Preço de hoje": custo = valor de mercado, lucro zero.
+      //  • Média de 12/24 meses: usa o MESMO histórico de preços que o
+      //    simulador de Reinvestimento de Dividendos já publica
+      //    (data/reinv-historico/<TICKER>.json). Sem histórico, cai no
+      //    preço de hoje e o log diz quais ativos foram assim.
+      const _histCache = {};
+      async function mediaHistorico(ticker, meses) {
+        if (ticker in _histCache) return media(_histCache[ticker], meses);
+        try {
+          const resp = await fetch(`data/reinv-historico/${encodeURIComponent(ticker)}.json`, { cache: 'no-store' });
+          const dados = resp.ok ? await resp.json() : null;
+          _histCache[ticker] = Array.isArray(dados?.precos) ? dados.precos : null;
+        } catch (e) { _histCache[ticker] = null; }
+        return media(_histCache[ticker], meses);
+        function media(precos, m) {
+          if (!precos || !precos.length) return null;
+          const limite = new Date();
+          limite.setMonth(limite.getMonth() - m);
+          const iso = limite.toISOString().slice(0, 10);
+          const vals = precos.filter(x => x && x.data >= iso && Number(x.fechamento) > 0).map(x => Number(x.fechamento));
+          if (!vals.length) return null;
+          return vals.reduce((a, b) => a + b, 0) / vals.length;
+        }
+      }
+
+      async function simularPrecoMedio() {
+        const base = (document.querySelector('input[name="apSimBase"]:checked') || {}).value || 'hoje';
+        const soVazios = $('apSimSoVazios').checked;
+        const alvos = ativos.filter(a => a.preco > 0 && !a.viaLanc && (!soVazios || !(a.pm > 0)));
+        if (!alvos.length) {
+          statusEl.textContent = ativos.some(a => a.viaLanc)
+            ? 'Nada a simular: os ativos com lançamentos já têm preço médio calculado em Compras & Vendas.'
+            : 'Nada a simular — todos já têm preço médio (desmarque "só onde está em branco" para refazer).';
+          return;
+        }
+        statusEl.textContent = 'Simulando preço médio...';
+        let semHistorico = [];
+        for (const a of alvos) {
+          let valor = a.preco;
+          if (base !== 'hoje') {
+            const m = await mediaHistorico(a.ticker, Number(base));
+            if (m) valor = m; else semHistorico.push(a.ticker);
+          }
+          a.pm = Math.round(valor * 100) / 100;
+          a.pmSimulado = true;
+        }
+        $('apSimPmBox').hidden = true;
+        $('apBtnSimularPm').setAttribute('aria-expanded', 'false');
+        invalidarResultado(); renderEdicao(); salvar();
+        const comoTexto = base === 'hoje' ? 'preço de hoje' : `média dos últimos ${base} meses`;
+        statusEl.textContent = `Preço médio simulado em ${alvos.length} ativo(s) pelo ${comoTexto}.`
+          + (semHistorico.length ? ` Sem histórico no site, ${semHistorico.join(', ')} ficaram com o preço de hoje.` : '')
+          + ' É estimativa: corrija na tabela quando tiver o valor real.';
+      }
+
+      function limparSimulados() {
+        const n = ativos.filter(a => a.pmSimulado).length;
+        if (!n) { statusEl.textContent = 'Nenhum preço médio simulado para apagar.'; return; }
+        ativos.forEach(a => { if (a.pmSimulado) { a.pm = null; a.pmSimulado = false; } });
+        invalidarResultado(); renderEdicao(); salvar();
+        statusEl.textContent = `${n} preço(s) médio(s) simulado(s) apagado(s).`;
+      }
+
+      $('apBtnSimularPm')?.addEventListener('click', () => {
+        const box = $('apSimPmBox'); box.hidden = !box.hidden;
+        $('apBtnSimularPm').setAttribute('aria-expanded', String(!box.hidden));
+      });
+      $('apSimAplicar')?.addEventListener('click', simularPrecoMedio);
+      $('apSimLimpar')?.addEventListener('click', limparSimulados);
+
       // ---------- Visão da carteira (colunas da planilha) ----------
       const visaoEl = $('apVisao');
       const visaoCardsEl = $('apVisaoCards');
@@ -12225,7 +12325,7 @@
             peso: vm !== null && total > 0 ? vm / total * 100 : null,
             cotas: a.cotas,
             pm: a.pm || null,
-            custo,
+            custo, pmSim: !!a.pmSimulado,
             dia: typeof a.dia === 'number' ? a.dia : null,
             pvp: pvpEfetivo(a),
             teto: tetoEfetivo(a),
@@ -12270,14 +12370,15 @@
       // Na tabela o "R$" fica num <span> próprio: em telas até 1440px ele
       // some (a coluna já diz que é dinheiro) e as 17 colunas cabem sem
       // rolagem lateral. Nos cards e no PDF ele continua.
+      const SELO_SIM = '<span class="ap-estimado" title="Preço médio simulado pelo site, não informado por você.">≈</span>';
       const moedaV = (v) => (typeof v === 'number' ? `<span class="ap-rs">R$ </span>${fmtNum(v)}` : '—');
       const COLS_VISAO = [
         { k: 'ticker', r: 'Ativo', g: 'carteira', t: 'txt', f: l => `<strong>${escapar(l.ticker)}</strong>` },
         { k: 'setor', r: 'Setor', g: 'carteira', t: 'txt', f: l => escapar(l.setor || '—') },
         { k: 'peso', r: 'Peso %', g: 'carteira', f: l => fmtPct(l.peso) },
         { k: 'cotas', r: 'Posição', g: 'carteira', f: l => fmtInt(l.cotas) },
-        { k: 'pm', r: 'Preço médio', g: 'carteira', f: l => moedaV(l.pm) },
-        { k: 'custo', r: 'Custo', g: 'carteira', f: l => moedaV(l.custo) },
+        { k: 'pm', r: 'Preço médio', g: 'carteira', f: l => moedaV(l.pm) + (l.pmSim ? SELO_SIM : '') },
+        { k: 'custo', r: 'Custo', g: 'carteira', f: l => moedaV(l.custo) + (l.pmSim ? SELO_SIM : '') },
         { k: 'dia', r: 'Dia', g: 'osc', f: l => sinal(l.dia, v => fmtNum(v) + '%') },
         { k: 'pvp', r: 'P/VP', g: 'analise', f: l => fmtNum(l.pvp) },
         { k: 'teto', r: 'Preço teto', g: 'analise', f: l => moedaV(l.teto) +
@@ -12292,7 +12393,7 @@
             : moedaV(l.prov) + (l.provEst ? '<span class="ap-estimado" title="Estimativa: cotas × preço × DY 12M. Informe o valor recebido na tabela acima.">≈</span>' : '') },
         { k: 'dyPct', r: 'DY', g: 'prov', f: l => fmtPct(l.dyPct) },
         { k: 'dyCost', r: 'DY on cost', g: 'prov', f: l => fmtPct(l.dyCost) },
-        { k: 'lucro', r: 'Lucro (R$)', g: 'rent', f: l => sinal(l.lucro, moedaV) },
+        { k: 'lucro', r: 'Lucro (R$)', g: 'rent', f: l => sinal(l.lucro, moedaV) + (l.pmSim && l.lucro !== null ? SELO_SIM : '') },
         { k: 'lucroPct', r: 'Lucro (%)', g: 'rent', f: l => sinal(l.lucroPct, v => fmtNum(v) + '%') },
       ];
       const GRUPOS_VISAO = [
@@ -12357,7 +12458,9 @@
         const semTeto = ls.filter(l => l.teto === null && !semPvp.includes(l.ticker) && !semDy.includes(l.ticker)).map(l => l.ticker);
         const lista = (arr) => arr.length > 6 ? arr.slice(0, 6).join(', ') + ` e mais ${arr.length - 6}` : arr.join(', ');
         const falta = [];
-        if (semPm.length) falta.push(`<strong>Preço médio</strong> em branco (${lista(semPm)}) — sem ele ficam vazios <em>Custo, DY on cost e Lucro</em>.`);
+        const simulados = ativos.filter(a => a.pmSimulado).map(a => a.ticker);
+        if (semPm.length) falta.push(`<strong>Preço médio</strong> em branco (${lista(semPm)}) — sem ele ficam vazios <em>Custo, DY on cost e Lucro</em>. Só simulando? Use <button type="button" class="ap-link-btn" data-acao="simular">🎲 Simular preço médio</button>.`);
+        if (simulados.length) falta.push(`<strong>Preço médio simulado</strong> em ${simulados.length} ativo(s) (${lista(simulados)}) — <em>Custo, Lucro e DY on cost</em> são estimativas (≈). Digite o valor real quando tiver.`);
         if (semPvp.length) falta.push(`<strong>P/VP</strong> não encontrado na fonte (${lista(semPvp)}) — comum em FI-Infra. Digite o P/VP na tabela (coluna P/VP) e o <em>Preço teto</em> e o <em>Compra?</em> passam a ser calculados.`);
         if (semDy.length) falta.push(`<strong>Ação sem dividendo nos últimos 12 meses</strong> (${lista(semDy)}) — o teto de Bazin precisa de dividendo. Digite um preço teto seu na tabela, se quiser um limite para ela.`);
         if (semTeto.length) falta.push(`<strong>Preço teto</strong> sem cálculo automático (${lista(semTeto)}) — o teto automático vale para FIIs com P/VP; para ações, digite o seu. Sem teto, <em>Compra?</em> fica vazio.`);
@@ -12369,9 +12472,21 @@
         tabelaVisaoEl.innerHTML = `<thead><tr class="ap-grupos">${grupos}</tr><tr>${cab}</tr></thead><tbody>${corpo}</tbody><tfoot><tr>${rodape}</tr></tfoot>`;
       }
 
+      // Os atalhos do aviso da Visão (ir para a tabela, simular preço
+      // médio) ficam neste mesmo tratador — o de data-acao da observação
+      // do botão Calcular é outro bloco e não enxerga estes botões.
       $('apVisaoFalta')?.addEventListener('click', (e) => {
-        if (!e.target.closest('[data-ir-edicao]')) return;
-        wrapEdicao.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (e.target.closest('[data-ir-edicao]')) {
+          wrapEdicao.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+        const b = e.target.closest('[data-acao]');
+        if (!b) return;
+        if (b.dataset.acao === 'simular') {
+          const box = $('apSimPmBox');
+          if (box.hidden) $('apBtnSimularPm').click();
+          box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       });
       tabelaVisaoEl?.addEventListener('click', (e) => {
         const th = e.target.closest('th[data-col]');
@@ -12697,6 +12812,8 @@
         ];
         if (Math.abs(r.somaAlvo - 100) >= 0.05) notas.push(`Os pesos-alvo informados somavam ${fmtPct(r.somaAlvo)} e foram usados em proporção.`);
         if (r.semPreco.length) notas.push(`Sem preço (fora da conta): ${r.semPreco.join(', ')}.`);
+        const simulados = ativos.filter(a => a.pmSimulado).map(a => a.ticker);
+        if (simulados.length) notas.push(`Preço médio SIMULADO pelo site (custo, lucro e DY on cost são estimativa): ${simulados.join(', ')}.`);
         doc.setFontSize(8); doc.setTextColor(90);
         let y = doc.lastAutoTable.finalY + 16;
         notas.forEach(n => {
@@ -13087,7 +13204,7 @@
         const n = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
         return {
           user_id: uid, ticker: a.ticker, cotas: Math.max(0, Math.floor(a.cotas || 0)),
-          peso_alvo: a.alvo > 0 ? a.alvo : null, preco_medio: n(a.pm), preco_teto: a.teto > 0 ? a.teto : null,
+          peso_alvo: a.alvo > 0 ? a.alvo : null, preco_medio: n(a.pm), pm_simulado: !!a.pmSimulado, preco_teto: a.teto > 0 ? a.teto : null,
           proventos_12m: n(a.prov), setor: a.setor || null,
           preco_manual: a.precoManual && a.preco > 0 ? a.preco : null,
           preco_planilha: n(a.precoPlanilha), teto_planilha: n(a.tetoPlanilha),
@@ -13170,7 +13287,7 @@
           const n = (v) => (v === null || v === undefined ? null : Number(v));
           ativos = (rAt.data || []).map(d => ({
             ticker: d.ticker, cotas: Number(d.cotas) || 0, alvo: n(d.peso_alvo) || 0,
-            teto: n(d.preco_teto), pm: n(d.preco_medio), prov: n(d.proventos_12m), setor: d.setor || null,
+            teto: n(d.preco_teto), pm: n(d.preco_medio), pmSimulado: !!d.pm_simulado, prov: n(d.proventos_12m), setor: d.setor || null,
             precoPlanilha: n(d.preco_planilha), tetoPlanilha: n(d.teto_planilha),
             pvpManual: n(d.pvp_manual), pvpPlanilha: n(d.pvp_planilha),
             preco: d.preco_manual !== null ? n(d.preco_manual) : null, precoManual: d.preco_manual !== null,
