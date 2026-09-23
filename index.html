@@ -596,6 +596,7 @@
     .ap-calc-ajuda .ap-link-btn { font-size: 0.78rem; margin-left: 4px; }
     /* Compras & Vendas */
     .ap-lanc { border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px 12px; background: var(--deep); }
+    .ap-ico { width: 15px; height: 15px; vertical-align: -3px; flex-shrink: 0; }
     .ap-lanc > summary { cursor: pointer; font-weight: 700; font-size: 0.95rem; list-style: revert; }
     .ap-lanc > summary small { font-weight: 500; color: var(--muted); font-size: 0.76rem; margin-left: 6px; }
     .ap-lanc-form { display: grid; grid-template-columns: 138px 100px minmax(90px,1.1fr) repeat(4, minmax(80px,1fr)) auto; gap: 6px; }
@@ -5667,7 +5668,7 @@
           </div>
 
           <details class="calc-educativo" open>
-            <summary>📋 Tabela de regras de IR por tipo de investimento</summary>
+            <summary><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="8" y1="11" x2="16" y2="11"></line><line x1="8" y1="15" x2="13" y2="15"></line></svg> Tabela de regras de IR por tipo de investimento</summary>
             <div class="calc-educativo-corpo">
               <table class="ir-tabela-regras">
                 <thead>
@@ -6372,10 +6373,10 @@
 
         <div class="ap-ferramentas">
           <button type="button" class="cmp-btn-secundario" id="apBtnImportar" title="Traz os ativos e as quantidades que você salvou na Carteira de Rendimentos">💰 Importar da Carteira</button>
-          <button type="button" class="cmp-btn-secundario" id="apBtnColar" aria-expanded="false">📋 Colar da planilha</button>
+          <button type="button" class="cmp-btn-secundario" id="apBtnColar" aria-expanded="false"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="8" y1="11" x2="16" y2="11"></line><line x1="8" y1="15" x2="13" y2="15"></line></svg> Colar da planilha</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnIguais" title="Mesmo peso-alvo para todos os ativos">⚖️ Pesos iguais</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnAtuais" title="Usa o peso que cada ativo tem hoje como peso-alvo">📌 Manter pesos atuais</button>
-          <button type="button" class="cmp-btn-secundario" id="apBtnSimularPm" aria-expanded="false" title="Sem o preço médio real, estima um para a simulação">🎲 Simular preço médio</button>
+          <button type="button" class="cmp-btn-secundario" id="apBtnSimularPm" aria-expanded="false" title="Sem o preço médio real, estima um para a simulação"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"></circle><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"></circle><circle cx="12" cy="12" r="1.2" fill="currentColor"></circle></svg> Simular preço médio</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnIrVisao" title="Todas as colunas: custo, lucro, proventos, DY on cost...">📊 Ver carteira completa</button>
           <button type="button" class="cmp-btn-secundario ap-btn-perigo" id="apBtnLimpar">Limpar tudo</button>
         </div>
@@ -6407,7 +6408,7 @@
         </div>
 
         <details class="ap-lanc" id="apLanc" open>
-          <summary><span class="ap-lanc-titulo">🧾 Compras &amp; Vendas</span> <small id="apLancResumo"></small></summary>
+          <summary><span class="ap-lanc-titulo"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"></path><line x1="9" y1="7" x2="15" y2="7"></line><line x1="9" y1="11" x2="15" y2="11"></line><line x1="9" y1="15" x2="13" y2="15"></line></svg> Compras &amp; Vendas</span> <small id="apLancResumo"></small></summary>
           <p class="calc-ajuda" style="margin:6px 0 10px;">
             Lance cada compra e venda, como na aba <em>Compras &amp; Vendas</em> da sua planilha. A <strong>quantidade acumulada</strong>
             e o <strong>preço médio</strong> de cada ativo passam a ser calculados daqui e alimentam a calculadora e a Visão da carteira.
@@ -6420,13 +6421,18 @@
             <input type="text" id="apLAtivo" placeholder="Ativo" autocomplete="off" list="sugestoesTickersB3" aria-label="Ativo" />
             <input type="number" id="apLQtd" placeholder="Quantidade" min="1" step="1" aria-label="Quantidade" />
             <input type="number" id="apLPreco" placeholder="Preço unitário" min="0" step="0.01" aria-label="Preço unitário" />
-            <input type="number" id="apLTaxas" placeholder="Taxas/emol." min="0" step="0.01" aria-label="Taxas, ISS e emolumentos" />
-            <input type="number" id="apLIrrf" placeholder="IRRF" min="0" step="0.01" aria-label="IRRF" />
+            <input type="number" id="apLTaxas" placeholder="Taxas/emol." min="0" step="0.01" aria-label="Taxas, ISS e emolumentos" hidden />
+            <input type="number" id="apLIrrf" placeholder="IRRF" min="0" step="0.01" aria-label="IRRF" hidden />
             <button type="button" class="hg-btn" id="apLBtn">+ Lançar</button>
           </div>
+          <p class="calc-ajuda ap-lanc-extras" style="margin:6px 0 0;">
+            <button type="button" class="ap-link-btn" id="apLBtnExtras" aria-expanded="false">+ taxas e IRRF</button>
+            <span class="ap-check-ajuda">opcional — <strong>taxas/emolumentos</strong> entram no custo (mexem no preço médio);
+              <strong>IRRF</strong> é só registro da venda, não altera conta nenhuma</span>
+          </p>
           <div class="ap-lanc-barra">
             <select id="apLFiltro" aria-label="Filtrar por ativo"><option value="">Todos os ativos</option></select>
-            <button type="button" class="cmp-btn-secundario" id="apLBtnColar" aria-expanded="false">📋 Colar da planilha (Compras &amp; Vendas)</button>
+            <button type="button" class="cmp-btn-secundario" id="apLBtnColar" aria-expanded="false"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="8" y1="11" x2="16" y2="11"></line><line x1="8" y1="15" x2="13" y2="15"></line></svg> Colar da planilha (Compras &amp; Vendas)</button>
           </div>
           <div id="apLColarBox" class="ap-colar" hidden>
             <label for="apLColarTexto">Na aba <strong>Compras &amp; Vendas</strong> da planilha, selecione a linha de cabeçalho
@@ -12496,7 +12502,7 @@
         const semDyNenhum = ativos.filter(a => a.preco > 0 && !(a.dy > 0) && (a.prov === null || a.prov === undefined)).map(a => a.ticker);
         if (semDyNenhum.length) falta.push(`<strong>Proventos</strong> sem estimativa (${lista(semDyNenhum)}) — nenhuma fonte trouxe o DY 12M desses. Digite na coluna <em>Proventos 12m</em> o total que você recebeu; sem isso eles ficam de fora dessa conta.`);
         const simulados = ativos.filter(a => a.pmSimulado).map(a => a.ticker);
-        if (semPm.length) falta.push(`<strong>Preço médio</strong> em branco (${lista(semPm)}) — sem ele ficam vazios <em>Custo, DY on cost e Lucro</em>. Só simulando? Use <button type="button" class="ap-link-btn" data-acao="simular">🎲 Simular preço médio</button>.`);
+        if (semPm.length) falta.push(`<strong>Preço médio</strong> em branco (${lista(semPm)}) — sem ele ficam vazios <em>Custo, DY on cost e Lucro</em>. Só simulando? Use <button type="button" class="ap-link-btn" data-acao="simular"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"></circle><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"></circle><circle cx="12" cy="12" r="1.2" fill="currentColor"></circle></svg> Simular preço médio</button>.`);
         if (simulados.length) falta.push(`<strong>Preço médio simulado</strong> em ${simulados.length} ativo(s) (${lista(simulados)}) — <em>Custo, Lucro e DY on cost</em> são estimativas (≈). Digite o valor real quando tiver.`);
         if (semPvp.length) falta.push(`<strong>P/VP</strong> não encontrado na fonte (${lista(semPvp)}) — comum em FI-Infra. Digite o P/VP na tabela (coluna P/VP) e o <em>Preço teto</em> e o <em>Compra?</em> passam a ser calculados.`);
         if (semDy.length) falta.push(`<strong>Ação sem dividendo nos últimos 12 meses</strong> (${lista(semDy)}) — o teto de Bazin precisa de dividendo. Digite um preço teto seu na tabela, se quiser um limite para ela.`);
@@ -12504,7 +12510,7 @@
         if (faltaEl) {
           faltaEl.hidden = falta.length === 0;
           faltaEl.innerHTML = falta.length ? falta.map(f => '• ' + f).join('<br>') +
-            `<br>Esses dados são seus (não vêm da bolsa): preencha na tabela lá em cima ou use <strong>📋 Colar da planilha</strong> com o cabeçalho da sua planilha. <button type="button" class="ap-link-btn" data-ir-edicao>Ir para a tabela ↑</button>` : '';
+            `<br>Esses dados são seus (não vêm da bolsa): preencha na tabela lá em cima ou use <strong><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="8" y1="11" x2="16" y2="11"></line><line x1="8" y1="15" x2="13" y2="15"></line></svg> Colar da planilha</strong> com o cabeçalho da sua planilha. <button type="button" class="ap-link-btn" data-ir-edicao>Ir para a tabela ↑</button>` : '';
         }
         tabelaVisaoEl.innerHTML = `<thead><tr class="ap-grupos">${grupos}</tr><tr>${cab}</tr></thead><tbody>${corpo}</tbody><tfoot><tr>${rodape}</tr></tfoot>`;
       }
@@ -13184,6 +13190,9 @@
         $('apLColarTexto').value = '';
         $('apLColarBox').hidden = true;
         $('apLBtnColar').setAttribute('aria-expanded', 'false');
+        // Colou nota com taxa? Abre os campos, para ficar claro de onde
+        // saiu a "Taxa rateada" na tabela.
+        if (lancamentos.some(l => l.taxas > 0 || l.irrf > 0)) mostrarExtrasLanc(true);
         const msg = `${add} operação(ões) lançada(s)` + (rep ? `; ${rep} já estavam lançadas e foram ignoradas.` : '.');
         statusEl.textContent = msg;
         // A busca de preços termina depois e reescreve o status: repõe.
@@ -13205,6 +13214,20 @@
       ['apLAtivo', 'apLQtd', 'apLPreco', 'apLTaxas', 'apLIrrf'].forEach(id => $(id)?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') { e.preventDefault(); lancar(); }
       }));
+      // Taxas e IRRF ficam escondidos: na maioria das notas são zero
+      // (corretagem zerada) e só poluem o lançamento. Quem precisa abre —
+      // e a escolha fica salva no navegador.
+      const LANC_EXTRAS_KEY = 'vrCalcAportesExtras';
+      function mostrarExtrasLanc(mostrar) {
+        $('apLTaxas').hidden = !mostrar;
+        $('apLIrrf').hidden = !mostrar;
+        $('apLBtnExtras').textContent = mostrar ? '− esconder taxas e IRRF' : '+ taxas e IRRF';
+        $('apLBtnExtras').setAttribute('aria-expanded', String(mostrar));
+        try { localStorage.setItem(LANC_EXTRAS_KEY, mostrar ? '1' : '0'); } catch (e) { /* segue */ }
+      }
+      try { if (localStorage.getItem(LANC_EXTRAS_KEY) === '1') mostrarExtrasLanc(true); } catch (e) { /* segue */ }
+      $('apLBtnExtras')?.addEventListener('click', () => mostrarExtrasLanc($('apLTaxas').hidden));
+
       $('apLBtnColar')?.addEventListener('click', () => {
         const box = $('apLColarBox'); box.hidden = !box.hidden;
         $('apLBtnColar').setAttribute('aria-expanded', String(!box.hidden));
