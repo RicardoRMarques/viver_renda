@@ -690,7 +690,8 @@
     .ap-btn-perigo:hover { color: var(--danger); border-color: var(--danger); }
     .ap-colar { margin-top: 10px; padding: 12px; border: 1px dashed var(--border); border-radius: 10px; display: flex; flex-direction: column; gap: 8px; }
     .ap-colar label { font-size: 0.8rem; color: var(--muted); line-height: 1.45; }
-    .ap-colar textarea { width: 100%; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 0.8rem; background: var(--deep); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px; resize: vertical; box-sizing: border-box; }
+    .ap-colar textarea { width: 100%; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 0.8rem;
+      tab-size: 14; -moz-tab-size: 14; white-space: pre; overflow-x: auto; background: var(--deep); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px; resize: vertical; box-sizing: border-box; }
     .ap-colar .cmp-acoes-linha { align-items: center; flex-wrap: wrap; }
     .ap-tabela { font-size: 0.8rem; min-width: 640px; }
     .ap-tabela th, .ap-tabela td { padding: 7px 8px; }
@@ -6400,7 +6401,7 @@
             (<em>ATIVO, SETOR, PESO %, POSIÇÃO, PREÇO MÉDIO…</em>) junto com as linhas dos ativos, copie e cole aqui — as colunas
             são reconhecidas pelo nome (Posição, Preço médio, Preço teto, Proventos, Setor e, se tiver, uma coluna <em>Peso-alvo</em>).
             Sem cabeçalho, a ordem é <strong>Ativo · Cotas · Peso-alvo % · Preço teto · Preço médio</strong>.</label>
-          <textarea id="apColarTexto" rows="5" placeholder="ALZR11	1055	10	10,59&#10;BTLG11	130	12,5	102,51&#10;MXRF11	2428	2,5	9,38"></textarea>
+          <textarea id="apColarTexto" rows="5" placeholder="ATIVO   POSIÇÃO  PESO ALVO  PREÇO TETO  PREÇO MÉDIO&#10;ALZR11  1.055    10         R$ 10,59    R$ 10,64&#10;BTLG11  130      12,5       R$ 102,51   R$ 100,77&#10;MXRF11  2.428    2,5        R$ 9,38     R$ 10,04"></textarea>
           <div class="cmp-acoes-linha">
             <button type="button" class="hg-btn" id="apBtnColarAplicar">Usar estas linhas</button>
             <label class="ap-check" style="margin:0;"><input type="checkbox" id="apColarSubstituir" checked /> <span>Substituir a lista atual</span></label>
@@ -6438,7 +6439,7 @@
             <label for="apLColarTexto">Na aba <strong>Compras &amp; Vendas</strong> da planilha, selecione a linha de cabeçalho
               (<em>DATA, OPERAÇÃO, ATIVO, SETOR, QUANTIDADE, PREÇO UNITÁRIO, TAXAS…, IRRF</em>) junto com as linhas das operações,
               copie e cole aqui. As colunas calculadas da planilha (subtotal, preço médio…) são ignoradas — o site refaz as contas.</label>
-            <textarea id="apLColarTexto" rows="5" placeholder="DATA	OPERAÇÃO	ATIVO	SETOR	QUANTIDADE	PREÇO UNITÁRIO	TAXAS / ISS /EMOLUMENTOS	IRRF&#10;01/01/2024	COMPRA	BTAL11	AGRO	226	R$ 90,02		&#10;01/01/2024	COMPRA	MXRF11	PAPEL	514	R$ 10,04		"></textarea>
+            <textarea id="apLColarTexto" rows="5" placeholder="DATA        OPERAÇÃO  ATIVO   SETOR  QUANTIDADE  PREÇO UNITÁRIO  TAXAS  IRRF&#10;01/01/2024  COMPRA    BTAL11  AGRO   226         R$ 90,02&#10;01/01/2024  COMPRA    MXRF11  PAPEL  514         R$ 10,04&#10;10/02/2024  COMPRA    MXRF11  PAPEL  100         R$ 10,00        3,00&#10;15/03/2024  VENDA     MXRF11  PAPEL  114         R$ 10,40               0,06"></textarea>
             <div class="cmp-acoes-linha">
               <button type="button" class="hg-btn" id="apLColarAplicar">Lançar estas operações</button>
               <label class="ap-check" style="margin:0;"><input type="checkbox" id="apLColarSubstituir" /> <span>Substituir todos os lançamentos</span></label>
