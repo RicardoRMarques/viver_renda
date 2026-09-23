@@ -1835,6 +1835,26 @@
 
     .hg-status { text-align: left; color: var(--muted); font-size: 0.88rem; margin: 14px 0; min-height: 1.2em; }
     .hg-status.erro { color: var(--danger); }
+    /* Recado de ATENÇÃO: enquanto a carteira salva está sendo carregada,
+       os cards mostram R$ 0,00 e a lista aparece vazia — sem um aviso à
+       vista a pessoa acha que perdeu a carteira. Caixa dourada, como os
+       outros avisos do site, com um rodinho girando. */
+    .hg-status.atencao {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--text); font-weight: 600; min-height: 0;
+      padding: 11px 13px; border-radius: 10px;
+      background: rgba(224,184,77,0.12); border: 1px solid rgba(224,184,77,0.45);
+    }
+    .hg-status.atencao strong { color: var(--gold); }
+    .hg-status.atencao::before {
+      content: ''; flex: 0 0 auto; width: 15px; height: 15px; border-radius: 50%;
+      border: 2px solid rgba(224,184,77,0.35); border-top-color: var(--gold);
+      animation: hg-status-girar 0.8s linear infinite;
+    }
+    @keyframes hg-status-girar { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) {
+      .hg-status.atencao::before { animation-duration: 3s; }
+    }
 
     .hg-card {
       margin-top: 6px;
@@ -9520,8 +9540,8 @@
 
         if (salvos.length === 0) return;
 
-        statusEl.className = 'hg-status';
-        statusEl.textContent = 'Carregando sua carteira salva...';
+        statusEl.className = 'hg-status atencao';
+        statusEl.innerHTML = '<span><strong>Atenção:</strong> carregando sua carteira salva — os totais abaixo ainda não estão completos. Aguarde um instante.</span>';
         for (const item of salvos) {
           try {
             await buscarEEmpilhar(item.ticker, item.qtd, item.kind);
@@ -9531,6 +9551,7 @@
             if (reg && Number(item.pm) > 0) reg.pm = Number(item.pm);
           } catch (e) { /* ignora um ativo que falhar, segue os outros */ }
         }
+        statusEl.className = 'hg-status';
         statusEl.textContent = '';
         renderizar();
         carteiraSalvarLocal(); // já garante que o localStorage também reflete o que veio da nuvem
