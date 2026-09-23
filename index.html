@@ -573,6 +573,9 @@
     .ap-visao-cards.carteira-resumo-cards { grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 8px; margin: 10px 0; }
     .ap-visao-cards .carteira-resumo-card { padding: 8px 11px; border-radius: 10px; }
     .ap-visao-cards .carteira-resumo-card > span { font-size: 0.6rem; }
+    /* O "?" acompanha o rótulo miúdo do card — o tamanho padrão (15px)
+       ficava maior que a própria letra. */
+    .ap-visao-cards .hg-info-btn { width: 13px; height: 13px; margin-left: 4px; font-size: 0.55rem; vertical-align: 1px; }
     .ap-visao-cards .carteira-resumo-card strong { font-size: 0.92rem; margin-top: 2px; }
     .ap-visao-cards .carteira-resumo-card small { display: block; margin-top: 2px; font-size: 0.64rem; font-weight: 700; line-height: 1.3; }
     /* Tabela: 17 colunas cabendo na largura, sem rolagem lateral no
@@ -12525,19 +12528,29 @@
         if (!ativos.length) return;
         const ls = linhasVisao();
         const t = totaisVisao(ls);
-        const card = (rot, val, extra = '', destaque = false) =>
-          `<div class="carteira-resumo-card${destaque ? ' carteira-resumo-destaque' : ''}"><span>${rot}</span><strong>${val}</strong>${extra}</div>`;
+        // Cada card ganha um "?" ligado ao glossário do site (mesmo balão
+        // do resto da página). Os textos estão em GLOSSARIO, com as chaves
+        // 'ap-...'; window.ligarGlossario liga os botões recém-criados.
+        const card = (rot, val, extra = '', destaque = false, chave = '') =>
+          `<div class="carteira-resumo-card${destaque ? ' carteira-resumo-destaque' : ''}"><span>${rot}${chave
+            ? ` <button type="button" class="hg-info-btn" data-glossario="${chave}" aria-label="O que é ${rot}?" title="">?</button>` : ''}</span><strong>${val}</strong>${extra}</div>`;
         visaoCardsEl.innerHTML = [
           card('Custo de aquisição', t.temCusto ? fmtMoeda(t.custo) : '—',
-            t.temCusto && !t.custoCompleto ? '<small style="color:var(--muted)">falta preço médio de algum ativo</small>' : ''),
-          card('Valor de mercado', fmtMoeda(t.vm), '', true),
+            t.temCusto && !t.custoCompleto ? '<small style="color:var(--muted)">falta preço médio de algum ativo</small>' : '',
+            false, 'ap-custo-aquisicao'),
+          card('Valor de mercado', fmtMoeda(t.vm), '', true, 'ap-valor-mercado'),
           card('Valorização', t.temCusto ? sinal(t.lucro, fmtMoeda) : '—',
-            t.lucroPct !== null ? `<small>${sinal(t.lucroPct, v => fmtNum(v) + '%')}</small>` : ''),
-          card('Proventos 12 meses', fmtMoeda(t.prov), t.algumEstimado ? '<small style="color:var(--muted)">inclui estimativas ≈</small>' : ''),
-          card('DY on cost', fmtPct(t.dyCost), t.dyPct !== null ? `<small style="color:var(--muted)">DY sobre o mercado: ${fmtPct(t.dyPct)}</small>` : ''),
+            t.lucroPct !== null ? `<small>${sinal(t.lucroPct, v => fmtNum(v) + '%')}</small>` : '',
+            false, 'ap-valorizacao'),
+          card('Proventos 12 meses', fmtMoeda(t.prov), t.algumEstimado ? '<small style="color:var(--muted)">inclui estimativas ≈</small>' : '',
+            false, 'ap-proventos-12m'),
+          card('DY on cost', fmtPct(t.dyCost), t.dyPct !== null ? `<small style="color:var(--muted)">DY sobre o mercado: ${fmtPct(t.dyPct)}</small>` : '',
+            false, 'ap-dy-on-cost'),
           card('Carteira com proventos', t.rentTotal !== null ? sinal(t.rentTotal, v => fmtNum(v) + '%') : '—',
-            '<small style="color:var(--muted)">valorização + proventos ÷ custo</small>'),
+            '<small style="color:var(--muted)">valorização + proventos ÷ custo</small>',
+            false, 'ap-carteira-proventos'),
         ].join('');
+        window.ligarGlossario?.(visaoCardsEl);
 
         const grupos = GRUPOS_VISAO.map(([g, rot, cls]) =>
           `<th colspan="${COLS_VISAO.filter(c => c.g === g).length}" class="${cls}">${rot}</th>`).join('');
@@ -16759,6 +16772,19 @@
         'graham-indicador': 'Preço Justo de Graham = estimativa de quanto a ação "valeria" segundo a fórmula clássica de Benjamin Graham, usada para comparar com a cotação atual.\n\nCálculo: raiz quadrada de (22,5 × LPA × VPA)\n\nO 22,5 vem dos limites que Graham considerava aceitáveis para uma empresa defensiva: P/L de até 15 e P/VP de até 1,5 (15 × 1,5 = 22,5).\n\nSó faz sentido quando LPA e VPA são positivos — empresa com prejuízo não tem preço justo por essa fórmula. É uma referência de estudo, criada nos anos 1930 para empresas industriais, não uma recomendação de compra nem um valor "correto" da ação.',
         'favoritos-login': 'Marque o ♥ ao lado do ativo para acompanhá-lo aqui. Clicando em "Meus Favoritos", a lista mostra só os ativos marcados.\n\nEntre na sua conta (botão "Entrar", no topo do site) para que seus favoritos fiquem salvos na sua conta e apareçam também no celular, no tablet e em qualquer outro aparelho.\n\nSem login eles continuam funcionando, mas ficam guardados só neste navegador: se você limpar os dados do navegador ou abrir o site em outro aparelho, a lista não estará lá.',
         'bazin-indicador': 'Preço-teto de Bazin = preço máximo que você pagaria pela ação para ainda receber um dividend yield de 6% ao ano, critério defendido por Décio Bazin.\n\nCálculo: dividendos por ação nos últimos 12 meses ÷ 0,06\n\nO 6% é a exigência de retorno do próprio Bazin — quem quiser outra régua muda o divisor. Aqui usamos os proventos dos últimos 12 meses, então o número muda conforme a empresa aumenta ou corta dividendos, e não garante que ela vá manter o pagamento. É referência de estudo, não recomendação.',
+
+        // Cards da "Visão da carteira" da Calculadora de Aportes.
+        'ap-custo-aquisicao': 'Quanto você pagou, no total, pelos ativos da carteira: soma de preço médio × cotas de cada ativo.\n\nO preço médio vem dos seus lançamentos em Compras & Vendas, do que você digitou na tabela ou do que colou da planilha. Taxas e emolumentos lançados entram no custo; nas vendas, o custo baixa pelo preço médio (o preço médio em si não muda).\n\nSó entram os ativos que têm preço médio preenchido — quando falta o de algum, o card avisa logo abaixo do valor.\n\nÉ o dinheiro que saiu do seu bolso, não o que a carteira vale hoje. A diferença entre os dois é a Valorização.',
+
+        'ap-valor-mercado': 'Quanto a carteira vale hoje: soma de cotas × preço atual de cada ativo.\n\nO preço atual é o último fechamento coletado pelos robôs do site (ou da HG Brasil, para os fundos que não estão nos arquivos do robô). NÃO é preço em tempo real — confira na corretora antes de enviar a ordem.\n\nAqui entram todos os ativos da lista, inclusive os que estão sem preço médio. Por isso este card pode somar mais ativos do que o Custo de aquisição.',
+
+        'ap-valorizacao': 'Quanto a carteira ganhou (verde) ou perdeu (vermelho) de preço, em reais, e logo abaixo o mesmo em percentual.\n\nConta: valor de mercado − custo de aquisição. Em percentual: essa diferença ÷ custo.\n\nÉ lucro ou prejuízo no papel: só vira dinheiro de verdade quando você vende. E é só preço — os dividendos e rendimentos que você já recebeu NÃO entram aqui; eles estão em Proventos 12 meses e na Carteira com proventos.\n\nPara a comparação ser justa, os dois lados da conta usam só os ativos que têm preço médio.',
+
+        'ap-proventos-12m': 'Soma dos dividendos e rendimentos dos últimos 12 meses dos ativos da carteira.\n\nQuando você informa o valor recebido (coluna Proventos da tabela), é esse valor que entra. Quando não informa, o site estima: cotas × preço atual × DY 12M, e marca o número com ≈.\n\nCuidado com a estimativa: ela supõe que você tinha essas cotas o ano inteiro. Se você comprou no meio do caminho, o número sai maior do que você realmente recebeu — informe o valor recebido para corrigir.\n\nO DY 12M vem dos robôs do site (ou da HG Brasil). Rendimento passado não é promessa de rendimento futuro.',
+
+        'ap-dy-on-cost': 'Dividend yield sobre o custo: quanto os proventos de 12 meses representam do que VOCÊ pagou.\n\nConta: proventos 12 meses ÷ custo de aquisição.\n\nÉ o retorno em renda sobre o seu dinheiro, não sobre o preço de hoje. Quem comprou barato tem DY on cost maior do que o DY de quem compra agora — e ele tende a crescer com o tempo, mesmo que o fundo pague sempre o mesmo valor por cota.\n\nLogo abaixo vem o DY sobre o mercado: os mesmos proventos divididos pelo valor de mercado de hoje, ou seja, o que um investidor receberia comprando agora. DY on cost acima dele significa que seus ativos valorizaram desde a compra.',
+
+        'ap-carteira-proventos': 'O retorno total da carteira: a valorização mais os proventos, tudo sobre o custo.\n\nConta: (valor de mercado − custo + proventos 12 meses) ÷ custo.\n\nÉ a visão mais completa das seis, porque junta o que o preço rendeu com o que caiu na sua conta em dividendos e rendimentos. Por isso ela pode ficar positiva mesmo com a Valorização negativa: os proventos compensam a queda do preço.\n\nDuas ressalvas: os proventos são só dos últimos 12 meses, enquanto a valorização é desde a compra (que pode ser de muitos anos) — então este número não é uma rentabilidade anual. E entram só os ativos que têm preço médio.',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
@@ -16842,6 +16868,10 @@
 
       document.addEventListener('click', fechar);
       window.addEventListener('scroll', fechar, { passive: true });
+      // O evento scroll não sobe na árvore: sem a fase de captura, rolar
+      // DENTRO de um modal (que é quem rola, não a janela) deixava o balão
+      // parado no ar, longe do "?" que o abriu.
+      document.addEventListener('scroll', fechar, { passive: true, capture: true });
     })();
 
     // ============================================================
