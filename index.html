@@ -699,6 +699,19 @@
       border: 1px solid var(--border); background: var(--deep); color: var(--text);
     }
     .ap-tabela-edicao input.ap-preco-manual { border-color: var(--gold); }
+    /* Campo com lista (setor): o Chrome só mostra a setinha da datalist
+       quando o mouse está em cima, então quase ninguém descobre que dá
+       para escolher. Aqui a seta é nossa, fica sempre visível, e o clique
+       abre a lista (showPicker). A nativa é escondida para não duplicar. */
+    .ap-campo-lista { position: relative; display: inline-block; }
+    .ap-campo-lista input { padding-right: 20px !important; }
+    .ap-campo-lista input::-webkit-calendar-picker-indicator { display: none !important; }
+    .ap-lista-seta {
+      position: absolute; right: 2px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; padding: 0 3px; cursor: pointer;
+      color: var(--primary); font-size: 0.7rem; line-height: 1;
+    }
+    .ap-lista-seta:hover { color: var(--text); }
     .ap-tabela-edicao input.ap-in-setor { width: 104px; }
     .ap-tabela-edicao input.ap-in-pvp { width: 70px; }
     .ap-tabela-edicao input.ap-falta { border-color: var(--gold); border-width: 2px; }
@@ -12038,6 +12051,7 @@
       }
       // Um ativo só vai à HG uma vez por sessão (a cota da chave é contada).
       const hgJaBuscado = new Set();
+      const hgDyBuscado = new Set();
 
       async function atualizarPrecos() {
         if (ativos.length === 0) return;
@@ -12074,6 +12088,18 @@
             if (!a.precoManual && !(a.preco > 0) && a.precoPlanilha) { a.preco = a.precoPlanilha; a.fonte = 'planilha'; }
           }));
         }
+        // DY zerado na fonte principal acontece (o Fundamentus não traz o
+        // DY de vários Fiagros — KNCA11, por exemplo). Sem DY, a estimativa
+        // de proventos nem aparece. A HG costuma ter: busca só o DY desses,
+        // uma vez por sessão, sem tocar no preço.
+        const semDyNoRobo = ativos.filter(a => a.preco > 0 && !(a.dy > 0) && !hgDyBuscado.has(a.ticker));
+        if (semDyNoRobo.length) {
+          await Promise.all(semDyNoRobo.map(async a => {
+            hgDyBuscado.add(a.ticker);
+            const r = await precoHg(a.ticker);
+            if (r?.dy > 0) { a.dy = r.dy; a.dyFonte = 'hg'; }
+          }));
+        }
         const semPreco = ativos.filter(a => !(a.preco > 0)).map(a => a.ticker);
         statusEl.textContent = semPreco.length
           ? `Não achei o preço de ${semPreco.join(', ')} — digite o preço na tabela para ele entrar na conta.`
@@ -12102,7 +12128,7 @@
         tbodyEdicao.innerHTML = ativos.map((a, i) => `
           <tr data-idx="${i}">
             <td class="ap-ativo"><strong>${escapar(a.ticker)}</strong>${a.segmento ? `<small>${escapar(a.segmento)}</small>` : ''}</td>
-            <td><input type="text" data-campo="setor" class="ap-in-setor" list="apSetores" value="${escapar(a.setor || '')}" placeholder="${escapar(a.segmento || '—')}" aria-label="Setor de ${escapar(a.ticker)}" /></td>
+            <td><span class="ap-campo-lista"><input type="text" data-campo="setor" class="ap-in-setor" list="apSetores" value="${escapar(a.setor || '')}" placeholder="${escapar(a.segmento || '—')}" title="Escolha na lista ou digite o seu" aria-label="Setor de ${escapar(a.ticker)}" /><button type="button" class="ap-lista-seta" data-abrir-lista tabindex="-1" aria-label="Ver a lista de setores">▾</button></span></td>
             <td><input type="number" min="0" step="1" data-campo="cotas" value="${valorInput(a.cotas, 0)}" aria-label="Cotas de ${escapar(a.ticker)}"${a.viaLanc ? ' disabled title="Calculado pelas Compras & Vendas"' : ''} /></td>
             <td><input type="number" min="0" step="0.01" data-campo="pm" value="${valorInput(a.pm, 2)}" class="${a.pmSimulado ? 'ap-pm-simulado' : ''}"
                  placeholder="opcional" title="${a.pmSimulado ? 'Preço médio SIMULADO pelo site — corrija quando tiver o valor real.' : 'Quanto você pagou, em média. Em branco, use "Simular preço médio".'}" aria-label="Preço médio de ${escapar(a.ticker)}"${a.viaLanc ? ' disabled title="Calculado pelas Compras & Vendas"' : ''} /></td>
@@ -12118,7 +12144,7 @@
                  placeholder="${tetoAuto(a) !== null ? 'auto ' + fmtNum(tetoAuto(a)) : a.tetoPlanilha ? 'plan. ' + fmtNum(a.tetoPlanilha) : 'opcional'}"
                  title="${tetoAuto(a) !== null ? 'Em branco = automático: VP/cota (preço ÷ P/VP) × P/VP máximo. Digite um valor para usar o seu.' : 'Preço teto opcional.'}"
                  aria-label="Preço teto de ${escapar(a.ticker)}" /></td>
-            <td><input type="number" min="0" step="0.01" data-campo="prov" value="${valorInput(a.prov, 2)}" placeholder="${a.preco > 0 && a.dy > 0 && a.cotas > 0 ? '≈ ' + valorInput(a.cotas * a.preco * a.dy / 100, 2) : 'R$'}" title="Proventos recebidos nos últimos 12 meses. Em branco: estimativa pelo DY 12M." aria-label="Proventos 12 meses de ${escapar(a.ticker)}" /></td>
+            <td><input type="number" min="0" step="0.01" data-campo="prov" value="${valorInput(a.prov, 2)}" placeholder="${a.preco > 0 && a.dy > 0 && a.cotas > 0 ? '≈ ' + valorInput(a.cotas * a.preco * a.dy / 100, 2) : (a.preco > 0 && !(a.dy > 0) ? 'sem DY: digite' : 'R$')}" title="Proventos recebidos nos últimos 12 meses. Em branco: estimativa pelo DY 12M." aria-label="Proventos 12 meses de ${escapar(a.ticker)}" /></td>
             <td class="ap-num" data-peso-hoje>${pesos.get(a.ticker) === null ? '—' : fmtPct(pesos.get(a.ticker))}</td>
             <td><button type="button" class="ap-remover" data-remover="${i}" title="Remover ${escapar(a.ticker)}" aria-label="Remover ${escapar(a.ticker)}">✕</button></td>
           </tr>`).join('');
@@ -12213,6 +12239,15 @@
         if (e.target.dataset?.campo === 'preco' && e.target.value === '') atualizarPrecos();
       });
       tbodyEdicao.addEventListener('click', (e) => {
+        const seta = e.target.closest('[data-abrir-lista]');
+        if (seta) {
+          const campo = seta.parentElement.querySelector('input');
+          campo?.focus();
+          // showPicker abre a datalist (Chrome 99+/Firefox 101+). Onde não
+          // existir, o foco sozinho já faz o navegador sugerir a lista.
+          try { campo?.showPicker?.(); } catch (err) { /* segue com o foco */ }
+          return;
+        }
         const b = e.target.closest('[data-remover]');
         if (!b) return;
         const alvoRm = ativos[Number(b.dataset.remover)];
@@ -12458,6 +12493,8 @@
         const semTeto = ls.filter(l => l.teto === null && !semPvp.includes(l.ticker) && !semDy.includes(l.ticker)).map(l => l.ticker);
         const lista = (arr) => arr.length > 6 ? arr.slice(0, 6).join(', ') + ` e mais ${arr.length - 6}` : arr.join(', ');
         const falta = [];
+        const semDyNenhum = ativos.filter(a => a.preco > 0 && !(a.dy > 0) && (a.prov === null || a.prov === undefined)).map(a => a.ticker);
+        if (semDyNenhum.length) falta.push(`<strong>Proventos</strong> sem estimativa (${lista(semDyNenhum)}) — nenhuma fonte trouxe o DY 12M desses. Digite na coluna <em>Proventos 12m</em> o total que você recebeu; sem isso eles ficam de fora dessa conta.`);
         const simulados = ativos.filter(a => a.pmSimulado).map(a => a.ticker);
         if (semPm.length) falta.push(`<strong>Preço médio</strong> em branco (${lista(semPm)}) — sem ele ficam vazios <em>Custo, DY on cost e Lucro</em>. Só simulando? Use <button type="button" class="ap-link-btn" data-acao="simular">🎲 Simular preço médio</button>.`);
         if (simulados.length) falta.push(`<strong>Preço médio simulado</strong> em ${simulados.length} ativo(s) (${lista(simulados)}) — <em>Custo, Lucro e DY on cost</em> são estimativas (≈). Digite o valor real quando tiver.`);
