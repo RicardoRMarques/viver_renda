@@ -685,8 +685,32 @@
     }
     .ap-add-linha #apTickerInput { flex: 1 1 170px; text-transform: uppercase; }
     .ap-add-linha .hg-btn { flex: 0 0 auto; }
-    .ap-ferramentas { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .ap-ferramentas { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin-top: 10px; }
     .ap-ferramentas .cmp-btn-secundario { flex: 0 0 auto; }
+    /* "Ver carteira completa" é a porta para a tabela de 17 colunas — o
+       botão mais usado da barra. Fica maior e com a cor do site para não
+       se perder no meio dos outros. */
+    .ap-ferramentas .ap-btn-destaque {
+      padding: 12px 18px; font-size: 0.92rem;
+      border: 2px solid var(--primary); color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 10%, transparent);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    }
+    .ap-ferramentas .ap-btn-destaque:hover {
+      background: var(--primary); color: #fff; border-color: var(--primary);
+    }
+    .ap-ferramentas .ap-btn-destaque svg { width: 19px; height: 19px; }
+    /* Volta da Visão para o campo "Valor do aporte", que fica lá em cima. */
+    .ap-visao-acoes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .ap-btn-voltar {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--deep); color: var(--primary);
+      border: 1px solid var(--primary); border-radius: 999px;
+      padding: 7px 14px; font-size: 0.78rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; white-space: nowrap;
+    }
+    .ap-btn-voltar:hover { background: var(--primary); color: #fff; }
+    .ap-visao-rodape { display: flex; justify-content: center; margin-top: 14px; }
     .ap-btn-perigo:hover { color: var(--danger); border-color: var(--danger); }
     .ap-colar { margin-top: 10px; padding: 12px; border: 1px dashed var(--border); border-radius: 10px; display: flex; flex-direction: column; gap: 8px; }
     .ap-colar label { font-size: 0.8rem; color: var(--muted); line-height: 1.45; }
@@ -745,7 +769,9 @@
       .calc-modal.ap-modal { max-width: calc(100vw - 16px); }
       .ap-add-linha input, .ap-add-linha #apTickerInput { flex: 1 1 100%; }
       .ap-add-linha .hg-btn { flex: 1 1 100%; }
+      .ap-ferramentas { align-items: stretch; }
       .ap-ferramentas .cmp-btn-secundario { flex: 1 1 calc(50% - 8px); }
+      .ap-ferramentas .ap-btn-destaque { flex: 1 1 100%; order: -1; }
       .ap-tabela { font-size: 0.72rem; }
       .ap-tabela-edicao input { width: 74px; }
       .ap-tabela td:first-child, .ap-tabela th:first-child { position: sticky; left: 0; background: var(--bg); z-index: 1; }
@@ -6345,7 +6371,7 @@
 
         <div id="apNuvem" class="ap-nuvem" aria-live="polite"></div>
 
-        <div class="calc-grid-2">
+        <div class="calc-grid-2" id="apTopoCampos">
           <div class="calc-campo">
             <label for="apValor">Valor do aporte</label>
             <div class="calc-input-prefixado">
@@ -6378,7 +6404,7 @@
           <button type="button" class="cmp-btn-secundario" id="apBtnIguais" title="Mesmo peso-alvo para todos os ativos">⚖️ Pesos iguais</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnAtuais" title="Usa o peso que cada ativo tem hoje como peso-alvo">📌 Manter pesos atuais</button>
           <button type="button" class="cmp-btn-secundario" id="apBtnSimularPm" aria-expanded="false" title="Sem o preço médio real, estima um para a simulação"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"></circle><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"></circle><circle cx="12" cy="12" r="1.2" fill="currentColor"></circle></svg> Simular preço médio</button>
-          <button type="button" class="cmp-btn-secundario" id="apBtnIrVisao" title="Todas as colunas: custo, lucro, proventos, DY on cost...">📊 Ver carteira completa</button>
+          <button type="button" class="cmp-btn-secundario ap-btn-destaque" id="apBtnIrVisao" title="Todas as colunas: custo, lucro, proventos, DY on cost..."><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="11"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="16" y1="20" x2="16" y2="14"></line><line x1="22" y1="20" x2="22" y2="8"></line></svg> Ver carteira completa</button>
           <button type="button" class="cmp-btn-secundario ap-btn-perigo" id="apBtnLimpar">Limpar tudo</button>
         </div>
 
@@ -6509,7 +6535,10 @@
         <div id="apVisao" hidden>
           <div class="ap-visao-titulo">
             <h4>📊 Visão da carteira</h4>
-            <span class="calc-ajuda" style="margin:0;">Clique no título de uma coluna para ordenar.</span>
+            <div class="ap-visao-acoes">
+              <span class="calc-ajuda" style="margin:0;">Clique no título de uma coluna para ordenar.</span>
+              <button type="button" class="ap-btn-voltar" data-voltar-aporte>↑ Voltar ao valor do aporte</button>
+            </div>
           </div>
           <div class="ap-visao-cards carteira-resumo-cards" id="apVisaoCards"></div>
           <div class="ap-aviso ap-visao-falta" id="apVisaoFalta" hidden></div>
@@ -6522,6 +6551,9 @@
             (cotas × preço × DY 12M), para quando você não informou o valor recebido. <strong>DY (%)</strong> = proventos ÷ valor de mercado;
             <strong>DY on cost</strong> = proventos ÷ custo.
           </p>
+          <div class="ap-visao-rodape">
+            <button type="button" class="ap-btn-voltar" data-voltar-aporte>↑ Voltar ao valor do aporte</button>
+          </div>
         </div>
       </div>
     </div>
@@ -13476,6 +13508,14 @@
       $('apBtnIguais').addEventListener('click', pesosIguais);
       $('apBtnAtuais').addEventListener('click', manterPesosAtuais);
       $('apBtnLimpar').addEventListener('click', limparTudo);
+      // "↑ Voltar ao valor do aporte": da Visão (que fica no fim do modal)
+      // de volta ao campo do aporte, lá no topo. Há um botão no título e
+      // outro no rodapé da Visão, por isso o tratador é delegado.
+      overlay.addEventListener('click', (e) => {
+        if (!e.target.closest('[data-voltar-aporte]')) return;
+        rolarNoModal($('apTopoCampos'));
+        inValor.focus({ preventScroll: true });
+      });
       $('apBtnIrVisao').addEventListener('click', () => {
         if (!ativos.length) { statusEl.textContent = 'Adicione ou cole seus ativos primeiro.'; return; }
         visaoEl.hidden = false;
