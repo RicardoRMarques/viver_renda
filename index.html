@@ -8914,15 +8914,27 @@
       // - variação do período no título e no balão;
       // - balão também pelo teclado (Tab até o gráfico e setas ← →).
       function hgDesenharGrafico(container, amostras, periodo) {
-        const larguraTotal = 640;
-        const alturaTotal = 210;
-        const margemEsq = 50;
-        const margemDir = 14;
+        // Tamanho do desenho. No computador o SVG tem 640 de largura e é
+        // esticado até a largura da coluna (os textos crescem junto). No
+        // celular isso fazia o contrário: 640 espremido em ~330px deixava os
+        // números dos eixos com uns 5px de altura. Em tela estreita o SVG
+        // passa a ter a largura REAL do espaço, então 12 no SVG = 12px na
+        // tela. hgRedesenharGraficoNoResize refaz o desenho se a largura mudar
+        // (celular girado, janela redimensionada).
+        const larguraDisponivel = Math.round(container.clientWidth || 0);
+        const estreito = larguraDisponivel > 0 && larguraDisponivel < 600;
+        const larguraTotal = estreito ? Math.max(280, larguraDisponivel) : 640;
+        const alturaTotal = estreito ? 220 : 210;
+        const fonteEixo = estreito ? 12 : 11;
+        const fonteBalao = estreito ? 12 : 9;
+        let margemEsq = 50;
+        const margemDir = estreito ? 8 : 14;
         const margemTop = 14;
-        const margemBaixo = 30;
-        const largura = larguraTotal - margemEsq - margemDir;
+        const margemBaixo = estreito ? 28 : 30;
+        let largura = larguraTotal - margemEsq - margemDir;
         const altura = alturaTotal - margemTop - margemBaixo;
-        const LARGURA_CARACTERE = 6.6; // 11px Courier New ≈ 0,6em por caractere
+        const LARGURA_CARACTERE = fonteEixo * 0.6; // Courier New ≈ 0,6em por caractere
+        container._hgUltimoDesenho = { amostras, periodo, estreito, largura: larguraDisponivel };
 
         const validas = amostras
           .map(s => ({ close: s.close, data: s.date || s.day || s.data || null }))
@@ -8938,6 +8950,9 @@
         // 48); acima disso, as casas que o passo pedir, para caber na margem.
         const casasEixo = escala.hi < 1000 ? Math.max(2, escala.casas) : escala.casas;
         const fmtEixo = v => v.toLocaleString('pt-BR', { minimumFractionDigits: casasEixo, maximumFractionDigits: casasEixo });
+        // A margem esquerda acompanha o rótulo mais comprido do eixo Y.
+        margemEsq = Math.ceil(Math.max(...escala.ticks.map(v => fmtEixo(v).length)) * LARGURA_CARACTERE) + 10;
+        largura = larguraTotal - margemEsq - margemDir;
 
         const emAlta = ultimo >= primeiro;
         const estilos = getComputedStyle(document.documentElement);
@@ -8969,7 +8984,7 @@
           const y = paraY(v);
           return `
             <line x1="${margemEsq}" y1="${y.toFixed(1)}" x2="${larguraTotal - margemDir}" y2="${y.toFixed(1)}" class="hg-grafico-grid-linha" stroke-dasharray="${k === 0 ? '0' : '2,3'}"></line>
-            <text x="${margemEsq - 6}" y="${(y + 3.5).toFixed(1)}" text-anchor="end" class="hg-grafico-eixo-label-preco">${fmtEixo(v)}</text>`;
+            <text x="${margemEsq - 6}" y="${(y + fonteEixo * 0.32).toFixed(1)}" text-anchor="end" class="hg-grafico-eixo-label-preco" style="font-size:${fonteEixo}px">${fmtEixo(v)}</text>`;
         }).join('');
 
         // Candidatos a rótulo no eixo X.
@@ -8988,7 +9003,7 @@
             candidatos.push({ x: (paraX(dia.ini) + paraX(dia.fim)) / 2, texto: hgFormatDataCurta(validas[dia.ini].data, periodo) });
           });
         } else {
-          const qtd = Math.min(6, n);
+          const qtd = Math.min(estreito ? 4 : 6, n);
           const idx = qtd <= 1 ? [0] : Array.from({ length: qtd }, (_, k) => Math.round((k / (qtd - 1)) * (n - 1)));
           [...new Set(idx)].forEach(i => candidatos.push({ x: paraX(i), texto: hgFormatDataCurta(validas[i].data, periodo) }));
         }
@@ -9012,7 +9027,7 @@
           mantidos.push(c);
         });
         const datasSvg = mantidos.map(c =>
-          `<text x="${c.cx.toFixed(1)}" y="${alturaTotal - 8}" text-anchor="middle" class="hg-grafico-eixo-label-preco">${c.texto}</text>`).join('');
+          `<text x="${c.cx.toFixed(1)}" y="${alturaTotal - 8}" text-anchor="middle" class="hg-grafico-eixo-label-preco" style="font-size:${fonteEixo}px">${c.texto}</text>`).join('');
         const divisoriasSvg = divisorias.map(x =>
           `<line x1="${x.toFixed(1)}" y1="${margemTop}" x2="${x.toFixed(1)}" y2="${base}" class="hg-grafico-grid-linha" stroke-dasharray="1,3" opacity="0.8"></line>`).join('');
 
@@ -9044,10 +9059,10 @@
               <circle r="4.5" fill="${cor}" stroke="var(--card)" stroke-width="2"></circle>
             </g>
             <g class="hg-grafico-tooltip-grupo hg-tt-caixa">
-              <rect class="hg-grafico-tooltip-caixa" rx="6" height="46"></rect>
-              <text class="hg-grafico-tooltip-texto hg-tt-preco" font-weight="700"></text>
-              <text class="hg-grafico-tooltip-texto hg-tt-var"></text>
-              <text class="hg-grafico-tooltip-texto hg-tt-data" opacity="0.75"></text>
+              <rect class="hg-grafico-tooltip-caixa" rx="6"></rect>
+              <text class="hg-grafico-tooltip-texto hg-tt-preco" font-weight="700" style="font-size:${fonteBalao}px"></text>
+              <text class="hg-grafico-tooltip-texto hg-tt-var" style="font-size:${fonteBalao}px"></text>
+              <text class="hg-grafico-tooltip-texto hg-tt-data" opacity="0.75" style="font-size:${fonteBalao}px"></text>
             </g>
 
             <rect class="hg-grafico-overlay" x="${margemEsq}" y="0" width="${largura}" height="${alturaTotal}" tabindex="0"
@@ -9081,8 +9096,10 @@
           tData.textContent = hgFormatDataTooltip(validas[i].data, periodo) || `Amostra ${i + 1}`;
 
           const maiorTexto = Math.max(tPreco.textContent.length, tVar.textContent.length, tData.textContent.length);
-          const w = Math.ceil(maiorTexto * 5.6 + 16);
-          const h = 46;
+          const linhaH = fonteBalao * 1.4;
+          const w = Math.ceil(maiorTexto * fonteBalao * 0.62 + 16);
+          const h = Math.round(linhaH * 3 + 8);
+          caixaRect.setAttribute('height', h);
           // Balão do lado oposto ao ponteiro quando está perto da borda.
           let cx = p.x + 12;
           if (cx + w > larguraTotal - margemDir) cx = p.x - 12 - w;
@@ -9092,7 +9109,7 @@
           caixaRect.setAttribute('x', cx.toFixed(2));
           caixaRect.setAttribute('y', cy.toFixed(2));
           caixaRect.setAttribute('width', w);
-          [[tPreco, 15], [tVar, 28], [tData, 40]].forEach(([el, dy]) => {
+          [[tPreco, 4 + linhaH * 0.95], [tVar, 4 + linhaH * 1.95], [tData, 4 + linhaH * 2.95]].forEach(([el, dy]) => {
             el.setAttribute('x', (cx + 8).toFixed(2));
             el.setAttribute('y', (cy + dy).toFixed(2));
           });
@@ -9128,6 +9145,23 @@
           else if (e.key === 'Escape') { esconder(); }
         });
       }
+
+      // Celular girado / janela redimensionada: redesenha com as amostras que
+      // já estão na tela (sem buscar de novo) quando a largura mudar de fato.
+      let hgResizeTimer = null;
+      window.addEventListener('resize', () => {
+        clearTimeout(hgResizeTimer);
+        hgResizeTimer = setTimeout(() => {
+          const c = document.getElementById('hgGrafico');
+          const u = c && c._hgUltimoDesenho;
+          if (!u) return;
+          const agora = Math.round(c.clientWidth || 0);
+          const estreitoAgora = agora > 0 && agora < 600;
+          if (estreitoAgora !== u.estreito || (estreitoAgora && Math.abs(agora - u.largura) > 8)) {
+            hgDesenharGrafico(c, u.amostras, u.periodo);
+          }
+        }, 150);
+      });
 
       btnBuscar.addEventListener('click', hgBuscarAtivo);
       inputTicker.addEventListener('keydown', (e) => { if (e.key === 'Enter') hgBuscarAtivo(); });
