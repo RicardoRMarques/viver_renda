@@ -875,14 +875,19 @@ def anexar_codigo_cvm(acoes):
     except Exception as e:  # noqa: BLE001
         log(f"  Código CVM: B3 falhou ({e}); mantendo os do arquivo anterior.")
         codigos = {}
-    com = 0
+    com, sem = 0, []
     for a in acoes:
         ticker = str(a.get("ticker") or "").upper()
         codigo = codigos.get(ticker[:4]) or anteriores.get(ticker)
         if codigo:
             a["codigo_cvm"] = codigo
             com += 1
+        else:
+            sem.append(ticker)
     log(f"  Código CVM em {com} de {len(acoes)} ações")
+    if sem:
+        # Sem código, o botão "Balanços (B3)" não aparece para essas ações.
+        log(f"  Sem código CVM ({len(sem)}): {', '.join(sorted(sem))}")
     return acoes
 
 
