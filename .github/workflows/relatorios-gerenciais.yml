@@ -1,0 +1,87 @@
+name: Relatórios Gerenciais dos FIIs (Fundos.NET)
+
+on:
+  schedule:
+    # Uma vez por dia útil é suficiente: relatório gerencial é mensal. O
+    # robô só consulta de novo quem publicou há mais de 20 dias, então a
+    # rodada diária é curta. 10h37 de Brasília: depois da manhã, quando a
+    # maioria das gestoras já entregou o documento do dia anterior.
+    # Minuto não-redondo de propósito (fila do Actions).
+    - cron: '37 10 * * 1-5'
+      timezone: 'America/Sao_Paulo'
+  workflow_dispatch:
+    inputs:
+      tudo:
+        description: 'Consultar todos os fundos (ignora a folga de 20 dias)'
+        type: boolean
+        default: false
+      tickers:
+        description: 'Só estes tickers, separados por vírgula (vazio = todos)'
+        type: string
+        default: ''
+      diagnostico:
+        description: 'Mostrar no log a primeira linha crua de cada fundo'
+        type: boolean
+        default: false
+
+concurrency:
+  group: relatorios-gerenciais
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      # Mesmo motivo dos outros robôs: em `schedule` o checkout fica no SHA
+      # de quando a execução foi CRIADA. Este robô LÊ o mercado-fiis.json
+      # (é de lá que vem o CNPJ de cada fundo), então precisa da versão
+      # mais nova dele.
+      - name: Sincronizar com o topo do main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Instalar dependências
+        run: pip install --upgrade requests
+
+      - name: Buscar os relatórios gerenciais
+        env:
+          TUDO: ${{ github.event.inputs.tudo }}
+          TICKERS: ${{ github.event.inputs.tickers }}
+          DIAG: ${{ github.event.inputs.diagnostico }}
+        run: |
+          ARGS=""
+          [ "$TUDO" = "true" ] && ARGS="$ARGS --tudo"
+          [ "$DIAG" = "true" ] && ARGS="$ARGS --diagnostico"
+          [ -n "$TICKERS" ] && ARGS="$ARGS --tickers $TICKERS"
+          python coletar_relatorios_gerenciais.py $ARGS
+
+      - name: Commitar e enviar
+        run: |
+          git config user.name "robo-relatorios"
+          git config user.email "robo-relatorios@users.noreply.github.com"
+          git add data/relatorios-gerenciais.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Nenhum relatório gerencial novo hoje."
+          else
+            git commit -m "Relatórios gerenciais: links atualizados $(date -u -d '-3 hours' '+%d-%m-%Y')"
+            for tentativa in 1 2 3; do
+              git pull --rebase origin main && git push && break
+              echo "Tentativa $tentativa falhou, aguardando..."
+              git rebase --abort 2>/dev/null || true
+              sleep $((tentativa * 5))
+            done
+          fi
