@@ -2022,6 +2022,12 @@
     }
     .hg-periodo-tab:hover { border-color: var(--primary); color: var(--primary); }
     .hg-periodo-tab.hg-periodo-ativo { background: var(--primary); border-color: var(--primary); color: var(--btn-text); }
+    /* Botões de abrir/fechar do cartão (histórico de dividendos, Análise
+       Fundamentalista, comparador): o que está ABERTO fica em destaque, no
+       mesmo azul do "1 ano"/"30D" selecionado — dá para ver de relance
+       qual painel está aberto embaixo. */
+    .hg-btn-secundario-pequeno.hg-btn-ativo,
+    .hg-btn-secundario-pequeno.hg-btn-ativo:hover { background: var(--primary); border-color: var(--primary); color: var(--btn-text); }
     .hg-grafico-periodo-valor { font-family: "Courier New", monospace; font-size: 0.72rem; }
     .hg-grafico-box svg { width: 100%; height: auto; max-height: 300px; display: block; overflow: visible; }
     #hgDividendosConteudo svg { max-height: 220px; }
@@ -8108,6 +8114,7 @@
           tabsEl.style.display = aberto ? '' : 'none';
           conteudoEl.style.display = aberto ? '' : 'none';
           btnToggle.textContent = aberto ? '✕ Fechar histórico de dividendos' : '📊 Ver histórico de dividendos';
+          btnToggle.classList.toggle('hg-btn-ativo', aberto);
           if (aberto && !jaCarregou) {
             jaCarregou = true;
             await hgCarregarDividendos(a.symbol, a.currency, 1); // padrão: 1 ano
@@ -8140,6 +8147,7 @@
           btnFundInline.textContent = fundInlineAberto
             ? '✕ Fechar Análise Fundamentalista'
             : '📊 Ver Análise Fundamentalista completa';
+          btnFundInline.classList.toggle('hg-btn-ativo', fundInlineAberto);
 
           if (fundInlineAberto && !fundInlineJaCarregou) {
             fundInlineJaCarregou = true;
@@ -8166,6 +8174,7 @@
           compararAberto = !compararAberto;
           wrapComparar.style.display = compararAberto ? '' : 'none';
           btnComparar.textContent = compararAberto ? '✕ Fechar comparador' : '⚖️ Comparar com outros ativos';
+          btnComparar.classList.toggle('hg-btn-ativo', compararAberto);
           if (compararAberto) inputComparar?.focus({ preventScroll: true });
           hgSegurarRolagem(scrollAntes);
         });
