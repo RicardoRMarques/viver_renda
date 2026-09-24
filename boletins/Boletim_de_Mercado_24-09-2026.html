@@ -101,17 +101,6 @@
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
-  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .section-com-lyket [data-lyket-type]{
-    font-size:12px;
-    background:#f2f2f2;
-    border-radius:20px;
-    padding:4px 10px;
-    display:inline-flex;
-    align-items:center;
-    box-shadow:0 1px 4px rgba(0,0,0,0.35);
-  }
-  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
   .grupo-whatsapp-card{
     display:flex;align-items:center;gap:12px;margin-top:12px;
     background:var(--card);border:1px solid var(--card-border);border-radius:12px;
@@ -124,7 +113,6 @@
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
-<script src="https://unpkg.com/@lyket/widget@latest/dist/lyket.js?apiKey=pt_d2c19f94733791f2b25c44987dd17e"></script>
 </head>
 <body>
 <div class="wrap">
@@ -139,13 +127,10 @@
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
-  <div class="sub">Boletim de Mercado · Segunda-feira, 24 de Agosto de 2026</div>
+  <div class="sub">Boletim de Mercado · Quinta-feira, 24 de Setembro de 2026</div>
 </header>
 
-<h2 class="section section-com-lyket">
-  <span>Indicadores Principais</span>
-  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-24-08-2026"></div>
-</h2>
+<h2 class="section">Indicadores Principais</h2>
 
 <a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
   <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
@@ -156,25 +141,25 @@
 </a>
 
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value up">170.448,88 pts ▲ 1.50%</div></div>
-  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.682,02 pts ▲ 0.95%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value down">R$ 5,16 ▼ 0.46%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value down">R$ 6,03 ▼ 0.41%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">US$ 77.082,00 ▲ 0.74%</div></div>
-  <div class="indicator"><div class="label">Ethereum</div><div class="value up">US$ 2.451,05 ▲ 1.39%</div></div>
-  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">14,00% a.a.</div></div>
-  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,90% a.a.</div></div>
-  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,44%</div></div>
-  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-1,16%</div></div>
+  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value down">185.814,10 pts ▼ 0.86%</div></div>
+  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value down">3.732,49 pts ▼ 0.37%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,14 ▲ 0.49%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,86 ▲ 0.15%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 83.831,00 ▼ 2.72%</div></div>
+  <div class="indicator"><div class="label">Ethereum</div><div class="value down">US$ 2.672,23 ▼ 2.66%</div></div>
+  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">13,75% a.a.</div></div>
+  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,65% a.a.</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,22%</div></div>
+  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-0,22%</div></div>
 </div>
 
 
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEE850IL_M.jpg" alt="Indonésia - Ações fecharam o pregão em queda e o Índice IDX Composite recuou 0,57%" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/indonesia--acoes-fecharam-o-pregao-em-queda-e-o-indice-idx-composite-recuou-057-2047295" target="_blank" rel="noopener noreferrer" class="tk-link">Indonésia - Ações fecharam o pregão em queda e o Índice IDX Composite recuou 0,57%</a></span><span class="pct">Investing.com (Ações)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEC0Q0MJ_M.jpg" alt="Por que as ações da Tracsis estão disparando hoje?" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-tracsis-estao-disparando-hoje-93CH-2047293" target="_blank" rel="noopener noreferrer" class="tk-link">Por que as ações da Tracsis estão disparando hoje?</a></span><span class="pct">Investing.com (Ações)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEC9R0ID_M.jpg" alt="Ações da Cellnex e INWIT sobem após upgrade do Barclays" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/acoes-da-cellnex-e-inwit-sobem-apos-upgrade-do-barclays-2047291" target="_blank" rel="noopener noreferrer" class="tk-link">Ações da Cellnex e INWIT sobem após upgrade do Barclays</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEBBR0PM_M.jpg" alt="Banco central da Noruega eleva taxa de juros para 4,50%" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/banco-central-da-noruega-eleva-taxa-de-juros-para-450-93CH-2073872" target="_blank" rel="noopener noreferrer" class="tk-link">Banco central da Noruega eleva taxa de juros para 4,50%</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEM5F12L_1200_L.jpg" alt="Cúpula Trump-Xi e venda de títulos em foco: o que move os mercados" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/cupula-trumpxi-em-foco-venda-de-titulos-agita-os-mercados-2073859" target="_blank" rel="noopener noreferrer" class="tk-link">Cúpula Trump-Xi e venda de títulos em foco: o que move os mercados</a></span><span class="pct">Investing.com (Economia)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEC0D0AP_S.jpg" alt="Ações da Energa disparam 37% após ORLEN anunciar compra de minoritários" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/acoes-da-energa-disparam-37-apos-orlen-anunciar-compra-de-minoritarios-93CH-2073869" target="_blank" rel="noopener noreferrer" class="tk-link">Ações da Energa disparam 37% após ORLEN anunciar compra de minoritários</a></span><span class="pct">Investing.com (Ações)</span></div>
 </div>
 
 <h2 class="section">FIIs - Maiores Dividend Yield</h2>
@@ -183,39 +168,39 @@
   
   <tr>
     <td class="name">XPCA11</td>
-    <td>18.21%</td>
-    <td>R$ 7.14</td>
+    <td>17.29%</td>
+    <td>R$ 7.46</td>
     <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
     <td class="name">IRIM11</td>
-    <td>16.55%</td>
-    <td>R$ 60.73</td>
+    <td>16.75%</td>
+    <td>R$ 60.18</td>
     <td class="rationale">FII Irim</td>
   </tr>
   <tr>
     <td class="name">TRXF11</td>
-    <td>16.46%</td>
-    <td>R$ 71.70</td>
+    <td>15.95%</td>
+    <td>R$ 73.98</td>
     <td class="rationale">FII Trx Real</td>
   </tr>
   <tr>
     <td class="name">VGIR11</td>
-    <td>16.00%</td>
-    <td>R$ 9.44</td>
+    <td>15.73%</td>
+    <td>R$ 9.60</td>
     <td class="rationale">FII Valreiii</td>
   </tr>
   <tr>
-    <td class="name">CPTS11</td>
-    <td>14.57%</td>
-    <td>R$ 7.38</td>
-    <td class="rationale">FII Capi Sec</td>
+    <td class="name">RECR11</td>
+    <td>14.62%</td>
+    <td>R$ 74.15</td>
+    <td class="rationale">FII Rec Rece</td>
   </tr>
   <tr>
-    <td class="name">RECR11</td>
-    <td>14.43%</td>
-    <td>R$ 75.44</td>
-    <td class="rationale">FII Rec Rece</td>
+    <td class="name">BTHF11</td>
+    <td>13.92%</td>
+    <td>R$ 8.55</td>
+    <td class="rationale">FII BTHF</td>
   </tr>
 </table>
 
@@ -224,65 +209,65 @@
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
-    <td class="name">SBSP3</td>
-    <td>14.61%</td>
-    <td>R$ 23.80</td>
-    <td class="rationale">Sabesp</td>
-  </tr>
-  <tr>
-    <td class="name">CMIG4</td>
-    <td>12.70%</td>
-    <td>R$ 10.09</td>
-    <td class="rationale">CEMIG</td>
-  </tr>
-  <tr>
     <td class="name">BBSE3</td>
-    <td>12.36%</td>
-    <td>R$ 37.15</td>
+    <td>11.82%</td>
+    <td>R$ 38.83</td>
     <td class="rationale">BB Seguridade</td>
   </tr>
   <tr>
+    <td class="name">CMIG4</td>
+    <td>11.56%</td>
+    <td>R$ 11.08</td>
+    <td class="rationale">CEMIG</td>
+  </tr>
+  <tr>
     <td class="name">ALOS3</td>
-    <td>10.87%</td>
-    <td>R$ 26.08</td>
+    <td>10.57%</td>
+    <td>R$ 29.59</td>
     <td class="rationale">ALLOS</td>
   </tr>
   <tr>
     <td class="name">BBDC4</td>
-    <td>9.57%</td>
-    <td>R$ 16.24</td>
+    <td>8.44%</td>
+    <td>R$ 18.42</td>
     <td class="rationale">Banco Bradesco</td>
   </tr>
   <tr>
-    <td class="name">ITUB4</td>
-    <td>8.21%</td>
-    <td>R$ 38.55</td>
-    <td class="rationale">Banco Itaú Unibanco</td>
+    <td class="name">VALE3</td>
+    <td>7.78%</td>
+    <td>R$ 72.12</td>
+    <td class="rationale">Vale</td>
+  </tr>
+  <tr>
+    <td class="name">PETR4</td>
+    <td>7.38%</td>
+    <td>R$ 49.54</td>
+    <td class="rationale">Petrobras</td>
   </tr>
 </table>
 
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/VENEZUELA-ABANDONING-THE-BOLIVAR-AND-ADOPTING-THE-US-DOLLAR-WOULD-BE-THE-BIGGEST-CURRENCY-SWITCH-SINCE-THE-ADVENT-OF-THE-EURO-HANKE-SAYS.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Venezuela pode abandonar bolívar pelo dólar na maior troca de moeda desde o euro" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/04/tufao-el-nino.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Super El Niño: como o fenômeno vai afetar PIB, logística e custo dos alimentos" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/business/global/venezuela-pode-abandonar-bolivar-pelo-dolar-na-maior-troca-de-moeda-desde-o-euro/" target="_blank" rel="noopener noreferrer" class="n-link">1. Venezuela pode abandonar bolívar pelo dólar na maior troca de moeda desde o euro</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/economia/impactos-super-el-nino-economia-agronegocio-brasil/" target="_blank" rel="noopener noreferrer" class="n-link">1. Super El Niño: como o fenômeno vai afetar PIB, logística e custo dos alimentos</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2019/07/dinheiro-reais.jpg?fit=300%2C225&amp;quality=70&amp;strip=all" alt="Recessão a caminho? O que fazer com seu dinheiro se o temor do mercado se confirmar" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/09/mitri_britto_rec_red.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Tivit separa cheque de R$ 1 bilhão para ciclo de aquisições em tecnologia" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/onde-investir/recessao-a-caminho-o-que-fazer-com-seu-dinheiro-se-temor-do-mercado-se-concretizar/" target="_blank" rel="noopener noreferrer" class="n-link">2. Recessão a caminho? O que fazer com seu dinheiro se o temor do mercado se confirmar</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/business/tivit-separa-cheque-de-r-1-bilhao-para-ciclo-de-aquisicoes-em-tecnologia/" target="_blank" rel="noopener noreferrer" class="n-link">2. Tivit separa cheque de R$ 1 bilhão para ciclo de aquisições em tecnologia</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/02/eleicao_sp_09.webp?fit=300%2C225&amp;quality=70&amp;strip=all" alt="IA amplia escala das campanhas, mas não é atalho para vencer eleição, diz cientista" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/eleicoes2026-pesquisa-lula-flavio-01.jpg?fit=300%2C193&amp;quality=70&amp;strip=all" alt="Lula versus Flávio Bolsonaro: quais ações devem ganhar em cada cenário das eleições?" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/politica/ia-sera-ferramenta-de-escala-mas-nao-atalho-para-vencer-eleicao-avalia-cientista/" target="_blank" rel="noopener noreferrer" class="n-link">3. IA amplia escala das campanhas, mas não é atalho para vencer eleição, diz cientista</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/lula-versus-flavio-bolsonaro-quais-acoes-devem-ganhar-em-cada-cenario-das-eleicoes/" target="_blank" rel="noopener noreferrer" class="n-link">3. Lula versus Flávio Bolsonaro: quais ações devem ganhar em cada cenário das eleições?</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
