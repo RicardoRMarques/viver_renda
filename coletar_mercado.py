@@ -508,6 +508,14 @@ def enriquecer_fiis_com_quotes(fiis):
             if not registro:
                 continue
             registro["nome"] = resultado.get("name") or simbolo
+            # CNPJ do fundo: vem de graça nesta mesma resposta (campo tax_id,
+            # o mesmo que a Consulta Rápida do site já usa). O robô dos
+            # relatórios gerenciais (coletar_relatorios_gerenciais.py) precisa
+            # dele para pedir ao Fundos.NET os documentos DE CADA FUNDO — a
+            # busca geral do Fundos.NET devolve o campo cnpjFundo sempre vazio.
+            cnpj = _so_digitos(resultado.get("tax_id"))
+            if len(cnpj) == 14:
+                registro["cnpj"] = cnpj
             quote = resultado.get("quote") or {}
             # Preço já veio do Fundamentus (mais fresco, é o request mais
             # recente) — só usa o da HG se por algum motivo o Fundamentus
