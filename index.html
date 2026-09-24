@@ -1884,12 +1884,10 @@
     }
     .hg-btn-secundario-pequeno:hover { color: var(--primary); border-color: var(--primary); }
     .hg-btn-secundario-pequeno.copiado { color: var(--accent); border-color: var(--accent); }
-    /* Relatório gerencial com link direto: destaque na cor do site, porque
-       é o documento que a pessoa veio buscar. Sem link (lista oficial do
-       fundo), fica com a cara dos outros botões pequenos. */
-    .hg-btn-relatorio.hg-btn-relatorio-ok { color: var(--primary); border-color: var(--primary); }
-    .hg-btn-relatorio.hg-btn-relatorio-ok:hover { background: var(--primary); color: #fff; }
-    .hg-btn-relatorio-mes { font-weight: 500; opacity: 0.85; }
+    /* Relatórios gerenciais: destaque na cor do site — é o documento que a
+       pessoa mais procura no cartão de um FII. */
+    .hg-btn-relatorio { color: var(--primary); border-color: var(--primary); }
+    .hg-btn-relatorio:hover { background: var(--primary); color: #fff; }
     button.hg-btn-secundario-pequeno svg, a.hg-btn-secundario-pequeno svg { width: 13px; height: 13px; flex-shrink: 0; max-height: none; }
     /* Botões lado a lado (ex: "Ver histórico de dividendos" + atalho pra
        Análise Fundamentalista), quebrando linha em telas estreitas. */
@@ -7774,72 +7772,27 @@
 
       // ------------------------------------------------------------
       // Relatório gerencial (FII/Fiagro)
-      // O robô coletar_relatorios_gerenciais.py grava, para cada fundo, o
-      // link do ÚLTIMO relatório gerencial no Fundos.NET — só o tipo
-      // "Relatório Gerencial"; fato relevante, oferta pública e informes
-      // ficam de fora. Antes o botão abria a lista inteira de documentos do
-      // fundo e a pessoa tinha de garimpar o relatório no meio deles.
-      // Sem link no arquivo (fundo que publica com outro tipo, CNPJ que não
-      // veio, arquivo fora do ar), o botão continua abrindo a lista oficial
-      // do fundo — e diz isso no rótulo, em vez de fingir que é o relatório.
+      // Abre a lista oficial do Fundos.NET JÁ FILTRADA em Relatórios >
+      // Relatório Gerencial (idCategoriaDocumento=7, idTipoDocumento=9):
+      // aparecem só os relatórios gerenciais do fundo, o mais recente no
+      // topo — nada de fato relevante, oferta pública ou informe. Conferido
+      // pelo Ricardo no navegador em 23/09/2026 com o HGLG11.
+      // Antes o botão abria a lista INTEIRA de documentos do fundo.
+      // Um robô para dar o link direto do PDF foi tentado e abandonado: o
+      // Fundos.NET não responde aos servidores do GitHub Actions e a API de
+      // documentos da B3 devolve lista vazia para FII (ver o doc
+      // claude/relatorios-gerenciais.md do projeto).
       // ------------------------------------------------------------
-      let hgRelGerenciaisPromessa = null;
-      function hgCarregarRelatoriosGerenciais() {
-        if (!hgRelGerenciaisPromessa) {
-          hgRelGerenciaisPromessa = fetch('data/relatorios-gerenciais.json', { cache: 'no-store' })
-            .then(r => (r.ok ? r.json() : null))
-            .then(d => (d && d.relatorios) || {})
-            .catch(e => { console.warn('Relatórios gerenciais: não consegui ler data/relatorios-gerenciais.json', e); return {}; });
-        }
-        return hgRelGerenciaisPromessa;
-      }
-      const HG_MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-      function hgMesAno(textoMmAaaa) {
-        const m = /^(\d{2})\/(\d{4})$/.exec(textoMmAaaa || '');
-        return m ? `${HG_MESES_CURTOS[Number(m[1]) - 1]}/${m[2]}` : '';
-      }
-      function hgDataBr(iso) {
-        const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '');
-        return m ? `${m[3]}/${m[2]}/${m[1]}` : '';
-      }
       const HG_ICONE_DOC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>';
-      function hgLinkDocumentosFundo(cnpj) {
-        // Os parâmetros de categoria/tipo pedem ao Fundos.NET a lista já
-        // filtrada em Relatórios > Relatório Gerencial.
-        return `https://fnet.bmfbovespa.com.br/fnet/publico/abrirGerenciadorDocumentosCVM?cnpjFundo=${cnpj}&idCategoriaDocumento=7&idTipoDocumento=9`;
-      }
-      // Estado inicial do botão (antes de o JSON chegar): o link oficial
-      // da lista do fundo. hgAtualizarBotaoRelatorio troca pelo PDF direto.
       function hgBotaoRelatorioGerencial(a) {
-        const ticker = (a.symbol || '').replace('B3:', '').toUpperCase();
         const cnpj = String(a.tax_id || '').replace(/\D/g, '');
+        if (cnpj.length !== 14) return '';
+        const url = `https://fnet.bmfbovespa.com.br/fnet/publico/abrirGerenciadorDocumentosCVM?cnpjFundo=${cnpj}&idCategoriaDocumento=7&idTipoDocumento=9`;
         return `
-                <a class="hg-btn-secundario-pequeno hg-btn-relatorio" id="hgBtnRelatorio" data-ticker="${ticker}" data-cnpj="${cnpj}"
-                   href="${hgLinkDocumentosFundo(cnpj)}" target="_blank" rel="noopener noreferrer"
-                   title="Documentos oficiais do fundo no Fundos.NET (B3/CVM)">
-                  ${HG_ICONE_DOC}<span>Documentos do fundo (B3/CVM)</span>
+                <a class="hg-btn-secundario-pequeno hg-btn-relatorio" id="hgBtnRelatorio" href="${url}" target="_blank" rel="noopener noreferrer"
+                   title="Lista oficial no Fundos.NET (B3/CVM) só com os relatórios gerenciais do fundo — o mais recente fica no topo">
+                  ${HG_ICONE_DOC}<span>Relatórios gerenciais (B3/CVM)</span>
                 </a>`;
-      }
-      async function hgAtualizarBotaoRelatorio() {
-        const btn = document.getElementById('hgBtnRelatorio');
-        if (!btn) return;
-        const ticker = btn.dataset.ticker;
-        const cnpj = btn.dataset.cnpj;
-        const lista = await hgCarregarRelatoriosGerenciais();
-        const r = lista[ticker];
-        // O cartão pode ter sido trocado por outra consulta enquanto o JSON
-        // carregava — só mexe se o botão ainda for do mesmo ativo.
-        const atual = document.getElementById('hgBtnRelatorio');
-        if (!atual || atual !== btn || atual.dataset.ticker !== ticker) return;
-        // CNPJ diferente = o ticker mudou de fundo ou o arquivo está velho:
-        // melhor a lista oficial do que o relatório de outro fundo.
-        if (!r || !r.url || (cnpj && r.cnpj && r.cnpj !== cnpj)) return;
-        const mes = hgMesAno(r.referencia_texto);
-        const entregue = hgDataBr(r.entregue_em);
-        btn.href = r.url;
-        btn.classList.add('hg-btn-relatorio-ok');
-        btn.title = `Relatório gerencial${mes ? ' de ' + mes : ''}${entregue ? ', entregue em ' + entregue : ''} — abre o PDF oficial no Fundos.NET (B3)`;
-        btn.innerHTML = `${HG_ICONE_DOC}<span>Relatório gerencial${mes ? ` <span class="hg-btn-relatorio-mes">· ${mes}</span>` : ''}</span>`;
       }
 
       function hgRenderizarAtivo(a) {
@@ -8007,8 +7960,6 @@
             ` : ''}
           </div>
         `;
-
-        hgAtualizarBotaoRelatorio();
 
         resultadoEl.querySelectorAll('.hg-chip').forEach(chip => {
           chip.addEventListener('click', () => {
