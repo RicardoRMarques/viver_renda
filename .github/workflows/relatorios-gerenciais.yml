@@ -23,6 +23,10 @@ on:
         description: 'Mostrar no log a primeira linha crua de cada fundo'
         type: boolean
         default: false
+      sondar:
+        description: 'Só testar as rotas da API da B3 com o HGLG11 (não grava nada)'
+        type: boolean
+        default: false
 
 concurrency:
   group: relatorios-gerenciais
@@ -62,10 +66,12 @@ jobs:
           TUDO: ${{ github.event.inputs.tudo }}
           TICKERS: ${{ github.event.inputs.tickers }}
           DIAG: ${{ github.event.inputs.diagnostico }}
+          SONDAR: ${{ github.event.inputs.sondar }}
         run: |
           ARGS=""
           [ "$TUDO" = "true" ] && ARGS="$ARGS --tudo"
           [ "$DIAG" = "true" ] && ARGS="$ARGS --diagnostico"
+          [ "$SONDAR" = "true" ] && ARGS="$ARGS --sondar"
           [ -n "$TICKERS" ] && ARGS="$ARGS --tickers $TICKERS"
           python coletar_relatorios_gerenciais.py $ARGS
 
