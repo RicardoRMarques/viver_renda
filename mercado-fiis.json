@@ -1,38 +1,41 @@
 {
-  "atualizado_em": "2026-09-23T12:43:52.629629+00:00",
+  "atualizado_em": "2026-09-24T01:42:04.448909+00:00",
   "ativos": [
     {
       "ticker": "AAZQ11",
       "nome": "Fiagro Aazq",
       "segmento": "Papel",
       "dy_pct": 0.0,
-      "pvp": 0.77,
-      "patrimonio_liquido": 159127000.0,
-      "preco": 6.62,
+      "pvp": 0.76,
+      "patrimonio_liquido": 157444000.0,
+      "preco": 6.55,
       "logo": null,
-      "variacao_dia_pct": -0.1508
+      "cnpj": "44625826000111",
+      "variacao_dia_pct": -1.0574
     },
     {
       "ticker": "ABCP11",
       "nome": "FII Abc Imobiliario",
       "segmento": "Tijolo",
-      "dy_pct": 9.2,
-      "pvp": 0.7,
-      "patrimonio_liquido": 362929000.0,
-      "preco": 77.07,
+      "dy_pct": 8.87,
+      "pvp": 0.72,
+      "patrimonio_liquido": 376727000.0,
+      "preco": 80.0,
       "logo": null,
-      "variacao_dia_pct": 1.1949
+      "cnpj": "01201140000190",
+      "variacao_dia_pct": 3.8017
     },
     {
       "ticker": "ADSH11",
       "nome": "FII ADSH",
       "segmento": "Outros",
-      "dy_pct": 2.0,
-      "pvp": 1.08,
-      "patrimonio_liquido": 502602000.0,
-      "preco": 10.7,
+      "dy_pct": 2.08,
+      "pvp": 1.04,
+      "patrimonio_liquido": 483813000.0,
+      "preco": 10.3,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "63375304000153",
+      "variacao_dia_pct": -3.7383
     },
     {
       "ticker": "AEFI11",
@@ -53,6 +56,7 @@
       "patrimonio_liquido": 62732400.0,
       "preco": 100.01,
       "logo": null,
+      "cnpj": "57927297000152",
       "variacao_dia_pct": 0.0
     },
     {
@@ -69,23 +73,25 @@
       "ticker": "AFHF11",
       "nome": "FII AFHF",
       "segmento": "Outros",
-      "dy_pct": 16.76,
+      "dy_pct": 16.69,
       "pvp": 1.0,
-      "patrimonio_liquido": 50900000.0,
-      "preco": 10.18,
+      "patrimonio_liquido": 51100000.0,
+      "preco": 10.22,
       "logo": null,
-      "variacao_dia_pct": -0.4888
+      "cnpj": "60077386000161",
+      "variacao_dia_pct": 0.3929
     },
     {
       "ticker": "AFHI11",
       "nome": "FII Afhi Cri",
       "segmento": "Papel",
-      "dy_pct": 12.65,
+      "dy_pct": 12.66,
       "pvp": 0.99,
-      "patrimonio_liquido": 498047000.0,
-      "preco": 94.17,
+      "patrimonio_liquido": 497677000.0,
+      "preco": 94.1,
       "logo": null,
-      "variacao_dia_pct": 0.0744
+      "cnpj": "36642293000158",
+      "variacao_dia_pct": -0.0743
     },
     {
       "ticker": "AFOF11",
@@ -113,32 +119,35 @@
       "segmento": "Papel",
       "dy_pct": 1.27,
       "pvp": 0.74,
-      "patrimonio_liquido": 139824000.0,
-      "preco": 7.81,
+      "patrimonio_liquido": 139645000.0,
+      "preco": 7.8,
       "logo": null,
-      "variacao_dia_pct": 0.1282
+      "cnpj": "43951911000107",
+      "variacao_dia_pct": -0.128
     },
     {
       "ticker": "AIEC11",
       "nome": "FII Autonomy",
       "segmento": "Tijolo",
-      "dy_pct": 6.16,
+      "dy_pct": 6.15,
       "pvp": 0.9,
-      "patrimonio_liquido": 327375000.0,
-      "preco": 67.85,
+      "patrimonio_liquido": 328099000.0,
+      "preco": 68.0,
       "logo": null,
-      "variacao_dia_pct": 0.1624
+      "cnpj": "35765826000126",
+      "variacao_dia_pct": 0.2211
     },
     {
       "ticker": "AJFI11",
       "nome": "FII Aj Malls",
       "segmento": "Tijolo",
-      "dy_pct": 7.36,
+      "dy_pct": 7.32,
       "pvp": 0.79,
-      "patrimonio_liquido": 276069000.0,
-      "preco": 8.21,
+      "patrimonio_liquido": 277414000.0,
+      "preco": 8.25,
       "logo": null,
-      "variacao_dia_pct": -0.7255
+      "cnpj": "51472985000199",
+      "variacao_dia_pct": 0.4872
     },
     {
       "ticker": "ALMI11",
@@ -147,20 +156,22 @@
       "dy_pct": 6.03,
       "pvp": 0.3,
       "patrimonio_liquido": 69263300.0,
-      "preco": 626.97,
+      "preco": 623.0,
       "logo": null,
-      "variacao_dia_pct": 0.6389
+      "cnpj": "07122725000100",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "ALZC11",
       "nome": "FII Alianzac",
       "segmento": "Papel",
-      "dy_pct": 16.15,
+      "dy_pct": 16.19,
       "pvp": 0.83,
-      "patrimonio_liquido": 207319000.0,
-      "preco": 7.34,
+      "patrimonio_liquido": 206755000.0,
+      "preco": 7.39,
       "logo": null,
-      "variacao_dia_pct": -0.1361
+      "cnpj": "40011324000140",
+      "variacao_dia_pct": 0.6812
     },
     {
       "ticker": "ALZM11",
@@ -176,12 +187,13 @@
       "ticker": "ALZR11",
       "nome": "FII Alianza",
       "segmento": "Outros",
-      "dy_pct": 10.07,
+      "dy_pct": 10.1,
       "pvp": 0.92,
-      "patrimonio_liquido": 1625920000.0,
-      "preco": 9.88,
+      "patrimonio_liquido": 1620990000.0,
+      "preco": 9.86,
       "logo": null,
-      "variacao_dia_pct": -0.202
+      "cnpj": "28737771000185",
+      "variacao_dia_pct": -0.3033
     },
     {
       "ticker": "ALZT11",
@@ -202,29 +214,32 @@
       "patrimonio_liquido": 9681310000.0,
       "preco": 270.0,
       "logo": null,
+      "cnpj": "07789135000127",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "APTO11",
       "nome": "FII Navi Rsd",
       "segmento": "Outros",
-      "dy_pct": 13.19,
-      "pvp": 0.8,
-      "patrimonio_liquido": 36667200.0,
-      "preco": 7.95,
+      "dy_pct": 13.1,
+      "pvp": 0.81,
+      "patrimonio_liquido": 36897800.0,
+      "preco": 8.0,
       "logo": null,
-      "variacao_dia_pct": -0.5006
+      "cnpj": "42432327000182",
+      "variacao_dia_pct": 0.6289
     },
     {
       "ticker": "APXM11",
       "nome": "FII Apex Ms",
       "segmento": "Tijolo",
-      "dy_pct": 8.77,
-      "pvp": 0.42,
-      "patrimonio_liquido": 150114000.0,
-      "preco": 55.02,
+      "dy_pct": 9.31,
+      "pvp": 0.4,
+      "patrimonio_liquido": 141457000.0,
+      "preco": 50.0,
       "logo": null,
-      "variacao_dia_pct": -6.6667
+      "cnpj": "43010485000107",
+      "variacao_dia_pct": -5.7671
     },
     {
       "ticker": "AQPA11",
@@ -235,6 +250,7 @@
       "patrimonio_liquido": 750000000.0,
       "preco": 1.0,
       "logo": null,
+      "cnpj": "67254758000127",
       "variacao_dia_pct": 0.4319
     },
     {
@@ -251,45 +267,49 @@
       "ticker": "AROA11",
       "nome": "FII Aroa",
       "segmento": "Outros",
-      "dy_pct": 7.89,
-      "pvp": 1.2,
-      "patrimonio_liquido": 189757000.0,
-      "preco": 1.13,
+      "dy_pct": 7.82,
+      "pvp": 1.21,
+      "patrimonio_liquido": 191437000.0,
+      "preco": 1.14,
       "logo": null,
-      "variacao_dia_pct": -0.88
+      "cnpj": "44674528000111",
+      "variacao_dia_pct": 0.885
     },
     {
       "ticker": "ARRI11",
       "nome": "FII Atrio",
       "segmento": "Papel",
-      "dy_pct": 19.43,
-      "pvp": 0.56,
-      "patrimonio_liquido": 98867700.0,
-      "preco": 4.77,
+      "dy_pct": 19.23,
+      "pvp": 0.57,
+      "patrimonio_liquido": 99904000.0,
+      "preco": 4.82,
       "logo": null,
-      "variacao_dia_pct": 1.2739
+      "cnpj": "32006821000121",
+      "variacao_dia_pct": 1.0482
     },
     {
       "ticker": "ARTE11",
       "nome": "FII ARTE",
       "segmento": "Outros",
-      "dy_pct": 10.59,
-      "pvp": 0.64,
-      "patrimonio_liquido": 61842700.0,
-      "preco": 6.51,
+      "dy_pct": 9.85,
+      "pvp": 0.68,
+      "patrimonio_liquido": 66497500.0,
+      "preco": 7.0,
       "logo": null,
-      "variacao_dia_pct": -7.0
+      "cnpj": "53193237000100",
+      "variacao_dia_pct": 7.5269
     },
     {
       "ticker": "ARXD11",
       "nome": "FII Arxd R",
       "segmento": "Papel",
-      "dy_pct": 14.0,
-      "pvp": 0.85,
-      "patrimonio_liquido": 66512700.0,
-      "preco": 7.76,
+      "dy_pct": 14.11,
+      "pvp": 0.84,
+      "patrimonio_liquido": 65998500.0,
+      "preco": 7.7,
       "logo": null,
-      "variacao_dia_pct": 0.129
+      "cnpj": "44527494000132",
+      "variacao_dia_pct": -0.7732
     },
     {
       "ticker": "ASMT11",
@@ -310,6 +330,7 @@
       "patrimonio_liquido": 49160000.0,
       "preco": 12290.0,
       "logo": null,
+      "cnpj": "45188033000145",
       "variacao_dia_pct": 0.0
     },
     {
@@ -321,6 +342,7 @@
       "patrimonio_liquido": 101741000.0,
       "preco": 58.1,
       "logo": null,
+      "cnpj": "12809972000100",
       "variacao_dia_pct": 0.0
     },
     {
@@ -332,6 +354,7 @@
       "patrimonio_liquido": 96504100.0,
       "preco": 88.88,
       "logo": null,
+      "cnpj": "41076823000188",
       "variacao_dia_pct": 0.4521
     },
     {
@@ -343,6 +366,7 @@
       "patrimonio_liquido": 22962000.0,
       "preco": 91.3,
       "logo": null,
+      "cnpj": "57109239000111",
       "variacao_dia_pct": 3.503
     },
     {
@@ -352,9 +376,10 @@
       "dy_pct": 12.47,
       "pvp": 0.84,
       "patrimonio_liquido": 304359000.0,
-      "preco": 7.25,
+      "preco": 7.26,
       "logo": null,
-      "variacao_dia_pct": -0.2751
+      "cnpj": "51890054000100",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "BARI11",
@@ -365,6 +390,7 @@
       "patrimonio_liquido": 367028000.0,
       "preco": 79.2,
       "logo": null,
+      "cnpj": "29267567000100",
       "variacao_dia_pct": 0.2659
     },
     {
@@ -376,40 +402,44 @@
       "patrimonio_liquido": 81770000.0,
       "preco": 629.0,
       "logo": null,
+      "cnpj": "07000400000146",
       "variacao_dia_pct": 0.9647
     },
     {
       "ticker": "BBFO11",
       "nome": "FII BB Fof",
       "segmento": "Híbrido",
-      "dy_pct": 15.02,
-      "pvp": 0.98,
-      "patrimonio_liquido": 269422000.0,
-      "preco": 67.29,
+      "dy_pct": 15.0,
+      "pvp": 0.99,
+      "patrimonio_liquido": 269863000.0,
+      "preco": 67.4,
       "logo": null,
-      "variacao_dia_pct": 0.4328
+      "cnpj": "37180091000102",
+      "variacao_dia_pct": 0.1635
     },
     {
       "ticker": "BBGO11",
       "nome": "Fiagro Bbgo",
       "segmento": "Papel",
-      "dy_pct": 2.4,
+      "dy_pct": 2.39,
       "pvp": 0.7,
-      "patrimonio_liquido": 262699000.0,
-      "preco": 65.59,
+      "patrimonio_liquido": 262859000.0,
+      "preco": 65.63,
       "logo": null,
-      "variacao_dia_pct": 2.6448
+      "cnpj": "42592257000120",
+      "variacao_dia_pct": 0.061
     },
     {
       "ticker": "BBIG11",
       "nome": "FII Bbig",
       "segmento": "Outros",
-      "dy_pct": 14.48,
+      "dy_pct": 14.54,
       "pvp": 0.54,
-      "patrimonio_liquido": 521376000.0,
-      "preco": 5.26,
+      "patrimonio_liquido": 519394000.0,
+      "preco": 5.24,
       "logo": null,
-      "variacao_dia_pct": 0.3817
+      "cnpj": "54375187000137",
+      "variacao_dia_pct": -0.3802
     },
     {
       "ticker": "BBPO11",
@@ -425,12 +455,13 @@
       "ticker": "BBRC11",
       "nome": "FII BB Corp",
       "segmento": "Outros",
-      "dy_pct": 14.15,
-      "pvp": 0.99,
-      "patrimonio_liquido": 163404000.0,
-      "preco": 102.77,
+      "dy_pct": 14.2,
+      "pvp": 0.98,
+      "patrimonio_liquido": 162848000.0,
+      "preco": 102.99,
       "logo": null,
-      "variacao_dia_pct": 0.3809
+      "cnpj": "12681340000104",
+      "variacao_dia_pct": 0.2141
     },
     {
       "ticker": "BBVJ11",
@@ -458,21 +489,23 @@
       "segmento": "Híbrido",
       "dy_pct": 12.81,
       "pvp": 0.91,
-      "patrimonio_liquido": 325788000.0,
-      "preco": 87.6,
+      "patrimonio_liquido": 325602000.0,
+      "preco": 87.55,
       "logo": null,
-      "variacao_dia_pct": -0.114
+      "cnpj": "20216935000117",
+      "variacao_dia_pct": -0.0571
     },
     {
       "ticker": "BCRI11",
       "nome": "FII Bees Cri",
       "segmento": "Papel",
-      "dy_pct": 17.39,
+      "dy_pct": 17.29,
       "pvp": 0.64,
-      "patrimonio_liquido": 338175000.0,
-      "preco": 54.04,
+      "patrimonio_liquido": 340303000.0,
+      "preco": 54.37,
       "logo": null,
-      "variacao_dia_pct": 0.4088
+      "cnpj": "22219335000138",
+      "variacao_dia_pct": 0.6107
     },
     {
       "ticker": "BFCC11",
@@ -483,6 +516,7 @@
       "patrimonio_liquido": 871713000.0,
       "preco": 104.97,
       "logo": null,
+      "cnpj": "31145875000105",
       "variacao_dia_pct": 0.7823
     },
     {
@@ -494,6 +528,7 @@
       "patrimonio_liquido": 278410000.0,
       "preco": 120.0,
       "logo": null,
+      "cnpj": "57216258000147",
       "variacao_dia_pct": 0.0
     },
     {
@@ -505,6 +540,7 @@
       "patrimonio_liquido": 53365600.0,
       "preco": 400.0,
       "logo": null,
+      "cnpj": "39332032000120",
       "variacao_dia_pct": 0.9948
     },
     {
@@ -521,12 +557,13 @@
       "ticker": "BIME11",
       "nome": "FII Brio Me",
       "segmento": "Outros",
-      "dy_pct": 16.89,
+      "dy_pct": 16.93,
       "pvp": 0.6,
-      "patrimonio_liquido": 27006700.0,
-      "preco": 4.62,
+      "patrimonio_liquido": 26948200.0,
+      "preco": 4.61,
       "logo": null,
-      "variacao_dia_pct": 0.6536
+      "cnpj": "41081356000184",
+      "variacao_dia_pct": -0.2165
     },
     {
       "ticker": "BIPD11",
@@ -537,6 +574,7 @@
       "patrimonio_liquido": 109261000.0,
       "preco": 989.33,
       "logo": null,
+      "cnpj": "42869892000101",
       "variacao_dia_pct": 0.0
     },
     {
@@ -548,18 +586,20 @@
       "patrimonio_liquido": 96250000.0,
       "preco": 1000.0,
       "logo": null,
+      "cnpj": "51817522000111",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "BLCA11",
       "nome": "FII Blue Aaa",
       "segmento": "Tijolo",
-      "dy_pct": 10.1,
-      "pvp": 0.82,
-      "patrimonio_liquido": 158368000.0,
-      "preco": 98.98,
+      "dy_pct": 10.31,
+      "pvp": 0.81,
+      "patrimonio_liquido": 155168000.0,
+      "preco": 96.98,
       "logo": null,
-      "variacao_dia_pct": -0.0101
+      "cnpj": "41076748000155",
+      "variacao_dia_pct": -2.0206
     },
     {
       "ticker": "BLCP11",
@@ -585,12 +625,13 @@
       "ticker": "BLMG11",
       "nome": "FII Blue Log",
       "segmento": "Outros",
-      "dy_pct": 13.31,
-      "pvp": 0.76,
-      "patrimonio_liquido": 162387000.0,
-      "preco": 34.75,
+      "dy_pct": 13.55,
+      "pvp": 0.75,
+      "patrimonio_liquido": 159583000.0,
+      "preco": 34.17,
       "logo": null,
-      "variacao_dia_pct": 8.5938
+      "cnpj": "34081637000171",
+      "variacao_dia_pct": -1.6691
     },
     {
       "ticker": "BLMO11",
@@ -601,6 +642,7 @@
       "patrimonio_liquido": 93482700.0,
       "preco": 93.97,
       "logo": null,
+      "cnpj": "34895894000147",
       "variacao_dia_pct": 0.0
     },
     {
@@ -622,6 +664,7 @@
       "patrimonio_liquido": 201102000.0,
       "preco": 6.53,
       "logo": null,
+      "cnpj": "49592781000140",
       "variacao_dia_pct": 0.0
     },
     {
@@ -633,6 +676,7 @@
       "patrimonio_liquido": 6842700.0,
       "preco": 76.03,
       "logo": null,
+      "cnpj": "38051307000194",
       "variacao_dia_pct": 0.0
     },
     {
@@ -644,18 +688,20 @@
       "patrimonio_liquido": 99790600.0,
       "preco": 99.95,
       "logo": null,
-      "variacao_dia_pct": 0.01
+      "cnpj": "14376247000111",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "BNFS11",
       "nome": "FII Banrisul",
       "segmento": "Outros",
-      "dy_pct": 20.0,
+      "dy_pct": 19.81,
       "pvp": 0.55,
-      "patrimonio_liquido": 26460000.0,
-      "preco": 37.8,
+      "patrimonio_liquido": 26712000.0,
+      "preco": 38.16,
       "logo": null,
-      "variacao_dia_pct": -0.5525
+      "cnpj": "15570431000160",
+      "variacao_dia_pct": 0.9524
     },
     {
       "ticker": "BPFF11",
@@ -671,12 +717,13 @@
       "ticker": "BPML11",
       "nome": "FII BTG Shop",
       "segmento": "Tijolo",
-      "dy_pct": 12.56,
-      "pvp": 0.73,
-      "patrimonio_liquido": 646985000.0,
-      "preco": 86.52,
+      "dy_pct": 11.73,
+      "pvp": 0.78,
+      "patrimonio_liquido": 692752000.0,
+      "preco": 87.0,
       "logo": null,
-      "variacao_dia_pct": -0.2076
+      "cnpj": "33046142000149",
+      "variacao_dia_pct": 0.069
     },
     {
       "ticker": "BPRP11",
@@ -692,12 +739,13 @@
       "ticker": "BRCO11",
       "nome": "FII Bresco",
       "segmento": "Logístico",
-      "dy_pct": 9.84,
+      "dy_pct": 9.88,
       "pvp": 0.96,
-      "patrimonio_liquido": 1991170000.0,
-      "preco": 110.15,
+      "patrimonio_liquido": 1981980000.0,
+      "preco": 109.98,
       "logo": null,
-      "variacao_dia_pct": -0.1179
+      "cnpj": "20748515000181",
+      "variacao_dia_pct": -0.4616
     },
     {
       "ticker": "BRCR11",
@@ -706,9 +754,10 @@
       "dy_pct": 11.63,
       "pvp": 0.52,
       "patrimonio_liquido": 1116140000.0,
-      "preco": 41.9,
+      "preco": 41.88,
       "logo": null,
-      "variacao_dia_pct": 0.7212
+      "cnpj": "08924783000101",
+      "variacao_dia_pct": -0.0477
     },
     {
       "ticker": "BREV11",
@@ -729,6 +778,7 @@
       "patrimonio_liquido": 11793000.0,
       "preco": 95.0,
       "logo": null,
+      "cnpj": "23964843000103",
       "variacao_dia_pct": 0.0
     },
     {
@@ -740,6 +790,7 @@
       "patrimonio_liquido": 75416200.0,
       "preco": 350.0,
       "logo": null,
+      "cnpj": "34895752000180",
       "variacao_dia_pct": 0.0
     },
     {
@@ -756,34 +807,37 @@
       "ticker": "BROF11",
       "nome": "FII Brof",
       "segmento": "Tijolo",
-      "dy_pct": 10.96,
-      "pvp": 0.55,
-      "patrimonio_liquido": 697229000.0,
-      "preco": 60.05,
+      "dy_pct": 10.79,
+      "pvp": 0.56,
+      "patrimonio_liquido": 708376000.0,
+      "preco": 61.01,
       "logo": null,
-      "variacao_dia_pct": 0.0167
+      "cnpj": "48978859000104",
+      "variacao_dia_pct": 1.5987
     },
     {
       "ticker": "BTAL11",
       "nome": "FII BTG Agro",
       "segmento": "Outros",
-      "dy_pct": 5.21,
-      "pvp": 0.71,
-      "patrimonio_liquido": 492080000.0,
-      "preco": 82.25,
+      "dy_pct": 5.3,
+      "pvp": 0.7,
+      "patrimonio_liquido": 484003000.0,
+      "preco": 80.9,
       "logo": null,
-      "variacao_dia_pct": -0.3875
+      "cnpj": "36642244000115",
+      "variacao_dia_pct": -1.6413
     },
     {
       "ticker": "BTCI11",
       "nome": "FII BTG CRI",
       "segmento": "Papel",
-      "dy_pct": 13.76,
+      "dy_pct": 13.89,
       "pvp": 0.83,
-      "patrimonio_liquido": 840954000.0,
-      "preco": 8.42,
+      "patrimonio_liquido": 832992000.0,
+      "preco": 8.37,
       "logo": null,
-      "variacao_dia_pct": -1.8648
+      "cnpj": "09552812000114",
+      "variacao_dia_pct": -0.9467
     },
     {
       "ticker": "BTCR11",
@@ -799,34 +853,37 @@
       "ticker": "BTHF11",
       "nome": "FII BTHF",
       "segmento": "Papel",
-      "dy_pct": 13.72,
-      "pvp": 0.9,
-      "patrimonio_liquido": 1764110000.0,
-      "preco": 8.59,
+      "dy_pct": 13.79,
+      "pvp": 0.89,
+      "patrimonio_liquido": 1755870000.0,
+      "preco": 8.53,
       "logo": null,
-      "variacao_dia_pct": -0.9227
+      "cnpj": "45188176000157",
+      "variacao_dia_pct": -0.4667
     },
     {
       "ticker": "BTHI11",
       "nome": "BTG Hotel Fi",
       "segmento": "Tijolo",
-      "dy_pct": 11.1,
-      "pvp": 0.68,
-      "patrimonio_liquido": 403771000.0,
-      "preco": 43.8,
+      "dy_pct": 11.18,
+      "pvp": 0.67,
+      "patrimonio_liquido": 401005000.0,
+      "preco": 43.5,
       "logo": null,
-      "variacao_dia_pct": -0.4319
+      "cnpj": "18308516000163",
+      "variacao_dia_pct": -0.6849
     },
     {
       "ticker": "BTLG11",
       "nome": "FII Btlg",
       "segmento": "Logístico",
-      "dy_pct": 9.6,
-      "pvp": 0.93,
-      "patrimonio_liquido": 7039400000.0,
-      "preco": 99.23,
+      "dy_pct": 9.68,
+      "pvp": 0.92,
+      "patrimonio_liquido": 6986910000.0,
+      "preco": 98.49,
       "logo": null,
-      "variacao_dia_pct": -0.77
+      "cnpj": "11839593000109",
+      "variacao_dia_pct": -0.7457
     },
     {
       "ticker": "BTML11",
@@ -837,18 +894,20 @@
       "patrimonio_liquido": 126206000.0,
       "preco": 111.28,
       "logo": null,
+      "cnpj": "36501210000100",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "BTRA11",
       "nome": "FII BTG Tagr",
       "segmento": "Papel",
-      "dy_pct": 3.08,
+      "dy_pct": 3.06,
       "pvp": 0.62,
-      "patrimonio_liquido": 236629000.0,
-      "preco": 70.33,
+      "patrimonio_liquido": 237874000.0,
+      "preco": 71.23,
       "logo": null,
-      "variacao_dia_pct": -0.3824
+      "cnpj": "41076607000132",
+      "variacao_dia_pct": 1.2797
     },
     {
       "ticker": "BTRU11",
@@ -856,10 +915,11 @@
       "segmento": "Outros",
       "dy_pct": 12.02,
       "pvp": 1.0,
-      "patrimonio_liquido": 773299000.0,
-      "preco": 86.9,
+      "patrimonio_liquido": 773566000.0,
+      "preco": 85.56,
       "logo": null,
-      "variacao_dia_pct": 0.1152
+      "cnpj": "08098114000128",
+      "variacao_dia_pct": -1.542
     },
     {
       "ticker": "BTSG11",
@@ -870,6 +930,7 @@
       "patrimonio_liquido": 113865000.0,
       "preco": 146.92,
       "logo": null,
+      "cnpj": "36098375000183",
       "variacao_dia_pct": 0.0
     },
     {
@@ -881,6 +942,7 @@
       "patrimonio_liquido": 701136000.0,
       "preco": 110.0,
       "logo": null,
+      "cnpj": "36930464000144",
       "variacao_dia_pct": 0.0
     },
     {
@@ -892,6 +954,7 @@
       "patrimonio_liquido": 72834300.0,
       "preco": 90.0,
       "logo": null,
+      "cnpj": "20132453000189",
       "variacao_dia_pct": 1.35
     },
     {
@@ -903,7 +966,8 @@
       "patrimonio_liquido": 193479000.0,
       "preco": 644.93,
       "logo": null,
-      "variacao_dia_pct": -0.78
+      "cnpj": "54645216000133",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "BVAR11",
@@ -914,18 +978,20 @@
       "patrimonio_liquido": 715824000.0,
       "preco": 1144.33,
       "logo": null,
+      "cnpj": "21126204000143",
       "variacao_dia_pct": 1.41
     },
     {
       "ticker": "CACR11",
       "nome": "Cartesia FII",
       "segmento": "Papel",
-      "dy_pct": 65.69,
-      "pvp": 0.17,
-      "patrimonio_liquido": 74140800.0,
-      "preco": 15.33,
+      "dy_pct": 66.16,
+      "pvp": 0.16,
+      "patrimonio_liquido": 73608800.0,
+      "preco": 15.22,
       "logo": null,
-      "variacao_dia_pct": -0.4545
+      "cnpj": "32065364000146",
+      "variacao_dia_pct": -0.7175
     },
     {
       "ticker": "CARE11",
@@ -933,32 +999,35 @@
       "segmento": "Outros",
       "dy_pct": 0.0,
       "pvp": 0.12,
-      "patrimonio_liquido": 28516900.0,
-      "preco": 3.83,
+      "patrimonio_liquido": 30101100.0,
+      "preco": 4.18,
       "logo": null,
-      "variacao_dia_pct": -4.01
+      "cnpj": "13584584000131",
+      "variacao_dia_pct": 5.56
     },
     {
       "ticker": "CBOP11",
       "nome": "FII C Branco",
       "segmento": "Tijolo",
-      "dy_pct": 7.66,
+      "dy_pct": 7.7,
       "pvp": 0.39,
-      "patrimonio_liquido": 39620000.0,
-      "preco": 28.0,
+      "patrimonio_liquido": 39407800.0,
+      "preco": 27.85,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "17144039000185",
+      "variacao_dia_pct": -0.5357
     },
     {
       "ticker": "CCME11",
       "nome": "FII Canuma",
       "segmento": "Outros",
-      "dy_pct": 11.74,
-      "pvp": 0.83,
-      "patrimonio_liquido": 589834000.0,
-      "preco": 8.7,
+      "dy_pct": 11.84,
+      "pvp": 0.82,
+      "patrimonio_liquido": 585089000.0,
+      "preco": 8.63,
       "logo": null,
-      "variacao_dia_pct": 1.1628
+      "cnpj": "43010844000126",
+      "variacao_dia_pct": -0.8046
     },
     {
       "ticker": "CCRF11",
@@ -979,18 +1048,20 @@
       "patrimonio_liquido": 62816300.0,
       "preco": 100.07,
       "logo": null,
+      "cnpj": "52713882000136",
       "variacao_dia_pct": 0.4471
     },
     {
       "ticker": "CEOC11",
       "nome": "FII Ceo Ccp",
       "segmento": "Tijolo",
-      "dy_pct": 12.96,
-      "pvp": 0.63,
-      "patrimonio_liquido": 77294200.0,
+      "dy_pct": 13.16,
+      "pvp": 0.62,
+      "patrimonio_liquido": 76114000.0,
       "preco": 42.12,
       "logo": null,
-      "variacao_dia_pct": -0.8008
+      "cnpj": "15799397000109",
+      "variacao_dia_pct": -1.0571
     },
     {
       "ticker": "CFHI11",
@@ -1001,6 +1072,7 @@
       "patrimonio_liquido": 1901460.0,
       "preco": 20.1,
       "logo": null,
+      "cnpj": "34508923000170",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1012,6 +1084,7 @@
       "patrimonio_liquido": 46106400.0,
       "preco": 365.0,
       "logo": null,
+      "cnpj": "41325993000159",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1023,29 +1096,32 @@
       "patrimonio_liquido": 258625000.0,
       "preco": 78.49,
       "logo": null,
-      "variacao_dia_pct": 1.4083
+      "cnpj": "10347985000180",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "CLIN11",
       "nome": "FII Clave In",
       "segmento": "Híbrido",
-      "dy_pct": 13.98,
+      "dy_pct": 13.89,
       "pvp": 0.86,
-      "patrimonio_liquido": 369084000.0,
-      "preco": 85.87,
+      "patrimonio_liquido": 371344000.0,
+      "preco": 85.43,
       "logo": null,
-      "variacao_dia_pct": 0.0233
+      "cnpj": "49005348000160",
+      "variacao_dia_pct": 0.6124
     },
     {
       "ticker": "CNES11",
       "nome": "FII Cenesp",
       "segmento": "Tijolo",
-      "dy_pct": 5.79,
-      "pvp": 0.23,
-      "patrimonio_liquido": 49154100.0,
-      "preco": 1.44,
+      "dy_pct": 5.91,
+      "pvp": 0.22,
+      "patrimonio_liquido": 48130100.0,
+      "preco": 1.41,
       "logo": null,
-      "variacao_dia_pct": 4.3478
+      "cnpj": "13551286000145",
+      "variacao_dia_pct": -2.0833
     },
     {
       "ticker": "COPP11",
@@ -1081,12 +1157,13 @@
       "ticker": "CPLG11",
       "nome": "FII Cplg",
       "segmento": "Outros",
-      "dy_pct": 15.8,
-      "pvp": 1.03,
-      "patrimonio_liquido": 623858000.0,
-      "preco": 11.07,
+      "dy_pct": 15.72,
+      "pvp": 1.04,
+      "patrimonio_liquido": 627239000.0,
+      "preco": 11.13,
       "logo": null,
-      "variacao_dia_pct": -0.8065
+      "cnpj": "52371756000140",
+      "variacao_dia_pct": 0.542
     },
     {
       "ticker": "CPOF11",
@@ -1097,40 +1174,44 @@
       "patrimonio_liquido": 647735000.0,
       "preco": 118.0,
       "logo": null,
+      "cnpj": "48916699000160",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "CPSH11",
       "nome": "FII Cpsh",
       "segmento": "Tijolo",
-      "dy_pct": 13.84,
+      "dy_pct": 13.83,
       "pvp": 0.84,
-      "patrimonio_liquido": 1195920000.0,
-      "preco": 9.71,
+      "patrimonio_liquido": 1197150000.0,
+      "preco": 9.72,
       "logo": null,
-      "variacao_dia_pct": -0.9184
+      "cnpj": "47896665000199",
+      "variacao_dia_pct": 0.103
     },
     {
       "ticker": "CPTR11",
       "nome": "Fiagro Cptr",
       "segmento": "Papel",
       "dy_pct": 1.19,
-      "pvp": 0.75,
-      "patrimonio_liquido": 146504000.0,
-      "preco": 7.39,
+      "pvp": 0.74,
+      "patrimonio_liquido": 145711000.0,
+      "preco": 7.35,
       "logo": null,
-      "variacao_dia_pct": 0.2714
+      "cnpj": "42537579000176",
+      "variacao_dia_pct": -0.5413
     },
     {
       "ticker": "CPTS11",
       "nome": "FII Capi Sec",
       "segmento": "Papel",
-      "dy_pct": 14.43,
-      "pvp": 0.87,
-      "patrimonio_liquido": 2686290000.0,
-      "preco": 7.4,
+      "dy_pct": 14.37,
+      "pvp": 0.88,
+      "patrimonio_liquido": 2697190000.0,
+      "preco": 7.44,
       "logo": null,
-      "variacao_dia_pct": -0.2695
+      "cnpj": "18979895000113",
+      "variacao_dia_pct": 0.6766
     },
     {
       "ticker": "CPUR11",
@@ -1141,18 +1222,20 @@
       "patrimonio_liquido": 712170000.0,
       "preco": 10.5,
       "logo": null,
-      "variacao_dia_pct": 1.1561
+      "cnpj": "34691520000100",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "CRAA11",
       "nome": "Fiagro Craa",
       "segmento": "Papel",
       "dy_pct": 0.0,
-      "pvp": 0.9,
-      "patrimonio_liquido": 216603000.0,
-      "preco": 91.4,
+      "pvp": 0.89,
+      "patrimonio_liquido": 216366000.0,
+      "preco": 91.3,
       "logo": null,
-      "variacao_dia_pct": 0.7718
+      "cnpj": "48903610000121",
+      "variacao_dia_pct": -0.1094
     },
     {
       "ticker": "CRFF11",
@@ -1163,18 +1246,20 @@
       "patrimonio_liquido": 45528800.0,
       "preco": 65.98,
       "logo": null,
-      "variacao_dia_pct": 0.4874
+      "cnpj": "31887401000139",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "CTXT11",
       "nome": "FII C Textil",
       "segmento": "Tijolo",
       "dy_pct": 0.0,
-      "pvp": 0.34,
-      "patrimonio_liquido": 32900200.0,
-      "preco": 5.05,
+      "pvp": 0.33,
+      "patrimonio_liquido": 32248700.0,
+      "preco": 4.95,
       "logo": null,
-      "variacao_dia_pct": 1.8145
+      "cnpj": "00762723000128",
+      "variacao_dia_pct": -1.9802
     },
     {
       "ticker": "CVBI11",
@@ -1190,56 +1275,61 @@
       "ticker": "CXAG11",
       "nome": "FII Caixa Ag",
       "segmento": "Outros",
-      "dy_pct": 12.02,
-      "pvp": 0.7,
-      "patrimonio_liquido": 150525000.0,
-      "preco": 72.0,
+      "dy_pct": 12.04,
+      "pvp": 0.69,
+      "patrimonio_liquido": 150232000.0,
+      "preco": 71.86,
       "logo": null,
-      "variacao_dia_pct": 0.2646
+      "cnpj": "40189596000134",
+      "variacao_dia_pct": -0.1944
     },
     {
       "ticker": "CXCE11",
       "nome": "FII Cx Cedae",
       "segmento": "Outros",
-      "dy_pct": 13.84,
-      "pvp": 0.64,
-      "patrimonio_liquido": 68860600.0,
-      "preco": 40.2,
+      "dy_pct": 13.6,
+      "pvp": 0.65,
+      "patrimonio_liquido": 70076800.0,
+      "preco": 40.91,
       "logo": null,
-      "variacao_dia_pct": -0.0994
+      "cnpj": "10991914000115",
+      "variacao_dia_pct": 1.7662
     },
     {
       "ticker": "CXCI11",
       "nome": "FII Caixa Ci",
       "segmento": "Papel",
-      "dy_pct": 14.02,
+      "dy_pct": 13.99,
       "pvp": 0.84,
-      "patrimonio_liquido": 133444000.0,
-      "preco": 64.85,
+      "patrimonio_liquido": 133752000.0,
+      "preco": 65.0,
       "logo": null,
-      "variacao_dia_pct": 0.3094
+      "cnpj": "42066916000194",
+      "variacao_dia_pct": 0.2313
     },
     {
       "ticker": "CXCO11",
       "nome": "FII Cef Corp",
       "segmento": "Tijolo",
-      "dy_pct": 12.45,
-      "pvp": 0.74,
-      "patrimonio_liquido": 280759000.0,
-      "preco": 71.54,
+      "dy_pct": 12.49,
+      "pvp": 0.73,
+      "patrimonio_liquido": 279817000.0,
+      "preco": 71.3,
       "logo": null,
-      "variacao_dia_pct": 0.8316
+      "cnpj": "38658984000175",
+      "variacao_dia_pct": -0.3355
     },
     {
       "ticker": "CXRI11",
       "nome": "FII Cx Rbrav",
       "segmento": "Híbrido",
-      "dy_pct": 9.97,
-      "pvp": 0.91,
-      "patrimonio_liquido": 116433000.0,
-      "preco": 69.0,
+      "dy_pct": 9.95,
+      "pvp": 0.92,
+      "patrimonio_liquido": 116606000.0,
+      "preco": 74.0,
       "logo": null,
-      "variacao_dia_pct": 0.1742
+      "cnpj": "17098794000170",
+      "variacao_dia_pct": 0.1489
     },
     {
       "ticker": "CXTL11",
@@ -1247,10 +1337,11 @@
       "segmento": "Outros",
       "dy_pct": 3.07,
       "pvp": 0.74,
-      "patrimonio_liquido": 16346500.0,
-      "preco": 304.99,
+      "patrimonio_liquido": 16347100.0,
+      "preco": 305.0,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "12887506000143",
+      "variacao_dia_pct": 0.0033
     },
     {
       "ticker": "CYLD11",
@@ -1261,40 +1352,44 @@
       "patrimonio_liquido": 160447000.0,
       "preco": 129.2,
       "logo": null,
+      "cnpj": "43010601000198",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "DAMA11",
       "nome": "FII Dama",
       "segmento": "Outros",
-      "dy_pct": 14.57,
-      "pvp": 0.8,
-      "patrimonio_liquido": 30453700.0,
-      "preco": 5.5,
+      "dy_pct": 13.84,
+      "pvp": 0.84,
+      "patrimonio_liquido": 32059400.0,
+      "preco": 5.51,
       "logo": null,
-      "variacao_dia_pct": 5.7692
+      "cnpj": "53866872000101",
+      "variacao_dia_pct": 0.1818
     },
     {
       "ticker": "DAMT11",
       "nome": "FII Diamante",
       "segmento": "Outros",
-      "dy_pct": 11.18,
-      "pvp": 0.79,
-      "patrimonio_liquido": 195755000.0,
-      "preco": 11.01,
+      "dy_pct": 5.6,
+      "pvp": 1.58,
+      "patrimonio_liquido": 391154000.0,
+      "preco": 17.99,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "26642727000166",
+      "variacao_dia_pct": 63.3969
     },
     {
       "ticker": "DAYM11",
       "nome": "FII Dayc Rem",
       "segmento": "Outros",
-      "dy_pct": 10.77,
-      "pvp": 0.42,
-      "patrimonio_liquido": 68574800.0,
-      "preco": 4.01,
+      "dy_pct": 10.88,
+      "pvp": 0.41,
+      "patrimonio_liquido": 67890700.0,
+      "preco": 3.97,
       "logo": null,
-      "variacao_dia_pct": 0.25
+      "cnpj": "38293921000162",
+      "variacao_dia_pct": -0.9975
     },
     {
       "ticker": "DCRA11",
@@ -1302,21 +1397,23 @@
       "segmento": "Papel",
       "dy_pct": 1.22,
       "pvp": 0.64,
-      "patrimonio_liquido": 41781200.0,
-      "preco": 6.2,
+      "patrimonio_liquido": 41646400.0,
+      "preco": 6.18,
       "logo": null,
-      "variacao_dia_pct": 0.3236
+      "cnpj": "42888360000111",
+      "variacao_dia_pct": -0.3226
     },
     {
       "ticker": "DEVA11",
       "nome": "FII Devant",
       "segmento": "Papel",
-      "dy_pct": 23.09,
-      "pvp": 0.17,
-      "patrimonio_liquido": 236938000.0,
-      "preco": 16.87,
+      "dy_pct": 22.87,
+      "pvp": 0.18,
+      "patrimonio_liquido": 239185000.0,
+      "preco": 16.97,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "37087810000137",
+      "variacao_dia_pct": 0.5928
     },
     {
       "ticker": "DMAC11",
@@ -1347,18 +1444,20 @@
       "patrimonio_liquido": 38717400.0,
       "preco": 583.04,
       "logo": null,
+      "cnpj": "10522648000181",
       "variacao_dia_pct": 1.0938
     },
     {
       "ticker": "DPRO11",
       "nome": "FII Deva Pro",
       "segmento": "Outros",
-      "dy_pct": 14.3,
+      "dy_pct": 14.27,
       "pvp": 0.53,
-      "patrimonio_liquido": 24966100.0,
+      "patrimonio_liquido": 25016100.0,
       "preco": 5.0,
       "logo": null,
-      "variacao_dia_pct": -1.9608
+      "cnpj": "42922127000108",
+      "variacao_dia_pct": 0.2004
     },
     {
       "ticker": "DRIT11",
@@ -1374,12 +1473,13 @@
       "ticker": "DVFF11",
       "nome": "FII Deva Fof",
       "segmento": "Híbrido",
-      "dy_pct": 19.69,
+      "dy_pct": 19.61,
       "pvp": 0.67,
-      "patrimonio_liquido": 57469600.0,
-      "preco": 5.22,
+      "patrimonio_liquido": 57689800.0,
+      "preco": 5.24,
       "logo": null,
-      "variacao_dia_pct": -0.3817
+      "cnpj": "39863059000149",
+      "variacao_dia_pct": 0.3831
     },
     {
       "ticker": "DVLP11",
@@ -1390,6 +1490,7 @@
       "patrimonio_liquido": 101250000.0,
       "preco": 142.31,
       "logo": null,
+      "cnpj": "42537601000188",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1401,6 +1502,7 @@
       "patrimonio_liquido": 52918500.0,
       "preco": 103.41,
       "logo": null,
+      "cnpj": "54635301000110",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1412,29 +1514,32 @@
       "patrimonio_liquido": 599886000.0,
       "preco": 1.2,
       "logo": null,
+      "cnpj": "21085863000189",
       "variacao_dia_pct": 0.6965
     },
     {
       "ticker": "EDFO11",
       "nome": "FII Ourinves",
       "segmento": "Outros",
-      "dy_pct": 8.28,
-      "pvp": 0.64,
-      "patrimonio_liquido": 36118500.0,
-      "preco": 121.0,
+      "dy_pct": 7.89,
+      "pvp": 0.67,
+      "patrimonio_liquido": 37903500.0,
+      "preco": 126.98,
       "logo": null,
-      "variacao_dia_pct": 4.8164
+      "cnpj": "06175262000173",
+      "variacao_dia_pct": 4.9421
     },
     {
       "ticker": "EDGA11",
       "nome": "FII Galeria",
       "segmento": "Tijolo",
-      "dy_pct": 4.56,
-      "pvp": 0.31,
-      "patrimonio_liquido": 49747300.0,
-      "preco": 13.05,
+      "dy_pct": 4.6,
+      "pvp": 0.3,
+      "patrimonio_liquido": 49289900.0,
+      "preco": 12.93,
       "logo": null,
-      "variacao_dia_pct": -0.3817
+      "cnpj": "15333306000137",
+      "variacao_dia_pct": -0.9195
     },
     {
       "ticker": "EDGE11",
@@ -1445,6 +1550,7 @@
       "patrimonio_liquido": 9535960.0,
       "preco": 834.0,
       "logo": null,
+      "cnpj": "54306150000157",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1453,10 +1559,11 @@
       "segmento": "Papel",
       "dy_pct": 0.0,
       "pvp": 0.84,
-      "patrimonio_liquido": 261076000.0,
-      "preco": 83.36,
+      "patrimonio_liquido": 259855000.0,
+      "preco": 82.97,
       "logo": null,
-      "variacao_dia_pct": -0.6436
+      "cnpj": "41224330000148",
+      "variacao_dia_pct": -0.4679
     },
     {
       "ticker": "EIRA11",
@@ -1464,10 +1571,11 @@
       "segmento": "Outros",
       "dy_pct": 13.71,
       "pvp": 1.01,
-      "patrimonio_liquido": 36208000.0,
-      "preco": 104.56,
+      "patrimonio_liquido": 36211400.0,
+      "preco": 104.57,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "59202651000107",
+      "variacao_dia_pct": 0.0096
     },
     {
       "ticker": "ELDO11B",
@@ -1488,7 +1596,8 @@
       "patrimonio_liquido": 49450000.0,
       "preco": 9.89,
       "logo": null,
-      "variacao_dia_pct": 6.1159
+      "cnpj": "53523736000100",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "EQIN11",
@@ -1504,12 +1613,13 @@
       "ticker": "EQIR11",
       "nome": "FII Eqi Rece",
       "segmento": "Papel",
-      "dy_pct": 14.7,
-      "pvp": 0.84,
-      "patrimonio_liquido": 87929100.0,
-      "preco": 7.99,
+      "dy_pct": 14.81,
+      "pvp": 0.83,
+      "patrimonio_liquido": 87274500.0,
+      "preco": 8.01,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "41076380000125",
+      "variacao_dia_pct": -0.6203
     },
     {
       "ticker": "ERCR11",
@@ -1520,29 +1630,32 @@
       "patrimonio_liquido": 11899800.0,
       "preco": 5008.34,
       "logo": null,
+      "cnpj": "37266902000184",
       "variacao_dia_pct": 36.31
     },
     {
       "ticker": "ERPA11",
       "nome": "FII Europa",
       "segmento": "Tijolo",
-      "dy_pct": 9.26,
-      "pvp": 0.72,
-      "patrimonio_liquido": 60110600.0,
-      "preco": 120.0,
+      "dy_pct": 8.86,
+      "pvp": 0.76,
+      "patrimonio_liquido": 62845700.0,
+      "preco": 125.46,
       "logo": null,
-      "variacao_dia_pct": -1.6393
+      "cnpj": "31469385000164",
+      "variacao_dia_pct": 4.55
     },
     {
       "ticker": "EURO11",
       "nome": "FII Europar",
       "segmento": "Outros",
-      "dy_pct": 8.77,
-      "pvp": 0.75,
-      "patrimonio_liquido": 121481000.0,
-      "preco": 296.38,
+      "dy_pct": 8.55,
+      "pvp": 0.77,
+      "patrimonio_liquido": 124600000.0,
+      "preco": 303.99,
       "logo": null,
-      "variacao_dia_pct": -0.1987
+      "cnpj": "05437916000127",
+      "variacao_dia_pct": 2.5676
     },
     {
       "ticker": "EVBI11",
@@ -1563,18 +1676,20 @@
       "patrimonio_liquido": 132695000.0,
       "preco": 9.41,
       "logo": null,
-      "variacao_dia_pct": 0.1064
+      "cnpj": "41076851000103",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "FAED11",
       "nome": "FII Anh Educ",
       "segmento": "Outros",
-      "dy_pct": 13.33,
+      "dy_pct": 13.39,
       "pvp": 0.68,
-      "patrimonio_liquido": 105795000.0,
-      "preco": 152.8,
+      "patrimonio_liquido": 105283000.0,
+      "preco": 152.06,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "11179118000145",
+      "variacao_dia_pct": -0.4843
     },
     {
       "ticker": "FAMB11",
@@ -1585,18 +1700,20 @@
       "patrimonio_liquido": 91903500.0,
       "preco": 750.0,
       "logo": null,
-      "variacao_dia_pct": 7.9137
+      "cnpj": "05562312000102",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "FATN11",
       "nome": "FII Athena I",
       "segmento": "Tijolo",
-      "dy_pct": 10.39,
-      "pvp": 0.86,
-      "patrimonio_liquido": 592886000.0,
-      "preco": 83.86,
+      "dy_pct": 10.54,
+      "pvp": 0.85,
+      "patrimonio_liquido": 584260000.0,
+      "preco": 82.64,
       "logo": null,
-      "variacao_dia_pct": 2.8957
+      "cnpj": "30567216000102",
+      "variacao_dia_pct": -1.4548
     },
     {
       "ticker": "FCFL11",
@@ -1605,9 +1722,10 @@
       "dy_pct": 9.31,
       "pvp": 0.94,
       "patrimonio_liquido": 409933000.0,
-      "preco": 119.03,
+      "preco": 119.0,
       "logo": null,
-      "variacao_dia_pct": 0.7875
+      "cnpj": "11602654000101",
+      "variacao_dia_pct": 0.8475
     },
     {
       "ticker": "FEXC11",
@@ -1633,12 +1751,13 @@
       "ticker": "FGAA11",
       "nome": "Fiagro Fga",
       "segmento": "Papel",
-      "dy_pct": 2.53,
+      "dy_pct": 2.54,
       "pvp": 0.86,
-      "patrimonio_liquido": 364709000.0,
-      "preco": 8.09,
+      "patrimonio_liquido": 363356000.0,
+      "preco": 8.01,
       "logo": null,
-      "variacao_dia_pct": 0.4969
+      "cnpj": "42405905000191",
+      "variacao_dia_pct": -0.9889
     },
     {
       "ticker": "FIGS11",
@@ -1646,32 +1765,35 @@
       "segmento": "Tijolo",
       "dy_pct": 11.96,
       "pvp": 0.68,
-      "patrimonio_liquido": 136344000.0,
-      "preco": 47.84,
+      "patrimonio_liquido": 136287000.0,
+      "preco": 47.81,
       "logo": null,
-      "variacao_dia_pct": -0.0209
+      "cnpj": "17590518000125",
+      "variacao_dia_pct": -0.0627
     },
     {
       "ticker": "FIIB11",
       "nome": "FII Indl Br",
       "segmento": "Outros",
-      "dy_pct": 8.47,
+      "dy_pct": 8.41,
       "pvp": 0.73,
-      "patrimonio_liquido": 295708000.0,
-      "preco": 431.69,
+      "patrimonio_liquido": 297865000.0,
+      "preco": 434.49,
       "logo": null,
-      "variacao_dia_pct": 1.6219
+      "cnpj": "14217108000145",
+      "variacao_dia_pct": 0.6486
     },
     {
       "ticker": "FIIP11",
       "nome": "FII Rb Cap I",
       "segmento": "Outros",
-      "dy_pct": 13.37,
-      "pvp": 0.62,
-      "patrimonio_liquido": 115895000.0,
-      "preco": 125.0,
+      "dy_pct": 13.15,
+      "pvp": 0.64,
+      "patrimonio_liquido": 117824000.0,
+      "preco": 127.08,
       "logo": null,
-      "variacao_dia_pct": -0.2315
+      "cnpj": "08696175000197",
+      "variacao_dia_pct": 1.664
     },
     {
       "ticker": "FISC11",
@@ -1682,7 +1804,8 @@
       "patrimonio_liquido": 110500000.0,
       "preco": 65.0,
       "logo": null,
-      "variacao_dia_pct": 5.7426
+      "cnpj": "12804013000100",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "FISD11",
@@ -1699,22 +1822,24 @@
       "nome": "Etf Fixx",
       "segmento": "Outros",
       "dy_pct": 0.0,
-      "pvp": 7.71,
-      "patrimonio_liquido": 1755010000.0,
-      "preco": 93.62,
+      "pvp": 7.8,
+      "patrimonio_liquido": 1777500000.0,
+      "preco": 94.82,
       "logo": null,
-      "variacao_dia_pct": -0.064
+      "cnpj": "59783336000110",
+      "variacao_dia_pct": 1.2818
     },
     {
       "ticker": "FLCR11",
       "nome": "FII Fl Receb",
       "segmento": "Papel",
-      "dy_pct": 14.15,
+      "dy_pct": 14.11,
       "pvp": 0.97,
-      "patrimonio_liquido": 68493000.0,
-      "preco": 91.2,
+      "patrimonio_liquido": 68688500.0,
+      "preco": 91.14,
       "logo": null,
-      "variacao_dia_pct": -0.0329
+      "cnpj": "33884145000151",
+      "variacao_dia_pct": 0.0439
     },
     {
       "ticker": "FLFL11",
@@ -1730,23 +1855,25 @@
       "ticker": "FLMA11",
       "nome": "FII S F Lima",
       "segmento": "Tijolo",
-      "dy_pct": 8.77,
+      "dy_pct": 8.71,
       "pvp": 0.64,
-      "patrimonio_liquido": 220217000.0,
-      "preco": 159.5,
+      "patrimonio_liquido": 221680000.0,
+      "preco": 160.56,
       "logo": null,
-      "variacao_dia_pct": -1.8462
+      "cnpj": "04141645000103",
+      "variacao_dia_pct": 0.6646
     },
     {
       "ticker": "FLRP11",
       "nome": "FII Floripa",
       "segmento": "Tijolo",
-      "dy_pct": 8.68,
-      "pvp": 0.98,
-      "patrimonio_liquido": 158720000.0,
-      "preco": 20.48,
+      "dy_pct": 8.83,
+      "pvp": 0.96,
+      "patrimonio_liquido": 156008000.0,
+      "preco": 20.37,
       "logo": null,
-      "variacao_dia_pct": 0.9862
+      "cnpj": "10375382000191",
+      "variacao_dia_pct": -0.5371
     },
     {
       "ticker": "FMOF11",
@@ -1757,18 +1884,20 @@
       "patrimonio_liquido": 18298400.0,
       "preco": 36.02,
       "logo": null,
-      "variacao_dia_pct": -7.641
+      "cnpj": "01633741000172",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "FPAB11",
       "nome": "FII A Branca",
       "segmento": "Tijolo",
-      "dy_pct": 11.21,
-      "pvp": 0.58,
-      "patrimonio_liquido": 154500000.0,
-      "preco": 206.0,
+      "dy_pct": 11.6,
+      "pvp": 0.56,
+      "patrimonio_liquido": 149250000.0,
+      "preco": 199.0,
       "logo": null,
-      "variacao_dia_pct": 4.0404
+      "cnpj": "03251720000118",
+      "variacao_dia_pct": -3.3981
     },
     {
       "ticker": "FPNG11",
@@ -1779,6 +1908,7 @@
       "patrimonio_liquido": 1065210000.0,
       "preco": 350.0,
       "logo": null,
+      "cnpj": "17161979000182",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1795,12 +1925,13 @@
       "ticker": "FTCA11",
       "nome": "Fi Agro Fyto",
       "segmento": "Papel",
-      "dy_pct": 1.62,
-      "pvp": 0.64,
-      "patrimonio_liquido": 30238500.0,
-      "preco": 6.78,
+      "dy_pct": 1.63,
+      "pvp": 0.63,
+      "patrimonio_liquido": 30015500.0,
+      "preco": 6.73,
       "logo": null,
-      "variacao_dia_pct": 1.194
+      "cnpj": "42537438000153",
+      "variacao_dia_pct": -0.7375
     },
     {
       "ticker": "FTCE11",
@@ -1811,6 +1942,7 @@
       "patrimonio_liquido": 3947180000.0,
       "preco": 2914.9,
       "logo": null,
+      "cnpj": "01235622000161",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1827,23 +1959,25 @@
       "ticker": "FVPQ11",
       "nome": "FII V Parque",
       "segmento": "Tijolo",
-      "dy_pct": 7.97,
+      "dy_pct": 7.96,
       "pvp": 0.55,
-      "patrimonio_liquido": 141408000.0,
-      "preco": 50.02,
+      "patrimonio_liquido": 141492000.0,
+      "preco": 50.53,
       "logo": null,
-      "variacao_dia_pct": -0.6554
+      "cnpj": "00332266000131",
+      "variacao_dia_pct": 0.0594
     },
     {
       "ticker": "FYTO11",
       "nome": "FII FYTO",
       "segmento": "Outros",
-      "dy_pct": 15.05,
+      "dy_pct": 15.01,
       "pvp": 0.79,
-      "patrimonio_liquido": 121181000.0,
-      "preco": 7.9,
+      "patrimonio_liquido": 121487000.0,
+      "preco": 7.95,
       "logo": null,
-      "variacao_dia_pct": -0.3783
+      "cnpj": "18085673000157",
+      "variacao_dia_pct": 0.2522
     },
     {
       "ticker": "FZDA11",
@@ -1854,7 +1988,8 @@
       "patrimonio_liquido": 201500000.0,
       "preco": 130.0,
       "logo": null,
-      "variacao_dia_pct": 0.0077
+      "cnpj": "44625694000128",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "FZDB11",
@@ -1865,6 +2000,7 @@
       "patrimonio_liquido": 556056000.0,
       "preco": 154.46,
       "logo": null,
+      "cnpj": "49489928000170",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1881,23 +2017,25 @@
       "ticker": "GAME11",
       "nome": "FII Guard Mu",
       "segmento": "Outros",
-      "dy_pct": 14.45,
-      "pvp": 0.87,
-      "patrimonio_liquido": 229399000.0,
-      "preco": 8.07,
+      "dy_pct": 14.48,
+      "pvp": 0.86,
+      "patrimonio_liquido": 228830000.0,
+      "preco": 8.06,
       "logo": null,
-      "variacao_dia_pct": -0.2472
+      "cnpj": "41269052000145",
+      "variacao_dia_pct": -0.1239
     },
     {
       "ticker": "GARE11",
       "nome": "FII Guardian",
       "segmento": "Outros",
-      "dy_pct": 11.67,
+      "dy_pct": 11.72,
       "pvp": 0.93,
-      "patrimonio_liquido": 2443630000.0,
-      "preco": 8.45,
+      "patrimonio_liquido": 2432060000.0,
+      "preco": 8.41,
       "logo": null,
-      "variacao_dia_pct": -0.1182
+      "cnpj": "37295919000160",
+      "variacao_dia_pct": -0.4734
     },
     {
       "ticker": "GCFF11",
@@ -1918,6 +2056,7 @@
       "patrimonio_liquido": 5733620.0,
       "preco": 50.74,
       "logo": null,
+      "cnpj": "46285299000179",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1925,22 +2064,24 @@
       "nome": "Fiagro Glpg",
       "segmento": "Papel",
       "dy_pct": 1.2,
-      "pvp": 0.54,
-      "patrimonio_liquido": 81240100.0,
-      "preco": 46.4,
+      "pvp": 0.55,
+      "patrimonio_liquido": 81450200.0,
+      "preco": 46.52,
       "logo": null,
-      "variacao_dia_pct": -1.2135
+      "cnpj": "37037297000170",
+      "variacao_dia_pct": 0.2586
     },
     {
       "ticker": "GCRI11",
       "nome": "FII Glpg Cri",
       "segmento": "Papel",
-      "dy_pct": 14.61,
+      "dy_pct": 14.7,
       "pvp": 0.74,
-      "patrimonio_liquido": 99414900.0,
-      "preco": 68.38,
+      "patrimonio_liquido": 98862400.0,
+      "preco": 68.0,
       "logo": null,
-      "variacao_dia_pct": 0.8555
+      "cnpj": "38293897000161",
+      "variacao_dia_pct": -0.5557
     },
     {
       "ticker": "GESE11B",
@@ -1961,18 +2102,20 @@
       "patrimonio_liquido": 34951600.0,
       "preco": 120.2,
       "logo": null,
+      "cnpj": "58523711000120",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "GGRC11",
       "nome": "FII Ggrcovep",
       "segmento": "Logístico",
-      "dy_pct": 13.2,
+      "dy_pct": 13.25,
       "pvp": 0.82,
-      "patrimonio_liquido": 3107930000.0,
-      "preco": 9.01,
+      "patrimonio_liquido": 3097560000.0,
+      "preco": 8.99,
       "logo": null,
-      "variacao_dia_pct": -0.2215
+      "cnpj": "26614291000100",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "GLCR11",
@@ -1983,6 +2126,7 @@
       "patrimonio_liquido": 47001700.0,
       "preco": 94.36,
       "logo": null,
+      "cnpj": "59669570000111",
       "variacao_dia_pct": 0.0
     },
     {
@@ -1994,6 +2138,7 @@
       "patrimonio_liquido": 56250000.0,
       "preco": 75.0,
       "logo": null,
+      "cnpj": "36501198000134",
       "variacao_dia_pct": 0.0
     },
     {
@@ -2005,7 +2150,8 @@
       "patrimonio_liquido": 164722000.0,
       "preco": 109.45,
       "logo": null,
-      "variacao_dia_pct": 0.0731
+      "cnpj": "58378463000171",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "GRLV11",
@@ -2021,12 +2167,13 @@
       "ticker": "GRUL11",
       "nome": "FII GRUL",
       "segmento": "Logístico",
-      "dy_pct": 11.72,
+      "dy_pct": 11.63,
       "pvp": 0.84,
-      "patrimonio_liquido": 200317000.0,
-      "preco": 8.11,
+      "patrimonio_liquido": 201799000.0,
+      "preco": 8.17,
       "logo": null,
-      "variacao_dia_pct": 0.8706
+      "cnpj": "54483412000159",
+      "variacao_dia_pct": 0.7398
     },
     {
       "ticker": "GRWA11",
@@ -2034,21 +2181,23 @@
       "segmento": "Papel",
       "dy_pct": 0.71,
       "pvp": 0.71,
-      "patrimonio_liquido": 19833500.0,
-      "preco": 7.19,
+      "patrimonio_liquido": 19861100.0,
+      "preco": 7.2,
       "logo": null,
-      "variacao_dia_pct": -1.5068
+      "cnpj": "47240671000193",
+      "variacao_dia_pct": 0.1391
     },
     {
       "ticker": "GSFI11",
       "nome": "FII General",
       "segmento": "Tijolo",
       "dy_pct": 0.0,
-      "pvp": 0.87,
-      "patrimonio_liquido": 1069670000.0,
-      "preco": 10.96,
+      "pvp": 0.86,
+      "patrimonio_liquido": 1057170000.0,
+      "preco": 11.1,
       "logo": null,
-      "variacao_dia_pct": 0.5505
+      "cnpj": "11769604000113",
+      "variacao_dia_pct": -0.2695
     },
     {
       "ticker": "GTLG11",
@@ -2059,18 +2208,20 @@
       "patrimonio_liquido": 459000000.0,
       "preco": 63.99,
       "logo": null,
+      "cnpj": "36200677000110",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "GTWR11",
       "nome": "FII G Towers",
       "segmento": "Tijolo",
-      "dy_pct": 13.63,
-      "pvp": 0.77,
-      "patrimonio_liquido": 940200000.0,
-      "preco": 78.35,
+      "dy_pct": 13.58,
+      "pvp": 0.78,
+      "patrimonio_liquido": 943680000.0,
+      "preco": 78.64,
       "logo": null,
-      "variacao_dia_pct": -0.2038
+      "cnpj": "23740527000158",
+      "variacao_dia_pct": 0.3701
     },
     {
       "ticker": "GURB11",
@@ -2096,12 +2247,13 @@
       "ticker": "GZIT11",
       "nome": "FII Gazit",
       "segmento": "Outros",
-      "dy_pct": 20.26,
-      "pvp": 0.42,
-      "patrimonio_liquido": 857593000.0,
-      "preco": 36.81,
+      "dy_pct": 20.72,
+      "pvp": 0.41,
+      "patrimonio_liquido": 838722000.0,
+      "preco": 36.0,
       "logo": null,
-      "variacao_dia_pct": -2.2311
+      "cnpj": "15447108000102",
+      "variacao_dia_pct": -2.2005
     },
     {
       "ticker": "HAAA11",
@@ -2112,29 +2264,32 @@
       "patrimonio_liquido": 193480000.0,
       "preco": 56.0,
       "logo": null,
+      "cnpj": "27445482000140",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HABT11",
       "nome": "FII Habit II",
       "segmento": "Papel",
-      "dy_pct": 17.24,
+      "dy_pct": 17.44,
       "pvp": 0.7,
-      "patrimonio_liquido": 530679000.0,
-      "preco": 65.3,
+      "patrimonio_liquido": 524503000.0,
+      "preco": 64.6,
       "logo": null,
-      "variacao_dia_pct": -0.6088
+      "cnpj": "30578417000105",
+      "variacao_dia_pct": -1.072
     },
     {
       "ticker": "HBCR11",
       "nome": "FII Hbc Ren",
       "segmento": "Tijolo",
-      "dy_pct": 9.81,
-      "pvp": 1.16,
-      "patrimonio_liquido": 243200000.0,
-      "preco": 152.0,
+      "dy_pct": 9.9,
+      "pvp": 1.09,
+      "patrimonio_liquido": 227200000.0,
+      "preco": 142.0,
       "logo": null,
-      "variacao_dia_pct": 0.3632
+      "cnpj": "36501159000137",
+      "variacao_dia_pct": -0.9245
     },
     {
       "ticker": "HBRH11",
@@ -2165,18 +2320,20 @@
       "patrimonio_liquido": 74376000.0,
       "preco": 61.98,
       "logo": null,
+      "cnpj": "34508959000154",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HCRI11",
       "nome": "FII Crianca",
       "segmento": "Outros",
-      "dy_pct": 17.81,
-      "pvp": 0.83,
-      "patrimonio_liquido": 54600000.0,
-      "preco": 273.0,
+      "dy_pct": 17.5,
+      "pvp": 0.84,
+      "patrimonio_liquido": 55570000.0,
+      "preco": 277.85,
       "logo": null,
-      "variacao_dia_pct": -1.087
+      "cnpj": "04066582000160",
+      "variacao_dia_pct": 1.7766
     },
     {
       "ticker": "HCTR11",
@@ -2187,29 +2344,32 @@
       "patrimonio_liquido": 287095000.0,
       "preco": 13.0,
       "logo": null,
-      "variacao_dia_pct": 1.7214
+      "cnpj": "30248180000196",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HDEL11",
       "nome": "FII Hedge Dv",
       "segmento": "Outros",
-      "dy_pct": 47.97,
+      "dy_pct": 47.83,
       "pvp": 0.7,
-      "patrimonio_liquido": 2738400.0,
-      "preco": 3.26,
+      "patrimonio_liquido": 2746800.0,
+      "preco": 3.27,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "44514162000113",
+      "variacao_dia_pct": 0.31
     },
     {
       "ticker": "HFOF11",
       "nome": "FII Htopfof3",
       "segmento": "Híbrido",
-      "dy_pct": 10.89,
-      "pvp": 0.85,
-      "patrimonio_liquido": 1394110000.0,
-      "preco": 6.39,
+      "dy_pct": 11.05,
+      "pvp": 0.84,
+      "patrimonio_liquido": 1374510000.0,
+      "preco": 6.32,
       "logo": null,
-      "variacao_dia_pct": 0.4717
+      "cnpj": "18307582000119",
+      "variacao_dia_pct": -1.25
     },
     {
       "ticker": "HGAG11",
@@ -2220,40 +2380,44 @@
       "patrimonio_liquido": 2681120.0,
       "preco": 10.8,
       "logo": null,
+      "cnpj": "40343867000164",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HGBL11",
       "nome": "FII Hgbl",
       "segmento": "Outros",
-      "dy_pct": 9.76,
+      "dy_pct": 9.73,
       "pvp": 0.97,
-      "patrimonio_liquido": 233730000.0,
-      "preco": 8.9,
+      "patrimonio_liquido": 234518000.0,
+      "preco": 8.93,
       "logo": null,
-      "variacao_dia_pct": -1.1111
+      "cnpj": "53466467000198",
+      "variacao_dia_pct": 0.3371
     },
     {
       "ticker": "HGBS11",
       "nome": "FII Hedgebs",
       "segmento": "Tijolo",
-      "dy_pct": 10.5,
+      "dy_pct": 10.53,
       "pvp": 0.91,
-      "patrimonio_liquido": 2659030000.0,
-      "preco": 18.42,
+      "patrimonio_liquido": 2651810000.0,
+      "preco": 18.36,
       "logo": null,
-      "variacao_dia_pct": -0.4324
+      "cnpj": "08431747000106",
+      "variacao_dia_pct": -0.3257
     },
     {
       "ticker": "HGCR11",
       "nome": "FII HGCR Pax",
       "segmento": "Papel",
-      "dy_pct": 12.19,
+      "dy_pct": 12.22,
       "pvp": 0.97,
-      "patrimonio_liquido": 1470120000.0,
-      "preco": 96.2,
+      "patrimonio_liquido": 1466570000.0,
+      "preco": 95.12,
       "logo": null,
-      "variacao_dia_pct": 0.5225
+      "cnpj": "11160521000122",
+      "variacao_dia_pct": -0.2412
     },
     {
       "ticker": "HGFF11",
@@ -2264,18 +2428,20 @@
       "patrimonio_liquido": 178631000.0,
       "preco": 62.38,
       "logo": null,
+      "cnpj": "32784898000122",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HGIC11",
       "nome": "FII Hgi Cri",
       "segmento": "Papel",
-      "dy_pct": 18.05,
-      "pvp": 0.41,
-      "patrimonio_liquido": 20905100.0,
-      "preco": 45.18,
+      "dy_pct": 17.35,
+      "pvp": 0.42,
+      "patrimonio_liquido": 21747200.0,
+      "preco": 47.0,
       "logo": null,
-      "variacao_dia_pct": -3.8519
+      "cnpj": "38456508000171",
+      "variacao_dia_pct": 4.0283
     },
     {
       "ticker": "HGJH11",
@@ -2291,12 +2457,13 @@
       "ticker": "HGLG11",
       "nome": "FII HGLG Pax",
       "segmento": "Logístico",
-      "dy_pct": 8.95,
+      "dy_pct": 8.97,
       "pvp": 0.89,
-      "patrimonio_liquido": 6740790000.0,
-      "preco": 147.92,
+      "patrimonio_liquido": 6728020000.0,
+      "preco": 147.31,
       "logo": null,
-      "variacao_dia_pct": -0.1889
+      "cnpj": "11728688000147",
+      "variacao_dia_pct": -0.3854
     },
     {
       "ticker": "HGPO11",
@@ -2307,29 +2474,32 @@
       "patrimonio_liquido": 268954000.0,
       "preco": 153.42,
       "logo": null,
+      "cnpj": "11260134000168",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HGRE11",
       "nome": "FII HGRE Pax",
       "segmento": "Tijolo",
-      "dy_pct": 9.9,
+      "dy_pct": 9.96,
       "pvp": 0.76,
-      "patrimonio_liquido": 1360230000.0,
-      "preco": 114.96,
+      "patrimonio_liquido": 1353130000.0,
+      "preco": 114.91,
       "logo": null,
-      "variacao_dia_pct": -1.4065
+      "cnpj": "09072017000129",
+      "variacao_dia_pct": -0.1651
     },
     {
       "ticker": "HGRU11",
       "nome": "FII HGRU Pax",
       "segmento": "Outros",
-      "dy_pct": 10.28,
-      "pvp": 0.9,
-      "patrimonio_liquido": 2850470000.0,
-      "preco": 114.8,
+      "dy_pct": 10.39,
+      "pvp": 0.89,
+      "patrimonio_liquido": 2819180000.0,
+      "preco": 113.5,
       "logo": null,
-      "variacao_dia_pct": -0.3905
+      "cnpj": "29641226000153",
+      "variacao_dia_pct": -1.1152
     },
     {
       "ticker": "HILG11",
@@ -2340,6 +2510,7 @@
       "patrimonio_liquido": 98309500.0,
       "preco": 186.81,
       "logo": null,
+      "cnpj": "34867728000137",
       "variacao_dia_pct": 141.78
     },
     {
@@ -2351,6 +2522,7 @@
       "patrimonio_liquido": 275017000.0,
       "preco": 100.36,
       "logo": null,
+      "cnpj": "63806554000109",
       "variacao_dia_pct": 0.0
     },
     {
@@ -2362,18 +2534,20 @@
       "patrimonio_liquido": 157170000.0,
       "preco": 121.25,
       "logo": null,
+      "cnpj": "62082124000110",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HLOG11",
       "nome": "FII Hedgelog",
       "segmento": "Outros",
-      "dy_pct": 10.21,
+      "dy_pct": 10.16,
       "pvp": 0.78,
-      "patrimonio_liquido": 391425000.0,
+      "patrimonio_liquido": 393125000.0,
       "preco": 9.21,
       "logo": null,
-      "variacao_dia_pct": -0.4324
+      "cnpj": "27486542000172",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HMOC11",
@@ -2391,10 +2565,11 @@
       "segmento": "Tijolo",
       "dy_pct": 0.0,
       "pvp": 0.54,
-      "patrimonio_liquido": 124889000.0,
-      "preco": 34.7,
+      "patrimonio_liquido": 123810000.0,
+      "preco": 34.4,
       "logo": null,
-      "variacao_dia_pct": 1.4027
+      "cnpj": "31894369000119",
+      "variacao_dia_pct": -0.8646
     },
     {
       "ticker": "HOSI11",
@@ -2405,40 +2580,44 @@
       "patrimonio_liquido": 42475400.0,
       "preco": 74.07,
       "logo": null,
-      "variacao_dia_pct": 4.3239
+      "cnpj": "34081631000102",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HPDP11",
       "nome": "FII Hedgepdp",
       "segmento": "Tijolo",
-      "dy_pct": 8.82,
-      "pvp": 0.94,
-      "patrimonio_liquido": 626622000.0,
-      "preco": 88.87,
+      "dy_pct": 8.7,
+      "pvp": 0.96,
+      "patrimonio_liquido": 634589000.0,
+      "preco": 99.99,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "35586415000173",
+      "variacao_dia_pct": 12.5127
     },
     {
       "ticker": "HRDF11",
       "nome": "FII Hrealty",
       "segmento": "Outros",
       "dy_pct": 0.0,
-      "pvp": 0.51,
-      "patrimonio_liquido": 6024180.0,
-      "preco": 3.97,
+      "pvp": 0.5,
+      "patrimonio_liquido": 6009000.0,
+      "preco": 3.96,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "16929519000199",
+      "variacao_dia_pct": -0.2519
     },
     {
       "ticker": "HREC11",
       "nome": "FII Hedgerec",
       "segmento": "Papel",
-      "dy_pct": 12.94,
-      "pvp": 0.9,
-      "patrimonio_liquido": 410903000.0,
-      "preco": 7.95,
+      "dy_pct": 12.97,
+      "pvp": 0.89,
+      "patrimonio_liquido": 409869000.0,
+      "preco": 7.93,
       "logo": null,
-      "variacao_dia_pct": -1.1194
+      "cnpj": "35507262000121",
+      "variacao_dia_pct": -0.2516
     },
     {
       "ticker": "HRES11",
@@ -2449,40 +2628,44 @@
       "patrimonio_liquido": 68105800.0,
       "preco": 145.45,
       "logo": null,
+      "cnpj": "42869853000104",
       "variacao_dia_pct": 2.7705
     },
     {
       "ticker": "HSAF11",
       "nome": "FII Hsi Cri",
       "segmento": "Papel",
-      "dy_pct": 14.88,
+      "dy_pct": 14.84,
       "pvp": 0.85,
-      "patrimonio_liquido": 191144000.0,
-      "preco": 75.66,
+      "patrimonio_liquido": 191599000.0,
+      "preco": 74.76,
       "logo": null,
-      "variacao_dia_pct": -0.2636
+      "cnpj": "35360687000150",
+      "variacao_dia_pct": -1.1895
     },
     {
       "ticker": "HSLG11",
       "nome": "FII Hsi Log",
       "segmento": "Logístico",
-      "dy_pct": 10.58,
+      "dy_pct": 10.57,
       "pvp": 0.74,
-      "patrimonio_liquido": 1031160000.0,
-      "preco": 81.45,
+      "patrimonio_liquido": 1031420000.0,
+      "preco": 80.41,
       "logo": null,
-      "variacao_dia_pct": -1.8202
+      "cnpj": "32903621000171",
+      "variacao_dia_pct": -1.2769
     },
     {
       "ticker": "HSML11",
       "nome": "FII Hsi Mall",
       "segmento": "Tijolo",
-      "dy_pct": 10.17,
-      "pvp": 0.85,
-      "patrimonio_liquido": 1787450000.0,
-      "preco": 83.8,
+      "dy_pct": 10.24,
+      "pvp": 0.84,
+      "patrimonio_liquido": 1774010000.0,
+      "preco": 83.26,
       "logo": null,
-      "variacao_dia_pct": -1.1209
+      "cnpj": "32892018000131",
+      "variacao_dia_pct": -0.6444
     },
     {
       "ticker": "HSRE11",
@@ -2493,29 +2676,32 @@
       "patrimonio_liquido": 769295000.0,
       "preco": 86.45,
       "logo": null,
+      "cnpj": "08098114000128",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "HTMX11",
       "nome": "FII Hotel Mx",
       "segmento": "Tijolo",
-      "dy_pct": 12.69,
-      "pvp": 0.91,
-      "patrimonio_liquido": 389200000.0,
-      "preco": 134.76,
+      "dy_pct": 12.57,
+      "pvp": 0.92,
+      "patrimonio_liquido": 393185000.0,
+      "preco": 136.14,
       "logo": null,
-      "variacao_dia_pct": -0.0074
+      "cnpj": "08706065000169",
+      "variacao_dia_pct": 1.024
     },
     {
       "ticker": "HUCG11",
       "nome": "FII Unimed C",
       "segmento": "Outros",
-      "dy_pct": 9.62,
+      "dy_pct": 9.61,
       "pvp": 0.67,
-      "patrimonio_liquido": 95103600.0,
-      "preco": 84.88,
+      "patrimonio_liquido": 95204500.0,
+      "preco": 84.97,
       "logo": null,
-      "variacao_dia_pct": 0.0118
+      "cnpj": "39347413000182",
+      "variacao_dia_pct": 0.106
     },
     {
       "ticker": "HUSC11",
@@ -2526,6 +2712,7 @@
       "patrimonio_liquido": 81687300.0,
       "preco": 96.01,
       "logo": null,
+      "cnpj": "28851767000143",
       "variacao_dia_pct": 0.0
     },
     {
@@ -2537,6 +2724,7 @@
       "patrimonio_liquido": 139633000.0,
       "preco": 1199.99,
       "logo": null,
+      "cnpj": "30017492000199",
       "variacao_dia_pct": 0.8
     },
     {
@@ -2548,18 +2736,20 @@
       "patrimonio_liquido": 237094000.0,
       "preco": 181.5,
       "logo": null,
+      "cnpj": "28899178000135",
       "variacao_dia_pct": 0.5301
     },
     {
       "ticker": "IAAG11",
       "nome": "Fiagro Iaag",
       "segmento": "Papel",
-      "dy_pct": 5.94,
+      "dy_pct": 5.99,
       "pvp": 0.74,
-      "patrimonio_liquido": 76001900.0,
-      "preco": 7.27,
+      "patrimonio_liquido": 75479200.0,
+      "preco": 7.22,
       "logo": null,
-      "variacao_dia_pct": 0.8322
+      "cnpj": "42692399000169",
+      "variacao_dia_pct": -0.6878
     },
     {
       "ticker": "IAGR11",
@@ -2570,29 +2760,32 @@
       "patrimonio_liquido": 12199000.0,
       "preco": 4.36,
       "logo": null,
+      "cnpj": "44286898000181",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "IBBP11",
       "nome": "FII Ibbp",
       "segmento": "Outros",
-      "dy_pct": 11.11,
-      "pvp": 0.85,
-      "patrimonio_liquido": 849409000.0,
-      "preco": 8.32,
+      "dy_pct": 10.84,
+      "pvp": 0.87,
+      "patrimonio_liquido": 869828000.0,
+      "preco": 8.52,
       "logo": null,
-      "variacao_dia_pct": 0.8485
+      "cnpj": "52551605000174",
+      "variacao_dia_pct": 2.4038
     },
     {
       "ticker": "IBCR11",
       "nome": "FII Brei",
       "segmento": "Papel",
-      "dy_pct": 17.65,
+      "dy_pct": 17.85,
       "pvp": 0.47,
-      "patrimonio_liquido": 40253800.0,
-      "preco": 42.0,
+      "patrimonio_liquido": 39812900.0,
+      "preco": 41.3,
       "logo": null,
-      "variacao_dia_pct": 2.9664
+      "cnpj": "40011251000196",
+      "variacao_dia_pct": -1.6667
     },
     {
       "ticker": "IBFF11",
@@ -2603,6 +2796,7 @@
       "patrimonio_liquido": 44267600.0,
       "preco": 66.4,
       "logo": null,
+      "cnpj": "33721517000129",
       "variacao_dia_pct": 0.0
     },
     {
@@ -2614,18 +2808,20 @@
       "patrimonio_liquido": 60000000.0,
       "preco": 500.0,
       "logo": null,
+      "cnpj": "53137434000102",
       "variacao_dia_pct": 2.54
     },
     {
       "ticker": "ICRI11",
       "nome": "FII Ci Ipca",
       "segmento": "Outros",
-      "dy_pct": 13.26,
+      "dy_pct": 13.31,
       "pvp": 0.9,
-      "patrimonio_liquido": 346584000.0,
-      "preco": 89.85,
+      "patrimonio_liquido": 345234000.0,
+      "preco": 89.5,
       "logo": null,
-      "variacao_dia_pct": 3.4304
+      "cnpj": "51294441000184",
+      "variacao_dia_pct": -0.3895
     },
     {
       "ticker": "IDFI11",
@@ -2656,7 +2852,8 @@
       "patrimonio_liquido": 11691200.0,
       "preco": 29.06,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "52324762000147",
+      "variacao_dia_pct": 0.5008
     },
     {
       "ticker": "IFID11",
@@ -2682,23 +2879,25 @@
       "ticker": "INHF11",
       "nome": "FII INHF",
       "segmento": "Outros",
-      "dy_pct": 0.67,
-      "pvp": 1.47,
-      "patrimonio_liquido": 293613000.0,
-      "preco": 14.7,
+      "dy_pct": 0.88,
+      "pvp": 1.13,
+      "patrimonio_liquido": 225703000.0,
+      "preco": 11.2,
       "logo": null,
-      "variacao_dia_pct": -5.1001
+      "cnpj": "58501860000199",
+      "variacao_dia_pct": -23.8095
     },
     {
       "ticker": "INLG11",
       "nome": "FII Inter Lg",
       "segmento": "Outros",
-      "dy_pct": 12.53,
+      "dy_pct": 12.55,
       "pvp": 0.58,
-      "patrimonio_liquido": 277630000.0,
-      "preco": 61.6,
+      "patrimonio_liquido": 277178000.0,
+      "preco": 61.0,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "34598181000111",
+      "variacao_dia_pct": -0.8614
     },
     {
       "ticker": "INRD11",
@@ -2709,6 +2908,7 @@
       "patrimonio_liquido": 82012400.0,
       "preco": 72.65,
       "logo": null,
+      "cnpj": "34835191000123",
       "variacao_dia_pct": 1.001
     },
     {
@@ -2725,12 +2925,13 @@
       "ticker": "IRIM11",
       "nome": "FII Irim",
       "segmento": "Outros",
-      "dy_pct": 16.47,
-      "pvp": 0.74,
-      "patrimonio_liquido": 2125890000.0,
-      "preco": 60.35,
+      "dy_pct": 16.53,
+      "pvp": 0.73,
+      "patrimonio_liquido": 2118490000.0,
+      "preco": 60.14,
       "logo": null,
-      "variacao_dia_pct": -0.6748
+      "cnpj": "41076564000195",
+      "variacao_dia_pct": -0.348
     },
     {
       "ticker": "ISCJ11",
@@ -2751,29 +2952,32 @@
       "patrimonio_liquido": 40549800.0,
       "preco": 54.2,
       "logo": null,
+      "cnpj": "36312772000106",
       "variacao_dia_pct": 1.7267
     },
     {
       "ticker": "ITIT11",
       "nome": "FII Inter It",
       "segmento": "Híbrido",
-      "dy_pct": 12.1,
+      "dy_pct": 12.2,
       "pvp": 0.82,
-      "patrimonio_liquido": 54786100.0,
-      "preco": 61.35,
+      "patrimonio_liquido": 54353800.0,
+      "preco": 60.36,
       "logo": null,
-      "variacao_dia_pct": -1.2554
+      "cnpj": "36293425000183",
+      "variacao_dia_pct": -0.789
     },
     {
       "ticker": "ITRI11",
       "nome": "FII Itri",
       "segmento": "Tijolo",
-      "dy_pct": 13.48,
-      "pvp": 0.88,
-      "patrimonio_liquido": 479562000.0,
-      "preco": 76.74,
+      "dy_pct": 13.69,
+      "pvp": 0.86,
+      "patrimonio_liquido": 471875000.0,
+      "preco": 75.5,
       "logo": null,
-      "variacao_dia_pct": -2.3043
+      "cnpj": "52270671000176",
+      "variacao_dia_pct": -1.603
     },
     {
       "ticker": "JASC11",
@@ -2784,6 +2988,7 @@
       "patrimonio_liquido": 385119000.0,
       "preco": 100.0,
       "logo": null,
+      "cnpj": "40886241000102",
       "variacao_dia_pct": 0.0
     },
     {
@@ -2795,18 +3000,20 @@
       "patrimonio_liquido": 104897000.0,
       "preco": 82.01,
       "logo": null,
+      "cnpj": "36615915000159",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "JCCJ11",
       "nome": "FII Jhsf Cj",
       "segmento": "Papel",
-      "dy_pct": 12.76,
-      "pvp": 0.72,
-      "patrimonio_liquido": 744891000.0,
-      "preco": 142.89,
+      "dy_pct": 12.89,
+      "pvp": 0.71,
+      "patrimonio_liquido": 737384000.0,
+      "preco": 141.45,
       "logo": null,
-      "variacao_dia_pct": -0.54
+      "cnpj": "50701686000116",
+      "variacao_dia_pct": -1.01
     },
     {
       "ticker": "JCIN11",
@@ -2817,29 +3024,32 @@
       "patrimonio_liquido": 196208000.0,
       "preco": 148.9,
       "logo": null,
+      "cnpj": "50718976000172",
       "variacao_dia_pct": 0.1788
     },
     {
       "ticker": "JFLL11",
       "nome": "FII Jfl Liv",
       "segmento": "Outros",
-      "dy_pct": 7.82,
+      "dy_pct": 7.85,
       "pvp": 0.49,
-      "patrimonio_liquido": 77115700.0,
-      "preco": 51.39,
+      "patrimonio_liquido": 76905600.0,
+      "preco": 51.26,
       "logo": null,
-      "variacao_dia_pct": 0.7845
+      "cnpj": "36501181000187",
+      "variacao_dia_pct": -0.253
     },
     {
       "ticker": "JGPX11",
       "nome": "Fiagro Jgp",
       "segmento": "Papel",
       "dy_pct": 0.0,
-      "pvp": 0.54,
-      "patrimonio_liquido": 111088000.0,
-      "preco": 51.88,
+      "pvp": 0.53,
+      "patrimonio_liquido": 109953000.0,
+      "preco": 51.35,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "42888292000190",
+      "variacao_dia_pct": -1.0216
     },
     {
       "ticker": "JPPA11",
@@ -2850,7 +3060,8 @@
       "patrimonio_liquido": 69602800.0,
       "preco": 76.99,
       "logo": null,
-      "variacao_dia_pct": 2.5576
+      "cnpj": "30982880000100",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "JPPC11",
@@ -2861,6 +3072,7 @@
       "patrimonio_liquido": 7760500.0,
       "preco": 141.1,
       "logo": null,
+      "cnpj": "17216625000198",
       "variacao_dia_pct": 0.0
     },
     {
@@ -2877,45 +3089,49 @@
       "ticker": "JSAF11",
       "nome": "FII Js A Fin",
       "segmento": "Híbrido",
-      "dy_pct": 13.62,
-      "pvp": 0.8,
-      "patrimonio_liquido": 545764000.0,
-      "preco": 7.04,
+      "dy_pct": 13.7,
+      "pvp": 0.79,
+      "patrimonio_liquido": 542663000.0,
+      "preco": 7.0,
       "logo": null,
-      "variacao_dia_pct": 0.428
+      "cnpj": "42085661000107",
+      "variacao_dia_pct": -0.5682
     },
     {
       "ticker": "JSCR11",
       "nome": "FII Jscr",
       "segmento": "Outros",
-      "dy_pct": 14.86,
-      "pvp": 0.83,
-      "patrimonio_liquido": 173776000.0,
-      "preco": 7.87,
+      "dy_pct": 14.79,
+      "pvp": 0.84,
+      "patrimonio_liquido": 174662000.0,
+      "preco": 7.84,
       "logo": null,
-      "variacao_dia_pct": -1.9925
+      "cnpj": "54866214000174",
+      "variacao_dia_pct": -0.1274
     },
     {
       "ticker": "JSRE11",
       "nome": "FII Js Real",
       "segmento": "Outros",
-      "dy_pct": 9.53,
-      "pvp": 0.59,
-      "patrimonio_liquido": 1253520000.0,
-      "preco": 60.36,
+      "dy_pct": 9.48,
+      "pvp": 0.6,
+      "patrimonio_liquido": 1260370000.0,
+      "preco": 60.94,
       "logo": null,
-      "variacao_dia_pct": 0.2658
+      "cnpj": "13371132000171",
+      "variacao_dia_pct": 0.9609
     },
     {
       "ticker": "KCRE11",
       "nome": "FII Kinea Cr",
       "segmento": "Papel",
-      "dy_pct": 13.42,
+      "dy_pct": 13.47,
       "pvp": 0.91,
-      "patrimonio_liquido": 307440000.0,
+      "patrimonio_liquido": 306360000.0,
       "preco": 8.54,
       "logo": null,
-      "variacao_dia_pct": 1.0651
+      "cnpj": "42502802000140",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "KDOL11",
@@ -2926,7 +3142,8 @@
       "patrimonio_liquido": 55054100.0,
       "preco": 82.05,
       "logo": null,
-      "variacao_dia_pct": 0.5761
+      "cnpj": "51641681000108",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "KEVE11",
@@ -2937,6 +3154,7 @@
       "patrimonio_liquido": 77543000.0,
       "preco": 525.0,
       "logo": null,
+      "cnpj": "32317313000164",
       "variacao_dia_pct": 7.188
     },
     {
@@ -2948,18 +3166,20 @@
       "patrimonio_liquido": 196516000.0,
       "preco": 1100.0,
       "logo": null,
+      "cnpj": "55753193000143",
       "variacao_dia_pct": 1.0686
     },
     {
       "ticker": "KFOF11",
       "nome": "FII Kineafof",
       "segmento": "Híbrido",
-      "dy_pct": 12.24,
+      "dy_pct": 12.23,
       "pvp": 0.89,
-      "patrimonio_liquido": 544681000.0,
-      "preco": 77.65,
+      "patrimonio_liquido": 545032000.0,
+      "preco": 77.7,
       "logo": null,
-      "variacao_dia_pct": 0.1806
+      "cnpj": "30091444000140",
+      "variacao_dia_pct": 0.0644
     },
     {
       "ticker": "KINP11",
@@ -2978,20 +3198,22 @@
       "dy_pct": 13.7,
       "pvp": 0.8,
       "patrimonio_liquido": 362029000.0,
-      "preco": 6.08,
+      "preco": 6.04,
       "logo": null,
-      "variacao_dia_pct": 0.1647
+      "cnpj": "36669660000107",
+      "variacao_dia_pct": -0.6579
     },
     {
       "ticker": "KIVO11",
       "nome": "FII Kivo",
       "segmento": "Papel",
-      "dy_pct": 20.08,
+      "dy_pct": 20.06,
       "pvp": 0.63,
-      "patrimonio_liquido": 117872000.0,
-      "preco": 53.03,
+      "patrimonio_liquido": 117961000.0,
+      "preco": 52.94,
       "logo": null,
-      "variacao_dia_pct": -0.2821
+      "cnpj": "42273325000198",
+      "variacao_dia_pct": -0.1697
     },
     {
       "ticker": "KNCA11",
@@ -2999,54 +3221,59 @@
       "segmento": "Papel",
       "dy_pct": 0.0,
       "pvp": 0.84,
-      "patrimonio_liquido": 1857590000.0,
-      "preco": 86.0,
+      "patrimonio_liquido": 1861050000.0,
+      "preco": 86.16,
       "logo": null,
-      "variacao_dia_pct": -1.1494
+      "cnpj": "41745701000137",
+      "variacao_dia_pct": 0.186
     },
     {
       "ticker": "KNCR11",
       "nome": "FII Kinea Ri",
       "segmento": "Papel",
-      "dy_pct": 13.06,
-      "pvp": 1.04,
-      "patrimonio_liquido": 11453200000.0,
-      "preco": 106.95,
+      "dy_pct": 13.16,
+      "pvp": 1.03,
+      "patrimonio_liquido": 11368600000.0,
+      "preco": 106.16,
       "logo": null,
-      "variacao_dia_pct": 0.1874
+      "cnpj": "16706958000132",
+      "variacao_dia_pct": -0.7387
     },
     {
       "ticker": "KNHF11",
       "nome": "FII Kinea Hf",
       "segmento": "Outros",
-      "dy_pct": 12.94,
-      "pvp": 0.93,
-      "patrimonio_liquido": 1803120000.0,
-      "preco": 91.7,
+      "dy_pct": 12.99,
+      "pvp": 0.92,
+      "patrimonio_liquido": 1796630000.0,
+      "preco": 91.37,
       "logo": null,
-      "variacao_dia_pct": -0.2176
+      "cnpj": "42754342000147",
+      "variacao_dia_pct": -0.3599
     },
     {
       "ticker": "KNHY11",
       "nome": "FII Kinea Hy",
       "segmento": "Papel",
-      "dy_pct": 12.26,
+      "dy_pct": 12.27,
       "pvp": 0.95,
-      "patrimonio_liquido": 2937440000.0,
-      "preco": 94.23,
+      "patrimonio_liquido": 2933700000.0,
+      "preco": 94.11,
       "logo": null,
-      "variacao_dia_pct": -0.8105
+      "cnpj": "30130708000128",
+      "variacao_dia_pct": -0.1273
     },
     {
       "ticker": "KNIP11",
       "nome": "FII Kinea Ip",
       "segmento": "Papel",
-      "dy_pct": 11.14,
-      "pvp": 0.96,
-      "patrimonio_liquido": 7189420000.0,
-      "preco": 89.78,
+      "dy_pct": 11.23,
+      "pvp": 0.95,
+      "patrimonio_liquido": 7136570000.0,
+      "preco": 89.48,
       "logo": null,
-      "variacao_dia_pct": -0.8832
+      "cnpj": "24960430000113",
+      "variacao_dia_pct": -0.3342
     },
     {
       "ticker": "KNPR11",
@@ -3057,51 +3284,56 @@
       "patrimonio_liquido": 14845700.0,
       "preco": 25.6,
       "logo": null,
+      "cnpj": "42737059000107",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "KNRE11",
       "nome": "FII Kii Real",
       "segmento": "Outros",
-      "dy_pct": 0.49,
-      "pvp": 0.43,
-      "patrimonio_liquido": 4636790.0,
-      "preco": 0.25,
+      "dy_pct": 0.59,
+      "pvp": 0.36,
+      "patrimonio_liquido": 3894900.0,
+      "preco": 0.21,
       "logo": null,
-      "variacao_dia_pct": 13.6364
+      "cnpj": "14423780000197",
+      "variacao_dia_pct": -16.0
     },
     {
       "ticker": "KNRI11",
       "nome": "FII Kinea",
       "segmento": "Outros",
-      "dy_pct": 8.23,
-      "pvp": 0.97,
-      "patrimonio_liquido": 4461880000.0,
-      "preco": 158.7,
+      "dy_pct": 8.32,
+      "pvp": 0.96,
+      "patrimonio_liquido": 4413650000.0,
+      "preco": 156.51,
       "logo": null,
-      "variacao_dia_pct": -0.0189
+      "cnpj": "12005956000165",
+      "variacao_dia_pct": -1.0683
     },
     {
       "ticker": "KNSC11",
       "nome": "FII Kinea Sc",
       "segmento": "Papel",
-      "dy_pct": 12.6,
-      "pvp": 1.03,
-      "patrimonio_liquido": 1839440000.0,
-      "preco": 9.01,
+      "dy_pct": 12.65,
+      "pvp": 1.02,
+      "patrimonio_liquido": 1831270000.0,
+      "preco": 8.97,
       "logo": null,
-      "variacao_dia_pct": -0.6615
+      "cnpj": "35864448000138",
+      "variacao_dia_pct": -0.444
     },
     {
       "ticker": "KNUQ11",
       "nome": "FII Kinea Un",
       "segmento": "Papel",
-      "dy_pct": 14.03,
+      "dy_pct": 14.08,
       "pvp": 1.02,
-      "patrimonio_liquido": 2202180000.0,
-      "preco": 102.5,
+      "patrimonio_liquido": 2194880000.0,
+      "preco": 102.12,
       "logo": null,
-      "variacao_dia_pct": -0.1364
+      "cnpj": "42754362000118",
+      "variacao_dia_pct": -0.3707
     },
     {
       "ticker": "KOPA11",
@@ -3109,21 +3341,23 @@
       "segmento": "Papel",
       "dy_pct": 0.0,
       "pvp": 0.23,
-      "patrimonio_liquido": 79447600.0,
-      "preco": 224.0,
+      "patrimonio_liquido": 79359000.0,
+      "preco": 225.99,
       "logo": null,
-      "variacao_dia_pct": -1.7544
+      "cnpj": "51475461000151",
+      "variacao_dia_pct": 0.8884
     },
     {
       "ticker": "KORE11",
       "nome": "FII Kore",
       "segmento": "Tijolo",
-      "dy_pct": 14.73,
+      "dy_pct": 14.75,
       "pvp": 0.61,
-      "patrimonio_liquido": 631400000.0,
-      "preco": 65.6,
+      "patrimonio_liquido": 630438000.0,
+      "preco": 65.66,
       "logo": null,
-      "variacao_dia_pct": -1.3237
+      "cnpj": "52219978000142",
+      "variacao_dia_pct": 0.0915
     },
     {
       "ticker": "LAFI11",
@@ -3134,18 +3368,20 @@
       "patrimonio_liquido": 95562500.0,
       "preco": 123.9,
       "logo": null,
+      "cnpj": "51710043000100",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "LASC11",
       "nome": "FII Legatus",
       "segmento": "Tijolo",
-      "dy_pct": 7.35,
+      "dy_pct": 7.37,
       "pvp": 0.83,
-      "patrimonio_liquido": 323433000.0,
-      "preco": 110.29,
+      "patrimonio_liquido": 322551000.0,
+      "preco": 110.0,
       "logo": null,
-      "variacao_dia_pct": -0.2171
+      "cnpj": "30248158000146",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "LATR11B",
@@ -3166,6 +3402,7 @@
       "patrimonio_liquido": 1396500.0,
       "preco": 2.1,
       "logo": null,
+      "cnpj": "24796967000190",
       "variacao_dia_pct": 0.0
     },
     {
@@ -3182,12 +3419,13 @@
       "ticker": "LIFE11",
       "nome": "FII Life",
       "segmento": "Outros",
-      "dy_pct": 20.27,
+      "dy_pct": 20.33,
       "pvp": 0.71,
-      "patrimonio_liquido": 275945000.0,
-      "preco": 6.94,
+      "patrimonio_liquido": 275150000.0,
+      "preco": 6.92,
       "logo": null,
-      "variacao_dia_pct": -0.2874
+      "cnpj": "39753295000102",
+      "variacao_dia_pct": -0.2882
     },
     {
       "ticker": "LKDV11",
@@ -3198,6 +3436,7 @@
       "patrimonio_liquido": 73767400.0,
       "preco": 1104.12,
       "logo": null,
+      "cnpj": "40102445000105",
       "variacao_dia_pct": 0.0
     },
     {
@@ -3209,18 +3448,20 @@
       "patrimonio_liquido": 20657200.0,
       "preco": 57.2,
       "logo": null,
+      "cnpj": "41218404000133",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "LMAI11",
       "nome": "LABINAFII",
       "segmento": "Outros",
-      "dy_pct": 9.96,
-      "pvp": 0.34,
-      "patrimonio_liquido": 186334000.0,
-      "preco": 35.29,
+      "dy_pct": 10.33,
+      "pvp": 0.32,
+      "patrimonio_liquido": 179522000.0,
+      "preco": 34.0,
       "logo": null,
-      "variacao_dia_pct": -0.0283
+      "cnpj": "17374696000119",
+      "variacao_dia_pct": -3.6554
     },
     {
       "ticker": "LOFT11B",
@@ -3241,6 +3482,7 @@
       "patrimonio_liquido": 232390000.0,
       "preco": 290.0,
       "logo": null,
+      "cnpj": "37262752000130",
       "variacao_dia_pct": 0.9264
     },
     {
@@ -3248,22 +3490,24 @@
       "nome": "FII Leblon",
       "segmento": "Outros",
       "dy_pct": 43.23,
-      "pvp": 1.95,
-      "patrimonio_liquido": 63311700.0,
-      "preco": 171.0,
+      "pvp": 1.83,
+      "patrimonio_liquido": 59357500.0,
+      "preco": 160.32,
       "logo": null,
-      "variacao_dia_pct": -0.5872
+      "cnpj": "41088534000107",
+      "variacao_dia_pct": 0.0014
     },
     {
       "ticker": "LSAG11",
       "nome": "Fiagro Leste",
       "segmento": "Papel",
       "dy_pct": 0.0,
-      "pvp": 0.75,
-      "patrimonio_liquido": 74630200.0,
-      "preco": 73.94,
+      "pvp": 0.74,
+      "patrimonio_liquido": 73681400.0,
+      "preco": 73.0,
       "logo": null,
-      "variacao_dia_pct": 1.4684
+      "cnpj": "42592476000109",
+      "variacao_dia_pct": -1.2713
     },
     {
       "ticker": "LSOI11",
@@ -3274,18 +3518,20 @@
       "patrimonio_liquido": 82196200.0,
       "preco": 15.32,
       "logo": null,
+      "cnpj": "53087126000101",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "LSOP11",
       "nome": "FII LSOP",
       "segmento": "Outros",
-      "dy_pct": 3.75,
-      "pvp": 0.92,
-      "patrimonio_liquido": 31500000.0,
-      "preco": 10.0,
+      "dy_pct": 3.5,
+      "pvp": 0.99,
+      "patrimonio_liquido": 33705000.0,
+      "preco": 10.7,
       "logo": null,
-      "variacao_dia_pct": -4.7619
+      "cnpj": "63429256000139",
+      "variacao_dia_pct": 7.0
     },
     {
       "ticker": "LSPA11",
@@ -3306,6 +3552,7 @@
       "patrimonio_liquido": 16100200.0,
       "preco": 93.78,
       "logo": null,
+      "cnpj": "46449786000120",
       "variacao_dia_pct": 0.0
     },
     {
@@ -3322,12 +3569,13 @@
       "ticker": "LVBI11",
       "nome": "FII Vbi Log",
       "segmento": "Logístico",
-      "dy_pct": 9.24,
+      "dy_pct": 9.27,
       "pvp": 0.8,
-      "patrimonio_liquido": 1566080000.0,
-      "preco": 97.16,
+      "patrimonio_liquido": 1562210000.0,
+      "preco": 97.1,
       "logo": null,
-      "variacao_dia_pct": -0.318
+      "cnpj": "30629603000118",
+      "variacao_dia_pct": -0.0618
     },
     {
       "ticker": "MALL11",
@@ -3343,12 +3591,13 @@
       "ticker": "MANA11",
       "nome": "FII Manati",
       "segmento": "Outros",
-      "dy_pct": 27.27,
-      "pvp": 1.0,
-      "patrimonio_liquido": 346083000.0,
-      "preco": 9.22,
+      "dy_pct": 27.42,
+      "pvp": 0.99,
+      "patrimonio_liquido": 344206000.0,
+      "preco": 9.17,
       "logo": null,
-      "variacao_dia_pct": 0.2174
+      "cnpj": "42888583000189",
+      "variacao_dia_pct": -0.5423
     },
     {
       "ticker": "MATV11",
@@ -3364,12 +3613,13 @@
       "ticker": "MAXR11",
       "nome": "FII Max Ret",
       "segmento": "Tijolo",
-      "dy_pct": 6.85,
-      "pvp": 0.56,
-      "patrimonio_liquido": 58646600.0,
-      "preco": 50.0,
+      "dy_pct": 7.14,
+      "pvp": 0.53,
+      "patrimonio_liquido": 56282800.0,
+      "preco": 50.76,
       "logo": null,
-      "variacao_dia_pct": -1.9608
+      "cnpj": "11274415000170",
+      "variacao_dia_pct": -2.572
     },
     {
       "ticker": "MBRF11",
@@ -3385,12 +3635,13 @@
       "ticker": "MCCI11",
       "nome": "FII Maua",
       "segmento": "Papel",
-      "dy_pct": 12.59,
+      "dy_pct": 12.58,
       "pvp": 1.0,
-      "patrimonio_liquido": 1597630000.0,
-      "preco": 94.89,
+      "patrimonio_liquido": 1599500000.0,
+      "preco": 93.8,
       "logo": null,
-      "variacao_dia_pct": 0.0316
+      "cnpj": "23648935000184",
+      "variacao_dia_pct": -0.4246
     },
     {
       "ticker": "MCEM11",
@@ -3401,6 +3652,7 @@
       "patrimonio_liquido": 92272700.0,
       "preco": 26.97,
       "logo": null,
+      "cnpj": "46157247000117",
       "variacao_dia_pct": 0.0
     },
     {
@@ -3427,23 +3679,25 @@
       "ticker": "MCLO11",
       "nome": "FII Mclo",
       "segmento": "Outros",
-      "dy_pct": 9.85,
+      "dy_pct": 9.86,
       "pvp": 0.76,
-      "patrimonio_liquido": 1306260000.0,
-      "preco": 10.48,
+      "patrimonio_liquido": 1305010000.0,
+      "preco": 10.47,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "57466934000130",
+      "variacao_dia_pct": -0.0954
     },
     {
       "ticker": "MCRE11",
       "nome": "FII Maua Re",
       "segmento": "Papel",
-      "dy_pct": 16.62,
+      "dy_pct": 16.75,
       "pvp": 0.77,
-      "patrimonio_liquido": 861544000.0,
-      "preco": 7.72,
+      "patrimonio_liquido": 854848000.0,
+      "preco": 7.66,
       "logo": null,
-      "variacao_dia_pct": -2.8931
+      "cnpj": "36655973000106",
+      "variacao_dia_pct": -0.7772
     },
     {
       "ticker": "MFAI11",
@@ -3469,12 +3723,13 @@
       "ticker": "MFII11",
       "nome": "FII Merito I",
       "segmento": "Outros",
-      "dy_pct": 26.51,
-      "pvp": 0.41,
-      "patrimonio_liquido": 272000000.0,
-      "preco": 40.2,
+      "dy_pct": 27.27,
+      "pvp": 0.4,
+      "patrimonio_liquido": 264384000.0,
+      "preco": 38.98,
       "logo": null,
-      "variacao_dia_pct": 3.3419
+      "cnpj": "16915968000188",
+      "variacao_dia_pct": -2.55
     },
     {
       "ticker": "MGCR11",
@@ -3485,6 +3740,7 @@
       "patrimonio_liquido": 126115000.0,
       "preco": 9.4,
       "logo": null,
+      "cnpj": "35652204000191",
       "variacao_dia_pct": 0.0
     },
     {
@@ -3502,11 +3758,12 @@
       "nome": "FII Mogno Ht",
       "segmento": "Tijolo",
       "dy_pct": 0.0,
-      "pvp": 0.51,
-      "patrimonio_liquido": 16422300.0,
-      "preco": 12.5,
+      "pvp": 0.53,
+      "patrimonio_liquido": 17250000.0,
+      "preco": 13.13,
       "logo": null,
-      "variacao_dia_pct": -1.8068
+      "cnpj": "34197776000165",
+      "variacao_dia_pct": 5.04
     },
     {
       "ticker": "MGIM11",
@@ -3532,11 +3789,12 @@
       "ticker": "MIDW11",
       "nome": "FII MIDW",
       "segmento": "Outros",
-      "dy_pct": 3.94,
+      "dy_pct": 3.91,
       "pvp": 1.13,
       "patrimonio_liquido": 207900000.0,
       "preco": 11.0,
       "logo": null,
+      "cnpj": "63992956000137",
       "variacao_dia_pct": 0.5944
     },
     {
@@ -3558,6 +3816,7 @@
       "patrimonio_liquido": 36031400.0,
       "preco": 67.92,
       "logo": null,
+      "cnpj": "41080968000152",
       "variacao_dia_pct": 1.3137
     },
     {
@@ -3584,12 +3843,13 @@
       "ticker": "MXRF11",
       "nome": "FII Maxi Ren",
       "segmento": "Papel",
-      "dy_pct": 14.09,
+      "dy_pct": 14.18,
       "pvp": 0.98,
-      "patrimonio_liquido": 5155910000.0,
-      "preco": 9.12,
+      "patrimonio_liquido": 5121870000.0,
+      "preco": 9.05,
       "logo": null,
-      "variacao_dia_pct": 0.1098
+      "cnpj": "97521225000125",
+      "variacao_dia_pct": -0.44
     },
     {
       "ticker": "NAUI11",
@@ -3600,18 +3860,20 @@
       "patrimonio_liquido": 51735000.0,
       "preco": 1000.0,
       "logo": null,
+      "cnpj": "49649500000148",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "NAVT11",
       "nome": "FII Navi Tot",
       "segmento": "Papel",
-      "dy_pct": 17.08,
+      "dy_pct": 17.13,
       "pvp": 0.75,
-      "patrimonio_liquido": 38684000.0,
-      "preco": 63.18,
+      "patrimonio_liquido": 38573800.0,
+      "preco": 63.0,
       "logo": null,
-      "variacao_dia_pct": 1.0233
+      "cnpj": "35652252000180",
+      "variacao_dia_pct": -0.2849
     },
     {
       "ticker": "NCHB11B",
@@ -3637,23 +3899,25 @@
       "ticker": "NCRI11",
       "nome": "FII Navi Cri",
       "segmento": "Papel",
-      "dy_pct": 14.99,
-      "pvp": 0.84,
-      "patrimonio_liquido": 33298500.0,
-      "preco": 8.43,
+      "dy_pct": 15.2,
+      "pvp": 0.83,
+      "patrimonio_liquido": 32824500.0,
+      "preco": 8.31,
       "logo": null,
-      "variacao_dia_pct": -0.1185
+      "cnpj": "40041603000156",
+      "variacao_dia_pct": -1.4235
     },
     {
       "ticker": "NEWL11",
       "nome": "FII Newport",
       "segmento": "Outros",
-      "dy_pct": 11.12,
-      "pvp": 0.81,
-      "patrimonio_liquido": 298527000.0,
-      "preco": 105.9,
+      "dy_pct": 11.15,
+      "pvp": 0.8,
+      "patrimonio_liquido": 297852000.0,
+      "preco": 105.03,
       "logo": null,
-      "variacao_dia_pct": -0.0755
+      "cnpj": "32527626000147",
+      "variacao_dia_pct": -1.1296
     },
     {
       "ticker": "NEWU11",
@@ -3664,6 +3928,7 @@
       "patrimonio_liquido": 82761100.0,
       "preco": 108.51,
       "logo": null,
+      "cnpj": "14793782000178",
       "variacao_dia_pct": 0.0
     },
     {
@@ -3672,10 +3937,11 @@
       "segmento": "Papel",
       "dy_pct": 0.0,
       "pvp": 1.28,
-      "patrimonio_liquido": 89799200.0,
-      "preco": 128.5,
+      "patrimonio_liquido": 89820100.0,
+      "preco": 128.59,
       "logo": null,
-      "variacao_dia_pct": -0.3722
+      "cnpj": "52044477000172",
+      "variacao_dia_pct": 0.0233
     },
     {
       "ticker": "NPAR11",
@@ -3691,12 +3957,13 @@
       "ticker": "NSLU11",
       "nome": "FII Lourdes",
       "segmento": "Outros",
-      "dy_pct": 16.72,
-      "pvp": 0.73,
-      "patrimonio_liquido": 237551000.0,
-      "preco": 183.59,
+      "dy_pct": 16.78,
+      "pvp": 0.72,
+      "patrimonio_liquido": 236671000.0,
+      "preco": 183.04,
       "logo": null,
-      "variacao_dia_pct": 0.2129
+      "cnpj": "08014513000163",
+      "variacao_dia_pct": -0.3484
     },
     {
       "ticker": "NVHO11",
@@ -3707,7 +3974,8 @@
       "patrimonio_liquido": 600011000.0,
       "preco": 14.46,
       "logo": null,
-      "variacao_dia_pct": 0.347
+      "cnpj": "17025970000144",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "OBAL11",
@@ -3718,18 +3986,20 @@
       "patrimonio_liquido": 154701000.0,
       "preco": 1095.0,
       "logo": null,
+      "cnpj": "42273290000197",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "OCRE11",
       "nome": "FII Octo",
       "segmento": "Papel",
-      "dy_pct": 8.44,
-      "pvp": 0.49,
-      "patrimonio_liquido": 31543800.0,
-      "preco": 64.31,
+      "dy_pct": 6.49,
+      "pvp": 0.64,
+      "patrimonio_liquido": 41053800.0,
+      "preco": 85.0,
       "logo": null,
-      "variacao_dia_pct": 0.7994
+      "cnpj": "44680435000108",
+      "variacao_dia_pct": 30.1485
     },
     {
       "ticker": "OGHY11",
@@ -3745,23 +4015,25 @@
       "ticker": "OIAG11",
       "nome": "Fiagro Innov",
       "segmento": "Papel",
-      "dy_pct": 1.21,
-      "pvp": 0.81,
-      "patrimonio_liquido": 72083300.0,
-      "preco": 7.98,
+      "dy_pct": 1.24,
+      "pvp": 0.79,
+      "patrimonio_liquido": 70005700.0,
+      "preco": 7.73,
       "logo": null,
-      "variacao_dia_pct": -0.7463
+      "cnpj": "41218352000103",
+      "variacao_dia_pct": -3.1328
     },
     {
       "ticker": "ONDA11",
       "nome": "FII ONDA ME",
       "segmento": "Outros",
-      "dy_pct": 15.54,
-      "pvp": 0.77,
-      "patrimonio_liquido": 68454900.0,
-      "preco": 8.19,
+      "dy_pct": 16.75,
+      "pvp": 0.71,
+      "patrimonio_liquido": 63523500.0,
+      "preco": 7.6,
       "logo": null,
-      "variacao_dia_pct": 0.6143
+      "cnpj": "52966340000175",
+      "variacao_dia_pct": -7.2039
     },
     {
       "ticker": "ONDV11",
@@ -3782,6 +4054,7 @@
       "patrimonio_liquido": 182227000.0,
       "preco": 200.03,
       "logo": null,
+      "cnpj": "12948291000123",
       "variacao_dia_pct": 0.0
     },
     {
@@ -3818,12 +4091,13 @@
       "ticker": "OUJP11",
       "nome": "FII Ouri Jpp",
       "segmento": "Papel",
-      "dy_pct": 20.25,
+      "dy_pct": 20.36,
       "pvp": 0.71,
-      "patrimonio_liquido": 224024000.0,
-      "preco": 68.4,
+      "patrimonio_liquido": 222821000.0,
+      "preco": 68.54,
       "logo": null,
-      "variacao_dia_pct": -0.5958
+      "cnpj": "26091656000150",
+      "variacao_dia_pct": -0.4936
     },
     {
       "ticker": "OULG11",
@@ -3834,6 +4108,7 @@
       "patrimonio_liquido": 59333100.0,
       "preco": 25.17,
       "logo": null,
+      "cnpj": "13974819000100",
       "variacao_dia_pct": 1.78
     },
     {
@@ -3855,18 +4130,20 @@
       "patrimonio_liquido": 51799500.0,
       "preco": 130.03,
       "logo": null,
+      "cnpj": "58561237000121",
       "variacao_dia_pct": 0.6843
     },
     {
       "ticker": "PATA11",
       "nome": "FII Pata",
       "segmento": "Outros",
-      "dy_pct": 18.06,
-      "pvp": 0.97,
-      "patrimonio_liquido": 16662600.0,
-      "preco": 9.79,
+      "dy_pct": 18.17,
+      "pvp": 0.96,
+      "patrimonio_liquido": 16560500.0,
+      "preco": 9.73,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "53764894000152",
+      "variacao_dia_pct": -0.6129
     },
     {
       "ticker": "PATC11",
@@ -3874,10 +4151,11 @@
       "segmento": "Outros",
       "dy_pct": 1.89,
       "pvp": 1.05,
-      "patrimonio_liquido": 125153000.0,
-      "preco": 36.62,
+      "patrimonio_liquido": 125083000.0,
+      "preco": 35.29,
       "logo": null,
-      "variacao_dia_pct": -1.027
+      "cnpj": "30048651000112",
+      "variacao_dia_pct": -1.945
     },
     {
       "ticker": "PATL11",
@@ -3888,18 +4166,20 @@
       "patrimonio_liquido": 320207000.0,
       "preco": 64.15,
       "logo": null,
+      "cnpj": "35754164000199",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "PCIP11",
       "nome": "FII PCIP PAX",
       "segmento": "Papel",
-      "dy_pct": 14.06,
-      "pvp": 0.8,
-      "patrimonio_liquido": 1266520000.0,
-      "preco": 74.32,
+      "dy_pct": 14.14,
+      "pvp": 0.79,
+      "patrimonio_liquido": 1258700000.0,
+      "preco": 73.83,
       "logo": null,
-      "variacao_dia_pct": 1.1569
+      "cnpj": "28729197000113",
+      "variacao_dia_pct": -0.8328
     },
     {
       "ticker": "PDBM11",
@@ -3910,6 +4190,7 @@
       "patrimonio_liquido": 39100000.0,
       "preco": 115.0,
       "logo": null,
+      "cnpj": "56978773000100",
       "variacao_dia_pct": 0.0
     },
     {
@@ -3931,6 +4212,7 @@
       "patrimonio_liquido": 13159700.0,
       "preco": 23.84,
       "logo": null,
+      "cnpj": "34736510000143",
       "variacao_dia_pct": 0.0
     },
     {
@@ -3939,21 +4221,23 @@
       "segmento": "Outros",
       "dy_pct": 10.88,
       "pvp": 0.96,
-      "patrimonio_liquido": 346188000.0,
-      "preco": 63.46,
+      "patrimonio_liquido": 346133000.0,
+      "preco": 63.06,
       "logo": null,
-      "variacao_dia_pct": -0.0473
+      "cnpj": "32754734000152",
+      "variacao_dia_pct": -0.6773
     },
     {
       "ticker": "PLCA11",
       "nome": "Fiagro Plur",
       "segmento": "Papel",
       "dy_pct": 0.0,
-      "pvp": 0.74,
-      "patrimonio_liquido": 39565100.0,
-      "preco": 71.03,
+      "pvp": 0.75,
+      "patrimonio_liquido": 39793400.0,
+      "preco": 71.44,
       "logo": null,
-      "variacao_dia_pct": -0.5739
+      "cnpj": "41272747000186",
+      "variacao_dia_pct": 0.5772
     },
     {
       "ticker": "PLCR11",
@@ -3964,6 +4248,7 @@
       "patrimonio_liquido": 166835000.0,
       "preco": 79.1,
       "logo": null,
+      "cnpj": "32527683000126",
       "variacao_dia_pct": -0.3778
     },
     {
@@ -3985,7 +4270,8 @@
       "patrimonio_liquido": 4742890.0,
       "preco": 4.97,
       "logo": null,
-      "variacao_dia_pct": -0.6
+      "cnpj": "14080689000116",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "PLTB11",
@@ -3996,6 +4282,7 @@
       "patrimonio_liquido": 967093000.0,
       "preco": 1.0,
       "logo": null,
+      "cnpj": "19872996000153",
       "variacao_dia_pct": 0.4823
     },
     {
@@ -4007,29 +4294,32 @@
       "patrimonio_liquido": 81761500.0,
       "preco": 83.78,
       "logo": null,
+      "cnpj": "50135849000140",
       "variacao_dia_pct": 1.06
     },
     {
       "ticker": "PMIS11",
       "nome": "FII Pmis",
       "segmento": "Outros",
-      "dy_pct": 14.89,
-      "pvp": 0.81,
-      "patrimonio_liquido": 111320000.0,
-      "preco": 7.55,
+      "dy_pct": 14.97,
+      "pvp": 0.8,
+      "patrimonio_liquido": 110728000.0,
+      "preco": 7.48,
       "logo": null,
-      "variacao_dia_pct": 0.2656
+      "cnpj": "51868778000158",
+      "variacao_dia_pct": -0.5319
     },
     {
       "ticker": "PMLL11",
       "nome": "Patria Malls FII",
       "segmento": "Tijolo",
-      "dy_pct": 10.99,
+      "dy_pct": 11.01,
       "pvp": 0.86,
-      "patrimonio_liquido": 1829720000.0,
-      "preco": 103.08,
+      "patrimonio_liquido": 1827590000.0,
+      "preco": 102.6,
       "logo": null,
-      "variacao_dia_pct": 0.0291
+      "cnpj": "26499833000132",
+      "variacao_dia_pct": -0.4657
     },
     {
       "ticker": "PMRL11",
@@ -4040,6 +4330,7 @@
       "patrimonio_liquido": 43626000.0,
       "preco": 110.68,
       "logo": null,
+      "cnpj": "63492653000155",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4051,6 +4342,7 @@
       "patrimonio_liquido": 23380000.0,
       "preco": 46.76,
       "logo": null,
+      "cnpj": "50569855000106",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4062,6 +4354,7 @@
       "patrimonio_liquido": 23093100.0,
       "preco": 160.0,
       "logo": null,
+      "cnpj": "37899400000190",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4073,6 +4366,7 @@
       "patrimonio_liquido": 42197400.0,
       "preco": 47.0,
       "logo": null,
+      "cnpj": "26813118000122",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4084,18 +4378,20 @@
       "patrimonio_liquido": 11536100.0,
       "preco": 28.13,
       "logo": null,
+      "cnpj": "46157348000198",
       "variacao_dia_pct": 25.44
     },
     {
       "ticker": "PORD11",
       "nome": "FII Polo Cri",
       "segmento": "Papel",
-      "dy_pct": 14.21,
+      "dy_pct": 14.2,
       "pvp": 0.87,
-      "patrimonio_liquido": 308709000.0,
-      "preco": 8.28,
+      "patrimonio_liquido": 309082000.0,
+      "preco": 8.27,
       "logo": null,
-      "variacao_dia_pct": 0.4854
+      "cnpj": "17156502000109",
+      "variacao_dia_pct": -0.1208
     },
     {
       "ticker": "PQAG11",
@@ -4106,7 +4402,8 @@
       "patrimonio_liquido": 767875000.0,
       "preco": 54.88,
       "logo": null,
-      "variacao_dia_pct": 0.7527
+      "cnpj": "12978943000172",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "PQDP11",
@@ -4115,9 +4412,10 @@
       "dy_pct": 9.04,
       "pvp": 0.96,
       "patrimonio_liquido": 645169000.0,
-      "preco": 2480.0,
+      "preco": 2489.99,
       "logo": null,
-      "variacao_dia_pct": 0.0012
+      "cnpj": "10869155000112",
+      "variacao_dia_pct": -0.0004
     },
     {
       "ticker": "PRSN11",
@@ -4128,6 +4426,7 @@
       "patrimonio_liquido": 1554230.0,
       "preco": 4.81,
       "logo": null,
+      "cnpj": "14056001000162",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4135,22 +4434,24 @@
       "nome": "FII P Vargas",
       "segmento": "Tijolo",
       "dy_pct": 0.0,
-      "pvp": 0.29,
-      "patrimonio_liquido": 8685800.0,
-      "preco": 27.4,
+      "pvp": 0.27,
+      "patrimonio_liquido": 7940850.0,
+      "preco": 25.05,
       "logo": null,
-      "variacao_dia_pct": 0.5505
+      "cnpj": "11281322000172",
+      "variacao_dia_pct": -8.5766
     },
     {
       "ticker": "PSEC11",
       "nome": "VBI Reits FOF",
       "segmento": "Híbrido",
-      "dy_pct": 14.41,
+      "dy_pct": 14.38,
       "pvp": 0.73,
-      "patrimonio_liquido": 947200000.0,
-      "preco": 51.48,
+      "patrimonio_liquido": 949408000.0,
+      "preco": 51.64,
       "logo": null,
-      "variacao_dia_pct": -0.8092
+      "cnpj": "35507457000171",
+      "variacao_dia_pct": 0.3108
     },
     {
       "ticker": "PULV11",
@@ -4161,6 +4462,7 @@
       "patrimonio_liquido": 105842000.0,
       "preco": 8.82,
       "logo": null,
+      "cnpj": "53018363000110",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4179,10 +4481,11 @@
       "segmento": "Tijolo",
       "dy_pct": 7.64,
       "pvp": 0.63,
-      "patrimonio_liquido": 1790040000.0,
-      "preco": 66.11,
+      "patrimonio_liquido": 1789230000.0,
+      "preco": 65.95,
       "logo": null,
-      "variacao_dia_pct": -1.2547
+      "cnpj": "35652102000176",
+      "variacao_dia_pct": -0.0455
     },
     {
       "ticker": "QAGR11",
@@ -4263,7 +4566,8 @@
       "patrimonio_liquido": 259372.0,
       "preco": 2.05,
       "logo": null,
-      "variacao_dia_pct": -1.9139
+      "cnpj": "11945604000127",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RBED11",
@@ -4284,18 +4588,20 @@
       "patrimonio_liquido": 199646000.0,
       "preco": 10.65,
       "logo": null,
+      "cnpj": "17329029000114",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RBFM11",
       "nome": "FII RIOB MT",
       "segmento": "Outros",
-      "dy_pct": 8.47,
-      "pvp": 0.83,
-      "patrimonio_liquido": 188773000.0,
-      "preco": 10.08,
+      "dy_pct": 8.66,
+      "pvp": 0.81,
+      "patrimonio_liquido": 184649000.0,
+      "preco": 9.85,
       "logo": null,
-      "variacao_dia_pct": 1.1033
+      "cnpj": "17329029000114",
+      "variacao_dia_pct": -2.1847
     },
     {
       "ticker": "RBFY11",
@@ -4306,6 +4612,7 @@
       "patrimonio_liquido": 72641500.0,
       "preco": 74.9,
       "logo": null,
+      "cnpj": "62662477000190",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4322,34 +4629,37 @@
       "ticker": "RBHG11",
       "nome": "FII Rbcri IV",
       "segmento": "Papel",
-      "dy_pct": 16.34,
+      "dy_pct": 16.36,
       "pvp": 0.67,
-      "patrimonio_liquido": 126500000.0,
-      "preco": 58.35,
+      "patrimonio_liquido": 126327000.0,
+      "preco": 58.65,
       "logo": null,
-      "variacao_dia_pct": -0.7653
+      "cnpj": "30647758000187",
+      "variacao_dia_pct": 0.5141
     },
     {
       "ticker": "RBHY11",
       "nome": "FII Rb Yield",
       "segmento": "Papel",
-      "dy_pct": 21.01,
-      "pvp": 0.63,
-      "patrimonio_liquido": 110391000.0,
-      "preco": 58.4,
+      "dy_pct": 21.03,
+      "pvp": 0.62,
+      "patrimonio_liquido": 110240000.0,
+      "preco": 58.22,
       "logo": null,
-      "variacao_dia_pct": -0.2051
+      "cnpj": "37899479000150",
+      "variacao_dia_pct": -0.1372
     },
     {
       "ticker": "RBIR11",
       "nome": "FII Rbres IV",
       "segmento": "Outros",
       "dy_pct": 22.12,
-      "pvp": 0.89,
+      "pvp": 0.92,
       "patrimonio_liquido": 109755000.0,
-      "preco": 71.81,
+      "preco": 71.8,
       "logo": null,
-      "variacao_dia_pct": 0.0697
+      "cnpj": "31161410000148",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RBIV11",
@@ -4370,18 +4680,20 @@
       "patrimonio_liquido": 11325100.0,
       "preco": 17.69,
       "logo": null,
+      "cnpj": "35652227000104",
       "variacao_dia_pct": 0.86
     },
     {
       "ticker": "RBOP11",
       "nome": "FII Merc Br",
       "segmento": "Tijolo",
-      "dy_pct": 9.9,
-      "pvp": 0.29,
-      "patrimonio_liquido": 21553800.0,
-      "preco": 212.01,
+      "dy_pct": 10.19,
+      "pvp": 0.28,
+      "patrimonio_liquido": 20943800.0,
+      "preco": 206.01,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "13500306000159",
+      "variacao_dia_pct": -2.8301
     },
     {
       "ticker": "RBRD11",
@@ -4390,9 +4702,10 @@
       "dy_pct": 17.32,
       "pvp": 0.53,
       "patrimonio_liquido": 70127100.0,
-      "preco": 37.65,
+      "preco": 37.87,
       "logo": null,
-      "variacao_dia_pct": -0.1856
+      "cnpj": "09006914000134",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RBRF11",
@@ -4403,6 +4716,7 @@
       "patrimonio_liquido": 909771000.0,
       "preco": 6.65,
       "logo": null,
+      "cnpj": "27529279000151",
       "variacao_dia_pct": 1.8377
     },
     {
@@ -4414,18 +4728,20 @@
       "patrimonio_liquido": 31427400.0,
       "preco": 225.02,
       "logo": null,
+      "cnpj": "32441656000136",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RBRL11",
       "nome": "FII Rbr Log",
       "segmento": "Logístico",
-      "dy_pct": 10.88,
+      "dy_pct": 10.87,
       "pvp": 0.81,
-      "patrimonio_liquido": 502865000.0,
-      "preco": 74.98,
+      "patrimonio_liquido": 503133000.0,
+      "preco": 74.55,
       "logo": null,
-      "variacao_dia_pct": -1.91
+      "cnpj": "35705463000133",
+      "variacao_dia_pct": -0.8644
     },
     {
       "ticker": "RBRM11",
@@ -4441,23 +4757,25 @@
       "ticker": "RBRP11",
       "nome": "FII Rbr Prop",
       "segmento": "Tijolo",
-      "dy_pct": 9.29,
+      "dy_pct": 9.32,
       "pvp": 0.64,
-      "patrimonio_liquido": 610908000.0,
-      "preco": 50.16,
+      "patrimonio_liquido": 608959000.0,
+      "preco": 49.88,
       "logo": null,
-      "variacao_dia_pct": -0.6733
+      "cnpj": "21408063000151",
+      "variacao_dia_pct": -0.5582
     },
     {
       "ticker": "RBRR11",
       "nome": "FII Rbrhgrad",
       "segmento": "Papel",
-      "dy_pct": 14.31,
+      "dy_pct": 14.43,
       "pvp": 0.74,
-      "patrimonio_liquido": 1118850000.0,
-      "preco": 68.79,
+      "patrimonio_liquido": 1109400000.0,
+      "preco": 68.06,
       "logo": null,
-      "variacao_dia_pct": -1.1922
+      "cnpj": "29467977000103",
+      "variacao_dia_pct": -0.845
     },
     {
       "ticker": "RBRS11",
@@ -4468,29 +4786,32 @@
       "patrimonio_liquido": 35034800.0,
       "preco": 45.83,
       "logo": null,
+      "cnpj": "36517660000191",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RBRX11",
       "nome": "FII Rbr Mult",
       "segmento": "Papel",
-      "dy_pct": 14.91,
+      "dy_pct": 14.97,
       "pvp": 0.77,
-      "patrimonio_liquido": 1047900000.0,
-      "preco": 7.11,
+      "patrimonio_liquido": 1043510000.0,
+      "preco": 7.13,
       "logo": null,
-      "variacao_dia_pct": -1.7956
+      "cnpj": "41088458000121",
+      "variacao_dia_pct": -0.419
     },
     {
       "ticker": "RBRY11",
       "nome": "FII Rbr Pcri",
       "segmento": "Papel",
-      "dy_pct": 16.09,
+      "dy_pct": 16.11,
       "pvp": 0.81,
-      "patrimonio_liquido": 1042120000.0,
-      "preco": 81.32,
+      "patrimonio_liquido": 1040720000.0,
+      "preco": 81.5,
       "logo": null,
-      "variacao_dia_pct": -0.8414
+      "cnpj": "30166700000111",
+      "variacao_dia_pct": -0.1348
     },
     {
       "ticker": "RBTS11",
@@ -4501,18 +4822,20 @@
       "patrimonio_liquido": 15544400.0,
       "preco": 275.0,
       "logo": null,
+      "cnpj": "29299737000139",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RBVA11",
       "nome": "FII Riob Va",
       "segmento": "Tijolo",
-      "dy_pct": 12.05,
+      "dy_pct": 12.07,
       "pvp": 0.83,
-      "patrimonio_liquido": 1465930000.0,
-      "preco": 8.85,
+      "patrimonio_liquido": 1464280000.0,
+      "preco": 8.89,
       "logo": null,
-      "variacao_dia_pct": 0.3401
+      "cnpj": "15576907000170",
+      "variacao_dia_pct": 0.2255
     },
     {
       "ticker": "RBVO11",
@@ -4533,29 +4856,32 @@
       "patrimonio_liquido": 24240000.0,
       "preco": 75.0,
       "logo": null,
+      "cnpj": "35689670000141",
       "variacao_dia_pct": 0.1509
     },
     {
       "ticker": "RCRB11",
       "nome": "FII Riob Rc",
       "segmento": "Tijolo",
-      "dy_pct": 9.55,
+      "dy_pct": 9.54,
       "pvp": 0.7,
-      "patrimonio_liquido": 490862000.0,
-      "preco": 133.05,
+      "patrimonio_liquido": 491121000.0,
+      "preco": 132.72,
       "logo": null,
-      "variacao_dia_pct": -0.015
+      "cnpj": "03683056000186",
+      "variacao_dia_pct": -0.2105
     },
     {
       "ticker": "RCRI11",
       "nome": "FII RCRI",
       "segmento": "Outros",
-      "dy_pct": 13.72,
+      "dy_pct": 13.71,
       "pvp": 1.01,
-      "patrimonio_liquido": 41657200.0,
-      "preco": 98.68,
+      "patrimonio_liquido": 41669800.0,
+      "preco": 98.71,
       "logo": null,
-      "variacao_dia_pct": 0.1522
+      "cnpj": "60801196000145",
+      "variacao_dia_pct": 0.0304
     },
     {
       "ticker": "RDES11",
@@ -4576,6 +4902,7 @@
       "patrimonio_liquido": 225643000.0,
       "preco": 86.0,
       "logo": null,
+      "cnpj": "36642275000176",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4587,6 +4914,7 @@
       "patrimonio_liquido": 25014500.0,
       "preco": 13.0,
       "logo": null,
+      "cnpj": "53391567000100",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4608,40 +4936,44 @@
       "patrimonio_liquido": 29723100.0,
       "preco": 5.45,
       "logo": null,
-      "variacao_dia_pct": 0.3683
+      "cnpj": "53260548000137",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RECM11",
       "nome": "FII Recm",
       "segmento": "Outros",
-      "dy_pct": 17.85,
+      "dy_pct": 17.9,
       "pvp": 0.8,
-      "patrimonio_liquido": 132591000.0,
-      "preco": 6.96,
+      "patrimonio_liquido": 132210000.0,
+      "preco": 6.94,
       "logo": null,
-      "variacao_dia_pct": -0.1435
+      "cnpj": "56430935000162",
+      "variacao_dia_pct": -0.2874
     },
     {
       "ticker": "RECR11",
       "nome": "FII Rec Rece",
       "segmento": "Papel",
-      "dy_pct": 14.31,
-      "pvp": 0.85,
-      "patrimonio_liquido": 1979160000.0,
-      "preco": 74.85,
+      "dy_pct": 14.47,
+      "pvp": 0.84,
+      "patrimonio_liquido": 1957480000.0,
+      "preco": 74.03,
       "logo": null,
-      "variacao_dia_pct": -1.1881
+      "cnpj": "28152272000126",
+      "variacao_dia_pct": -1.0955
     },
     {
       "ticker": "RECT11",
       "nome": "FII Rec Rend",
       "segmento": "Tijolo",
-      "dy_pct": 15.78,
+      "dy_pct": 15.72,
       "pvp": 0.37,
-      "patrimonio_liquido": 284327000.0,
-      "preco": 33.25,
+      "patrimonio_liquido": 285353000.0,
+      "preco": 33.38,
       "logo": null,
-      "variacao_dia_pct": -0.0901
+      "cnpj": "32274163000159",
+      "variacao_dia_pct": 0.3005
     },
     {
       "ticker": "RECX11",
@@ -4662,6 +4994,7 @@
       "patrimonio_liquido": 1604010.0,
       "preco": 61.01,
       "logo": null,
+      "cnpj": "16841067000199",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4673,29 +5006,32 @@
       "patrimonio_liquido": 25068600.0,
       "preco": 69.95,
       "logo": null,
+      "cnpj": "37112770000136",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "REME11",
       "nome": "FII REME",
       "segmento": "Outros",
-      "dy_pct": 5.27,
+      "dy_pct": 5.28,
       "pvp": 0.85,
-      "patrimonio_liquido": 49197000.0,
-      "preco": 75.1,
+      "patrimonio_liquido": 49131500.0,
+      "preco": 75.0,
       "logo": null,
-      "variacao_dia_pct": -1.4824
+      "cnpj": "63051078000155",
+      "variacao_dia_pct": -0.1332
     },
     {
       "ticker": "RENV11",
       "nome": "FII Renv",
       "segmento": "Outros",
-      "dy_pct": 14.96,
+      "dy_pct": 15.06,
       "pvp": 0.43,
-      "patrimonio_liquido": 6396930.0,
-      "preco": 6.23,
+      "patrimonio_liquido": 6355860.0,
+      "preco": 6.19,
       "logo": null,
-      "variacao_dia_pct": 0.3221
+      "cnpj": "54174907000104",
+      "variacao_dia_pct": -0.6421
     },
     {
       "ticker": "RFOF11",
@@ -4706,18 +5042,20 @@
       "patrimonio_liquido": 49477200.0,
       "preco": 64.49,
       "logo": null,
+      "cnpj": "34027774000128",
       "variacao_dia_pct": 1.0182
     },
     {
       "ticker": "RINV11",
       "nome": "FII Real Investimento",
       "segmento": "Outros",
-      "dy_pct": 13.0,
+      "dy_pct": 12.99,
       "pvp": 1.03,
-      "patrimonio_liquido": 515244000.0,
-      "preco": 102.4,
+      "patrimonio_liquido": 515495000.0,
+      "preco": 102.35,
       "logo": null,
-      "variacao_dia_pct": -0.0586
+      "cnpj": "44625612000145",
+      "variacao_dia_pct": -0.0488
     },
     {
       "ticker": "RMAI11",
@@ -4728,18 +5066,20 @@
       "patrimonio_liquido": 202894000.0,
       "preco": 39.99,
       "logo": null,
+      "cnpj": "17374696000119",
       "variacao_dia_pct": 3.8701
     },
     {
       "ticker": "RMBS11",
       "nome": "FII RMBS",
       "segmento": "Outros",
-      "dy_pct": 10.26,
-      "pvp": 0.89,
-      "patrimonio_liquido": 18767900.0,
-      "preco": 7.4,
+      "dy_pct": 10.05,
+      "pvp": 0.91,
+      "patrimonio_liquido": 19148300.0,
+      "preco": 7.55,
       "logo": null,
-      "variacao_dia_pct": -3.8961
+      "cnpj": "58366499000135",
+      "variacao_dia_pct": 2.027
     },
     {
       "ticker": "RNDP11",
@@ -4757,10 +5097,11 @@
       "segmento": "Tijolo",
       "dy_pct": 9.79,
       "pvp": 0.62,
-      "patrimonio_liquido": 139553000.0,
-      "preco": 52.15,
+      "patrimonio_liquido": 139446000.0,
+      "preco": 52.11,
       "logo": null,
-      "variacao_dia_pct": -0.534
+      "cnpj": "15006286000190",
+      "variacao_dia_pct": -0.0767
     },
     {
       "ticker": "ROOF11",
@@ -4771,18 +5112,20 @@
       "patrimonio_liquido": 19216400.0,
       "preco": 247.97,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "38456598000109",
+      "variacao_dia_pct": 27.9694
     },
     {
       "ticker": "RPRI11",
       "nome": "FII Rbr Pr",
       "segmento": "Papel",
-      "dy_pct": 15.69,
-      "pvp": 0.73,
-      "patrimonio_liquido": 249548000.0,
-      "preco": 71.88,
+      "dy_pct": 15.86,
+      "pvp": 0.72,
+      "patrimonio_liquido": 246944000.0,
+      "preco": 71.06,
       "logo": null,
-      "variacao_dia_pct": 0.1393
+      "cnpj": "42502842000191",
+      "variacao_dia_pct": -1.1408
     },
     {
       "ticker": "RRCI11",
@@ -4793,6 +5136,7 @@
       "patrimonio_liquido": 38661000.0,
       "preco": 80.25,
       "logo": null,
+      "cnpj": "35689733000160",
       "variacao_dia_pct": 0.68
     },
     {
@@ -4804,6 +5148,7 @@
       "patrimonio_liquido": 16761400.0,
       "preco": 9.8,
       "logo": null,
+      "cnpj": "65923811000100",
       "variacao_dia_pct": 2.0833
     },
     {
@@ -4815,18 +5160,20 @@
       "patrimonio_liquido": 110788000.0,
       "preco": 743.49,
       "logo": null,
-      "variacao_dia_pct": 9.34
+      "cnpj": "19249989000108",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RURA11",
       "nome": "Fiagro Rura",
       "segmento": "Papel",
       "dy_pct": 0.0,
-      "pvp": 0.79,
-      "patrimonio_liquido": 1295200000.0,
-      "preco": 8.07,
+      "pvp": 0.78,
+      "patrimonio_liquido": 1284000000.0,
+      "preco": 8.01,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "42479593000160",
+      "variacao_dia_pct": -0.9889
     },
     {
       "ticker": "RVBI11",
@@ -4844,32 +5191,35 @@
       "segmento": "Papel",
       "dy_pct": 0.0,
       "pvp": 0.87,
-      "patrimonio_liquido": 570179000.0,
-      "preco": 8.4,
+      "patrimonio_liquido": 570859000.0,
+      "preco": 8.35,
       "logo": null,
-      "variacao_dia_pct": 0.4785
+      "cnpj": "40413979000144",
+      "variacao_dia_pct": -0.358
     },
     {
       "ticker": "RZAK11",
       "nome": "FII Riza Akn",
       "segmento": "Papel",
-      "dy_pct": 16.6,
+      "dy_pct": 16.58,
       "pvp": 0.87,
-      "patrimonio_liquido": 677414000.0,
-      "preco": 76.9,
+      "patrimonio_liquido": 678119000.0,
+      "preco": 76.98,
       "logo": null,
-      "variacao_dia_pct": -1.0296
+      "cnpj": "36642219000131",
+      "variacao_dia_pct": 0.091
     },
     {
       "ticker": "RZAT11",
       "nome": "FII Arctium",
       "segmento": "Outros",
-      "dy_pct": 15.91,
-      "pvp": 0.86,
-      "patrimonio_liquido": 368449000.0,
-      "preco": 87.35,
+      "dy_pct": 15.97,
+      "pvp": 0.85,
+      "patrimonio_liquido": 367220000.0,
+      "preco": 86.7,
       "logo": null,
-      "variacao_dia_pct": 0.1146
+      "cnpj": "28267696000136",
+      "variacao_dia_pct": -0.3448
     },
     {
       "ticker": "RZDM11",
@@ -4890,29 +5240,32 @@
       "patrimonio_liquido": 381504000.0,
       "preco": 121.0,
       "logo": null,
+      "cnpj": "45718511000181",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "RZLC11",
       "nome": "FII Rzlc",
       "segmento": "Outros",
-      "dy_pct": 14.46,
+      "dy_pct": 14.45,
       "pvp": 1.01,
-      "patrimonio_liquido": 163320000.0,
-      "preco": 1008.38,
+      "patrimonio_liquido": 163411000.0,
+      "preco": 1008.94,
       "logo": null,
-      "variacao_dia_pct": 0.0546
+      "cnpj": "56212023000114",
+      "variacao_dia_pct": 0.0555
     },
     {
       "ticker": "RZTR11",
       "nome": "FII Riza Tx",
       "segmento": "Outros",
-      "dy_pct": 13.59,
-      "pvp": 0.87,
-      "patrimonio_liquido": 1597310000.0,
-      "preco": 84.75,
+      "dy_pct": 13.79,
+      "pvp": 0.85,
+      "patrimonio_liquido": 1574120000.0,
+      "preco": 83.6,
       "logo": null,
-      "variacao_dia_pct": -0.2824
+      "cnpj": "36501128000186",
+      "variacao_dia_pct": -1.3336
     },
     {
       "ticker": "RZZI11",
@@ -4923,18 +5276,20 @@
       "patrimonio_liquido": 117118000.0,
       "preco": 1050.0,
       "logo": null,
+      "cnpj": "54134474000155",
       "variacao_dia_pct": 0.7678
     },
     {
       "ticker": "RZZR11",
       "nome": "FII Rzzr",
       "segmento": "Outros",
-      "dy_pct": 10.79,
-      "pvp": 0.73,
-      "patrimonio_liquido": 755351000.0,
-      "preco": 134.86,
+      "dy_pct": 11.28,
+      "pvp": 0.7,
+      "patrimonio_liquido": 722530000.0,
+      "preco": 129.0,
       "logo": null,
-      "variacao_dia_pct": 2.9466
+      "cnpj": "35652278000128",
+      "variacao_dia_pct": -4.3452
     },
     {
       "ticker": "RZZV11",
@@ -4945,6 +5300,7 @@
       "patrimonio_liquido": 182217000.0,
       "preco": 1050.0,
       "logo": null,
+      "cnpj": "51786271000155",
       "variacao_dia_pct": 0.6924
     },
     {
@@ -4956,6 +5312,7 @@
       "patrimonio_liquido": 133497000.0,
       "preco": 8.62,
       "logo": null,
+      "cnpj": "32903521000145",
       "variacao_dia_pct": 0.0
     },
     {
@@ -4967,18 +5324,20 @@
       "patrimonio_liquido": 48668300.0,
       "preco": 34.04,
       "logo": null,
+      "cnpj": "17311079000174",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "SAPI11",
       "nome": "FII Sapi",
       "segmento": "Outros",
-      "dy_pct": 16.68,
+      "dy_pct": 16.74,
       "pvp": 0.84,
-      "patrimonio_liquido": 249810000.0,
-      "preco": 8.42,
+      "patrimonio_liquido": 248923000.0,
+      "preco": 8.36,
       "logo": null,
-      "variacao_dia_pct": -0.8245
+      "cnpj": "51646298000142",
+      "variacao_dia_pct": -1.0651
     },
     {
       "ticker": "SARE11",
@@ -4989,18 +5348,20 @@
       "patrimonio_liquido": 438631000.0,
       "preco": 4.75,
       "logo": null,
+      "cnpj": "32903702000171",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "SCPF11",
       "nome": "FII Scp",
       "segmento": "Tijolo",
-      "dy_pct": 1.99,
+      "dy_pct": 2.02,
       "pvp": 0.29,
-      "patrimonio_liquido": 12096000.0,
-      "preco": 2.88,
+      "patrimonio_liquido": 11928000.0,
+      "preco": 2.84,
       "logo": null,
-      "variacao_dia_pct": 0.3484
+      "cnpj": "01657856000105",
+      "variacao_dia_pct": -1.3889
     },
     {
       "ticker": "SDIL11",
@@ -5031,25 +5392,27 @@
       "patrimonio_liquido": 164000000.0,
       "preco": 100.0,
       "logo": null,
+      "cnpj": "35689497000181",
       "variacao_dia_pct": 15.82
     },
     {
       "ticker": "SEQR11",
       "nome": "FII Sequoia",
       "segmento": "Outros",
-      "dy_pct": 12.61,
-      "pvp": 0.57,
-      "patrimonio_liquido": 91596600.0,
-      "preco": 54.99,
+      "dy_pct": 12.67,
+      "pvp": 0.56,
+      "patrimonio_liquido": 91113500.0,
+      "preco": 54.7,
       "logo": null,
-      "variacao_dia_pct": 0.8621
+      "cnpj": "09517273000182",
+      "variacao_dia_pct": -0.5274
     },
     {
       "ticker": "SHDP11B",
       "nome": "SHDP11B",
       "segmento": "Tijolo",
       "dy_pct": 129.9,
-      "pvp": 1.62,
+      "pvp": 1.61,
       "patrimonio_liquido": 1439630000.0,
       "preco": 1210.05,
       "logo": null
@@ -5063,18 +5426,20 @@
       "patrimonio_liquido": 92100300.0,
       "preco": 36.5,
       "logo": null,
+      "cnpj": "22459737000100",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "SHPH11",
       "nome": "FII Higienop",
       "segmento": "Tijolo",
-      "dy_pct": 6.82,
+      "dy_pct": 6.84,
       "pvp": 0.91,
-      "patrimonio_liquido": 572413000.0,
-      "preco": 940.0,
+      "patrimonio_liquido": 569983000.0,
+      "preco": 936.01,
       "logo": null,
-      "variacao_dia_pct": 1.5097
+      "cnpj": "03507519000159",
+      "variacao_dia_pct": -0.4245
     },
     {
       "ticker": "SHPP11",
@@ -5082,10 +5447,11 @@
       "segmento": "Outros",
       "dy_pct": 4.67,
       "pvp": 1.39,
-      "patrimonio_liquido": 689410000.0,
-      "preco": 13.75,
+      "patrimonio_liquido": 689921000.0,
+      "preco": 13.01,
       "logo": null,
-      "variacao_dia_pct": -1.7857
+      "cnpj": "59090726000105",
+      "variacao_dia_pct": -3.6296
     },
     {
       "ticker": "SIGR11",
@@ -5103,43 +5469,47 @@
       "segmento": "Outros",
       "dy_pct": 0.0,
       "pvp": 0.11,
-      "patrimonio_liquido": 1300890.0,
-      "preco": 1.64,
+      "patrimonio_liquido": 1245360.0,
+      "preco": 1.57,
       "logo": null,
-      "variacao_dia_pct": -2.381
+      "cnpj": "27771547000147",
+      "variacao_dia_pct": -4.2683
     },
     {
       "ticker": "SMRE11",
       "nome": "FII Smre",
       "segmento": "Outros",
-      "dy_pct": 21.41,
+      "dy_pct": 21.35,
       "pvp": 0.55,
-      "patrimonio_liquido": 56139400.0,
-      "preco": 56.26,
+      "patrimonio_liquido": 56299100.0,
+      "preco": 56.25,
       "logo": null,
-      "variacao_dia_pct": 0.4643
+      "cnpj": "53730029000195",
+      "variacao_dia_pct": -0.0178
     },
     {
       "ticker": "SNAG11",
       "nome": "Fiagro Suno",
       "segmento": "Papel",
-      "dy_pct": 1.03,
-      "pvp": 0.95,
-      "patrimonio_liquido": 595863000.0,
-      "preco": 9.81,
+      "dy_pct": 1.04,
+      "pvp": 0.94,
+      "patrimonio_liquido": 591004000.0,
+      "preco": 9.73,
       "logo": null,
-      "variacao_dia_pct": 0.3067
+      "cnpj": "28152777000190",
+      "variacao_dia_pct": -0.8155
     },
     {
       "ticker": "SNCI11",
       "nome": "FII Suno Cri",
       "segmento": "Papel",
-      "dy_pct": 14.66,
+      "dy_pct": 14.7,
       "pvp": 0.85,
-      "patrimonio_liquido": 339360000.0,
-      "preco": 80.8,
+      "patrimonio_liquido": 338520000.0,
+      "preco": 80.61,
       "logo": null,
-      "variacao_dia_pct": -0.9804
+      "cnpj": "41076710000182",
+      "variacao_dia_pct": -0.2351
     },
     {
       "ticker": "SNCR11",
@@ -5155,34 +5525,37 @@
       "ticker": "SNEL11",
       "nome": "FII Suno El",
       "segmento": "Outros",
-      "dy_pct": 14.87,
-      "pvp": 1.03,
-      "patrimonio_liquido": 1809580000.0,
-      "preco": 7.97,
+      "dy_pct": 14.89,
+      "pvp": 0.99,
+      "patrimonio_liquido": 1807310000.0,
+      "preco": 7.96,
       "logo": null,
-      "variacao_dia_pct": -1.1166
+      "cnpj": "43741171000184",
+      "variacao_dia_pct": -0.1255
     },
     {
       "ticker": "SNFF11",
       "nome": "FII Sunofofi",
       "segmento": "Híbrido",
-      "dy_pct": 14.88,
-      "pvp": 0.85,
-      "patrimonio_liquido": 282048000.0,
-      "preco": 70.15,
+      "dy_pct": 14.91,
+      "pvp": 0.84,
+      "patrimonio_liquido": 281485000.0,
+      "preco": 70.01,
       "logo": null,
-      "variacao_dia_pct": -0.988
+      "cnpj": "40011225000168",
+      "variacao_dia_pct": -0.1996
     },
     {
       "ticker": "SNFZ11",
       "nome": "Fiagro SNFZ",
       "segmento": "Outros",
-      "dy_pct": 0.95,
+      "dy_pct": 0.96,
       "pvp": 0.91,
-      "patrimonio_liquido": 57000400.0,
-      "preco": 9.19,
+      "patrimonio_liquido": 56752300.0,
+      "preco": 9.15,
       "logo": null,
-      "variacao_dia_pct": 0.547
+      "cnpj": "53313475000102",
+      "variacao_dia_pct": -0.44
     },
     {
       "ticker": "SNLG11",
@@ -5193,18 +5566,20 @@
       "patrimonio_liquido": 3137160.0,
       "preco": 1.24,
       "logo": null,
+      "cnpj": "40041711000129",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "SNME11",
       "nome": "FII Snme",
       "segmento": "Outros",
-      "dy_pct": 16.79,
+      "dy_pct": 16.85,
       "pvp": 0.96,
-      "patrimonio_liquido": 68247800.0,
-      "preco": 9.2,
+      "patrimonio_liquido": 68025300.0,
+      "preco": 9.17,
       "logo": null,
-      "variacao_dia_pct": -0.1086
+      "cnpj": "52227760000130",
+      "variacao_dia_pct": -0.3261
     },
     {
       "ticker": "SOFF11",
@@ -5215,6 +5590,7 @@
       "patrimonio_liquido": 172848000.0,
       "preco": 94.2,
       "logo": null,
+      "cnpj": "57811221000167",
       "variacao_dia_pct": 0.0
     },
     {
@@ -5226,6 +5602,7 @@
       "patrimonio_liquido": 71325700.0,
       "preco": 1051.35,
       "logo": null,
+      "cnpj": "22169671000113",
       "variacao_dia_pct": 0.0
     },
     {
@@ -5237,6 +5614,7 @@
       "patrimonio_liquido": 115774000.0,
       "preco": 1266.67,
       "logo": null,
+      "cnpj": "43741150000169",
       "variacao_dia_pct": 0.0
     },
     {
@@ -5248,6 +5626,7 @@
       "patrimonio_liquido": 78385200.0,
       "preco": 11.99,
       "logo": null,
+      "cnpj": "57077139000150",
       "variacao_dia_pct": 0.0
     },
     {
@@ -5259,29 +5638,32 @@
       "patrimonio_liquido": 217883000.0,
       "preco": 120.0,
       "logo": null,
+      "cnpj": "40225262000179",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "SPTW11",
       "nome": "FII Sp Downt",
       "segmento": "Tijolo",
-      "dy_pct": 16.41,
-      "pvp": 0.66,
-      "patrimonio_liquido": 63559300.0,
-      "preco": 35.25,
+      "dy_pct": 17.06,
+      "pvp": 0.63,
+      "patrimonio_liquido": 61132000.0,
+      "preco": 34.0,
       "logo": null,
-      "variacao_dia_pct": 2.8296
+      "cnpj": "15538445000105",
+      "variacao_dia_pct": -3.819
     },
     {
       "ticker": "SPXS11",
       "nome": "FII Spx Syn",
       "segmento": "Outros",
-      "dy_pct": 15.89,
+      "dy_pct": 15.91,
       "pvp": 0.8,
-      "patrimonio_liquido": 150610000.0,
-      "preco": 7.43,
+      "patrimonio_liquido": 150408000.0,
+      "preco": 7.45,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "43010543000100",
+      "variacao_dia_pct": -0.134
     },
     {
       "ticker": "SRVD11",
@@ -5292,6 +5674,7 @@
       "patrimonio_liquido": 288858000.0,
       "preco": 3.0,
       "logo": null,
+      "cnpj": "38082796000141",
       "variacao_dia_pct": 0.0
     },
     {
@@ -5303,6 +5686,7 @@
       "patrimonio_liquido": 229061000.0,
       "preco": 141.96,
       "logo": null,
+      "cnpj": "11044355000107",
       "variacao_dia_pct": 0.5596
     },
     {
@@ -5324,29 +5708,32 @@
       "patrimonio_liquido": 30819000.0,
       "preco": 9.94,
       "logo": null,
-      "variacao_dia_pct": 3.5417
+      "cnpj": "45188099000135",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "TEPP11",
       "nome": "FII Tel Prop",
       "segmento": "Tijolo",
-      "dy_pct": 16.11,
+      "dy_pct": 16.2,
       "pvp": 0.76,
-      "patrimonio_liquido": 384948000.0,
-      "preco": 7.15,
+      "patrimonio_liquido": 382797000.0,
+      "preco": 7.12,
       "logo": null,
-      "variacao_dia_pct": -0.4178
+      "cnpj": "26681370000125",
+      "variacao_dia_pct": -0.5587
     },
     {
       "ticker": "TGAR11",
       "nome": "FII Tg Ativo",
       "segmento": "Outros",
-      "dy_pct": 21.66,
-      "pvp": 0.42,
-      "patrimonio_liquido": 1045240000.0,
-      "preco": 44.79,
+      "dy_pct": 21.81,
+      "pvp": 0.41,
+      "patrimonio_liquido": 1038170000.0,
+      "preco": 44.2,
       "logo": null,
-      "variacao_dia_pct": -0.4667
+      "cnpj": "25032881000153",
+      "variacao_dia_pct": -0.3382
     },
     {
       "ticker": "THRA11",
@@ -5367,40 +5754,44 @@
       "patrimonio_liquido": 531496000.0,
       "preco": 249.0,
       "logo": null,
-      "variacao_dia_pct": -0.4239
+      "cnpj": "39714024000148",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "TMPS11",
       "nome": "FII Itau Tem",
       "segmento": "Híbrido",
-      "dy_pct": 13.58,
-      "pvp": 0.95,
-      "patrimonio_liquido": 71014300.0,
-      "preco": 72.54,
+      "dy_pct": 13.7,
+      "pvp": 0.94,
+      "patrimonio_liquido": 70368200.0,
+      "preco": 71.88,
       "logo": null,
-      "variacao_dia_pct": 1.2139
+      "cnpj": "42737077000199",
+      "variacao_dia_pct": -0.9098
     },
     {
       "ticker": "TOPP11",
       "nome": "FII TOPP",
       "segmento": "Outros",
-      "dy_pct": 14.79,
-      "pvp": 0.64,
-      "patrimonio_liquido": 296147000.0,
-      "preco": 66.25,
+      "dy_pct": 14.66,
+      "pvp": 0.65,
+      "patrimonio_liquido": 298773000.0,
+      "preco": 65.94,
       "logo": null,
-      "variacao_dia_pct": 1.7665
+      "cnpj": "56805391000176",
+      "variacao_dia_pct": 0.8257
     },
     {
       "ticker": "TORD11",
       "nome": "FII Torde Ei",
       "segmento": "Outros",
-      "dy_pct": 8.48,
+      "dy_pct": 8.4,
       "pvp": 0.03,
-      "patrimonio_liquido": 5900350.0,
-      "preco": 1.01,
+      "patrimonio_liquido": 5958770.0,
+      "preco": 1.03,
       "logo": null,
-      "variacao_dia_pct": -1.9417
+      "cnpj": "30230870000118",
+      "variacao_dia_pct": 1.9802
     },
     {
       "ticker": "TOUR11",
@@ -5416,12 +5807,13 @@
       "ticker": "TRBL11",
       "nome": "FII Sdi Log",
       "segmento": "Logístico",
-      "dy_pct": 18.97,
-      "pvp": 0.66,
-      "patrimonio_liquido": 393146000.0,
-      "preco": 50.8,
+      "dy_pct": 19.84,
+      "pvp": 0.63,
+      "patrimonio_liquido": 375888000.0,
+      "preco": 48.21,
       "logo": null,
-      "variacao_dia_pct": -1.3975
+      "cnpj": "16671412000193",
+      "variacao_dia_pct": -5.0984
     },
     {
       "ticker": "TRCO11",
@@ -5432,6 +5824,7 @@
       "patrimonio_liquido": 36720000.0,
       "preco": 10.2,
       "logo": null,
+      "cnpj": "62173370000188",
       "variacao_dia_pct": 0.0
     },
     {
@@ -5439,33 +5832,36 @@
       "nome": "FII Torre No",
       "segmento": "Tijolo",
       "dy_pct": 0.0,
-      "pvp": 0.74,
-      "patrimonio_liquido": 491945000.0,
-      "preco": 125.0,
+      "pvp": 0.86,
+      "patrimonio_liquido": 569830000.0,
+      "preco": 144.79,
       "logo": null,
-      "variacao_dia_pct": 8.6957
+      "cnpj": "04722883000102",
+      "variacao_dia_pct": 15.832
     },
     {
       "ticker": "TRXB11",
       "nome": "FII Trx R II",
       "segmento": "Outros",
-      "dy_pct": 17.92,
-      "pvp": 1.75,
-      "patrimonio_liquido": 727818000.0,
-      "preco": 179.0,
+      "dy_pct": 18.15,
+      "pvp": 1.73,
+      "patrimonio_liquido": 718385000.0,
+      "preco": 176.68,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "36368925000137",
+      "variacao_dia_pct": -1.2961
     },
     {
       "ticker": "TRXF11",
       "nome": "FII Trx Real",
       "segmento": "Outros",
-      "dy_pct": 15.98,
-      "pvp": 0.76,
-      "patrimonio_liquido": 4557440000.0,
-      "preco": 73.0,
+      "dy_pct": 15.76,
+      "pvp": 0.77,
+      "patrimonio_liquido": 4619250000.0,
+      "preco": 74.15,
       "logo": null,
-      "variacao_dia_pct": -1.0304
+      "cnpj": "28548288000152",
+      "variacao_dia_pct": 1.5753
     },
     {
       "ticker": "TRXL11",
@@ -5481,12 +5877,13 @@
       "ticker": "TRXY11",
       "nome": "FII Trxy",
       "segmento": "Outros",
-      "dy_pct": 17.54,
-      "pvp": 0.91,
-      "patrimonio_liquido": 269549000.0,
-      "preco": 7.59,
+      "dy_pct": 17.65,
+      "pvp": 0.9,
+      "patrimonio_liquido": 267776000.0,
+      "preco": 7.55,
       "logo": null,
-      "variacao_dia_pct": -1.1719
+      "cnpj": "43985938000110",
+      "variacao_dia_pct": -0.6579
     },
     {
       "ticker": "TSER11",
@@ -5497,6 +5894,7 @@
       "patrimonio_liquido": 160434000.0,
       "preco": 108.0,
       "logo": null,
+      "cnpj": "34847042000184",
       "variacao_dia_pct": 7.45
     },
     {
@@ -5508,18 +5906,20 @@
       "patrimonio_liquido": 64011300.0,
       "preco": 58.9,
       "logo": null,
+      "cnpj": "17007443000107",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "TVRI11",
       "nome": "FII Tivio Ri",
       "segmento": "Outros",
-      "dy_pct": 14.27,
+      "dy_pct": 14.24,
       "pvp": 0.87,
-      "patrimonio_liquido": 1388670000.0,
-      "preco": 87.23,
+      "patrimonio_liquido": 1392180000.0,
+      "preco": 87.45,
       "logo": null,
-      "variacao_dia_pct": 0.1838
+      "cnpj": "14410722000129",
+      "variacao_dia_pct": 0.2522
     },
     {
       "ticker": "UBSR11",
@@ -5535,34 +5935,37 @@
       "ticker": "URHF11",
       "nome": "FII Urhf",
       "segmento": "Outros",
-      "dy_pct": 22.43,
+      "dy_pct": 22.44,
       "pvp": 0.54,
-      "patrimonio_liquido": 6087290.0,
-      "preco": 55.13,
+      "patrimonio_liquido": 6083980.0,
+      "preco": 55.1,
       "logo": null,
-      "variacao_dia_pct": -0.1268
+      "cnpj": "52649350000187",
+      "variacao_dia_pct": -0.0544
     },
     {
       "ticker": "URPR11",
       "nome": "FII Urca Ren",
       "segmento": "Papel",
-      "dy_pct": 20.37,
+      "dy_pct": 20.35,
       "pvp": 0.21,
-      "patrimonio_liquido": 227051000.0,
-      "preco": 19.4,
+      "patrimonio_liquido": 227286000.0,
+      "preco": 19.37,
       "logo": null,
-      "variacao_dia_pct": -0.2571
+      "cnpj": "34508872000187",
+      "variacao_dia_pct": 0.1034
     },
     {
       "ticker": "VCJR11",
       "nome": "FII Vectis",
       "segmento": "Papel",
-      "dy_pct": 17.05,
+      "dy_pct": 17.07,
       "pvp": 0.72,
-      "patrimonio_liquido": 972813000.0,
-      "preco": 65.88,
+      "patrimonio_liquido": 971782000.0,
+      "preco": 65.7,
       "logo": null,
-      "variacao_dia_pct": -0.4082
+      "cnpj": "32400250000105",
+      "variacao_dia_pct": -0.56
     },
     {
       "ticker": "VCRA11",
@@ -5570,32 +5973,35 @@
       "segmento": "Papel",
       "dy_pct": 0.0,
       "pvp": 0.55,
-      "patrimonio_liquido": 256524000.0,
-      "preco": 55.75,
+      "patrimonio_liquido": 257903000.0,
+      "preco": 56.11,
       "logo": null,
-      "variacao_dia_pct": -0.1075
+      "cnpj": "42502827000143",
+      "variacao_dia_pct": 0.4835
     },
     {
       "ticker": "VCRI11",
       "nome": "FII Vinci Cr",
       "segmento": "Papel",
-      "dy_pct": 14.46,
-      "pvp": 0.79,
-      "patrimonio_liquido": 154899000.0,
-      "preco": 7.52,
+      "dy_pct": 14.2,
+      "pvp": 0.8,
+      "patrimonio_liquido": 157775000.0,
+      "preco": 7.57,
       "logo": null,
-      "variacao_dia_pct": 0.2667
+      "cnpj": "41081374000166",
+      "variacao_dia_pct": 0.3979
     },
     {
       "ticker": "VCRR11",
       "nome": "FII Vect Ren",
       "segmento": "Outros",
-      "dy_pct": 9.35,
-      "pvp": 0.55,
-      "patrimonio_liquido": 114000000.0,
-      "preco": 57.0,
+      "dy_pct": 9.62,
+      "pvp": 0.54,
+      "patrimonio_liquido": 110800000.0,
+      "preco": 55.4,
       "logo": null,
-      "variacao_dia_pct": 2.6657
+      "cnpj": "40041723000153",
+      "variacao_dia_pct": -2.807
     },
     {
       "ticker": "VERE11",
@@ -5606,18 +6012,20 @@
       "patrimonio_liquido": 285539000.0,
       "preco": 445.76,
       "logo": null,
+      "cnpj": "08693497000182",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "VGHF11",
       "nome": "FII Valor He",
       "segmento": "Outros",
-      "dy_pct": 16.29,
+      "dy_pct": 16.35,
       "pvp": 0.62,
-      "patrimonio_liquido": 830197000.0,
-      "preco": 5.04,
+      "patrimonio_liquido": 826903000.0,
+      "preco": 5.02,
       "logo": null,
-      "variacao_dia_pct": -0.198
+      "cnpj": "36771692000119",
+      "variacao_dia_pct": -0.3968
     },
     {
       "ticker": "VGIA11",
@@ -5625,10 +6033,11 @@
       "segmento": "Papel",
       "dy_pct": 1.22,
       "pvp": 0.9,
-      "patrimonio_liquido": 755618000.0,
-      "preco": 8.75,
+      "patrimonio_liquido": 753024000.0,
+      "preco": 8.71,
       "logo": null,
-      "variacao_dia_pct": -0.2281
+      "cnpj": "41081088000109",
+      "variacao_dia_pct": -0.3432
     },
     {
       "ticker": "VGII11",
@@ -5639,40 +6048,44 @@
       "patrimonio_liquido": 32449800.0,
       "preco": 62.54,
       "logo": null,
+      "cnpj": "52649680000172",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "VGIP11",
       "nome": "FII Valoraip",
       "segmento": "Papel",
-      "dy_pct": 13.96,
-      "pvp": 0.81,
-      "patrimonio_liquido": 863887000.0,
-      "preco": 73.28,
+      "dy_pct": 14.2,
+      "pvp": 0.79,
+      "patrimonio_liquido": 849271000.0,
+      "preco": 71.71,
       "logo": null,
-      "variacao_dia_pct": -2.7343
+      "cnpj": "34197811000146",
+      "variacao_dia_pct": -2.1558
     },
     {
       "ticker": "VGIR11",
       "nome": "FII Valreiii",
       "segmento": "Papel",
-      "dy_pct": 15.45,
-      "pvp": 0.98,
-      "patrimonio_liquido": 1408420000.0,
-      "preco": 9.66,
+      "dy_pct": 15.59,
+      "pvp": 0.97,
+      "patrimonio_liquido": 1395270000.0,
+      "preco": 9.56,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "29852732000191",
+      "variacao_dia_pct": -0.8299
     },
     {
       "ticker": "VGRI11",
       "nome": "FII Vgri",
       "segmento": "Outros",
-      "dy_pct": 20.96,
+      "dy_pct": 20.88,
       "pvp": 0.64,
-      "patrimonio_liquido": 192620000.0,
-      "preco": 5.5,
+      "patrimonio_liquido": 193320000.0,
+      "preco": 5.52,
       "logo": null,
-      "variacao_dia_pct": 0.5484
+      "cnpj": "53656482000107",
+      "variacao_dia_pct": 0.3636
     },
     {
       "ticker": "VHFA11",
@@ -5683,6 +6096,7 @@
       "patrimonio_liquido": 98120700.0,
       "preco": 10.35,
       "logo": null,
+      "cnpj": "51658280000160",
       "variacao_dia_pct": 0.0
     },
     {
@@ -5701,43 +6115,47 @@
       "segmento": "Logístico",
       "dy_pct": 10.23,
       "pvp": 0.84,
-      "patrimonio_liquido": 1372410000.0,
-      "preco": 91.72,
+      "patrimonio_liquido": 1371810000.0,
+      "preco": 91.31,
       "logo": null,
-      "variacao_dia_pct": 0.7912
+      "cnpj": "24853044000122",
+      "variacao_dia_pct": -0.2186
     },
     {
       "ticker": "VINO11",
       "nome": "FII Vinci Of",
       "segmento": "Tijolo",
-      "dy_pct": 12.26,
+      "dy_pct": 12.29,
       "pvp": 0.44,
-      "patrimonio_liquido": 355325000.0,
-      "preco": 4.31,
+      "patrimonio_liquido": 354497000.0,
+      "preco": 4.3,
       "logo": null,
-      "variacao_dia_pct": 0.7009
+      "cnpj": "12516185000170",
+      "variacao_dia_pct": 0.2331
     },
     {
       "ticker": "VISC11",
       "nome": "FII Vinci Sc",
       "segmento": "Tijolo",
-      "dy_pct": 9.56,
-      "pvp": 0.9,
-      "patrimonio_liquido": 2979150000.0,
-      "preco": 103.34,
+      "dy_pct": 9.6,
+      "pvp": 0.89,
+      "patrimonio_liquido": 2965890000.0,
+      "preco": 102.52,
       "logo": null,
-      "variacao_dia_pct": -0.539
+      "cnpj": "17554274000125",
+      "variacao_dia_pct": -0.7935
     },
     {
       "ticker": "VIUR11",
       "nome": "FII Vinci Iu",
       "segmento": "Outros",
-      "dy_pct": 7.26,
-      "pvp": 0.65,
-      "patrimonio_liquido": 62784700.0,
-      "preco": 2.33,
+      "dy_pct": 7.13,
+      "pvp": 0.66,
+      "patrimonio_liquido": 63862500.0,
+      "preco": 2.37,
       "logo": null,
-      "variacao_dia_pct": 0.431
+      "cnpj": "36445587000190",
+      "variacao_dia_pct": 1.7167
     },
     {
       "ticker": "VJFD11",
@@ -5748,6 +6166,7 @@
       "patrimonio_liquido": 833672000.0,
       "preco": 170.97,
       "logo": null,
+      "cnpj": "15489509000117",
       "variacao_dia_pct": 1.0401
     },
     {
@@ -5769,7 +6188,8 @@
       "patrimonio_liquido": 72028400.0,
       "preco": 87.0,
       "logo": null,
-      "variacao_dia_pct": -0.4463
+      "cnpj": "17870926000130",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "VPSI11",
@@ -5780,29 +6200,32 @@
       "patrimonio_liquido": 176371000.0,
       "preco": 21.85,
       "logo": null,
+      "cnpj": "14721889000100",
       "variacao_dia_pct": 1.2742
     },
     {
       "ticker": "VRTA11",
       "nome": "FII Fator Ve",
       "segmento": "Papel",
-      "dy_pct": 14.21,
-      "pvp": 0.85,
-      "patrimonio_liquido": 1105810000.0,
-      "preco": 70.8,
+      "dy_pct": 14.3,
+      "pvp": 0.84,
+      "patrimonio_liquido": 1098950000.0,
+      "preco": 70.48,
       "logo": null,
-      "variacao_dia_pct": -1.0482
+      "cnpj": "11664201000100",
+      "variacao_dia_pct": -0.6204
     },
     {
       "ticker": "VRTM11",
       "nome": "FII Vrtm",
       "segmento": "Outros",
-      "dy_pct": 15.8,
+      "dy_pct": 15.87,
       "pvp": 0.73,
-      "patrimonio_liquido": 316586000.0,
-      "preco": 6.74,
+      "patrimonio_liquido": 315177000.0,
+      "preco": 6.71,
       "logo": null,
-      "variacao_dia_pct": 0.2976
+      "cnpj": "51870412000113",
+      "variacao_dia_pct": -0.4451
     },
     {
       "ticker": "VSEC11",
@@ -5818,23 +6241,25 @@
       "ticker": "VSHO11",
       "nome": "FII Vot Shop",
       "segmento": "Tijolo",
-      "dy_pct": 11.26,
-      "pvp": 0.64,
-      "patrimonio_liquido": 159257000.0,
-      "preco": 74.06,
+      "dy_pct": 11.52,
+      "pvp": 0.62,
+      "patrimonio_liquido": 155689000.0,
+      "preco": 74.18,
       "logo": null,
-      "variacao_dia_pct": -0.0944
+      "cnpj": "23740595000117",
+      "variacao_dia_pct": -2.2404
     },
     {
       "ticker": "VSLH11",
       "nome": "FII Vers Cri",
       "segmento": "Papel",
-      "dy_pct": 20.32,
+      "dy_pct": 20.19,
       "pvp": 0.14,
-      "patrimonio_liquido": 47782500.0,
-      "preco": 1.62,
+      "patrimonio_liquido": 48081200.0,
+      "preco": 1.61,
       "logo": null,
-      "variacao_dia_pct": 0.0
+      "cnpj": "36244015000142",
+      "variacao_dia_pct": 0.625
     },
     {
       "ticker": "VTLT11",
@@ -5845,6 +6270,7 @@
       "patrimonio_liquido": 188193000.0,
       "preco": 88.98,
       "logo": null,
+      "cnpj": "27368600000163",
       "variacao_dia_pct": 0.0
     },
     {
@@ -5856,18 +6282,20 @@
       "patrimonio_liquido": 91353300.0,
       "preco": 65.9,
       "logo": null,
+      "cnpj": "15098422000119",
       "variacao_dia_pct": 2.5649
     },
     {
       "ticker": "VVCR11",
       "nome": "FII V2 Rece",
       "segmento": "Papel",
-      "dy_pct": 11.7,
-      "pvp": 1.01,
-      "patrimonio_liquido": 187908000.0,
-      "preco": 10.28,
+      "dy_pct": 13.21,
+      "pvp": 0.89,
+      "patrimonio_liquido": 166339000.0,
+      "preco": 9.1,
       "logo": null,
-      "variacao_dia_pct": 16.8182
+      "cnpj": "23120027000113",
+      "variacao_dia_pct": -11.4786
     },
     {
       "ticker": "VVDI11",
@@ -5878,18 +6306,20 @@
       "patrimonio_liquido": 49500000.0,
       "preco": 9.9,
       "logo": null,
-      "variacao_dia_pct": -1.0
+      "cnpj": "66661365000175",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "VVMR11",
       "nome": "FII Mult Ren",
       "segmento": "Tijolo",
-      "dy_pct": 0.81,
-      "pvp": 1.08,
-      "patrimonio_liquido": 239829000.0,
-      "preco": 84.93,
+      "dy_pct": 0.83,
+      "pvp": 1.05,
+      "patrimonio_liquido": 231981000.0,
+      "preco": 82.15,
       "logo": null,
-      "variacao_dia_pct": -0.0118
+      "cnpj": "30871698000181",
+      "variacao_dia_pct": -3.2961
     },
     {
       "ticker": "VVPR11",
@@ -5900,18 +6330,20 @@
       "patrimonio_liquido": 234036000.0,
       "preco": 101.5,
       "logo": null,
+      "cnpj": "33045581000137",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "VVRI11",
       "nome": "FII V2 Renda",
       "segmento": "Outros",
-      "dy_pct": 4.77,
-      "pvp": 0.94,
-      "patrimonio_liquido": 142504000.0,
-      "preco": 8.11,
+      "dy_pct": 5.16,
+      "pvp": 0.87,
+      "patrimonio_liquido": 131786000.0,
+      "preco": 7.5,
       "logo": null,
-      "variacao_dia_pct": -2.2892
+      "cnpj": "49184940000177",
+      "variacao_dia_pct": -7.5216
     },
     {
       "ticker": "VXXV11",
@@ -5919,10 +6351,11 @@
       "segmento": "Outros",
       "dy_pct": 0.0,
       "pvp": 1.62,
-      "patrimonio_liquido": 389482000.0,
-      "preco": 815.03,
+      "patrimonio_liquido": 389468000.0,
+      "preco": 815.0,
       "logo": null,
-      "variacao_dia_pct": 0.21
+      "cnpj": "30982974000189",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "WHGR11",
@@ -5931,9 +6364,10 @@
       "dy_pct": 13.99,
       "pvp": 0.89,
       "patrimonio_liquido": 262137000.0,
-      "preco": 8.5,
+      "preco": 8.43,
       "logo": null,
-      "variacao_dia_pct": -0.7009
+      "cnpj": "41256643000188",
+      "variacao_dia_pct": -0.5896
     },
     {
       "ticker": "WPLZ11",
@@ -5944,6 +6378,7 @@
       "patrimonio_liquido": 56082600.0,
       "preco": 47.26,
       "logo": null,
+      "cnpj": "09326861000139",
       "variacao_dia_pct": 0.0
     },
     {
@@ -5955,18 +6390,20 @@
       "patrimonio_liquido": 3463680.0,
       "preco": 1.41,
       "logo": null,
+      "cnpj": "43440579000116",
       "variacao_dia_pct": 0.0
     },
     {
       "ticker": "WTSP11",
       "nome": "FII Wtc Sp",
       "segmento": "Outros",
-      "dy_pct": 8.48,
-      "pvp": 0.67,
-      "patrimonio_liquido": 80259500.0,
-      "preco": 64.8,
+      "dy_pct": 8.86,
+      "pvp": 0.65,
+      "patrimonio_liquido": 76791500.0,
+      "preco": 62.0,
       "logo": null,
-      "variacao_dia_pct": 1.6949
+      "cnpj": "28693595000127",
+      "variacao_dia_pct": -4.321
     },
     {
       "ticker": "XLPR11",
@@ -5977,29 +6414,32 @@
       "patrimonio_liquido": 33723000.0,
       "preco": 70.0,
       "logo": null,
-      "variacao_dia_pct": -0.3559
+      "cnpj": "35689733000160",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "XPCA11",
       "nome": "Fiagro XP Ca",
       "segmento": "Papel",
       "dy_pct": 0.0,
-      "pvp": 0.78,
-      "patrimonio_liquido": 342334000.0,
-      "preco": 7.52,
+      "pvp": 0.77,
+      "patrimonio_liquido": 336416000.0,
+      "preco": 7.39,
       "logo": null,
-      "variacao_dia_pct": 0.9396
+      "cnpj": "41269527000101",
+      "variacao_dia_pct": -1.7287
     },
     {
       "ticker": "XPCI11",
       "nome": "FII XP Cred",
       "segmento": "Papel",
-      "dy_pct": 13.62,
-      "pvp": 0.89,
-      "patrimonio_liquido": 681419000.0,
-      "preco": 78.31,
+      "dy_pct": 13.76,
+      "pvp": 0.88,
+      "patrimonio_liquido": 674370000.0,
+      "preco": 77.82,
       "logo": null,
-      "variacao_dia_pct": -0.5208
+      "cnpj": "28516301000191",
+      "variacao_dia_pct": -0.6257
     },
     {
       "ticker": "XPCM11",
@@ -6007,10 +6447,11 @@
       "segmento": "Tijolo",
       "dy_pct": 0.0,
       "pvp": 0.49,
-      "patrimonio_liquido": 28805000.0,
-      "preco": 7.83,
+      "patrimonio_liquido": 28878500.0,
+      "preco": 7.85,
       "logo": null,
-      "variacao_dia_pct": -0.8861
+      "cnpj": "16802320000103",
+      "variacao_dia_pct": 0.2554
     },
     {
       "ticker": "XPHT11",
@@ -6031,29 +6472,32 @@
       "patrimonio_liquido": 443612000.0,
       "preco": 62.04,
       "logo": null,
+      "cnpj": "28516325000140",
       "variacao_dia_pct": 108.077
     },
     {
       "ticker": "XPLG11",
       "nome": "FII XP Log",
       "segmento": "Logístico",
-      "dy_pct": 10.56,
+      "dy_pct": 10.6,
       "pvp": 0.88,
-      "patrimonio_liquido": 4746390000.0,
-      "preco": 92.36,
+      "patrimonio_liquido": 4727890000.0,
+      "preco": 92.0,
       "logo": null,
-      "variacao_dia_pct": -0.1729
+      "cnpj": "26502794000185",
+      "variacao_dia_pct": -0.3898
     },
     {
       "ticker": "XPML11",
       "nome": "FII XP Malls",
       "segmento": "Tijolo",
-      "dy_pct": 11.16,
+      "dy_pct": 11.14,
       "pvp": 0.89,
-      "patrimonio_liquido": 6302830000.0,
-      "preco": 98.24,
+      "patrimonio_liquido": 6314410000.0,
+      "preco": 98.01,
       "logo": null,
-      "variacao_dia_pct": 0.1631
+      "cnpj": "28757546000100",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "XPPR11",
@@ -6069,12 +6513,13 @@
       "ticker": "XPSF11",
       "nome": "FII XP Selec",
       "segmento": "Híbrido",
-      "dy_pct": 12.84,
+      "dy_pct": 12.82,
       "pvp": 0.85,
-      "patrimonio_liquido": 276701000.0,
-      "preco": 6.38,
+      "patrimonio_liquido": 277134000.0,
+      "preco": 6.4,
       "logo": null,
-      "variacao_dia_pct": -0.6231
+      "cnpj": "30983020000190",
+      "variacao_dia_pct": 0.1565
     },
     {
       "ticker": "XTED11",
@@ -6105,6 +6550,7 @@
       "patrimonio_liquido": 7389750.0,
       "preco": 15.0,
       "logo": null,
+      "cnpj": "36445551000106",
       "variacao_dia_pct": 0.0
     },
     {
@@ -6116,29 +6562,32 @@
       "patrimonio_liquido": 201507000.0,
       "preco": 8.59,
       "logo": null,
-      "variacao_dia_pct": 7.7792
+      "cnpj": "45188066000195",
+      "variacao_dia_pct": 0.0
     },
     {
       "ticker": "ZAVC11",
       "nome": "FII Zavit C",
       "segmento": "Outros",
-      "dy_pct": 16.48,
+      "dy_pct": 16.52,
       "pvp": 0.91,
-      "patrimonio_liquido": 32779200.0,
-      "preco": 9.15,
+      "patrimonio_liquido": 32707500.0,
+      "preco": 9.13,
       "logo": null,
-      "variacao_dia_pct": 0.2191
+      "cnpj": "52101897000143",
+      "variacao_dia_pct": -0.2186
     },
     {
       "ticker": "ZAVI11",
       "nome": "FII Zavit R",
       "segmento": "Outros",
-      "dy_pct": 14.11,
+      "dy_pct": 14.0,
       "pvp": 0.69,
-      "patrimonio_liquido": 113343000.0,
-      "preco": 9.66,
+      "patrimonio_liquido": 114164000.0,
+      "preco": 9.64,
       "logo": null,
-      "variacao_dia_pct": -0.6173
+      "cnpj": "40575940000123",
+      "variacao_dia_pct": -0.207
     },
     {
       "ticker": "ZIFI11",
@@ -6149,6 +6598,7 @@
       "patrimonio_liquido": 35613300.0,
       "preco": 749.99,
       "logo": null,
+      "cnpj": "35820768000196",
       "variacao_dia_pct": 0.0
     },
     {
@@ -6156,12 +6606,12 @@
       "nome": "Bocaina FI-Infra",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 15.32,
-      "pvp": 0.93,
+      "dy_pct": 15.47,
+      "pvp": 0.92,
       "vp_cota": 7.9799,
       "patrimonio_liquido": 517067406.13,
-      "preco": 7.44,
-      "variacao_dia_pct": 0.813,
+      "preco": 7.37,
+      "variacao_dia_pct": -0.9409,
       "logo": null,
       "cnpj": "41771670000199"
     },
@@ -6170,12 +6620,12 @@
       "nome": "Fic Fi Bodi",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 7.47,
+      "dy_pct": 7.44,
       "pvp": null,
       "vp_cota": null,
       "patrimonio_liquido": null,
-      "preco": 9.5,
-      "variacao_dia_pct": 0.1054,
+      "preco": 9.54,
+      "variacao_dia_pct": 0.4211,
       "logo": null,
       "cnpj": null
     },
@@ -6184,12 +6634,12 @@
       "nome": "Fic Infr BTG",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 14.05,
-      "pvp": 0.89,
+      "dy_pct": 14.1,
+      "pvp": 0.88,
       "vp_cota": 78.5593,
       "patrimonio_liquido": 1423885909.07,
-      "preco": 69.75,
-      "variacao_dia_pct": 0.2155,
+      "preco": 69.48,
+      "variacao_dia_pct": -0.3871,
       "logo": null,
       "cnpj": "40502607000194"
     },
@@ -6198,12 +6648,12 @@
       "nome": "Fic Ie Cap",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 15.73,
+      "dy_pct": 15.7,
       "pvp": 0.94,
       "vp_cota": 89.6781,
       "patrimonio_liquido": 1218069475.0,
-      "preco": 83.9,
-      "variacao_dia_pct": -0.3445,
+      "preco": 84.1,
+      "variacao_dia_pct": 0.24,
       "logo": null,
       "cnpj": "38065012000177"
     },
@@ -6212,12 +6662,12 @@
       "nome": "Fic Inter",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 15.92,
-      "pvp": 0.96,
+      "dy_pct": 15.88,
+      "pvp": 0.97,
       "vp_cota": 78.2515,
       "patrimonio_liquido": 195297141.74,
-      "preco": 75.4,
-      "variacao_dia_pct": 0.1328,
+      "preco": 75.58,
+      "variacao_dia_pct": 0.2387,
       "logo": null,
       "cnpj": "42294971000131"
     },
@@ -6226,12 +6676,12 @@
       "nome": "Fi Itau IFRI",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 31.89,
+      "dy_pct": 31.91,
       "pvp": 0.99,
       "vp_cota": 99.1109,
       "patrimonio_liquido": 986153084.31,
-      "preco": 97.81,
-      "variacao_dia_pct": -0.2142,
+      "preco": 97.74,
+      "variacao_dia_pct": -0.0716,
       "logo": null,
       "cnpj": "54773359000120"
     },
@@ -6240,12 +6690,12 @@
       "nome": "Fi Itauinfra",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 12.35,
-      "pvp": 0.93,
+      "dy_pct": 12.48,
+      "pvp": 0.92,
       "vp_cota": 95.0771,
       "patrimonio_liquido": 1472938395.1,
-      "preco": 88.5,
-      "variacao_dia_pct": -0.6734,
+      "preco": 87.6,
+      "variacao_dia_pct": -1.0169,
       "logo": null,
       "cnpj": "34633510000118"
     },
@@ -6254,12 +6704,12 @@
       "nome": "Infra JMBI",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 17.68,
-      "pvp": 0.83,
+      "dy_pct": 17.94,
+      "pvp": 0.81,
       "vp_cota": 98.6296,
       "patrimonio_liquido": 431504495.55,
-      "preco": 81.55,
-      "variacao_dia_pct": -0.5488,
+      "preco": 80.36,
+      "variacao_dia_pct": -1.4592,
       "logo": null,
       "cnpj": "57021822000176"
     },
@@ -6268,12 +6718,12 @@
       "nome": "Kinea Infraf",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 16.1,
+      "dy_pct": 16.06,
       "pvp": 0.95,
       "vp_cota": 118.8576,
       "patrimonio_liquido": 2791343510.03,
-      "preco": 112.81,
-      "variacao_dia_pct": -0.177,
+      "preco": 113.11,
+      "variacao_dia_pct": 0.2659,
       "logo": null,
       "cnpj": "26324298000189"
     },
@@ -6282,12 +6732,12 @@
       "nome": "Nikos Infra",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 12.83,
-      "pvp": 0.79,
+      "dy_pct": 13.03,
+      "pvp": 0.78,
       "vp_cota": 9.4245,
       "patrimonio_liquido": 43686666.3,
-      "preco": 7.48,
-      "variacao_dia_pct": 0.5376,
+      "preco": 7.37,
+      "variacao_dia_pct": -1.4706,
       "logo": null,
       "cnpj": "58171813000124"
     },
@@ -6296,12 +6746,12 @@
       "nome": "Fic Fi Rb Es",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 19.25,
+      "dy_pct": 19.24,
       "pvp": 0.64,
       "vp_cota": 98.2428,
       "patrimonio_liquido": 85234370.68,
-      "preco": 62.44,
-      "variacao_dia_pct": -0.3988,
+      "preco": 62.48,
+      "variacao_dia_pct": 0.4502,
       "logo": null,
       "cnpj": "51189318000101"
     },
@@ -6310,12 +6760,12 @@
       "nome": "Sparta Cdii",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 20.17,
-      "pvp": 0.94,
+      "dy_pct": 20.31,
+      "pvp": 0.93,
       "vp_cota": 101.1352,
       "patrimonio_liquido": 2779311206.4,
-      "preco": 94.66,
-      "variacao_dia_pct": -0.4522,
+      "preco": 94.0,
+      "variacao_dia_pct": -0.6972,
       "logo": null,
       "cnpj": "48973783000116"
     },
@@ -6324,12 +6774,12 @@
       "nome": "Sparta Infra",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 10.22,
+      "dy_pct": 10.21,
       "pvp": 0.96,
       "vp_cota": 101.5553,
       "patrimonio_liquido": 2089163301.23,
-      "preco": 97.81,
-      "variacao_dia_pct": -1.4509,
+      "preco": 97.98,
+      "variacao_dia_pct": 0.1738,
       "logo": null,
       "cnpj": "42730834000100"
     },
@@ -6338,12 +6788,12 @@
       "nome": "Suno Fic Fi",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 13.24,
-      "pvp": 1.02,
+      "dy_pct": 13.33,
+      "pvp": 1.01,
       "vp_cota": 10.0635,
       "patrimonio_liquido": 72827697.07,
-      "preco": 10.27,
-      "variacao_dia_pct": -0.1944,
+      "preco": 10.2,
+      "variacao_dia_pct": -0.6816,
       "logo": null,
       "cnpj": "58356902000145"
     },
@@ -6352,12 +6802,12 @@
       "nome": "Firf XP Ie",
       "segmento": "Infra",
       "tipo_fundo": "FI-Infra",
-      "dy_pct": 16.27,
-      "pvp": 0.67,
+      "dy_pct": 16.39,
+      "pvp": 0.66,
       "vp_cota": 73.7477,
       "patrimonio_liquido": 233791641.52,
-      "preco": 49.17,
-      "variacao_dia_pct": 0.9651,
+      "preco": 48.8,
+      "variacao_dia_pct": -0.7525,
       "logo": null,
       "cnpj": "37396696000127"
     }
