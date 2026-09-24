@@ -120,7 +120,17 @@ TIMEOUT_TESTE_FNET = (10, 30)  # teste único do Fundos.NET no começo
 # Se os primeiros fundos falharem TODOS, a fonte está fora do ar: para aqui
 # em vez de esperar o timeout de cada um dos ~500 fundos.
 DISJUNTOR_FALHAS_SEGUIDAS = 5
-B3_DOCUMENTOS = "https://sistemaswebb3-listados.b3.com.br/fundsListedProxy/Search/GetListedDocuments/"
+# A B3 tem dois "proxies" de fundos. A biblioteca `mercados` chama o
+# GetListedDocuments no primeiro; o coletar_mercado.py pega o suplemento dos
+# FI-Infra no segundo (achado no projeto OpenFinData). Na 1ª execução real
+# (23/09/2026) o primeiro devolveu 404 para os FI-Infra — então o robô tenta
+# os dois e fica com o que responder.
+B3_BASES_DOCUMENTOS = (
+    "https://sistemaswebb3-listados.b3.com.br/fundsListedProxy/Search/GetListedDocuments/",
+    "https://sistemaswebb3-listados.b3.com.br/fundsProxy/fundsCall/GetListedDocuments/",
+)
+# Fundo de referência para o modo --sondar (CSHG Logística).
+SONDA_TICKER, SONDA_CNPJ = "HGLG11", "11728688000147"
 B3_TIPO_FII, B3_TIPO_FI_INFRA, B3_TIPO_FIAGRO = 7, 27, 34
 DIAS_JANELA_B3 = 200
 TENTATIVAS = 3
@@ -386,6 +396,17 @@ def linha_b3_para_fnet(bruta):
     }
 
 
+def _rota(url):
+    """Só o caminho da URL, para o log não ficar ilegível."""
+    from urllib.parse import urlparse
+    return urlparse(url).path.lstrip("/") or url
+
+
+class NaoEncontrado(Exception):
+    """HTTP 404 da B3: rota inexistente OU "nada para este pedido" — a B3
+    usa o mesmo código para as duas coisas."""
+
+
 class FonteB3:
     """GetListedDocuments da B3, categoria 7 (Relatórios)."""
     nome = "API da B3"
@@ -395,13 +416,16 @@ class FonteB3:
         self.sessao.headers["User-Agent"] = UA
         self.sessao.headers["Accept"] = "application/json,*/*"
         self.primeira_linha_mostrada = False
+        self.base_boa = None        # a primeira base que devolver 200 vira a preferida
 
     @staticmethod
     def _b64(payload):
         return base64.b64encode(json.dumps(payload, separators=(",", ":")).encode("utf-8")).decode("ascii")
 
-    def _pedir(self, payload):
-        resp = self.sessao.get(B3_DOCUMENTOS + self._b64(payload), timeout=TIMEOUT)
+    def _pedir(self, base, payload):
+        resp = self.sessao.get(base + self._b64(payload), timeout=TIMEOUT)
+        if resp.status_code == 404:
+            raise NaoEncontrado(f"404 em {_rota(base)}")
         if resp.status_code >= 500 or resp.status_code == 429:
             raise RuntimeError(f"HTTP {resp.status_code}")
         resp.raise_for_status()
@@ -415,35 +439,92 @@ class FonteB3:
             return dados.get("results") or dados.get("data") or []
         return dados if isinstance(dados, list) else []
 
-    def relatorios_do_fundo(self, cnpj, ticker=None, fundo=None, quantos=50):
+    def _bases(self):
+        if self.base_boa:
+            return [self.base_boa] + [b for b in B3_BASES_DOCUMENTOS if b != self.base_boa]
+        return list(B3_BASES_DOCUMENTOS)
+
+    @staticmethod
+    def _payload(cnpj, sigla, tipo, quantos):
         hoje = datetime.now(BRT).date()
+        return {"pageNumber": 1, "pageSize": quantos, "cnpj": cnpj, "identifierFund": sigla,
+                "typeFund": tipo, "dateInitial": (hoje - timedelta(days=DIAS_JANELA_B3)).isoformat(),
+                "dateFinal": hoje.isoformat(), "category": ID_CATEGORIA_RELATORIOS}
+
+    def relatorios_do_fundo(self, cnpj, ticker=None, fundo=None, quantos=50):
+        """Devolve as linhas já no formato do Fundos.NET. Lança
+        NaoEncontrado quando TODAS as combinações deram 404 (para o
+        disjuntor saber que a rota não está servindo) e RuntimeError em
+        erro de rede/servidor."""
         sigla = (ticker or "")[:4]
         tipo_fundo = str((fundo or {}).get("tipo_fundo") or "").lower()
         tipos = [B3_TIPO_FI_INFRA] if "infra" in tipo_fundo else [B3_TIPO_FII, B3_TIPO_FIAGRO]
-        ultimo_erro = None
+        ultimo_erro, so_404, respondeu = None, True, False
         for tipo in tipos:
-            payload = {"pageNumber": 1, "pageSize": quantos, "cnpj": cnpj, "identifierFund": sigla,
-                       "typeFund": tipo, "dateInitial": (hoje - timedelta(days=DIAS_JANELA_B3)).isoformat(),
-                       "dateFinal": hoje.isoformat(), "category": ID_CATEGORIA_RELATORIOS}
-            brutas = None
-            for tentativa in range(1, TENTATIVAS + 1):
-                try:
-                    brutas = self._pedir(payload)
-                    break
-                except (requests.RequestException, ValueError, RuntimeError) as e:
-                    ultimo_erro = e
-                    time.sleep(1.5 * tentativa)
-            if brutas is None:
-                continue
-            if brutas and not self.primeira_linha_mostrada:
-                self.primeira_linha_mostrada = True
-                log(f"  [B3] formato da resposta (1ª linha, {ticker}, typeFund {tipo}): "
-                    f"{json.dumps(brutas[0], ensure_ascii=False)[:1200]}")
-            if brutas:
-                return [ln for ln in (linha_b3_para_fnet(b) for b in brutas) if ln]
-        if ultimo_erro is not None:
-            raise RuntimeError(f"API da B3 falhou para {ticker} ({cnpj}): {ultimo_erro}")
-        return []
+            for base in self._bases():
+                brutas = None
+                for tentativa in range(1, TENTATIVAS + 1):
+                    try:
+                        brutas = self._pedir(base, self._payload(cnpj, sigla, tipo, quantos))
+                        break
+                    except NaoEncontrado as e:
+                        ultimo_erro = e
+                        break               # 404 não melhora repetindo
+                    except (requests.RequestException, ValueError, RuntimeError) as e:
+                        ultimo_erro, so_404 = e, False
+                        time.sleep(1.5 * tentativa)
+                if brutas is None:
+                    continue
+                respondeu = True
+                if self.base_boa != base:
+                    self.base_boa = base
+                    log(f"  [B3] respondendo em: {base}")
+                if brutas and not self.primeira_linha_mostrada:
+                    self.primeira_linha_mostrada = True
+                    log(f"  [B3] formato da resposta (1ª linha, {ticker}, typeFund {tipo}): "
+                        f"{json.dumps(brutas[0], ensure_ascii=False)[:1200]}")
+                if brutas:
+                    return [ln for ln in (linha_b3_para_fnet(b) for b in brutas) if ln]
+                break                       # 200 vazio nesta base: tenta o próximo typeFund
+        if respondeu:
+            return []
+        if so_404:
+            raise NaoEncontrado(f"API da B3: 404 em todas as rotas para {ticker} ({cnpj})")
+        raise RuntimeError(f"API da B3 falhou para {ticker} ({cnpj}): {ultimo_erro}")
+
+    def sondar(self, ticker=SONDA_TICKER, cnpj=SONDA_CNPJ):
+        """Modo diagnóstico: mostra status e começo da resposta de cada
+        combinação, para descobrir qual rota/parâmetro a B3 aceita hoje."""
+        sigla = ticker[:4]
+        hoje = datetime.now(BRT).date()
+        variantes = []
+        for base in B3_BASES_DOCUMENTOS:
+            for rotulo, payload in (
+                ("completo", self._payload(cnpj, sigla, B3_TIPO_FII, 5)),
+                ("cnpj '0'", self._payload("0", sigla, B3_TIPO_FII, 5)),
+                ("sem categoria", {k: v for k, v in self._payload(cnpj, sigla, B3_TIPO_FII, 5).items() if k != "category"}),
+                ("sem datas", {k: v for k, v in self._payload(cnpj, sigla, B3_TIPO_FII, 5).items()
+                               if k not in ("dateInitial", "dateFinal")}),
+            ):
+                variantes.append((base, rotulo, payload))
+        extras = (
+            ("GetListedCategory", {"cnpj": cnpj}),
+            ("GetListedByType", {"cnpj": cnpj, "identifierFund": sigla, "typeFund": B3_TIPO_FII,
+                                 "dateInitial": (hoje - timedelta(days=DIAS_JANELA_B3)).isoformat(),
+                                 "dateFinal": hoje.isoformat()}),
+        )
+        for base in B3_BASES_DOCUMENTOS:
+            for rota, payload in extras:
+                variantes.append((base.replace("GetListedDocuments/", rota + "/"), rota, payload))
+        log(f"[sondar] {ticker} (CNPJ {cnpj}) — {len(variantes)} combinações")
+        for url_base, rotulo, payload in variantes:
+            try:
+                resp = self.sessao.get(url_base + self._b64(payload), timeout=TIMEOUT)
+                corpo = resp.text.strip().replace("\n", " ")[:600]
+                log(f"[sondar] {resp.status_code} · {_rota(url_base)} · {rotulo} · {corpo or '(vazio)'}")
+            except Exception as e:  # noqa: BLE001
+                log(f"[sondar] ERRO · {_rota(url_base)} · {rotulo} · {e.__class__.__name__}: {str(e)[:200]}")
+            time.sleep(PAUSA_ENTRE_PEDIDOS)
 
 
 class FonteComReserva:
@@ -530,6 +611,10 @@ def coletar(fnet, fiis, anterior, agora, tudo=False, diagnostico=False):
             "descartadas_inativas": 0, "exemplos_descartados": []}
     sem_cnpj = []
 
+    # FIIs comuns primeiro: o CNPJ deles vem da HG (o mesmo que a B3 usa);
+    # o dos FI-Infra vem de um casamento com a CVM e pode ser o da classe.
+    # Os primeiros fundos é que decidem o disjuntor, então a amostra importa.
+    fiis = sorted(fiis, key=lambda f: "infra" in str(f.get("tipo_fundo") or "").lower())
     for f in fiis:
         ticker = str(f.get("ticker") or "").strip().upper()
         cnpj = re.sub(r"\D", "", str(f.get("cnpj") or ""))
@@ -629,9 +714,14 @@ def main(argv=None):
     ap.add_argument("--tudo", action="store_true", help=f"consulta mesmo quem publicou há menos de {DIAS_SEM_CONSULTAR} dias")
     ap.add_argument("--tickers", default="", help="só estes tickers, separados por vírgula")
     ap.add_argument("--diagnostico", action="store_true", help="mostra a primeira linha crua de cada fundo")
+    ap.add_argument("--sondar", action="store_true",
+                    help=f"só testa as rotas da B3 com o {SONDA_TICKER} e mostra as respostas (não grava nada)")
     args = ap.parse_args(argv)
 
     agora = datetime.now(BRT)
+    if args.sondar:
+        FonteB3().sondar()
+        return 0
     base = ler_json(ARQ_FIIS, {})
     fiis = base.get("ativos") or []
     if args.tickers:
@@ -641,6 +731,12 @@ def main(argv=None):
     if not fiis:
         log("Nada a fazer.")
         return 0
+
+    com_cnpj = sum(1 for f in fiis if len(re.sub(r"\D", "", str(f.get("cnpj") or ""))) == 14)
+    log(f"  {com_cnpj} de {len(fiis)} fundos têm CNPJ no {ARQ_FIIS}.")
+    if com_cnpj < len(fiis) / 2:
+        log("  ATENÇÃO: a maioria está sem CNPJ. O coletar_mercado.py NOVO (que grava o campo cnpj)"
+            " precisa rodar antes deste robô — sem CNPJ não há como pedir os documentos do fundo.")
 
     anterior = ler_json(ARQ_SAIDA, {})
     fnet = escolher_fonte()
