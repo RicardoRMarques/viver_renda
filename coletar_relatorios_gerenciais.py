@@ -50,6 +50,30 @@ Ids de categoria/tipo e o formato das datas conferidos na biblioteca aberta
 `mercados` (PythonicCafe/mercados, fundosnet.py e choices.py).
 Link do PDF: downloadDocumento?id=<id>.
 
+--------------------------------------------------------------------------
+Duas fontes: Fundos.NET e, se ele não responder, a API da B3
+--------------------------------------------------------------------------
+Na primeira execução no GitHub Actions (23/09/2026) o Fundos.NET não
+respondeu nem a página inicial (read timeout de 25 s) — o mesmo que acontece
+a partir dos servidores das sessões do Claude. Tudo indica que ele não
+atende bem máquinas de nuvem fora do Brasil. Por isso:
+  1. o robô testa o Fundos.NET UMA vez (até ~30 s). Respondeu → usa ele.
+  2. não respondeu → usa a API de documentos da própria B3,
+     sistemaswebb3-listados.b3.com.br/fundsListedProxy/Search/GetListedDocuments,
+     o mesmo host que o coletar_mercado.py já usa para os FI-Infra. Pedido:
+     {cnpj, identifierFund (sigla), typeFund (7 FII, 27 FI-Infra, 34 Fiagro),
+     dateInitial, dateFinal, category: 7 (Relatórios), pageNumber, pageSize}
+     — formato visto na biblioteca `mercados` (b3.py).
+     O FORMATO DA RESPOSTA desse endpoint não está documentado em lugar
+     nenhum que eu tenha conseguido ler; a biblioteca devolve a linha crua.
+     Então a leitura é tolerante (procura o valor "Relatório Gerencial", o
+     id do documento e as datas pelos nomes dos campos) e a PRIMEIRA linha
+     de cada execução vai inteira para o log — se algo não casar, é ali que
+     se descobre o formato real.
+Em nenhum dos dois caminhos o link muda: é sempre o PDF no Fundos.NET
+(downloadDocumento?id=), que abre normalmente no navegador de quem está no
+Brasil — o problema é só com os servidores do Actions.
+
 O certificado TLS do Fundos.NET já deu problema de cadeia com o requests.
 O robô tenta com verificação; se falhar por SSL, repete sem verificar e
 avisa no log (é dado público, só leitura).
@@ -62,6 +86,7 @@ Uso:
 """
 
 import argparse
+import base64
 import json
 import os
 import re
@@ -90,7 +115,14 @@ DIAS_SEM_CONSULTAR = 20
 # fundo que parou de publicar não deve continuar com botão.
 DIAS_MAXIMO_RELATORIO = 400
 PAUSA_ENTRE_PEDIDOS = 0.4
-TIMEOUT = 25
+TIMEOUT = (10, 40)            # (conectar, ler)
+TIMEOUT_TESTE_FNET = (10, 30)  # teste único do Fundos.NET no começo
+# Se os primeiros fundos falharem TODOS, a fonte está fora do ar: para aqui
+# em vez de esperar o timeout de cada um dos ~500 fundos.
+DISJUNTOR_FALHAS_SEGUIDAS = 5
+B3_DOCUMENTOS = "https://sistemaswebb3-listados.b3.com.br/fundsListedProxy/Search/GetListedDocuments/"
+B3_TIPO_FII, B3_TIPO_FI_INFRA, B3_TIPO_FIAGRO = 7, 27, 34
+DIAS_JANELA_B3 = 200
 TENTATIVAS = 3
 
 BRT = timezone(timedelta(hours=-3))
@@ -186,10 +218,12 @@ class FundosNet:
         self.contador = 0
         self._iniciado = False
 
-    def _get(self, caminho, **kw):
+    nome = "Fundos.NET"
+
+    def _get(self, caminho, timeout=TIMEOUT, **kw):
         url = BASE_FNET + caminho
         try:
-            return self.sessao.get(url, timeout=TIMEOUT, verify=self.verificar_ssl, **kw)
+            return self.sessao.get(url, timeout=timeout, verify=self.verificar_ssl, **kw)
         except requests.exceptions.SSLError as e:
             if not self.verificar_ssl:
                 raise
@@ -198,13 +232,13 @@ class FundosNet:
             import urllib3
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
             self.verificar_ssl = False
-            return self.sessao.get(url, timeout=TIMEOUT, verify=False, **kw)
+            return self.sessao.get(url, timeout=timeout, verify=False, **kw)
 
     def iniciar(self):
         """Abre a página pública para pegar cookie de sessão e token CSRF."""
         if self._iniciado:
             return
-        resp = self._get("abrirGerenciadorDocumentosCVM")
+        resp = self._get("abrirGerenciadorDocumentosCVM", timeout=TIMEOUT_TESTE_FNET)
         resp.raise_for_status()
         m = _RE_CSRF_META.search(resp.text) or _RE_CSRF_JS.search(resp.text)
         if m and m.group(1).strip():
@@ -214,7 +248,7 @@ class FundosNet:
             log("  Fundos.NET: sessão aberta (a página não publicou token CSRF).")
         self._iniciado = True
 
-    def relatorios_do_fundo(self, cnpj, quantos=10):
+    def relatorios_do_fundo(self, cnpj, ticker=None, fundo=None, quantos=10):
         """Últimos documentos Relatórios > Relatório Gerencial do fundo."""
         self.iniciar()
         self.contador += 1
@@ -253,6 +287,209 @@ class FundosNet:
         raise RuntimeError(f"Fundos.NET falhou para o CNPJ {cnpj}: {ultimo_erro}")
 
 
+# ---------------------------------------------------------------------------
+# Fonte alternativa: API de documentos da B3
+# ---------------------------------------------------------------------------
+_CHAVES_ID = ("idfnet", "iddocumento", "iddocument", "documentid", "id")
+_TIPOS_PROIBIDOS = ("fato relevante", "comunicado ao mercado", "aviso aos cotistas",
+                    "ata de assembleia", "edital de convocacao")
+# Outros tipos da mesma categoria "Relatórios" no Fundos.NET.
+_OUTROS_RELATORIOS = ("relatorio anual", "outros relatorios", "relatorio de agencia de rating",
+                      "relatorio de agencia classificadora de risco", "relatorio do representante de cotistas",
+                      "relatorio de agente fiduciario")
+
+
+def _parse_data_b3(valor):
+    """Aceita os formatos vistos nas APIs da B3 e do Fundos.NET. Devolve
+    (datetime, precisao) — precisao 'mes' quando só veio MM/AAAA."""
+    v = str(valor or "").strip()
+    if not v or v.startswith("0001-01-01"):
+        return None, None
+    for fmt, prec in (("%Y-%m-%dT%H:%M:%S.%f", "dia"), ("%Y-%m-%dT%H:%M:%S", "dia"),
+                      ("%Y-%m-%d %H:%M:%S", "dia"), ("%Y-%m-%d", "dia"),
+                      ("%d/%m/%Y %H:%M:%S", "dia"), ("%d/%m/%Y %H:%M", "dia"),
+                      ("%d/%m/%Y", "dia"), ("%m/%Y", "mes")):
+        try:
+            return datetime.strptime(v[:26] if "T" in v else v, fmt), prec
+        except ValueError:
+            continue
+    return None, None
+
+
+def linha_b3_para_fnet(bruta):
+    """Traduz uma linha da API da B3 para o formato do Fundos.NET usado no
+    resto do robô. Leitura tolerante: o formato da resposta não é
+    documentado. Linha que não der para identificar com segurança como
+    Relatório Gerencial sai com tipo vazio — e é descartada adiante."""
+    if not isinstance(bruta, dict):
+        return None
+    chaves = {normalizar(k).replace("_", ""): k for k in bruta}
+    textos = [normalizar(v) for v in bruta.values() if isinstance(v, str)]
+
+    # Aceita o valor "Relatório Gerencial" (ou um título que comece assim,
+    # como "Relatório Gerencial - Agosto 2026"), desde que NENHUM outro
+    # campo da linha diga que é outro tipo de documento.
+    tipo = ""
+    parece_gerencial = any(t == "relatorio gerencial" or t.startswith("relatorio gerencial ")
+                           or t.startswith("relatorio gerencial-") for t in textos)
+    outro_tipo = any(t in _TIPOS_PROIBIDOS or t in _OUTROS_RELATORIOS or t.startswith("oferta publica")
+                     for t in textos)
+    if parece_gerencial and not outro_tipo:
+        tipo = "Relatório Gerencial"
+
+    doc_id = None
+    for chave in _CHAVES_ID:
+        k = chaves.get(chave)
+        if k is not None and str(bruta[k]).strip().isdigit() and int(bruta[k]) > 0:
+            doc_id = int(bruta[k])
+            break
+
+    ref = ent = None
+    ref_prec = None
+    for kn, k in chaves.items():
+        dt, prec = _parse_data_b3(bruta[k])
+        if not dt:
+            continue
+        if "refer" in kn and ref is None:
+            ref, ref_prec = dt, prec
+        elif any(p in kn for p in ("deliver", "entrega", "delivery", "sent", "publica")) and ent is None:
+            ent = dt
+        elif kn in ("date", "data", "datedocument", "documentdate") and ent is None:
+            ent = dt
+
+    status = ""
+    for kn, k in chaves.items():
+        if "status" in kn or "situa" in kn:
+            status = normalizar(bruta[k])
+            break
+    situacao = "C" if status.startswith("cancel") or status == "c" else "I" if status.startswith("inativ") or status == "i" else "A"
+
+    versao = 1
+    for kn in ("version", "versao"):
+        k = chaves.get(kn)
+        if k is not None and str(bruta[k]).strip().isdigit():
+            versao = int(bruta[k])
+
+    if doc_id is None:
+        return None
+    return {
+        "id": doc_id,
+        "categoriaDocumento": "Relatórios" if tipo else "",
+        "tipoDocumento": tipo,
+        "dataReferencia": (ref.strftime("%m/%Y") if ref_prec == "mes" else ref.strftime("%d/%m/%Y")) if ref else "",
+        "formatoDataReferencia": "2" if ref_prec == "mes" else "3",
+        "dataEntrega": ent.strftime("%d/%m/%Y %H:%M") if ent else "",
+        "versao": versao,
+        "situacaoDocumento": situacao,
+        "descricaoFundo": next((str(bruta[k]).strip() for kn, k in chaves.items()
+                                if kn in ("companyname", "fundname", "nomefundo")), ""),
+    }
+
+
+class FonteB3:
+    """GetListedDocuments da B3, categoria 7 (Relatórios)."""
+    nome = "API da B3"
+
+    def __init__(self):
+        self.sessao = requests.Session()
+        self.sessao.headers["User-Agent"] = UA
+        self.sessao.headers["Accept"] = "application/json,*/*"
+        self.primeira_linha_mostrada = False
+
+    @staticmethod
+    def _b64(payload):
+        return base64.b64encode(json.dumps(payload, separators=(",", ":")).encode("utf-8")).decode("ascii")
+
+    def _pedir(self, payload):
+        resp = self.sessao.get(B3_DOCUMENTOS + self._b64(payload), timeout=TIMEOUT)
+        if resp.status_code >= 500 or resp.status_code == 429:
+            raise RuntimeError(f"HTTP {resp.status_code}")
+        resp.raise_for_status()
+        texto = resp.text.strip()
+        if not texto:
+            return []
+        dados = json.loads(texto)
+        if isinstance(dados, str):          # a B3 às vezes devolve o JSON como string
+            dados = json.loads(dados) if dados.strip() else []
+        if isinstance(dados, dict):
+            return dados.get("results") or dados.get("data") or []
+        return dados if isinstance(dados, list) else []
+
+    def relatorios_do_fundo(self, cnpj, ticker=None, fundo=None, quantos=50):
+        hoje = datetime.now(BRT).date()
+        sigla = (ticker or "")[:4]
+        tipo_fundo = str((fundo or {}).get("tipo_fundo") or "").lower()
+        tipos = [B3_TIPO_FI_INFRA] if "infra" in tipo_fundo else [B3_TIPO_FII, B3_TIPO_FIAGRO]
+        ultimo_erro = None
+        for tipo in tipos:
+            payload = {"pageNumber": 1, "pageSize": quantos, "cnpj": cnpj, "identifierFund": sigla,
+                       "typeFund": tipo, "dateInitial": (hoje - timedelta(days=DIAS_JANELA_B3)).isoformat(),
+                       "dateFinal": hoje.isoformat(), "category": ID_CATEGORIA_RELATORIOS}
+            brutas = None
+            for tentativa in range(1, TENTATIVAS + 1):
+                try:
+                    brutas = self._pedir(payload)
+                    break
+                except (requests.RequestException, ValueError, RuntimeError) as e:
+                    ultimo_erro = e
+                    time.sleep(1.5 * tentativa)
+            if brutas is None:
+                continue
+            if brutas and not self.primeira_linha_mostrada:
+                self.primeira_linha_mostrada = True
+                log(f"  [B3] formato da resposta (1ª linha, {ticker}, typeFund {tipo}): "
+                    f"{json.dumps(brutas[0], ensure_ascii=False)[:1200]}")
+            if brutas:
+                return [ln for ln in (linha_b3_para_fnet(b) for b in brutas) if ln]
+        if ultimo_erro is not None:
+            raise RuntimeError(f"API da B3 falhou para {ticker} ({cnpj}): {ultimo_erro}")
+        return []
+
+
+class FonteComReserva:
+    """Fundos.NET na frente, API da B3 de reserva — fundo a fundo.
+    Se o Fundos.NET falhar para um fundo, o MESMO fundo é pedido à B3 na
+    hora. Se ele falhar nos primeiros DISJUNTOR_FALHAS_SEGUIDAS fundos sem
+    nenhum acerto, deixa de ser tentado no resto da rodada (a página inicial
+    pode abrir e a busca não responder — foi preciso cobrir os dois casos)."""
+
+    def __init__(self, principal, reserva):
+        self.principal, self.reserva = principal, reserva
+        self.falhas_principal = 0
+        self.acertos_principal = 0
+        self.desistiu = False
+
+    @property
+    def nome(self):
+        return self.reserva.nome if self.desistiu else f"{self.principal.nome} (reserva: {self.reserva.nome})"
+
+    def relatorios_do_fundo(self, cnpj, ticker=None, fundo=None):
+        if not self.desistiu:
+            try:
+                linhas = self.principal.relatorios_do_fundo(cnpj, ticker=ticker, fundo=fundo)
+                self.acertos_principal += 1
+                return linhas
+            except Exception as e:  # noqa: BLE001
+                self.falhas_principal += 1
+                if not self.acertos_principal and self.falhas_principal >= DISJUNTOR_FALHAS_SEGUIDAS:
+                    self.desistiu = True
+                    log(f"  {self.principal.nome} falhou nos {self.falhas_principal} primeiros fundos "
+                        f"({str(e)[:120]}). Seguindo só com a {self.reserva.nome}.")
+        return self.reserva.relatorios_do_fundo(cnpj, ticker=ticker, fundo=fundo)
+
+
+def escolher_fonte():
+    """Fundos.NET se ele responder; senão, a API da B3."""
+    fnet = FundosNet()
+    try:
+        fnet.iniciar()
+        return FonteComReserva(fnet, FonteB3())
+    except Exception as e:  # noqa: BLE001
+        log(f"  Fundos.NET não respondeu daqui ({e.__class__.__name__}: {str(e)[:160]}). "
+            "Usando a API de documentos da B3.")
+        return FonteB3()
+
+
 def ler_json(caminho, padrao):
     try:
         with open(caminho, encoding="utf-8") as f:
@@ -287,7 +524,7 @@ def montar_registro(linha, cnpj):
 
 def coletar(fnet, fiis, anterior, agora, tudo=False, diagnostico=False):
     relatorios = dict(anterior.get("relatorios") or {})
-    diag = {"fundos_no_arquivo": len(fiis), "sem_cnpj": 0, "consultados": 0,
+    diag = {"fonte": getattr(fnet, "nome", "?"), "fundos_no_arquivo": len(fiis), "sem_cnpj": 0, "consultados": 0,
             "pulados_em_dia": 0, "com_relatorio": 0, "sem_relatorio": 0,
             "falhas": 0, "linhas_lidas": 0, "descartadas_outro_tipo": 0,
             "descartadas_inativas": 0, "exemplos_descartados": []}
@@ -315,10 +552,14 @@ def coletar(fnet, fiis, anterior, agora, tudo=False, diagnostico=False):
 
         diag["consultados"] += 1
         try:
-            linhas = fnet.relatorios_do_fundo(cnpj)
+            linhas = fnet.relatorios_do_fundo(cnpj, ticker=ticker, fundo=f)
         except Exception as e:  # noqa: BLE001 — um fundo não derruba os outros
             diag["falhas"] += 1
             log(f"  {ticker}: falhou ({e}) — mantém o link anterior, se houver.")
+            if diag["falhas"] == diag["consultados"] >= DISJUNTOR_FALHAS_SEGUIDAS:
+                log(f"  Os {DISJUNTOR_FALHAS_SEGUIDAS} primeiros fundos falharam: {fnet.nome} fora do ar. Parando.")
+                diag["interrompido"] = True
+                break
             time.sleep(PAUSA_ENTRE_PEDIDOS)
             continue
 
@@ -351,6 +592,9 @@ def coletar(fnet, fiis, anterior, agora, tudo=False, diagnostico=False):
             # vazia: pode ser instabilidade. A idade máxima (abaixo) é que
             # tira do ar o que ficou velho.
         time.sleep(PAUSA_ENTRE_PEDIDOS)
+
+    if diag.get("interrompido"):
+        return dict(sorted(relatorios.items())), diag
 
     # Fundo que saiu do mercado-fiis.json ou relatório velho demais saem.
     tickers_vivos = {str(f.get("ticker") or "").upper() for f in fiis}
@@ -399,12 +643,8 @@ def main(argv=None):
         return 0
 
     anterior = ler_json(ARQ_SAIDA, {})
-    fnet = FundosNet()
-    try:
-        fnet.iniciar()
-    except Exception as e:  # noqa: BLE001
-        log(f"ERRO: não consegui abrir o Fundos.NET ({e}). Arquivo mantido como estava.")
-        return 1
+    fnet = escolher_fonte()
+    log(f"  Fonte: {fnet.nome}.")
 
     relatorios, diag = coletar(fnet, fiis, anterior, agora, tudo=args.tudo, diagnostico=args.diagnostico)
 
@@ -416,7 +656,7 @@ def main(argv=None):
     # Se TODAS as consultas falharam, não sobrescreve o arquivo bom com um
     # arquivo que só reflete a queda do Fundos.NET.
     if diag["consultados"] and diag["falhas"] == diag["consultados"]:
-        log("ERRO: todas as consultas falharam. Arquivo mantido como estava.")
+        log(f"ERRO: todas as consultas falharam ({fnet.nome}). Arquivo mantido como estava.")
         return 1
 
     saida = {
