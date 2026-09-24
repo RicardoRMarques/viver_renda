@@ -1888,6 +1888,7 @@
        pessoa mais procura no cartão de um FII. */
     .hg-btn-relatorio { color: var(--primary); border-color: var(--primary); }
     .hg-btn-relatorio:hover { background: var(--primary); color: #fff; }
+    .hg-btn-relatorio[hidden] { display: none; }
     button.hg-btn-secundario-pequeno svg, a.hg-btn-secundario-pequeno svg { width: 13px; height: 13px; flex-shrink: 0; max-height: none; }
     /* Botões lado a lado (ex: "Ver histórico de dividendos" + atalho pra
        Análise Fundamentalista), quebrando linha em telas estreitas. */
@@ -7795,6 +7796,55 @@
                 </a>`;
       }
 
+      // ------------------------------------------------------------
+      // Balanços (ações)
+      // Mesma ideia do "Relatórios gerenciais" dos FIIs: abre a página da
+      // empresa na B3, aba de relatórios, onde ficam as Informações
+      // Trimestrais (ITR) e as Demonstrações Financeiras Padronizadas (DFP)
+      // — conferida pelo Ricardo no navegador em 24/09/2026 com a CAML3:
+      //   .../listedCompaniesPage/main/24228/CAML/reports?language=pt-br
+      // O endereço usa o CÓDIGO CVM da empresa, que a HG não traz; ele vem do
+      // mercado-acoes.json (campo codigo_cvm, gravado pelo coletar_mercado.py
+      // a partir da lista de empresas da B3). Sem código, o botão não aparece.
+      // ------------------------------------------------------------
+      let hgCodigosCvmPromessa = null;
+      function hgCarregarCodigosCvm() {
+        if (!hgCodigosCvmPromessa) {
+          hgCodigosCvmPromessa = fetch('mercado-acoes.json', { cache: 'no-store' })
+            .then(r => (r.ok ? r.json() : null))
+            .then(d => {
+              const mapa = {};
+              for (const x of (d && d.ativos) || []) {
+                const t = String(x.ticker || '').toUpperCase();
+                if (t && Number(x.codigo_cvm) > 0) mapa[t] = Number(x.codigo_cvm);
+              }
+              return mapa;
+            })
+            .catch(e => { console.warn('Balanços: não consegui ler mercado-acoes.json', e); return {}; });
+        }
+        return hgCodigosCvmPromessa;
+      }
+      function hgBotaoBalancos(a) {
+        const ticker = (a.symbol || '').replace('B3:', '').toUpperCase();
+        return `
+                <a class="hg-btn-secundario-pequeno hg-btn-relatorio" id="hgBtnBalancos" data-ticker="${ticker}" hidden
+                   target="_blank" rel="noopener noreferrer"
+                   title="Página oficial da empresa na B3 com os balanços: ITR (trimestral) e DFP (anual)">
+                  ${HG_ICONE_DOC}<span>Balanços (B3)</span>
+                </a>`;
+      }
+      async function hgAtualizarBotaoBalancos() {
+        const btn = document.getElementById('hgBtnBalancos');
+        if (!btn) return;
+        const ticker = btn.dataset.ticker;
+        const codigos = await hgCarregarCodigosCvm();
+        // O cartão pode ter sido trocado enquanto o arquivo carregava.
+        const atual = document.getElementById('hgBtnBalancos');
+        if (atual !== btn || !codigos[ticker]) return;
+        btn.href = `https://sistemaswebb3-listados.b3.com.br/listedCompaniesPage/main/${codigos[ticker]}/${ticker.slice(0, 4)}/reports?language=pt-br`;
+        btn.hidden = false;
+      }
+
       function hgRenderizarAtivo(a) {
         const q = a.quote || {};
         const logo = a.logos?.square_large || a.logos?.square_small;
@@ -7828,6 +7878,7 @@
                   <span id="hgBtnCompartilharTexto" class="hg-btn-compartilhar-texto">Compartilhar</span>
                 </button>
                 ${['fii', 'fiagro'].includes(a.kind) && a.tax_id ? hgBotaoRelatorioGerencial(a) : ''}
+                ${a.kind === 'stock' ? hgBotaoBalancos(a) : ''}
               </div>
             </div>
 
@@ -7960,6 +8011,8 @@
             ` : ''}
           </div>
         `;
+
+        hgAtualizarBotaoBalancos();
 
         resultadoEl.querySelectorAll('.hg-chip').forEach(chip => {
           chip.addEventListener('click', () => {

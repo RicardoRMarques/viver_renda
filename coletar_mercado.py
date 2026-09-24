@@ -823,6 +823,69 @@ def coletar_fi_infra():
 # ---------------------------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 5) CÓDIGO CVM DAS AÇÕES — para o botão "Balanços (B3)" da Consulta Rápida
+# ---------------------------------------------------------------------------
+# A página da empresa na B3 com ITR e DFP é
+#   https://sistemaswebb3-listados.b3.com.br/listedCompaniesPage/main/<codigo_cvm>/<SIGLA>/reports?language=pt-br
+# (conferida pelo Ricardo no navegador em 24/09/2026 com a CAML3 / 24228).
+# O código CVM não vem da HG nem do Fundamentus; vem da lista de empresas da
+# própria B3 (GetInitialCompanies, mesmo host sistemaswebb3-listados que já
+# responde ao Actions). Chave: issuingCompany = as 4 letras do ticker.
+B3_EMPRESAS = "https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall/GetInitialCompanies/"
+
+
+def buscar_codigos_cvm_b3():
+    """{SIGLA (4 letras): código CVM} de todas as empresas listadas na B3."""
+    codigos, pagina = {}, 1
+    while True:
+        url = B3_EMPRESAS + _b64({"language": "pt-br", "pageNumber": pagina, "pageSize": 100})
+        resp = requests.get(url, headers=UA_NAVEGADOR, timeout=TIMEOUT)
+        resp.raise_for_status()
+        dados = resp.json()
+        if isinstance(dados, str):          # a B3 às vezes devolve o JSON como string
+            dados = json.loads(dados) if dados.strip() else {}
+        for linha in dados.get("results") or []:
+            sigla = str(linha.get("issuingCompany") or "").strip().upper()
+            codigo = str(linha.get("codeCVM") or "").strip()
+            if sigla and codigo.isdigit() and int(codigo) > 0:
+                codigos.setdefault(sigla, int(codigo))
+        total = int((dados.get("page") or {}).get("totalPages") or 1)
+        if pagina >= total:
+            break
+        pagina += 1
+        time.sleep(0.3)
+    log(f"  B3: código CVM de {len(codigos)} empresas")
+    return codigos
+
+
+def anexar_codigo_cvm(acoes):
+    """Grava `codigo_cvm` em cada ação. Etapa isolada: se a B3 falhar,
+    reaproveita o código do arquivo anterior (código CVM não muda)."""
+    anteriores = {}
+    try:
+        with open(SAIDA_ACOES, encoding="utf-8") as f:
+            for a in (json.load(f).get("ativos") or []):
+                if a.get("codigo_cvm"):
+                    anteriores[a.get("ticker")] = a["codigo_cvm"]
+    except (OSError, ValueError):
+        pass
+    try:
+        codigos = buscar_codigos_cvm_b3()
+    except Exception as e:  # noqa: BLE001
+        log(f"  Código CVM: B3 falhou ({e}); mantendo os do arquivo anterior.")
+        codigos = {}
+    com = 0
+    for a in acoes:
+        ticker = str(a.get("ticker") or "").upper()
+        codigo = codigos.get(ticker[:4]) or anteriores.get(ticker)
+        if codigo:
+            a["codigo_cvm"] = codigo
+            com += 1
+    log(f"  Código CVM em {com} de {len(acoes)} ações")
+    return acoes
+
+
 def main():
     agora = datetime.now(timezone.utc).isoformat()
 
@@ -835,6 +898,7 @@ def main():
     log("=== Ações ===")
     universo_acoes = buscar_universo_acoes()
     acoes = enriquecer_acoes_com_fundamentals(universo_acoes)
+    acoes = anexar_codigo_cvm(acoes)
     with open(SAIDA_ACOES, "w", encoding="utf-8") as f:
         json.dump({"atualizado_em": agora, "ativos": acoes}, f, ensure_ascii=False, indent=2)
     log(f"Gravado {SAIDA_ACOES} com {len(acoes)} ações")
