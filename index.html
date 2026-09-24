@@ -2037,6 +2037,13 @@
     .hg-grafico-tooltip-grupo { pointer-events: none; opacity: 0; transition: opacity 0.1s ease; }
     .hg-grafico-tooltip-caixa { fill: var(--card); stroke: var(--border); stroke-width: 1; }
     .hg-grafico-tooltip-texto { font-size: 9px; font-family: "Courier New", monospace; fill: var(--text); }
+    .hg-grafico-variacao { font-family: "Courier New", monospace; font-size: 0.74rem; font-weight: 700; margin-left: 6px; white-space: nowrap; }
+    /* .hg-grafico-titulo span pinta todo span do título de azul — a
+       variação precisa do verde/vermelho de alta/baixa. */
+    .hg-grafico-titulo .hg-grafico-variacao.val-up { color: var(--accent); }
+    .hg-grafico-titulo .hg-grafico-variacao.val-down { color: var(--danger); }
+    .hg-grafico-overlay:focus { outline: none; }
+    .hg-grafico-overlay:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
     .hg-grafico-overlay { fill: transparent; cursor: crosshair; }
 
     /* "Se você tivesse investido..." */
@@ -7915,7 +7922,7 @@
             <div class="hg-preco-grafico">
               <div class="hg-grafico-box">
                 <div class="hg-grafico-topo">
-                  <div class="hg-grafico-titulo">Cotação — <span id="hgGraficoPeriodoLabel">30 dias</span></div>
+                  <div class="hg-grafico-titulo">Cotação — <span id="hgGraficoPeriodoLabel">30 dias</span> <span id="hgGraficoVariacao" class="hg-grafico-variacao" aria-live="polite"></span></div>
                   <div class="hg-periodo-tabs" id="hgPeriodoTabs">
                     <button type="button" class="hg-periodo-tab" data-periodo="1D">1D</button>
                     <button type="button" class="hg-periodo-tab" data-periodo="7D">7D</button>
@@ -8842,32 +8849,18 @@
         resultadoElInvestido.innerHTML = `${hgFormatMoeda(resultado) ?? '—'} <small class="${variacao >= 0 ? 'val-up' : 'val-down'}">(${variacao >= 0 ? '+' : ''}${hgFormatNumero(variacao)}%)</small>`;
       }
 
-      // Converte uma lista de pontos {x,y} numa string de path SVG suavizada
-      // (curva de Catmull-Rom convertida para Béziers cúbicas), em vez de
-      // linhas retas ligando ponto a ponto.
-      function hgSuavizarLinha(pontos) {
-        if (pontos.length < 3) {
-          return `M ${pontos.map(p => `${p.x},${p.y}`).join(' L ')}`;
-        }
-        let d = `M ${pontos[0].x},${pontos[0].y}`;
-        for (let i = 0; i < pontos.length - 1; i++) {
-          const p0 = pontos[i === 0 ? 0 : i - 1];
-          const p1 = pontos[i];
-          const p2 = pontos[i + 1];
-          const p3 = pontos[i + 2 < pontos.length ? i + 2 : i + 1];
-          const c1x = p1.x + (p2.x - p0.x) / 6;
-          const c1y = p1.y + (p2.y - p0.y) / 6;
-          const c2x = p2.x - (p3.x - p1.x) / 6;
-          const c2y = p2.y - (p3.y - p1.y) / 6;
-          d += ` C ${c1x.toFixed(2)},${c1y.toFixed(2)} ${c2x.toFixed(2)},${c2y.toFixed(2)} ${p2.x.toFixed(2)},${p2.y.toFixed(2)}`;
-        }
-        return d;
+      // A HG devolve datas como "2026-09-23 14:00:00". O Safari não entende
+      // o espaço no lugar do "T" (dá Invalid Date), então normaliza antes.
+      function hgParseData(valor) {
+        if (!valor) return null;
+        const txt = typeof valor === 'string' && /^\d{4}-\d{2}-\d{2} \d/.test(valor) ? valor.replace(' ', 'T') : valor;
+        const d = new Date(txt);
+        return isNaN(d.getTime()) ? null : d;
       }
 
       function hgFormatDataCurta(valor, periodo) {
-        if (!valor) return '';
-        const d = new Date(valor);
-        if (isNaN(d.getTime())) return '';
+        const d = hgParseData(valor);
+        if (!d) return '';
         if (periodo === '1D') {
           return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
@@ -8875,160 +8868,264 @@
           const diaSemana = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
           return `${diaSemana} ${d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}`;
         }
-        if (periodo === '1A') {
-          return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        if (periodo === '1A' || periodo === '6M' || periodo === 'YTD') {
+          const mes = d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+          return `${mes}/${String(d.getFullYear()).slice(2)}`;
         }
         return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
       }
 
+      // Data completa para o balão: com hora nos períodos intradiários.
+      function hgFormatDataTooltip(valor, periodo) {
+        const d = hgParseData(valor);
+        if (!d) return '';
+        const data = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        if (periodo === '1D' || periodo === '7D') {
+          const dia = d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+          return `${dia} ${data.slice(0, 5)} · ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        }
+        return data;
+      }
+
+      // Escala "redonda" do eixo Y: passos de 1, 2, 2,5 ou 5 × 10^n, para os
+      // rótulos saírem 48,00 / 48,50 / 49,00 em vez de 47,6 / 48,2 / 48,8.
+      function hgEscalaRedonda(minimo, maximo, alvoDivisoes = 4) {
+        let amp = maximo - minimo;
+        if (!(amp > 0)) amp = Math.abs(maximo) * 0.02 || 1;
+        const bruto = amp / alvoDivisoes;
+        const pot = Math.pow(10, Math.floor(Math.log10(bruto)));
+        const passo = [1, 2, 2.5, 5, 10].map(m => m * pot).find(v => v >= bruto) || 10 * pot;
+        let lo = Math.floor(minimo / passo) * passo;
+        let hi = Math.ceil(maximo / passo) * passo;
+        if (hi === lo) { lo -= passo; hi += passo; }
+        const casas = Math.max(0, Math.min(4, -Math.floor(Math.log10(passo)) + (Math.round(passo / pot) === 2.5 ? 1 : 0)));
+        const ticks = [];
+        for (let v = lo; v <= hi + passo / 2; v += passo) ticks.push(Number(v.toFixed(8)));
+        return { lo, hi, ticks, casas };
+      }
+
+      // Gráfico de cotação da Consulta Rápida (redesenhado em 24/09/2026):
+      // - linha RETA entre as amostras (a curva suavizada de antes passava
+      //   acima da máxima e abaixo da mínima reais entre dois pontos —
+      //   mostrava preço que o ativo nunca teve);
+      // - eixo Y com valores redondos;
+      // - eixo X sem rótulos repetidos/encavalados (no 7D, um rótulo por dia,
+      //   centrado no trecho do dia, com divisória fina entre os dias);
+      // - variação do período no título e no balão;
+      // - balão também pelo teclado (Tab até o gráfico e setas ← →).
       function hgDesenharGrafico(container, amostras, periodo) {
         const larguraTotal = 640;
         const alturaTotal = 210;
-        const margemEsq = 58;
+        const margemEsq = 50;
         const margemDir = 14;
-        const margemTop = 16;
+        const margemTop = 14;
         const margemBaixo = 30;
         const largura = larguraTotal - margemEsq - margemDir;
         const altura = alturaTotal - margemTop - margemBaixo;
+        const LARGURA_CARACTERE = 6.6; // 11px Courier New ≈ 0,6em por caractere
 
         const validas = amostras
           .map(s => ({ close: s.close, data: s.date || s.day || s.data || null }))
           .filter(s => typeof s.close === 'number');
-
         const fechamentos = validas.map(s => s.close);
-        const minimoBruto = Math.min(...fechamentos);
-        const maximoBruto = Math.max(...fechamentos);
-        const folga = ((maximoBruto - minimoBruto) || maximoBruto * 0.02) * 0.12;
-        const minimo = minimoBruto - folga;
-        const maximo = maximoBruto + folga;
-        const amplitude = (maximo - minimo) || 1;
+        const n = fechamentos.length;
+        const primeiro = fechamentos[0];
+        const ultimo = fechamentos[n - 1];
 
-        const emAlta = fechamentos[fechamentos.length - 1] >= fechamentos[0];
+        const escala = hgEscalaRedonda(Math.min(...fechamentos), Math.max(...fechamentos));
+        const amplitude = (escala.hi - escala.lo) || 1;
+        // Preço abaixo de R$ 1.000 sempre com 2 casas (é dinheiro: 48,00 e não
+        // 48); acima disso, as casas que o passo pedir, para caber na margem.
+        const casasEixo = escala.hi < 1000 ? Math.max(2, escala.casas) : escala.casas;
+        const fmtEixo = v => v.toLocaleString('pt-BR', { minimumFractionDigits: casasEixo, maximumFractionDigits: casasEixo });
+
+        const emAlta = ultimo >= primeiro;
         const estilos = getComputedStyle(document.documentElement);
         const corAlta = estilos.getPropertyValue('--accent').trim() || '#7cff92';
         const corBaixa = estilos.getPropertyValue('--danger').trim() || '#ff6b6b';
         const cor = emAlta ? corAlta : corBaixa;
         const gradienteId = `hgGrad_${Date.now()}`;
 
-        const paraX = i => margemEsq + (i / (fechamentos.length - 1)) * largura;
-        const paraY = valor => margemTop + altura - ((valor - minimo) / amplitude) * altura;
-
+        const paraX = i => margemEsq + (n === 1 ? largura / 2 : (i / (n - 1)) * largura);
+        const paraY = valor => margemTop + altura - ((valor - escala.lo) / amplitude) * altura;
         const pontos = fechamentos.map((valor, i) => ({ x: paraX(i), y: paraY(valor) }));
-        const pathLinha = hgSuavizarLinha(pontos);
-        const pathArea = `${pathLinha} L ${pontos[pontos.length - 1].x.toFixed(2)},${margemTop + altura} L ${pontos[0].x.toFixed(2)},${margemTop + altura} Z`;
+        const pathLinha = 'M ' + pontos.map(p => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' L ');
+        const base = margemTop + altura;
+        const pathArea = `${pathLinha} L ${pontos[n - 1].x.toFixed(2)},${base} L ${pontos[0].x.toFixed(2)},${base} Z`;
 
-        // Grade horizontal (5 níveis) com rótulo de preço em cada linha.
-        const niveisGrade = 5;
-        let gradeSvg = '';
-        for (let i = 0; i <= niveisGrade; i++) {
-          const valorNivel = minimo + (amplitude * i / niveisGrade);
-          const y = paraY(valorNivel);
-          gradeSvg += `
-            <line x1="${margemEsq}" y1="${y.toFixed(1)}" x2="${larguraTotal - margemDir}" y2="${y.toFixed(1)}" class="hg-grafico-grid-linha" stroke-dasharray="${i === 0 ? '0' : '2,3'}"></line>
-            <text x="${margemEsq - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" class="hg-grafico-eixo-label-preco">${hgFormatCompacto(valorNivel)}</text>`;
+        // Variação do período, no título ("▲ +2,70% em 7 dias").
+        const variacaoPeriodo = primeiro ? (ultimo / primeiro - 1) * 100 : null;
+        const varEl = document.getElementById('hgGraficoVariacao');
+        if (varEl) {
+          if (variacaoPeriodo === null) { varEl.textContent = ''; }
+          else {
+            varEl.className = `hg-grafico-variacao ${emAlta ? 'val-up' : 'val-down'}`;
+            varEl.textContent = `${emAlta ? '▲' : '▼'} ${variacaoPeriodo >= 0 ? '+' : ''}${hgFormatNumero(variacaoPeriodo)}% no período`;
+          }
         }
 
-        // Rótulos de data/hora no eixo X: até 5 marcações bem espaçadas
-        // (menos quando há poucas amostras, pra não repetir/sobrepor).
-        // Formato se adapta ao período: hora no 1D, dia da semana no 7D,
-        // DD/MM nos períodos médios, DD/MM/AA no 1A.
-        const qtdAmostras = fechamentos.length;
-        const qtdLabels = Math.min(8, qtdAmostras);
-        const indicesLabel = qtdLabels <= 1
-          ? [0]
-          : Array.from({ length: qtdLabels }, (_, k) => Math.round((k / (qtdLabels - 1)) * (qtdAmostras - 1)));
-        const indicesUnicos = [...new Set(indicesLabel)];
-        const datasSvg = indicesUnicos.map((i, posicao) => {
-          const texto = hgFormatDataCurta(validas[i]?.data, periodo) || (i === qtdAmostras - 1 ? 'Hoje' : '');
-          if (!texto) return '';
-          const ehPrimeiro = posicao === 0;
-          const ehUltimo = posicao === indicesUnicos.length - 1;
-          const anchor = ehPrimeiro ? 'start' : (ehUltimo ? 'end' : 'middle');
-          const offsetX = ehPrimeiro ? -2 : (ehUltimo ? 2 : 0);
-          return `<text x="${(paraX(i) + offsetX).toFixed(1)}" y="${alturaTotal - 8}" text-anchor="${anchor}" class="hg-grafico-eixo-label-preco">${texto}</text>`;
+        // Grade horizontal nos valores redondos.
+        const gradeSvg = escala.ticks.map((v, k) => {
+          const y = paraY(v);
+          return `
+            <line x1="${margemEsq}" y1="${y.toFixed(1)}" x2="${larguraTotal - margemDir}" y2="${y.toFixed(1)}" class="hg-grafico-grid-linha" stroke-dasharray="${k === 0 ? '0' : '2,3'}"></line>
+            <text x="${margemEsq - 6}" y="${(y + 3.5).toFixed(1)}" text-anchor="end" class="hg-grafico-eixo-label-preco">${fmtEixo(v)}</text>`;
         }).join('');
 
-        const ultimoPonto = pontos[pontos.length - 1];
+        // Candidatos a rótulo no eixo X.
+        let candidatos = [];      // { x, texto }
+        let divisorias = [];      // x das divisórias entre dias (só 7D)
+        if (periodo === '7D') {
+          const dias = [];
+          validas.forEach((s, i) => {
+            const d = hgParseData(s.data);
+            const chave = d ? `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}` : `?${i}`;
+            if (!dias.length || dias[dias.length - 1].chave !== chave) dias.push({ chave, ini: i, fim: i });
+            else dias[dias.length - 1].fim = i;
+          });
+          dias.forEach((dia, k) => {
+            if (k > 0) divisorias.push((paraX(dia.ini - 1) + paraX(dia.ini)) / 2);
+            candidatos.push({ x: (paraX(dia.ini) + paraX(dia.fim)) / 2, texto: hgFormatDataCurta(validas[dia.ini].data, periodo) });
+          });
+        } else {
+          const qtd = Math.min(6, n);
+          const idx = qtd <= 1 ? [0] : Array.from({ length: qtd }, (_, k) => Math.round((k / (qtd - 1)) * (n - 1)));
+          [...new Set(idx)].forEach(i => candidatos.push({ x: paraX(i), texto: hgFormatDataCurta(validas[i].data, periodo) }));
+        }
+        // Tira texto vazio e repetido, prende os rótulos dentro da área e
+        // descarta o que encostaria no vizinho (o último tem prioridade
+        // sobre o penúltimo — é a data mais importante).
+        const vistos = new Set();
+        candidatos = candidatos.filter(c => c.texto && !vistos.has(c.texto) && vistos.add(c.texto));
+        const caixa = c => {
+          const w = c.texto.length * LARGURA_CARACTERE;
+          const cx = Math.min(Math.max(c.x, margemEsq + w / 2), larguraTotal - margemDir - w / 2);
+          return { ...c, cx, esq: cx - w / 2, dir: cx + w / 2 };
+        };
+        const caixas = candidatos.map(caixa);
+        const mantidos = [];
+        const ultimoRotulo = caixas[caixas.length - 1];
+        caixas.forEach((c, k) => {
+          const anterior = mantidos[mantidos.length - 1];
+          if (anterior && c.esq < anterior.dir + 12) return;
+          if (k < caixas.length - 1 && ultimoRotulo && c.dir > ultimoRotulo.esq - 12) return;
+          mantidos.push(c);
+        });
+        const datasSvg = mantidos.map(c =>
+          `<text x="${c.cx.toFixed(1)}" y="${alturaTotal - 8}" text-anchor="middle" class="hg-grafico-eixo-label-preco">${c.texto}</text>`).join('');
+        const divisoriasSvg = divisorias.map(x =>
+          `<line x1="${x.toFixed(1)}" y1="${margemTop}" x2="${x.toFixed(1)}" y2="${base}" class="hg-grafico-grid-linha" stroke-dasharray="1,3" opacity="0.8"></line>`).join('');
+
+        const ultimoPonto = pontos[n - 1];
+        const rotuloAria = `Cotação no período: de R$ ${formatMoeda(primeiro)} a R$ ${formatMoeda(ultimo)}` +
+          (variacaoPeriodo !== null ? ` (${variacaoPeriodo >= 0 ? '+' : ''}${hgFormatNumero(variacaoPeriodo)}%)` : '');
 
         container.innerHTML = `
-          <svg viewBox="0 0 ${larguraTotal} ${alturaTotal}" preserveAspectRatio="xMidYMid meet">
+          <svg viewBox="0 0 ${larguraTotal} ${alturaTotal}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${rotuloAria}">
             <defs>
               <linearGradient id="${gradienteId}" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="${cor}" stop-opacity="0.18"></stop>
+                <stop offset="0%" stop-color="${cor}" stop-opacity="0.16"></stop>
                 <stop offset="100%" stop-color="${cor}" stop-opacity="0"></stop>
               </linearGradient>
             </defs>
 
             ${gradeSvg}
+            ${divisoriasSvg}
             ${datasSvg}
 
             <path d="${pathArea}" fill="url(#${gradienteId})" stroke="none"></path>
-            <path d="${pathLinha}" fill="none" stroke="${cor}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"></path>
+            <path d="${pathLinha}" fill="none" stroke="${cor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
 
-            <circle cx="${ultimoPonto.x.toFixed(2)}" cy="${ultimoPonto.y.toFixed(2)}" r="3.2" fill="${cor}"></circle>
             <circle cx="${ultimoPonto.x.toFixed(2)}" cy="${ultimoPonto.y.toFixed(2)}" r="6.5" fill="${cor}" opacity="0.18"></circle>
+            <circle cx="${ultimoPonto.x.toFixed(2)}" cy="${ultimoPonto.y.toFixed(2)}" r="4" fill="${cor}" stroke="var(--card)" stroke-width="2"></circle>
 
-            <g id="hgTooltipLinha" class="hg-grafico-tooltip-grupo">
-              <line x1="0" y1="${margemTop}" x2="0" y2="${margemTop + altura}" stroke="${cor}" stroke-width="1" stroke-dasharray="3,3"></line>
-              <circle r="4.5" fill="${cor}" stroke="var(--card)" stroke-width="1.5"></circle>
+            <g class="hg-grafico-tooltip-grupo hg-tt-linha">
+              <line x1="0" y1="${margemTop}" x2="0" y2="${base}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3,3"></line>
+              <circle r="4.5" fill="${cor}" stroke="var(--card)" stroke-width="2"></circle>
             </g>
-            <g id="hgTooltipCaixa" class="hg-grafico-tooltip-grupo">
-              <rect class="hg-grafico-tooltip-caixa" rx="6" width="86" height="34"></rect>
-              <text id="hgTooltipData" class="hg-grafico-tooltip-texto" x="8" y="14"></text>
-              <text id="hgTooltipPreco" class="hg-grafico-tooltip-texto" x="8" y="27" font-weight="700"></text>
+            <g class="hg-grafico-tooltip-grupo hg-tt-caixa">
+              <rect class="hg-grafico-tooltip-caixa" rx="6" height="46"></rect>
+              <text class="hg-grafico-tooltip-texto hg-tt-preco" font-weight="700"></text>
+              <text class="hg-grafico-tooltip-texto hg-tt-var"></text>
+              <text class="hg-grafico-tooltip-texto hg-tt-data" opacity="0.75"></text>
             </g>
 
-            <rect class="hg-grafico-overlay" x="${margemEsq}" y="0" width="${largura}" height="${alturaTotal}"></rect>
+            <rect class="hg-grafico-overlay" x="${margemEsq}" y="0" width="${largura}" height="${alturaTotal}" tabindex="0"
+                  aria-label="Use as setas para percorrer a cotação dia a dia"></rect>
           </svg>
         `;
 
         const svgEl = container.querySelector('svg');
         const overlay = container.querySelector('.hg-grafico-overlay');
-        const grupoLinha = container.querySelector('#hgTooltipLinha');
-        const grupoCaixa = container.querySelector('#hgTooltipCaixa');
+        const grupoLinha = container.querySelector('.hg-tt-linha');
+        const grupoCaixa = container.querySelector('.hg-tt-caixa');
         const linhaVertical = grupoLinha.querySelector('line');
         const circuloTooltip = grupoLinha.querySelector('circle');
         const caixaRect = grupoCaixa.querySelector('rect');
-        const textoData = grupoCaixa.querySelector('#hgTooltipData');
-        const textoPreco = grupoCaixa.querySelector('#hgTooltipPreco');
+        const tPreco = grupoCaixa.querySelector('.hg-tt-preco');
+        const tVar = grupoCaixa.querySelector('.hg-tt-var');
+        const tData = grupoCaixa.querySelector('.hg-tt-data');
+        let indiceAtual = n - 1;
 
-        function hgMoverTooltip(evt) {
-          const ponto = svgEl.createSVGPoint();
-          ponto.x = evt.clientX;
-          ponto.y = evt.clientY;
-          const ctm = svgEl.getScreenCTM();
-          if (!ctm) return;
-          const local = ponto.matrixTransform(ctm.inverse());
-
-          let i = Math.round(((local.x - margemEsq) / largura) * (fechamentos.length - 1));
-          i = Math.max(0, Math.min(fechamentos.length - 1, i));
+        function mostrar(i) {
+          indiceAtual = i;
           const p = pontos[i];
-
           linhaVertical.setAttribute('x1', p.x.toFixed(2));
           linhaVertical.setAttribute('x2', p.x.toFixed(2));
           circuloTooltip.setAttribute('cx', p.x.toFixed(2));
           circuloTooltip.setAttribute('cy', p.y.toFixed(2));
 
-          const caixaX = Math.min(Math.max(p.x - 43, margemEsq), larguraTotal - margemDir - 86);
-          const caixaY = p.y - 44 < margemTop ? p.y + 12 : p.y - 44;
-          caixaRect.setAttribute('x', caixaX.toFixed(2));
-          caixaRect.setAttribute('y', caixaY.toFixed(2));
-          textoData.setAttribute('x', (caixaX + 8).toFixed(2));
-          textoData.setAttribute('y', (caixaY + 14).toFixed(2));
-          textoPreco.setAttribute('x', (caixaX + 8).toFixed(2));
-          textoPreco.setAttribute('y', (caixaY + 27).toFixed(2));
-          textoData.textContent = hgFormatDataCurta(validas[i]?.data, periodo) || `Dia ${i + 1}`;
-          textoPreco.textContent = `R$ ${formatMoeda(fechamentos[i])}`;
+          const v = primeiro ? (fechamentos[i] / primeiro - 1) * 100 : 0;
+          tPreco.textContent = `R$ ${formatMoeda(fechamentos[i])}`;
+          tVar.textContent = i === 0 ? 'início do período' : `${v >= 0 ? '▲ +' : '▼ '}${hgFormatNumero(v)}% desde o início`;
+          tData.textContent = hgFormatDataTooltip(validas[i].data, periodo) || `Amostra ${i + 1}`;
 
+          const maiorTexto = Math.max(tPreco.textContent.length, tVar.textContent.length, tData.textContent.length);
+          const w = Math.ceil(maiorTexto * 5.6 + 16);
+          const h = 46;
+          // Balão do lado oposto ao ponteiro quando está perto da borda.
+          let cx = p.x + 12;
+          if (cx + w > larguraTotal - margemDir) cx = p.x - 12 - w;
+          cx = Math.max(margemEsq, cx);
+          let cy = p.y - h / 2;
+          cy = Math.min(Math.max(cy, margemTop), base - h);
+          caixaRect.setAttribute('x', cx.toFixed(2));
+          caixaRect.setAttribute('y', cy.toFixed(2));
+          caixaRect.setAttribute('width', w);
+          [[tPreco, 15], [tVar, 28], [tData, 40]].forEach(([el, dy]) => {
+            el.setAttribute('x', (cx + 8).toFixed(2));
+            el.setAttribute('y', (cy + dy).toFixed(2));
+          });
           grupoLinha.style.opacity = '1';
           grupoCaixa.style.opacity = '1';
         }
-
-        overlay.addEventListener('mousemove', hgMoverTooltip);
-        overlay.addEventListener('touchmove', (e) => { if (e.touches[0]) hgMoverTooltip(e.touches[0]); }, { passive: true });
-        overlay.addEventListener('mouseleave', () => {
+        function esconder() {
           grupoLinha.style.opacity = '0';
           grupoCaixa.style.opacity = '0';
+        }
+        function indicePeloEvento(evt) {
+          const ponto = svgEl.createSVGPoint();
+          ponto.x = evt.clientX;
+          ponto.y = evt.clientY;
+          const ctm = svgEl.getScreenCTM();
+          if (!ctm) return null;
+          const local = ponto.matrixTransform(ctm.inverse());
+          const i = Math.round(((local.x - margemEsq) / largura) * (n - 1));
+          return Math.max(0, Math.min(n - 1, i));
+        }
+
+        overlay.addEventListener('mousemove', (e) => { const i = indicePeloEvento(e); if (i !== null) mostrar(i); });
+        overlay.addEventListener('touchmove', (e) => { if (e.touches[0]) { const i = indicePeloEvento(e.touches[0]); if (i !== null) mostrar(i); } }, { passive: true });
+        overlay.addEventListener('mouseleave', esconder);
+        overlay.addEventListener('focus', () => mostrar(indiceAtual));
+        overlay.addEventListener('blur', esconder);
+        overlay.addEventListener('keydown', (e) => {
+          const passo = e.shiftKey ? Math.max(1, Math.round(n / 10)) : 1;
+          if (e.key === 'ArrowLeft') { mostrar(Math.max(0, indiceAtual - passo)); e.preventDefault(); }
+          else if (e.key === 'ArrowRight') { mostrar(Math.min(n - 1, indiceAtual + passo)); e.preventDefault(); }
+          else if (e.key === 'Home') { mostrar(0); e.preventDefault(); }
+          else if (e.key === 'End') { mostrar(n - 1); e.preventDefault(); }
+          else if (e.key === 'Escape') { esconder(); }
         });
       }
 
