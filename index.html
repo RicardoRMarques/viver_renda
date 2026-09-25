@@ -3757,6 +3757,8 @@
       border: 1px solid var(--border); background: var(--card);
     }
     .tj-chamada span { display: block; font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    /* Entre as duas tabelas: mesmo respiro acima e abaixo. */
+    #tjConteudo > .tj-chamada { margin: 24px 0; }
     .tj-rodape { font-size: 0.78rem; color: var(--muted); line-height: 1.55; margin-top: 14px; }
 
     /* "Vale a Pena?" — análise de uma oferta de renda fixa */
@@ -13867,6 +13869,7 @@
     (function () {
       const secao = document.getElementById('taxa-justa');
       const conteudoEl = document.getElementById('tjConteudo');
+      const chamadaEl = document.querySelector('#taxa-justa .tj-chamada');
       const statusEl = document.getElementById('tjStatus');
       if (!secao || !conteudoEl) return;
 
@@ -14033,6 +14036,7 @@
           statusEl.className = 'hg-status erro';
           statusEl.textContent = 'Os dados do Tesouro Direto não estão disponíveis agora. Tente de novo em instantes.';
           conteudoEl.innerHTML = '';
+          if (chamadaEl) conteudoEl.appendChild(chamadaEl);
           return;
         }
 
@@ -14050,6 +14054,16 @@
             Conteúdo educativo: o site compara taxas públicas, não indica onde investir e não recebe comissão
             de nenhuma instituição.
           </p>`;
+        // "Tem uma oferta específica na mão?" fica ENTRE as duas tabelas
+        // (pedido do Ricardo, 25/09/2026): quem acabou de ver o piso do
+        // pós-fixado já é convidado a testar a própria oferta. O elemento é
+        // o mesmo do HTML (guardado em chamadaEl), só muda de lugar — por
+        // isso o clique do botão continua funcionando a cada novo desenho.
+        const primeiroBloco = conteudoEl.querySelector('.tj-bloco');
+        if (chamadaEl) {
+          if (primeiroBloco) primeiroBloco.after(chamadaEl);
+          else conteudoEl.prepend(chamadaEl);
+        }
         jaRenderizou = true;
       }
 
