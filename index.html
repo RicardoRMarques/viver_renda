@@ -2372,7 +2372,12 @@
     /* ---------- Calculadora Financeira (RPN) ---------- */
     /* Este modal tem duas colunas de campos E uma tabela comparativa de
        três colunas; nos 480px padrão os dois ficavam apertados. */
-    .calc-modal.calc-invest-modal { max-width: 620px; }
+    /* Mesma largura da Calculadora Aposentadoria INSS (.financ-modal):
+       720px e, a partir de 1024px de tela, 980px. */
+    .calc-modal.calc-invest-modal { max-width: 720px; }
+    @media (min-width: 1024px) {
+      .calc-modal.calc-invest-modal { max-width: 980px; }
+    }
     .calc-modal.rpn-modal { max-width: 486px; }
 
     /* O teclado vive dentro de um "aparelho" com paleta PRÓPRIA e fixa, que
