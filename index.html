@@ -62,7 +62,7 @@
     "featureList": [
       "Reinvestimento de Dividendos",
       "Carteira de Rendimentos",
-      "Agenda de Proventos",
+      "Agenda de Proventos e reuniões do Copom",
       "Alertas de Preço por e-mail",
       "Simulador de Financiamento Imobiliário (Price e SAC)",
       "Calculadora de Renda Fixa (CDB, LCI/LCA, Tesouro Direto)",
@@ -4229,7 +4229,7 @@
               🔁 Reinvestimento de Dividendos
             </button>
             <button type="button" class="nav-dropdown-item" id="agendaBtnAbrir">
-              📅 Agenda de Proventos
+              📅 Agenda de Proventos / Copom
             </button>
           </div>
         </div>
@@ -4293,7 +4293,7 @@
     <button type="button" class="mobile-menu-item" data-mobile-alvo="carteiraBtnAbrir">💰 Carteira de Rendimentos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="apBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v6"></path><path d="M9 5l3 3 3-3"></path><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 16h.01"></path><path d="M12 16h.01"></path><path d="M17 16h.01"></path></svg> Calculadora de Aportes</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="reinvBtnAbrir">🔁 Reinvestimento de Dividendos</button>
-    <button type="button" class="mobile-menu-item" data-mobile-alvo="agendaBtnAbrir">📅 Agenda de Proventos</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="agendaBtnAbrir">📅 Agenda de Proventos / Copom</button>
   </div>
 
   <!-- LOGIN / PERFIL — Magic Link via Supabase Auth. Sem senha: a pessoa
@@ -6844,7 +6844,7 @@
   <div id="agendaOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="agendaTitulo" hidden>
     <div class="calc-modal agenda-modal">
       <div class="calc-modal-topo">
-        <h3 id="agendaTitulo">📅 Agenda de Proventos</h3>
+        <h3 id="agendaTitulo">📅 Agenda de Proventos / Copom</h3>
         <div style="display:flex; align-items:center; gap:8px;">
           <button type="button" id="agendaCompartilharLink" class="modal-link-btn"
                   aria-label="Compartilhar o link desta ferramenta"
@@ -15534,8 +15534,8 @@
       document.getElementById('agendaCompartilharLink')?.addEventListener('click', (e) =>
         hgCompartilharLinkFerramenta(e.currentTarget, {
           view: 'agenda',
-          titulo: 'Agenda de Proventos — Viver de Renda',
-          texto: 'Veja os próximos pagamentos de dividendos e rendimentos dos seus ativos.',
+          titulo: 'Agenda de Proventos / Copom — Viver de Renda',
+          texto: 'Veja os próximos pagamentos de dividendos e rendimentos dos seus ativos e as próximas reuniões do Copom.',
         }));
 
       hgAbrirPorLinkDeFerramenta('agenda', abrirModal);
