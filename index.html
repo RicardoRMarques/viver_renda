@@ -296,6 +296,14 @@
     .mobile-menu-item:last-child { border-bottom: none; }
     .mobile-menu-item:hover { color: var(--primary); background: rgba(127,127,127,0.08); }
     .mobile-menu-subitem { padding-left: 34px; font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+    /* Grupo recolhível (Lista de Ações / Lista de FIIs): seta à direita que
+       gira quando abre; aberto, o título fica na cor do site. */
+    .mobile-menu-grupo { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .mobile-menu-grupo .mm-seta { font-size: 0.8rem; color: var(--muted); transition: transform 0.15s ease; }
+    .mobile-menu-grupo[aria-expanded="true"] { color: var(--primary); }
+    .mobile-menu-grupo[aria-expanded="true"] .mm-seta { transform: rotate(180deg); color: var(--primary); }
+    .mobile-menu-sub[hidden] { display: none; }
+    .mobile-menu-sub .mobile-menu-item:last-child { border-bottom: 1px solid var(--border); }
 
     .auth-btn-entrar {
       background: var(--primary);
@@ -4250,16 +4258,25 @@
     <div class="mobile-menu-separador">Mercado</div>
     <a href="#consulta-rapida" class="mobile-menu-item">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
     <a href="#consulta-rapida" class="mobile-menu-item">📊 Análise Fundamentalista</a>
-    <a href="#lista-acoes" class="mobile-menu-item">📈 Lista de Ações</a>
-    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Financeiro">↳ Financeiro</button>
-    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Energia Elétrica">↳ Energia elétrica</button>
-    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Saúde">↳ Saúde</button>
-    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Materiais Básicos">↳ Materiais básicos</button>
-    <a href="#lista-fiis" class="mobile-menu-item">🏢 Lista de Fundos Imobiliários</a>
-    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Tijolo">↳ Tijolo</button>
-    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Papel">↳ Papel</button>
-    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Logístico">↳ Logístico</button>
-    <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Híbrido">↳ Híbrido</button>
+    <!-- Os setores ficam recolhidos: tocar em "Lista de Ações" / "Lista de
+         Fundos Imobiliários" só abre a lista de setores (a seta gira). A lista
+         completa continua a um toque, no primeiro item ("Todas as ..."). -->
+    <button type="button" class="mobile-menu-item mobile-menu-grupo" aria-expanded="false" aria-controls="mmSubAcoes">📈 Lista de Ações <span class="mm-seta" aria-hidden="true">▾</span></button>
+    <div id="mmSubAcoes" class="mobile-menu-sub" hidden>
+      <a href="#lista-acoes" class="mobile-menu-item mobile-menu-subitem">↳ Todas as ações</a>
+      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Financeiro">↳ Financeiro</button>
+      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Energia Elétrica">↳ Energia elétrica</button>
+      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Saúde">↳ Saúde</button>
+      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Materiais Básicos">↳ Materiais básicos</button>
+    </div>
+    <button type="button" class="mobile-menu-item mobile-menu-grupo" aria-expanded="false" aria-controls="mmSubFiis">🏢 Lista de Fundos Imobiliários <span class="mm-seta" aria-hidden="true">▾</span></button>
+    <div id="mmSubFiis" class="mobile-menu-sub" hidden>
+      <a href="#lista-fiis" class="mobile-menu-item mobile-menu-subitem">↳ Todos os fundos imobiliários</a>
+      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Tijolo">↳ Tijolo</button>
+      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Papel">↳ Papel</button>
+      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Logístico">↳ Logístico</button>
+      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Híbrido">↳ Híbrido</button>
+    </div>
     <div class="mobile-menu-separador">Renda Fixa</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirCalculadoraMenu"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="9" y1="21" x2="9" y2="10"></line><line x1="15" y1="21" x2="15" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Calculadora Renda Fixa</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
@@ -15922,6 +15939,12 @@
       function fechar() {
         painel.hidden = true;
         btn.setAttribute('aria-expanded', 'false');
+        // Na próxima abertura do menu, os setores voltam recolhidos.
+        painel.querySelectorAll('.mobile-menu-grupo').forEach(g => {
+          g.setAttribute('aria-expanded', 'false');
+          const sub = document.getElementById(g.getAttribute('aria-controls'));
+          if (sub) sub.hidden = true;
+        });
       }
       function abrir() {
         // Posiciona o painel dinamicamente logo abaixo do header (a
@@ -15946,6 +15969,14 @@
       // cabeçalho fixo — senão o topo da seção fica escondido atrás dele.
       painel.querySelectorAll('.mobile-menu-item').forEach(item => {
         item.addEventListener('click', (e) => {
+          // Título de grupo: só abre/fecha a lista de setores, sem fechar o menu.
+          if (item.classList.contains('mobile-menu-grupo')) {
+            const abrirGrupo = item.getAttribute('aria-expanded') !== 'true';
+            item.setAttribute('aria-expanded', String(abrirGrupo));
+            const sub = document.getElementById(item.getAttribute('aria-controls'));
+            if (sub) sub.hidden = !abrirGrupo;
+            return;
+          }
           const alvo = item.getAttribute('data-mobile-alvo');
           if (alvo) {
             document.getElementById(alvo)?.click();
