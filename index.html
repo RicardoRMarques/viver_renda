@@ -15769,6 +15769,7 @@
         { termo: 'IFIX', cat: 'fii', definicao: 'Índice que acompanha o desempenho médio dos fundos imobiliários mais negociados na B3 — funciona como um "termômetro" do mercado de FIIs, parecido com o que o Ibovespa faz para ações.' },
         { termo: 'IOF', cat: 'rf', definicao: 'Imposto sobre Operações Financeiras. Incide, por exemplo, na compra de moeda estrangeira (câmbio) e em alguns investimentos de renda fixa resgatados antes de 30 dias.' },
         { termo: 'IPCA', cat: 'rf', definicao: 'Índice de Preços ao Consumidor Amplo — o indicador oficial de inflação do Brasil, medido pelo IBGE. Usado como referência para o Copom decidir a Selic, e também como indexador de vários investimentos (Tesouro IPCA+, alguns CRIs).' },
+        { termo: 'IPCA-15', cat: 'rf', definicao: 'A "prévia" da inflação oficial. É calculado pelo IBGE com a mesma cesta de produtos e o mesmo método do IPCA, mas com a coleta de preços deslocada: vai do dia 16 do mês anterior ao dia 15 do mês de referência.\n\nPor isso sai antes do IPCA do mesmo mês e é acompanhado pelo mercado e pelo Banco Central como um sinal antecipado de para onde a inflação está indo.\n\nNão é ele que corrige o Tesouro IPCA+ ou os CDBs atrelados à inflação: esses usam o IPCA "cheio".' },
         { termo: 'Liquidez', cat: 'geral', definicao: 'Facilidade de comprar ou vender um ativo sem afetar muito o preço dele. Ativos com liquidez baixa podem levar tempo pra vender, ou exigir aceitar um preço pior.' },
         { termo: 'Margem Bruta', cat: 'ind', definicao: 'Percentual da receita que sobra depois de descontar apenas o custo direto do produto/serviço vendido, antes de despesas administrativas e impostos. Cálculo: (receita − custo dos produtos vendidos) ÷ receita × 100.' },
         { termo: 'Margem Líquida', cat: 'ind', definicao: 'Percentual da receita que sobra como lucro líquido, depois de todos os custos, despesas, juros e impostos. Cálculo: lucro líquido ÷ receita × 100.' },
@@ -15796,13 +15797,13 @@
         { termo: 'LC (Letra de Câmbio)', cat: 'rf', definicao: 'Apesar do nome, não tem nada a ver com moeda estrangeira. É o equivalente ao CDB, só que emitido por FINANCEIRAS em vez de bancos. Tem cobertura do FGC e segue a tabela regressiva de IR. Como as financeiras costumam ser menores, as taxas tendem a ser mais altas — e o risco de crédito também.' },
         { termo: 'LIG (Letra Imobiliária Garantida)', cat: 'rf', definicao: 'Título imobiliário isento de IR para pessoa física, com prazo mínimo de 24 meses.\n\nAtenção à diferença que mais importa: a LIG NÃO tem FGC. No lugar da garantia do Fundo, ela é lastreada numa carteira de créditos imobiliários segregada do banco — se o emissor quebrar, essa carteira responde pelo pagamento.' },
         { termo: 'CRA (Certificado de Recebíveis do Agronegócio)', cat: 'rf', definicao: 'Título lastreado em recebíveis do agronegócio, emitido por securitizadoras. Isento de IR para pessoa física.\n\nNÃO tem cobertura do FGC — quem paga é a empresa devedora lá na ponta. Por isso exige olhar quem é o devedor e qual a garantia, não só a taxa.' },
-        { termo: 'Debênture', cat: 'rf', definicao: 'Dívida emitida por uma empresa não financeira para financiar suas operações. Você vira credor da empresa.\n\nSem FGC: a garantia é a saúde da empresa emissora. Paga IR pela tabela regressiva. Como o risco é maior que o de um banco grande, a taxa costuma vir acima do CDI.' },
+        { termo: 'Debênture', cat: 'rf', definicao: 'Dívida emitida por uma empresa não financeira para financiar suas operações. Você vira credor da empresa.\n\nSem FGC: a garantia é a saúde da empresa emissora. Paga IR pela tabela regressiva. Como o risco é maior que o de um banco grande, a taxa costuma vir acima do CDI.\n\nAs taxas negociadas no mercado secundário estão no menu Renda Fixa → Debêntures.' },
         { termo: 'Debênture Incentivada', cat: 'rf', definicao: 'Debênture emitida para financiar projetos de infraestrutura (energia, saneamento, transporte). É ISENTA de Imposto de Renda para pessoa física, por incentivo da Lei 12.431.\n\nContinua sem FGC, e costuma ter prazo longo — o que a torna sensível à marcação a mercado se você precisar vender antes.' },
         { termo: 'Tesouro Direto', cat: 'rf', definicao: 'Programa do Tesouro Nacional que vende títulos públicos a pessoas físicas pela internet, a partir de cerca de R$ 30.\n\nÉ o investimento de menor risco de crédito do país: quem deve é o governo federal. Não tem FGC porque não precisa — o FGC protege contra quebra de banco, e aqui o devedor é o Tesouro.\n\nTaxa de custódia da B3: 0,20% ao ano, com isenção para os primeiros R$ 10 mil em Tesouro Selic.' },
         { termo: 'Tesouro Selic (LFT)', cat: 'rf', definicao: 'Título público pós-fixado que acompanha a taxa Selic dia a dia.\n\nÉ o de menor oscilação do Tesouro: resgatar antes do vencimento quase nunca dá prejuízo. Por isso é o mais indicado para reserva de emergência. Os primeiros R$ 10 mil são isentos da taxa de custódia da B3.' },
         { termo: 'Tesouro Prefixado (LTN e NTN-F)', cat: 'rf', definicao: 'Título público com taxa travada na compra: você sabe exatamente quantos reais vai receber no vencimento.\n\nA LTN paga tudo de uma vez no fim; a NTN-F paga cupons de juros a cada semestre.\n\nO risco não é calote, é o de vender antes: se os juros do mercado subirem, o preço do seu título cai (marcação a mercado).' },
-        { termo: 'Tesouro IPCA+ (NTN-B)', cat: 'rf', definicao: 'Título público híbrido: paga a variação do IPCA MAIS uma taxa fixa contratada. Garante ganho acima da inflação se levado até o vencimento — é o único que protege o poder de compra de forma contratual.\n\nA NTN-B Principal paga tudo no fim; a NTN-B tradicional paga cupons semestrais. Como costumam ter prazo longo, oscilam bastante no meio do caminho.' },
-        { termo: 'Tesouro Renda+ e Educa+', cat: 'rf', definicao: 'Títulos IPCA+ com um formato diferente: em vez de pagar tudo no vencimento, pagam uma renda MENSAL por um período (20 anos no Renda+, para aposentadoria; 5 anos no Educa+, para a faculdade dos filhos).\n\nMesma proteção contra a inflação dos IPCA+ tradicionais, com o dinheiro chegando parcelado.' },
+        { termo: 'Tesouro IPCA+ (NTN-B)', cat: 'rf', definicao: 'Título público híbrido: paga a variação do IPCA MAIS uma taxa fixa contratada. Garante ganho acima da inflação se levado até o vencimento — é o único que protege o poder de compra de forma contratual.\n\nA NTN-B Principal paga tudo no fim; a NTN-B tradicional paga cupons semestrais de 6% ao ano sobre o valor corrigido pelo IPCA. Como costumam ter prazo longo, oscilam bastante no meio do caminho.\n\nOs vencimentos caem sempre no dia 15 — de maio ou de agosto. É por isso que a tabela do Tesouro mostra datas como 15/05/2035 e 15/08/2050.' },
+        { termo: 'Tesouro Renda+ e Educa+ (NTN-B1)', cat: 'rf', definicao: 'Títulos IPCA+ com um formato diferente: em vez de pagar tudo no vencimento, pagam uma renda MENSAL por um período — 240 parcelas (20 anos) no Renda+, para a aposentadoria; 60 parcelas (5 anos) no Educa+, para a faculdade dos filhos. O nome técnico do título é NTN-B1.\n\nMesma proteção contra a inflação dos IPCA+ tradicionais, com o dinheiro chegando parcelado.\n\nNa tabela do Tesouro, o ano do nome é o da conversão em renda; o vencimento mostrado é o do último pagamento.' },
         { termo: 'FGC (Fundo Garantidor de Créditos)', cat: 'rf', definicao: 'Fundo mantido pelos próprios bancos que devolve seu dinheiro se a instituição quebrar.\n\nCobre até R$ 250 mil por CPF em cada instituição, com teto de R$ 1 milhão a cada 4 anos, somando todas as instituições. Cobre CDB, RDB, LC, LCI, LCA, poupança e conta corrente.\n\nNÃO cobre: CRI, CRA, LIG, debêntures, fundos de investimento e ações. Investir dentro do limite do FGC protege mais do que qualquer indicador de solidez.' },
         { termo: 'Emissor', cat: 'rf', definicao: 'Quem pegou seu dinheiro emprestado e tem a obrigação de devolver: o banco (no CDB), o governo (no Tesouro), a empresa (na debênture).\n\nA taxa que te oferecem é, em boa parte, o preço do risco desse emissor. Taxa muito acima da média do mercado quase sempre significa emissor com mais risco — não almoço grátis.' },
         { termo: 'Prefixado', cat: 'rf', definicao: 'A taxa é travada no momento da compra: "12% ao ano", e pronto. Você sabe hoje quanto vai receber no vencimento, em reais.\n\nBom quando você acredita que os juros vão CAIR. Ruim se a inflação disparar, porque sua taxa não acompanha.' },
@@ -15827,6 +15828,7 @@
         { termo: 'Poupança', cat: 'rf', definicao: 'A aplicação mais popular do país e uma das que menos rende.\n\nRegra atual: com a Selic acima de 8,5% ao ano, rende 0,5% ao mês mais a TR; com a Selic em 8,5% ou menos, rende 70% da Selic mais a TR.\n\nÉ isenta de IR e coberta pelo FGC, mas só remunera no "aniversário" mensal do depósito — sacar um dia antes faz você perder o mês inteiro de rendimento. Um Tesouro Selic ou um CDB de liquidez diária costumam render mais, mesmo depois do imposto.' },
         { termo: 'Fundo DI', cat: 'rf', definicao: 'Fundo de investimento que busca acompanhar o CDI aplicando em títulos públicos e privados de baixo risco.\n\nConveniente, mas cuidado com dois pontos: a taxa de administração (acima de 0,5% ao ano já compromete o retorno) e o come-cotas, que antecipa imposto em maio e novembro. Não tem FGC — a proteção vem da carteira do fundo.' },
         { termo: 'Curva de Juros (DI futuro)', cat: 'rf', definicao: 'O conjunto de taxas que o mercado projeta para cada prazo — o "preço do tempo". É negociada na B3 e é ela que define quanto um prefixado ou um IPCA+ paga hoje.\n\nQuando a curva sobe, os títulos já emitidos perdem valor de mercado; quando cai, ganham.' },
+        { termo: 'Home Equity (Crédito com Garantia de Imóvel)', cat: 'geral', definicao: 'Empréstimo em que você dá um imóvel seu como garantia. Por ter garantia, os juros costumam ser bem menores que os do crédito pessoal ou do cartão, e o prazo é longo — em geral de 10 a 20 anos.\n\nO banco empresta só uma parte do valor do imóvel (é comum ficar em torno de 60%), e o dinheiro pode ser usado para qualquer fim: quitar dívidas caras, reformar, investir no negócio.\n\nO risco é sério: a garantia é feita por alienação fiduciária, então, se as parcelas deixarem de ser pagas, o banco pode retomar o imóvel pela via extrajudicial, sem processo longo na Justiça. Faz sentido para trocar dívida cara por dívida barata; não para consumo.\n\nAntes de contratar, compare o Custo Efetivo Total (CET), que soma juros, seguros, avaliação do imóvel e registro em cartório.' },
         { termo: 'Índice de Basileia', cat: 'rf', definicao: 'Mede quanto capital próprio um banco tem para absorver perdas, em relação aos riscos que assumiu. Quanto maior, mais folga.\n\nMínimo exigido no Brasil: 10,5% — 8% de Patrimônio de Referência mais 2,5% do adicional de conservação. Bancos sistêmicos precisam de mais. Os 11% que muita fonte ainda cita são da regra antiga, de 1994.\n\nÉ o indicador mais direto para comparar a solidez de quem emite o CDB que você está pensando em comprar. Veja a tabela no menu Mercado.' },
         { termo: 'Rentabilidade Bruta e Líquida', cat: 'rf', definicao: 'Bruta é o que o título anuncia; líquida é o que sobra depois de IR, IOF e taxas — e é a única que interessa comparar.\n\nÉ por isso que um LCI a 90% do CDI pode bater um CDB a 105%: o LCI é isento de IR e o CDB, num resgate em menos de seis meses, entrega 22,5% do lucro para a Receita.' },
       ].sort((a, b) => a.termo.localeCompare(b.termo, 'pt-BR'));
@@ -15835,8 +15837,18 @@
       let catAtiva = 'todos';
       const catsContainer = document.getElementById('glossarioCats');
 
+      // Busca que não depende de acento, hífen nem espaço: "debentures"
+      // acha "Debênture", "ntnb" acha "NTN-B", "basileia" acha "Índice de
+      // Basileia". Antes a comparação era literal e esses termos pareciam
+      // não existir.
+      const normalizarBusca = (txt) => String(txt || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const compactar = (txt) => normalizarBusca(txt).replace(/[^a-z0-9]/g, '');
+      TERMOS.forEach(t => { t._busca = normalizarBusca(t.termo + ' ' + t.definicao); t._buscaCompacta = compactar(t.termo + ' ' + t.definicao); });
+      // Letra do A-Z sem acento: "Índice de Basileia" fica no I.
+      const letraDe = (t) => normalizarBusca(t.termo[0]).toUpperCase();
+
       // Monta os botões A-Z, desabilitando letras sem nenhum termo.
-      const letrasComTermo = new Set(TERMOS.map(t => t.termo[0].toUpperCase()));
+      const letrasComTermo = new Set(TERMOS.map(letraDe));
       for (let i = 65; i <= 90; i++) {
         const letra = String.fromCharCode(i);
         const btn = document.createElement('button');
@@ -15849,11 +15861,15 @@
       }
 
       function renderizar() {
-        const termoBusca = buscaInput.value.trim().toLowerCase();
+        const termoBusca = normalizarBusca(buscaInput.value.trim());
+        const buscaCompacta = compactar(termoBusca);
+        // Plural simples: "debentures" também procura "debenture".
+        const buscaSingular = buscaCompacta.length > 4 && buscaCompacta.endsWith('s') ? buscaCompacta.slice(0, -1) : buscaCompacta;
         const filtrados = TERMOS.filter(t => {
           const bateCat = catAtiva === 'todos' || t.cat === catAtiva;
-          const bateLetra = letraAtiva === 'todos' || t.termo[0].toUpperCase() === letraAtiva;
-          const bateBusca = !termoBusca || t.termo.toLowerCase().includes(termoBusca) || t.definicao.toLowerCase().includes(termoBusca);
+          const bateLetra = letraAtiva === 'todos' || letraDe(t) === letraAtiva;
+          const bateBusca = !termoBusca || t._busca.includes(termoBusca)
+            || (buscaCompacta && (t._buscaCompacta.includes(buscaCompacta) || t._buscaCompacta.includes(buscaSingular)));
           return bateCat && bateLetra && bateBusca;
         });
 
@@ -15862,7 +15878,7 @@
         // defeito do site.
         const letrasDisponiveis = new Set(
           TERMOS.filter(t => catAtiva === 'todos' || t.cat === catAtiva)
-                .map(t => t.termo[0].toUpperCase()));
+                .map(letraDe));
         azContainer.querySelectorAll('.glossario-az-btn[data-letra]').forEach(b => {
           if (b.dataset.letra === 'todos') return;
           b.disabled = !letrasDisponiveis.has(b.dataset.letra);
