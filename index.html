@@ -7976,7 +7976,7 @@
                   <button type="button" class="hg-btn-secundario-pequeno" id="hgDividendosBtnToggle">
                     📊 Ver histórico de dividendos
                   </button>
-                  ${a.kind !== 'fii' ? `
+                  ${a.kind === 'stock' ? `
                   <button type="button" class="hg-btn-secundario-pequeno" id="hgFundInlineBtnToggle">
                     📊 Ver Análise Fundamentalista completa
                   </button>
@@ -7988,7 +7988,7 @@
 
                 <div id="hgDividendosConteudo"></div>
 
-                ${a.kind !== 'fii' ? `
+                ${a.kind === 'stock' ? `
                 <div id="hgFundInlineWrap" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
                   <div class="hg-status" id="hgFundInlineStatus"></div>
                   <div id="hgFundInlineResultado"></div>
@@ -8121,9 +8121,12 @@
         hgInicializarInvestido();
 
         // Histórico de Dividendos: disponível pra qualquer tipo de ativo
-        // (ações, FIIs, FIAGROs) — só "Análise Fundamentalista" e
+        // (ações, FIIs, FIAGROs, FI-Infra) — só "Análise Fundamentalista" e
         // "Comparar" continuam exclusivos de ações (ver condição no HTML
-        // acima, a.kind !== 'fii').
+        // acima, a.kind === 'stock'): a HG Brasil não tem "statements"
+        // (EBITDA, balanço etc.) pra fundos, só pra ações — por isso o
+        // comparador dava erro em FI-Infra/Fiagro (kind !== 'fii', mas
+        // também não é 'stock').
         const tabsEl = document.getElementById('hgDividendosPeriodoTabs');
         const btnToggle = document.getElementById('hgDividendosBtnToggle');
         const conteudoEl = document.getElementById('hgDividendosConteudo');
