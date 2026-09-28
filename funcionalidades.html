@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Funcionalidades — Dividendos | Viver de Renda</title>
+<meta name="description" content="Resumo de todas as funcionalidades do site Dividendos | Viver de Renda." />
+<style>
+  :root {
+    --bg: #0b1220;
+    --card: #111b2e;
+    --deep: #04101a;
+    --grad-a: #07101c;
+    --grad-b: #0b1220;
+    --text: #e8eefc;
+    --muted: #a9b6d3;
+    --primary: #31c3ff;
+    --primary-dark: #16a0d8;
+    --accent: #7cff92;
+    --gold: #e0b84d;
+    --danger: #ff6b6b;
+    --border: rgba(255,255,255,0.08);
+    --shadow: 0 16px 40px rgba(0,0,0,0.28);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+      radial-gradient(circle at top, rgba(49,195,255,0.15), transparent 40%),
+      linear-gradient(180deg, var(--grad-a) 0%, var(--grad-b) 100%);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 40px 20px 60px; }
+  header { text-align: center; margin-bottom: 40px; }
+  header .logo { font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); font-weight: 700; margin-bottom: 8px; }
+  h1 { font-size: 1.9rem; margin: 0 0 10px; }
+  header p { color: var(--muted); max-width: 620px; margin: 0 auto; font-size: 0.95rem; }
+  header .data { color: var(--muted); font-size: 0.78rem; margin-top: 14px; }
+
+  .grupo { margin-bottom: 34px; }
+  .grupo-titulo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 1.15rem; font-weight: 800; margin-bottom: 14px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .grupo-titulo .emoji { font-size: 1.3rem; }
+
+  .lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+  }
+  .item strong { display: block; margin-bottom: 4px; color: var(--text); font-size: 0.95rem; }
+  .item span { color: var(--muted); font-size: 0.84rem; }
+  .item .tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: rgba(49,195,255,0.1);
+    border: 1px solid rgba(49,195,255,0.25);
+    border-radius: 999px;
+    padding: 2px 8px;
+  }
+  .item .tag.login {
+    color: var(--gold);
+    background: rgba(224,184,77,0.1);
+    border-color: rgba(224,184,77,0.25);
+  }
+
+  .automacao {
+    background: var(--deep);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    color: var(--muted);
+    font-size: 0.86rem;
+  }
+  .automacao strong { color: var(--text); }
+  .automacao code {
+    background: rgba(255,255,255,0.06);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    color: var(--accent);
+  }
+
+  footer { text-align: center; margin-top: 50px; color: var(--muted); font-size: 0.78rem; }
+  footer a { color: var(--primary); text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">Dividendos | Viver de Renda</div>
+      <h1>Funcionalidades do site</h1>
+      <p>Resumo de tudo que o site oferece hoje: consultas de mercado, calculadoras, ferramentas de renda fixa, acompanhamento de carteira e conteúdo educativo.</p>
+      <div class="data">Gerado em 28/09/2026</div>
+    </header>
+
+    <section class="grupo">
+      <div class="grupo-titulo"><span class="emoji">🔎</span> Consulta e dados de mercado</div>
+      <div class="lista">
+        <div class="item">
+          <strong>Consulta rápida</strong>
+          <span>Ações, FIIs e Stocks/ETFs americanos — cotação, variação, indicadores, gráfico (1D/7D/30D/6M/YTD/1A) e "se você tivesse investido" há X tempo.</span>
+        </div>
+        <div class="item">
+          <strong>Análise Fundamentalista</strong>
+          <span>Indicadores com faróis verde/amarelo/vermelho por setor, exclusiva para ações.</span>
+        </div>
+        <div class="item">
+          <strong>Comparador de ativos</strong>
+          <span>Compara até 4 ações lado a lado pelos mesmos indicadores.</span>
+        </div>
+        <div class="item">
+          <strong>Listas completas</strong>
+          <span>Todas as Ações e todos os FIIs, com filtros por segmento (Financeiro, Energia, Saúde... / Tijolo, Papel, Logístico, Híbrido...).</span>
+        </div>
+        <div class="item">
+          <strong>Rankings</strong>
+          <span>Melhores FIIs e Ações por valor patrimonial, Dividend Yield e mais negociados.</span>
+        </div>
+        <div class="item">
+          <strong>Carrossel de índices</strong>
+          <span>Ibovespa, IFIX, Dólar, Euro, Bitcoin e Selic em tempo real.</span>
+        </div>
+        <div class="item">
+          <strong>Boletim de Mercado Diário</strong>
+          <span>Gerado automaticamente em dias úteis, com opção de compartilhar no WhatsApp.</span>
+        </div>
+        <div class="item">
+          <strong>Notícias do Mercado Econômico</strong>
+          <span>Atualizadas ao longo do dia.</span>
+        </div>
+        <div class="item">
+          <strong>Histórico de dividendos</strong>
+          <span>De qualquer ativo: ações, FIIs e Fiagro.</span>
+        </div>
+        <div class="item">
+          <strong>Relatório gerencial</strong>
+          <span>Dos fundos, quando disponível.</span>
+        </div>
+        <div class="item">
+          <strong>Favoritos</strong>
+          <span>Fixe ativos no carrossel de topo para acompanhar rapidinho.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grupo">
+      <div class="grupo-titulo"><span class="emoji">🧮</span> Calculadoras financeiras</div>
+      <div class="lista">
+        <div class="item"><strong>Juros Compostos</strong><span>Simula o crescimento de um aporte ao longo do tempo.</span></div>
+        <div class="item"><strong>Aposentadoria (INSS)</strong><span>Estimativa da aposentadoria pelo regime geral.</span></div>
+        <div class="item"><strong>Aposentadoria / Renda Passiva (FIRE)</strong><span>Quanto patrimônio é preciso para viver de renda.</span></div>
+        <div class="item"><strong>Financiamento Imobiliário</strong><span>Simulador SAC/Price, com amortização extra.</span></div>
+        <div class="item"><strong>Empréstimo</strong><span>Simulação de parcelas e juros.</span></div>
+        <div class="item"><strong>Renda Fixa</strong><span>CDB, LCI/LCA e Tesouro Direto.</span></div>
+        <div class="item"><strong>Calculadora de Aportes</strong><span>Planeja aportes recorrentes por ativo.</span></div>
+        <div class="item"><strong>Calculadora Financeira (RPN)</strong><span>Estilo HP-12C, para cálculos financeiros manuais.</span></div>
+        <div class="item"><strong>Imposto de Renda</strong><span>Estima o IR devido sobre investimentos.</span></div>
+      </div>
+    </section>
+
+    <section class="grupo">
+      <div class="grupo-titulo"><span class="emoji">💰</span> Renda fixa e crédito privado</div>
+      <div class="lista">
+        <div class="item"><strong>Tesouro Direto</strong><span>Preços e taxas de referência em tempo real.</span></div>
+        <div class="item"><strong>Debêntures</strong><span>Taxas de mercado atualizadas.</span></div>
+        <div class="item"><strong>Qual é uma taxa justa hoje?</strong><span>Piso de referência (Tesouro descontado de IR/custódia) para comparar ofertas.</span></div>
+        <div class="item"><strong>Vale a Pena?</strong><span>Analisa uma oferta específica de CDB/LCI/debênture, cruzando com a Basileia do emissor.</span></div>
+        <div class="item"><strong>Índice de Basileia dos Bancos</strong><span>Atualizado semanalmente.</span></div>
+        <div class="item"><strong>Cobertura do FGC</strong><span>Checa o limite de garantia do Fundo Garantidor de Créditos.</span></div>
+        <div class="item"><strong>Marcação a mercado</strong><span>Explica por que o preço de um título muda antes do vencimento.</span></div>
+      </div>
+    </section>
+
+    <section class="grupo">
+      <div class="grupo-titulo"><span class="emoji">📊</span> Carteira e acompanhamento pessoal</div>
+      <div class="lista">
+        <div class="item">
+          <strong>Carteira de Rendimentos</strong>
+          <span>Monta a carteira, calcula proventos/mês e % por ativo, exporta em PDF/Excel.</span>
+          <span class="tag login">requer login</span>
+        </div>
+        <div class="item">
+          <strong>Meus Alertas de Preço</strong>
+          <span>E-mail automático quando o ativo bate um valor — ações, FIIs, Fiagro e Stocks/ETFs americanos, até 5 alertas.</span>
+          <span class="tag login">requer login</span>
+        </div>
+        <div class="item">
+          <strong>Reinvestimento de Dividendos</strong>
+          <span>Simula o efeito de reinvestir proventos ao longo do tempo, com histórico real.</span>
+        </div>
+        <div class="item">
+          <strong>Agenda de Proventos / Copom</strong>
+          <span>Calendário de pagamentos e reuniões do Copom.</span>
+        </div>
+        <div class="item">
+          <strong>Login sem senha</strong>
+          <span>Magic Link via e-mail (Supabase Auth).</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grupo">
+      <div class="grupo-titulo"><span class="emoji">🎓</span> Conteúdo e educação</div>
+      <div class="lista">
+        <div class="item"><strong>Glossário do Investidor</strong><span>Explicações rápidas dos termos do mercado.</span></div>
+        <div class="item"><strong>Quiz de Perfil de Investidor</strong><span>Descubra seu perfil (conservador, moderado, arrojado...).</span></div>
+        <div class="item"><strong>Conversor de Moedas</strong><span>Conversão rápida entre moedas.</span></div>
+        <div class="item"><strong>Seção Educação</strong><span>Renda Fixa, Renda Variável e Estratégia — com apresentação paga complementar.</span></div>
+        <div class="item"><strong>Assistente de IA</strong><span>Chat flutuante para tirar dúvidas sobre investimentos, indicadores e conceitos de mercado.</span></div>
+      </div>
+    </section>
+
+    <section class="grupo">
+      <div class="grupo-titulo"><span class="emoji">⚙️</span> Automação (bastidores)</div>
+      <div class="automacao">
+        Robôs via <strong>GitHub Actions</strong> rodando em cron, sem servidor próprio:
+        <code>boletim.yml</code> (boletim diário),
+        <code>mercado.yml</code> (índices, notícias e ranking de mercado),
+        <code>coletar-fiis.yml</code> (dados de FIIs a cada 15 min — e é aqui que os alertas de preço são checados e disparados por e-mail),
+        <code>basileia.yml</code> (Basileia dos bancos, semanal),
+        <code>debentures.yml</code> (taxas de debêntures),
+        <code>tesouro.yml</code> (Tesouro Direto) e
+        <code>coleta-reinv-yahoo.yml</code> (histórico para reinvestimento).
+      </div>
+    </section>
+
+    <footer>
+      Feito por <a href="https://github.com/RicardoRMarques" target="_blank" rel="noopener">Ricardo Marques</a> ·
+      <a href="https://viverderenda.dev.br" target="_blank" rel="noopener">viverderenda.dev.br</a>
+    </footer>
+  </div>
+</body>
+</html>
