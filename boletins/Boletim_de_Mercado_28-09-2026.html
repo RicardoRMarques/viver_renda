@@ -101,17 +101,6 @@
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
-  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .section-com-lyket [data-lyket-type]{
-    font-size:12px;
-    background:#f2f2f2;
-    border-radius:20px;
-    padding:4px 10px;
-    display:inline-flex;
-    align-items:center;
-    box-shadow:0 1px 4px rgba(0,0,0,0.35);
-  }
-  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
   .grupo-whatsapp-card{
     display:flex;align-items:center;gap:12px;margin-top:12px;
     background:var(--card);border:1px solid var(--card-border);border-radius:12px;
@@ -124,7 +113,6 @@
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
-<script src="https://unpkg.com/@lyket/widget@latest/dist/lyket.js?apiKey=pt_d2c19f94733791f2b25c44987dd17e"></script>
 </head>
 <body>
 <div class="wrap">
@@ -139,13 +127,10 @@
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
-  <div class="sub">Boletim de Mercado · Quarta-feira, 26 de Agosto de 2026</div>
+  <div class="sub">Boletim de Mercado · Segunda-feira, 28 de Setembro de 2026</div>
 </header>
 
-<h2 class="section section-com-lyket">
-  <span>Indicadores Principais</span>
-  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-26-08-2026"></div>
-</h2>
+<h2 class="section">Indicadores Principais</h2>
 
 <a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
   <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
@@ -156,25 +141,25 @@
 </a>
 
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value up">174.576,80 pts ▲ 1.55%</div></div>
-  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.700,71 pts ▲ 0.62%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value down">R$ 5,15 ▼ 0.04%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 6,01 ▲ 0.03%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 78.971,00 ▼ 1.33%</div></div>
-  <div class="indicator"><div class="label">Ethereum</div><div class="value down">US$ 2.461,56 ▼ 1.10%</div></div>
-  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">14,00% a.a.</div></div>
-  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,90% a.a.</div></div>
-  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,44%</div></div>
-  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-1,16%</div></div>
+  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value down">183.476,86 pts ▼ 0.27%</div></div>
+  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.741,57 pts ▲ 0.48%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,20 ▲ 0.38%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,93 ▲ 0.63%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 82.919,00 ▼ 1.88%</div></div>
+  <div class="indicator"><div class="label">Ethereum</div><div class="value down">US$ 2.643,30 ▼ 2.36%</div></div>
+  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">13,75% a.a.</div></div>
+  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,65% a.a.</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,22%</div></div>
+  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-0,22%</div></div>
 </div>
 
 
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEM4R1OV_1200_L.jpg" alt="Ações da Applied Nutrition sobem 5% após resultados acima do esperado" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/acoes-da-applied-nutrition-sobem-5-apos-resultados-acima-do-esperado-2049485" target="_blank" rel="noopener noreferrer" class="tk-link">Ações da Applied Nutrition sobem 5% após resultados acima do esperado</a></span><span class="pct">Investing.com (Ações)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEA6M0QA_M.jpg" alt="Nvidia divulga resultados; PCE à vista — o que move os mercados" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/nvidia-divulga-resultados-pce-a-vista--o-que-move-os-mercados-2049493" target="_blank" rel="noopener noreferrer" class="tk-link">Nvidia divulga resultados; PCE à vista — o que move os mercados</a></span><span class="pct">Investing.com (Economia)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEC0E0NI_M.jpg" alt="Por que as ações da SAP estão caindo hoje?" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-sap-estao-caindo-hoje-93CH-2049483" target="_blank" rel="noopener noreferrer" class="tk-link">Por que as ações da SAP estão caindo hoje?</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEB6U08A_M.jpg" alt="FTSE 100 sobe com esperanças de diplomacia com o Irã" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/ftse-100-sobe-com-esperancas-de-diplomacia-com-o-ira-2076326" target="_blank" rel="noopener noreferrer" class="tk-link">FTSE 100 sobe com esperanças de diplomacia com o Irã</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEA7P0D2_M.jpg" alt="China reduz tarifas sobre produtos agrícolas dos EUA, mas soja fica de fora" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/china-reduz-tarifas-sobre-produtos-agricolas-dos-eua-mas-soja-fica-de-fora-2076265" target="_blank" rel="noopener noreferrer" class="tk-link">China reduz tarifas sobre produtos agrícolas dos EUA, mas soja fica de fora</a></span><span class="pct">Investing.com (Economia)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/ECB_M_1440049450.jpg" alt="Bolsas europeias recuam após Trump rejeitar proposta do Irã; ações de tecnologia caem" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/bolsas-europeias-recuam-apos-trump-rejeitar-proposta-do-ira-acoes-de-tecnologia-caem-2076324" target="_blank" rel="noopener noreferrer" class="tk-link">Bolsas europeias recuam após Trump rejeitar proposta do Irã; ações de tecnologia caem</a></span><span class="pct">Investing.com (Ações)</span></div>
 </div>
 
 <h2 class="section">FIIs - Maiores Dividend Yield</h2>
@@ -183,39 +168,39 @@
   
   <tr>
     <td class="name">XPCA11</td>
-    <td>18.31%</td>
-    <td>R$ 7.10</td>
+    <td>17.41%</td>
+    <td>R$ 7.41</td>
     <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
-    <td class="name">TRXF11</td>
-    <td>16.69%</td>
-    <td>R$ 70.71</td>
-    <td class="rationale">FII Trx Real</td>
-  </tr>
-  <tr>
     <td class="name">IRIM11</td>
-    <td>16.60%</td>
-    <td>R$ 60.55</td>
+    <td>16.73%</td>
+    <td>R$ 60.26</td>
     <td class="rationale">FII Irim</td>
   </tr>
   <tr>
+    <td class="name">TRXF11</td>
+    <td>16.15%</td>
+    <td>R$ 73.05</td>
+    <td class="rationale">FII Trx Real</td>
+  </tr>
+  <tr>
     <td class="name">VGIR11</td>
-    <td>16.05%</td>
-    <td>R$ 9.41</td>
+    <td>15.79%</td>
+    <td>R$ 9.56</td>
     <td class="rationale">FII Valreiii</td>
   </tr>
   <tr>
-    <td class="name">CPTS11</td>
-    <td>14.57%</td>
-    <td>R$ 7.38</td>
-    <td class="rationale">FII Capi Sec</td>
+    <td class="name">RECR11</td>
+    <td>14.69%</td>
+    <td>R$ 73.83</td>
+    <td class="rationale">FII Rec Rece</td>
   </tr>
   <tr>
-    <td class="name">RECR11</td>
-    <td>14.51%</td>
-    <td>R$ 75.05</td>
-    <td class="rationale">FII Rec Rece</td>
+    <td class="name">CPTS11</td>
+    <td>14.44%</td>
+    <td>R$ 7.48</td>
+    <td class="rationale">FII Capi Sec</td>
   </tr>
 </table>
 
@@ -224,39 +209,39 @@
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
-    <td class="name">SBSP3</td>
-    <td>14.48%</td>
-    <td>R$ 24.01</td>
-    <td class="rationale">Sabesp</td>
-  </tr>
-  <tr>
     <td class="name">CMIG4</td>
-    <td>12.56%</td>
-    <td>R$ 10.20</td>
+    <td>12.42%</td>
+    <td>R$ 10.88</td>
     <td class="rationale">CEMIG</td>
   </tr>
   <tr>
     <td class="name">BBSE3</td>
-    <td>12.06%</td>
-    <td>R$ 38.07</td>
+    <td>11.77%</td>
+    <td>R$ 39.00</td>
     <td class="rationale">BB Seguridade</td>
   </tr>
   <tr>
     <td class="name">ALOS3</td>
-    <td>12.00%</td>
-    <td>R$ 26.06</td>
+    <td>11.45%</td>
+    <td>R$ 28.98</td>
     <td class="rationale">ALLOS</td>
   </tr>
   <tr>
     <td class="name">BBDC4</td>
-    <td>9.51%</td>
-    <td>R$ 16.35</td>
+    <td>8.69%</td>
+    <td>R$ 17.89</td>
     <td class="rationale">Banco Bradesco</td>
   </tr>
   <tr>
+    <td class="name">VALE3</td>
+    <td>7.94%</td>
+    <td>R$ 70.72</td>
+    <td class="rationale">Vale</td>
+  </tr>
+  <tr>
     <td class="name">PETR4</td>
-    <td>8.71%</td>
-    <td>R$ 41.98</td>
+    <td>7.61%</td>
+    <td>R$ 48.04</td>
     <td class="rationale">Petrobras</td>
   </tr>
 </table>
@@ -264,25 +249,25 @@
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/IBOVESPA-SEMANAL-26.08.2026-1.png?fit=300%2C137&amp;quality=70&amp;strip=all" alt="Ibovespa engata 5ª alta seguida; recuperação pode ganhar mais força?" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://content-media.investing.com/news/ECB_M_1440049450.jpg" alt="Bolsas europeias recuam após Trump rejeitar proposta do Irã; ações de tecnologia caem" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/ibovespa-engata-5a-alta-seguida-recuperacao-pode-ganhar-mais-forca/" target="_blank" rel="noopener noreferrer" class="n-link">1. Ibovespa engata 5ª alta seguida; recuperação pode ganhar mais força?</a></div>
-    <div class="n-body">Fonte: InfoMoney (geral)</div>
+    <div class="n-title"><a href="https://br.investing.com/news/stock-market-news/bolsas-europeias-recuam-apos-trump-rejeitar-proposta-do-ira-acoes-de-tecnologia-caem-2076324" target="_blank" rel="noopener noreferrer" class="n-link">1. Bolsas europeias recuam após Trump rejeitar proposta do Irã; ações de tecnologia caem</a></div>
+    <div class="n-body">Fonte: Investing.com (Ações)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/DOLLY-PARTONS-PHILANTHROPY-INSPIRATION-WAS-HER-FATHER-WHO-COULDNT-READ-OR-WRITE-I-SAW-HOW-CRIPPLING-THAT-COULD-BE.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Como o pai analfabeto inspirou legado de educação e filantropia de Dolly Parton" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://content-media.investing.com/news/LYNXMPEA7I00T_L.jpg" alt="Prévia do RBA de setembro: alta de 25 bps esperada com riscos de inflação" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/business/global/como-o-pai-analfabeto-inspirou-legado-de-educacao-e-filantropia-de-dolly-parton/" target="_blank" rel="noopener noreferrer" class="n-link">2. Como o pai analfabeto inspirou legado de educação e filantropia de Dolly Parton</a></div>
-    <div class="n-body">Fonte: InfoMoney (geral)</div>
+    <div class="n-title"><a href="https://br.investing.com/news/economy-news/previa-do-rba-de-setembro-alta-de-25-bps-esperada-com-riscos-de-inflacao-2076245" target="_blank" rel="noopener noreferrer" class="n-link">2. Prévia do RBA de setembro: alta de 25 bps esperada com riscos de inflação</a></div>
+    <div class="n-body">Fonte: Investing.com (Economia)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/ANTHROPICS-POTENTIAL-2-TRILLION-IPO-COULD-TURN-STAFF-INTO-MILLIONAIRESNOW-THE-AI-FIRM-IS-ASKING-CANDIDATES-WHAT-THEYD-DO-IF-STOCK-FELL-TO-ZERO.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Anthropic testa candidatos com pergunta inusitada enquanto mira IPO de US$ 2 tri" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/09/Imagem-do-ChatGPT-27-de-set.-de-2026-18_01_55.jpg?fit=300%2C169&amp;quality=70&amp;strip=all" alt="Às vésperas do 1º turno, Ibovespa perde força e chega à eleição sob pressão" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/business/global/anthropic-testa-candidatos-com-pergunta-inusitada-enquanto-mira-ipo-de-us-2-tri/" target="_blank" rel="noopener noreferrer" class="n-link">3. Anthropic testa candidatos com pergunta inusitada enquanto mira IPO de US$ 2 tri</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/ibovespa-primeiro-turno-eleicoes-2026-uma-semana/" target="_blank" rel="noopener noreferrer" class="n-link">3. Às vésperas do 1º turno, Ibovespa perde força e chega à eleição sob pressão</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
