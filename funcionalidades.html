@@ -81,23 +81,6 @@
     border-color: rgba(224,184,77,0.25);
   }
 
-  .automacao {
-    background: var(--deep);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 20px;
-    color: var(--muted);
-    font-size: 0.86rem;
-  }
-  .automacao strong { color: var(--text); }
-  .automacao code {
-    background: rgba(255,255,255,0.06);
-    padding: 1px 6px;
-    border-radius: 5px;
-    font-size: 0.8rem;
-    color: var(--accent);
-  }
-
   footer { text-align: center; margin-top: 50px; color: var(--muted); font-size: 0.78rem; }
   footer a { color: var(--primary); text-decoration: none; }
 </style>
@@ -225,20 +208,6 @@
         <div class="item"><strong>Conversor de Moedas</strong><span>Conversão rápida entre moedas.</span></div>
         <div class="item"><strong>Seção Educação</strong><span>Renda Fixa, Renda Variável e Estratégia — com apresentação paga complementar.</span></div>
         <div class="item"><strong>Assistente de IA</strong><span>Chat flutuante para tirar dúvidas sobre investimentos, indicadores e conceitos de mercado.</span></div>
-      </div>
-    </section>
-
-    <section class="grupo">
-      <div class="grupo-titulo"><span class="emoji">⚙️</span> Automação (bastidores)</div>
-      <div class="automacao">
-        Robôs via <strong>GitHub Actions</strong> rodando em cron, sem servidor próprio:
-        <code>boletim.yml</code> (boletim diário),
-        <code>mercado.yml</code> (índices, notícias e ranking de mercado),
-        <code>coletar-fiis.yml</code> (dados de FIIs a cada 15 min — e é aqui que os alertas de preço são checados e disparados por e-mail),
-        <code>basileia.yml</code> (Basileia dos bancos, semanal),
-        <code>debentures.yml</code> (taxas de debêntures),
-        <code>tesouro.yml</code> (Tesouro Direto) e
-        <code>coleta-reinv-yahoo.yml</code> (histórico para reinvestimento).
       </div>
     </section>
 
