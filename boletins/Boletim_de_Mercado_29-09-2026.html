@@ -101,17 +101,6 @@
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
-  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .section-com-lyket [data-lyket-type]{
-    font-size:12px;
-    background:#f2f2f2;
-    border-radius:20px;
-    padding:4px 10px;
-    display:inline-flex;
-    align-items:center;
-    box-shadow:0 1px 4px rgba(0,0,0,0.35);
-  }
-  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
   .grupo-whatsapp-card{
     display:flex;align-items:center;gap:12px;margin-top:12px;
     background:var(--card);border:1px solid var(--card-border);border-radius:12px;
@@ -124,7 +113,6 @@
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
-<script src="https://unpkg.com/@lyket/widget@latest/dist/lyket.js?apiKey=pt_d2c19f94733791f2b25c44987dd17e"></script>
 </head>
 <body>
 <div class="wrap">
@@ -139,13 +127,10 @@
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
-  <div class="sub">Boletim de Mercado · Sexta-feira, 28 de Agosto de 2026</div>
+  <div class="sub">Boletim de Mercado · Terça-feira, 29 de Setembro de 2026</div>
 </header>
 
-<h2 class="section section-com-lyket">
-  <span>Indicadores Principais</span>
-  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-28-08-2026"></div>
-</h2>
+<h2 class="section">Indicadores Principais</h2>
 
 <a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
   <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
@@ -156,15 +141,15 @@
 </a>
 
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value down">174.363,53 pts ▼ 0.44%</div></div>
-  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.722,64 pts ▲ 0.11%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,20 ▲ 0.70%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 6,03 ▲ 0.22%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 77.956,00 ▼ 3.09%</div></div>
-  <div class="indicator"><div class="label">Ethereum</div><div class="value down">US$ 2.441,70 ▼ 3.34%</div></div>
-  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">14,00% a.a.</div></div>
-  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,90% a.a.</div></div>
-  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,44%</div></div>
+  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value down">182.991,12 pts ▼ 0.26%</div></div>
+  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value down">3.737,17 pts ▼ 0.12%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,21 ▲ 0.27%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value down">R$ 5,93 ▼ 0.05%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value">—</div></div>
+  <div class="indicator"><div class="label">Ethereum</div><div class="value">—</div></div>
+  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">13,75% a.a.</div></div>
+  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,65% a.a.</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,22%</div></div>
   <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-0,22%</div></div>
 </div>
 
@@ -172,9 +157,9 @@
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEB660A4_M.jpg" alt="Blackstone reduz participação no India Realty Trust em venda de US$ 1,25 bilhão" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/blackstone-reduz-participacao-no-india-realty-trust-em-venda-de-us-125-bilhao-93CH-2052464" target="_blank" rel="noopener noreferrer" class="tk-link">Blackstone reduz participação no India Realty Trust em venda de US$ 1,25 bilhão</a></span><span class="pct">Investing.com (Ações)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEM0L1FN_1200_L.jpg" alt="Canadá registra déficit de C$ 370 milhões no primeiro trimestre" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/canada-registra-deficit-de-c-370-milhoes-no-primeiro-trimestre-93CH-2052424" target="_blank" rel="noopener noreferrer" class="tk-link">Canadá registra déficit de C$ 370 milhões no primeiro trimestre</a></span><span class="pct">Investing.com (Economia)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/trkd-images/LYNXMPEM7R1F7_1200_L.jpg" alt="Empresa francesa de computação quântica dispara em estreia na Nasdaq" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/empresa-francesa-de-computacao-quantica-dispara-em-estreia-na-nasdaq-2052463" target="_blank" rel="noopener noreferrer" class="tk-link">Empresa francesa de computação quântica dispara em estreia na Nasdaq</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEDB602H_M.jpg" alt="Austrália - Ações fecharam o pregão em alta e o Índice S&P/ASX 200 avançou 0,34%" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/australia--acoes-fecharam-o-pregao-em-alta-e-o-indice-spasx-200-avancou-034-2077562" target="_blank" rel="noopener noreferrer" class="tk-link">Austrália - Ações fecharam o pregão em alta e o Índice S&P/ASX 200 avançou 0,34%</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEC9H04N_L.jpg" alt="RBA eleva juros em 25 pontos-base e sinaliza mais altas diante de riscos inflacionários" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/rba-eleva-juros-em-25-pontosbase-e-sinaliza-mais-altas-diante-de-riscos-inflacionarios-2077520" target="_blank" rel="noopener noreferrer" class="tk-link">RBA eleva juros em 25 pontos-base e sinaliza mais altas diante de riscos inflacionários</a></span><span class="pct">Investing.com (Economia)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEBBF0GH_M.jpg" alt="Vendas da Toyota caem pelo sétimo mês consecutivo com fraqueza na China" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/vendas-da-toyota-caem-pelo-setimo-mes-consecutivo-com-fraqueza-na-china-2077551" target="_blank" rel="noopener noreferrer" class="tk-link">Vendas da Toyota caem pelo sétimo mês consecutivo com fraqueza na China</a></span><span class="pct">Investing.com (Ações)</span></div>
 </div>
 
 <h2 class="section">FIIs - Maiores Dividend Yield</h2>
@@ -183,39 +168,39 @@
   
   <tr>
     <td class="name">XPCA11</td>
-    <td>17.66%</td>
-    <td>R$ 7.36</td>
+    <td>17.36%</td>
+    <td>R$ 7.43</td>
     <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
     <td class="name">IRIM11</td>
-    <td>16.48%</td>
-    <td>R$ 61.00</td>
+    <td>16.82%</td>
+    <td>R$ 59.94</td>
     <td class="rationale">FII Irim</td>
   </tr>
   <tr>
-    <td class="name">VGIR11</td>
-    <td>16.01%</td>
-    <td>R$ 9.43</td>
-    <td class="rationale">FII Valreiii</td>
-  </tr>
-  <tr>
     <td class="name">TRXF11</td>
-    <td>15.58%</td>
-    <td>R$ 75.76</td>
+    <td>16.16%</td>
+    <td>R$ 73.00</td>
     <td class="rationale">FII Trx Real</td>
   </tr>
   <tr>
-    <td class="name">CPTS11</td>
-    <td>14.51%</td>
-    <td>R$ 7.41</td>
-    <td class="rationale">FII Capi Sec</td>
+    <td class="name">VGIR11</td>
+    <td>15.88%</td>
+    <td>R$ 9.51</td>
+    <td class="rationale">FII Valreiii</td>
   </tr>
   <tr>
     <td class="name">RECR11</td>
-    <td>14.08%</td>
-    <td>R$ 77.31</td>
+    <td>14.73%</td>
+    <td>R$ 73.63</td>
     <td class="rationale">FII Rec Rece</td>
+  </tr>
+  <tr>
+    <td class="name">CPTS11</td>
+    <td>14.55%</td>
+    <td>R$ 7.42</td>
+    <td class="rationale">FII Capi Sec</td>
   </tr>
 </table>
 
@@ -224,66 +209,66 @@
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
-    <td class="name">SBSP3</td>
-    <td>13.86%</td>
-    <td>R$ 25.09</td>
-    <td class="rationale">Sabesp</td>
-  </tr>
-  <tr>
     <td class="name">CMIG4</td>
-    <td>12.33%</td>
-    <td>R$ 10.39</td>
+    <td>12.49%</td>
+    <td>R$ 10.82</td>
     <td class="rationale">CEMIG</td>
   </tr>
   <tr>
-    <td class="name">ALOS3</td>
-    <td>11.93%</td>
-    <td>R$ 26.21</td>
-    <td class="rationale">ALLOS</td>
-  </tr>
-  <tr>
     <td class="name">BBSE3</td>
-    <td>11.64%</td>
-    <td>R$ 39.42</td>
+    <td>11.91%</td>
+    <td>R$ 38.55</td>
     <td class="rationale">BB Seguridade</td>
   </tr>
   <tr>
+    <td class="name">ALOS3</td>
+    <td>11.63%</td>
+    <td>R$ 28.52</td>
+    <td class="rationale">ALLOS</td>
+  </tr>
+  <tr>
     <td class="name">BBDC4</td>
-    <td>9.18%</td>
-    <td>R$ 16.94</td>
+    <td>8.79%</td>
+    <td>R$ 17.69</td>
     <td class="rationale">Banco Bradesco</td>
   </tr>
   <tr>
-    <td class="name">PETR4</td>
-    <td>8.53%</td>
-    <td>R$ 42.84</td>
-    <td class="rationale">Petrobras</td>
+    <td class="name">VALE3</td>
+    <td>7.89%</td>
+    <td>R$ 71.11</td>
+    <td class="rationale">Vale</td>
+  </tr>
+  <tr>
+    <td class="name">ITUB4</td>
+    <td>7.57%</td>
+    <td>R$ 41.84</td>
+    <td class="rationale">Banco Itaú Unibanco</td>
   </tr>
 </table>
 
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2019/12/shutterstock_1043121319.jpg?fit=300%2C158&amp;quality=70&amp;strip=all" alt="Ibovespa recua após Warsh levar mercado a ajustar expectativa sobre juros dos EUA" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2025/07/bets-celular.jpg?fit=300%2C179&amp;quality=70&amp;strip=all" alt="Governo pede na Justiça indenização de R$ 1 bi de 17 bets" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/ibovespa-recua-apos-warsh-levar-mercado-a-ajustar-expectativa-sobre-juros-dos-eua/" target="_blank" rel="noopener noreferrer" class="n-link">1. Ibovespa recua após Warsh levar mercado a ajustar expectativa sobre juros dos EUA</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/politica/governo-pede-na-justica-indenizacao-de-r-1-bi-de-17-bets/" target="_blank" rel="noopener noreferrer" class="n-link">1. Governo pede na Justiça indenização de R$ 1 bi de 17 bets</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/06/2026-06-17T190008Z_118389025_RC2UVLA9XT8I_RTRMADP_3_USA-FED.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Apostas de alta de juros na próxima reunião do Fed sobem para 59% após fala de Warsh" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/2026-08-26T211621Z_1_LYNXMPEM7P1RP_RTROPTP_4_OPENAI-PROBE-ALABAMA.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="OpenAI segura lançamento de novo modelo de IA após falhas em testes de segurança" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/apostas-de-alta-de-juros-na-proxima-reuniao-do-fed-sobem-para-59-apos-fala-de-warsh/" target="_blank" rel="noopener noreferrer" class="n-link">2. Apostas de alta de juros na próxima reunião do Fed sobem para 59% após fala de Warsh</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/business/openai-segura-lancamento-de-novo-modelo-de-ia-apos-falhas-em-testes-de-seguranca/" target="_blank" rel="noopener noreferrer" class="n-link">2. OpenAI segura lançamento de novo modelo de IA após falhas em testes de segurança</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/Ibovespa-ao-vivo-9-1.jpeg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Ibovespa Hoje Ao Vivo: Bolsa cai com holofote voltado para chair do Fed" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://content-media.investing.com/news/LYNXMPEBBF0GH_M.jpg" alt="Vendas da Toyota caem pelo sétimo mês consecutivo com fraqueza na China" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/ibovespa-hoje-bolsa-de-valores-ao-vivo-28082026/" target="_blank" rel="noopener noreferrer" class="n-link">3. Ibovespa Hoje Ao Vivo: Bolsa cai com holofote voltado para chair do Fed</a></div>
-    <div class="n-body">Fonte: InfoMoney (geral)</div>
+    <div class="n-title"><a href="https://br.investing.com/news/stock-market-news/vendas-da-toyota-caem-pelo-setimo-mes-consecutivo-com-fraqueza-na-china-2077551" target="_blank" rel="noopener noreferrer" class="n-link">3. Vendas da Toyota caem pelo sétimo mês consecutivo com fraqueza na China</a></div>
+    <div class="n-body">Fonte: Investing.com (Ações)</div>
   </div>
 </div>
 
