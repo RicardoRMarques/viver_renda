@@ -6701,6 +6701,19 @@
           </table>
         </div>
 
+        <div class="carteira-secao-titulo" id="carteiraTituloEtfs" hidden>
+          🧺 ETFs
+          <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="etf-dy-indisponivel" aria-label="Por que o DY de alguns ETFs aparece zerado?" title="Por que o DY de alguns ETFs aparece zerado?">?</button>
+        </div>
+        <div class="cmp-tabela-wrap" id="carteiraWrapEtfs" hidden>
+          <table class="cmp-tabela carteira-tabela">
+            <thead>
+              <tr><th>Ativo</th><th>Preço</th><th title="Quanto você pagou, em média, por cota/ação. Opcional: preencha para ver o custo, o lucro e o DY on cost — aqui e na Calculadora de Aportes.">Preço médio</th><th>DY (12m)</th><th>Provento méd./mês</th><th>Qtd.</th><th>Valor investido</th><th>% da carteira</th><th>Proventos/mês</th><th></th></tr>
+            </thead>
+            <tbody id="carteiraTbodyEtfs"></tbody>
+          </table>
+        </div>
+
         <div class="carteira-secao-titulo" id="carteiraTituloIntl" hidden>🌎 Stocks/ETFs Internacionais</div>
         <div class="cmp-tabela-wrap" id="carteiraWrapIntl" hidden>
           <table class="cmp-tabela carteira-tabela">
@@ -9512,6 +9525,9 @@
       const tituloFiis = document.getElementById('carteiraTituloFiis');
       const wrapFiis = document.getElementById('carteiraWrapFiis');
       const tbodyFiis = document.getElementById('carteiraTbodyFiis');
+      const tituloEtfs = document.getElementById('carteiraTituloEtfs');
+      const wrapEtfs = document.getElementById('carteiraWrapEtfs');
+      const tbodyEtfs = document.getElementById('carteiraTbodyEtfs');
       const tituloIntl = document.getElementById('carteiraTituloIntl');
       const wrapIntl = document.getElementById('carteiraWrapIntl');
       const tbodyIntl = document.getElementById('carteiraTbodyIntl');
@@ -9632,7 +9648,7 @@
         const data = await resp.json();
         const a = data?.results?.[0];
 
-        if (a && (a.kind === 'stock' || a.kind === 'fii' || a.kind === 'fiagro' || a.kind === 'fund')) {
+        if (a && (a.kind === 'stock' || a.kind === 'fii' || a.kind === 'fiagro' || a.kind === 'fund' || a.kind === 'etf')) {
           const preco = a.quote?.value ?? null;
           const yield12mCash = a.dividends?.yield_12m_cash;
           const proventoMes = typeof yield12mCash === 'number' ? yield12mCash / 12 : null;
@@ -9964,7 +9980,7 @@
           const ok = await buscarEEmpilhar(ticker, qtd);
           if (!ok) {
             statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro, FI-Infra ou Stock/ETF americano. Confira o ticker digitado.`;
+            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro, FI-Infra, ETF ou Stock/ETF americano. Confira o ticker digitado.`;
             return;
           }
           statusEl.textContent = '';
@@ -10025,6 +10041,7 @@
       function renderizar() {
         const acoes = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'stock');
         const fiis = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'fii' || x.item.kind === 'fiagro' || x.item.kind === 'fund');
+        const etfs = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'etf');
         const intl = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'internacional');
 
         vazioEl.hidden = carteira.length > 0;
@@ -10041,6 +10058,9 @@
 
         tituloFiis.hidden = wrapFiis.hidden = fiis.length === 0;
         if (fiis.length > 0) tbodyFiis.innerHTML = fiis.map(x => linhaHtml(x.item, x.idx, totalInvestido)).join('');
+
+        tituloEtfs.hidden = wrapEtfs.hidden = etfs.length === 0;
+        if (etfs.length > 0) tbodyEtfs.innerHTML = etfs.map(x => linhaHtml(x.item, x.idx, totalInvestido)).join('');
 
         tituloIntl.hidden = wrapIntl.hidden = intl.length === 0;
         if (intl.length > 0) tbodyIntl.innerHTML = intl.map(x => linhaHtml(x.item, x.idx, totalInvestido)).join('');
@@ -10158,7 +10178,7 @@
             const pctCarteira = totalInvestido > 0 ? (investimento / totalInvestido) * 100 : 0;
             return [
               item.ticker,
-              item.kind === 'fii' ? 'FII' : (item.kind === 'fiagro' ? 'Fiagro' : (item.kind === 'fund' ? 'FI-Infra' : (item.kind === 'internacional' ? 'Stock/ETF' : 'Ação'))),
+              item.kind === 'fii' ? 'FII' : (item.kind === 'fiagro' ? 'Fiagro' : (item.kind === 'fund' ? 'FI-Infra' : (item.kind === 'etf' ? 'ETF' : (item.kind === 'internacional' ? 'Stock/ETF' : 'Ação')))),
               hgFormatMoeda(item.preco, item.moeda) ?? '—',
               item.dyPercent !== null ? `${hgFormatNumero(item.dyPercent)}%` : '—',
               item.proventoMes !== null ? hgFormatMoeda(item.proventoMes, item.moeda) : '—',
@@ -17132,6 +17152,8 @@
         'ap-dy-on-cost': 'Dividend yield sobre o custo: quanto os proventos de 12 meses representam do que VOCÊ pagou.\n\nConta: proventos 12 meses ÷ custo de aquisição.\n\nÉ o retorno em renda sobre o seu dinheiro, não sobre o preço de hoje. Quem comprou barato tem DY on cost maior do que o DY de quem compra agora — e ele tende a crescer com o tempo, mesmo que o fundo pague sempre o mesmo valor por cota.\n\nLogo abaixo vem o DY sobre o mercado: os mesmos proventos divididos pelo valor de mercado de hoje, ou seja, o que um investidor receberia comprando agora. DY on cost acima dele significa que seus ativos valorizaram desde a compra.',
 
         'ap-carteira-proventos': 'O retorno total da carteira: a valorização mais os proventos, tudo sobre o custo.\n\nConta: (valor de mercado − custo + proventos 12 meses) ÷ custo.\n\nÉ a visão mais completa das seis, porque junta o que o preço rendeu com o que caiu na sua conta em dividendos e rendimentos. Por isso ela pode ficar positiva mesmo com a Valorização negativa: os proventos compensam a queda do preço.\n\nDuas ressalvas: os proventos são só dos últimos 12 meses, enquanto a valorização é desde a compra (que pode ser de muitos anos) — então este número não é uma rentabilidade anual. E entram só os ativos que têm preço médio.',
+
+        'etf-dy-indisponivel': 'A fonte de dados do site (HG Brasil) ainda não tem o histórico de dividendos completo para todos os ETFs da B3 — por isso o DY e o Provento méd./mês de alguns deles pode aparecer zerado mesmo quando o ETF paga rendimentos normalmente.\n\nIsso não significa que o ETF não paga nada: confira o histórico de dividendos direto no site da gestora ou da B3 antes de decidir com base só nesse número.',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
@@ -17782,7 +17804,7 @@
           return;
         }
         listaEl.innerHTML = lista.map(a => {
-          const simboloMoeda = ['stock', 'fii', 'fiagro'].includes(a.kind) ? 'R$' : 'US$';
+          const simboloMoeda = ['stock', 'fii', 'fiagro', 'etf'].includes(a.kind) ? 'R$' : 'US$';
           return `
           <div class="alertas-item">
             <span><strong>${a.ticker}</strong> ${a.condicao === 'abaixo' ? 'cair abaixo de' : 'subir acima de'} ${simboloMoeda} ${Number(a.valor_alvo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
@@ -17887,14 +17909,14 @@
           const dados = await resp.json();
           const ativo = dados?.results?.[0];
 
-          let kind = (ativo && ['stock', 'fii', 'fiagro'].includes(ativo.kind)) ? ativo.kind : null;
+          let kind = (ativo && ['stock', 'fii', 'fiagro', 'etf'].includes(ativo.kind)) ? ativo.kind : null;
           if (!kind) {
             statusEl.textContent = `Não achei "${ticker}" na B3 — tentando como Stock/ETF americano...`;
             kind = await alertasVerificarTwelveData(ticker);
           }
           if (!kind) {
             statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro ou Stock/ETF americano.`;
+            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro, ETF ou Stock/ETF americano.`;
             return;
           }
 
@@ -18329,7 +18351,7 @@
           : '';
 
         const linhas = [
-          { label: 'Tipo', get: a => a.kind === 'fii' ? 'Fundo Imobiliário' : (a.kind === 'stock' ? 'Ação' : (a.kind || '—')) },
+          { label: 'Tipo', get: a => a.kind === 'fii' ? 'Fundo Imobiliário' : (a.kind === 'stock' ? 'Ação' : (a.kind === 'etf' ? 'ETF' : (a.kind || '—'))) },
           { label: 'Setor / Segmento', get: a => a.classification?.sector || a.classification?.segment || '—' },
           { label: 'Cotação', get: a => hgFormatMoeda(a.quote?.value, a.currency) ?? '—' },
           { label: 'Variação (dia)', get: a => typeof a.quote?.change_percent === 'number' ? `${hgFormatNumero(a.quote.change_percent)}%` : '—' },
