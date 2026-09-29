@@ -9771,11 +9771,32 @@
                 .from('carteira_dividendos')
                 .select('ticker, kind, qtd, preco_medio')
                 .eq('user_id', session.user.id);
-              if (!error && data) {
-                // Funde: nuvem tem prioridade sobre o que já existia só
-                // localmente (mais provável de estar atualizado).
-                const tickersNuvem = new Set(data.map(d => d.ticker));
-                salvos = [...data.map(d => ({ ...d, pm: d.preco_medio })), ...salvos.filter(s => !tickersNuvem.has(s.ticker))];
+              if (!error && Array.isArray(data)) {
+                if (data.length === 0 && salvos.length > 0) {
+                  // Nuvem vazia (conta ainda sem nada salva nesse recurso) e
+                  // já existia uma carteira só local — essa é a ÚNICA
+                  // situação segura pra "adotar" o que estava no
+                  // localStorage: como a nuvem está vazia, não tem o que
+                  // ressuscitar por engano. Sobe cada ativo pra nuvem uma
+                  // única vez, aqui.
+                  for (const item of salvos) {
+                    try {
+                      await cliente.from('carteira_dividendos').upsert({
+                        user_id: session.user.id, ticker: item.ticker, kind: item.kind, qtd: item.qtd,
+                        preco_medio: item.pm > 0 ? item.pm : null,
+                      });
+                    } catch (e) { /* segue tentando subir os outros */ }
+                  }
+                } else {
+                  // Nuvem já tem dados: ela manda sozinha a partir daqui —
+                  // NÃO mescla com o que sobrou no localStorage. Foi
+                  // exatamente mesclar que causava o bug de dois aparelhos
+                  // com a mesma conta mostrando carteiras diferentes: um
+                  // ativo removido em outro aparelho "voltava" porque este
+                  // navegador ainda tinha ele em cache local, e cada
+                  // aparelho divergia pra sempre.
+                  salvos = data.map(d => ({ ...d, pm: d.preco_medio }));
+                }
               }
             }
           } catch (e) {
