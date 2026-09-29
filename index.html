@@ -4404,6 +4404,10 @@
           <span class="atalho-icone-bg" style="background:#ff7ab0;"><svg viewBox="0 0 24 24" fill="none" stroke="#4b1528" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V20a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1V9.5"></path></svg></span>
           Calculadora Financiamento Imobiliário
         </button>
+        <button type="button" class="atalho-simulador" id="vcBtnAbrirAtalho">
+          <span class="atalho-icone-bg" style="background:#2dd4bf;"><svg viewBox="0 0 24 24" fill="none" stroke="#04302b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg></span>
+          Calculadora de Venda Coberta
+        </button>
         <button type="button" class="atalho-simulador" id="rpnBtnAbrirAtalho">
           <span class="atalho-icone-bg" style="background:#e0b84d;"><svg viewBox="0 0 24 24" fill="none" stroke="#412402" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg></span>
           Calculadora Financeira (RPN)
@@ -5644,6 +5648,105 @@
       </div>
     </div>
 
+    <!-- Modal: Calculadora de Venda Coberta (opções) -->
+    <div id="vcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="vcTitulo" hidden>
+      <div class="calc-modal">
+        <div class="calc-modal-topo">
+          <h3 id="vcTitulo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>Calculadora de Venda Coberta
+          </h3>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" id="vcCompartilharLink" class="modal-link-btn"
+                    aria-label="Compartilhar o link desta ferramenta"
+                    title="Compartilhar o link desta ferramenta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+            <button id="vcFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+          </div>
+        </div>
+
+        <div class="calc-corpo">
+          <p class="calc-ajuda" style="margin-top:0;">
+            Você já tem a ação e vende uma opção de compra (call) contra ela, recebendo um prêmio na hora — uma forma
+            de gerar renda extra sobre uma carteira parada.
+            <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="venda-coberta" aria-label="O que é venda coberta?" title="">?</button>
+          </p>
+
+          <div class="calc-campo">
+            <label for="vcTicker">Ativo (opcional, só pra identificar)</label>
+            <input type="text" id="vcTicker" placeholder="Ex: PETR4" autocomplete="off" style="text-transform:uppercase;" />
+          </div>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="vcPrecoAcao">Preço da ação hoje</label>
+              <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" inputmode="numeric" id="vcPrecoAcao" placeholder="0,00" /></div>
+            </div>
+            <div class="calc-campo">
+              <label for="vcStrike">
+                Strike (preço de exercício)
+                <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="opcao-strike" aria-label="O que é strike?" title="">?</button>
+              </label>
+              <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" inputmode="numeric" id="vcStrike" placeholder="0,00" /></div>
+            </div>
+          </div>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="vcPremio">
+                Prêmio recebido (por ação)
+                <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="opcao-premio" aria-label="O que é prêmio?" title="">?</button>
+              </label>
+              <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" inputmode="numeric" id="vcPremio" placeholder="0,00" /></div>
+            </div>
+            <div class="calc-campo">
+              <label for="vcVencimento">Data de vencimento da opção</label>
+              <input type="date" id="vcVencimento" />
+            </div>
+          </div>
+
+          <div class="calc-grid-2">
+            <div class="calc-campo">
+              <label for="vcQtd">Quantidade de ações (opcional)</label>
+              <input type="number" id="vcQtd" min="1" step="1" placeholder="Ex: 100" />
+            </div>
+            <div class="calc-campo">
+              <label for="vcPrecoMedio">Preço médio da ação (opcional)</label>
+              <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" inputmode="numeric" id="vcPrecoMedio" placeholder="0,00" /></div>
+            </div>
+          </div>
+          <p class="calc-ajuda" style="margin-top:-6px;">
+            Quantidade e preço médio são opcionais: preencha se quiser ver o resultado também em R$ e o lucro total
+            considerando o que você pagou pela ação (não só a partir de hoje).
+          </p>
+
+          <div style="display:flex; gap:10px; margin-top:6px;">
+            <button class="hg-btn" id="vcBtnCalcular" style="flex:1;">Calcular</button>
+            <button class="hg-btn" id="vcBtnLimpar" style="flex:1; background:var(--deep); color:var(--text); border:1px solid var(--border);">Limpar</button>
+          </div>
+          <div class="cmp-acoes-linha" style="margin-top:8px;">
+            <button type="button" class="cmp-btn-secundario" id="vcBtnPdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+              Baixar PDF
+            </button>
+            <button type="button" class="cmp-btn-secundario" id="vcBtnCompartilhar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              Compartilhar
+            </button>
+          </div>
+
+          <div id="vcResultado"></div>
+
+          <p class="calc-ajuda" style="margin-top:14px;">
+            Simulação educativa. Não considera corretagem, emolumentos, Imposto de Renda sobre o prêmio nem a
+            possibilidade de recompra da opção antes do vencimento. Vender opções cobertas limita o ganho se a ação
+            subir muito além do strike — e não protege contra queda do papel além do valor do prêmio recebido. Não é
+            recomendação de investimento.
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- SIMULADOR VISUAL DE JUROS COMPOSTOS (com controles deslizantes),
          exibido direto na página, antes da seção "Explore o mercado".
@@ -17154,6 +17257,10 @@
         'ap-carteira-proventos': 'O retorno total da carteira: a valorização mais os proventos, tudo sobre o custo.\n\nConta: (valor de mercado − custo + proventos 12 meses) ÷ custo.\n\nÉ a visão mais completa das seis, porque junta o que o preço rendeu com o que caiu na sua conta em dividendos e rendimentos. Por isso ela pode ficar positiva mesmo com a Valorização negativa: os proventos compensam a queda do preço.\n\nDuas ressalvas: os proventos são só dos últimos 12 meses, enquanto a valorização é desde a compra (que pode ser de muitos anos) — então este número não é uma rentabilidade anual. E entram só os ativos que têm preço médio.',
 
         'etf-dy-indisponivel': 'A fonte de dados do site (HG Brasil) ainda não tem o histórico de dividendos completo para todos os ETFs da B3 — por isso o DY e o Provento méd./mês de alguns deles pode aparecer zerado mesmo quando o ETF paga rendimentos normalmente.\n\nIsso não significa que o ETF não paga nada: confira o histórico de dividendos direto no site da gestora ou da B3 antes de decidir com base só nesse número.',
+
+        'venda-coberta': 'Venda Coberta (covered call) = você já tem a ação e vende uma opção de compra (call) contra ela, recebendo um prêmio na hora.\n\nSe a ação ficar abaixo do strike no vencimento, a opção vira pó: você fica com a ação e com o prêmio, como uma renda extra. Se a ação passar do strike, você é obrigado a vender pelo preço combinado — ainda lucra, mas perde o que a ação subiu além disso.\n\nÉ uma forma de gerar caixa mensal sobre uma carteira parada, ao custo de limitar o ganho se a ação disparar. Não protege contra queda além do valor do prêmio recebido.',
+        'opcao-strike': 'Strike (preço de exercício) = o preço pelo qual a ação será vendida, caso a opção seja exercida.\n\nQuanto mais distante o strike estiver do preço atual da ação, menor o prêmio recebido (menor chance de ser exercido), mas mais espaço a ação tem pra subir antes de você "perder" ela pelo strike.',
+        'opcao-premio': 'Prêmio = o valor que você recebe, por ação, ao vender a opção — é o seu ganho garantido na hora, não depende do que acontece depois com a ação.\n\nÉ negociado em bolsa (varia com o tempo até o vencimento, a distância até o strike e a volatilidade do ativo) — aqui você digita o valor que já negociou ou pretende negociar.',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
@@ -24248,6 +24355,334 @@
       btnLimpar.addEventListener('click', limpar);
       btnPdf.addEventListener('click', gerarPdfEmp);
       btnCompartilhar.addEventListener('click', (e) => compartilharResultadoEmp(e.currentTarget));
+    })();
+
+    // ============================================================
+    // CALCULADORA DE VENDA COBERTA (covered call) — simula o retorno de
+    // vender uma opção de compra contra uma ação que você já tem. Só
+    // matemática sobre o que a pessoa digita, sem consultar cotação de
+    // opção nenhuma (a B3/HG Brasil não tem esse dado disponível aqui).
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('vcOverlay');
+      const btnAbrirMenu = document.getElementById('vcBtnAbrirAtalho');
+      const btnFechar = document.getElementById('vcFechar');
+      const inTicker = document.getElementById('vcTicker');
+      const inPrecoAcao = document.getElementById('vcPrecoAcao');
+      const inStrike = document.getElementById('vcStrike');
+      const inPremio = document.getElementById('vcPremio');
+      const inVencimento = document.getElementById('vcVencimento');
+      const inQtd = document.getElementById('vcQtd');
+      const inPrecoMedio = document.getElementById('vcPrecoMedio');
+      const btnCalcular = document.getElementById('vcBtnCalcular');
+      const btnLimpar = document.getElementById('vcBtnLimpar');
+      const btnPdf = document.getElementById('vcBtnPdf');
+      const btnCompartilhar = document.getElementById('vcBtnCompartilhar');
+      const resultadoEl = document.getElementById('vcResultado');
+
+      if (!overlay || !btnAbrirMenu) return;
+
+      hgAplicarMascaraMoeda(inPrecoAcao);
+      hgAplicarMascaraMoeda(inStrike);
+      hgAplicarMascaraMoeda(inPremio);
+      hgAplicarMascaraMoeda(inPrecoMedio);
+
+      // Guarda o último cálculo válido, pro PDF e o compartilhamento
+      // (mesmo padrão da Calculadora de Empréstimo).
+      let ultimoCalculoVc = null;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function erro(msg) {
+        resultadoEl.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a; margin-top:14px;">${msg}</p>`;
+        ultimoCalculoVc = null;
+      }
+
+      function calcular() {
+        const ticker = inTicker.value.trim().toUpperCase();
+        const precoAcao = hgValorMascarado(inPrecoAcao);
+        const strike = hgValorMascarado(inStrike);
+        const premio = hgValorMascarado(inPremio);
+        const precoMedio = hgValorMascarado(inPrecoMedio);
+        const qtd = parseInt(inQtd.value, 10) || 0;
+        const vencimentoStr = inVencimento.value; // AAAA-MM-DD
+
+        if (!(precoAcao > 0)) { erro('Informe o preço da ação hoje.'); return; }
+        if (!(strike > 0)) { erro('Informe o strike (preço de exercício) da opção.'); return; }
+        if (!(premio > 0)) { erro('Informe o prêmio recebido pela opção.'); return; }
+        if (!vencimentoStr) { erro('Informe a data de vencimento da opção.'); return; }
+
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        const vencimento = new Date(vencimentoStr + 'T00:00:00');
+        const diasVenc = Math.round((vencimento - hoje) / 86400000);
+        if (diasVenc <= 0) { erro('A data de vencimento precisa ser no futuro.'); return; }
+
+        // Cenário 1: não exercida (ação fecha abaixo do strike) — fica com
+        // a ação e com o prêmio, como renda extra sobre a posição.
+        const retornoNaoExercPct = (premio / precoAcao) * 100;
+        const retornoAnualNaoExercPct = retornoNaoExercPct * (365 / diasVenc);
+
+        // Cenário 2: exercida (ação é "chamada" pelo strike) — ganha a
+        // valorização até o strike, mais o prêmio.
+        const lucroPorAcaoExerc = (strike - precoAcao) + premio;
+        const retornoExercPct = (lucroPorAcaoExerc / precoAcao) * 100;
+        const retornoAnualExercPct = retornoExercPct * (365 / diasVenc);
+
+        // Proteção e espaço até o strike.
+        const breakeven = precoAcao - premio;
+        const protecaoQuedaPct = (premio / precoAcao) * 100;
+        const distanciaStrikePct = ((strike - precoAcao) / precoAcao) * 100;
+
+        // Se informou preço médio: lucro total (ação + prêmio) sobre o que
+        // realmente foi pago, não só a partir de hoje.
+        const temPrecoMedio = precoMedio > 0;
+        const lucroTotalCustoNaoExerc = temPrecoMedio ? (precoAcao - precoMedio) + premio : null;
+        const lucroTotalCustoExerc = temPrecoMedio ? (strike - precoMedio) + premio : null;
+        const retornoCustoNaoExercPct = temPrecoMedio ? (lucroTotalCustoNaoExerc / precoMedio) * 100 : null;
+        const retornoCustoExercPct = temPrecoMedio ? (lucroTotalCustoExerc / precoMedio) * 100 : null;
+
+        const temQtd = qtd > 0;
+        const premioTotal = temQtd ? premio * qtd : null;
+
+        ultimoCalculoVc = {
+          ticker, precoAcao, strike, premio, precoMedio, qtd, diasVenc, vencimentoStr,
+          retornoNaoExercPct, retornoAnualNaoExercPct,
+          retornoExercPct, retornoAnualExercPct,
+          breakeven, protecaoQuedaPct, distanciaStrikePct,
+          temPrecoMedio, retornoCustoNaoExercPct, retornoCustoExercPct,
+          temQtd, premioTotal,
+        };
+
+        const corPct = (v) => v >= 0 ? 'var(--accent)' : 'var(--danger)';
+
+        resultadoEl.innerHTML = `
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha calc-destaque">
+              <span>Prêmio recebido${temQtd ? ` (${qtd} ações)` : ' (por ação)'}</span>
+              <strong>${temQtd ? hgFormatMoeda(premioTotal) : hgFormatMoeda(premio)}</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Dias até o vencimento</span>
+              <strong>${diasVenc}</strong>
+            </div>
+          </div>
+
+          <p class="calc-ajuda" style="margin:14px 0 4px; font-weight:700; color:var(--text);">Se a ação NÃO for exercida (fica abaixo do strike)</p>
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha">
+              <span>Retorno da operação</span>
+              <strong style="color:${corPct(retornoNaoExercPct)};">${hgFormatNumero(retornoNaoExercPct)}%</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Retorno anualizado</span>
+              <strong style="color:${corPct(retornoAnualNaoExercPct)};">${hgFormatNumero(retornoAnualNaoExercPct)}%</strong>
+            </div>
+          </div>
+
+          <p class="calc-ajuda" style="margin:14px 0 4px; font-weight:700; color:var(--text);">Se a ação FOR exercida (passa do strike)</p>
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha">
+              <span>Retorno da operação</span>
+              <strong style="color:${corPct(retornoExercPct)};">${hgFormatNumero(retornoExercPct)}%</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Retorno anualizado</span>
+              <strong style="color:${corPct(retornoAnualExercPct)};">${hgFormatNumero(retornoAnualExercPct)}%</strong>
+            </div>
+          </div>
+
+          <p class="calc-ajuda" style="margin:14px 0 4px; font-weight:700; color:var(--text);">Proteção e distância até o strike</p>
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha">
+              <span>Preço de equilíbrio (breakeven)</span>
+              <strong>${hgFormatMoeda(breakeven)}</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Proteção contra queda</span>
+              <strong>${hgFormatNumero(protecaoQuedaPct)}%</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Distância até o strike</span>
+              <strong style="color:${corPct(distanciaStrikePct)};">${hgFormatNumero(distanciaStrikePct)}%</strong>
+            </div>
+          </div>
+
+          ${temPrecoMedio ? `
+          <p class="calc-ajuda" style="margin:14px 0 4px; font-weight:700; color:var(--text);">Considerando seu preço médio (${hgFormatMoeda(precoMedio)})</p>
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha">
+              <span>Retorno total se NÃO exercida</span>
+              <strong style="color:${corPct(retornoCustoNaoExercPct)};">${hgFormatNumero(retornoCustoNaoExercPct)}%</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Retorno total se exercida</span>
+              <strong style="color:${corPct(retornoCustoExercPct)};">${hgFormatNumero(retornoCustoExercPct)}%</strong>
+            </div>
+          </div>` : ''}
+
+          <p class="calc-ajuda" style="margin-top:14px;">
+            "Retorno da operação" é só o resultado desta venda de opção (prêmio, e ganho até o strike se exercida)
+            sobre o preço atual da ação — não é a rentabilidade total da sua posição na ação em si.
+          </p>`;
+      }
+
+      function limpar() {
+        inTicker.value = '';
+        inPrecoAcao.value = ''; inPrecoAcao.dataset.centavos = '0';
+        inStrike.value = ''; inStrike.dataset.centavos = '0';
+        inPremio.value = ''; inPremio.dataset.centavos = '0';
+        inPrecoMedio.value = ''; inPrecoMedio.dataset.centavos = '0';
+        inQtd.value = '';
+        inVencimento.value = '';
+        resultadoEl.innerHTML = '';
+        ultimoCalculoVc = null;
+      }
+
+      function nomeArquivoPdfVc() {
+        return 'venda-coberta.pdf';
+      }
+
+      async function montarDocumentoPdfVc() {
+        if (!ultimoCalculoVc) {
+          alert('Faça um cálculo primeiro, clicando em "Calcular".');
+          return null;
+        }
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const c = ultimoCalculoVc;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text(`Simulação — Venda Coberta${c.ticker ? ` (${c.ticker})` : ''}`, 40, 40);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
+        doc.setFontSize(8);
+        doc.text('Aviso: simulação educativa, sem corretagem, emolumentos ou IR. Não é recomendação de investimento.', 40, 70);
+        doc.setTextColor(0);
+
+        const [vAno, vMes, vDia] = c.vencimentoStr.split('-');
+
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Dados da operação']],
+          body: [
+            ['Preço da ação hoje', hgFormatMoeda(c.precoAcao)],
+            ['Strike', hgFormatMoeda(c.strike)],
+            ['Prêmio (por ação)', hgFormatMoeda(c.premio)],
+            ['Vencimento', `${vDia}/${vMes}/${vAno} (${c.diasVenc} dias)`],
+            ...(c.temQtd ? [['Quantidade', String(c.qtd)], ['Prêmio total', hgFormatMoeda(c.premioTotal)]] : []),
+            ...(c.temPrecoMedio ? [['Preço médio informado', hgFormatMoeda(c.precoMedio)]] : []),
+          ],
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 20,
+          head: [['Cenário', 'Retorno da operação', 'Retorno anualizado']],
+          body: [
+            ['Se NÃO exercida', `${hgFormatNumero(c.retornoNaoExercPct)}%`, `${hgFormatNumero(c.retornoAnualNaoExercPct)}%`],
+            ['Se exercida', `${hgFormatNumero(c.retornoExercPct)}%`, `${hgFormatNumero(c.retornoAnualExercPct)}%`],
+          ],
+          theme: 'striped',
+          styles: { fontSize: 9, cellPadding: 6, halign: 'center' },
+          headStyles: { fillColor: [43, 43, 43] },
+        });
+
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 20,
+          head: [['', '']],
+          body: [
+            ['Preço de equilíbrio (breakeven)', hgFormatMoeda(c.breakeven)],
+            ['Proteção contra queda', `${hgFormatNumero(c.protecaoQuedaPct)}%`],
+            ['Distância até o strike', `${hgFormatNumero(c.distanciaStrikePct)}%`],
+            ...(c.temPrecoMedio ? [
+              ['Retorno total se NÃO exercida (s/ preço médio)', `${hgFormatNumero(c.retornoCustoNaoExercPct)}%`],
+              ['Retorno total se exercida (s/ preço médio)', `${hgFormatNumero(c.retornoCustoExercPct)}%`],
+            ] : []),
+          ],
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119] },
+          columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'center' } },
+        });
+
+        return doc;
+      }
+
+      async function gerarPdfVc() {
+        const doc = await montarDocumentoPdfVc();
+        if (!doc) return;
+        doc.save(nomeArquivoPdfVc());
+      }
+
+      async function compartilharResultadoVc(botao) {
+        const doc = await montarDocumentoPdfVc();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoPdfVc();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Simulação — Venda Coberta', files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoOriginal = botao.innerHTML;
+        botao.innerHTML = 'PDF baixado!';
+        setTimeout(() => { botao.innerHTML = textoOriginal; }, 2500);
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
+      btnLimpar.addEventListener('click', limpar);
+      btnPdf.addEventListener('click', gerarPdfVc);
+      btnCompartilhar.addEventListener('click', (e) => compartilharResultadoVc(e.currentTarget));
+
+      document.getElementById('vcCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'vendacoberta',
+          titulo: 'Calculadora de Venda Coberta — Viver de Renda',
+          texto: 'Simule o retorno de vender uma opção de compra coberta pela sua ação.',
+        }));
+
+      hgAbrirPorLinkDeFerramenta('vendacoberta', abrirModal);
     })();
   </script>
 
