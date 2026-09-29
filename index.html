@@ -857,6 +857,25 @@
       flex: 0 1 90px; background: var(--deep); border: 1px solid var(--border); color: var(--text);
       border-radius: 10px; padding: 10px 12px; font-size: 0.88rem; font-family: inherit; text-align: center;
     }
+    .carteira-resumo-linha { display: flex; gap: 14px; align-items: stretch; margin: 14px 0; }
+    .carteira-resumo-linha .carteira-resumo-cards { flex: 1 1 320px; margin: 0; }
+    .carteira-grafico-wrap {
+      flex: 0 0 220px; display: flex; flex-direction: column;
+      background: var(--card); border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 8px 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .carteira-grafico-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
+    .carteira-grafico-tab {
+      flex: 1; background: transparent; border: 1px solid var(--border); color: var(--muted);
+      font-size: 0.68rem; font-weight: 700; padding: 4px 6px; border-radius: 8px; cursor: pointer;
+      font-family: inherit;
+    }
+    .carteira-grafico-tab.carteira-grafico-tab-ativo { border-color: var(--primary); color: var(--primary); }
+    .carteira-grafico-canvas-box { position: relative; flex: 1 1 auto; min-height: 210px; }
+    @media (max-width: 700px) {
+      .carteira-resumo-linha { flex-wrap: wrap; }
+      .carteira-grafico-wrap { flex-basis: 100%; }
+    }
     .carteira-resumo-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 14px 0; }
     .carteira-resumo-card {
       background: var(--card); border: 1.5px solid var(--border); border-radius: 10px;
@@ -920,7 +939,7 @@
        quando #carteiraStatus tiver mesmo uma mensagem pra mostrar, ele
        deixa de ser :empty e volta a ter a margem normal. */
     .carteira-fixo-corpo #carteiraStatus:empty { margin: 0; min-height: 0; }
-    .carteira-fixo-corpo .carteira-resumo-cards { margin-top: 0; }
+    .carteira-fixo-corpo .carteira-resumo-linha { margin-top: 0; }
 
     /* Carteira de Rendimentos — mover e redimensionar (só desktop/tablet).
        Diferente dos outros modais (fixos e centralizados via flex do
@@ -6664,18 +6683,30 @@
 
           <div id="carteiraStatus" class="hg-status"></div>
 
-          <div class="carteira-resumo-cards">
-            <div class="carteira-resumo-card">
-              <span>Total investido</span>
-              <strong id="carteiraTotalInvestido">R$ 0,00</strong>
+          <div class="carteira-resumo-linha">
+            <div class="carteira-resumo-cards">
+              <div class="carteira-resumo-card">
+                <span>Total investido</span>
+                <strong id="carteiraTotalInvestido">R$ 0,00</strong>
+              </div>
+              <div class="carteira-resumo-card carteira-resumo-destaque">
+                <span>Proventos / mês (estimado)</span>
+                <strong id="carteiraTotalProventos">R$ 0,00</strong>
+              </div>
+              <div class="carteira-resumo-card">
+                <span>Yield médio da carteira</span>
+                <strong id="carteiraYieldMedio">—</strong>
+              </div>
             </div>
-            <div class="carteira-resumo-card carteira-resumo-destaque">
-              <span>Proventos / mês (estimado)</span>
-              <strong id="carteiraTotalProventos">R$ 0,00</strong>
-            </div>
-            <div class="carteira-resumo-card">
-              <span>Yield médio da carteira</span>
-              <strong id="carteiraYieldMedio">—</strong>
+
+            <div class="carteira-grafico-wrap" id="carteiraGraficoWrap" hidden>
+              <div class="carteira-grafico-tabs">
+                <button type="button" class="carteira-grafico-tab carteira-grafico-tab-ativo" data-modo="ativo">Por Ativo</button>
+                <button type="button" class="carteira-grafico-tab" data-modo="setor">Por Setor</button>
+              </div>
+              <div class="carteira-grafico-canvas-box">
+                <canvas id="carteiraGraficoPizza"></canvas>
+              </div>
             </div>
           </div>
         </div>
@@ -9512,9 +9543,23 @@
       const elYieldMedio = document.getElementById('carteiraYieldMedio');
       if (!btnAbrir || !overlay) return;
 
-      let carteira = []; // { ticker, kind, nome, preco, moeda, dyPercent, proventoMes, qtd }
+      let carteira = []; // { ticker, kind, nome, preco, moeda, dyPercent, proventoMes, qtd, setor }
       const CARTEIRA_LOCAL_KEY = 'vrCarteiraDividendos';
       let carteiraJaCarregada = false; // evita recarregar/duplicar toda vez que o modal reabre
+      let carteiraGrafico = null;
+      let carteiraGraficoModo = 'ativo'; // 'ativo' ou 'setor'
+
+      // A HG classifica muito FI-Infra/Fiagro como "Indefinido" — o nome do
+      // fundo quase sempre diz o que ele é (mesma heurística usada no
+      // Explorar Mercado, mas duplicada aqui pra não depender de outra IIFE).
+      function carteiraSetorPeloNome(nome) {
+        const n = String(nome || '');
+        if (/infra/i.test(n)) return 'Infraestrutura';
+        if (/fiagro|agro/i.test(n)) return 'Agro';
+        if (/log[ií]stic/i.test(n)) return 'Logística';
+        if (/shopping/i.test(n)) return 'Shoppings';
+        return null;
+      }
 
       // Lista curada de tickers comuns (Ações, FIIs e Fiagros/FI-Infra) só
       // para dar sugestão de autocomplete ao digitar — não é a fonte de
@@ -9633,6 +9678,7 @@
           if (existente) {
             existente.qtd = qtd; // ao restaurar, usa a quantidade salva (não soma)
           } else {
+            const setorHg = a.classification?.sector;
             carteira.push({
               ticker,
               kind: a.kind,
@@ -9642,6 +9688,7 @@
               dyPercent: typeof a.dividends?.yield_12m_percent === 'number' ? a.dividends.yield_12m_percent : null,
               proventoMes,
               qtd,
+              setor: (setorHg && setorHg !== 'Indefinido') ? setorHg : (carteiraSetorPeloNome(a.name) || 'Outros'),
             });
           }
           return true;
@@ -9694,6 +9741,7 @@
               dyPercent: typeof dividendYieldPct === 'number' ? dividendYieldPct : null,
               proventoMes,
               qtd,
+              setor: 'Internacional',
             });
           }
           return true;
@@ -9993,6 +10041,80 @@
           `<span style="color:${lucro >= 0 ? 'var(--accent)' : 'var(--danger)'};">${lucro >= 0 ? '+' : '−'}${hgFormatMoeda(Math.abs(lucro))} (${hgFormatNumero(Math.abs(pct))}%)</span>`;
       }
 
+      // Paleta fixa (cores escolhidas à mão, funcionam nos temas claro e
+      // escuro) — gera mais tons via HSL só se a carteira tiver mais
+      // ativos/setores do que cores na lista.
+      function carteiraGraficoPaleta(qtd) {
+        const base = ['#31c3ff', '#7cff92', '#e0b84d', '#ff6b6b', '#a78bfa', '#fb923c', '#38bdf8', '#f472b6', '#4ade80', '#facc15'];
+        const cores = [];
+        for (let i = 0; i < qtd; i++) {
+          cores.push(i < base.length ? base[i] : `hsl(${(i * 47) % 360}, 65%, 60%)`);
+        }
+        return cores;
+      }
+
+      // Gráfico de pizza (rosca) da distribuição da carteira — por ativo
+      // (cada ticker é uma fatia) ou por setor (agrupado por item.setor).
+      // Chamado de dentro de renderizar(), então sempre reflete o estado
+      // atual da carteira; o Chart.js só é carregado na primeira vez.
+      async function carteiraMontarGraficoPizza() {
+        const wrap = document.getElementById('carteiraGraficoWrap');
+        const canvas = document.getElementById('carteiraGraficoPizza');
+        if (!wrap || !canvas) return;
+
+        let totalInvestido = 0;
+        carteira.forEach(item => { totalInvestido += (item.preco || 0) * item.qtd; });
+
+        if (carteira.length === 0 || totalInvestido <= 0) {
+          wrap.hidden = true;
+          return;
+        }
+        wrap.hidden = false;
+        await hgCarregarChartJs();
+
+        const agrupado = new Map();
+        carteira.forEach(item => {
+          const valor = (item.preco || 0) * item.qtd;
+          if (valor <= 0) return;
+          const chave = carteiraGraficoModo === 'setor' ? (item.setor || 'Outros') : item.ticker;
+          agrupado.set(chave, (agrupado.get(chave) || 0) + valor);
+        });
+
+        const entradas = Array.from(agrupado.entries()).sort((a, b) => b[1] - a[1]);
+        const labels = entradas.map(([chave]) => chave);
+        const valores = entradas.map(([, valor]) => valor);
+        const cores = carteiraGraficoPaleta(entradas.length);
+
+        if (carteiraGrafico) carteiraGrafico.destroy();
+        carteiraGrafico = new Chart(canvas, {
+          type: 'doughnut',
+          data: { labels, datasets: [{ data: valores, backgroundColor: cores, borderColor: hgCssVar('--card') || '#111b2e', borderWidth: 2 }] },
+          options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: HG_COR_MUTED(), boxWidth: 10, font: { size: 10 }, padding: 6 } },
+              tooltip: {
+                callbacks: {
+                  label: (c) => {
+                    const pct = totalInvestido > 0 ? (c.parsed / totalInvestido) * 100 : 0;
+                    return ` ${c.label}: ${hgFormatNumero(pct)}% (${hgFormatMoeda(c.parsed)})`;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      document.querySelectorAll('.carteira-grafico-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          carteiraGraficoModo = btn.getAttribute('data-modo');
+          document.querySelectorAll('.carteira-grafico-tab').forEach(b =>
+            b.classList.toggle('carteira-grafico-tab-ativo', b === btn));
+          carteiraMontarGraficoPizza();
+        });
+      });
+
       function renderizar() {
         const acoes = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'stock');
         const fiis = carteira.map((item, idx) => ({ item, idx })).filter(x => x.item.kind === 'fii' || x.item.kind === 'fiagro' || x.item.kind === 'fund');
@@ -10022,6 +10144,7 @@
         elYieldMedio.textContent = totalInvestido > 0
           ? `${hgFormatNumero((totalProventos * 12 / totalInvestido) * 100)}%`
           : '—';
+        carteiraMontarGraficoPizza();
 
         // Reconecta os inputs de quantidade e os botões de remover (o HTML
         // foi recriado do zero a cada render).
@@ -10107,6 +10230,20 @@
           totalProventos += (item.proventoMes || 0) * item.qtd;
         });
 
+        // Garante que o gráfico de pizza da tela está desenhado e em dia
+        // antes de capturar a imagem (evita PDF com o canvas ainda vazio
+        // se a pessoa clicar em "Baixar PDF" logo após adicionar um ativo).
+        await carteiraMontarGraficoPizza();
+        const canvasPizza = document.getElementById('carteiraGraficoPizza');
+        let imagemPizza = null;
+        try {
+          if (canvasPizza && canvasPizza.width > 0 && canvasPizza.height > 0) {
+            imagemPizza = canvasPizza.toDataURL('image/png', 1.0);
+          }
+        } catch (e) {
+          console.error('Não foi possível capturar o gráfico de pizza pro PDF:', e);
+        }
+
         doc.autoTable({
           startY: 88,
           head: [['', 'Valores']],
@@ -10121,8 +10258,20 @@
           columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
         });
 
+        let proximoY = doc.lastAutoTable.finalY + 20;
+        if (imagemPizza) {
+          const larguraImg = 150;
+          const alturaImg = larguraImg * (canvasPizza.height / canvasPizza.width);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.setTextColor(0);
+          doc.text(`Distribuição da carteira por ${carteiraGraficoModo === 'setor' ? 'setor' : 'ativo'}`, 40, proximoY);
+          doc.addImage(imagemPizza, 'PNG', 40, proximoY + 8, larguraImg, alturaImg);
+          proximoY += 8 + alturaImg + 20;
+        }
+
         doc.autoTable({
-          startY: doc.lastAutoTable.finalY + 20,
+          startY: proximoY,
           head: [['Ativo', 'Tipo', 'Preço', 'DY 12m', 'Provento/cota/mês', 'Qtd.', 'Valor investido', '% carteira', 'Proventos/mês']],
           body: carteira.map(item => {
             const investimento = (item.preco || 0) * item.qtd;
