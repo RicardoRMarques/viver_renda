@@ -5675,7 +5675,7 @@
 
           <div class="calc-campo">
             <label for="vcTicker">Ativo (opcional, só pra identificar)</label>
-            <input type="text" id="vcTicker" placeholder="Ex: PETR4" autocomplete="off" style="text-transform:uppercase;" />
+            <input type="text" id="vcTicker" placeholder="Ex: PETR4" autocomplete="off" list="sugestoesTickersB3" style="text-transform:uppercase;" />
           </div>
 
           <div class="calc-grid-2">
@@ -9737,7 +9737,7 @@
       }
       window.hgBuscarSugestoesTickers = hgBuscarSugestoesTickers;
 
-      ['hgTickerInput', 'graficoConsultaInput', 'hgFundTickerInput', 'alertasTickerInput', 'carteiraTickerInput']
+      ['hgTickerInput', 'graficoConsultaInput', 'hgFundTickerInput', 'alertasTickerInput', 'carteiraTickerInput', 'vcTicker']
         .forEach(hgLigarAutocompleteTickers);
 
       // Busca um ticker na API e empilha (ou soma quantidade, se já
