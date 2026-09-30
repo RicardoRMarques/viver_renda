@@ -14106,12 +14106,12 @@
               <table class="tj-tabela">
                 <thead>
                   <tr>
-                    <th>Prazo</th>
-                    <th>IR no período</th>
-                    <th>Referência</th>
-                    <th>Tesouro líquido a.a.</th>
-                    <th>CDB / RDB precisa</th>
-                    <th>LCI / LCA precisa</th>
+                    <th>Prazo <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-prazo" aria-label="O que é isso?" title="">?</button></th>
+                    <th>IR no período <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-ir-periodo" aria-label="O que é isso?" title="">?</button></th>
+                    <th>Referência <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-referencia" aria-label="O que é isso?" title="">?</button></th>
+                    <th>Tesouro líquido a.a. <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-tesouro-liquido" aria-label="O que é isso?" title="">?</button></th>
+                    <th>CDB / RDB precisa <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-cdb-rdb-precisa" aria-label="O que é isso?" title="">?</button></th>
+                    <th>LCI / LCA precisa <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-lci-lca-precisa" aria-label="O que é isso?" title="">?</button></th>
                   </tr>
                 </thead>
                 <tbody>${linhas}</tbody>
@@ -14169,11 +14169,11 @@
               <table class="tj-tabela">
                 <thead>
                   <tr>
-                    <th>Título público</th>
-                    <th>Prazo</th>
-                    <th>Taxa hoje</th>
-                    <th>CDB precisa pagar mais que</th>
-                    <th>LCI / CRI / CRA precisa pagar mais que</th>
+                    <th>Título público <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-titulo-publico" aria-label="O que é isso?" title="">?</button></th>
+                    <th>Prazo <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-prazo-titulo" aria-label="O que é isso?" title="">?</button></th>
+                    <th>Taxa hoje <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-taxa-hoje-titulo" aria-label="O que é isso?" title="">?</button></th>
+                    <th>CDB precisa pagar mais que <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-cdb-mais-que" aria-label="O que é isso?" title="">?</button></th>
+                    <th>LCI / CRI / CRA precisa pagar mais que <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="tj-lci-cri-cra-mais-que" aria-label="O que é isso?" title="">?</button></th>
                   </tr>
                 </thead>
                 <tbody>${linhas}</tbody>
@@ -14217,6 +14217,9 @@
             Conteúdo educativo: o site compara taxas públicas, não indica onde investir e não recebe comissão
             de nenhuma instituição.
           </p>`;
+        // Os "?" das colunas nascem aqui dentro, a cada render — precisam
+        // ser ligados de novo toda vez (a função é idempotente).
+        if (typeof window.ligarGlossario === 'function') window.ligarGlossario(conteudoEl);
         // "Tem uma oferta específica na mão?" fica ENTRE as duas tabelas
         // (pedido do Ricardo, 25/09/2026): quem acabou de ver o piso do
         // pós-fixado já é convidado a testar a própria oferta. O elemento é
@@ -17278,6 +17281,21 @@
         'venda-coberta': 'Venda Coberta (covered call) = você já tem a ação e vende uma opção de compra (call) contra ela, recebendo um prêmio na hora.\n\nSe a ação ficar abaixo do strike no vencimento, a opção vira pó: você fica com a ação e com o prêmio, como uma renda extra. Se a ação passar do strike, você é obrigado a vender pelo preço combinado — ainda lucra, mas perde o que a ação subiu além disso.\n\nÉ uma forma de gerar caixa mensal sobre uma carteira parada, ao custo de limitar o ganho se a ação disparar. Não protege contra queda além do valor do prêmio recebido.',
         'opcao-strike': 'Strike (preço de exercício) = o preço pelo qual a ação será vendida, caso a opção seja exercida.\n\nQuanto mais distante o strike estiver do preço atual da ação, menor o prêmio recebido (menor chance de ser exercido), mas mais espaço a ação tem pra subir antes de você "perder" ela pelo strike.',
         'opcao-premio': 'Prêmio = o valor que você recebe, por ação, ao vender a opção — é o seu ganho garantido na hora, não depende do que acontece depois com a ação.\n\nÉ negociado em bolsa (varia com o tempo até o vencimento, a distância até o strike e a volatilidade do ativo) — aqui você digita o valor que já negociou ou pretende negociar.',
+
+        // --- "Qual é uma taxa justa hoje?" (tabela pós-fixado) ---
+        'tj-prazo': 'Tempo que o dinheiro ficaria aplicado. É usado pra duas coisas: achar a alíquota de IR regressiva desse período e escolher o título do Tesouro Selic de vencimento mais parecido, pra servir de comparação.',
+        'tj-ir-periodo': 'Alíquota de Imposto de Renda que incide sobre o rendimento nesse prazo, pela tabela regressiva (22,5% até 6 meses, caindo até 15% acima de 2 anos).\n\nVale tanto pro CDB quanto pro Tesouro — por isso ela "se cancela" na hora de comparar as taxas brutas dos dois.',
+        'tj-referencia': 'O título do Tesouro Selic usado como comparação nesse prazo, escolhido automaticamente pelo vencimento mais próximo disponível hoje.',
+        'tj-tesouro-liquido': 'Quanto o Tesouro Selic realmente rende ao ano, já descontados o Imposto de Renda (pela alíquota do prazo) e a taxa de custódia da B3 — é o "dinheiro de verdade" que sobra no bolso no final.',
+        'tj-cdb-rdb-precisa': 'A taxa bruta mínima (em % do CDI) que um CDB ou RDB — que pagam o mesmo IR do Tesouro — precisam render pra empatar com o Tesouro líquido desta linha.\n\nAbaixo disso, o título privado rende menos que o público e ainda carrega risco de crédito à toa.',
+        'tj-lci-lca-precisa': 'A taxa bruta mínima (em % do CDI) que um LCI ou LCA — isentos de Imposto de Renda — precisam render pra empatar com o mesmo Tesouro líquido.\n\nComo não tem imposto a descontar, a taxa bruta necessária é menor que a do CDB/RDB da coluna ao lado.',
+
+        // --- "Qual é uma taxa justa hoje?" (tabela prefixado e IPCA+) ---
+        'tj-titulo-publico': 'O título do Tesouro Direto (Prefixado ou IPCA+) usado como referência nesta linha, escolhido pelo vencimento mais parecido com o prazo da sua oferta.',
+        'tj-prazo-titulo': 'Tempo até o vencimento deste título público, em anos — é o prazo que faz sentido comparar com uma oferta de CDB/LCI de duração parecida.',
+        'tj-taxa-hoje-titulo': 'A taxa de compra deste título, negociada no Tesouro Direto hoje.',
+        'tj-cdb-mais-que': 'A taxa mínima que um CDB de prazo parecido precisa pagar pra empatar com este título público — abaixo disso, está cobrando o risco de crédito de uma empresa/banco sem remunerar por isso.',
+        'tj-lci-cri-cra-mais-que': 'A taxa mínima que um título isento de Imposto de Renda (LCI, LCA, CRI ou CRA) de prazo parecido precisa pagar — já descontando o imposto que o título público paga e que esses isentos não pagam.',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
