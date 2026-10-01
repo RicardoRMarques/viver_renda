@@ -572,6 +572,28 @@
        três colunas — com 480px o "R$ 2.440,22" quebrava em duas linhas e
        os rótulos dos campos idem. */
     .calc-modal.vp-modal { max-width: 860px; }
+    /* ---------- Gráficos da Carteira de Rendimentos ---------- */
+    .calc-modal.gc-modal { max-width: 900px; }
+    .gc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+    .gc-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+    .gc-card-titulo { font-size: 0.85rem; font-weight: 700; color: var(--muted); margin: 0 0 12px; }
+    .gc-card-corpo { display: flex; align-items: center; gap: 16px; }
+    .gc-donut-box { position: relative; width: 128px; height: 128px; flex: 0 0 auto; }
+    /* Total centralizado por cima do "buraco" do donut (mesmo truque do
+       dashboard do FortiGate que inspirou esse layout) — div absoluta,
+       não dá pra fazer isso só com o Chart.js sem plugin extra. */
+    .gc-donut-total { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; pointer-events: none; }
+    .gc-donut-total strong { font-size: 0.9rem; line-height: 1.15; color: var(--text); }
+    .gc-donut-total span { font-size: 0.6rem; color: var(--muted); margin-top: 2px; }
+    .gc-legenda { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 7px; max-height: 170px; overflow-y: auto; }
+    .gc-legenda-item { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; }
+    .gc-legenda-cor { width: 9px; height: 9px; border-radius: 2px; flex: 0 0 auto; }
+    .gc-legenda-label { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+    .gc-legenda-valor { flex: 0 0 auto; font-weight: 700; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+    @media (max-width: 700px) {
+      .gc-card-corpo { flex-direction: column; }
+      .gc-legenda { max-height: none; width: 100%; }
+    }
     /* ---------- Calculadora de Aportes ---------- */
     .calc-modal.ap-modal { max-width: min(1440px, 96vw); }
     /* Visão da carteira (mesmas colunas da planilha "Minha Carteira") */
@@ -4224,6 +4246,9 @@
             <button type="button" class="nav-dropdown-item" id="carteiraBtnAbrir">
               💰 Carteira de Rendimentos
             </button>
+            <button type="button" class="nav-dropdown-item" id="gcBtnAbrir">
+              📊 Gráficos da Carteira de Rendimentos
+            </button>
             <button type="button" class="nav-dropdown-item" id="apBtnAbrir">
               <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v6"></path><path d="M9 5l3 3 3-3"></path><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 16h.01"></path><path d="M12 16h.01"></path><path d="M17 16h.01"></path></svg> Calculadora de Aportes
             </button>
@@ -4296,6 +4321,7 @@
     <button type="button" class="mobile-menu-item" data-mobile-alvo="rpnBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="quizBtnAbrir">❓ Descubra seu Perfil de Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="carteiraBtnAbrir">💰 Carteira de Rendimentos</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="gcBtnAbrir">📊 Gráficos da Carteira de Rendimentos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="apBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v6"></path><path d="M9 5l3 3 3-3"></path><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 16h.01"></path><path d="M12 16h.01"></path><path d="M17 16h.01"></path></svg> Calculadora de Aportes</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="reinvBtnAbrir">🔁 Reinvestimento de Dividendos</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="agendaBtnAbrir">📅 Agenda de Proventos / Copom</button>
@@ -6862,6 +6888,79 @@
           Simulação educativa com base em dados históricos; dividendos futuros não são garantidos e podem variar
           (pra mais ou pra menos) em relação à média dos últimos 12 meses.
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Gráficos da Carteira de Rendimentos -->
+  <div id="gcOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="gcTitulo" hidden>
+    <div class="calc-modal gc-modal">
+      <div class="calc-modal-topo">
+        <h3 id="gcTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><circle cx="12" cy="12" r="8"></circle><path d="M12 2a10 10 0 0 1 10 10h-10z"></path></svg>Gráficos da Carteira de Rendimentos
+        </h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="gcCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button id="gcFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+      </div>
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Como o dinheiro guardado na sua <strong>Carteira de Rendimentos</strong> está distribuído hoje — por ativo, por
+          tipo, por setor e de onde vêm os proventos mensais estimados.
+        </p>
+        <div id="gcStatus" class="hg-status"></div>
+        <div id="gcVazio" class="calc-ajuda" style="text-align:center; padding:20px 0;" hidden>
+          Sua Carteira de Rendimentos está vazia — adicione ativos em <strong>Simuladores → Carteira de Rendimentos</strong>
+          pra ver os gráficos aqui.
+        </div>
+        <div id="gcGrid" class="gc-grid" hidden>
+          <div class="gc-card">
+            <h4 class="gc-card-titulo">Por Ativo (valor investido)</h4>
+            <div class="gc-card-corpo">
+              <div class="gc-donut-box">
+                <canvas id="gcCanvasAtivo"></canvas>
+                <div class="gc-donut-total"><strong id="gcTotalAtivo">—</strong><span>Total</span></div>
+              </div>
+              <div class="gc-legenda" id="gcLegendaAtivo"></div>
+            </div>
+          </div>
+          <div class="gc-card">
+            <h4 class="gc-card-titulo">Por Tipo</h4>
+            <div class="gc-card-corpo">
+              <div class="gc-donut-box">
+                <canvas id="gcCanvasTipo"></canvas>
+                <div class="gc-donut-total"><strong id="gcTotalTipo">—</strong><span>Total</span></div>
+              </div>
+              <div class="gc-legenda" id="gcLegendaTipo"></div>
+            </div>
+          </div>
+          <div class="gc-card">
+            <h4 class="gc-card-titulo">Por Setor</h4>
+            <div class="gc-card-corpo">
+              <div class="gc-donut-box">
+                <canvas id="gcCanvasSetor"></canvas>
+                <div class="gc-donut-total"><strong id="gcTotalSetor">—</strong><span>Total</span></div>
+              </div>
+              <div class="gc-legenda" id="gcLegendaSetor"></div>
+            </div>
+          </div>
+          <div class="gc-card">
+            <h4 class="gc-card-titulo">Proventos/mês estimados, por ativo</h4>
+            <div class="gc-card-corpo">
+              <div class="gc-donut-box">
+                <canvas id="gcCanvasProvento"></canvas>
+                <div class="gc-donut-total"><strong id="gcTotalProvento">—</strong><span>/mês</span></div>
+              </div>
+              <div class="gc-legenda" id="gcLegendaProvento"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -9756,6 +9855,19 @@
       ['hgTickerInput', 'graficoConsultaInput', 'hgFundTickerInput', 'alertasTickerInput', 'carteiraTickerInput', 'vcTicker']
         .forEach(hgLigarAutocompleteTickers);
 
+      // A HG classifica muito FI-Infra/Fiagro como "Indefinido" — o nome do
+      // fundo quase sempre diz o que ele é (mesma heurística usada no
+      // Explorar Mercado). Usado só como fallback do campo setor, pros
+      // "Gráficos da Carteira de Rendimentos".
+      function carteiraSetorPeloNome(nome) {
+        const n = String(nome || '');
+        if (/infra/i.test(n)) return 'Infraestrutura';
+        if (/fiagro|agro/i.test(n)) return 'Agro';
+        if (/log[ií]stic/i.test(n)) return 'Logística';
+        if (/shopping/i.test(n)) return 'Shoppings';
+        return null;
+      }
+
       // Busca um ticker na API e empilha (ou soma quantidade, se já
       // existir) no array `carteira` em memória — SEM mexer no status/UI
       // de digitação, pra poder ser reaproveitado tanto pelo botão
@@ -9776,6 +9888,7 @@
           if (existente) {
             existente.qtd = qtd; // ao restaurar, usa a quantidade salva (não soma)
           } else {
+            const setorHg = a.classification?.sector;
             carteira.push({
               ticker,
               kind: a.kind,
@@ -9785,6 +9898,7 @@
               dyPercent: typeof a.dividends?.yield_12m_percent === 'number' ? a.dividends.yield_12m_percent : null,
               proventoMes,
               qtd,
+              setor: (setorHg && setorHg !== 'Indefinido') ? setorHg : (carteiraSetorPeloNome(a.name) || 'Outros'),
             });
           }
           return true;
@@ -9837,6 +9951,7 @@
               dyPercent: typeof dividendYieldPct === 'number' ? dividendYieldPct : null,
               proventoMes,
               qtd,
+              setor: 'Internacional',
             });
           }
           return true;
@@ -10383,8 +10498,185 @@
         carteiraCarregarSalva();
         carteiraPopularSugestoes();
       });
+
+      // Exposto pra outras IIFEs (os "Gráficos da Carteira de
+      // Rendimentos") reaproveitarem os MESMOS dados já carregados e
+      // sincronizados aqui (local + nuvem + cotação ao vivo), sem duplicar
+      // toda essa lógica de novo. Garante o carregamento mesmo se a
+      // Carteira nunca tiver sido aberta nesta visita.
+      window.hgObterCarteiraAtual = async function () {
+        await carteiraCarregarSalva();
+        return carteira;
+      };
     })();
 
+    // ============================================================
+    // GRÁFICOS DA CARTEIRA DE RENDIMENTOS — visão só de leitura dos
+    // mesmos ativos cadastrados na Carteira de Rendimentos (mesma fonte de
+    // dados, via window.hgObterCarteiraAtual exposto por aquela IIFE), em
+    // 4 gráficos de rosca: por ativo, por tipo, por setor e por proventos
+    // estimados/mês. Não tem formulário próprio e não grava nada — é só
+    // outro jeito de olhar pra carteira que a pessoa já montou.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('gcOverlay');
+      const btnAbrirMenu = document.getElementById('gcBtnAbrir');
+      const btnFechar = document.getElementById('gcFechar');
+      const statusEl = document.getElementById('gcStatus');
+      const vazioEl = document.getElementById('gcVazio');
+      const gridEl = document.getElementById('gcGrid');
+      if (!overlay || !btnAbrirMenu) return;
+
+      const graficos = {}; // chave ('Ativo'/'Tipo'/'Setor'/'Provento') -> instância Chart.js
+
+      const TIPO_LABEL = {
+        stock: 'Ações', fii: 'FIIs', fiagro: 'Fiagro', fund: 'Fundos',
+        etf: 'ETFs', internacional: 'Internacional',
+      };
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        montar();
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      // Paleta fixa (cores escolhidas à mão, funcionam nos temas claro e
+      // escuro) — gera tons extras via HSL só se a carteira tiver mais
+      // fatias do que cores na lista.
+      function gcPaleta(qtd) {
+        const base = ['#31c3ff', '#7cff92', '#e0b84d', '#ff6b6b', '#a78bfa', '#fb923c', '#38bdf8', '#f472b6', '#4ade80', '#facc15'];
+        const cores = [];
+        for (let i = 0; i < qtd; i++) cores.push(i < base.length ? base[i] : `hsl(${(i * 47) % 360}, 65%, 60%)`);
+        return cores;
+      }
+
+      // Agrupa os itens da carteira por uma chave (ticker, tipo, setor...)
+      // somando um valor (valor investido, provento/mês...) — descarta
+      // entradas sem valor positivo e devolve já ordenado da maior fatia
+      // pra menor.
+      function gcAgrupar(carteira, chaveDe, valorDe) {
+        const mapa = new Map();
+        carteira.forEach(item => {
+          const valor = valorDe(item);
+          if (!valor || valor <= 0) return;
+          const chave = chaveDe(item) || 'Outros';
+          mapa.set(chave, (mapa.get(chave) || 0) + valor);
+        });
+        return Array.from(mapa.entries()).sort((a, b) => b[1] - a[1]);
+      }
+
+      // Desenha um gráfico de rosca num dos 4 cards (canvas + total
+      // central + lista de legenda ao lado), a partir de uma lista
+      // [label, valor] já agrupada e ordenada.
+      function gcDesenharDonut(chave, entradas, formatarValor) {
+        const canvas = document.getElementById(`gcCanvas${chave}`);
+        const elTotal = document.getElementById(`gcTotal${chave}`);
+        const elLegenda = document.getElementById(`gcLegenda${chave}`);
+        if (!canvas || !elTotal || !elLegenda) return;
+
+        const total = entradas.reduce((s, [, v]) => s + v, 0);
+        elTotal.textContent = total > 0 ? formatarValor(total) : '—';
+
+        const labels = entradas.map(([l]) => l);
+        const valores = entradas.map(([, v]) => v);
+        const cores = gcPaleta(entradas.length);
+
+        elLegenda.innerHTML = entradas.map(([label, valor], i) => {
+          const pct = total > 0 ? (valor / total) * 100 : 0;
+          return `<div class="gc-legenda-item">
+            <span class="gc-legenda-cor" style="background:${cores[i]}"></span>
+            <span class="gc-legenda-label" title="${label}">${label}</span>
+            <span class="gc-legenda-valor">${hgFormatNumero(pct)}%</span>
+          </div>`;
+        }).join('');
+
+        if (graficos[chave]) { graficos[chave].destroy(); graficos[chave] = null; }
+        graficos[chave] = new Chart(canvas, {
+          type: 'doughnut',
+          data: { labels, datasets: [{ data: valores, backgroundColor: cores, borderColor: hgCssVar('--card') || '#111b2e', borderWidth: 2 }] },
+          options: {
+            responsive: true, maintainAspectRatio: false, animation: false, cutout: '68%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (c) => {
+                    const pct = total > 0 ? (c.parsed / total) * 100 : 0;
+                    return ` ${c.label}: ${formatarValor(c.parsed)} (${hgFormatNumero(pct)}%)`;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      async function montar() {
+        if (typeof window.hgObterCarteiraAtual !== 'function') {
+          statusEl.textContent = 'Não foi possível carregar sua Carteira de Rendimentos agora.';
+          return;
+        }
+        statusEl.textContent = 'Carregando sua carteira...';
+        vazioEl.hidden = true;
+        gridEl.hidden = true;
+
+        let carteira;
+        try {
+          carteira = await window.hgObterCarteiraAtual();
+        } catch (e) {
+          console.error('Gráficos da Carteira: erro ao carregar a carteira.', e);
+          statusEl.textContent = 'Não foi possível carregar sua Carteira de Rendimentos agora.';
+          return;
+        }
+
+        statusEl.textContent = '';
+
+        if (!Array.isArray(carteira) || carteira.length === 0) {
+          vazioEl.hidden = false;
+          return;
+        }
+
+        const porAtivo = gcAgrupar(carteira, i => i.ticker, i => (i.preco || 0) * i.qtd);
+        if (porAtivo.length === 0) {
+          vazioEl.hidden = false;
+          vazioEl.textContent = 'Nenhum ativo da sua carteira tem cotação disponível ainda pra montar os gráficos.';
+          return;
+        }
+
+        await hgCarregarChartJs();
+        gridEl.hidden = false;
+
+        const porTipo = gcAgrupar(carteira, i => TIPO_LABEL[i.kind] || i.kind, i => (i.preco || 0) * i.qtd);
+        const porSetor = gcAgrupar(carteira, i => i.setor || 'Outros', i => (i.preco || 0) * i.qtd);
+        const porProvento = gcAgrupar(carteira, i => i.ticker, i => (i.proventoMes || 0) * i.qtd);
+
+        gcDesenharDonut('Ativo', porAtivo, hgFormatMoeda);
+        gcDesenharDonut('Tipo', porTipo, hgFormatMoeda);
+        gcDesenharDonut('Setor', porSetor, hgFormatMoeda);
+        gcDesenharDonut('Provento', porProvento, hgFormatMoeda);
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+
+      document.getElementById('gcCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'graficoscarteira',
+          titulo: 'Gráficos da Carteira de Rendimentos — Viver de Renda',
+          texto: 'Veja como seus investimentos estão distribuídos por ativo, tipo e setor.',
+        }));
+
+      hgAbrirPorLinkDeFerramenta('graficoscarteira', abrirModal);
+    })();
 
 
 
