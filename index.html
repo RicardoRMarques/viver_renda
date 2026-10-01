@@ -10529,10 +10529,17 @@
 
       const graficos = {}; // chave ('Ativo'/'Tipo'/'Setor'/'Provento') -> instância Chart.js
 
-      const TIPO_LABEL = {
-        stock: 'Ações', fii: 'FIIs', fiagro: 'Fiagro', fund: 'Fundos',
-        etf: 'ETFs', internacional: 'Internacional',
-      };
+      // Mesmos 4 grupos já usados nas tabelas da Carteira de Rendimentos
+      // (ver renderizar() logo abaixo: fii/fiagro/fund viram uma seção só,
+      // "🏢 Fundos Imobiliários e FI-Infra") — "fund" sozinho não é um tipo
+      // que a pessoa reconhece; é como a HG Brasil classifica FI-Infra.
+      function gcTipoLabel(kind) {
+        if (kind === 'stock') return 'Ações';
+        if (kind === 'fii' || kind === 'fiagro' || kind === 'fund') return 'FIIs e FI-Infra';
+        if (kind === 'etf') return 'ETFs';
+        if (kind === 'internacional') return 'Internacional';
+        return kind;
+      }
 
       function abrirModal() {
         overlay.hidden = false;
@@ -10650,7 +10657,7 @@
         await hgCarregarChartJs();
         gridEl.hidden = false;
 
-        const porTipo = gcAgrupar(carteira, i => TIPO_LABEL[i.kind] || i.kind, i => (i.preco || 0) * i.qtd);
+        const porTipo = gcAgrupar(carteira, i => gcTipoLabel(i.kind), i => (i.preco || 0) * i.qtd);
         const porSetor = gcAgrupar(carteira, i => i.setor || 'Outros', i => (i.preco || 0) * i.qtd);
         const porProvento = gcAgrupar(carteira, i => i.ticker, i => (i.proventoMes || 0) * i.qtd);
 
