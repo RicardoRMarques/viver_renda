@@ -3587,15 +3587,38 @@
     @media (min-width: 1024px) {
       .agenda-modal { max-width: 980px; }
     }
-    .sobre-modal { max-width: 720px; }
+    .sobre-modal, .cookies-modal { max-width: 720px; }
     @media (min-width: 1024px) {
-      .sobre-modal { max-width: 900px; }
+      .sobre-modal, .cookies-modal { max-width: 900px; }
     }
-    .sobre-modal .calc-corpo h4 {
+    .sobre-modal .calc-corpo h4, .cookies-modal .calc-corpo h4 {
       font-size: 0.95rem; margin: 20px 0 8px; color: var(--primary);
     }
-    .sobre-modal .calc-corpo h4:first-child { margin-top: 0; }
-    .sobre-modal .calc-corpo p { margin: 0 0 4px; line-height: 1.6; font-size: 0.9rem; }
+    .sobre-modal .calc-corpo h4:first-child, .cookies-modal .calc-corpo h4:first-child { margin-top: 0; }
+    .sobre-modal .calc-corpo p, .cookies-modal .calc-corpo p { margin: 0 0 4px; line-height: 1.6; font-size: 0.9rem; }
+    .cookies-modal .calc-corpo ul { margin: 0 0 4px; padding-left: 20px; line-height: 1.6; font-size: 0.9rem; }
+    .cookies-modal .calc-corpo li { margin-bottom: 6px; }
+    .cookies-tabela { width: 100%; border-collapse: collapse; margin: 4px 0 12px; font-size: 0.82rem; }
+    .cookies-tabela th, .cookies-tabela td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .cookies-tabela th { color: var(--muted); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.02em; }
+    .cookies-tabela td:first-child { font-weight: 600; white-space: nowrap; }
+
+    /* ---------- Aviso de cookies (banner de rodapé) ---------- */
+    .cookies-aviso {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 2500;
+      background: var(--bg); border-top: 1px solid var(--border);
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.25);
+      padding: 14px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .cookies-aviso[hidden] { display: none; }
+    .cookies-aviso p { margin: 0; flex: 1 1 320px; font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    .cookies-aviso p a { color: var(--primary); text-decoration: underline; }
+    .cookies-aviso-acoes { flex: 0 0 auto; display: flex; gap: 10px; }
+    @media (max-width: 520px) {
+      .cookies-aviso { flex-direction: column; align-items: stretch; }
+      .cookies-aviso-acoes { width: 100%; }
+      .cookies-aviso-acoes .hg-btn { flex: 1 1 auto; }
+    }
     /* .reinv-modal precisa vir DEPOIS de .calc-modal (que também define
        max-width) — regras com a mesma especificidade, quando empatam, a
        que vem depois no arquivo vence. Colocada antes, essa regra era
@@ -7187,6 +7210,80 @@
     </div>
   </div>
 
+  <!-- Modal: Política de Cookies -->
+  <div id="cookiesOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="cookiesTitulo" hidden>
+    <div class="calc-modal cookies-modal">
+      <div class="calc-modal-topo">
+        <h3 id="cookiesTitulo">🍪 Política de Cookies</h3>
+        <button id="cookiesFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+
+        <h4>Resumo rápido</h4>
+        <p>
+          Este site <strong>não usa cookies de rastreamento, de publicidade ou de terceiros</strong> — nada de
+          Google Analytics, Facebook Pixel ou similares. O que existe é <strong>armazenamento local do seu próprio
+          navegador</strong> (<em>localStorage</em>), usado só para lembrar as suas preferências e os dados que
+          você mesmo cadastra nas calculadoras, para você não precisar preencher tudo de novo a cada visita.
+        </p>
+
+        <h4>O que fica salvo no seu navegador</h4>
+        <table class="cookies-tabela">
+          <thead><tr><th>O que guardamos</th><th>Para quê</th><th>Até quando</th></tr></thead>
+          <tbody>
+            <tr><td>Tema (claro/escuro)</td><td>Lembrar a aparência que você escolheu</td><td>Até você apagar os dados do site no navegador</td></tr>
+            <tr><td>Carteira de Rendimentos</td><td>Lembrar os ativos e quantidades que você cadastrou, sem precisar de login</td><td>Idem</td></tr>
+            <tr><td>Favoritos (⭐) e atalhos da tela inicial</td><td>Lembrar os ativos que você marcou como favoritos</td><td>Idem</td></tr>
+            <tr><td>Simulações salvas (Calculadora de Aportes, Cobertura do FGC)</td><td>Não perder o que você digitou ao fechar a aba</td><td>Idem</td></tr>
+            <tr><td>Colunas escolhidas nas tabelas</td><td>Lembrar quais colunas você prefere ver</td><td>Idem</td></tr>
+            <tr><td>Sessão de login</td><td>Manter você logado entre visitas — só existe se você criar uma conta (link mágico por e-mail)</td><td>Até você sair ou o link expirar</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Tudo isso fica <strong>só no seu aparelho</strong> (exceto a Carteira e os Favoritos quando você está
+          logado, que também sincronizam com a sua conta, pra aparecerem em qualquer aparelho). Nada aqui é
+          compartilhado com terceiros nem usado para te rastrear por outros sites.
+        </p>
+
+        <h4>Estatísticas de visitas</h4>
+        <p>
+          Usamos o <strong>Cloudflare Web Analytics</strong> para saber quantas pessoas visitam o site — ele foi
+          desenhado pra funcionar <strong>sem cookies</strong> e sem identificar visitantes individualmente; só
+          gera contagens agregadas e anônimas de acesso.
+        </p>
+
+        <h4>Como apagar esses dados</h4>
+        <p>
+          Clicando em "Sair" você encerra a sessão de login. Para apagar todo o resto (carteira, favoritos,
+          preferências), basta limpar os dados do site nas configurações de privacidade do seu navegador — o site
+          volta a funcionar normalmente, só que do zero, como numa primeira visita.
+        </p>
+
+        <h4>Dúvidas</h4>
+        <p>
+          Qualquer pergunta sobre isso, é só escrever para
+          <a href="#" id="cookiesContatoLink" class="footer-contato-link">carregando contato...</a>.
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Aviso de cookies/armazenamento local — some ao clicar em "Entendi" e
+       não volta a aparecer (marcado no localStorage). Como o site não usa
+       cookie nenhum de terceiro, é só um aviso informativo — não bloqueia
+       nada enquanto a pessoa decide. -->
+  <div id="cookiesAviso" class="cookies-aviso" hidden>
+    <p>
+      🍪 Este site usa armazenamento local do seu navegador (não cookies de rastreamento) para lembrar suas
+      preferências e os dados que você mesmo cadastra, como tema e Carteira de Rendimentos.
+      <a href="#" id="cookiesAvisoSaibaMais">Saiba mais</a>.
+    </p>
+    <div class="cookies-aviso-acoes">
+      <button type="button" class="hg-btn" id="cookiesAvisoEntendi">Entendi</button>
+    </div>
+  </div>
+
   <footer>
     <div class="container">
       <p>Desenvolvido para investidores. Dados fornecidos via integração com a B3.</p>
@@ -7199,6 +7296,7 @@
       <p class="disclaimer" style="margin-top:10px;">
         Dúvidas, sugestões ou parcerias: <a href="#" id="footerContatoLink" class="footer-contato-link">carregando contato...</a>
         · <button type="button" id="sobreBtnAbrir" class="footer-contato-link" style="background:none; border:none; font: inherit; cursor:pointer; padding:0;">Sobre o Viver de Renda</button>
+        · <button type="button" id="cookiesBtnAbrir" class="footer-contato-link" style="background:none; border:none; font: inherit; cursor:pointer; padding:0;">Política de Cookies</button>
       </p>
     </div>
   </footer>
@@ -7211,7 +7309,7 @@
       const usuario = 'suporte';
       const dominio = 'viverderenda.dev.br';
       const enderecoCompleto = `${usuario}@${dominio}`;
-      ['footerContatoLink', 'sobreContatoLink'].forEach(id => {
+      ['footerContatoLink', 'sobreContatoLink', 'cookiesContatoLink'].forEach(id => {
         const link = document.getElementById(id);
         if (link) {
           link.href = `mailto:${enderecoCompleto}`;
@@ -16228,6 +16326,59 @@
       btnFechar?.addEventListener('click', fecharModal);
       overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+    })();
+
+    // ============================================================
+    // POLÍTICA DE COOKIES — modal simples (mesmo padrão do "Sobre") +
+    // banner de aviso no rodapé, que some depois que a pessoa clica em
+    // "Entendi" e não volta mais (marcado no localStorage). Como o site
+    // não usa nenhum cookie de terceiro, o banner é só informativo — não
+    // bloqueia nada enquanto a pessoa decide.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('cookiesOverlay');
+      const btnFechar = document.getElementById('cookiesFechar');
+      const aviso = document.getElementById('cookiesAviso');
+      const btnEntendi = document.getElementById('cookiesAvisoEntendi');
+      const linkSaibaMais = document.getElementById('cookiesAvisoSaibaMais');
+      if (!overlay) return;
+
+      const COOKIES_AVISO_KEY = 'vrCookiesAvisoOk';
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+      function fecharAviso() {
+        if (!aviso) return;
+        aviso.hidden = true;
+        try { localStorage.setItem(COOKIES_AVISO_KEY, '1'); } catch (e) { /* sem storage: aviso volta na próxima visita, sem problema */ }
+      }
+
+      // Mostra o banner na primeira visita (ou se o navegador não lembrar
+      // mais a escolha) — só depois de dar tempo da página assentar, pra
+      // não ser a primeira coisa saltando na tela.
+      try {
+        if (aviso && localStorage.getItem(COOKIES_AVISO_KEY) !== '1') {
+          setTimeout(() => { aviso.hidden = false; }, 1200);
+        }
+      } catch (e) { /* sem storage: não mostra o banner (evita insistir toda hora) */ }
+
+      document.getElementById('cookiesBtnAbrir')?.addEventListener('click', abrirModal);
+      btnFechar?.addEventListener('click', fecharModal);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+
+      btnEntendi?.addEventListener('click', fecharAviso);
+      linkSaibaMais?.addEventListener('click', (e) => {
+        e.preventDefault();
+        fecharAviso();
+        abrirModal();
+      });
     })();
 
     // ============================================================
