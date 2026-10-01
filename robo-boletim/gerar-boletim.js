@@ -1028,7 +1028,10 @@ function gerarGraficoBarrasSVG(itens) {
 // ou dois — vai enriquecendo sozinho com o tempo.
 function gerarGraficoLinhaSVG(pontos, opcoes = {}) {
   const { prefixo = '', sufixo = '', casasDecimais = 2 } = opcoes;
-  const largura = 260, altura = 110, margem = { topo: 14, baixo: 26, esq: 8, dir: 8 };
+  // topo:26 — dá espaço pro rótulo de valor do último ponto quando ele
+  // é o maior da série (antes com topo:14 o texto nascia acima do
+  // viewBox e saía cortado, ver print de 01/10/2026).
+  const largura = 260, altura = 120, margem = { topo: 26, baixo: 26, esq: 8, dir: 8 };
   const areaLargura = largura - margem.esq - margem.dir;
   const areaAltura = altura - margem.topo - margem.baixo;
 
@@ -1055,11 +1058,18 @@ function gerarGraficoLinhaSVG(pontos, opcoes = {}) {
   const pontosCirculos = pontos.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.valor).toFixed(1)}" r="3" fill="var(--gold-soft)" />`).join('');
   const rotulos = pontos.map((p, i) => `<text x="${x(i).toFixed(1)}" y="${altura - 6}" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">${p.label}</text>`).join('');
   const ultimo = pontos[pontos.length - 1];
+  // O último ponto é sempre o mais à direita do gráfico — centralizar o
+  // rótulo nele (text-anchor middle) fazia o texto estourar a borda
+  // direita do viewBox e cortar (ex: "R$ 5,23" virando "R$ 5,"). Ancorado
+  // em "end" o texto cresce pra esquerda, a partir da borda da área útil,
+  // então sempre cabe.
+  const xRotuloUltimo = Math.min(x(pontos.length - 1) + 2, largura - margem.dir);
+  const yRotuloUltimo = Math.max(y(ultimo.valor) - 10, 12);
 
   return `<svg viewBox="0 0 ${largura} ${altura}" width="100%" style="max-width:${largura}px;">
     <path d="${linha}" fill="none" stroke="var(--gold-soft)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
     ${pontosCirculos}
-    <text x="${x(pontos.length - 1).toFixed(1)}" y="${(y(ultimo.valor) - 10).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">${prefixo}${ultimo.valor.toLocaleString('pt-BR', { minimumFractionDigits: casasDecimais, maximumFractionDigits: casasDecimais })}${sufixo}</text>
+    <text x="${xRotuloUltimo.toFixed(1)}" y="${yRotuloUltimo.toFixed(1)}" text-anchor="end" font-size="11" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">${prefixo}${ultimo.valor.toLocaleString('pt-BR', { minimumFractionDigits: casasDecimais, maximumFractionDigits: casasDecimais })}${sufixo}</text>
     ${rotulos}
   </svg>`;
 }
