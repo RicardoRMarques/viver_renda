@@ -211,7 +211,7 @@ async function carregarIndices() {
     `  checkout : ${descreverColeta(coletaLocal)}\n` +
     `  publicado: ${remoto ? descreverColeta(coletaRemota) : 'indisponível'}\n` +
     `  tolerância: ${HORAS_MAX_INDICES}h.\n` +
-    '  Confira se o robô "Coletar Mercado (Ações e FIIs)" está rodando e commitando.'
+    '  Confira se o robô "Atualizar Boletim (Notícias, Índices e Ranking)" (coletar-fiis.yml) está rodando e commitando.'
   );
 }
 

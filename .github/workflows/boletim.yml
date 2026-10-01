@@ -11,14 +11,25 @@ on:
       timezone: 'America/Sao_Paulo'
   workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
 
-# Evita que duas execuções rodem ao mesmo tempo e briguem pelo commit
+# cancel-in-progress: true — descoberto em 01/10/2026: o GitHub às vezes
+# atrasa o disparo do `schedule` por ~20h (fila do próprio GitHub, fora do
+# nosso controle). Com cancel-in-progress: false, cada novo disparo atrasado
+# ficava esperando atrás do anterior (também atrasado) em vez de assumir —
+# empilhando atraso em cima de atraso, dia após dia. Como o job é
+# idempotente (sempre gera a partir do estado atual) e o passo de commit já
+# tem retry próprio pra conflito de push, cancelar o mais velho em favor do
+# mais novo é seguro e é sempre isso que queremos: o dado mais recente.
 concurrency:
   group: boletim-diario
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   gerar-boletim:
     runs-on: ubuntu-latest
+    # Trava de segurança: sem isso, um job travado (rede pendurada etc.)
+    # ficaria preso até o limite padrão do GitHub (6h), segurando a fila
+    # pro próximo disparo bem mais do que precisa.
+    timeout-minutes: 15
     permissions:
       contents: write # necessário para commitar o boletim de volta no repo
 
