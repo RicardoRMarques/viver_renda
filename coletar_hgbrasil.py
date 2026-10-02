@@ -838,7 +838,19 @@ def _requisitar_bcb_com_retry(url, tentativas=3):
         try:
             resp = requests.get(url, timeout=TIMEOUT, headers=headers_bcb)
             resp.raise_for_status()
-            return resp.json()
+            corpo = resp.json()
+            # O SGS normalmente devolve uma LISTA de registros, mesmo para
+            # "ultimos/1" — mas em 02/10/2026 o IPCA (série 433, ultimos/1)
+            # veio como um dict solto (um registro, sem a lista por fora),
+            # quebrando _ordenar_bcb_por_data: sorted() de um dict itera as
+            # CHAVES ("data", "valor"), não os registros, e a chamada
+            # seguinte (item["valor"]) caía numa string ("valor"["valor"]),
+            # gerando "TypeError: string indices must be integers". Normaliza
+            # aqui, na origem, pra Selic/CDI/IPCA/IPCA 12m/IGP-M (tudo que
+            # passa por essa função) ficarem protegidos de uma vez.
+            if isinstance(corpo, dict):
+                corpo = [corpo]
+            return corpo
         except (requests.RequestException, ValueError) as exc:
             ultimo_erro = exc
             if tentativa < tentativas:
@@ -879,7 +891,11 @@ def _ordenar_bcb_por_data(dados):
             return datetime.strptime((item or {}).get("data", ""), "%d/%m/%Y")
         except (ValueError, TypeError, AttributeError):
             return datetime.min
-    return sorted(dados or [], key=_chave)
+    # Descarta qualquer item que não seja um dict (registro malformado) —
+    # sorted() aceitaria strings/números silenciosamente, e eles só
+    # explodiriam mais adiante (ex: item["valor"] com item sendo string).
+    registros = [item for item in (dados or []) if isinstance(item, dict)]
+    return sorted(registros, key=_chave)
 
 
 def coletar_selic_bcb():
@@ -929,13 +945,18 @@ def coletar_ipca_12_meses():
 
         fator_acumulado = 1.0
         for item in dados:
+            if not isinstance(item, dict):
+                continue  # registro malformado — pula em vez de derrubar o robô inteiro
             valor_mes = float(item["valor"].replace(",", ".")) / 100
             fator_acumulado *= (1 + valor_mes)
 
         acumulado_pct = (fator_acumulado - 1) * 100
         # O acumulado é um produto, então independe da ordem; a REFERÊNCIA
         # não — sem ordenar, ela podia apontar o mês mais antigo da janela.
-        ultimo_mes = _ordenar_bcb_por_data(dados)[-1].get("data")
+        registros_ordenados = _ordenar_bcb_por_data(dados)
+        if not registros_ordenados:
+            return None
+        ultimo_mes = registros_ordenados[-1].get("data")
         return {
             "label": "IPCA (12 meses)",
             "valor_pct": acumulado_pct,
