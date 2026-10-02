@@ -4798,8 +4798,30 @@
             return t;
           }
 
+          // Limite de tentativas: sem isso, se o script do TradingView nunca
+          // carregar (ad-blocker, extensão de privacidade, CDN fora do ar),
+          // ficava tentando de novo a cada 200ms PRA SEMPRE, em silêncio — a
+          // pessoa só via a área vazia, sem nenhuma pista do que deu errado.
+          let tentativasWidget = 0;
+          const LIMITE_TENTATIVAS_WIDGET = 50; // 50 × 200ms ≈ 10s
           function montarWidget() {
-            if (typeof TradingView === 'undefined') { setTimeout(montarWidget, 200); return; }
+            if (typeof TradingView === 'undefined') {
+              tentativasWidget++;
+              if (tentativasWidget > LIMITE_TENTATIVAS_WIDGET) {
+                containerEl.innerHTML = `
+                  <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:20px; text-align:center;">
+                    <p class="calc-ajuda" style="margin:0; color:#ff5a5a;">
+                      Não foi possível carregar o gráfico. Verifique sua conexão ou se alguma extensão do navegador
+                      (ad-blocker, bloqueador de rastreadores) está impedindo o TradingView de carregar.
+                    </p>
+                    <button type="button" class="hg-btn" id="graficoConsultaTentarDeNovo" style="flex:0 0 auto;">Tentar novamente</button>
+                  </div>`;
+                document.getElementById('graficoConsultaTentarDeNovo')?.addEventListener('click', consultarTicker);
+                return;
+              }
+              setTimeout(montarWidget, 200);
+              return;
+            }
             new TradingView.widget({
               autosize: true,
               symbol: detectarSimbolo(ticker),
