@@ -5794,6 +5794,18 @@
             considerando o que você pagou pela ação (não só a partir de hoje).
           </p>
 
+          <div class="calc-campo">
+            <label for="vcDelta">
+              Delta da opção (opcional)
+              <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="opcao-delta" aria-label="O que é Delta?" title="">?</button>
+            </label>
+            <input type="text" id="vcDelta" inputmode="decimal" placeholder="Ex: 0,30 (ou 30)" />
+          </div>
+          <p class="calc-ajuda" style="margin-top:-6px;">
+            Se você souber o Delta da opção (sua corretora mostra isso na grade de opções), preencha para ver a
+            probabilidade aproximada de exercício e como ele se compara à "regra de bolso" do lançador coberto.
+          </p>
+
           <div style="display:flex; gap:10px; margin-top:6px;">
             <button class="hg-btn" id="vcBtnCalcular" style="flex:1;">Calcular</button>
             <button class="hg-btn" id="vcBtnLimpar" style="flex:1; background:var(--deep); color:var(--text); border:1px solid var(--border);">Limpar</button>
@@ -17763,6 +17775,7 @@
         'venda-coberta': 'Venda Coberta (covered call) = você já tem a ação e vende uma opção de compra (call) contra ela, recebendo um prêmio na hora.\n\nSe a ação ficar abaixo do strike no vencimento, a opção vira pó: você fica com a ação e com o prêmio, como uma renda extra. Se a ação passar do strike, você é obrigado a vender pelo preço combinado — ainda lucra, mas perde o que a ação subiu além disso.\n\nÉ uma forma de gerar caixa mensal sobre uma carteira parada, ao custo de limitar o ganho se a ação disparar. Não protege contra queda além do valor do prêmio recebido.',
         'opcao-strike': 'Strike (preço de exercício) = o preço pelo qual a ação será vendida, caso a opção seja exercida.\n\nQuanto mais distante o strike estiver do preço atual da ação, menor o prêmio recebido (menor chance de ser exercido), mas mais espaço a ação tem pra subir antes de você "perder" ela pelo strike.',
         'opcao-premio': 'Prêmio = o valor que você recebe, por ação, ao vender a opção — é o seu ganho garantido na hora, não depende do que acontece depois com a ação.\n\nÉ negociado em bolsa (varia com o tempo até o vencimento, a distância até o strike e a volatilidade do ativo) — aqui você digita o valor que já negociou ou pretende negociar.',
+        'opcao-delta': 'Delta = mede o quanto o preço da opção varia para cada R$ 1,00 de variação na ação — e também é usado como uma aproximação da probabilidade de ela ser exercida (fechar "dentro do dinheiro").\n\nRegra de bolso de quem vende opção coberta: Delta entre 0,20 e 0,35 foca em renda recorrente com baixo risco de perder a ação; entre 0,40 e 0,50 (opção "no dinheiro") você aceita mais chance de entregar a ação em troca de um prêmio maior. Não é dado obrigatório aqui — sua corretora mostra o Delta de cada opção na grade de opções.',
 
         // --- "Qual é uma taxa justa hoje?" (tabela pós-fixado) ---
         'tj-prazo': 'Tempo que o dinheiro ficaria aplicado. É usado pra duas coisas: achar a alíquota de IR regressiva desse período e escolher o título do Tesouro Selic de vencimento mais parecido, pra servir de comparação.',
@@ -24919,6 +24932,7 @@
       const inVencimento = document.getElementById('vcVencimento');
       const inQtd = document.getElementById('vcQtd');
       const inPrecoMedio = document.getElementById('vcPrecoMedio');
+      const inDelta = document.getElementById('vcDelta');
       const btnCalcular = document.getElementById('vcBtnCalcular');
       const btnLimpar = document.getElementById('vcBtnLimpar');
       const btnPdf = document.getElementById('vcBtnPdf');
@@ -24950,6 +24964,39 @@
         ultimoCalculoVc = null;
       }
 
+      // "Regra de bolso" de quem vende opção coberta (ver glossário
+      // opcao-delta): 0,20-0,35 pra renda com baixo risco de perder a
+      // ação; 0,40-0,50 (opção "no dinheiro") pra quem aceita entregar a
+      // ação por um prêmio maior. Fora dessas faixas, só informa.
+      function classificarDelta(delta) {
+        if (delta >= 0.20 && delta <= 0.35) {
+          return 'dentro da faixa clássica pra <strong>renda recorrente com baixo risco</strong> de perder a ação (0,20 a 0,35).';
+        }
+        if (delta > 0.35 && delta <= 0.50) {
+          return 'na faixa de quem <strong>aceita entregar a ação</strong> em troca de um prêmio maior (0,40 a 0,50 = opção "no dinheiro" ou perto disso).';
+        }
+        if (delta < 0.20) {
+          return 'abaixo da faixa clássica (0,20 a 0,35) — prêmio menor, mas ainda mais seguro de reter a ação do que o normal.';
+        }
+        return 'acima da faixa clássica (0,40 a 0,50) — opção já "além do dinheiro", prêmio maior mas chance de exercício também bem maior.';
+      }
+
+      // Teoria do Theta (decaimento temporal): ele não é linear, acelera
+      // quando faltam menos de ~30-45 dias pro vencimento. A janela de
+      // 30 a 45 dias é onde se concentra a maior velocidade de decaimento
+      // diário por dia de capital investido — nem tão longe (Theta lento,
+      // capital preso à toa) nem tão perto (mais sensível a um movimento
+      // brusco da ação).
+      function classificarJanelaTheta(dias) {
+        if (dias >= 30 && dias <= 45) {
+          return { texto: 'dentro da janela ideal de Theta (30 a 45 dias) — ponto de maior velocidade de decaimento diário da opção.', cor: 'var(--accent)' };
+        }
+        if (dias > 45) {
+          return { texto: 'acima da janela ideal de Theta (30 a 45 dias) — o decaimento diário ainda é lento; seu capital fica "preso" na operação por mais tempo que o necessário.', cor: 'var(--muted)' };
+        }
+        return { texto: 'abaixo da janela ideal de Theta (30 a 45 dias) — decaimento rápido, mas perto do vencimento a opção também fica mais sensível a um movimento brusco da ação.', cor: 'var(--muted)' };
+      }
+
       function calcular() {
         const ticker = inTicker.value.trim().toUpperCase();
         const precoAcao = hgValorMascarado(inPrecoAcao);
@@ -24958,6 +25005,19 @@
         const precoMedio = hgValorMascarado(inPrecoMedio);
         const qtd = parseInt(inQtd.value, 10) || 0;
         const vencimentoStr = inVencimento.value; // AAAA-MM-DD
+
+        // Delta é opcional e aceita tanto decimal (0,30) quanto percentual
+        // (30) — quem olha a grade de opções na corretora às vezes vê de
+        // um jeito, às vezes do outro.
+        let delta = null;
+        const deltaBruto = (inDelta.value || '').trim();
+        if (deltaBruto) {
+          let d = parseFloat(deltaBruto.replace(',', '.'));
+          if (Number.isFinite(d) && d > 0) {
+            if (d > 1) d = d / 100;
+            delta = d;
+          }
+        }
 
         if (!(precoAcao > 0)) { erro('Informe o preço da ação hoje.'); return; }
         if (!(strike > 0)) { erro('Informe o strike (preço de exercício) da opção.'); return; }
@@ -25003,7 +25063,7 @@
           retornoExercPct, retornoAnualExercPct,
           breakeven, protecaoQuedaPct, distanciaStrikePct,
           temPrecoMedio, retornoCustoNaoExercPct, retornoCustoExercPct,
-          temQtd, premioTotal,
+          temQtd, premioTotal, delta,
         };
 
         const corPct = (v) => v >= 0 ? 'var(--accent)' : 'var(--danger)';
@@ -25019,6 +25079,13 @@
               <strong>${diasVenc}</strong>
             </div>
           </div>
+          <p class="calc-ajuda" style="margin:6px 0 0; color:${classificarJanelaTheta(diasVenc).cor};">
+            ⏳ <strong>${diasVenc} dias até o vencimento</strong>: ${classificarJanelaTheta(diasVenc).texto}
+          </p>
+          ${delta !== null ? `
+          <p class="calc-ajuda" style="margin:8px 0 0;">
+            🎯 <strong>Delta ${hgFormatNumero(delta * 100)}%</strong> ≈ probabilidade aproximada de exercício — ${classificarDelta(delta)}
+          </p>` : ''}
 
           <p class="calc-ajuda" style="margin:14px 0 4px; font-weight:700; color:var(--text);">Se a ação NÃO for exercida (fica abaixo do strike)</p>
           <div class="calc-resultado-card">
@@ -25087,6 +25154,7 @@
         inPrecoMedio.value = ''; inPrecoMedio.dataset.centavos = '0';
         inQtd.value = '';
         inVencimento.value = '';
+        inDelta.value = '';
         resultadoEl.innerHTML = '';
         ultimoCalculoVc = null;
       }
@@ -25139,6 +25207,7 @@
             ['Vencimento', `${vDia}/${vMes}/${vAno} (${c.diasVenc} dias)`],
             ...(c.temQtd ? [['Quantidade', String(c.qtd)], ['Prêmio total', hgFormatMoeda(c.premioTotal)]] : []),
             ...(c.temPrecoMedio ? [['Preço médio informado', hgFormatMoeda(c.precoMedio)]] : []),
+            ...(c.delta !== null ? [['Delta informado', `${hgFormatNumero(c.delta * 100)}% (≈ probabilidade de exercício)`]] : []),
           ],
           theme: 'grid',
           styles: { fontSize: 9, cellPadding: 6 },
