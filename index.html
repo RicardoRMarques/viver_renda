@@ -20544,7 +20544,13 @@
       // tabela é overflow:visible de propósito, pra não quebrar o
       // cabeçalho fixo da lista. Com o teto + o modo compacto abaixo, a
       // tabela cabe na largura do cartão em qualquer combinação possível.
-      const MAX_COLUNAS = 14;
+      // O teto é 14 por causa da largura da tabela (ver comentário acima),
+      // mas isso só faz sentido pra quem TEM 14+ colunas pra escolher
+      // (caso das Ações). Nas listas com menos opções (FIIs, por exemplo,
+      // tem só 7 ao todo) o teto nunca seria alcançado, e mostrar "7 de
+      // 14" no contador é só confuso — parece que faltam colunas que não
+      // existem. min() faz o teto nunca passar do total disponível.
+      const MAX_COLUNAS = Math.min(14, colunas.length);
       const LIMITE_COMPACTO = 11; // a partir daqui, células mais justas
 
       function aplicarVisibilidadeColunas() {
