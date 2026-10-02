@@ -8163,8 +8163,16 @@
         const cnpj = String(a.tax_id || '').replace(/\D/g, '');
         if (cnpj.length !== 14) return '';
         const url = `https://fnet.bmfbovespa.com.br/fnet/publico/abrirGerenciadorDocumentosCVM?cnpjFundo=${cnpj}&idCategoriaDocumento=7&idTipoDocumento=9`;
+        // rel só com "noopener" (sem "noreferrer"): reportado em 02/10/2026
+        // que o primeiro clique sempre cai em "login?expired" no Fundos.NET,
+        // e só o segundo clique abre a lista de verdade — clássico de site
+        // legado que valida a navegação pelo cabeçalho Referer antes de
+        // aceitar a sessão "pública" sem login. Sem "noreferrer" o navegador
+        // volta a mandar esse cabeçalho (apontando pro nosso domínio); o
+        // "noopener" sozinho já cobre a parte que importa de segurança
+        // (bloqueia a nova aba de manipular esta via window.opener).
         return `
-                <a class="hg-btn-secundario-pequeno hg-btn-relatorio" id="hgBtnRelatorio" href="${url}" target="_blank" rel="noopener noreferrer"
+                <a class="hg-btn-secundario-pequeno hg-btn-relatorio" id="hgBtnRelatorio" href="${url}" target="_blank" rel="noopener"
                    title="Lista oficial no Fundos.NET (B3/CVM) só com os relatórios gerenciais do fundo — o mais recente fica no topo">
                   ${HG_ICONE_DOC}<span>Relatórios gerenciais (B3/CVM)</span>
                 </a>`;
