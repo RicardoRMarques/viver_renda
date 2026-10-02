@@ -4518,7 +4518,15 @@
     <section class="hg-busca lista-mercado" id="lista-acoes" hidden>
       <div class="lista-mercado-topo">
         <h2 class="hg-titulo">📈 Todas as Ações</h2>
-        <button type="button" class="lista-mercado-fechar" data-fechar-secao="lista-acoes" aria-label="Fechar lista de ações">✕</button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="listaAcoesCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta lista"
+                  title="Compartilhar o link desta lista">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button type="button" class="lista-mercado-fechar" data-fechar-secao="lista-acoes" aria-label="Fechar lista de ações">✕</button>
+        </div>
       </div>
       <div class="lista-mercado-filtros" id="filtrosListaAcoes"></div>
       <div class="lista-mercado-tabela-wrap">
@@ -4568,7 +4576,15 @@
     <section class="hg-busca lista-mercado" id="lista-fiis" hidden>
       <div class="lista-mercado-topo">
         <h2 class="hg-titulo">🏢 Todos os Fundos Imobiliários</h2>
-        <button type="button" class="lista-mercado-fechar" data-fechar-secao="lista-fiis" aria-label="Fechar lista de FIIs">✕</button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="listaFiisCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta lista"
+                  title="Compartilhar o link desta lista">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button type="button" class="lista-mercado-fechar" data-fechar-secao="lista-fiis" aria-label="Fechar lista de FIIs">✕</button>
+        </div>
       </div>
       <div class="lista-mercado-filtros" id="filtrosListaFiis"></div>
       <div class="lista-mercado-tabela-wrap">
@@ -20207,6 +20223,19 @@
         atualizarCabecalhoFixoListaMercado(secao);
       });
     }
+    document.getElementById('listaAcoesCompartilharLink')?.addEventListener('click', (e) =>
+      hgCompartilharLinkFerramenta(e.currentTarget, {
+        hash: 'lista-acoes',
+        titulo: 'Todas as Ações — Viver de Renda',
+        texto: 'Cotações e indicadores fundamentalistas de todas as ações da B3, num só lugar.',
+      }));
+    document.getElementById('listaFiisCompartilharLink')?.addEventListener('click', (e) =>
+      hgCompartilharLinkFerramenta(e.currentTarget, {
+        hash: 'lista-fiis',
+        titulo: 'Todos os Fundos Imobiliários — Viver de Renda',
+        texto: 'Cotações e indicadores de todos os Fundos Imobiliários da B3, num só lugar.',
+      }));
+
     document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#tesouro-direto"], a[href="#taxa-justa"], a[href="#debentures"]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
