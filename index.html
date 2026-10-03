@@ -3603,6 +3603,13 @@
     .cookies-tabela th { color: var(--muted); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.02em; }
     .cookies-tabela td:first-child { font-weight: 600; white-space: nowrap; }
 
+    /* ---------- Venda Coberta: tabela de parâmetros ideais ---------- */
+    .vc-tabela-parametros { width: 100%; border-collapse: collapse; margin: 10px 0 0; font-size: 0.78rem; }
+    .vc-tabela-parametros th, .vc-tabela-parametros td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .vc-tabela-parametros th { color: var(--muted); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.02em; }
+    .vc-tabela-parametros td:first-child { font-weight: 600; white-space: nowrap; }
+    .vc-tabela-parametros td:nth-child(2) { color: var(--primary); font-weight: 700; white-space: nowrap; }
+
     /* ---------- Aviso de cookies (banner de rodapé) ---------- */
     .cookies-aviso {
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 2500;
@@ -4798,8 +4805,30 @@
             return t;
           }
 
+          // Limite de tentativas: sem isso, se o script do TradingView nunca
+          // carregar (ad-blocker, extensão de privacidade, CDN fora do ar),
+          // ficava tentando de novo a cada 200ms PRA SEMPRE, em silêncio — a
+          // pessoa só via a área vazia, sem nenhuma pista do que deu errado.
+          let tentativasWidget = 0;
+          const LIMITE_TENTATIVAS_WIDGET = 50; // 50 × 200ms ≈ 10s
           function montarWidget() {
-            if (typeof TradingView === 'undefined') { setTimeout(montarWidget, 200); return; }
+            if (typeof TradingView === 'undefined') {
+              tentativasWidget++;
+              if (tentativasWidget > LIMITE_TENTATIVAS_WIDGET) {
+                containerEl.innerHTML = `
+                  <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:20px; text-align:center;">
+                    <p class="calc-ajuda" style="margin:0; color:#ff5a5a;">
+                      Não foi possível carregar o gráfico. Verifique sua conexão ou se alguma extensão do navegador
+                      (ad-blocker, bloqueador de rastreadores) está impedindo o TradingView de carregar.
+                    </p>
+                    <button type="button" class="hg-btn" id="graficoConsultaTentarDeNovo" style="flex:0 0 auto;">Tentar novamente</button>
+                  </div>`;
+                document.getElementById('graficoConsultaTentarDeNovo')?.addEventListener('click', consultarTicker);
+                return;
+              }
+              setTimeout(montarWidget, 200);
+              return;
+            }
             new TradingView.widget({
               autosize: true,
               symbol: detectarSimbolo(ticker),
@@ -5745,6 +5774,52 @@
             de gerar renda extra sobre uma carteira parada.
             <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="venda-coberta" aria-label="O que é venda coberta?" title="">?</button>
           </p>
+
+          <details class="calc-educativo">
+            <summary>📉 Delta, Theta e a janela ideal pra montar a operação</summary>
+            <div class="calc-educativo-corpo">
+              <div class="calc-educativo-item">
+                <strong>Theta (decaimento temporal)</strong>
+                <p>
+                  O Theta mede quanto a opção perde de valor por dia, só pela passagem do tempo — é a favor de quem
+                  vende opções. Esse decaimento não é linear: ele acelera bastante quando faltam <strong>menos de 30 a
+                  45 dias</strong> pro vencimento. Montar a operação cedo demais (90+ dias) deixa seu capital "preso"
+                  por mais tempo pra um decaimento lento; a faixa de 30 a 45 dias é onde o Theta trabalha mais rápido
+                  a seu favor.
+                </p>
+              </div>
+              <div class="calc-educativo-item">
+                <strong>Delta (probabilidade de exercício)</strong>
+                <p>
+                  O Delta mede o quanto o preço da opção varia pra cada R$ 1,00 de variação na ação — e também serve
+                  como uma aproximação da probabilidade de ela ser exercida. Delta de 0,30 ≈ 30% de chance de
+                  exercício (e 70% de chance de vencer sem valor, o que é bom pra quem busca só a renda do prêmio).
+                </p>
+              </div>
+
+              <table class="vc-tabela-parametros">
+                <thead><tr><th>Parâmetro</th><th>Faixa de referência</th><th>Por quê</th></tr></thead>
+                <tbody>
+                  <tr><td>Delta</td><td>0,20 a 0,35</td><td>~70% de chance de reter a ação e embolsar o prêmio puro</td></tr>
+                  <tr><td>Theta (prazo até o vencimento)</td><td>30 a 45 dias</td><td>É onde o decaimento diário da opção é mais rápido</td></tr>
+                  <tr><td>Volatilidade Implícita (IV)</td><td>Acima da média histórica do ativo</td><td>Prêmios mais "inflados" — você vende caro e aproveita a contração da IV depois</td></tr>
+                  <tr><td>Liquidez</td><td>Spread (compra/venda) estreito</td><td>Garante sair ou rolar a operação sem perder dinheiro no spread</td></tr>
+                </tbody>
+              </table>
+              <p class="calc-ajuda" style="margin:6px 0 0; font-size:0.75rem;">
+                IV e liquidez não entram nos cálculos abaixo (exigem dado de opções ao vivo que não temos de graça) —
+                confira esses dois direto na grade de opções da sua corretora.
+              </p>
+
+              <div style="position:relative; height:200px; margin-top:14px;">
+                <canvas id="vcThetaChart"></canvas>
+              </div>
+              <p class="calc-ajuda" style="margin:8px 0 0; font-size:0.75rem;">
+                Curva ilustrativa do decaimento temporal (não é o Theta real da sua opção — isso exigiria dado de
+                mercado que não temos). O ponto vermelho marca os dias até o vencimento que você informar abaixo.
+              </p>
+            </div>
+          </details>
 
           <div class="calc-campo">
             <label for="vcTicker">Ativo (opcional, só pra identificar)</label>
@@ -24997,6 +25072,76 @@
         return { texto: 'abaixo da janela ideal de Theta (30 a 45 dias) — decaimento rápido, mas perto do vencimento a opção também fica mais sensível a um movimento brusco da ação.', cor: 'var(--muted)' };
       }
 
+      // Curva ILUSTRATIVA do decaimento temporal — não é o Theta real de
+      // nenhuma opção (isso exigiria dado de mercado que não temos de
+      // graça), é só pra mostrar visualmente por que a janela de 30-45
+      // dias existe: o valor extrínseco cai devagar no começo e acelera
+      // perto do vencimento (aproximação clássica: valor ∝ √(dias
+      // restantes), igual o "T" na fórmula de Black-Scholes).
+      let vcThetaChart = null;
+      const VC_THETA_EIXO_MAX = 90;
+      async function montarGraficoTheta() {
+        const canvas = document.getElementById('vcThetaChart');
+        if (!canvas || vcThetaChart) return;
+        await hgCarregarChartJs();
+        if (vcThetaChart) return; // evita corrida se chamado 2x em paralelo
+
+        const pontosCurva = [];
+        for (let t = VC_THETA_EIXO_MAX; t >= 0; t -= 2) {
+          pontosCurva.push({ x: t, y: 10 * Math.sqrt(t / VC_THETA_EIXO_MAX) });
+        }
+
+        vcThetaChart = new Chart(canvas, {
+          type: 'line',
+          data: {
+            datasets: [
+              {
+                label: 'Valor extrínseco (ilustrativo)',
+                data: pontosCurva, borderColor: '#31c3ff', backgroundColor: 'transparent',
+                borderWidth: 2, pointRadius: 0, tension: 0.3,
+              },
+              {
+                label: 'Sua operação',
+                data: [], borderColor: '#ff6b6b', backgroundColor: '#ff6b6b',
+                pointRadius: 6, pointHoverRadius: 6, showLine: false,
+              },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            scales: {
+              x: {
+                type: 'linear', reverse: true, min: 0, max: VC_THETA_EIXO_MAX,
+                title: { display: true, text: 'Dias até o vencimento (DTE)', color: HG_COR_MUTED(), font: { size: 10 } },
+                ticks: { color: HG_COR_MUTED(), font: { size: 9 } }, grid: { color: HG_COR_GRID() },
+              },
+              y: {
+                title: { display: true, text: 'Valor extrínseco (ilustrativo)', color: HG_COR_MUTED(), font: { size: 10 } },
+                ticks: { display: false }, grid: { color: HG_COR_GRID() },
+              },
+            },
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          },
+        });
+      }
+
+      // Marca "você está aqui" na curva, usando os dias até o vencimento
+      // já calculados — carrega o gráfico sob demanda se a pessoa ainda
+      // não tinha aberto o "Delta, Theta e a janela ideal".
+      async function marcarPontoTheta(dias) {
+        await montarGraficoTheta();
+        if (!vcThetaChart) return;
+        const diasNoEixo = Math.max(0, Math.min(dias, VC_THETA_EIXO_MAX));
+        const valor = 10 * Math.sqrt(diasNoEixo / VC_THETA_EIXO_MAX);
+        vcThetaChart.data.datasets[1].data = [{ x: diasNoEixo, y: valor }];
+        vcThetaChart.update();
+      }
+
+      const detalhesTheta = overlay.querySelector('details.calc-educativo');
+      detalhesTheta?.addEventListener('toggle', () => {
+        if (detalhesTheta.open) montarGraficoTheta();
+      });
+
       function calcular() {
         const ticker = inTicker.value.trim().toUpperCase();
         const precoAcao = hgValorMascarado(inPrecoAcao);
@@ -25029,6 +25174,7 @@
         const vencimento = new Date(vencimentoStr + 'T00:00:00');
         const diasVenc = Math.round((vencimento - hoje) / 86400000);
         if (diasVenc <= 0) { erro('A data de vencimento precisa ser no futuro.'); return; }
+        marcarPontoTheta(diasVenc);
 
         // Cenário 1: não exercida (ação fecha abaixo do strike) — fica com
         // a ação e com o prêmio, como renda extra sobre a posição.
