@@ -3612,11 +3612,20 @@
     .cookies-tabela td:first-child { font-weight: 600; white-space: nowrap; }
 
     /* ---------- Venda Coberta: tabela de parâmetros ideais ---------- */
-    .vc-tabela-parametros { width: 100%; border-collapse: collapse; margin: 10px 0 0; font-size: 0.78rem; }
+    /* table-layout:fixed força as 3 colunas a dividir 100% da largura
+       disponível desde o início — sem isso, "nowrap" nas 2 primeiras
+       colunas inflava a largura mínima da tabela além do modal, e a
+       3ª coluna (com o texto mais longo) saía cortada pelo
+       overflow-x:hidden do .calc-modal (invisível, sem rolagem — só a
+       altura da linha, inflada pelo texto que não cabia, sobrava). */
+    .vc-tabela-parametros { width: 100%; table-layout: fixed; border-collapse: collapse; margin: 10px 0 0; font-size: 0.78rem; }
     .vc-tabela-parametros th, .vc-tabela-parametros td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
-    .vc-tabela-parametros th { color: var(--muted); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.02em; }
-    .vc-tabela-parametros td:first-child { font-weight: 600; white-space: nowrap; }
-    .vc-tabela-parametros td:nth-child(2) { color: var(--primary); font-weight: 700; white-space: nowrap; }
+    .vc-tabela-parametros td { word-break: break-word; }
+    .vc-tabela-parametros th { color: var(--muted); font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.02em; overflow-wrap: break-word; }
+    .vc-tabela-parametros td:first-child { font-weight: 600; }
+    .vc-tabela-parametros td:nth-child(2) { color: var(--primary); font-weight: 700; }
+    .vc-tabela-parametros th:first-child, .vc-tabela-parametros td:first-child { width: 30%; }
+    .vc-tabela-parametros th:nth-child(2), .vc-tabela-parametros td:nth-child(2) { width: 30%; }
 
     /* ---------- Aviso de cookies (banner de rodapé) ---------- */
     .cookies-aviso {
@@ -24984,6 +24993,34 @@
       const inStrike = document.getElementById('vcStrike');
       const inPremio = document.getElementById('vcPremio');
       const inVencimento = document.getElementById('vcVencimento');
+
+      // No celular, o seletor nativo de data (calendário cheio de tela) é
+      // incômodo de usar — troca pra campo de texto com máscara
+      // DD/MM/AAAA, mais rápido de digitar direto. No desktop mantém o
+      // <input type="date"> nativo. Mesmo tratamento já usado no
+      // Reinvestimento de Dividendos.
+      if (inVencimento && ehDispositivoMovel()) {
+        inVencimento.type = 'text';
+        inVencimento.setAttribute('inputmode', 'numeric');
+        inVencimento.setAttribute('placeholder', 'DD/MM/AAAA');
+        inVencimento.setAttribute('maxlength', '10');
+        inVencimento.addEventListener('input', () => {
+          let v = inVencimento.value.replace(/\D/g, '').slice(0, 8);
+          if (v.length >= 5) v = `${v.slice(0, 2)}/${v.slice(2, 4)}/${v.slice(4)}`;
+          else if (v.length >= 3) v = `${v.slice(0, 2)}/${v.slice(2)}`;
+          inVencimento.value = v;
+        });
+      }
+      // Lê a data do campo sempre em ISO (AAAA-MM-DD), não importa se é o
+      // <input type="date"> nativo (desktop) ou o texto mascarado
+      // DD/MM/AAAA (mobile).
+      function vcLerVencimentoISO() {
+        if (!inVencimento) return '';
+        if (inVencimento.type === 'date') return inVencimento.value;
+        const m = inVencimento.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        return m ? `${m[3]}-${m[2]}-${m[1]}` : '';
+      }
+
       const inQtd = document.getElementById('vcQtd');
       const inPrecoMedio = document.getElementById('vcPrecoMedio');
       const inDelta = document.getElementById('vcDelta');
@@ -25128,7 +25165,7 @@
         const premio = hgValorMascarado(inPremio);
         const precoMedio = hgValorMascarado(inPrecoMedio);
         const qtd = parseInt(inQtd.value, 10) || 0;
-        const vencimentoStr = inVencimento.value; // AAAA-MM-DD
+        const vencimentoStr = vcLerVencimentoISO(); // AAAA-MM-DD
 
         // Delta é opcional e aceita tanto decimal (0,30) quanto percentual
         // (30) — quem olha a grade de opções na corretora às vezes vê de
