@@ -10707,7 +10707,6 @@
 
       btnAbrir.addEventListener('click', () => { abrirModal(); carteiraCarregarSalva(); carteiraPopularSugestoes(); });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
 
       hgAbrirPorLinkDeFerramenta('carteira', () => {
@@ -10889,7 +10888,6 @@
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
 
       document.getElementById('gcCompartilharLink')?.addEventListener('click', (e) =>
@@ -11174,7 +11172,6 @@
       };
 
       document.getElementById('tdgFechar').addEventListener('click', fechar);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fechar(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fechar(); });
       window.addEventListener('hg-tema-mudou', () => {
         if (!overlay.hidden && tituloAtual) window.vrAbrirMarcacaoMercado(tituloAtual, PORTAL_PADRAO);
@@ -11898,7 +11895,6 @@
 
       btnAbrir.addEventListener('click', () => { fecharMenusNav(); abrirModal(); });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnAdicionar.addEventListener('click', adicionar);
       [inInstituicao, inValor].forEach(el => el.addEventListener('keydown', (e) => {
@@ -12583,7 +12579,6 @@
 
       btnAbrir.addEventListener('click', () => { fecharMenusNav(); abrirModal(); });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnAnalisar.addEventListener('click', analisar);
       btnLimpar.addEventListener('click', () => {
@@ -14452,7 +14447,6 @@
       hgAplicarMascaraMoeda(inValor, 0);
       btnAbrir?.addEventListener('click', () => { if (typeof fecharMenusNav === 'function') fecharMenusNav(); abrirModal(); });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
 
       $('apBtnAdicionar').addEventListener('click', adicionar);
@@ -15306,7 +15300,6 @@
 
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
     })();
 
@@ -15456,7 +15449,6 @@
 
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
 
       document.getElementById('reinvCompartilharLink')?.addEventListener('click', (e) =>
@@ -16242,7 +16234,6 @@
       }
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
 
       document.getElementById('agendaCompartilharLink')?.addEventListener('click', (e) =>
@@ -16443,7 +16434,6 @@
         document.getElementById(id)?.addEventListener('click', abrirModal);
       });
       btnFechar?.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
     })();
 
@@ -16489,7 +16479,6 @@
 
       document.getElementById('cookiesBtnAbrir')?.addEventListener('click', abrirModal);
       btnFechar?.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
 
       btnEntendi?.addEventListener('click', fecharAviso);
@@ -16705,7 +16694,6 @@
 
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
     })();
 
@@ -17470,7 +17458,6 @@
 
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
@@ -17770,7 +17757,6 @@
 
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       valorInput.addEventListener('input', converter);
       iofTipoSelect.addEventListener('change', converter);
       deBotao.addEventListener('click', () => abrirListaMoedas('de'));
@@ -18264,7 +18250,6 @@
 
       btnAbrir.addEventListener('click', abrirModal);
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       // Trocar de período só muda a coluna de Basileia — os indicadores de
       // mercado são os mesmos. Reaproveita o cache em vez de refazer as
       // 18 requisições à HG Brasil.
@@ -18711,7 +18696,6 @@
       btnAbrir?.addEventListener('click', abrirModalAuth);
       btnAbrirMobile?.addEventListener('click', abrirModalAuth);
       btnFechar?.addEventListener('click', fecharModalAuth);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModalAuth(); });
 
       // Busca se o usuário logado já é assinante do boletim por e-mail, e
       // marca/desmarca o checkbox de acordo (silencioso se a tabela ainda
@@ -19300,8 +19284,6 @@
 
       btnFecharSelecao.addEventListener('click', fecharSelecao);
       btnFecharTabela.addEventListener('click', fecharTabela);
-      overlaySelecao.addEventListener('click', e => { if (e.target === overlaySelecao) fecharSelecao(); });
-      overlayTabela.addEventListener('click', e => { if (e.target === overlayTabela) fecharTabela(); });
       btnAdicionar.addEventListener('click', adicionarAtivo);
       buscaInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); adicionarAtivo(); } });
       btnComparar.addEventListener('click', compararAtivos);
@@ -20904,7 +20886,6 @@
 
         const fechar = () => { overlay.hidden = true; };
         overlay.querySelector('.calc-fechar').addEventListener('click', fechar);
-        overlay.addEventListener('click', e => { if (e.target === overlay) fechar(); });
         document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) fechar(); });
 
         overlay.querySelector('.lm-col-restaurar').addEventListener('click', () => marcarConforme(padraoVisivel()));
@@ -21894,7 +21875,6 @@
         });
       });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       selTipo.addEventListener('change', () => { atualizarCampoTaxa(); resetarAcoes(); });
       selIndexador.addEventListener('change', () => { atualizarCampoTaxa(); resetarAcoes(); });
@@ -22748,9 +22728,6 @@
 
       if (amortFechar) amortFechar.addEventListener('click', fecharModalAmort);
       if (amortBtnFechar2) amortBtnFechar2.addEventListener('click', fecharModalAmort);
-      if (amortOverlay) {
-        amortOverlay.addEventListener('click', (e) => { if (e.target === amortOverlay) fecharModalAmort(); });
-      }
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && amortOverlay && !amortOverlay.hidden) fecharModalAmort(); });
 
       if (amortBtnAdicionar) {
@@ -22818,7 +22795,6 @@
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnSimular.addEventListener('click', () => {
         estadoAmortizacao = { lista: [] };
@@ -23566,7 +23542,6 @@
         });
       });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', aoTeclar);
 
       atualizar();
@@ -23909,7 +23884,6 @@
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
@@ -24168,7 +24142,6 @@
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
@@ -24697,7 +24670,6 @@
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
@@ -24990,7 +24962,6 @@
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
@@ -25436,7 +25407,6 @@
         abrirModal();
       });
       btnFechar.addEventListener('click', fecharModal);
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharModal(); });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
