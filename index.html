@@ -3532,8 +3532,12 @@
     .calc-tabela-comp th:first-child, .calc-tabela-comp td:first-child { text-align: left; }
     .calc-tabela-comp tr.calc-linha-selecionada td { color: var(--primary); font-weight: 700; }
 
-    /* Simulador de Aposentadoria Renda Passiva */
-    .rp-modal { max-width: 860px; }
+    /* Simulador de Aposentadoria Renda Passiva — mesma largura da
+       Calculadora de Venda Coberta (.vc-modal), a pedido do usuário. */
+    .rp-modal { max-width: 960px; }
+    @media (min-width: 1024px) {
+      .rp-modal { max-width: 1040px; }
+    }
     .rp-risco-grid { display: flex; gap: 8px; flex-wrap: wrap; }
     .rp-risco-chip {
       flex: 1 1 60px;
