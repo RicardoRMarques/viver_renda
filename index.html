@@ -5180,7 +5180,15 @@
           <h3 id="rpTitulo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>Aposentadoria Renda Passiva
           </h3>
-          <button id="rpFechar" class="calc-fechar" aria-label="Fechar simulador" title="Fechar">✕</button>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" id="rpCompartilharLink" class="modal-link-btn"
+                    aria-label="Compartilhar o link desta ferramenta"
+                    title="Compartilhar o link desta ferramenta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+            <button id="rpFechar" class="calc-fechar" aria-label="Fechar simulador" title="Fechar">✕</button>
+          </div>
         </div>
 
         <div class="calc-corpo">
@@ -24684,6 +24692,15 @@
       btnLimpar.addEventListener('click', limpar);
       btnPdf.addEventListener('click', gerarPdfRp);
       btnCompartilhar.addEventListener('click', (e) => compartilharResultadoRp(e.currentTarget));
+
+      document.getElementById('rpCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'aposentadoria',
+          titulo: 'Aposentadoria Renda Passiva — Viver de Renda',
+          texto: 'Simule o capital e a renda passiva mensal que seu perfil de risco pode sustentar.',
+        }));
+
+      hgAbrirPorLinkDeFerramenta('aposentadoria', abrirModal);
     })();
 
     // ============================================================
