@@ -7131,6 +7131,7 @@
           Sua Carteira de Rendimentos está vazia — adicione ativos em <strong>Simuladores → Carteira de Rendimentos</strong>
           pra ver os gráficos aqui.
         </div>
+        <div id="gcAvisoSemPreco" class="hg-status atencao" hidden></div>
         <div id="gcGrid" class="gc-grid" hidden>
           <div class="gc-card">
             <h4 class="gc-card-titulo">Por Ativo (valor investido)</h4>
@@ -10924,6 +10925,7 @@
         statusEl.textContent = 'Carregando sua carteira...';
         vazioEl.hidden = true;
         gridEl.hidden = true;
+        document.getElementById('gcAvisoSemPreco').hidden = true;
 
         let carteira;
         try {
@@ -10942,6 +10944,21 @@
         }
 
         const porAtivo = gcAgrupar(carteira, i => i.ticker, i => (i.preco || 0) * i.qtd);
+
+        // Ativos sem cotação (preco null/0 — API fora do ar, ticker não
+        // reconhecido etc.) são descartados pelo gcAgrupar sem aviso
+        // nenhum: a pessoa via o gráfico "faltando" um ativo que sabia
+        // que tinha cadastrado, sem entender por quê. Agora avisa quais
+        // ficaram de fora, em vez de só sumir.
+        const tickersIncluidos = new Set(porAtivo.map(([ticker]) => ticker));
+        const excluidos = carteira.filter(i => !tickersIncluidos.has(i.ticker));
+        const avisoEl = document.getElementById('gcAvisoSemPreco');
+        if (excluidos.length > 0) {
+          const lista = excluidos.map(i => i.ticker).join(', ');
+          avisoEl.hidden = false;
+          avisoEl.innerHTML = `<span><strong>Atenção:</strong> ${excluidos.length} ativo${excluidos.length > 1 ? 's' : ''} sem cotação disponível no momento não entra${excluidos.length > 1 ? 'ram' : ''} nos gráficos: <strong>${lista}</strong>. Abra a Carteira de Rendimentos (ela busca a cotação de novo) e volte aqui.</span>`;
+        }
+
         if (porAtivo.length === 0) {
           vazioEl.hidden = false;
           vazioEl.textContent = 'Nenhum ativo da sua carteira tem cotação disponível ainda pra montar os gráficos.';
