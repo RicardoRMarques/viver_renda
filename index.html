@@ -632,6 +632,9 @@
     .ap-ico { width: 15px; height: 15px; vertical-align: -3px; flex-shrink: 0; }
     .ap-lanc > summary { cursor: pointer; font-weight: 700; font-size: 0.95rem; list-style: revert; }
     .ap-lanc > summary small { font-weight: 500; color: var(--muted); font-size: 0.76rem; margin-left: 6px; }
+    /* Fica fechado por padrão (recurso avançado/opcional) — o rótulo
+       deixa isso explícito pra quem só quer calcular o aporte rápido. */
+    .ap-lanc-opcional { font-weight: 500; color: var(--muted); font-size: 0.74rem; text-transform: none; letter-spacing: normal; }
     .ap-lanc-form { display: grid; grid-template-columns: 138px 100px minmax(90px,1.1fr) repeat(4, minmax(80px,1fr)) auto; gap: 6px; }
     .ap-lanc-form input, .ap-lanc-form select, .ap-lanc-barra select {
       background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px;
@@ -718,7 +721,29 @@
     }
     .ap-add-linha #apTickerInput { flex: 1 1 170px; text-transform: uppercase; }
     .ap-add-linha .hg-btn { flex: 0 0 auto; }
-    .ap-ferramentas { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin-top: 10px; }
+    /* Reportado como confuso: os 7 botões ficavam todos iguais, numa
+       fileira só, sem nada indicando que são coisas bem diferentes
+       (formas de preencher a lista, ajuste de peso-alvo, navegação pra
+       outra tela, ação destrutiva). Agrupados por categoria, com um
+       rótulo acima de cada grupo e um divisor antes das "Outras ações". */
+    /* Mapa mental rápido do fluxo da tela, logo abaixo da explicação —
+       pedido junto com o agrupamento dos botões (tela "confusa demais"). */
+    .ap-passos { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 2px; }
+    .ap-passo {
+      display: inline-flex; align-items: center; gap: 7px; font-size: 0.78rem; font-weight: 600; color: var(--text);
+      background: var(--deep); border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px 5px 6px;
+    }
+    .ap-passo strong {
+      display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;
+      border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.7rem; flex: 0 0 auto;
+    }
+    .ap-passo-seta { color: var(--muted); font-size: 0.8rem; }
+    .ap-ferramentas { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 16px; margin-top: 10px; }
+    .ap-ferramentas-grupo { display: flex; flex-direction: column; gap: 6px; }
+    .ap-ferramentas-rotulo { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    .ap-ferramentas-linha { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ap-ferramentas-separador { align-self: stretch; width: 1px; background: var(--border); margin: 18px 0 4px; }
+    .ap-ferramentas-grupo-final { margin-left: auto; }
     .ap-ferramentas .cmp-btn-secundario { flex: 0 0 auto; }
     /* "Ver carteira completa" é a porta para a tabela de 17 colunas — o
        botão mais usado da barra. Fica maior e com a cor do site para não
@@ -803,8 +828,11 @@
       .ap-add-linha input, .ap-add-linha #apTickerInput { flex: 1 1 100%; }
       .ap-add-linha .hg-btn { flex: 1 1 100%; }
       .ap-ferramentas { align-items: stretch; }
+      .ap-ferramentas-linha { align-items: stretch; }
       .ap-ferramentas .cmp-btn-secundario { flex: 1 1 calc(50% - 8px); }
-      .ap-ferramentas .ap-btn-destaque { flex: 1 1 100%; order: -1; }
+      .ap-ferramentas .ap-btn-destaque { flex: 1 1 100%; }
+      .ap-ferramentas-separador { display: none; }
+      .ap-ferramentas-grupo-final { margin-left: 0; width: 100%; border-top: 1px dashed var(--border); padding-top: 12px; }
       .ap-tabela { font-size: 0.72rem; }
       .ap-tabela-edicao input { width: 74px; }
       .ap-tabela td:first-child, .ap-tabela th:first-child { position: sticky; left: 0; background: var(--bg); z-index: 1; }
@@ -6734,6 +6762,14 @@
           pulando o que está acima do seu preço teto.
         </p>
 
+        <div class="ap-passos" aria-hidden="true">
+          <span class="ap-passo"><strong>1</strong> Quanto vai aportar</span>
+          <span class="ap-passo-seta">→</span>
+          <span class="ap-passo"><strong>2</strong> Monte a lista de ativos</span>
+          <span class="ap-passo-seta">→</span>
+          <span class="ap-passo"><strong>3</strong> Calcular aporte</span>
+        </div>
+
         <div id="apNuvem" class="ap-nuvem" aria-live="polite"></div>
 
         <div class="calc-grid-2" id="apTopoCampos">
@@ -6764,13 +6800,34 @@
         </div>
 
         <div class="ap-ferramentas">
-          <button type="button" class="cmp-btn-secundario" id="apBtnImportar" title="Traz os ativos e as quantidades que você salvou na Carteira de Rendimentos">💰 Importar da Carteira</button>
-          <button type="button" class="cmp-btn-secundario" id="apBtnColar" aria-expanded="false"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="8" y1="11" x2="16" y2="11"></line><line x1="8" y1="15" x2="13" y2="15"></line></svg> Colar da planilha</button>
-          <button type="button" class="cmp-btn-secundario" id="apBtnIguais" title="Mesmo peso-alvo para todos os ativos">⚖️ Pesos iguais</button>
-          <button type="button" class="cmp-btn-secundario" id="apBtnAtuais" title="Usa o peso que cada ativo tem hoje como peso-alvo">📌 Manter pesos atuais</button>
-          <button type="button" class="cmp-btn-secundario" id="apBtnSimularPm" aria-expanded="false" title="Sem o preço médio real, estima um para a simulação"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"></circle><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"></circle><circle cx="12" cy="12" r="1.2" fill="currentColor"></circle></svg> Simular preço médio</button>
-          <button type="button" class="cmp-btn-secundario ap-btn-destaque" id="apBtnIrVisao" title="Todas as colunas: custo, lucro, proventos, DY on cost..."><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="11"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="16" y1="20" x2="16" y2="14"></line><line x1="22" y1="20" x2="22" y2="8"></line></svg> Ver carteira completa</button>
-          <button type="button" class="cmp-btn-secundario ap-btn-perigo" id="apBtnLimpar">Limpar tudo</button>
+          <div class="ap-ferramentas-grupo">
+            <span class="ap-ferramentas-rotulo">Preencher a lista</span>
+            <div class="ap-ferramentas-linha">
+              <button type="button" class="cmp-btn-secundario" id="apBtnImportar" title="Traz os ativos e as quantidades que você salvou na Carteira de Rendimentos">💰 Importar da Carteira</button>
+              <button type="button" class="cmp-btn-secundario" id="apBtnColar" aria-expanded="false"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="8" y1="11" x2="16" y2="11"></line><line x1="8" y1="15" x2="13" y2="15"></line></svg> Colar da planilha</button>
+            </div>
+          </div>
+          <div class="ap-ferramentas-grupo">
+            <span class="ap-ferramentas-rotulo">Peso-alvo</span>
+            <div class="ap-ferramentas-linha">
+              <button type="button" class="cmp-btn-secundario" id="apBtnIguais" title="Mesmo peso-alvo para todos os ativos">⚖️ Pesos iguais</button>
+              <button type="button" class="cmp-btn-secundario" id="apBtnAtuais" title="Usa o peso que cada ativo tem hoje como peso-alvo">📌 Manter pesos atuais</button>
+            </div>
+          </div>
+          <div class="ap-ferramentas-grupo">
+            <span class="ap-ferramentas-rotulo">Preço médio</span>
+            <div class="ap-ferramentas-linha">
+              <button type="button" class="cmp-btn-secundario" id="apBtnSimularPm" aria-expanded="false" title="Sem o preço médio real, estima um para a simulação"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"></circle><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"></circle><circle cx="12" cy="12" r="1.2" fill="currentColor"></circle></svg> Simular preço médio</button>
+            </div>
+          </div>
+          <div class="ap-ferramentas-separador" aria-hidden="true"></div>
+          <div class="ap-ferramentas-grupo ap-ferramentas-grupo-final">
+            <span class="ap-ferramentas-rotulo">Outras ações</span>
+            <div class="ap-ferramentas-linha">
+              <button type="button" class="cmp-btn-secundario ap-btn-destaque" id="apBtnIrVisao" title="Todas as colunas: custo, lucro, proventos, DY on cost..."><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="11"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="16" y1="20" x2="16" y2="14"></line><line x1="22" y1="20" x2="22" y2="8"></line></svg> Ver carteira completa</button>
+              <button type="button" class="cmp-btn-secundario ap-btn-perigo" id="apBtnLimpar">Limpar tudo</button>
+            </div>
+          </div>
         </div>
 
         <div id="apSimPmBox" class="ap-colar" hidden>
@@ -6799,8 +6856,8 @@
           </div>
         </div>
 
-        <details class="ap-lanc" id="apLanc" open>
-          <summary><span class="ap-lanc-titulo"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"></path><line x1="9" y1="7" x2="15" y2="7"></line><line x1="9" y1="11" x2="15" y2="11"></line><line x1="9" y1="15" x2="13" y2="15"></line></svg> Compras &amp; Vendas</span> <small id="apLancResumo"></small></summary>
+        <details class="ap-lanc" id="apLanc">
+          <summary><span class="ap-lanc-titulo"><svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"></path><line x1="9" y1="7" x2="15" y2="7"></line><line x1="9" y1="11" x2="15" y2="11"></line><line x1="9" y1="15" x2="13" y2="15"></line></svg> Compras &amp; Vendas <span class="ap-lanc-opcional">(opcional)</span></span> <small id="apLancResumo"></small></summary>
           <p class="calc-ajuda" style="margin:6px 0 10px;">
             Lance cada compra e venda, como na aba <em>Compras &amp; Vendas</em> da sua planilha. A <strong>quantidade acumulada</strong>
             e o <strong>preço médio</strong> de cada ativo passam a ser calculados daqui e alimentam a calculadora e a Visão da carteira.
