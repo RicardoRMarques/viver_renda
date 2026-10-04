@@ -1913,6 +1913,17 @@
     @media (prefers-reduced-motion: reduce) {
       .hg-status.atencao::before { animation-duration: 3s; }
     }
+    /* Mesma caixa dourada do .atencao, mas pra avisos ESTÁTICOS (não é
+       "carregando algo") — sem a rodinha girando do ::before, que faz
+       sentido só enquanto algo está de fato em andamento. Usar .atencao
+       aqui parecia um carregamento travado pra sempre. */
+    .hg-status.atencao-fixa {
+      display: flex; align-items: flex-start; gap: 10px;
+      color: var(--text); font-weight: 600; min-height: 0;
+      padding: 11px 13px; border-radius: 10px;
+      background: rgba(224,184,77,0.12); border: 1px solid rgba(224,184,77,0.45);
+    }
+    .hg-status.atencao-fixa strong { color: var(--gold); }
 
     .hg-card {
       margin-top: 6px;
@@ -7131,7 +7142,7 @@
           Sua Carteira de Rendimentos está vazia — adicione ativos em <strong>Simuladores → Carteira de Rendimentos</strong>
           pra ver os gráficos aqui.
         </div>
-        <div id="gcAvisoSemPreco" class="hg-status atencao" hidden></div>
+        <div id="gcAvisoSemPreco" class="hg-status atencao-fixa" hidden></div>
         <div id="gcGrid" class="gc-grid" hidden>
           <div class="gc-card">
             <h4 class="gc-card-titulo">Por Ativo (valor investido)</h4>
@@ -10956,7 +10967,7 @@
         if (excluidos.length > 0) {
           const lista = excluidos.map(i => i.ticker).join(', ');
           avisoEl.hidden = false;
-          avisoEl.innerHTML = `<span><strong>Atenção:</strong> ${excluidos.length} ativo${excluidos.length > 1 ? 's' : ''} sem cotação disponível no momento não entra${excluidos.length > 1 ? 'ram' : ''} nos gráficos: <strong>${lista}</strong>. Abra a Carteira de Rendimentos (ela busca a cotação de novo) e volte aqui.</span>`;
+          avisoEl.innerHTML = `<span>⚠️</span><span><strong>Atenção:</strong> ${excluidos.length} ativo${excluidos.length > 1 ? 's' : ''} sem cotação disponível no momento não entra${excluidos.length > 1 ? 'ram' : ''} nos gráficos: <strong>${lista}</strong>. Abra a Carteira de Rendimentos (ela busca a cotação de novo) e volte aqui.</span>`;
         }
 
         if (porAtivo.length === 0) {
