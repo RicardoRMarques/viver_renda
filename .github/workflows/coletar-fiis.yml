@@ -80,28 +80,8 @@ jobs:
           if [ -f noticias-historico.json ]; then git add noticias-historico.json; fi
           if git diff --cached --quiet; then
             echo "Sem alterações no boletim, nada para commitar."
-            exit 0
-          fi
-          git commit -m "chore: atualizar boletim (notícias, índices, ranking) [skip ci]"
-
-          # Se outro robô (ex.: robo-boletim) commitar na main entre o
-          # checkout e este push, o rebase pode dar conflito nestes mesmos
-          # arquivos (cada execução é só a leitura mais recente da API, sem
-          # nenhuma edição manual) — então o lado de cá sempre venceria sem
-          # perder nada de real. Tenta algumas vezes antes de desistir, em
-          # vez de abortar o ciclo na primeira corrida entre robôs.
-          tentativas=5
-          ok=0
-          for i in $(seq 1 $tentativas); do
-            if git pull --rebase -X theirs origin main && git push; then
-              ok=1
-              break
-            fi
-            echo "Tentativa $i/$tentativas falhou (provável corrida com outro robô), tentando de novo..."
-            git rebase --abort 2>/dev/null || true
-            sleep $((i * 5))
-          done
-          if [ "$ok" -ne 1 ]; then
-            echo "::error::Não foi possível commitar o boletim após $tentativas tentativas."
-            exit 1
+          else
+            git commit -m "chore: atualizar boletim (notícias, índices, ranking) [skip ci]"
+            git pull --rebase origin main
+            git push
           fi
