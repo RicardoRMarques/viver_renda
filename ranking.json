@@ -4,75 +4,75 @@
       {
         "ticker": "BBSE3",
         "nome": "BB Seguridade",
-        "preco": 40.49,
-        "valor": 11.336
+        "preco": 41.2,
+        "valor": 11.141
       },
       {
         "ticker": "ALOS3",
         "nome": "ALLOS",
-        "preco": 30.47,
-        "valor": 10.889
+        "preco": 33.32,
+        "valor": 9.958
       },
       {
         "ticker": "CMIG4",
         "nome": "CEMIG",
-        "preco": 11.39,
-        "valor": 10.0
+        "preco": 12.07,
+        "valor": 9.437
       },
       {
         "ticker": "VALE3",
         "nome": "Vale",
-        "preco": 71.83,
-        "valor": 7.814
+        "preco": 71.43,
+        "valor": 7.858
+      },
+      {
+        "ticker": "TAEE11",
+        "nome": "Taesa",
+        "preco": 44.15,
+        "valor": 6.809
       },
       {
         "ticker": "PETR4",
         "nome": "Petrobras",
-        "preco": 51.15,
-        "valor": 7.146
-      },
-      {
-        "ticker": "ITUB4",
-        "nome": "Banco Itaú Unibanco",
-        "preco": 44.88,
-        "valor": 7.054
+        "preco": 55.45,
+        "valor": 6.592
       }
     ],
     "valor_mercado": [
       {
         "ticker": "PETR4",
         "nome": "Petrobras",
-        "preco": 51.15,
+        "preco": 55.45,
         "valor": 567178000000.0
       },
       {
         "ticker": "ITUB4",
         "nome": "Banco Itaú Unibanco",
-        "preco": 44.88,
+        "preco": 49.92,
         "valor": 485548000000.0
       },
       {
         "ticker": "VALE3",
         "nome": "Vale",
-        "preco": 71.83,
+        "preco": 71.43,
         "valor": 336000000000.0
       },
       {
         "ticker": "ABEV3",
         "nome": "Ambev",
-        "preco": 15.74,
+        "preco": 16.52,
         "valor": 250012000000.0
       },
       {
         "ticker": "WEGE3",
         "nome": "WEG",
-        "preco": 51.3,
+        "preco": 50.92,
         "valor": 194756000000.0
       },
       {
         "ticker": "BBDC4",
         "nome": "Banco Bradesco",
-        "preco": 19.21,
+        "preco": 21.81,
         "valor": 185342000000.0
       }
     ],
@@ -80,37 +80,37 @@
       {
         "ticker": "PETR4",
         "nome": "Petrobras",
-        "preco": 51.15,
+        "preco": 55.45,
         "valor": 548493000000
       },
       {
         "ticker": "ITUB4",
         "nome": "Banco Itaú Unibanco",
-        "preco": 44.88,
+        "preco": 49.92,
         "valor": 385985000000
       },
       {
         "ticker": "BBAS3",
         "nome": "Banco do Brasil",
-        "preco": 23.72,
+        "preco": 26.51,
         "valor": 330956647000
       },
       {
         "ticker": "BBDC4",
         "nome": "Banco Bradesco",
-        "preco": 19.21,
+        "preco": 21.81,
         "valor": 299942971000
       },
       {
         "ticker": "VALE3",
         "nome": "Vale",
-        "preco": 71.83,
+        "preco": 71.43,
         "valor": 218069000000
       },
       {
         "ticker": "ABEV3",
         "nome": "Ambev",
-        "preco": 15.74,
+        "preco": 16.52,
         "valor": 88268294000
       }
     ]
@@ -120,132 +120,132 @@
       {
         "ticker": "KNCR11",
         "nome": "FII Kinea Ri",
-        "preco": 105.35,
-        "variacao_pct": 0.398,
-        "valor": 11281891677.7
+        "preco": 104.14,
+        "variacao_pct": -1.2891,
+        "valor": 11152313235.08
       },
       {
         "ticker": "BTLG11",
         "nome": "FII Btlg",
-        "preco": 100.0,
-        "variacao_pct": 0.7049,
-        "valor": 7094026100.0
+        "preco": 101.02,
+        "variacao_pct": 1.02,
+        "valor": 7166385166.22
       },
       {
         "ticker": "HGLG11",
         "nome": "FII HGLG Pax",
-        "preco": 148.2,
-        "variacao_pct": 0.8232,
-        "valor": 6758178609.0
+        "preco": 150.26,
+        "variacao_pct": 1.5957,
+        "valor": 6852118203.7
       },
       {
         "ticker": "XPML11",
         "nome": "FII XP Malls",
-        "preco": 101.67,
-        "variacao_pct": 0.3157,
-        "valor": 6538199951.85
+        "preco": 102.7,
+        "variacao_pct": 0.7851,
+        "valor": 6604437248.5
       },
       {
         "ticker": "MXRF11",
         "nome": "FII Maxi Ren",
-        "preco": 9.11,
-        "variacao_pct": 0.22,
-        "valor": 5167249147.03
+        "preco": 9.16,
+        "variacao_pct": 0.7701,
+        "valor": 5195609460.68
       },
       {
         "ticker": "XPLG11",
         "nome": "FII XP Log",
-        "preco": 94.4,
-        "variacao_pct": 2.4417,
-        "valor": 4851225251.2
+        "preco": 96.37,
+        "variacao_pct": 2.7289,
+        "valor": 4952463744.26
       }
     ],
     "dividend_yield": [
       {
         "ticker": "XPCA11",
         "nome": "Fiagro XP Ca",
-        "preco": 7.26,
-        "variacao_pct": -0.5479,
-        "valor": 17.631
+        "preco": 7.38,
+        "variacao_pct": 1.7931,
+        "valor": 17.344
       },
       {
         "ticker": "TRXF11",
         "nome": "FII Trx Real",
-        "preco": 70.4,
-        "variacao_pct": 0.128,
-        "valor": 16.761
+        "preco": 70.53,
+        "variacao_pct": 0.2986,
+        "valor": 16.73
       },
       {
         "ticker": "IRIM11",
         "nome": "FII Irim",
-        "preco": 62.11,
-        "variacao_pct": 1.2718,
-        "valor": 16.229
+        "preco": 63.1,
+        "variacao_pct": 1.8563,
+        "valor": 15.975
       },
       {
         "ticker": "VGIR11",
         "nome": "FII Valreiii",
-        "preco": 9.67,
-        "variacao_pct": 0.4154,
-        "valor": 15.615
+        "preco": 9.65,
+        "variacao_pct": 0.0,
+        "valor": 15.648
       },
       {
         "ticker": "RECR11",
         "nome": "FII Rec Rece",
-        "preco": 73.4,
-        "variacao_pct": 0.3967,
-        "valor": 14.774
+        "preco": 74.42,
+        "variacao_pct": 1.3896,
+        "valor": 14.571
       },
       {
         "ticker": "CPTS11",
         "nome": "FII Capi Sec",
-        "preco": 7.59,
-        "variacao_pct": 0.7968,
-        "valor": 14.229
+        "preco": 7.68,
+        "variacao_pct": 1.5873,
+        "valor": 14.063
       }
     ],
     "mais_negociados": [
       {
         "ticker": "MXRF11",
         "nome": "FII Maxi Ren",
-        "preco": 9.11,
-        "variacao_pct": 0.22,
-        "valor": 1987767
-      },
-      {
-        "ticker": "KNSC11",
-        "nome": "FII Kinea Sc",
-        "preco": 9.15,
-        "variacao_pct": 1.4412,
-        "valor": 1443904
+        "preco": 9.16,
+        "variacao_pct": 0.7701,
+        "valor": 3639912
       },
       {
         "ticker": "GARE11",
         "nome": "FII Guardian",
-        "preco": 8.39,
-        "variacao_pct": 0.479,
-        "valor": 717991
+        "preco": 8.48,
+        "variacao_pct": 1.0727,
+        "valor": 1435113
       },
       {
-        "ticker": "VGIR11",
-        "nome": "FII Valreiii",
-        "preco": 9.67,
-        "variacao_pct": 0.4154,
-        "valor": 604899
+        "ticker": "KNSC11",
+        "nome": "FII Kinea Sc",
+        "preco": 9.14,
+        "variacao_pct": 0.3293,
+        "valor": 1136845
       },
       {
         "ticker": "CPTS11",
         "nome": "FII Capi Sec",
-        "preco": 7.59,
-        "variacao_pct": 0.7968,
-        "valor": 498621
+        "preco": 7.68,
+        "variacao_pct": 1.5873,
+        "valor": 990864
       },
       {
-        "ticker": "ALZR11",
-        "nome": "FII Alianza",
-        "preco": 10.05,
-        "variacao_pct": 1.1066,
-        "valor": 415113
+        "ticker": "VGIR11",
+        "nome": "FII Valreiii",
+        "preco": 9.65,
+        "variacao_pct": 0.0,
+        "valor": 770634
+      },
+      {
+        "ticker": "TRXF11",
+        "nome": "FII Trx Real",
+        "preco": 70.53,
+        "variacao_pct": 0.2986,
+        "valor": 580885
       }
     ]
   }
