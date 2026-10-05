@@ -101,17 +101,6 @@
   .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
-  .section-com-lyket{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-  .section-com-lyket [data-lyket-type]{
-    font-size:12px;
-    background:#f2f2f2;
-    border-radius:20px;
-    padding:4px 10px;
-    display:inline-flex;
-    align-items:center;
-    box-shadow:0 1px 4px rgba(0,0,0,0.35);
-  }
-  .section-com-lyket [data-lyket-type] * { color:#1a1a1a !important; }
   .grupo-whatsapp-card{
     display:flex;align-items:center;gap:12px;margin-top:12px;
     background:var(--card);border:1px solid var(--card-border);border-radius:12px;
@@ -124,7 +113,6 @@
   .alert b{color:var(--gold-soft);}
   footer{text-align:center;margin-top:32px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;}
 </style>
-<script src="https://unpkg.com/@lyket/widget@latest/dist/lyket.js?apiKey=pt_d2c19f94733791f2b25c44987dd17e"></script>
 </head>
 <body>
 <div class="wrap">
@@ -139,13 +127,10 @@
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
-  <div class="sub">Boletim de Mercado · Quarta-feira, 02 de Setembro de 2026</div>
+  <div class="sub">Boletim de Mercado · Domingo, 04 de Outubro de 2026</div>
 </header>
 
-<h2 class="section section-com-lyket">
-  <span>Indicadores Principais</span>
-  <div data-lyket-type="updown" data-lyket-namespace="boletim" data-lyket-id="boletim-likedislike-02-09-2026"></div>
-</h2>
+<h2 class="section">Indicadores Principais</h2>
 
 <a href="https://chat.whatsapp.com/GDq8JlzWgwHJAspiVDcwSZ" target="_blank" rel="noopener noreferrer" class="grupo-whatsapp-card">
   <img src="https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=https%3A%2F%2Fchat.whatsapp.com%2FGDq8JlzWgwHJAspiVDcwSZ" alt="QR Code do grupo do WhatsApp" width="70" height="70" />
@@ -156,78 +141,86 @@
 </a>
 
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value up">185.205,10 pts ▲ 3.05%</div></div>
-  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.753,87 pts ▲ 0.32%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value down">R$ 5,13 ▼ 0.58%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value down">R$ 5,94 ▼ 0.58%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">US$ 77.406,00 ▲ 0.07%</div></div>
-  <div class="indicator"><div class="label">Ethereum</div><div class="value down">US$ 2.392,32 ▼ 1.15%</div></div>
-  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">14,00% a.a.</div></div>
-  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,90% a.a.</div></div>
-  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,44%</div></div>
-  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">-0,22%</div></div>
+  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value up">192.114,55 pts ▲ 2.63%</div></div>
+  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.771,85 pts ▲ 0.43%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,22 ▲ 0.31%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,88 ▲ 0.55%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value up">US$ 86.734,00 ▲ 2.33%</div></div>
+  <div class="indicator"><div class="label">Ethereum</div><div class="value up">US$ 2.725,38 ▲ 1.25%</div></div>
+  <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">13,75% a.a.</div></div>
+  <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,65% a.a.</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,22%</div></div>
+  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">1,57%</div></div>
 </div>
 
 
 <div style="background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:16px; margin-bottom:24px;">
-  <h2 class="section" style="margin-top:0;">📊 Resumo de Agosto de 2026</h2>
+  <h2 class="section" style="margin-top:0;">📊 Resumo de Setembro de 2026</h2>
   <svg viewBox="0 0 560 156" width="100%" style="max-width:560px; display:block; margin:0 auto;">
       <text x="120" y="31" text-anchor="end" font-size="12" fill="var(--muted)" font-family="Inter,sans-serif">Selic</text>
       <rect x="130" y="16" width="360" height="20" rx="4" fill="var(--gold-soft)" opacity="0.85" />
-      <text x="498" y="31" font-size="12" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">14,00%</text>
+      <text x="498" y="31" font-size="12" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">13,89%</text>
     
       <text x="120" y="65" text-anchor="end" font-size="12" fill="var(--muted)" font-family="Inter,sans-serif">CDI</text>
-      <rect x="130" y="50" width="357.42857142857144" height="20" rx="4" fill="var(--gold-soft)" opacity="0.85" />
-      <text x="495.42857142857144" y="65" font-size="12" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">13,90%</text>
+      <rect x="130" y="50" width="357.9967266775778" height="20" rx="4" fill="var(--gold-soft)" opacity="0.85" />
+      <text x="495.9967266775778" y="65" font-size="12" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">13,81%</text>
     
       <text x="120" y="99" text-anchor="end" font-size="12" fill="var(--muted)" font-family="Inter,sans-serif">IPCA (12m)</text>
-      <rect x="130" y="84" width="114.24920445860371" height="20" rx="4" fill="var(--gold-soft)" opacity="0.85" />
-      <text x="252.2492044586037" y="99" font-size="12" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">4,44%</text>
+      <rect x="130" y="84" width="111.82048632164843" height="20" rx="4" fill="var(--gold-soft)" opacity="0.85" />
+      <text x="249.82048632164845" y="99" font-size="12" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">4,31%</text>
     
       <text x="120" y="133" text-anchor="end" font-size="12" fill="var(--muted)" font-family="Inter,sans-serif">IGP-M (mensal)</text>
       <rect x="130" y="118" width="2" height="20" rx="4" fill="var(--gold-soft)" opacity="0.85" />
-      <text x="140" y="133" font-size="12" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">-0,85%</text>
+      <text x="140" y="133" font-size="12" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">-0,14%</text>
     </svg>
   <div class="grid" style="margin-top:18px;">
       <div class="indicator" style="text-align:center;">
         <div class="label" style="justify-content:center;">Ibovespa</div>
-        <div style="margin-top:4px;"><svg viewBox="0 0 260 44" width="100%" style="max-width:260px; display:block;">
-      <text x="130" y="20" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">173.851 pts</text>
-      <text x="130" y="37" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="Inter,sans-serif">Ago</text>
-    </svg></div>
+        <div style="margin-top:4px;"><svg viewBox="0 0 260 120" width="100%" style="max-width:260px;">
+    <path d="M 8.0 94.0 L 252.0 26.0" fill="none" stroke="var(--gold-soft)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="8.0" cy="94.0" r="3" fill="var(--gold-soft)" /><circle cx="252.0" cy="26.0" r="3" fill="var(--gold-soft)" />
+    <text x="252.0" y="16.0" text-anchor="end" font-size="11" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">185.189 pts</text>
+    <text x="8.0" y="114" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">Ago</text><text x="252.0" y="114" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">Set</text>
+  </svg></div>
       </div>
 
       <div class="indicator" style="text-align:center;">
         <div class="label" style="justify-content:center;">IFIX</div>
-        <div style="margin-top:4px;"><svg viewBox="0 0 260 44" width="100%" style="max-width:260px; display:block;">
-      <text x="130" y="20" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">3.706 pts</text>
-      <text x="130" y="37" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="Inter,sans-serif">Ago</text>
-    </svg></div>
+        <div style="margin-top:4px;"><svg viewBox="0 0 260 120" width="100%" style="max-width:260px;">
+    <path d="M 8.0 94.0 L 252.0 26.0" fill="none" stroke="var(--gold-soft)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="8.0" cy="94.0" r="3" fill="var(--gold-soft)" /><circle cx="252.0" cy="26.0" r="3" fill="var(--gold-soft)" />
+    <text x="252.0" y="16.0" text-anchor="end" font-size="11" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">3.749 pts</text>
+    <text x="8.0" y="114" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">Ago</text><text x="252.0" y="114" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">Set</text>
+  </svg></div>
       </div>
 
       <div class="indicator" style="text-align:center;">
         <div class="label" style="justify-content:center;">Dólar</div>
-        <div style="margin-top:4px;"><svg viewBox="0 0 260 44" width="100%" style="max-width:260px; display:block;">
-      <text x="130" y="20" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">R$ 5,17</text>
-      <text x="130" y="37" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="Inter,sans-serif">Ago</text>
-    </svg></div>
+        <div style="margin-top:4px;"><svg viewBox="0 0 260 120" width="100%" style="max-width:260px;">
+    <path d="M 8.0 26.0 L 252.0 94.0" fill="none" stroke="var(--gold-soft)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="8.0" cy="26.0" r="3" fill="var(--gold-soft)" /><circle cx="252.0" cy="94.0" r="3" fill="var(--gold-soft)" />
+    <text x="252.0" y="84.0" text-anchor="end" font-size="11" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">R$ 5,14</text>
+    <text x="8.0" y="114" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">Ago</text><text x="252.0" y="114" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">Set</text>
+  </svg></div>
       </div>
 
       <div class="indicator" style="text-align:center;">
         <div class="label" style="justify-content:center;">Euro</div>
-        <div style="margin-top:4px;"><svg viewBox="0 0 260 44" width="100%" style="max-width:260px; display:block;">
-      <text x="130" y="20" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">R$ 6,02</text>
-      <text x="130" y="37" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="Inter,sans-serif">Ago</text>
-    </svg></div>
+        <div style="margin-top:4px;"><svg viewBox="0 0 260 120" width="100%" style="max-width:260px;">
+    <path d="M 8.0 26.0 L 252.0 94.0" fill="none" stroke="var(--gold-soft)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="8.0" cy="26.0" r="3" fill="var(--gold-soft)" /><circle cx="252.0" cy="94.0" r="3" fill="var(--gold-soft)" />
+    <text x="252.0" y="84.0" text-anchor="end" font-size="11" font-weight="600" fill="var(--text)" font-family="'IBM Plex Mono',monospace">R$ 5,93</text>
+    <text x="8.0" y="114" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">Ago</text><text x="252.0" y="114" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Inter,sans-serif">Set</text>
+  </svg></div>
       </div></div>
-  <p style="font-size:11px; color:var(--muted); margin:8px 0 0; font-family:Inter,sans-serif;">* Média parcial — considerando 6 dia(s) úteis registrados naquele mês (recurso novo, ainda coletando histórico completo).</p>
+  
 </div>
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/trkd-images/LYNXMPEM811WR_1200_L.jpg" alt="Wall Street fecha em alta, com ações recuperando um pouco do brilho" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/wall-street-fecha-em-alta-com-acoes-recuperando-um-pouco-do-brilho-2055771" target="_blank" rel="noopener noreferrer" class="tk-link">Wall Street fecha em alta, com ações recuperando um pouco do brilho</a></span><span class="pct">Investing.com (Ações)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/moved_LYNXMPEK5B0SF_L.jpg" alt="Vendas de veículos novos caem 1,6% em agosto ante julho, diz Fenabrave" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/vendas-de-veiculos-novos-somam-275-mil-unidades-em-agosto-alta-de-22-na-base-anual-diz-fenabrave-2055680" target="_blank" rel="noopener noreferrer" class="tk-link">Vendas de veículos novos caem 1,6% em agosto ante julho, diz Fenabrave</a></span><span class="pct">Investing.com (Economia)</span></div>
-  <div class="mover-row com-thumb"><img src="https://www.infomoney.com.br/wp-content/uploads/2026/09/2026-09-02T165248Z_1_LYNXMPEM811NJ_RTROPTP_4_IRAN-CRISIS-ECONOMY-1.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Moeda do Irã afunda após novos ataques e ultrapassa 2,2 milhões de riais por dólar" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://www.infomoney.com.br/mercados/moeda-do-ira-afunda-apos-novos-ataques-e-ultrapassa-22-milhoes-de-riais-por-dolar/" target="_blank" rel="noopener noreferrer" class="tk-link">Moeda do Irã afunda após novos ataques e ultrapassa 2,2 milhões de riais por dólar</a></span><span class="pct">InfoMoney (geral)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEE33022_M.jpg" alt="CSL pagará até US$ 1,6 bilhão para desenvolver medicamento para doenças raras; ações sobem" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/csl-pagara-ate-us-16-bilhao-para-desenvolver-medicamento-para-doencas-raras-acoes-sobem-2082590" target="_blank" rel="noopener noreferrer" class="tk-link">CSL pagará até US$ 1,6 bilhão para desenvolver medicamento para doenças raras; ações sobem</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/futuros-das-bolsas-americanas-sobem-apos-dados-fracos-do-mercado-de-trabalho-2082585" target="_blank" rel="noopener noreferrer" class="tk-link">Futuros das bolsas americanas sobem após dados fracos do mercado de trabalho</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEB5S0BT_M.jpg" alt="Schneider Electric perto de acordo de US$ 20 bi para comprar a PTC" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/schneider-electric-perto-de-acordo-de-us-20-bilhoes-para-comprar-a-ptc-2082562" target="_blank" rel="noopener noreferrer" class="tk-link">Schneider Electric perto de acordo de US$ 20 bi para comprar a PTC</a></span><span class="pct">Investing.com (Ações)</span></div>
 </div>
 
 <h2 class="section">FIIs - Maiores Dividend Yield</h2>
@@ -236,39 +229,39 @@
   
   <tr>
     <td class="name">XPCA11</td>
-    <td>17.55%</td>
-    <td>R$ 7.35</td>
+    <td>17.63%</td>
+    <td>R$ 7.26</td>
     <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
+    <td class="name">TRXF11</td>
+    <td>16.76%</td>
+    <td>R$ 70.40</td>
+    <td class="rationale">FII Trx Real</td>
+  </tr>
+  <tr>
     <td class="name">IRIM11</td>
-    <td>16.47%</td>
-    <td>R$ 61.02</td>
+    <td>16.23%</td>
+    <td>R$ 62.11</td>
     <td class="rationale">FII Irim</td>
   </tr>
   <tr>
     <td class="name">VGIR11</td>
-    <td>15.66%</td>
-    <td>R$ 9.64</td>
+    <td>15.62%</td>
+    <td>R$ 9.67</td>
     <td class="rationale">FII Valreiii</td>
   </tr>
   <tr>
-    <td class="name">TRXF11</td>
-    <td>15.65%</td>
-    <td>R$ 75.41</td>
-    <td class="rationale">FII Trx Real</td>
+    <td class="name">RECR11</td>
+    <td>14.77%</td>
+    <td>R$ 73.40</td>
+    <td class="rationale">FII Rec Rece</td>
   </tr>
   <tr>
     <td class="name">CPTS11</td>
-    <td>14.39%</td>
-    <td>R$ 7.47</td>
+    <td>14.23%</td>
+    <td>R$ 7.59</td>
     <td class="rationale">FII Capi Sec</td>
-  </tr>
-  <tr>
-    <td class="name">RECR11</td>
-    <td>13.88%</td>
-    <td>R$ 78.45</td>
-    <td class="rationale">FII Rec Rece</td>
   </tr>
 </table>
 
@@ -277,39 +270,39 @@
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
-    <td class="name">CMIG4</td>
-    <td>11.61%</td>
-    <td>R$ 11.03</td>
-    <td class="rationale">CEMIG</td>
-  </tr>
-  <tr>
-    <td class="name">ALOS3</td>
-    <td>10.94%</td>
-    <td>R$ 28.59</td>
-    <td class="rationale">ALLOS</td>
-  </tr>
-  <tr>
     <td class="name">BBSE3</td>
-    <td>10.93%</td>
-    <td>R$ 42.00</td>
+    <td>11.34%</td>
+    <td>R$ 40.49</td>
     <td class="rationale">BB Seguridade</td>
   </tr>
   <tr>
-    <td class="name">BBDC4</td>
-    <td>8.67%</td>
-    <td>R$ 17.72</td>
-    <td class="rationale">Banco Bradesco</td>
+    <td class="name">ALOS3</td>
+    <td>10.89%</td>
+    <td>R$ 30.47</td>
+    <td class="rationale">ALLOS</td>
+  </tr>
+  <tr>
+    <td class="name">CMIG4</td>
+    <td>10.00%</td>
+    <td>R$ 11.39</td>
+    <td class="rationale">CEMIG</td>
+  </tr>
+  <tr>
+    <td class="name">VALE3</td>
+    <td>7.81%</td>
+    <td>R$ 71.83</td>
+    <td class="rationale">Vale</td>
   </tr>
   <tr>
     <td class="name">PETR4</td>
-    <td>7.68%</td>
-    <td>R$ 47.61</td>
+    <td>7.15%</td>
+    <td>R$ 51.15</td>
     <td class="rationale">Petrobras</td>
   </tr>
   <tr>
     <td class="name">ITUB4</td>
-    <td>7.65%</td>
-    <td>R$ 41.39</td>
+    <td>7.05%</td>
+    <td>R$ 44.88</td>
     <td class="rationale">Banco Itaú Unibanco</td>
   </tr>
 </table>
@@ -317,26 +310,26 @@
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/2026-08-12T000331Z_1603220559_RC2MWMAQQQE0_RTRMADP_3_USA-TRUMP.jpg?fit=300%2C214&amp;quality=70&amp;strip=all" alt="Trump elogia relação com Brasil, e diz que América do Sul está virando “à direita”" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/07/2026-07-25T161010Z_2094840813_RC24LMA5KFP7_RTRMADP_3_BRAZIL-POLITICS.jpg?fit=300%2C200&amp;quality=70&amp;strip=all" alt="Milei parabeniza Flávio e vê oportunidade de aproximação entre Brasil e Argentina" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mundo/trump-elogia-relacao-com-brasil-e-diz-que-america-do-sul-esta-virando-a-direita/" target="_blank" rel="noopener noreferrer" class="n-link">1. Trump elogia relação com Brasil, e diz que América do Sul está virando “à direita”</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/mundo/milei-parabeniza-flavio-e-ve-oportunidade-de-aproximacao-entre-brasil-e-argentina/" target="_blank" rel="noopener noreferrer" class="n-link">1. Milei parabeniza Flávio e vê oportunidade de aproximação entre Brasil e Argentina</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/06/bandeira-ira-oriente-medio-iran2.jpg?fit=300%2C191&amp;quality=70&amp;strip=all" alt="Petróleo fecha em alta com tensões ainda elevadas no Oriente Médio" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/08/debate-band-augusto-cury-eleicoes2026-02.jpg?fit=300%2C191&amp;quality=70&amp;strip=all" alt="Augusto Cury não apoia Lula nem Flávio e defende fim da polarização após eleição" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/petroleo-fecha-em-alta-com-tensoes-ainda-elevadas-no-oriente-medio/" target="_blank" rel="noopener noreferrer" class="n-link">2. Petróleo fecha em alta com tensões ainda elevadas no Oriente Médio</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/politica/augusto-cury-nao-apoia-lula-nem-flavio-e-defende-fim-da-polarizacao-apos-eleicao/" target="_blank" rel="noopener noreferrer" class="n-link">2. Augusto Cury não apoia Lula nem Flávio e defende fim da polarização após eleição</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
 
-<div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2025/11/569748806_18531095635019767_2156363233076774354_n.jpg?fit=300%2C225&amp;quality=70&amp;strip=all" alt="T4F deixa a Bolsa após 15 anos, com perda de mais de 90% das ações" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+<div class="news-item">
+  
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/t4f-deixa-a-bolsa-apos-15-anos-com-perda-de-mais-de-90-das-acoes/" target="_blank" rel="noopener noreferrer" class="n-link">3. T4F deixa a Bolsa após 15 anos, com perda de mais de 90% das ações</a></div>
-    <div class="n-body">Fonte: InfoMoney (geral)</div>
+    <div class="n-title"><a href="https://br.investing.com/news/stock-market-news/futuros-das-bolsas-americanas-sobem-apos-dados-fracos-do-mercado-de-trabalho-2082585" target="_blank" rel="noopener noreferrer" class="n-link">3. Futuros das bolsas americanas sobem após dados fracos do mercado de trabalho</a></div>
+    <div class="n-body">Fonte: Investing.com (Ações)</div>
   </div>
 </div>
 
