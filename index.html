@@ -7911,22 +7911,20 @@
         });
       });
 
-      // IBOV/IBOVESPA não são tickers negociáveis — são índice, não vêm no
-      // /v2/finance/quotes da HG Brasil (que é por ativo da B3). O ponto do
-      // índice já é coletado à parte (robô de boletim, via brapi) e mora em
-      // indices.json; aqui só lemos de lá em vez de tentar como ativo.
-      const ALIASES_INDICE = { IBOV: 'Ibovespa', IBOVESPA: 'Ibovespa', '^BVSP': 'Ibovespa' };
+      // IBOV/IBOVESPA não são tickers de ativo — são índice, e a HG Brasil
+      // os atende com uma fonte própria (INDEXB3:, não B3:). Confirmado
+      // testando direto na API: B3:IBOV dá "Ticker inválido", mas
+      // INDEXB3:BVSP funciona tanto em /finance/quotes quanto em
+      // /finance/history — ou seja, o índice pode usar o MESMO card e
+      // gráfico dos outros ativos, só com a fonte certa no ticker.
+      const ALIASES_INDICE = { IBOV: 'INDEXB3:BVSP', IBOVESPA: 'INDEXB3:BVSP', '^BVSP': 'INDEXB3:BVSP' };
 
       async function hgBuscarAtivo() {
         const digitado = inputTicker.value.trim().toUpperCase();
         if (!digitado) return;
 
-        if (ALIASES_INDICE[digitado]) {
-          await hgConsultarIndice(ALIASES_INDICE[digitado], digitado);
-          return;
-        }
-
-        const ticker = digitado.startsWith('B3:') ? digitado : `B3:${digitado}`;
+        const tickerIndice = ALIASES_INDICE[digitado];
+        const ticker = tickerIndice || (digitado.startsWith('B3:') ? digitado : `B3:${digitado}`);
 
         statusEl.className = 'hg-status';
         statusEl.textContent = `Consultando ${digitado}...`;
@@ -7969,6 +7967,11 @@
 
         const ativo = data?.results?.[0];
         if (!ativo) {
+          if (tickerIndice) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Não encontrei dados do ${digitado} agora. Tente novamente em instantes.`;
+            return;
+          }
           // Não é ticker da B3 — tenta como Stock/ETF internacional via
           // TwelveData antes de desistir de vez.
           const achouTwelveData = await hgBuscarTwelveData(digitado);
@@ -7980,6 +7983,12 @@
         }
 
         statusEl.textContent = '';
+        // A HG Brasil não devolve um campo "ticker" pronto pra reusar no
+        // histórico — só "symbol" (aqui viraria "BVSP", sem a fonte). Pra
+        // /finance/history pedir no índice certo, grava o ticker completo
+        // (INDEXB3:BVSP) explicitamente; hgInicializarPeriodoTabs usa
+        // a.ticker quando presente, antes de cair para a.symbol.
+        if (tickerIndice) ativo.ticker = tickerIndice;
         hgRenderizarAtivo(ativo);
       }
 
@@ -8463,70 +8472,6 @@
         btn.hidden = false;
       }
 
-      // Card de índice (Ibovespa): bem mais enxuto que o de ativo — sem DY,
-      // P/VP, dividendos ou gráfico, porque índice não tem nada disso. Só
-      // pontos, variação do dia e um aviso de que não dá pra comprar ele
-      // direto, com atalho pro ETF que o replica.
-      async function hgConsultarIndice(label, digitado) {
-        statusEl.className = 'hg-status';
-        statusEl.textContent = `Consultando ${digitado}...`;
-        resultadoEl.innerHTML = '';
-        try {
-          const resp = await fetch('indices.json', { cache: 'no-store' });
-          if (!resp.ok) throw new Error('HTTP ' + resp.status);
-          const lista = await resp.json();
-          const item = Array.isArray(lista) ? lista.find(i => i.label === label) : null;
-          if (!item || typeof item.valor !== 'number') {
-            statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Não encontrei dados do ${label} agora. Tente novamente em instantes.`;
-            return;
-          }
-          statusEl.textContent = '';
-          hgRenderizarIndice(item, digitado);
-        } catch (e) {
-          statusEl.className = 'hg-status erro';
-          statusEl.textContent = `Falha ao carregar o ${label}. Tente novamente em instantes.`;
-          console.error('Erro ao consultar índice:', e);
-        }
-      }
-
-      function hgRenderizarIndice(item, digitado) {
-        const emAlta = (item.variacao_pct || 0) >= 0;
-        resultadoEl.innerHTML = `
-          <div class="hg-card">
-            <div class="hg-card-topo">
-              <div class="hg-card-topo-info">
-                <div>
-                  <h3>${item.label} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${digitado})</span></h3>
-                  <div class="hg-setor">Índice da B3 — não é um ativo negociável</div>
-                </div>
-              </div>
-            </div>
-            <div class="hg-indicadores-cards">
-              <div class="hg-indicador-card">
-                <div class="hg-indicador-label"><span>Pontos</span></div>
-                <strong>${hgFormatNumero(item.valor)}</strong>
-                <small class="${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${hgFormatNumero(Math.abs(item.variacao_pct || 0))}%</small>
-              </div>
-            </div>
-            <div class="hg-status atencao-fixa" style="margin-top:14px;">
-              <span>⚠️</span>
-              <span>
-                O ${item.label} é um <strong>índice</strong>: mede o desempenho médio das principais ações da B3,
-                mas não é um ativo que se compra diretamente. Quem quer investir nele costuma usar um ETF que o
-                replica, como o <span class="hg-chip" data-ticker="BOVA11">BOVA11</span>.
-              </span>
-            </div>
-          </div>
-        `;
-        resultadoEl.querySelectorAll('.hg-chip').forEach(chip => {
-          chip.addEventListener('click', () => {
-            inputTicker.value = chip.getAttribute('data-ticker');
-            hgBuscarAtivo();
-          });
-        });
-      }
-
       function hgRenderizarAtivo(a) {
         const q = a.quote || {};
         const logo = a.logos?.square_large || a.logos?.square_small;
@@ -8563,6 +8508,17 @@
                 ${a.kind === 'stock' ? hgBotaoBalancos(a) : ''}
               </div>
             </div>
+
+            ${a.kind === 'index' ? `
+            <div class="hg-status atencao-fixa" style="margin-bottom:14px;">
+              <span>⚠️</span>
+              <span>
+                O ${a.name || a.symbol} é um <strong>índice</strong>: mede o desempenho médio de um grupo de ações,
+                mas não é um ativo que se compra diretamente. Quem quer investir nele costuma usar um ETF que o
+                replica, como o <span class="hg-chip" data-ticker="BOVA11">BOVA11</span>.
+              </span>
+            </div>
+            ` : ''}
 
             <div class="hg-indicadores-cards">
               <div class="hg-indicador-card">
@@ -9411,9 +9367,12 @@
       async function hgBuscarHistoricoPrecos(ticker, periodo) {
         const { inicio, sampleBy } = hgParametrosPeriodo(periodo);
         const hoje = new Date();
-        const simbolo = String(ticker || '').replace(/^B3:/i, '').toUpperCase();
+        const bruto = String(ticker || '').toUpperCase();
+        // Índice (ex: INDEXB3:BVSP) já vem com a fonte certa no nome — só
+        // ativo "solto" (ex: PETR4, sem ':') precisa do prefixo B3: aqui.
+        const simbolo = bruto.includes(':') ? bruto : `B3:${bruto}`;
 
-        const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent('B3:' + simbolo)}&sample_by=${sampleBy}&start_date=${hgDataYYYYMMDD(inicio)}&end_date=${hgDataYYYYMMDD(hoje)}&key=${CHAVE_HG}`;
+        const url = `https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=${encodeURIComponent(simbolo)}&sample_by=${sampleBy}&start_date=${hgDataYYYYMMDD(inicio)}&end_date=${hgDataYYYYMMDD(hoje)}&key=${CHAVE_HG}`;
 
         const resp = await fetch(url);
         const data = await resp.json();
