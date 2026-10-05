@@ -1,5 +1,6 @@
 name: TMP teste HG Brasil IBOV
-on: workflow_dispatch: {}
+on:
+  workflow_dispatch: {}
 jobs:
   teste:
     runs-on: ubuntu-latest
