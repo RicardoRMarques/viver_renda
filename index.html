@@ -7911,9 +7911,21 @@
         });
       });
 
+      // IBOV/IBOVESPA não são tickers negociáveis — são índice, não vêm no
+      // /v2/finance/quotes da HG Brasil (que é por ativo da B3). O ponto do
+      // índice já é coletado à parte (robô de boletim, via brapi) e mora em
+      // indices.json; aqui só lemos de lá em vez de tentar como ativo.
+      const ALIASES_INDICE = { IBOV: 'Ibovespa', IBOVESPA: 'Ibovespa', '^BVSP': 'Ibovespa' };
+
       async function hgBuscarAtivo() {
         const digitado = inputTicker.value.trim().toUpperCase();
         if (!digitado) return;
+
+        if (ALIASES_INDICE[digitado]) {
+          await hgConsultarIndice(ALIASES_INDICE[digitado], digitado);
+          return;
+        }
+
         const ticker = digitado.startsWith('B3:') ? digitado : `B3:${digitado}`;
 
         statusEl.className = 'hg-status';
@@ -8449,6 +8461,70 @@
         if (atual !== btn || !codigos[ticker]) return;
         btn.href = `https://sistemaswebb3-listados.b3.com.br/listedCompaniesPage/main/${codigos[ticker]}/${ticker.slice(0, 4)}/reports?language=pt-br`;
         btn.hidden = false;
+      }
+
+      // Card de índice (Ibovespa): bem mais enxuto que o de ativo — sem DY,
+      // P/VP, dividendos ou gráfico, porque índice não tem nada disso. Só
+      // pontos, variação do dia e um aviso de que não dá pra comprar ele
+      // direto, com atalho pro ETF que o replica.
+      async function hgConsultarIndice(label, digitado) {
+        statusEl.className = 'hg-status';
+        statusEl.textContent = `Consultando ${digitado}...`;
+        resultadoEl.innerHTML = '';
+        try {
+          const resp = await fetch('indices.json', { cache: 'no-store' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          const lista = await resp.json();
+          const item = Array.isArray(lista) ? lista.find(i => i.label === label) : null;
+          if (!item || typeof item.valor !== 'number') {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Não encontrei dados do ${label} agora. Tente novamente em instantes.`;
+            return;
+          }
+          statusEl.textContent = '';
+          hgRenderizarIndice(item, digitado);
+        } catch (e) {
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = `Falha ao carregar o ${label}. Tente novamente em instantes.`;
+          console.error('Erro ao consultar índice:', e);
+        }
+      }
+
+      function hgRenderizarIndice(item, digitado) {
+        const emAlta = (item.variacao_pct || 0) >= 0;
+        resultadoEl.innerHTML = `
+          <div class="hg-card">
+            <div class="hg-card-topo">
+              <div class="hg-card-topo-info">
+                <div>
+                  <h3>${item.label} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${digitado})</span></h3>
+                  <div class="hg-setor">Índice da B3 — não é um ativo negociável</div>
+                </div>
+              </div>
+            </div>
+            <div class="hg-indicadores-cards">
+              <div class="hg-indicador-card">
+                <div class="hg-indicador-label"><span>Pontos</span></div>
+                <strong>${hgFormatNumero(item.valor)}</strong>
+                <small class="${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${hgFormatNumero(Math.abs(item.variacao_pct || 0))}%</small>
+              </div>
+            </div>
+            <div class="hg-status atencao-fixa" style="margin-top:14px;">
+              <span>⚠️</span>
+              <span>
+                O ${item.label} é um <strong>índice</strong>: mede o desempenho médio das principais ações da B3,
+                mas não é um ativo que se compra diretamente. Quem quer investir nele costuma usar um ETF que o
+                replica, como o <span class="hg-chip" data-ticker="BOVA11">BOVA11</span>.
+              </span>
+            </div>
+          </div>
+        `;
+        resultadoEl.querySelectorAll('.hg-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            inputTicker.value = chip.getAttribute('data-ticker');
+            hgBuscarAtivo();
+          });
+        });
       }
 
       function hgRenderizarAtivo(a) {
