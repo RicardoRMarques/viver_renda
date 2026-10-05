@@ -1,0 +1,16 @@
+name: TMP teste HG Brasil IBOV
+on: workflow_dispatch: {}
+jobs:
+  teste:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Testar tickers de indice na HG Brasil
+        run: |
+          echo "--- INDEXB3:BVSP (quotes) ---"
+          curl -s "https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=INDEXB3:BVSP&key=850310af" | head -c 2000
+          echo ""
+          echo "--- B3:IBOV (quotes, pra comparar) ---"
+          curl -s "https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=B3:IBOV&key=850310af" | head -c 1000
+          echo ""
+          echo "--- INDEXB3:BVSP (history, 30 dias) ---"
+          curl -s "https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=INDEXB3:BVSP&sample_by=1d&start_date=2026-09-05&end_date=2026-10-05&key=850310af" | head -c 2500
