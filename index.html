@@ -2081,6 +2081,25 @@
     .hg-indicador-card small { font-size: 0.74rem; font-weight: 700; font-family: "Courier New", monospace; }
 
     .hg-grafico-box { min-width: 0; position: relative; }
+    /* Fundo decorativo só nos cards de índice (Ibovespa/IFIX) — não tem
+       empresa/fundo por trás pra mostrar logo, então um fundo temático
+       preenche o espaço. Pseudo-elemento em vez de background direto no
+       container: assim a opacidade baixa (só o fundo, bem apagado) não
+       arrasta a linha do gráfico e os números junto — eles continuam
+       100% nítidos, por cima. */
+    .hg-grafico-fundo-indice { position: relative; border-radius: 10px; overflow: hidden; }
+    .hg-grafico-fundo-indice::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: url('fundo-indice-mercado.jpg');
+      background-size: cover; background-position: center;
+      opacity: 0.16; z-index: 0; pointer-events: none;
+    }
+    /* Fundo claro precisa de mais opacidade — a mesma imagem quase some
+       contra o branco do card (o oposto do tema escuro, onde ela já
+       aparece demais se não for bem apagada). */
+    html[data-theme="light"] .hg-grafico-fundo-indice::before,
+    html[data-theme="white"] .hg-grafico-fundo-indice::before { opacity: 0.24; }
+    .hg-grafico-fundo-indice svg { position: relative; z-index: 1; }
     .hg-grafico-topo { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
     .hg-grafico-titulo { font-size: 0.78rem; color: var(--text); font-weight: 700; }
     .hg-grafico-titulo span { color: var(--primary); font-weight: 700; }
@@ -8567,7 +8586,7 @@
                     <button type="button" class="hg-periodo-tab" data-periodo="1A">1A</button>
                   </div>
                 </div>
-                <div id="hgGrafico">
+                <div id="hgGrafico" class="${a.kind === 'index' ? 'hg-grafico-fundo-indice' : ''}">
                   <svg viewBox="0 0 640 260"><text x="10" y="130" fill="var(--muted)" font-size="11">Carregando gráfico...</text></svg>
                 </div>
               </div>
