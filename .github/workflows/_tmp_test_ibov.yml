@@ -5,13 +5,13 @@ jobs:
   teste:
     runs-on: ubuntu-latest
     steps:
-      - name: Testar tickers de indice na HG Brasil
+      - name: Testar ticker do IFIX na HG Brasil
         run: |
-          echo "--- INDEXB3:BVSP (quotes) ---"
-          curl -s "https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=INDEXB3:BVSP&key=850310af" | head -c 2000
+          echo "--- INDEXB3:IFIX (quotes) ---"
+          curl -s "https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=INDEXB3:IFIX&key=850310af" | head -c 1500
           echo ""
-          echo "--- B3:IBOV (quotes, pra comparar) ---"
-          curl -s "https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=B3:IBOV&key=850310af" | head -c 1000
+          echo "--- B3:IFIX (quotes, pra comparar) ---"
+          curl -s "https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=B3:IFIX&key=850310af" | head -c 800
           echo ""
-          echo "--- INDEXB3:BVSP (history, 30 dias) ---"
-          curl -s "https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=INDEXB3:BVSP&sample_by=1d&start_date=2026-09-05&end_date=2026-10-05&key=850310af" | head -c 2500
+          echo "--- INDEXB3:IFIX (history, 10 dias) ---"
+          curl -s "https://api.hgbrasil.com/v2/finance/history?format=json-cors&tickers=INDEXB3:IFIX&sample_by=1d&start_date=2026-09-26&end_date=2026-10-06&key=850310af" | head -c 1200
