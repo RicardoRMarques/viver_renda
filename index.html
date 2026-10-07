@@ -22580,9 +22580,26 @@
           primeiraParcela, ultimaParcela,
           dataUltimaParcela: linhas[linhas.length - 1]?.rotuloData ?? '—',
           linhas,
-          amortizacao: estadoAmortizacao.lista.length > 0
-            ? { lista: [...estadoAmortizacao.lista].sort((a, b) => a.ponto - b.ponto) }
-            : null,
+          // A mesma lista MESCLADA (avulsas + pontos gerados pelo FGTS a
+          // cada 2 anos) que foi de fato usada em simularFinanciamento — se
+          // guardasse só estadoAmortizacao.lista aqui, as linhas do FGTS
+          // apareceriam destacadas na tabela/PDF (o flag amortizacaoExtra
+          // vem do motor de simulação) mas com valor "R$ 0,00", por não
+          // serem encontradas nesta lista na hora de montar o relatório.
+          //
+          // Filtra pelo prazo REAL (linhas.length - 1), não pelo prazo
+          // contratado (parcelas): o FGTS a cada 2 anos é gerado até o fim
+          // do prazo ORIGINAL, mas quando o modo encurta o financiamento
+          // (ex: termina na parcela 222 em vez de 360), os pontos depois
+          // da quitação nunca chegam a ser aplicados — listar eles mesmo
+          // assim faria o relatório mostrar amortizações que não aconteceram.
+          amortizacao: (() => {
+            const mesclada = montarAmortParaSimulacao(parcelas);
+            if (!mesclada) return null;
+            const prazoReal = linhas.length - 1;
+            const lista = mesclada.lista.filter(a => a.ponto <= prazoReal).sort((a, b) => a.ponto - b.ponto);
+            return lista.length > 0 ? { lista } : null;
+          })(),
         };
 
         document.getElementById('financBtnPdf').addEventListener('click', gerarPdf);
