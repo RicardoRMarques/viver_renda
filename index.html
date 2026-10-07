@@ -5703,12 +5703,18 @@
                 </div>
               </div>
               <div class="calc-campo">
-                <label for="amortFgtsModo">Modo</label>
-                <select id="amortFgtsModo">
-                  <option value="prazo">Amortizar por prazo (reduz o nº de meses)</option>
-                  <option value="prazo_parcela_fixa">Amortizar por prazo, mantendo o valor da parcela</option>
-                  <option value="parcela">Amortizar por parcela (mantém o prazo, reduz a parcela)</option>
-                </select>
+                <label style="margin-bottom:6px;">
+                  <input type="radio" name="amortFgtsModo" value="prazo" checked style="margin-right:6px;" />
+                  Amortizar por prazo <span id="amortFgtsDescPrazo" style="color:var(--muted); font-weight:400;">(reduz o nº de meses)</span>
+                </label>
+                <label style="margin-bottom:6px;" id="amortFgtsLabelPrazoParcelaFixa">
+                  <input type="radio" name="amortFgtsModo" value="prazo_parcela_fixa" style="margin-right:6px;" />
+                  Amortizar por prazo, mantendo o valor da parcela <span style="color:var(--muted); font-weight:400;">(a parcela seguinte fica igual à de antes da amortização; o prazo encolhe pra compensar)</span>
+                </label>
+                <label>
+                  <input type="radio" name="amortFgtsModo" value="parcela" style="margin-right:6px;" />
+                  Amortizar por parcela <span id="amortFgtsDescParcela" style="color:var(--muted); font-weight:400;">(mantém o prazo, reduz o valor da parcela)</span>
+                </label>
               </div>
             </div>
           </div>
@@ -22960,8 +22966,11 @@
       const amortFgtsAtivo = document.getElementById('amortFgtsAtivo');
       const amortFgtsCampos = document.getElementById('amortFgtsCampos');
       const amortFgtsValor = document.getElementById('amortFgtsValor');
-      const amortFgtsModo = document.getElementById('amortFgtsModo');
       const MAX_AMORTIZACOES = 5;
+
+      function amortFgtsModoSelecionado() {
+        return document.querySelector('input[name="amortFgtsModo"]:checked')?.value || 'prazo';
+      }
 
       if (amortValor) hgAplicarMascaraMoeda(amortValor);
       if (amortFgtsValor) hgAplicarMascaraMoeda(amortFgtsValor);
@@ -23012,7 +23021,8 @@
           if (estadoAmortizacao.fgts) {
             amortFgtsValor.value = estadoAmortizacao.fgts.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             amortFgtsValor.dataset.centavos = String(Math.round(estadoAmortizacao.fgts.valor * 100));
-            amortFgtsModo.value = estadoAmortizacao.fgts.modo;
+            const radioFgtsModo = document.querySelector(`input[name="amortFgtsModo"][value="${estadoAmortizacao.fgts.modo}"]`);
+            if (radioFgtsModo) radioFgtsModo.checked = true;
           }
         }
 
@@ -23021,24 +23031,29 @@
         // "amortizar por prazo" no SAC mantém a AMORTIZAÇÃO mensal igual
         // (não a parcela) e só termina o financiamento mais cedo. Já no
         // Price, a parcela é fixa e realmente não muda até o fim do prazo.
+        const descPrazoTexto = ultimaSimulacao.sistema === 'sac'
+          ? '(mantém a amortização mensal igual; a parcela continua caindo mês a mês por causa dos juros, e o financiamento termina mais cedo)'
+          : '(mantém a parcela igual até o fim, reduz o nº de meses)';
         const descPrazoEl = document.getElementById('amortDescPrazo');
-        if (descPrazoEl) {
-          descPrazoEl.textContent = ultimaSimulacao.sistema === 'sac'
-            ? '(mantém a amortização mensal igual; a parcela continua caindo mês a mês por causa dos juros, e o financiamento termina mais cedo)'
-            : '(mantém a parcela igual até o fim, reduz o nº de meses)';
-        }
+        if (descPrazoEl) descPrazoEl.textContent = descPrazoTexto;
+        const descPrazoFgtsEl = document.getElementById('amortFgtsDescPrazo');
+        if (descPrazoFgtsEl) descPrazoFgtsEl.textContent = descPrazoTexto;
 
         // "Amortizar por prazo, mantendo o valor da parcela" só faz sentido
         // no SAC — no Price, o modo "prazo" comum já mantém a parcela fixa
-        // por definição, então esse modo extra ficaria redundante.
-        const labelPrazoParcelaFixa = document.getElementById('amortLabelPrazoParcelaFixa');
-        if (labelPrazoParcelaFixa) {
-          const ehSac = ultimaSimulacao.sistema === 'sac';
-          labelPrazoParcelaFixa.style.display = ehSac ? '' : 'none';
-          if (!ehSac && labelPrazoParcelaFixa.querySelector('input').checked) {
-            document.querySelector('input[name="amortModo"][value="prazo"]').checked = true;
+        // por definição, então esse modo extra ficaria redundante. Mesma
+        // regra vale pros dois conjuntos de radio (avulsa e FGTS).
+        const ehSac = ultimaSimulacao.sistema === 'sac';
+        [
+          { label: document.getElementById('amortLabelPrazoParcelaFixa'), grupo: 'amortModo' },
+          { label: document.getElementById('amortFgtsLabelPrazoParcelaFixa'), grupo: 'amortFgtsModo' },
+        ].forEach(({ label, grupo }) => {
+          if (!label) return;
+          label.style.display = ehSac ? '' : 'none';
+          if (!ehSac && label.querySelector('input').checked) {
+            document.querySelector(`input[name="${grupo}"][value="prazo"]`).checked = true;
           }
-        }
+        });
       }
       function fecharModalAmort() {
         amortOverlay.hidden = true;
@@ -23108,7 +23123,7 @@
               amortStatus.textContent = 'Informe o valor do FGTS a cada 2 anos (ou desmarque a opção).';
               return;
             }
-            estadoAmortizacao.fgts = { valor: valorFgts, modo: amortFgtsModo.value };
+            estadoAmortizacao.fgts = { valor: valorFgts, modo: amortFgtsModoSelecionado() };
           } else {
             estadoAmortizacao.fgts = null;
           }
