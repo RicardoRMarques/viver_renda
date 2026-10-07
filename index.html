@@ -5684,6 +5684,35 @@
 
           <button class="hg-btn" id="amortBtnAdicionar" style="width:100%; background:var(--deep); color:var(--text); border:1px solid var(--border);">+ Adicionar à lista</button>
 
+          <div class="calc-campo" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;">
+              <input type="checkbox" id="amortFgtsAtivo" style="width:16px; height:16px;" />
+              Usar o FGTS a cada 2 anos
+            </label>
+            <p class="calc-ajuda" style="margin:4px 0 10px;">
+              Pela regra do FGTS/Caixa, quem financiou pelo SFH pode usar o saldo do FGTS para abater o saldo devedor
+              a cada 24 meses. Informe o valor e ele é aplicado automaticamente a partir da parcela 24, repetindo a
+              cada 24 parcelas até o fim do financiamento — sem ocupar vaga na lista de até 5 amortizações acima.
+            </p>
+            <div id="amortFgtsCampos" hidden>
+              <div class="calc-campo">
+                <label for="amortFgtsValor">Valor do FGTS a cada 2 anos</label>
+                <div class="calc-input-prefixado">
+                  <span class="calc-prefixo">R$</span>
+                  <input type="text" inputmode="numeric" id="amortFgtsValor" placeholder="0,00" />
+                </div>
+              </div>
+              <div class="calc-campo">
+                <label for="amortFgtsModo">Modo</label>
+                <select id="amortFgtsModo">
+                  <option value="prazo">Amortizar por prazo (reduz o nº de meses)</option>
+                  <option value="prazo_parcela_fixa">Amortizar por prazo, mantendo o valor da parcela</option>
+                  <option value="parcela">Amortizar por parcela (mantém o prazo, reduz a parcela)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div class="calc-campo" style="margin-top:14px;">
             <label>Histórico de amortizações (<span id="amortContagem">0</span>/5)</label>
             <div id="amortHistoricoLista" class="amort-historico-lista">
@@ -22166,7 +22195,23 @@
       let financChartBarras = null;
       // Estado da amortização extra aplicada (se houver). "ativo" controla
       // se a última simulação deve considerar essas amortizações ou não.
-      let estadoAmortizacao = { lista: [] }; // cada item: { ponto, valor, modo }
+      let estadoAmortizacao = { lista: [], fgts: null }; // lista: até 5 avulsas { ponto, valor, modo }; fgts: { valor, modo } | null, repetida a cada 24 parcelas
+      const INTERVALO_FGTS_MESES = 24;
+
+      // Junta a lista avulsa (até 5, cadastradas uma a uma) com os pontos
+      // GERADOS automaticamente pelo uso do FGTS a cada 24 parcelas (24, 48,
+      // 72, ...) até o fim do financiamento. Ponto com entrada manual E
+      // automática no mesmo mês: a manual prevalece (foi escolhida a dedo).
+      function montarAmortParaSimulacao(parcelasTotais) {
+        const lista = [...estadoAmortizacao.lista];
+        if (estadoAmortizacao.fgts && estadoAmortizacao.fgts.valor > 0) {
+          const pontosManuais = new Set(estadoAmortizacao.lista.map(a => a.ponto));
+          for (let p = INTERVALO_FGTS_MESES; p < parcelasTotais; p += INTERVALO_FGTS_MESES) {
+            if (!pontosManuais.has(p)) lista.push({ ponto: p, valor: estadoAmortizacao.fgts.valor, modo: estadoAmortizacao.fgts.modo });
+          }
+        }
+        return lista.length > 0 ? { lista } : null;
+      }
 
       if (!overlay || !btnAbrirMenu) return; // seção não presente nesta página
 
@@ -22434,7 +22479,7 @@
         }
 
         const taxaMensal = taxaMensalEfetiva(taxaPct, periodo);
-        const linhas = simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0, amort: estadoAmortizacao.lista.length > 0 ? estadoAmortizacao : null });
+        const linhas = simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0, amort: montarAmortParaSimulacao(parcelas) });
 
         const totalJuros = linhas.reduce((acc, l) => acc + l.juros, 0);
         const totalPago = linhas.reduce((acc, l) => acc + l.parcela, 0);
@@ -22895,9 +22940,19 @@
       const amortStatus = document.getElementById('amortStatus');
       const amortHistoricoLista = document.getElementById('amortHistoricoLista');
       const amortContagem = document.getElementById('amortContagem');
+      const amortFgtsAtivo = document.getElementById('amortFgtsAtivo');
+      const amortFgtsCampos = document.getElementById('amortFgtsCampos');
+      const amortFgtsValor = document.getElementById('amortFgtsValor');
+      const amortFgtsModo = document.getElementById('amortFgtsModo');
       const MAX_AMORTIZACOES = 5;
 
       if (amortValor) hgAplicarMascaraMoeda(amortValor);
+      if (amortFgtsValor) hgAplicarMascaraMoeda(amortFgtsValor);
+      if (amortFgtsAtivo) {
+        amortFgtsAtivo.addEventListener('change', () => {
+          amortFgtsCampos.hidden = !amortFgtsAtivo.checked;
+        });
+      }
 
       function renderizarHistoricoAmort() {
         amortContagem.textContent = String(estadoAmortizacao.lista.length);
@@ -22931,6 +22986,18 @@
         amortOverlay.hidden = false;
         document.body.style.overflow = 'hidden';
         renderizarHistoricoAmort();
+
+        // Restaura o que já estava configurado de FGTS, se o modal foi
+        // fechado e reaberto sem passar pelo "Limpar tudo".
+        if (amortFgtsAtivo) {
+          amortFgtsAtivo.checked = !!estadoAmortizacao.fgts;
+          amortFgtsCampos.hidden = !estadoAmortizacao.fgts;
+          if (estadoAmortizacao.fgts) {
+            amortFgtsValor.value = estadoAmortizacao.fgts.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            amortFgtsValor.dataset.centavos = String(Math.round(estadoAmortizacao.fgts.valor * 100));
+            amortFgtsModo.value = estadoAmortizacao.fgts.modo;
+          }
+        }
 
         // No SAC, a parcela sempre cai mês a mês (juros incidem sobre um
         // saldo cada vez menor) — mesmo sem amortização extra. Por isso,
@@ -23003,9 +23070,21 @@
 
       if (amortBtnAplicar) {
         amortBtnAplicar.addEventListener('click', () => {
-          if (estadoAmortizacao.lista.length === 0) {
+          if (amortFgtsAtivo && amortFgtsAtivo.checked) {
+            const valorFgts = hgValorMascarado(amortFgtsValor);
+            if (valorFgts <= 0) {
+              amortStatus.className = 'hg-status erro';
+              amortStatus.textContent = 'Informe o valor do FGTS a cada 2 anos (ou desmarque a opção).';
+              return;
+            }
+            estadoAmortizacao.fgts = { valor: valorFgts, modo: amortFgtsModo.value };
+          } else {
+            estadoAmortizacao.fgts = null;
+          }
+
+          if (estadoAmortizacao.lista.length === 0 && !estadoAmortizacao.fgts) {
             amortStatus.className = 'hg-status erro';
-            amortStatus.textContent = 'Adicione ao menos uma amortização à lista antes de aplicar.';
+            amortStatus.textContent = 'Adicione uma amortização à lista ou ative o FGTS a cada 2 anos antes de aplicar.';
             return;
           }
           fecharModalAmort();
@@ -23015,7 +23094,10 @@
 
       if (amortBtnLimpar) {
         amortBtnLimpar.addEventListener('click', () => {
-          estadoAmortizacao = { lista: [] };
+          estadoAmortizacao = { lista: [], fgts: null };
+          if (amortFgtsAtivo) amortFgtsAtivo.checked = false;
+          if (amortFgtsCampos) amortFgtsCampos.hidden = true;
+          if (amortFgtsValor) { amortFgtsValor.value = ''; amortFgtsValor.dataset.centavos = '0'; }
           amortSequencia.value = '';
           amortValor.value = '';
           amortValor.dataset.centavos = '0';
@@ -23032,7 +23114,7 @@
       btnFechar.addEventListener('click', fecharModal);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnSimular.addEventListener('click', () => {
-        estadoAmortizacao = { lista: [] };
+        estadoAmortizacao = { lista: [], fgts: null };
         simular();
       });
 
