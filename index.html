@@ -23087,6 +23087,20 @@
 
       if (amortBtnAplicar) {
         amortBtnAplicar.addEventListener('click', () => {
+          // Preenchendo "Após qual parcela?"/"Valor" mas esquecendo de
+          // clicar em "+ Adicionar à lista" faz esses campos ficarem
+          // visíveis na tela sem nunca entrar na simulação — confuso
+          // principalmente agora que o FGTS, logo abaixo, foi aplicado
+          // "sozinho" sem precisar desse botão. Avisa em vez de aplicar
+          // calado e deixar a pessoa achando que os 49.000 também entraram.
+          const sequenciaPreenchida = amortSequencia.value.trim() !== '';
+          const valorAvulsoPreenchido = hgValorMascarado(amortValor) > 0;
+          if (sequenciaPreenchida || valorAvulsoPreenchido) {
+            amortStatus.className = 'hg-status erro';
+            amortStatus.textContent = 'Você preencheu uma amortização avulsa mas não clicou em "+ Adicionar à lista" — ela ainda não foi aplicada. Clique em "+ Adicionar à lista" (ou apague os dois campos acima, se não for usar essa) antes de aplicar.';
+            return;
+          }
+
           if (amortFgtsAtivo && amortFgtsAtivo.checked) {
             const valorFgts = hgValorMascarado(amortFgtsValor);
             if (valorFgts <= 0) {
