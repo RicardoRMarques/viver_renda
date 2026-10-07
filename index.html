@@ -3594,8 +3594,13 @@
     /* Simulador de Aposentadoria Renda Passiva — mesma largura da
        Calculadora de Venda Coberta (.vc-modal), a pedido do usuário. */
     .rp-modal { max-width: 960px; }
+    /* Fica apertado desde que o modal ganhou dois blocos de radio lado a
+       lado em espírito (avulsa + FGTS), cada um com texto de explicação
+       longo — mesma largura das outras calculadoras "densas". */
+    .amort-modal { max-width: 960px; }
     @media (min-width: 1024px) {
       .rp-modal { max-width: 1040px; }
+      .amort-modal { max-width: 1040px; }
     }
     .rp-risco-grid { display: flex; gap: 8px; flex-wrap: wrap; }
     .rp-risco-chip {
@@ -5642,7 +5647,7 @@
 
     <!-- Modal: Amortizar financiamento (aplica amortizações extras na simulação já feita) -->
     <div id="amortOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="amortTitulo" hidden>
-      <div class="calc-modal">
+      <div class="calc-modal amort-modal">
         <div class="calc-modal-topo">
           <h3 id="amortTitulo">Amortizar financiamento</h3>
           <button id="amortFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
@@ -5691,10 +5696,18 @@
             </label>
             <p class="calc-ajuda" style="margin:4px 0 10px;">
               Pela regra do FGTS/Caixa, quem financiou pelo SFH pode usar o saldo do FGTS para abater o saldo devedor
-              a cada 24 meses. Informe o valor e ele é aplicado automaticamente a partir da parcela 24, repetindo a
-              cada 24 parcelas até o fim do financiamento — sem ocupar vaga na lista de até 5 amortizações acima.
+              a cada 24 meses. Informe a partir de qual parcela e o valor, e ele é aplicado automaticamente, repetindo
+              a cada 24 parcelas até o fim do financiamento — sem ocupar vaga na lista de até 5 amortizações acima.
             </p>
             <div id="amortFgtsCampos" hidden>
+              <div class="calc-campo">
+                <label for="amortFgtsInicio">1ª aplicação a partir de qual parcela?</label>
+                <input type="text" inputmode="numeric" id="amortFgtsInicio" placeholder="ex: 24" value="24" />
+                <p class="calc-ajuda" style="margin:4px 0 0;">
+                  Normalmente 24 (2 anos do início do contrato) — mude se o financiamento já tiver andado, ou se
+                  quiser simular a primeira retirada mais tarde. As seguintes continuam a cada 24 parcelas daí em diante.
+                </p>
+              </div>
               <div class="calc-campo">
                 <label for="amortFgtsValor">Valor do FGTS a cada 2 anos</label>
                 <div class="calc-input-prefixado">
@@ -22201,18 +22214,20 @@
       let financChartBarras = null;
       // Estado da amortização extra aplicada (se houver). "ativo" controla
       // se a última simulação deve considerar essas amortizações ou não.
-      let estadoAmortizacao = { lista: [], fgts: null }; // lista: até 5 avulsas { ponto, valor, modo }; fgts: { valor, modo } | null, repetida a cada 24 parcelas
+      let estadoAmortizacao = { lista: [], fgts: null }; // lista: até 5 avulsas { ponto, valor, modo }; fgts: { inicio, valor, modo } | null, repetida a cada 24 parcelas a partir de "inicio"
       const INTERVALO_FGTS_MESES = 24;
 
       // Junta a lista avulsa (até 5, cadastradas uma a uma) com os pontos
-      // GERADOS automaticamente pelo uso do FGTS a cada 24 parcelas (24, 48,
-      // 72, ...) até o fim do financiamento. Ponto com entrada manual E
-      // automática no mesmo mês: a manual prevalece (foi escolhida a dedo).
+      // GERADOS automaticamente pelo uso do FGTS a partir de "inicio",
+      // repetindo a cada 24 parcelas (inicio, inicio+24, inicio+48, ...) até
+      // o fim do financiamento. Ponto com entrada manual E automática no
+      // mesmo mês: a manual prevalece (foi escolhida a dedo).
       function montarAmortParaSimulacao(parcelasTotais) {
         const lista = [...estadoAmortizacao.lista];
         if (estadoAmortizacao.fgts && estadoAmortizacao.fgts.valor > 0) {
           const pontosManuais = new Set(estadoAmortizacao.lista.map(a => a.ponto));
-          for (let p = INTERVALO_FGTS_MESES; p < parcelasTotais; p += INTERVALO_FGTS_MESES) {
+          const inicio = estadoAmortizacao.fgts.inicio || INTERVALO_FGTS_MESES;
+          for (let p = inicio; p < parcelasTotais; p += INTERVALO_FGTS_MESES) {
             if (!pontosManuais.has(p)) lista.push({ ponto: p, valor: estadoAmortizacao.fgts.valor, modo: estadoAmortizacao.fgts.modo });
           }
         }
@@ -22965,6 +22980,7 @@
       const amortContagem = document.getElementById('amortContagem');
       const amortFgtsAtivo = document.getElementById('amortFgtsAtivo');
       const amortFgtsCampos = document.getElementById('amortFgtsCampos');
+      const amortFgtsInicio = document.getElementById('amortFgtsInicio');
       const amortFgtsValor = document.getElementById('amortFgtsValor');
       const MAX_AMORTIZACOES = 5;
 
@@ -23019,6 +23035,7 @@
           amortFgtsAtivo.checked = !!estadoAmortizacao.fgts;
           amortFgtsCampos.hidden = !estadoAmortizacao.fgts;
           if (estadoAmortizacao.fgts) {
+            amortFgtsInicio.value = String(estadoAmortizacao.fgts.inicio);
             amortFgtsValor.value = estadoAmortizacao.fgts.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             amortFgtsValor.dataset.centavos = String(Math.round(estadoAmortizacao.fgts.valor * 100));
             const radioFgtsModo = document.querySelector(`input[name="amortFgtsModo"][value="${estadoAmortizacao.fgts.modo}"]`);
@@ -23117,13 +23134,19 @@
           }
 
           if (amortFgtsAtivo && amortFgtsAtivo.checked) {
+            const inicioFgts = parseInt(amortFgtsInicio.value, 10);
             const valorFgts = hgValorMascarado(amortFgtsValor);
+            if (isNaN(inicioFgts) || inicioFgts <= 0) {
+              amortStatus.className = 'hg-status erro';
+              amortStatus.textContent = 'Informe a partir de qual parcela a 1ª aplicação do FGTS acontece (ex: 24).';
+              return;
+            }
             if (valorFgts <= 0) {
               amortStatus.className = 'hg-status erro';
               amortStatus.textContent = 'Informe o valor do FGTS a cada 2 anos (ou desmarque a opção).';
               return;
             }
-            estadoAmortizacao.fgts = { valor: valorFgts, modo: amortFgtsModoSelecionado() };
+            estadoAmortizacao.fgts = { inicio: inicioFgts, valor: valorFgts, modo: amortFgtsModoSelecionado() };
           } else {
             estadoAmortizacao.fgts = null;
           }
@@ -23143,6 +23166,7 @@
           estadoAmortizacao = { lista: [], fgts: null };
           if (amortFgtsAtivo) amortFgtsAtivo.checked = false;
           if (amortFgtsCampos) amortFgtsCampos.hidden = true;
+          if (amortFgtsInicio) amortFgtsInicio.value = '24';
           if (amortFgtsValor) { amortFgtsValor.value = ''; amortFgtsValor.dataset.centavos = '0'; }
           amortSequencia.value = '';
           amortValor.value = '';
