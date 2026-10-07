@@ -5209,7 +5209,15 @@
           <h3 id="aposTitulo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a8 8 0 0 1 16 0v1"></path></svg>Calculadora Aposentadoria INSS
           </h3>
-          <button id="aposFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" id="aposCompartilharLink" class="modal-link-btn"
+                    aria-label="Compartilhar o link desta ferramenta"
+                    title="Compartilhar o link desta ferramenta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+            <button id="aposFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+          </div>
         </div>
 
         <div class="calc-corpo">
@@ -5701,7 +5709,15 @@
           <h3 id="jcTitulo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M3 17 9 11 13 15 21 7"></path><path d="M15 7h6v6"></path></svg>Calculadora de Juros Compostos
           </h3>
-          <button id="jcFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" id="jcCompartilharLink" class="modal-link-btn"
+                    aria-label="Compartilhar o link desta ferramenta"
+                    title="Compartilhar o link desta ferramenta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+            <button id="jcFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+          </div>
         </div>
 
         <div class="calc-corpo">
@@ -5814,7 +5830,15 @@
           <h3 id="empTitulo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><rect x="2" y="6" width="20" height="12" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line><line x1="6" y1="14" x2="10" y2="14"></line></svg>Calculadora de Empréstimo
           </h3>
-          <button id="empFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button type="button" id="empCompartilharLink" class="modal-link-btn"
+                    aria-label="Compartilhar o link desta ferramenta"
+                    title="Compartilhar o link desta ferramenta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+            <button id="empFechar" class="calc-fechar" aria-label="Fechar calculadora" title="Fechar">✕</button>
+          </div>
         </div>
 
         <div class="calc-corpo">
@@ -24096,6 +24120,13 @@
       });
       btnFechar.addEventListener('click', fecharModal);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      document.getElementById('jcCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'juroscompostos',
+          titulo: 'Calculadora de Juros Compostos — Viver de Renda',
+          texto: 'Simule o crescimento dos seus investimentos com juros compostos.',
+        }));
+      hgAbrirPorLinkDeFerramenta('juroscompostos', abrirModal);
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
       btnPdf.addEventListener('click', gerarPdfJc);
@@ -24354,6 +24385,13 @@
       });
       btnFechar.addEventListener('click', fecharModal);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      document.getElementById('aposCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'aposinss',
+          titulo: 'Calculadora Aposentadoria INSS — Viver de Renda',
+          texto: 'Simule sua aposentadoria pelas regras do INSS após a Reforma da Previdência.',
+        }));
+      hgAbrirPorLinkDeFerramenta('aposinss', abrirModal);
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
     })();
@@ -25183,6 +25221,13 @@
       });
       btnFechar.addEventListener('click', fecharModal);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      document.getElementById('empCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'emprestimo',
+          titulo: 'Calculadora de Empréstimo — Viver de Renda',
+          texto: 'Simule as parcelas do seu empréstimo ou financiamento.',
+        }));
+      hgAbrirPorLinkDeFerramenta('emprestimo', abrirModal);
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
       btnPdf.addEventListener('click', gerarPdfEmp);
