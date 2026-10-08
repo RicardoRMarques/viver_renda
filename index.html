@@ -4326,6 +4326,7 @@
               🏦 Índice de Basileia dos Bancos
             </button>
             <a class="nav-dropdown-item" href="#tesouro-direto"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="12" y1="21" x2="12" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Tesouro Direto</a>
+            <button type="button" class="nav-dropdown-item" id="mmBtnAbrirMenu">📊 Marcação a Mercado</button>
             <button type="button" class="nav-dropdown-item" id="fgcBtnAbrir">
               <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC
             </button>
@@ -4428,6 +4429,7 @@
     <a class="mobile-menu-item" href="#debentures"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"></rect><circle cx="12" cy="12.5" r="2.6"></circle><line x1="6" y1="10" x2="6" y2="15"></line><line x1="18" y1="10" x2="18" y2="15"></line></svg> Debêntures — taxas do mercado</a>
     <a class="mobile-menu-item" href="#taxa-justa"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="16" y1="20" x2="16" y2="14"></line><line x1="22" y1="20" x2="2" y2="20"></line></svg> Qual é uma taxa justa hoje?</a>
     <a class="mobile-menu-item" href="#tesouro-direto"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="12" y1="21" x2="12" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Tesouro Direto</a>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="mmBtnAbrirMenu">📊 Marcação a Mercado</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="fgcBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC</button>
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     <div class="mobile-menu-separador">Simuladores</div>
@@ -11509,6 +11511,7 @@
     // ============================================================
     (function () {
       const btnAbrir = document.getElementById('mmBtnAbrir');
+      const btnAbrirMenu = document.getElementById('mmBtnAbrirMenu');
       const overlay = document.getElementById('mmOverlay');
       const btnFechar = document.getElementById('mmFechar');
       const btnVerGrafico = document.getElementById('mmBtnVerGrafico');
@@ -11526,6 +11529,10 @@
       }
 
       btnAbrir.addEventListener('click', abrirModal);
+      // Mesmo modal, dois pontos de entrada: o card "Renda Fixa" da seção
+      // Educação e o menu "Renda Fixa" do cabeçalho — igual à Calculadora
+      // Financeira (RPN), que também abre pelos dois lugares.
+      btnAbrirMenu?.addEventListener('click', () => { fecharMenusNav(); abrirModal(); });
       btnFechar.addEventListener('click', fecharModal);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
 
