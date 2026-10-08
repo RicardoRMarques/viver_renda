@@ -9546,6 +9546,9 @@
           .filter(p => typeof p.close === 'number' && p.date)
           .sort((a, b) => new Date(a.date) - new Date(b.date));
       }
+      // Exposta para o gráfico de Marcação a Mercado (outra IIFE), que
+      // reaproveita a mesma busca pra sobrepor IFIX/Ibovespa.
+      window.hgBuscarHistoricoPrecos = hgBuscarHistoricoPrecos;
 
       async function hgCarregarGrafico(ticker, periodo) {
         const container = document.getElementById('hgGrafico');
@@ -11339,6 +11342,8 @@
       let carregando = null;
       let grafico = null;
       let tituloAtual = null;
+      let indices = null;
+      let carregandoIndices = null;
 
       async function carregarHistorico() {
         if (historico) return historico;
@@ -11351,6 +11356,49 @@
           return historico;
         })();
         return carregando;
+      }
+
+      // IFIX e Ibovespa não têm arquivo histórico próprio no site — busca
+      // direto na HG Brasil, igual ao gráfico de "Consulta Ações/FIIs".
+      // Falha aqui não deve derrubar o gráfico do título: some a linha,
+      // mas preço e taxa do Tesouro continuam aparecendo.
+      async function carregarIndices() {
+        if (indices) return indices;
+        if (carregandoIndices) return carregandoIndices;
+        carregandoIndices = (async () => {
+          try {
+            const [ifix, ibov] = await Promise.all([
+              window.hgBuscarHistoricoPrecos('INDEXB3:IFIX', '1A'),
+              window.hgBuscarHistoricoPrecos('INDEXB3:BVSP', '1A'),
+            ]);
+            indices = { ifix, ibov };
+          } catch (e) {
+            console.warn('Marcação a mercado: falha ao carregar IFIX/Ibovespa', e);
+            indices = { ifix: [], ibov: [] };
+          }
+          return indices;
+        })();
+        return carregandoIndices;
+      }
+
+      // Alinha a série de um índice (datas próprias) à série do título
+      // (datas do Tesouro) pela data mais próxima, e converte pra variação
+      // % desde o primeiro ponto disponível do índice — é a variação, não
+      // o valor em pontos, que dá pra comparar visualmente com a taxa.
+      function alinharEIndexar(serieBase, pontos) {
+        if (!Array.isArray(pontos) || pontos.length < 2) return serieBase.map(() => null);
+        const base = pontos[0].close;
+        const LIMITE_MS = 5 * 24 * 60 * 60 * 1000;
+        return serieBase.map(p => {
+          const alvo = new Date(p.data);
+          let melhor = null, menorDif = Infinity;
+          for (const q of pontos) {
+            const dif = Math.abs(new Date(q.date) - alvo);
+            if (dif < menorDif) { menorDif = dif; melhor = q; }
+          }
+          if (!melhor || menorDif > LIMITE_MS) return null;
+          return ((melhor.close / base) - 1) * 100;
+        });
       }
 
       function dataBr(iso) {
@@ -11398,24 +11446,34 @@
           '</div>';
       }
 
-      async function desenhar(serie) {
+      async function desenhar(serie, indicesCarregados) {
         await hgCarregarChartJs();
         if (grafico) grafico.destroy();
 
         const corPreco = HG_COR_PRIMARIA();
         const corTaxa = '#e0994d';
+        const corIfix = '#2ec4b6';
+        const corIbov = '#b388ff';
+
+        const ifixPct = alinharEIndexar(serie, indicesCarregados?.ifix);
+        const ibovPct = alinharEIndexar(serie, indicesCarregados?.ibov);
+        const temIfix = ifixPct.some(v => v !== null);
+        const temIbov = ibovPct.some(v => v !== null);
+
+        const datasets = [
+          { label: 'Preço (PU)', data: serie.map(p => p.pu), borderColor: corPreco,
+            borderWidth: 2, pointRadius: 0, tension: 0.15, yAxisID: 'y' },
+          { label: 'Taxa (% a.a.)', data: serie.map(p => p.taxa), borderColor: corTaxa,
+            borderWidth: 2, pointRadius: 0, tension: 0.15, yAxisID: 'y1', borderDash: [5, 4] },
+        ];
+        if (temIfix) datasets.push({ label: 'IFIX (variação %)', data: ifixPct, borderColor: corIfix,
+          borderWidth: 1.5, pointRadius: 0, tension: 0.15, yAxisID: 'y2', borderDash: [2, 2] });
+        if (temIbov) datasets.push({ label: 'Ibovespa (variação %)', data: ibovPct, borderColor: corIbov,
+          borderWidth: 1.5, pointRadius: 0, tension: 0.15, yAxisID: 'y2', borderDash: [2, 2] });
 
         grafico = new Chart(canvas, {
           type: 'line',
-          data: {
-            labels: serie.map(p => dataBr(p.data)),
-            datasets: [
-              { label: 'Preço (PU)', data: serie.map(p => p.pu), borderColor: corPreco,
-                borderWidth: 2, pointRadius: 0, tension: 0.15, yAxisID: 'y' },
-              { label: 'Taxa (% a.a.)', data: serie.map(p => p.taxa), borderColor: corTaxa,
-                borderWidth: 2, pointRadius: 0, tension: 0.15, yAxisID: 'y1', borderDash: [5, 4] },
-            ],
-          },
+          data: { labels: serie.map(p => dataBr(p.data)), datasets },
           options: {
             responsive: true, maintainAspectRatio: false, animation: false,
             interaction: { mode: 'index', intersect: false },
@@ -11423,9 +11481,13 @@
               legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (c) => c.datasetIndex === 0
-                    ? 'Preço: ' + hgFormatMoeda(c.parsed.y)
-                    : 'Taxa: ' + hgFormatNumero(c.parsed.y) + '%',
+                  label: (c) => {
+                    const rotulo = c.dataset.label || '';
+                    if (rotulo.startsWith('Preço')) return 'Preço: ' + hgFormatMoeda(c.parsed.y);
+                    if (rotulo.startsWith('Taxa')) return 'Taxa: ' + hgFormatNumero(c.parsed.y) + '%';
+                    const sinal = c.parsed.y >= 0 ? '+' : '';
+                    return rotulo.replace(' (variação %)', '') + ': ' + sinal + hgFormatNumero(c.parsed.y) + '%';
+                  },
                 },
               },
             },
@@ -11437,13 +11499,21 @@
               // deixam o fundo riscado e não ajudam a ler nenhuma das duas.
               y1: { position: 'right', ticks: { color: HG_COR_MUTED(), callback: (v) => hgFormatNumero(v) + '%' },
                     grid: { drawOnChartArea: false } },
+              // Terceiro eixo, deslocado pra fora do y1: variação % de
+              // IFIX/Ibovespa não é a mesma grandeza da taxa, mas compartilha
+              // a ideia de "%", e "offset" evita sobrepor os números do y1.
+              y2: { position: 'right', offset: true, display: temIfix || temIbov,
+                    ticks: { color: HG_COR_MUTED(), callback: (v) => (v >= 0 ? '+' : '') + hgFormatNumero(v) + '%' },
+                    grid: { drawOnChartArea: false } },
             },
           },
         });
 
         legendaEl.innerHTML =
           '<span><i class="tdg-marca" style="background:' + corPreco + ';"></i>Preço (PU), eixo da esquerda</span>' +
-          '<span><i class="tdg-marca" style="background:' + corTaxa + ';"></i>Taxa ao ano, eixo da direita</span>';
+          '<span><i class="tdg-marca" style="background:' + corTaxa + ';"></i>Taxa ao ano, eixo da direita</span>' +
+          (temIfix ? '<span><i class="tdg-marca" style="background:' + corIfix + ';"></i>IFIX, variação % no período</span>' : '') +
+          (temIbov ? '<span><i class="tdg-marca" style="background:' + corIbov + ';"></i>Ibovespa, variação % no período</span>' : '');
       }
 
       function abrir() {
@@ -11486,11 +11556,14 @@
 
         statusEl.textContent = '';
         montarResumo(serie);
-        await desenhar(serie);
+        const indicesCarregados = await carregarIndices();
+        await desenhar(serie, indicesCarregados);
+        const temIndices = (indicesCarregados.ifix.length > 1) || (indicesCarregados.ibov.length > 1);
         rodapeEl.innerHTML =
           'Preço e taxa de venda (o que você receberia vendendo), de ' + dataBr(serie[0].data) +
-          ' a ' + dataBr(serie[serie.length - 1].data) + '. Fonte: Tesouro Transparente. ' +
-          'Comprar e vender pelo portal oficial: <a href="' + (portal || 'https://www.tesourodireto.com.br') +
+          ' a ' + dataBr(serie[serie.length - 1].data) + '. Fonte: Tesouro Transparente.' +
+          (temIndices ? ' IFIX e Ibovespa em variação % (não em pontos), últimos 12 meses — fonte: HG Brasil.' : '') +
+          ' Comprar e vender pelo portal oficial: <a href="' + (portal || 'https://www.tesourodireto.com.br') +
           '" target="_blank" rel="noopener noreferrer">https://www.tesourodireto.com.br</a>';
       };
 
