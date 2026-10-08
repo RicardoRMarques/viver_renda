@@ -6343,6 +6343,9 @@
         <div class="card">
           <h3>Renda Fixa</h3>
           <p>Entenda o porto seguro da sua carteira: Tesouro Direto, CDBs, LCIs e proteção do FGC.</p>
+          <button type="button" class="hg-btn-secundario-pequeno" id="mmBtnAbrir" style="margin-top:12px;">
+            📊 O que é Marcação a Mercado?
+          </button>
         </div>
         <div class="card">
           <h3>Renda Variável</h3>
@@ -6649,6 +6652,49 @@
           Teste simplificado e educativo — não substitui a Análise de Perfil do Investidor (API) oficial exigida por
           corretoras e bancos antes de qualquer recomendação real de investimento.
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: O que é Marcação a Mercado (explicador da seção Educação) -->
+  <div id="mmOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="mmTitulo" hidden>
+    <div class="calc-modal tdg-modal">
+      <div class="calc-modal-topo">
+        <h3 id="mmTitulo">📊 O que é Marcação a Mercado?</h3>
+        <button id="mmFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          É quanto o seu título de renda fixa VALERIA HOJE se você vendesse ele agora, antes do vencimento — e é por
+          isso que o preço de um Tesouro Prefixado ou IPCA+ sobe e desce todo santo dia, mesmo sem você fazer nada.
+        </p>
+
+        <p class="calc-ajuda">
+          O mecanismo é simples: quando os juros que o mercado pede para títulos novos SOBEM, os títulos antigos (com
+          uma taxa contratada menor) ficam menos atraentes — e só encontram comprador por um preço mais baixo. Quando
+          os juros CAEM, acontece o contrário: o título antigo, travado numa taxa maior que a de hoje, passa a valer
+          mais. A direção é sempre oposta: juros do mercado sobem, preço do título cai; juros caem, preço sobe.
+        </p>
+
+        <div class="hg-status atencao-fixa">
+          <span>💡</span>
+          <span>
+            Aconteceu de verdade em outubro de 2026: com o resultado do 1º turno das eleições reduzindo a incerteza
+            no mercado, as taxas exigidas pelos investidores para o Tesouro IPCA+ caíram — e o preço desses títulos
+            disparou da noite para o dia, sem nenhuma mudança no título em si.
+          </span>
+        </div>
+
+        <p class="calc-ajuda">
+          <strong>O detalhe que mais confunde:</strong> isso só importa pra quem VENDE antes do vencimento. Levando o
+          título até o fim, essas oscilações no meio do caminho não mudam nada — você recebe exatamente a taxa que
+          contratou na compra, ponto final.
+        </p>
+
+        <button type="button" class="hg-btn" id="mmBtnVerGrafico" style="width:100%; margin-top:6px;">
+          📈 Ver o gráfico real de um Tesouro IPCA+
+        </button>
+        <div id="mmStatus" class="hg-status" style="margin-top:8px;"></div>
       </div>
     </div>
   </div>
@@ -11452,6 +11498,61 @@
         if (!overlay.hidden && tituloAtual) window.vrAbrirMarcacaoMercado(tituloAtual, PORTAL_PADRAO);
       });
       const PORTAL_PADRAO = 'https://www.tesourodireto.com.br';
+    })();
+
+    // ============================================================
+    // "O QUE É MARCAÇÃO A MERCADO" — explicador da seção Educação
+    // (card Renda Fixa). O botão "Ver o gráfico real" reaproveita o MESMO
+    // modal/engine de gráfico do Tesouro Direto (window.vrAbrirMarcacaoMercado),
+    // escolhendo o IPCA+ com Juros Semestrais de vencimento mais distante —
+    // é o que mais oscila, então é o exemplo mais didático.
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('mmBtnAbrir');
+      const overlay = document.getElementById('mmOverlay');
+      const btnFechar = document.getElementById('mmFechar');
+      const btnVerGrafico = document.getElementById('mmBtnVerGrafico');
+      const statusEl = document.getElementById('mmStatus');
+      if (!btnAbrir || !overlay) return;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+        statusEl.textContent = '';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+
+      btnVerGrafico.addEventListener('click', async () => {
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Carregando título...';
+        try {
+          const resp = await fetch('data/tesouro.json', { cache: 'no-store' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          const dados = await resp.json();
+          const candidatos = (dados.titulos || [])
+            .filter(t => t.indexador === 'ipca' && t.cupom === 'semestral')
+            .sort((a, b) => new Date(b.vencimento) - new Date(a.vencimento));
+          const titulo = candidatos[0];
+          if (!titulo || typeof window.vrAbrirMarcacaoMercado !== 'function') {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = 'Não consegui carregar o gráfico agora. Tente de novo em instantes.';
+            return;
+          }
+          fecharModal();
+          window.vrAbrirMarcacaoMercado(titulo, 'https://www.tesourodireto.com.br');
+        } catch (e) {
+          console.warn('Marcação a mercado (Educação): falha ao escolher título', e);
+          statusEl.className = 'hg-status erro';
+          statusEl.textContent = 'Não consegui carregar o gráfico agora. Tente de novo em instantes.';
+        }
+      });
     })();
 
     // ============================================================
