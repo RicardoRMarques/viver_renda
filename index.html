@@ -11431,6 +11431,12 @@
         const idxExemplo = encontrarExemplo(serie);
         const raioPreco = serie.map((_, i) => i === idxExemplo ? 5 : 0);
         const raioTaxa = serie.map((_, i) => i === idxExemplo ? 5 : 0);
+        // A cor do ponto precisa ser um array por ponto (não uma cor única
+        // pro dataset inteiro) — senão o Chart.js usa essa cor também no
+        // quadradinho do tooltip, e Preço/Taxa apareciam os dois dourados
+        // em vez de azul/laranja, mesmo longe do ponto de exemplo.
+        const corPontoPreco = serie.map((_, i) => i === idxExemplo ? corDestaque : corPreco);
+        const corPontoTaxa = serie.map((_, i) => i === idxExemplo ? corDestaque : corTaxa);
 
         // Plugin de instância (não registrado globalmente): desenha a
         // linha vertical e o selo "Exemplo" no dia escolhido acima.
@@ -11474,11 +11480,11 @@
             labels: serie.map(p => dataBr(p.data)),
             datasets: [
               { label: 'Preço (PU)', data: serie.map(p => p.pu), borderColor: corPreco,
-                borderWidth: 2, pointRadius: raioPreco, pointBackgroundColor: corDestaque,
-                pointBorderColor: corDestaque, tension: 0.15, yAxisID: 'y' },
+                borderWidth: 2, pointRadius: raioPreco, pointBackgroundColor: corPontoPreco,
+                pointBorderColor: corPontoPreco, tension: 0.15, yAxisID: 'y' },
               { label: 'Taxa (% a.a.)', data: serie.map(p => p.taxa), borderColor: corTaxa,
-                borderWidth: 2, pointRadius: raioTaxa, pointBackgroundColor: corDestaque,
-                pointBorderColor: corDestaque, tension: 0.15, yAxisID: 'y1', borderDash: [5, 4] },
+                borderWidth: 2, pointRadius: raioTaxa, pointBackgroundColor: corPontoTaxa,
+                pointBorderColor: corPontoTaxa, tension: 0.15, yAxisID: 'y1', borderDash: [5, 4] },
             ],
           },
           plugins: [pluginExemplo],
