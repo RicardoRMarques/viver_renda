@@ -6727,6 +6727,36 @@
         <div class="tdg-grafico"><canvas id="tdgCanvas"></canvas></div>
         <div class="tdg-legenda" id="tdgLegenda"></div>
         <div id="tdgExemplo" class="hg-status atencao-fixa" style="margin-top:10px;" hidden></div>
+
+        <details class="calc-educativo" style="margin-top:10px;" open>
+          <summary>
+            <svg class="ap-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="8" y1="11" x2="16" y2="11"></line><line x1="8" y1="15" x2="13" y2="15"></line></svg>
+            Vendeu antes do vencimento? Veja o imposto que incide
+          </summary>
+          <div class="calc-educativo-corpo">
+            <p class="calc-ajuda" style="margin-top:0;">
+              O IR incide só sobre o <strong>lucro da venda</strong> (preço de venda menos o que você pagou), nunca
+              sobre o valor total — e a alíquota cai quanto mais tempo você ficou com o título, pela tabela
+              regressiva (a mesma do CDB):
+            </p>
+            <table class="ir-tabela-regras">
+              <thead><tr><th>Tempo até a venda</th><th>Alíquota sobre o lucro</th></tr></thead>
+              <tbody>
+                <tr><td>Até 180 dias</td><td>22,5%</td></tr>
+                <tr><td>De 181 a 360 dias</td><td>20%</td></tr>
+                <tr><td>De 361 a 720 dias</td><td>17,5%</td></tr>
+                <tr><td>Acima de 720 dias</td><td>15%</td></tr>
+              </tbody>
+            </table>
+            <p class="calc-ajuda" style="margin:10px 0 0;">
+              Além do IR, a B3 cobra a <strong>taxa de custódia</strong> (0,20% ao ano, pro-rata pelo tempo
+              investido) — descontada na hora da venda ou do vencimento, nunca saindo da sua conta separadamente.
+              Os primeiros R$ 10 mil aplicados em <strong>Tesouro Selic</strong> são isentos dessa taxa; nos demais
+              títulos (Prefixado, IPCA+), ela incide desde o primeiro real.
+            </p>
+          </div>
+        </details>
+
         <p class="calc-ajuda" id="tdgRodape"></p>
       </div>
     </div>
