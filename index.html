@@ -6671,19 +6671,14 @@
           isso que o preço de um Tesouro Prefixado ou IPCA+ sobe e desce todo santo dia, mesmo sem você fazer nada.
         </p>
 
-        <p class="calc-ajuda">
-          O mecanismo é simples: quando os juros que o mercado pede para títulos novos SOBEM, os títulos antigos (com
-          uma taxa contratada menor) ficam menos atraentes — e só encontram comprador por um preço mais baixo. Quando
-          os juros CAEM, acontece o contrário: o título antigo, travado numa taxa maior que a de hoje, passa a valer
-          mais. A direção é sempre oposta: juros do mercado sobem, preço do título cai; juros caem, preço sobe.
-        </p>
-
         <div class="hg-status atencao-fixa">
-          <span>💡</span>
+          <span>⚙️</span>
           <span>
-            Aconteceu de verdade em outubro de 2026: com o resultado do 1º turno das eleições reduzindo a incerteza
-            no mercado, as taxas exigidas pelos investidores para o Tesouro IPCA+ caíram — e o preço desses títulos
-            disparou da noite para o dia, sem nenhuma mudança no título em si.
+            <strong>O mecanismo é simples:</strong> quando os juros que o mercado pede para títulos novos SOBEM, os
+            títulos antigos (com uma taxa contratada menor) ficam menos atraentes — e só encontram comprador por um
+            preço mais baixo. Quando os juros CAEM, acontece o contrário: o título antigo, travado numa taxa maior
+            que a de hoje, passa a valer mais. A direção é sempre oposta: <strong>juros do mercado sobem, preço do
+            título cai; juros caem, preço sobe.</strong>
           </span>
         </div>
 
@@ -6703,14 +6698,15 @@
 
   <!-- Modal: Carteira de Rendimentos -->
   <!-- Modal: Marcação a mercado de um título público -->
-  <div id="tdgOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="tdgTitulo" hidden>
+  <div id="tdgOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="tdgTituloFixo" hidden>
     <div class="calc-modal tdg-modal">
       <div class="calc-modal-topo">
-        <h3 id="tdgTitulo">Marcação a mercado</h3>
+        <h3 id="tdgTituloFixo">📊 Marcação a Mercado</h3>
         <button id="tdgFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
       </div>
       <div class="calc-corpo">
-        <p class="calc-ajuda" style="margin-top:0;">
+        <p class="calc-ajuda" id="tdgSubtitulo" style="margin-top:0; font-weight:700; color:var(--text);"></p>
+        <p class="calc-ajuda">
           O preço deste título muda todo dia. Se você levar até o vencimento, recebe a taxa combinada na compra —
           mas se precisar vender antes, recebe o preço de mercado do dia. <strong>Quando a taxa sobe, o preço cai</strong>,
           e é por isso que um título "seguro" pode aparecer no vermelho na corretora.
@@ -6719,6 +6715,7 @@
         <div id="tdgStatus" class="hg-status"></div>
         <div class="tdg-grafico"><canvas id="tdgCanvas"></canvas></div>
         <div class="tdg-legenda" id="tdgLegenda"></div>
+        <div id="tdgExemplo" class="hg-status atencao-fixa" style="margin-top:10px;" hidden></div>
         <p class="calc-ajuda" id="tdgRodape"></p>
       </div>
     </div>
@@ -9546,9 +9543,6 @@
           .filter(p => typeof p.close === 'number' && p.date)
           .sort((a, b) => new Date(a.date) - new Date(b.date));
       }
-      // Exposta para o gráfico de Marcação a Mercado (outra IIFE), que
-      // reaproveita a mesma busca pra sobrepor IFIX/Ibovespa.
-      window.hgBuscarHistoricoPrecos = hgBuscarHistoricoPrecos;
 
       async function hgCarregarGrafico(ticker, periodo) {
         const container = document.getElementById('hgGrafico');
@@ -11330,11 +11324,12 @@
     // ============================================================
     (function () {
       const overlay = document.getElementById('tdgOverlay');
-      const tituloEl = document.getElementById('tdgTitulo');
+      const tituloEl = document.getElementById('tdgSubtitulo');
       const resumoEl = document.getElementById('tdgResumo');
       const statusEl = document.getElementById('tdgStatus');
       const legendaEl = document.getElementById('tdgLegenda');
       const rodapeEl = document.getElementById('tdgRodape');
+      const exemploEl = document.getElementById('tdgExemplo');
       const canvas = document.getElementById('tdgCanvas');
       if (!overlay) return;
 
@@ -11342,8 +11337,6 @@
       let carregando = null;
       let grafico = null;
       let tituloAtual = null;
-      let indices = null;
-      let carregandoIndices = null;
 
       async function carregarHistorico() {
         if (historico) return historico;
@@ -11356,49 +11349,6 @@
           return historico;
         })();
         return carregando;
-      }
-
-      // IFIX e Ibovespa não têm arquivo histórico próprio no site — busca
-      // direto na HG Brasil, igual ao gráfico de "Consulta Ações/FIIs".
-      // Falha aqui não deve derrubar o gráfico do título: some a linha,
-      // mas preço e taxa do Tesouro continuam aparecendo.
-      async function carregarIndices() {
-        if (indices) return indices;
-        if (carregandoIndices) return carregandoIndices;
-        carregandoIndices = (async () => {
-          try {
-            const [ifix, ibov] = await Promise.all([
-              window.hgBuscarHistoricoPrecos('INDEXB3:IFIX', '1A'),
-              window.hgBuscarHistoricoPrecos('INDEXB3:BVSP', '1A'),
-            ]);
-            indices = { ifix, ibov };
-          } catch (e) {
-            console.warn('Marcação a mercado: falha ao carregar IFIX/Ibovespa', e);
-            indices = { ifix: [], ibov: [] };
-          }
-          return indices;
-        })();
-        return carregandoIndices;
-      }
-
-      // Alinha a série de um índice (datas próprias) à série do título
-      // (datas do Tesouro) pela data mais próxima, e converte pra variação
-      // % desde o primeiro ponto disponível do índice — é a variação, não
-      // o valor em pontos, que dá pra comparar visualmente com a taxa.
-      function alinharEIndexar(serieBase, pontos) {
-        if (!Array.isArray(pontos) || pontos.length < 2) return serieBase.map(() => null);
-        const base = pontos[0].close;
-        const LIMITE_MS = 5 * 24 * 60 * 60 * 1000;
-        return serieBase.map(p => {
-          const alvo = new Date(p.data);
-          let melhor = null, menorDif = Infinity;
-          for (const q of pontos) {
-            const dif = Math.abs(new Date(q.date) - alvo);
-            if (dif < menorDif) { menorDif = dif; melhor = q; }
-          }
-          if (!melhor || menorDif > LIMITE_MS) return null;
-          return ((melhor.close / base) - 1) * 100;
-        });
       }
 
       function dataBr(iso) {
@@ -11446,34 +11396,81 @@
           '</div>';
       }
 
-      async function desenhar(serie, indicesCarregados) {
+      // O melhor exemplo real pra apontar no gráfico é o dia em que a taxa
+      // bateu a mínima do período — é exatamente aí que a relação inversa
+      // (taxa caiu, preço subiu) fica mais visível, com dados de verdade,
+      // em vez de citar um evento fixo que pode nem estar na janela do
+      // título sendo mostrado.
+      function encontrarExemplo(serie) {
+        let idx = -1, menorTaxa = Infinity;
+        serie.forEach((p, i) => {
+          if (typeof p.taxa === 'number' && p.taxa < menorTaxa) { menorTaxa = p.taxa; idx = i; }
+        });
+        return idx;
+      }
+
+      async function desenhar(serie) {
         await hgCarregarChartJs();
         if (grafico) grafico.destroy();
 
         const corPreco = HG_COR_PRIMARIA();
         const corTaxa = '#e0994d';
-        const corIfix = '#2ec4b6';
-        const corIbov = '#b388ff';
+        const corDestaque = hgCssVar('--gold') || '#e0b84d';
 
-        const ifixPct = alinharEIndexar(serie, indicesCarregados?.ifix);
-        const ibovPct = alinharEIndexar(serie, indicesCarregados?.ibov);
-        const temIfix = ifixPct.some(v => v !== null);
-        const temIbov = ibovPct.some(v => v !== null);
+        const idxExemplo = encontrarExemplo(serie);
+        const raioPreco = serie.map((_, i) => i === idxExemplo ? 5 : 0);
+        const raioTaxa = serie.map((_, i) => i === idxExemplo ? 5 : 0);
 
-        const datasets = [
-          { label: 'Preço (PU)', data: serie.map(p => p.pu), borderColor: corPreco,
-            borderWidth: 2, pointRadius: 0, tension: 0.15, yAxisID: 'y' },
-          { label: 'Taxa (% a.a.)', data: serie.map(p => p.taxa), borderColor: corTaxa,
-            borderWidth: 2, pointRadius: 0, tension: 0.15, yAxisID: 'y1', borderDash: [5, 4] },
-        ];
-        if (temIfix) datasets.push({ label: 'IFIX (variação %)', data: ifixPct, borderColor: corIfix,
-          borderWidth: 1.5, pointRadius: 0, tension: 0.15, yAxisID: 'y2', borderDash: [2, 2] });
-        if (temIbov) datasets.push({ label: 'Ibovespa (variação %)', data: ibovPct, borderColor: corIbov,
-          borderWidth: 1.5, pointRadius: 0, tension: 0.15, yAxisID: 'y2', borderDash: [2, 2] });
+        // Plugin de instância (não registrado globalmente): desenha a
+        // linha vertical e o selo "Exemplo" no dia escolhido acima.
+        const pluginExemplo = {
+          id: 'tdgExemploPlugin',
+          afterDatasetsDraw(chart) {
+            if (idxExemplo < 0) return;
+            const { ctx, chartArea, scales } = chart;
+            const x = scales.x.getPixelForValue(idxExemplo);
+            if (!Number.isFinite(x)) return;
+            ctx.save();
+            ctx.setLineDash([4, 3]);
+            ctx.strokeStyle = corDestaque;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x, chartArea.top);
+            ctx.lineTo(x, chartArea.bottom);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const texto = 'Exemplo ↓';
+            ctx.font = 'bold 11px sans-serif';
+            const largura = ctx.measureText(texto).width + 14;
+            const xSelo = Math.min(Math.max(x - largura / 2, chartArea.left), chartArea.right - largura);
+            ctx.fillStyle = corDestaque;
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(xSelo, chartArea.top + 4, largura, 18, 9);
+            else ctx.rect(xSelo, chartArea.top + 4, largura, 18);
+            ctx.fill();
+            ctx.fillStyle = '#1a1a1a';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(texto, xSelo + largura / 2, chartArea.top + 13);
+            ctx.restore();
+          },
+        };
 
         grafico = new Chart(canvas, {
           type: 'line',
-          data: { labels: serie.map(p => dataBr(p.data)), datasets },
+          data: {
+            labels: serie.map(p => dataBr(p.data)),
+            datasets: [
+              { label: 'Preço (PU)', data: serie.map(p => p.pu), borderColor: corPreco,
+                borderWidth: 2, pointRadius: raioPreco, pointBackgroundColor: corDestaque,
+                pointBorderColor: corDestaque, tension: 0.15, yAxisID: 'y' },
+              { label: 'Taxa (% a.a.)', data: serie.map(p => p.taxa), borderColor: corTaxa,
+                borderWidth: 2, pointRadius: raioTaxa, pointBackgroundColor: corDestaque,
+                pointBorderColor: corDestaque, tension: 0.15, yAxisID: 'y1', borderDash: [5, 4] },
+            ],
+          },
+          plugins: [pluginExemplo],
           options: {
             responsive: true, maintainAspectRatio: false, animation: false,
             interaction: { mode: 'index', intersect: false },
@@ -11481,13 +11478,9 @@
               legend: { display: false },
               tooltip: {
                 callbacks: {
-                  label: (c) => {
-                    const rotulo = c.dataset.label || '';
-                    if (rotulo.startsWith('Preço')) return 'Preço: ' + hgFormatMoeda(c.parsed.y);
-                    if (rotulo.startsWith('Taxa')) return 'Taxa: ' + hgFormatNumero(c.parsed.y) + '%';
-                    const sinal = c.parsed.y >= 0 ? '+' : '';
-                    return rotulo.replace(' (variação %)', '') + ': ' + sinal + hgFormatNumero(c.parsed.y) + '%';
-                  },
+                  label: (c) => c.datasetIndex === 0
+                    ? 'Preço: ' + hgFormatMoeda(c.parsed.y)
+                    : 'Taxa: ' + hgFormatNumero(c.parsed.y) + '%',
                 },
               },
             },
@@ -11499,21 +11492,24 @@
               // deixam o fundo riscado e não ajudam a ler nenhuma das duas.
               y1: { position: 'right', ticks: { color: HG_COR_MUTED(), callback: (v) => hgFormatNumero(v) + '%' },
                     grid: { drawOnChartArea: false } },
-              // Terceiro eixo, deslocado pra fora do y1: variação % de
-              // IFIX/Ibovespa não é a mesma grandeza da taxa, mas compartilha
-              // a ideia de "%", e "offset" evita sobrepor os números do y1.
-              y2: { position: 'right', offset: true, display: temIfix || temIbov,
-                    ticks: { color: HG_COR_MUTED(), callback: (v) => (v >= 0 ? '+' : '') + hgFormatNumero(v) + '%' },
-                    grid: { drawOnChartArea: false } },
             },
           },
         });
 
         legendaEl.innerHTML =
           '<span><i class="tdg-marca" style="background:' + corPreco + ';"></i>Preço (PU), eixo da esquerda</span>' +
-          '<span><i class="tdg-marca" style="background:' + corTaxa + ';"></i>Taxa ao ano, eixo da direita</span>' +
-          (temIfix ? '<span><i class="tdg-marca" style="background:' + corIfix + ';"></i>IFIX, variação % no período</span>' : '') +
-          (temIbov ? '<span><i class="tdg-marca" style="background:' + corIbov + ';"></i>Ibovespa, variação % no período</span>' : '');
+          '<span><i class="tdg-marca" style="background:' + corTaxa + ';"></i>Taxa ao ano, eixo da direita</span>';
+
+        if (idxExemplo >= 0 && exemploEl) {
+          const p = serie[idxExemplo];
+          exemploEl.hidden = false;
+          exemploEl.innerHTML = '<span>💡</span><span><strong>Exemplo real, direto do gráfico:</strong> em ' +
+            dataBr(p.data) + ' a taxa de venda bateu a mínima do período (' + hgFormatNumero(p.taxa) +
+            '%) — e foi exatamente aí que o preço (PU) esteve entre os mais altos, ' + hgFormatMoeda(p.pu) +
+            '. Juros mais baixos, título mais valioso: a relação inversa, acontecendo de verdade.</span>';
+        } else if (exemploEl) {
+          exemploEl.hidden = true;
+        }
       }
 
       function abrir() {
@@ -11533,6 +11529,7 @@
         resumoEl.innerHTML = '';
         legendaEl.innerHTML = '';
         rodapeEl.innerHTML = '';
+        if (exemploEl) exemploEl.hidden = true;
         statusEl.className = 'hg-status';
         statusEl.textContent = 'Carregando histórico...';
         abrir();
@@ -11556,14 +11553,11 @@
 
         statusEl.textContent = '';
         montarResumo(serie);
-        const indicesCarregados = await carregarIndices();
-        await desenhar(serie, indicesCarregados);
-        const temIndices = (indicesCarregados.ifix.length > 1) || (indicesCarregados.ibov.length > 1);
+        await desenhar(serie);
         rodapeEl.innerHTML =
           'Preço e taxa de venda (o que você receberia vendendo), de ' + dataBr(serie[0].data) +
-          ' a ' + dataBr(serie[serie.length - 1].data) + '. Fonte: Tesouro Transparente.' +
-          (temIndices ? ' IFIX e Ibovespa em variação % (não em pontos), últimos 12 meses — fonte: HG Brasil.' : '') +
-          ' Comprar e vender pelo portal oficial: <a href="' + (portal || 'https://www.tesourodireto.com.br') +
+          ' a ' + dataBr(serie[serie.length - 1].data) + '. Fonte: Tesouro Transparente. ' +
+          'Comprar e vender pelo portal oficial: <a href="' + (portal || 'https://www.tesourodireto.com.br') +
           '" target="_blank" rel="noopener noreferrer">https://www.tesourodireto.com.br</a>';
       };
 
