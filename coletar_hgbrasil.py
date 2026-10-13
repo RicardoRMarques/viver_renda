@@ -1460,10 +1460,13 @@ SUPABASE_URL = "https://mzknjnupizprfatfmxqg.supabase.co"
 # internacionais do index.html — não é segredo, só limitada por domínio/plano.
 CHAVE_TWELVEDATA = "034d1589162e413d9a1e9608860cb06a"
 
-# Kinds gravados pelo front-end quando o alerta é de ação/FII/Fiagro da B3
-# (ver botão "Criar alerta" no index.html). Qualquer outro kind (ex:
-# "internacional") é tratado aqui como Stock/ETF americano via TwelveData.
-KINDS_B3 = ("stock", "fii", "fiagro")
+# Kinds gravados pelo front-end quando o alerta é de ação/FII/Fiagro/FI-Infra/
+# ETF da B3 (ver botão "Criar alerta" no index.html, mesmo whitelist de lá).
+# Qualquer outro kind (ex: "internacional") é tratado aqui como Stock/ETF
+# americano via TwelveData. Faltavam "fund" (FI-Infra, ex: DIVS11) e "etf"
+# (ETF listado na B3, ex: BOVA11) — esses alertas caíam no ramo errado
+# (TwelveData, que não tem ticker da B3) e nunca disparavam.
+KINDS_B3 = ("stock", "fii", "fiagro", "fund", "etf")
 
 
 def _obter_alertas_pendentes(service_role_key):
@@ -1516,7 +1519,7 @@ def _enviar_email_alerta(resend_key, destinatario, ticker, condicao, valor_alvo,
 
 def _obter_precos_twelvedata(tickers):
     """Cotação atual de tickers fora da B3 (Stocks/ETFs americanos, ex:
-    KBWD, AAPL), usados pelos alertas de preço com kind != stock/fii/fiagro."""
+    KBWD, AAPL), usados pelos alertas de preço com kind fora de KINDS_B3."""
     if not tickers:
         return {}
     try:
