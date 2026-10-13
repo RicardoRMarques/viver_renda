@@ -9886,6 +9886,11 @@
               <line x1="0" y1="${margemTop}" x2="0" y2="${base}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3,3"></line>
               <circle r="4.5" fill="${cor}" stroke="var(--card)" stroke-width="2"></circle>
             </g>
+            <g class="hg-grafico-tooltip-grupo hg-tt-horiz">
+              <line x1="${margemEsq}" y1="0" x2="${larguraTotal - margemDir}" y2="0" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3,3"></line>
+              <rect class="hg-grafico-tooltip-caixa hg-tt-horiz-caixa" rx="4"></rect>
+              <text class="hg-grafico-tooltip-texto hg-tt-horiz-valor" font-weight="700" text-anchor="end" style="font-size:${fonteEixo}px"></text>
+            </g>
             <g class="hg-grafico-tooltip-grupo hg-tt-caixa">
               <rect class="hg-grafico-tooltip-caixa" rx="6"></rect>
               <text class="hg-grafico-tooltip-texto hg-tt-preco" font-weight="700" style="font-size:${fonteBalao}px"></text>
@@ -9902,13 +9907,45 @@
         const overlay = container.querySelector('.hg-grafico-overlay');
         const grupoLinha = container.querySelector('.hg-tt-linha');
         const grupoCaixa = container.querySelector('.hg-tt-caixa');
+        const grupoHoriz = container.querySelector('.hg-tt-horiz');
         const linhaVertical = grupoLinha.querySelector('line');
         const circuloTooltip = grupoLinha.querySelector('circle');
         const caixaRect = grupoCaixa.querySelector('rect');
         const tPreco = grupoCaixa.querySelector('.hg-tt-preco');
         const tVar = grupoCaixa.querySelector('.hg-tt-var');
         const tData = grupoCaixa.querySelector('.hg-tt-data');
+        const linhaHoriz = grupoHoriz.querySelector('line');
+        const caixaHoriz = grupoHoriz.querySelector('.hg-tt-horiz-caixa');
+        const textoHoriz = grupoHoriz.querySelector('.hg-tt-horiz-valor');
         let indiceAtual = n - 1;
+
+        // Eixo Y inverso de paraY: devolve o preço correspondente a uma
+        // altura (em unidades do viewBox) dentro da área do gráfico — pro
+        // "régua" horizontal que segue o mouse, pedida pra imitar o cursor
+        // de preço que outros sites de cotação mostram.
+        function paraValor(y) {
+          const yClamp = Math.min(Math.max(y, margemTop), base);
+          return escala.lo + amplitude * (margemTop + altura - yClamp) / altura;
+        }
+
+        function mostrarHoriz(y) {
+          const yClamp = Math.min(Math.max(y, margemTop), base);
+          linhaHoriz.setAttribute('y1', yClamp.toFixed(2));
+          linhaHoriz.setAttribute('y2', yClamp.toFixed(2));
+
+          const texto = fmtEixo(paraValor(yClamp));
+          textoHoriz.textContent = texto;
+          const h = Math.round(fonteEixo * 1.5);
+          const w = Math.ceil(texto.length * LARGURA_CARACTERE * 1.15) + 10;
+          const xCaixa = Math.max(2, margemEsq - w - 4);
+          caixaHoriz.setAttribute('x', xCaixa.toFixed(2));
+          caixaHoriz.setAttribute('y', (yClamp - h / 2).toFixed(2));
+          caixaHoriz.setAttribute('width', w);
+          caixaHoriz.setAttribute('height', h);
+          textoHoriz.setAttribute('x', (margemEsq - 8).toFixed(2));
+          textoHoriz.setAttribute('y', (yClamp + fonteEixo * 0.32).toFixed(2));
+          grupoHoriz.style.opacity = '1';
+        }
 
         function mostrar(i) {
           indiceAtual = i;
@@ -9943,24 +9980,43 @@
           });
           grupoLinha.style.opacity = '1';
           grupoCaixa.style.opacity = '1';
+          // Padrão pra navegação por teclado (sem posição de mouse): a régua
+          // horizontal acompanha o preço exato do dia selecionado. No mouse,
+          // os handlers abaixo chamam mostrarHoriz(local.y) na sequência e
+          // substituem por onde o cursor realmente está.
+          mostrarHoriz(p.y);
         }
         function esconder() {
           grupoLinha.style.opacity = '0';
           grupoCaixa.style.opacity = '0';
+          grupoHoriz.style.opacity = '0';
         }
-        function indicePeloEvento(evt) {
+        function localPeloEvento(evt) {
           const ponto = svgEl.createSVGPoint();
           ponto.x = evt.clientX;
           ponto.y = evt.clientY;
           const ctm = svgEl.getScreenCTM();
           if (!ctm) return null;
-          const local = ponto.matrixTransform(ctm.inverse());
+          return ponto.matrixTransform(ctm.inverse());
+        }
+        function indicePeloLocal(local) {
           const i = Math.round(((local.x - margemEsq) / largura) * (n - 1));
           return Math.max(0, Math.min(n - 1, i));
         }
 
-        overlay.addEventListener('mousemove', (e) => { const i = indicePeloEvento(e); if (i !== null) mostrar(i); });
-        overlay.addEventListener('touchmove', (e) => { if (e.touches[0]) { const i = indicePeloEvento(e.touches[0]); if (i !== null) mostrar(i); } }, { passive: true });
+        overlay.addEventListener('mousemove', (e) => {
+          const local = localPeloEvento(e);
+          if (!local) return;
+          mostrar(indicePeloLocal(local));
+          mostrarHoriz(local.y);
+        });
+        overlay.addEventListener('touchmove', (e) => {
+          if (!e.touches[0]) return;
+          const local = localPeloEvento(e.touches[0]);
+          if (!local) return;
+          mostrar(indicePeloLocal(local));
+          mostrarHoriz(local.y);
+        }, { passive: true });
         overlay.addEventListener('mouseleave', esconder);
         overlay.addEventListener('focus', () => mostrar(indiceAtual));
         overlay.addEventListener('blur', esconder);
