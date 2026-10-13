@@ -8888,7 +8888,7 @@
         // Brasil, /finance/stock_price (o /v2/finance/quotes usado acima é um
         // payload enxuto e não inclui "financials"). Busca à parte e injeta
         // no card assim que chegar. Vale tanto para ações quanto para FIIs.
-        if (a.kind === 'fii' || a.kind === 'stock') {
+        if (['fii', 'fiagro', 'fund', 'stock'].includes(a.kind)) {
           const grid = resultadoEl.querySelector('.hg-grid-dados');
           if (grid) {
             // Sem título próprio de propósito: "Valuation" tinha só 2
