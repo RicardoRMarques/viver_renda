@@ -19018,7 +19018,7 @@
           return;
         }
         listaEl.innerHTML = lista.map(a => {
-          const simboloMoeda = ['stock', 'fii', 'fiagro', 'etf'].includes(a.kind) ? 'R$' : 'US$';
+          const simboloMoeda = ['stock', 'fii', 'fiagro', 'fund', 'etf'].includes(a.kind) ? 'R$' : 'US$';
           return `
           <div class="alertas-item">
             <span><strong>${a.ticker}</strong> ${a.condicao === 'abaixo' ? 'cair abaixo de' : 'subir acima de'} ${simboloMoeda} ${Number(a.valor_alvo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
@@ -19123,14 +19123,14 @@
           const dados = await resp.json();
           const ativo = dados?.results?.[0];
 
-          let kind = (ativo && ['stock', 'fii', 'fiagro', 'etf'].includes(ativo.kind)) ? ativo.kind : null;
+          let kind = (ativo && ['stock', 'fii', 'fiagro', 'fund', 'etf'].includes(ativo.kind)) ? ativo.kind : null;
           if (!kind) {
             statusEl.textContent = `Não achei "${ticker}" na B3 — tentando como Stock/ETF americano...`;
             kind = await alertasVerificarTwelveData(ticker);
           }
           if (!kind) {
             statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro, ETF ou Stock/ETF americano.`;
+            statusEl.textContent = `Não encontrei "${ticker}" como ação, FII, Fiagro, FI-Infra, ETF ou Stock/ETF americano.`;
             return;
           }
 
