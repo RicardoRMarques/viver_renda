@@ -25073,8 +25073,8 @@
           </div>
           ${verdictHtml}
           <p class="calc-ajuda" style="margin-top:10px;">
-            Simulação com juros compostos, sem considerar inflação, taxas ou impostos. Retornos passados não garantem
-            resultados futuros. Não constitui recomendação de investimento.
+            Simulação com juros compostos, <strong>sem considerar inflação</strong>, taxas ou impostos. Retornos
+            passados não garantem resultados futuros. Não constitui recomendação de investimento.
           </p>`;
         layoutEl.classList.add('com-resultado');
         ativarTooltipsCategoria();
@@ -25208,10 +25208,23 @@
           40, 58
         );
         doc.setFontSize(8);
-        doc.text(
-          'Aviso: simulação educativa de juros compostos, sem considerar inflação, taxas ou impostos. Não constitui recomendação de investimento.',
-          40, 70
-        );
+        // "sem considerar inflação" em negrito, igual ao aviso na tela —
+        // jsPDF não tem negrito parcial numa chamada só de texto, então
+        // desenha em 3 pedaços, cada um avançando o cursor pela largura
+        // real do anterior (doc.getTextWidth), pra não sobrepor nem deixar
+        // espaço sobrando entre os trechos.
+        const avisoParte1 = 'Aviso: simulação educativa de juros compostos, ';
+        const avisoParteBold = 'sem considerar inflação';
+        const avisoParte3 = ', taxas ou impostos. Não constitui recomendação de investimento.';
+        let xAviso = 40;
+        doc.setFont('helvetica', 'normal');
+        doc.text(avisoParte1, xAviso, 70);
+        xAviso += doc.getTextWidth(avisoParte1);
+        doc.setFont('helvetica', 'bold');
+        doc.text(avisoParteBold, xAviso, 70);
+        xAviso += doc.getTextWidth(avisoParteBold);
+        doc.setFont('helvetica', 'normal');
+        doc.text(avisoParte3, xAviso, 70);
         doc.setTextColor(0);
 
         // Variáveis informadas pelo usuário + resultado calculado.
