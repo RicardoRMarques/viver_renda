@@ -515,6 +515,10 @@
     .tesouro-tabela thead th.tes-ord.ordenado-asc::after { content: ' ▲'; opacity: 1; font-size: 0.65em; }
     .tesouro-tabela thead th.tes-ord.ordenado-desc::after { content: ' ▼'; opacity: 1; font-size: 0.65em; }
     .tesouro-tabela thead th.tes-ord:hover { filter: brightness(1.2); }
+    .tesouro-tabela thead th .hg-info-btn {
+      width: 13px; height: 13px; font-size: 0.58rem; margin-left: 4px; vertical-align: 1px;
+      text-transform: none; letter-spacing: normal; cursor: pointer;
+    }
     .tesouro-rodape { font-size: 0.72rem; color: var(--muted); margin-top: 10px; }
     /* Nos temas claros o azul da marca fica em ~3,6:1 sobre branco, abaixo
        do mínimo para texto pequeno — e este cabeçalho é 0,68rem. Mesmo tom
@@ -11784,11 +11788,11 @@
       const ORDEM_INDEXADOR = { selic: 0, prefixado: 1, ipca: 2, igpm: 3 };
 
       const COLUNAS_TESOURO = [
-        { chave: 'titulo',        rotulo: 'Título',              tipo: 'texto',  num: false },
-        { chave: 'vencimento',    rotulo: 'Vencimento',          tipo: 'data',   num: false },
-        { chave: 'rentabilidade', rotulo: 'Rentabilidade',       tipo: 'taxa',   num: false },
-        { chave: 'pu',            rotulo: 'Preço unitário',      tipo: 'numero', num: true  },
-        { chave: 'minimo',        rotulo: 'Investimento mínimo', tipo: 'numero', num: true  },
+        { chave: 'titulo',        rotulo: 'Título',              tipo: 'texto',  num: false, glossario: 'tesouro-titulo-col' },
+        { chave: 'vencimento',    rotulo: 'Vencimento',          tipo: 'data',   num: false, glossario: 'tesouro-vencimento-col' },
+        { chave: 'rentabilidade', rotulo: 'Rentabilidade',       tipo: 'taxa',   num: false, glossario: 'tesouro-rentabilidade-col' },
+        { chave: 'pu',            rotulo: 'Preço unitário',      tipo: 'numero', num: true,  glossario: 'tesouro-pu-col' },
+        { chave: 'minimo',        rotulo: 'Investimento mínimo', tipo: 'numero', num: true,  glossario: 'tesouro-minimo-col' },
       ];
 
       const puDe = (t) => (typeof t.pu_compra === 'number' ? t.pu_compra : t.pu_venda);
@@ -11931,7 +11935,9 @@
           const dica = c.tipo === 'taxa'
             ? 'Ordenar por rentabilidade — agrupada por indexador, porque Selic, IPCA+ e Prefixado não se comparam pelo número'
             : 'Ordenar por ' + c.rotulo.toLowerCase();
-          return '<th class="' + classes.join(' ') + '" data-coluna="' + c.chave + '" title="' + dica + '">' + c.rotulo + '</th>';
+          const botaoInfo = '<button type="button" class="hg-info-btn" data-glossario="' + c.glossario +
+            '" aria-label="O que é ' + c.rotulo + '?" title="">?</button>';
+          return '<th class="' + classes.join(' ') + '" data-coluna="' + c.chave + '" title="' + dica + '">' + c.rotulo + botaoInfo + '</th>';
         }).join('');
 
         tabelaEl.innerHTML =
@@ -11954,6 +11960,11 @@
               '</tr>';
           }).join('') +
           '</tbody>';
+
+        // A varredura de [data-glossario] roda uma vez só, no carregamento
+        // da página — esta tabela é montada de novo a cada filtro/ordenação,
+        // bem depois disso, então precisa ligar os botões "?" à mão.
+        if (window.ligarGlossario) window.ligarGlossario(tabelaEl);
       }
 
       function montarRodape() {
@@ -18363,6 +18374,13 @@
         'deb-contratada': 'A taxa combinada na emissão do papel. Está no contrato e não muda.\n\nEx: "DI + 1,75%" significa que o papel paga o CDI acumulado mais 1,75% ao ano sobre o valor de face.\n\nCompare sempre com a coluna "Taxa hoje" ao lado: a distância entre as duas conta o que aconteceu com esse crédito desde que ele foi emitido.',
         'deb-taxa-hoje': 'A taxa indicativa do mercado secundário — o retorno que o mercado está exigindo HOJE para carregar esse papel.\n\nÉ onde ele negocia entre instituições, e NÃO uma oferta que você consegue comprar na sua corretora.\n\nBem acima da taxa contratada significa que o mercado ficou mais desconfiado do emissor, ou que os juros subiram — nos dois casos o preço do papel caiu. Abaixo dela, aconteceu o contrário.',
         'deb-pct-par': 'Quanto o papel está sendo negociado em relação ao valor que ele promete pagar.\n\nO "par" é o valor de face: o que o emissor devolve no vencimento, corrigido pelo indexador. A coluna mostra o preço de mercado dividido por esse valor.\n\n• Acima de 100% — ágio: a taxa contratada é melhor que a do mercado hoje, então o papel vale mais que o valor de face.\n• 100% — negocia exatamente ao par.\n• Abaixo de 100% — deságio: o mercado pede desconto para carregar.\n\nO deságio tem duas causas bem diferentes, e a coluna "Taxa hoje" separa as duas. Desconto pequeno, com a taxa de hoje perto da contratada, é só efeito de juros — marcação a mercado, sem nada de errado com a empresa. Desconto grande, com a taxa de hoje muito acima da contratada, é risco de crédito: o mercado duvida que o emissor vá pagar.',
+
+        // --- Colunas da tabela do Tesouro Direto ---
+        'tesouro-titulo-col': 'Nome do título público, seguido do ano de referência. O texto menor embaixo diz como e quando você recebe o dinheiro: "paga tudo no vencimento" (zero cupom) ou "paga juros a cada 6 meses" (com cupom semestral).\n\nClique no nome pra ver o gráfico de marcação a mercado — como o preço desse título oscilou nos últimos meses.',
+        'tesouro-vencimento-col': 'Data em que o título termina de pagar. Para a maioria, é quando você recebe tudo de volta.\n\nNo Tesouro Educa+ e no Tesouro Renda+ é diferente: eles pagam uma renda mensal por vários anos (5 anos no Educa+, 20 no Renda+), e esta coluna mostra a data do ÚLTIMO desses pagamentos — não uma data única de resgate.',
+        'tesouro-rentabilidade-col': 'A taxa combinada na compra, mas o que ela significa muda com o indexador — por isso vem escrita por extenso:\n\n• Tesouro Selic: um spread sobre a Selic (ex: "Selic + 0,05%") — rende perto da taxa básica de juros.\n• Tesouro IPCA+: uma taxa REAL acima da inflação (ex: "IPCA + 6,68%") — o que sobra depois de corrigir pelo IPCA.\n• Tesouro Prefixado: a taxa nominal cheia (ex: "13,27% a.a.") — já inclui a inflação esperada, sem reajuste.\n\nNão dá pra comparar os três pelo número cru: 0,05% do Selic não é "pior" que 6,68% do IPCA+, são grandezas diferentes.',
+        'tesouro-pu-col': 'Preço Unitário (PU) = quanto custa 1 título inteiro hoje, se você comprasse 100% dele.\n\nNinguém precisa pagar esse valor todo: o Tesouro Direto permite comprar frações (a partir de 1%), que é exatamente o que a coluna "Investimento mínimo" ao lado mostra.',
+        'tesouro-minimo-col': 'O menor valor que dá pra investir nesse título — geralmente 1% do Preço Unitário (PU).\n\nCálculo: PU ÷ 100. É por isso que títulos de PU mais alto (como os IPCA+ de vencimento distante) ainda têm investimento mínimo baixo.',
 
         'dy-acoes': 'Dividend Yield (DY) = quanto a empresa pagou em dividendos/proventos nos últimos 12 meses, em relação à cotação atual da ação.\n\nCálculo: dividendos pagos em 12 meses / cotação atual × 100',
         'valor-mercado': 'Valor de Mercado (Market Cap) = valor total da empresa negociado na bolsa.\n\nCálculo: cotação atual × número total de ações em circulação.',
