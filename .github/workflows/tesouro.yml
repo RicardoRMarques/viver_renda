@@ -45,4 +45,25 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/tesouro.json data/tesouro-historico.json
           git commit -m "Tesouro Direto: atualiza preços e taxas"
-          git push
+
+          # Mesma corrida que já acontecia no boletim (coletar-fiis.yml):
+          # se outro robô commitar na main entre o checkout e este push
+          # (ex: coletar-fiis.yml roda a cada 15 min), o push simples falha
+          # porque main avançou. Como esses arquivos são exclusivos deste
+          # robô, um rebase normal nunca dá conflito de verdade nos dados —
+          # só precisa buscar e reaplicar o commit em cima da main atual.
+          tentativas=5
+          ok=0
+          for i in $(seq 1 $tentativas); do
+            if git pull --rebase -X theirs origin main && git push; then
+              ok=1
+              break
+            fi
+            echo "Tentativa $i/$tentativas falhou (provável corrida com outro robô), tentando de novo..."
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "::error::Não foi possível publicar o Tesouro Direto após $tentativas tentativas."
+            exit 1
+          fi
