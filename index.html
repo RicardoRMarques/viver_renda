@@ -20046,11 +20046,35 @@
             <span style="font-size:0.78rem; color:var(--muted); display:inline-flex; align-items:center; gap:4px;">${rotulo}<button type="button" class="hg-info-btn" data-indicador="${rotulo} (CVM)" aria-label="O que é ${rotulo}?" title="">?</button></span>
             <strong style="font-family:'Courier New', monospace; font-size:0.95rem;">R$ ${hgFormatCompacto(valor)}</strong>
           </div>`;
+
+        // Leitura automática da relação CAPEX x D&A: CAPEX bem acima da
+        // depreciação indica expansão da base de ativos (ou reposição de
+        // reservas, em setores como petróleo e gás); próximo, é só CAPEX
+        // de manutenção; abaixo, sobra mais caixa livre no curto prazo,
+        // mas pode sinalizar desinvestimento. Só dá pra calcular com os
+        // dois valores presentes e D&A diferente de zero.
+        let leituraHtml = '';
+        if (info.capex != null && info.depreciacao_amortizacao) {
+          const diffPct = ((info.capex - info.depreciacao_amortizacao) / Math.abs(info.depreciacao_amortizacao)) * 100;
+          let leitura;
+          if (Math.abs(diffPct) < 5) {
+            leitura = 'O CAPEX está próximo da D&A: indício de investimento de manutenção, repondo o desgaste dos ativos sem expandir muito a base.';
+          } else if (diffPct > 0) {
+            leitura = `O CAPEX está ${hgFormatNumero(diffPct, 0)}% acima da D&A: a empresa está investindo mais do que deprecia, sinal de expansão da base de ativos (ou de reposição de reservas, em setores de capital intensivo como petróleo e gás).`;
+          } else {
+            leitura = `O CAPEX está ${hgFormatNumero(Math.abs(diffPct), 0)}% abaixo da D&A: a empresa está gastando menos do que deprecia — sobra mais caixa livre no curto prazo, mas pode sinalizar desinvestimento ou maturidade.`;
+          }
+          leituraHtml = `<p style="margin:0; font-size:0.78rem; color:var(--muted); line-height:1.4;">${leitura}</p>`;
+        }
+
         placeholder.innerHTML = `
-          <div style="margin-top:12px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
-            ${info.capex != null ? item('CAPEX', info.capex) : ''}
-            ${info.depreciacao_amortizacao != null ? item('D&A', info.depreciacao_amortizacao) : ''}
-            <span style="font-size:0.75rem; color:var(--muted); margin-left:auto;">Acumulado no ano · até ${fmtDataBr(info.dt_refer)} · fonte: CVM</span>
+          <div style="margin-top:12px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
+              ${info.capex != null ? item('CAPEX', info.capex) : ''}
+              ${info.depreciacao_amortizacao != null ? item('D&A', info.depreciacao_amortizacao) : ''}
+              <span style="font-size:0.75rem; color:var(--muted); margin-left:auto;">Acumulado no ano · até ${fmtDataBr(info.dt_refer)} · fonte: CVM</span>
+            </div>
+            ${leituraHtml}
           </div>`;
         ativarTooltipsFundamentos(placeholder);
       }
