@@ -20009,7 +20009,51 @@
         'Dividend Yield': 'Dividend Yield (DY) = quanto a empresa pagou em dividendos/proventos no período, em relação à cotação atual da ação.\n\nCálculo: dividendos pagos / cotação atual × 100',
         'Atual (TTM)': 'TTM = "Trailing Twelve Months" (últimos 12 meses).\n\nOs indicadores desta coluna somam os últimos 4 trimestres divulgados, e não só o último ano fiscal fechado — dá uma visão mais atualizada, sem esperar o fechamento do exercício anual.\n\nAs demais colunas mostram cada ano fiscal fechado, no encerramento do exercício.',
         'Crescimento EBITDA': 'Compara o EBITDA do TTM (últimos 12 meses) com o EBITDA do último ano fiscal já fechado — assim a conta reflete a tendência mais recente sem misturar exercícios antigos.\n\nNão é um CAGR de vários anos: é uma comparação de 12 meses, não uma taxa composta de 5 ou 10 anos.\n\nReceita e Lucro Líquido não aparecem em valor absoluto neste endpoint (só em índices), então esse cálculo só é possível para EBITDA.',
+        'CAPEX (CVM)': 'CAPEX (Capital Expenditure / Investimento em Capital) = quanto a empresa investiu no período comprando ou ampliando imobilizado (máquinas, imóveis, equipamentos) e intangível (software, marcas, direitos).\n\nValor ACUMULADO NO ANO (convenção do fluxo de caixa brasileiro), extraído direto da Demonstração de Fluxo de Caixa enviada à CVM — a HG Brasil não tem esse dado.',
+        'D&A (CVM)': 'D&A (Depreciação e Amortização) = desgaste contábil dos ativos da empresa (imobilizado e intangível) ao longo do tempo. É uma despesa que não representa saída de caixa no período — por isso aparece como ajuste na Demonstração de Fluxo de Caixa.\n\nValor ACUMULADO NO ANO, extraído direto da Demonstração de Fluxo de Caixa enviada à CVM — a HG Brasil não tem esse dado.',
       };
+
+      // CAPEX e D&A (CVM): não vem do endpoint da HG Brasil (não tem esses
+      // campos) — vem de data/capex-da.json, gerado pelo robô
+      // coletar_cvm_capex.py a partir dos dados abertos da CVM (ITR/DFP).
+      // Cache em memória: o arquivo é o mesmo pra qualquer ação pesquisada
+      // nesta sessão, não precisa buscar de novo a cada pesquisa.
+      let capexDaPromise = null;
+      function carregarCapexDA() {
+        if (!capexDaPromise) {
+          capexDaPromise = fetch('data/capex-da.json', { cache: 'no-store' })
+            .then(resp => resp.ok ? resp.json() : null)
+            .catch(() => null);
+        }
+        return capexDaPromise;
+      }
+
+      async function preencherCapexDA(ticker, containerEl) {
+        const placeholder = containerEl.querySelector('[data-capex-da]');
+        if (!placeholder) return;
+        const dados = await carregarCapexDA();
+        // containerEl pode ter sido substituído por outra pesquisa nesse
+        // meio tempo (fetch assíncrono) — isConnected confere se o
+        // placeholder ainda está no DOM antes de preencher.
+        if (!placeholder.isConnected) return;
+        const info = dados?.ativos?.[ticker];
+        if (!info || (info.capex == null && info.depreciacao_amortizacao == null)) {
+          placeholder.remove();
+          return;
+        }
+        const item = (rotulo, valor) => `
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <span style="font-size:0.78rem; color:var(--muted); display:inline-flex; align-items:center; gap:4px;">${rotulo}<button type="button" class="hg-info-btn" data-indicador="${rotulo} (CVM)" aria-label="O que é ${rotulo}?" title="">?</button></span>
+            <strong style="font-family:'Courier New', monospace; font-size:0.95rem;">R$ ${hgFormatCompacto(valor)}</strong>
+          </div>`;
+        placeholder.innerHTML = `
+          <div style="margin-top:12px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
+            ${info.capex != null ? item('CAPEX', info.capex) : ''}
+            ${info.depreciacao_amortizacao != null ? item('D&A', info.depreciacao_amortizacao) : ''}
+            <span style="font-size:0.75rem; color:var(--muted); margin-left:auto;">Acumulado no ano · até ${fmtDataBr(info.dt_refer)} · fonte: CVM</span>
+          </div>`;
+        ativarTooltipsFundamentos(placeholder);
+      }
 
       // Tooltip próprio desta seção: mesmo padrão usado no Comparador de
       // Ativos (elemento único fixo, anexado ao <body>, fora da tabela —
@@ -20278,6 +20322,7 @@
                 </tbody>
               </table>
             </div>
+            <div data-capex-da></div>
             <p style="margin-top:12px; font-size:0.78rem; color:var(--muted);">
               Fonte: HG Brasil · Indicadores trimestrais dos últimos 2 anos.
             </p>
@@ -20290,6 +20335,7 @@
           );
         }
         ativarTooltipsFundamentos(containerEl);
+        preencherCapexDA(info.symbol, containerEl);
       }
 
       // Tudo abaixo depende dos elementos da seção antiga e independente
