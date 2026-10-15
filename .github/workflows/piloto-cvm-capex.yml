@@ -1,0 +1,36 @@
+name: "[Piloto] CAPEX/D&A via CVM"
+
+# Só manual, de propósito: isto é um teste pra validar se dá pra extrair
+# CAPEX e Depreciação/Amortização dos dados abertos da CVM, antes de
+# decidir se vale construir o robô de verdade (agendado, cobrindo toda a
+# B3). Não grava nada no repositório — só imprime nos logs da execução,
+# pra conferência manual contra o release em PDF de cada empresa.
+on:
+  workflow_dispatch:
+    inputs:
+      ano:
+        description: 'Ano do ITR a consultar (vazio = ano atual, com fallback pro anterior)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  piloto:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Rodar piloto (CAPEX/D&A via CVM)
+        run: |
+          if [ -n "${{ inputs.ano }}" ]; then
+            python3 coletar_cvm_capex_piloto.py --ano "${{ inputs.ano }}"
+          else
+            python3 coletar_cvm_capex_piloto.py
+          fi
