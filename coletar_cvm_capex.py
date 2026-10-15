@@ -151,6 +151,13 @@ def processar_arquivo(zf, nome_arquivo, codigos_alvo, acumulado):
     anterior, sem favorecer ordem de leitura)."""
     linhas = ler_csv_do_zip(zf, nome_arquivo)
     print(f"  {len(linhas)} linhas em {nome_arquivo}")
+    if linhas:
+        print(f"  DIAGNÓSTICO exemplo de linha: CD_CVM={linhas[0].get('CD_CVM')!r} "
+              f"CNPJ_CIA={linhas[0].get('CNPJ_CIA')!r} DENOM_CIA={linhas[0].get('DENOM_CIA')!r}")
+        for l in linhas:
+            if "PETROBRAS" in sem_acento_maiusculo(l.get("DENOM_CIA", "")):
+                print(f"  DIAGNÓSTICO Petrobras: CD_CVM={l.get('CD_CVM')!r} DENOM_CIA={l.get('DENOM_CIA')!r}")
+                break
 
     por_cvm = {}
     for linha in linhas:
