@@ -70,8 +70,16 @@ PILOTO = {
     "03342704000130": {"ticker": "RECV3", "nome": "PetroReconcavo"},
 }
 
+# Testado contra dados reais de PETR4/VALE3/RECV3 (ver histórico do
+# commit): a CVM varia tanto o verbo ("Adições" é mais comum que
+# "Aquisições") quanto o plural ("imobilizado" vs "ativos imobilizados")
+# entre empresas — por isso o padrão frouxo, com uma janela curta entre
+# o verbo e o substantivo pra não casar coisas tipo "Aquisição de
+# subsidiária" ou "Aquisição de direito exploratório do Excedente...".
 RE_CAPEX = re.compile(
-    r"aquisi[cç][ãa]o de (ativo )?(imobilizado|intang[ií]vel)", re.IGNORECASE
+    r"(adi[cç][ãa]o|adi[cç][õo]es|aquisi[cç][ãa]o|aquisi[cç][õo]es)"
+    r".{0,15}(imobilizad[oa]s?|intang[ií]ve(l|is))",
+    re.IGNORECASE,
 )
 RE_DA = re.compile(
     r"deprecia[cç][ãa]o.{0,25}(amortiza[cç][ãa]o|exaust[ãa]o)", re.IGNORECASE
