@@ -103,16 +103,33 @@ def sem_acento_maiusculo(txt):
     return "".join(c for c in nfkd if not unicodedata.combining(c)).upper().strip()
 
 
+def normalizar_cod_cvm(valor):
+    """A CVM grava CD_CVM com zero à esquerda ('009512' pra Petrobras);
+    mercado-acoes.json grava como int sem padding (9512). Normaliza os
+    dois lados removendo o padding, via int(), em vez de comparar string
+    crua — foi exatamente essa diferença que zerou a primeira execução
+    em escala real (0 de 299 ações, apesar dos arquivos da CVM baixarem
+    e lerem certinho)."""
+    try:
+        return str(int(str(valor).strip()))
+    except (TypeError, ValueError):
+        return ""
+
+
 def carregar_codigos_cvm_alvo():
-    """{codigo_cvm (str) -> ticker}, a partir dos ativos que o site já
-    rastreia. Ignora o que não tem codigo_cvm (HG Brasil não retornou)."""
+    """{codigo_cvm (str, sem zero à esquerda) -> [tickers]}, a partir dos
+    ativos que o site já rastreia. Uma empresa pode ter mais de uma
+    classe de ação com o MESMO código CVM (ex: PETR3/PETR4, código
+    9512) — por isso é lista, não um ticker só; um dict simples
+    sobrescreveria um ticker pelo outro e um dos dois nunca receberia
+    dado nenhum."""
     with open(MERCADO_ACOES_FILE, encoding="utf-8") as f:
         dados = json.load(f)
     alvo = {}
     for ativo in dados.get("ativos", []):
-        cod = ativo.get("codigo_cvm")
+        cod = normalizar_cod_cvm(ativo.get("codigo_cvm"))
         if cod:
-            alvo[str(cod)] = ativo["ticker"]
+            alvo.setdefault(cod, []).append(ativo["ticker"])
     return alvo
 
 
@@ -151,17 +168,10 @@ def processar_arquivo(zf, nome_arquivo, codigos_alvo, acumulado):
     anterior, sem favorecer ordem de leitura)."""
     linhas = ler_csv_do_zip(zf, nome_arquivo)
     print(f"  {len(linhas)} linhas em {nome_arquivo}")
-    if linhas:
-        print(f"  DIAGNÓSTICO exemplo de linha: CD_CVM={linhas[0].get('CD_CVM')!r} "
-              f"CNPJ_CIA={linhas[0].get('CNPJ_CIA')!r} DENOM_CIA={linhas[0].get('DENOM_CIA')!r}")
-        for l in linhas:
-            if "PETROBRAS" in sem_acento_maiusculo(l.get("DENOM_CIA", "")):
-                print(f"  DIAGNÓSTICO Petrobras: CD_CVM={l.get('CD_CVM')!r} DENOM_CIA={l.get('DENOM_CIA')!r}")
-                break
 
     por_cvm = {}
     for linha in linhas:
-        cod = str(linha.get("CD_CVM", "")).strip()
+        cod = normalizar_cod_cvm(linha.get("CD_CVM", ""))
         if cod not in codigos_alvo:
             continue
         if sem_acento_maiusculo(linha.get("ORDEM_EXERC", "")) != "ULTIMO":
@@ -245,10 +255,11 @@ def main():
             coletar_ano_tipo(tipo, ano, codigos_alvo, acumulado)
 
     saida_ativos = {}
-    for cod, ticker in codigos_alvo.items():
+    for cod, tickers in codigos_alvo.items():
         dados = acumulado.get(cod)
         if dados and (dados["capex"] is not None or dados["depreciacao_amortizacao"] is not None):
-            saida_ativos[ticker] = dados
+            for ticker in tickers:
+                saida_ativos[ticker] = dados
 
     print(f"\n{len(saida_ativos)} de {len(codigos_alvo)} ações com CAPEX e/ou D&A extraídos.")
 
