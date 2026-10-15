@@ -146,13 +146,19 @@ def extrair_pilotos(linhas):
             desc = l.get("DS_CONTA", "")
             grupo = l.get("CD_CONTA", "")
             valor = numero(l.get("VL_CONTA"))
-            contas_vistas.add((grupo, desc))
+            contas_vistas.add((grupo, desc, valor))
             if valor is None:
                 continue
             if grupo.startswith("6.02") and RE_CAPEX.search(desc):
                 capex_contas.append({"conta": grupo, "descricao": desc, "valor": valor})
             elif grupo.startswith("6.01") and RE_DA.search(desc) and da_conta is None:
                 da_conta = {"conta": grupo, "descricao": desc, "valor": valor}
+
+        # Diagnóstico: todas as contas do período, pra ver a árvore real
+        # quando a extração falhar (nomenclatura varia entre empresas).
+        print(f"\n--- Todas as contas de {cnpj} em {dt_mais_recente} ---")
+        for grupo, desc, valor in sorted(contas_vistas, key=lambda x: x[0]):
+            print(f"  {grupo}  {desc}  =  {valor}")
 
         capex_total = sum(abs(c["valor"]) for c in capex_contas) if capex_contas else None
 
