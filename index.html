@@ -7872,6 +7872,16 @@
         : null;
     }
 
+    // Escapa texto antes de interpolar em innerHTML — necessário sempre que
+    // o valor pode vir de algo que o usuário digitou (campo de busca,
+    // ticker, nome de emissor) ou de uma API externa, pra não deixar HTML/JS
+    // ser interpretado se o texto contiver "<", ">", aspas etc.
+    function hgEscapeHtml(valor) {
+      return String(valor ?? '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      }[c]));
+    }
+
     // Carrega o Chart.js sob demanda (só quando alguma calculadora abre um
     // gráfico), em vez de deixá-lo no carregamento inicial da página.
     // Reaproveitado por todas as calculadoras que têm gráfico.
@@ -12871,7 +12881,7 @@
               <div class="vp-cartao-titulo">Saúde do emissor</div>
               <div class="vp-cartao-valor" style="color:var(--muted);">Sem dado</div>
               <div class="vp-cartao-nota">
-                Não encontrei "${inEmissor.value.trim()}" na tabela do IF.data. Confira o nome na
+                Não encontrei "${hgEscapeHtml(inEmissor.value.trim())}" na tabela do IF.data. Confira o nome na
                 ferramenta Índice de Basileia dos Bancos.
               </div>
             </div>`;
@@ -14101,7 +14111,10 @@
         const semPvp = ativos.filter(a => ehFundo(a) && !(a.teto > 0) && pvpEfetivo(a) === null).map(a => a.ticker);
         const semDy = ativos.filter(a => !ehFundo(a) && !(a.teto > 0) && !(a.dy > 0) && a.preco > 0).map(a => a.ticker);
         const semTeto = ls.filter(l => l.teto === null && !semPvp.includes(l.ticker) && !semDy.includes(l.ticker)).map(l => l.ticker);
-        const lista = (arr) => arr.length > 6 ? arr.slice(0, 6).join(', ') + ` e mais ${arr.length - 6}` : arr.join(', ');
+        const lista = (arr) => {
+          const escapados = arr.map(hgEscapeHtml);
+          return escapados.length > 6 ? escapados.slice(0, 6).join(', ') + ` e mais ${escapados.length - 6}` : escapados.join(', ');
+        };
         const falta = [];
         const semDyNenhum = ativos.filter(a => a.preco > 0 && !(a.dy > 0) && (a.prov === null || a.prov === undefined)).map(a => a.ticker);
         if (semDyNenhum.length) falta.push(`<strong>Proventos</strong> sem estimativa (${lista(semDyNenhum)}) — nenhuma fonte trouxe o DY 12M desses. Digite na coluna <em>Proventos 12m</em> o total que você recebeu; sem isso eles ficam de fora dessa conta.`);
@@ -15569,7 +15582,7 @@
           const busca = buscaEl.value.trim();
           const chip = { todos: 'Todos', di: 'DI +', ipca: 'IPCA +', igpm: 'IGP-M +' }[indexador] || indexador;
           conteudoEl.innerHTML = busca && indexador !== 'todos'
-            ? `<p class="hg-status">Nenhum papel com <strong>${busca}</strong> dentro de <strong>${chip}</strong>.
+            ? `<p class="hg-status">Nenhum papel com <strong>${hgEscapeHtml(busca)}</strong> dentro de <strong>${hgEscapeHtml(chip)}</strong>.
                  <button type="button" class="deb-link-acao" id="debVerEmTodos">Procurar em todos os indexadores</button></p>`
             : `<p class="hg-status">Nenhum papel encontrado com esse filtro.</p>`;
           document.getElementById('debVerEmTodos')?.addEventListener('click', () => {
@@ -15954,7 +15967,7 @@
 
       function renderizarChips() {
         chipsEl.innerHTML = listaTickers.map(item => `
-          <span class="reinv-chip">${item.ticker} <span class="reinv-chip-valor">· ${reinvFormatMoedaChip(item.valor)} · ${item.dataCompra.toLocaleDateString('pt-BR')}</span><button type="button" data-remover="${item.ticker}" aria-label="Remover ${item.ticker}">✕</button></span>
+          <span class="reinv-chip">${hgEscapeHtml(item.ticker)} <span class="reinv-chip-valor">· ${reinvFormatMoedaChip(item.valor)} · ${item.dataCompra.toLocaleDateString('pt-BR')}</span><button type="button" data-remover="${hgEscapeHtml(item.ticker)}" aria-label="Remover ${hgEscapeHtml(item.ticker)}">✕</button></span>
         `).join('');
         chipsEl.querySelectorAll('button[data-remover]').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -16446,14 +16459,14 @@
       function reinvRenderizarTabela(linhas) {
         const linhasHtml = linhas.map(l => {
           if (l.erro) {
-            return `<div class="reinv-card-ativo"><div class="reinv-card-ativo-topo"><span class="reinv-card-ativo-nome">${l.ticker}</span></div><div class="reinv-card-erro">${l.erro}</div></div>`;
+            return `<div class="reinv-card-ativo"><div class="reinv-card-ativo-topo"><span class="reinv-card-ativo-nome">${hgEscapeHtml(l.ticker)}</span></div><div class="reinv-card-erro">${hgEscapeHtml(l.erro)}</div></div>`;
           }
           const r = l.resultado;
           const classeRent = r.rentabilidadePct >= 0 ? 'reinv-pos' : 'reinv-neg';
           return `
             <div class="reinv-card-ativo">
               <div class="reinv-card-ativo-topo">
-                <span class="reinv-card-ativo-nome">${r.ticker}</span>
+                <span class="reinv-card-ativo-nome">${hgEscapeHtml(r.ticker)}</span>
                 <span class="reinv-card-ativo-rent ${classeRent}">${r.rentabilidadePct >= 0 ? '+' : ''}${r.rentabilidadePct.toFixed(2)}%</span>
               </div>
               <div class="reinv-card-linha"><span>Data da compra</span><span>${r.dataCompra.toLocaleDateString('pt-BR')}</span></div>
@@ -16474,10 +16487,10 @@
         const truncados = linhas.filter(l => !l.erro && l.resultado.truncado);
         const semDividendos = linhas.filter(l => !l.erro && l.resultado.dividendosIncompletos);
         const avisoTruncamento = (truncados.length
-          ? `<div class="reinv-comparativo" style="margin-top:10px; color:var(--gold);">⚠️ Histórico de preços limitado para: ${truncados.map(l => `${l.ticker} (a partir de ${l.resultado.dataInicioReal.toLocaleDateString('pt-BR')})`).join(', ')}.</div>`
+          ? `<div class="reinv-comparativo" style="margin-top:10px; color:var(--gold);">⚠️ Histórico de preços limitado para: ${truncados.map(l => `${hgEscapeHtml(l.ticker)} (a partir de ${l.resultado.dataInicioReal.toLocaleDateString('pt-BR')})`).join(', ')}.</div>`
           : '')
           + (semDividendos.length
-          ? `<div class="reinv-comparativo" style="margin-top:10px; color:var(--gold);">⚠️ Proventos anteriores a estas datas não entraram na conta (resultado real foi maior): ${semDividendos.map(l => `${l.ticker} (só desde ${l.resultado.dividendosDesde.toLocaleDateString('pt-BR')})`).join(', ')}.</div>`
+          ? `<div class="reinv-comparativo" style="margin-top:10px; color:var(--gold);">⚠️ Proventos anteriores a estas datas não entraram na conta (resultado real foi maior): ${semDividendos.map(l => `${hgEscapeHtml(l.ticker)} (só desde ${l.resultado.dividendosDesde.toLocaleDateString('pt-BR')})`).join(', ')}.</div>`
           : '');
 
         const validos = linhas.filter(l => !l.erro).map(l => l.resultado);
@@ -19570,7 +19583,7 @@
           return;
         }
         listaSelecionados.innerHTML = selecionados.map(t => `
-          <span class="cmp-pill">${t}<button type="button" data-remover="${t}" title="Remover" aria-label="Remover ${t}">✕</button></span>
+          <span class="cmp-pill">${hgEscapeHtml(t)}<button type="button" data-remover="${hgEscapeHtml(t)}" title="Remover" aria-label="Remover ${hgEscapeHtml(t)}">✕</button></span>
         `).join('');
         listaSelecionados.querySelectorAll('[data-remover]').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -20313,9 +20326,9 @@
           return `<th>${c.rotulo}${botaoInfo}</th>`;
         }).join('');
 
-        const nomeExibicao = info.name || info.symbol || '';
+        const nomeExibicao = hgEscapeHtml(info.name || info.symbol || '');
         const setorHtml = info.classification?.sector
-          ? `<span class="hg-setor">${info.classification.sector}</span>`
+          ? `<span class="hg-setor">${hgEscapeHtml(info.classification.sector)}</span>`
           : '';
 
         containerEl.innerHTML = `
@@ -20323,7 +20336,7 @@
             <div class="hg-card-topo">
               <div class="hg-card-topo-info">
                 <div>
-                  <h3>${nomeExibicao} <span style="color:var(--muted); font-weight:600;">(${info.symbol})</span></h3>
+                  <h3>${nomeExibicao} <span style="color:var(--muted); font-weight:600;">(${hgEscapeHtml(info.symbol)})</span></h3>
                   ${setorHtml}
                   ${crescimentoEbitdaHtml}
                 </div>
@@ -20657,7 +20670,7 @@
                 <select id="boletimHistoricoSelect" class="boletim-historico-select">
                   ${outrosDias.map(e => `<option value="${e.arquivo}">${e.dataExibicao} — ${(e.labelDia || '').split(',')[0]}</option>`).join('')}
                 </select>
-                <a class="boletim-btn boletim-btn-ver" id="boletimHistoricoVer" href="boletins/${outrosDias[0].arquivo}" target="_blank" rel="noopener noreferrer">${iconeAbrir()} Ver</a>
+                <a class="boletim-btn boletim-btn-ver" id="boletimHistoricoVer" href="boletins/${encodeURIComponent(outrosDias[0].arquivo)}" target="_blank" rel="noopener noreferrer">${iconeAbrir()} Ver</a>
                 <button type="button" class="boletim-btn boletim-btn-whatsapp" id="boletimHistoricoCompartilhar" data-arquivo="${outrosDias[0].arquivo}">${iconeWhatsapp()} Compartilhar</button>
               </div>`;
           }
@@ -20670,7 +20683,7 @@
           if (selectHistorico) {
             selectHistorico.addEventListener('change', () => {
               const arquivo = selectHistorico.value;
-              document.getElementById('boletimHistoricoVer').href = `boletins/${arquivo}`;
+              document.getElementById('boletimHistoricoVer').href = `boletins/${encodeURIComponent(arquivo)}`;
               document.getElementById('boletimHistoricoCompartilhar').setAttribute('data-arquivo', arquivo);
             });
           }
@@ -21490,16 +21503,16 @@
 
         const montarGrupo = g => `
           <div class="lm-col-grupo">
-            <h4>${g.nome}</h4>
+            <h4>${hgEscapeHtml(g.nome)}</h4>
             <div class="lm-col-lista">
               ${g.itens.map(c => {
                 const chaveGlos = chaveGlossarioPorCampo[c.campo];
                 return `
                 <label class="lm-col-item">
-                  <input type="checkbox" class="lm-col-check" data-campo="${c.campo}" />
+                  <input type="checkbox" class="lm-col-check" data-campo="${hgEscapeHtml(c.campo)}" />
                   <span class="lm-switch" aria-hidden="true"></span>
-                  <span class="lm-col-nome">${c.rotulo || c.campo}</span>
-                  ${chaveGlos ? `<button type="button" class="hg-info-btn" data-glossario="${chaveGlos}" aria-label="O que é ${c.rotulo}?" title="">?</button>` : ''}
+                  <span class="lm-col-nome">${hgEscapeHtml(c.rotulo || c.campo)}</span>
+                  ${chaveGlos ? `<button type="button" class="hg-info-btn" data-glossario="${hgEscapeHtml(chaveGlos)}" aria-label="O que é ${hgEscapeHtml(c.rotulo)}?" title="">?</button>` : ''}
                 </label>`;
               }).join('')}
             </div>
@@ -26290,11 +26303,11 @@
 
   <!-- jsPDF: usada só pelo Simulador de Financiamento Imobiliário, para
        gerar o PDF de verdade (baixar e compartilhar como arquivo). -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" integrity="sha384-fCAW/rDWORTbQXSiB7mOg0QtQ5c+r0f544y6XoKjuVva0nMBlCpNUjiFeG5iMdS3" crossorigin="anonymous" defer></script>
   <!-- SheetJS (xlsx): usada só pelo Simulador de Financiamento Imobiliário,
        para gerar a planilha .xlsx da tabela de parcelas. -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" crossorigin="anonymous" defer></script>
 
   <!-- Supabase: base de dados usada pra login, alertas de preço,
        assinatura do boletim e favoritos sincronizados (ver
