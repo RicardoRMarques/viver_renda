@@ -1,0 +1,24 @@
+name: TMP - checar certificado fundamentus
+on: push
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspecionar certificado TLS
+        run: |
+          echo "=== www.fundamentus.com.br ==="
+          echo | openssl s_client -connect www.fundamentus.com.br:443 -servername www.fundamentus.com.br 2>/dev/null | openssl x509 -noout -subject -issuer -dates -ext subjectAltName || echo "FALHOU"
+          echo
+          echo "=== fundamentus.com.br (sem www) ==="
+          echo | openssl s_client -connect fundamentus.com.br:443 -servername fundamentus.com.br 2>/dev/null | openssl x509 -noout -subject -issuer -dates -ext subjectAltName || echo "FALHOU"
+          echo
+          echo "=== DNS www.fundamentus.com.br ==="
+          getent hosts www.fundamentus.com.br || true
+          echo "=== DNS fundamentus.com.br ==="
+          getent hosts fundamentus.com.br || true
+          echo
+          echo "=== curl -v www (com verificação normal) ==="
+          curl -vI --max-time 15 https://www.fundamentus.com.br/fii_resultado.php 2>&1 | tail -40 || true
+          echo
+          echo "=== curl -v sem www ==="
+          curl -vI --max-time 15 https://fundamentus.com.br/fii_resultado.php 2>&1 | tail -40 || true
