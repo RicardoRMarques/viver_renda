@@ -419,7 +419,11 @@ def buscar_fiis_fundamentus():
     negociados numa tabela HTML só — muito mais simples que bater ticker
     por ticker, e é a mesma fonte que o projeto já usa hoje pro P/VP."""
     log("Buscando fundamentos de FIIs no Fundamentus...")
-    url = "https://www.fundamentus.com.br/fii_resultado.php"
+    # Sem "www": o Fundamentus renovou o certificado TLS em 15/10/2026 e o
+    # novo só cobre "fundamentus.com.br" (confirmado via openssl s_client),
+    # derrubando toda coleta desde então com SSLCertVerificationError pro
+    # host com "www". O domínio sem "www" responde normalmente (HTTP 200).
+    url = "https://fundamentus.com.br/fii_resultado.php"
     headers = {
         # Sem um User-Agent de navegador de verdade o Fundamentus costuma
         # bloquear a requisição — já é uma pegadinha conhecida desse site.
