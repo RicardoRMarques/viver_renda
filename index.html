@@ -4913,7 +4913,22 @@
           ultimoTickerPesquisado = ticker;
           containerEl.innerHTML = '<div id="graficoConsultaChart" style="height:100%;width:100%;"></div>';
 
+          // Atalhos pra ativos que não são "tickers" no sentido usual — nome
+          // popular -> símbolo de verdade que o TradingView reconhece. São os
+          // mesmos 5 usados no padrão rotativo ao abrir a página (ver mais
+          // abaixo), mas funcionam também se a pessoa digitar um deles à mão.
+          const ATALHOS_GRAFICO = {
+            EWZ: 'AMEX:EWZ',
+            IBOV: 'BMFBOVESPA:IBOV',
+            IBOVESPA: 'BMFBOVESPA:IBOV',
+            DOLAR: 'FX_IDC:USDBRL',
+            DÓLAR: 'FX_IDC:USDBRL',
+            EURO: 'FX_IDC:EURBRL',
+            BITCOIN: 'BITSTAMP:BTCUSD',
+          };
+
           function detectarSimbolo(t) {
+            if (ATALHOS_GRAFICO[t]) return ATALHOS_GRAFICO[t];
             // Padrão B3: 4 letras + 1 ou 2 dígitos (ex: PETR4, TRXF11, HGLG11)
             if (/^[A-Z]{4}\d{1,2}$/.test(t)) return 'BMFBOVESPA:' + t;
             // Caso contrário, assume ativo americano (ação ou ETF) e deixa o
@@ -5005,10 +5020,20 @@
             window.addEventListener('load', executarAutoLoad, { once: true });
           }
         } else {
-          // Sem ticker vindo de link compartilhado: carrega PETR4 como
-          // padrão, já pronto assim que a página abre — sem rolar a tela
-          // (diferente do caso acima, que veio de um link específico).
-          input.value = 'PETR4';
+          // Sem ticker vindo de link compartilhado: alterna entre 5 ativos
+          // de referência como padrão, um por acesso (ETF do Brasil,
+          // Ibovespa, dólar, euro, bitcoin) — guarda o índice no
+          // localStorage e avança 1 por vez, em vez de sempre abrir no
+          // mesmo ativo.
+          const PADROES_GRAFICO = ['EWZ', 'IBOV', 'DOLAR', 'EURO', 'BITCOIN'];
+          const CHAVE_INDICE_GRAFICO = 'hg_grafico_padrao_indice';
+          let indice = 0;
+          try {
+            indice = parseInt(localStorage.getItem(CHAVE_INDICE_GRAFICO), 10);
+            if (!Number.isInteger(indice) || indice < 0) indice = 0;
+            localStorage.setItem(CHAVE_INDICE_GRAFICO, String((indice + 1) % PADROES_GRAFICO.length));
+          } catch (e) { /* localStorage indisponível (modo privado etc.) — fica sempre no primeiro */ }
+          input.value = PADROES_GRAFICO[indice % PADROES_GRAFICO.length];
           consultarTicker();
         }
       })();
