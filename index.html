@@ -1349,6 +1349,13 @@
       margin-left: auto;
       min-width: 0;
       max-width: min(94vw, 760px);
+      /* O "top" genérico (100% + 10px) abre o painel logo abaixo do
+         cabeçalho — mas o carrossel de índices (ticker) vem logo depois
+         do cabeçalho, com ~41px de altura (9px de padding de cada lado +
+         conteúdo). Sem esse espaço extra, o painel largo sobrepunha o
+         ticker, que ficava visível "atrás" dele nas laterais (onde o
+         painel é mais estreito que o ticker, que é largura total). */
+      top: calc(100% + 51px);
     }
     .nav-dropdown.aberto .nav-dropdown-menu.nav-mega {
       display: grid;
