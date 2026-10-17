@@ -1327,6 +1327,22 @@
       .nav-dropdown-fechar { display: block; }
     }
     .nav-dropdown-separador { height: 1px; background: var(--border); margin: 6px 4px; }
+    /* Variante "mega-menu" do dropdown: várias colunas com categoria —
+       usada só pelo menu Ferramentas, que cresceu demais pra lista única.
+       Especificidade (3 classes) de propósito, pra vencer o
+       "display:flex" da regra genérica acima sem precisar de !important. */
+    .nav-dropdown-menu.nav-mega { min-width: 620px; max-width: min(92vw, 760px); }
+    .nav-dropdown.aberto .nav-dropdown-menu.nav-mega {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px 18px;
+      align-items: start;
+    }
+    .nav-mega-coluna { display: flex; flex-direction: column; gap: 2px; }
+    .nav-mega-titulo {
+      font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--muted); padding: 10px 12px 4px;
+    }
     .nav-submenu { padding-left: 12px; margin: 0 0 6px; border-left: 1px solid var(--border); display: flex; flex-direction: column; }
     .nav-submenu-item {
       background: none; border: none; color: var(--muted); font-family: inherit;
@@ -4350,40 +4366,52 @@
         <a href="#educacao">Educação</a>
         <div class="nav-dropdown" id="navSimuladoresDropdown">
           <button type="button" class="nav-dropdown-btn" id="navSimuladoresBtn" aria-haspopup="true" aria-expanded="false">
-            Simuladores <span class="nav-dropdown-seta">▾</span>
+            Ferramentas <span class="nav-dropdown-seta">▾</span>
           </button>
-          <div class="nav-dropdown-menu" id="navSimuladoresMenu">
-            <a class="nav-dropdown-item" href="#alertas-preco" id="navAbrirAlertasPreco">🔔 Meus Alertas de Preço</a>
-            <button type="button" class="nav-dropdown-item" id="navAbrirConversor">
-              💱 Conversor de Moedas
-            </button>
-            <button type="button" class="nav-dropdown-item" id="navAbrirGlossario">
-              📖 Glossário do Investidor
-            </button>
-            <button type="button" class="nav-dropdown-item" id="rpnBtnAbrir">
-              <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)
-            </button>
-            <button type="button" class="nav-dropdown-item" id="quizBtnAbrir">
-              ❓ Descubra seu Perfil de Investidor
-            </button>
-            <button type="button" class="nav-dropdown-item" id="carteiraBtnAbrir">
-              💰 Carteira de Rendimentos
-            </button>
-            <button type="button" class="nav-dropdown-item" id="gcBtnAbrir">
-              📊 Gráficos da Carteira de Rendimentos
-            </button>
-            <button type="button" class="nav-dropdown-item" id="apBtnAbrir">
-              <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v6"></path><path d="M9 5l3 3 3-3"></path><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 16h.01"></path><path d="M12 16h.01"></path><path d="M17 16h.01"></path></svg> Calculadora de Aportes
-            </button>
-            <button type="button" class="nav-dropdown-item" id="reinvBtnAbrir">
-              🔁 Reinvestimento de Dividendos
-            </button>
-            <button type="button" class="nav-dropdown-item" id="agendaBtnAbrir">
-              📅 Agenda de Proventos / Copom
-            </button>
-            <button type="button" class="nav-dropdown-item" id="vcBtnAbrir">
-              <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg> Calculadora de Venda Coberta
-            </button>
+          <div class="nav-dropdown-menu nav-mega" id="navSimuladoresMenu">
+            <div class="nav-mega-coluna">
+              <div class="nav-mega-titulo">Minha carteira</div>
+              <button type="button" class="nav-dropdown-item" id="carteiraBtnAbrir">
+                💰 Carteira de Rendimentos
+              </button>
+              <button type="button" class="nav-dropdown-item" id="gcBtnAbrir">
+                📊 Gráficos da Carteira de Rendimentos
+              </button>
+              <button type="button" class="nav-dropdown-item" id="apBtnAbrir">
+                <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v6"></path><path d="M9 5l3 3 3-3"></path><rect x="3" y="11" width="18" height="10" rx="2"></rect><path d="M7 16h.01"></path><path d="M12 16h.01"></path><path d="M17 16h.01"></path></svg> Calculadora de Aportes
+              </button>
+              <button type="button" class="nav-dropdown-item" id="reinvBtnAbrir">
+                🔁 Reinvestimento de Dividendos
+              </button>
+            </div>
+            <div class="nav-mega-coluna">
+              <div class="nav-mega-titulo">Calculadoras</div>
+              <button type="button" class="nav-dropdown-item" id="rpnBtnAbrir">
+                <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)
+              </button>
+              <button type="button" class="nav-dropdown-item" id="vcBtnAbrir">
+                <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg> Calculadora de Venda Coberta
+              </button>
+              <button type="button" class="nav-dropdown-item" id="crBtnAbrir">
+                🏠 Cap Rate — Imóvel x FII
+              </button>
+              <button type="button" class="nav-dropdown-item" id="navAbrirConversor">
+                💱 Conversor de Moedas
+              </button>
+            </div>
+            <div class="nav-mega-coluna">
+              <div class="nav-mega-titulo">Planeje e aprenda</div>
+              <a class="nav-dropdown-item" href="#alertas-preco" id="navAbrirAlertasPreco">🔔 Meus Alertas de Preço</a>
+              <button type="button" class="nav-dropdown-item" id="agendaBtnAbrir">
+                📅 Agenda de Proventos / Copom
+              </button>
+              <button type="button" class="nav-dropdown-item" id="quizBtnAbrir">
+                ❓ Descubra seu Perfil de Investidor
+              </button>
+              <button type="button" class="nav-dropdown-item" id="navAbrirGlossario">
+                📖 Glossário do Investidor
+              </button>
+            </div>
           </div>
         </div>
         <button id="themeToggle" class="theme-toggle" type="button" title="Clarear/escurecer a página" aria-label="Alternar tema claro/escuro">☀️</button>
@@ -4439,7 +4467,8 @@
     <button type="button" class="mobile-menu-item" data-mobile-alvo="mmBtnAbrirMenu">📊 Marcação a Mercado</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="fgcBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC</button>
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
-    <div class="mobile-menu-separador">Simuladores</div>
+    <div class="mobile-menu-separador">Ferramentas</div>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="crBtnAbrir">🏠 Cap Rate — Imóvel x FII</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário do Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="rpnBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)</button>
@@ -6981,6 +7010,126 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CAP RATE — compara o retorno de alugar um imóvel com o de um
+       ativo de renda mensal (ex: FII). Só matemática sobre o que a
+       pessoa digita, sem consultar nenhuma cotação.
+       ============================================================ -->
+  <div id="crOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="crTitulo" hidden>
+    <div class="calc-modal cr-modal">
+      <div class="calc-modal-topo">
+        <h3 id="crTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg>Cap Rate — Imóvel x FII
+        </h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="crCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button id="crFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+      </div>
+
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Compare o retorno de alugar um imóvel com o de investir num ativo de renda mensal, como um FII — a mesma
+          conta que o mercado imobiliário chama de <strong>Cap Rate</strong>.
+          <button type="button" class="hg-info-btn" data-glossario="cap-rate" aria-label="O que é Cap Rate?" title="">?</button>
+        </p>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="crValorImovel">Valor de mercado do imóvel</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="crValorImovel" placeholder="700.000,00" />
+            </div>
+          </div>
+          <div class="calc-campo">
+            <label for="crAluguelMensal">Aluguel mensal</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="crAluguelMensal" placeholder="2.500,00" />
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="crDespesasMensais">Despesas mensais <span style="color:var(--muted); font-weight:400;">(condomínio, IPTU, manutenção — opcional)</span></label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="crDespesasMensais" placeholder="0,00" />
+            </div>
+          </div>
+          <div class="calc-campo">
+            <label for="crDyFii">DY anual do FII pra comparar (%) <span style="color:var(--muted); font-weight:400;">opcional</span></label>
+            <input type="number" id="crDyFii" min="0" step="0.01" placeholder="9,50" />
+          </div>
+        </div>
+
+        <div class="cmp-acoes-linha" style="margin-top:14px;">
+          <button type="button" class="hg-btn" id="crBtnCalcular">Calcular Cap Rate</button>
+          <button type="button" class="cmp-btn-secundario" id="crBtnLimpar">Limpar</button>
+        </div>
+
+        <div id="crResultado"></div>
+
+        <details class="calc-educativo">
+          <summary>📋 O que o Cap Rate NÃO mostra</summary>
+          <div class="calc-educativo-corpo">
+            <div class="calc-educativo-item">
+              <strong>Imposto de Renda</strong>
+              <p>
+                Aluguel recebido por pessoa física entra na tabela progressiva do IR (até 27,5% ao ano, com
+                recolhimento mensal via carnê-leão). Rendimentos de FIIs distribuídos mensalmente são isentos de
+                IR para pessoa física (fundo com no mínimo 50 cotistas, cotas negociadas só em bolsa, cotista com
+                menos de 10% das cotas do fundo). Essa diferença, sozinha, já reduz bastante o retorno líquido do
+                imóvel frente ao Cap Rate bruto calculado acima.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>Vacância e inadimplência</strong>
+              <p>
+                O Cap Rate assume o imóvel alugado o ano inteiro, sem atraso de pagamento. Na prática, meses vagos
+                entre inquilinos (ou inquilino que não paga) reduzem a renda real — e isso não aparece na conta. Um
+                FII diversifica entre dezenas ou centenas de imóveis/contratos, diluindo o risco de vacância de um
+                único inquilino.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>Liquidez</strong>
+              <p>
+                Vender uma cota de FII leva segundos, na bolsa, a qualquer hora do pregão. Vender um imóvel costuma
+                levar meses (às vezes anos), e envolve corretagem, ITBI, cartório e negociação de preço — dinheiro
+                parado por muito mais tempo se você precisar dele de repente.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>Diversificação e ticket de entrada</strong>
+              <p>
+                Comprar 1 imóvel concentra um valor alto (geralmente 6 ou 7 dígitos) num único ativo, numa única
+                cidade/bairro. Com o mesmo dinheiro em FIIs, dá pra espalhar entre dezenas de fundos, tipos de
+                imóvel (shoppings, galpões logísticos, lajes corporativas) e regiões diferentes.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>Valorização (ou desvalorização)</strong>
+              <p>
+                Nem o Cap Rate nem o DY do FII incluem a variação de preço do ativo — só a renda. Um imóvel pode
+                valorizar mais que a cota de um FII num ciclo de alta do mercado imobiliário local, ou desvalorizar
+                numa região em declínio; o mesmo vale pro preço da cota do fundo. Esta calculadora não tenta prever
+                nenhum dos dois.
+              </p>
+            </div>
+          </div>
+        </details>
       </div>
     </div>
   </div>
@@ -13237,6 +13386,126 @@
     })();
 
     // ============================================================
+    // CAP RATE — compara o retorno de alugar um imóvel (renda do
+    // aluguel ÷ valor do imóvel) com o DY de um ativo de renda mensal
+    // (ex: FII). Só matemática sobre o que a pessoa digita.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('crOverlay');
+      const btnAbrirMenu = document.getElementById('crBtnAbrir');
+      const btnFechar = document.getElementById('crFechar');
+      const inValorImovel = document.getElementById('crValorImovel');
+      const inAluguelMensal = document.getElementById('crAluguelMensal');
+      const inDespesasMensais = document.getElementById('crDespesasMensais');
+      const inDyFii = document.getElementById('crDyFii');
+      const btnCalcular = document.getElementById('crBtnCalcular');
+      const btnLimpar = document.getElementById('crBtnLimpar');
+      const resultadoEl = document.getElementById('crResultado');
+
+      if (!overlay || !btnAbrirMenu) return;
+
+      hgAplicarMascaraMoeda(inValorImovel);
+      hgAplicarMascaraMoeda(inAluguelMensal);
+      hgAplicarMascaraMoeda(inDespesasMensais);
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function pct(v) {
+        return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+      }
+
+      function erro(msg) {
+        resultadoEl.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a; margin-top:14px;">${msg}</p>`;
+      }
+
+      function calcular() {
+        const valorImovel = hgValorMascarado(inValorImovel);
+        const aluguelMensal = hgValorMascarado(inAluguelMensal);
+        const despesasMensais = hgValorMascarado(inDespesasMensais);
+        const dyFii = parseFloat((inDyFii.value || '').replace(',', '.'));
+
+        if (!(valorImovel > 0) || !(aluguelMensal > 0)) {
+          erro('Preencha o valor do imóvel e o aluguel mensal pra calcular.');
+          return;
+        }
+
+        const capRateBruto = ((aluguelMensal * 12) / valorImovel) * 100;
+        const temDespesas = despesasMensais > 0;
+        const capRateLiquido = temDespesas ? (((aluguelMensal - despesasMensais) * 12) / valorImovel) * 100 : null;
+
+        let comparacaoHtml = '';
+        if (dyFii > 0) {
+          const base = temDespesas ? capRateLiquido : capRateBruto;
+          const rotuloBase = temDespesas ? 'Cap Rate líquido' : 'Cap Rate';
+          const diferenca = base - dyFii;
+          let leitura;
+          if (Math.abs(diferenca) < 0.3) {
+            leitura = `${rotuloBase} do imóvel (${pct(base)}) e o DY do FII (${pct(dyFii)}) estão bem próximos — olhando só a renda, a diferença entre os dois é pequena.`;
+          } else if (diferenca > 0) {
+            leitura = `${rotuloBase} do imóvel (${pct(base)}) é ${pct(diferenca)} <strong>maior</strong> que o DY do FII (${pct(dyFii)}) — olhando só o retorno de renda, o imóvel paga mais.`;
+          } else {
+            leitura = `${rotuloBase} do imóvel (${pct(base)}) é ${pct(Math.abs(diferenca))} <strong>menor</strong> que o DY do FII (${pct(dyFii)}) — olhando só o retorno de renda, o FII paga mais.`;
+          }
+          comparacaoHtml = `
+            <div class="hg-status atencao-fixa" style="margin-top:12px;">
+              <span>⚖️</span>
+              <span>${leitura} Isso não inclui IR, vacância, liquidez nem valorização dos dois lados — veja os detalhes logo abaixo.</span>
+            </div>`;
+        }
+
+        resultadoEl.innerHTML = `
+          <div class="carteira-resumo-cards">
+            <div class="carteira-resumo-card">
+              <span>Cap Rate (bruto)</span>
+              <strong>${pct(capRateBruto)}</strong>
+            </div>
+            ${temDespesas ? `
+            <div class="carteira-resumo-card carteira-resumo-destaque">
+              <span>Cap Rate (líquido de despesas)</span>
+              <strong>${pct(capRateLiquido)}</strong>
+            </div>` : ''}
+          </div>
+          ${comparacaoHtml}`;
+      }
+
+      function limpar() {
+        inValorImovel.value = '';
+        inValorImovel.dataset.centavos = '0';
+        inAluguelMensal.value = '';
+        inAluguelMensal.dataset.centavos = '0';
+        inDespesasMensais.value = '';
+        inDespesasMensais.dataset.centavos = '0';
+        inDyFii.value = '';
+        resultadoEl.innerHTML = '';
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
+      btnLimpar.addEventListener('click', limpar);
+
+      document.getElementById('crCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'caprate',
+          titulo: 'Cap Rate — Imóvel x FII — Viver de Renda',
+          texto: 'Compare o retorno de alugar um imóvel com o de investir num FII.',
+        }));
+
+      hgAbrirPorLinkDeFerramenta('caprate', abrirModal);
+    })();
+
+    // ============================================================
     // CALCULADORA DE APORTES
     // ------------------------------------------------------------
     // Pergunta que ela responde: "tenho R$ X este mês — quantas cotas
@@ -18456,6 +18725,7 @@
         'graham-indicador': 'Preço Justo de Graham = estimativa de quanto a ação "valeria" segundo a fórmula clássica de Benjamin Graham, usada para comparar com a cotação atual.\n\nCálculo: raiz quadrada de (22,5 × LPA × VPA)\n\nO 22,5 vem dos limites que Graham considerava aceitáveis para uma empresa defensiva: P/L de até 15 e P/VP de até 1,5 (15 × 1,5 = 22,5).\n\nSó faz sentido quando LPA e VPA são positivos — empresa com prejuízo não tem preço justo por essa fórmula. É uma referência de estudo, criada nos anos 1930 para empresas industriais, não uma recomendação de compra nem um valor "correto" da ação.',
         'favoritos-login': 'Marque o ♥ ao lado do ativo para acompanhá-lo aqui. Clicando em "Meus Favoritos", a lista mostra só os ativos marcados.\n\nEntre na sua conta (botão "Entrar", no topo do site) para que seus favoritos fiquem salvos na sua conta e apareçam também no celular, no tablet e em qualquer outro aparelho.\n\nSem login eles continuam funcionando, mas ficam guardados só neste navegador: se você limpar os dados do navegador ou abrir o site em outro aparelho, a lista não estará lá.',
         'bazin-indicador': 'Preço-teto de Bazin = preço máximo que você pagaria pela ação para ainda receber um dividend yield de 6% ao ano, critério defendido por Décio Bazin.\n\nCálculo: dividendos por ação nos últimos 12 meses ÷ 0,06\n\nO 6% é a exigência de retorno do próprio Bazin — quem quiser outra régua muda o divisor. Aqui usamos os proventos dos últimos 12 meses, então o número muda conforme a empresa aumenta ou corta dividendos, e não garante que ela vá manter o pagamento. É referência de estudo, não recomendação.',
+        'cap-rate': 'Cap Rate (Taxa de Capitalização) = retorno anual de um imóvel alugado, considerando só a renda do aluguel — sem contar se o imóvel valoriza ou desvaloriza.\n\nCálculo: (aluguel mensal × 12) ÷ valor de mercado do imóvel × 100\n\nServe pra comparar o retorno de "renda" de um imóvel com o de outros ativos que pagam renda mensal, como FIIs — mas não é uma comparação completa: veja "O que o Cap Rate NÃO mostra" logo abaixo da calculadora.',
 
         // Cards da "Visão da carteira" da Calculadora de Aportes.
         'ap-custo-aquisicao': 'Quanto você pagou, no total, pelos ativos da carteira: soma de preço médio × cotas de cada ativo.\n\nO preço médio vem dos seus lançamentos em Compras & Vendas, do que você digitou na tabela ou do que colou da planilha. Taxas e emolumentos lançados entram no custo; nas vendas, o custo baixa pelo preço médio (o preço médio em si não muda).\n\nSó entram os ativos que têm preço médio preenchido — quando falta o de algum, o card avisa logo abaixo do valor.\n\nÉ o dinheiro que saiu do seu bolso, não o que a carteira vale hoje. A diferença entre os dois é a Valorização.',
