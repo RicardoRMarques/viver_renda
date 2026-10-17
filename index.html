@@ -1330,13 +1330,34 @@
     /* Variante "mega-menu" do dropdown: várias colunas com categoria —
        usada só pelo menu Ferramentas, que cresceu demais pra lista única.
        Especificidade (3 classes) de propósito, pra vencer o
-       "display:flex" da regra genérica acima sem precisar de !important. */
-    .nav-dropdown-menu.nav-mega { min-width: 620px; max-width: min(92vw, 760px); }
+       "display:flex" da regra genérica acima sem precisar de !important.
+
+       A âncora normal (.nav-dropdown{position:relative} + right:0) alinha
+       o painel pela borda direita do BOTÃO — ótimo pro dropdown estreito
+       original, mas o Ferramentas cresceu bastante (até 760px) e nem
+       sempre há espaço à esquerda do botão pra caber: num tablet em
+       retrato (768px) ou numa janela de desktop não maximizada, as
+       colunas da esquerda ficavam cortadas, fora da tela. Em vez de
+       ancorar no botão, ancora no .topbar inteiro (ver position:relative
+       abaixo) — daí o painel nunca ultrapassa a borda esquerda da própria
+       barra, que já é responsiva. */
+    .topbar { position: relative; }
+    #navSimuladoresDropdown { position: static; }
+    .nav-dropdown-menu.nav-mega {
+      left: 0;
+      right: 0;
+      margin-left: auto;
+      min-width: 0;
+      max-width: min(94vw, 760px);
+    }
     .nav-dropdown.aberto .nav-dropdown-menu.nav-mega {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 2px 18px;
       align-items: start;
+    }
+    @media (max-width: 900px) {
+      .nav-dropdown.aberto .nav-dropdown-menu.nav-mega { grid-template-columns: repeat(2, 1fr); }
     }
     .nav-mega-coluna { display: flex; flex-direction: column; gap: 2px; }
     .nav-mega-titulo {
