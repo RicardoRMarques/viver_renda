@@ -20903,6 +20903,113 @@
           </div>`;
       }
 
+      function nomeArquivoPdfFund(info) {
+        return `${(info.symbol || 'ativo').toLowerCase().replace(/[^a-z0-9]/g, '')}-analise-fundamentalista.pdf`;
+      }
+
+      // Monta o PDF da Análise Fundamentalista: mesmo cabeçalho padrão dos
+      // outros relatórios do site, depois a tabela de indicadores EM
+      // COLUNAS (Indicador + até 5 períodos — TTM e anos fiscais), igual à
+      // tabela da tela, que o autoTable já lida bem com várias colunas
+      // (mesmo mecanismo do Comparador de Ativos). Inclui o crescimento de
+      // EBITDA e o CAPEX/D&A (CVM) quando disponíveis para o ativo.
+      async function montarDocumentoPdfFund(info, colunas) {
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text(`Análise Fundamentalista — ${info.symbol}`, 40, 40);
+
+        const nomeSetor = [info.name, info.classification?.sector].filter(Boolean).join(' · ');
+        let y = 58;
+        if (nomeSetor) {
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(60);
+          doc.text(nomeSetor, 40, y);
+          doc.setTextColor(0);
+          y += 16;
+        }
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, y);
+        y += 12;
+        doc.setFontSize(8);
+        doc.text(
+          'Fonte: HG Brasil, indicadores trimestrais dos últimos 2 anos. Conteúdo educativo, não é recomendação de compra ou venda.',
+          40, y
+        );
+        doc.setTextColor(0);
+
+        doc.autoTable({
+          startY: y + 18,
+          head: [['Indicador', ...colunas.map(c => c.rotulo)]],
+          body: LINHAS_FUND.map(([rotulo, campo, formato]) => [
+            rotulo, ...colunas.map(c => fmtCelula(c.statement?.[campo], formato)),
+          ]),
+          theme: 'grid',
+          styles: { fontSize: 7.5, cellPadding: 4.5 },
+          headStyles: { fillColor: [43, 43, 43], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', cellWidth: 100 } },
+          bodyStyles: { halign: 'right' },
+        });
+
+        // Crescimento de EBITDA interanual, se der pra calcular (mesmo
+        // critério da tela: TTM vs último ano fiscal fechado).
+        const ebitdaAtual = colunas[0]?.statement?.ebitda;
+        const ebitdaAnoAnterior = colunas[1]?.statement?.ebitda;
+        if (typeof ebitdaAtual === 'number' && typeof ebitdaAnoAnterior === 'number' && ebitdaAnoAnterior !== 0) {
+          const variacao = ((ebitdaAtual - ebitdaAnoAnterior) / Math.abs(ebitdaAnoAnterior)) * 100;
+          doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 18,
+            head: [['', 'Crescimento de EBITDA (interanual, TTM x último ano fechado)']],
+            body: [['', `${variacao >= 0 ? '+' : ''}${hgFormatNumero(variacao)}%`]],
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 6 },
+            headStyles: { fillColor: [119, 119, 119], textColor: 255 },
+            columnStyles: { 0: { cellWidth: 1 } },
+          });
+        }
+
+        // CAPEX/D&A (fonte CVM), se o robô já tiver dado pra esse ativo —
+        // mesma fonte usada no bloco da tela (preencherCapexDA).
+        try {
+          const dadosCapex = await carregarCapexDA();
+          const infoCapex = dadosCapex?.ativos?.[info.symbol];
+          if (infoCapex && (infoCapex.capex != null || infoCapex.depreciacao_amortizacao != null)) {
+            const linhasCapex = [];
+            if (infoCapex.capex != null) linhasCapex.push(['CAPEX', hgFormatMoeda(infoCapex.capex)]);
+            if (infoCapex.depreciacao_amortizacao != null) linhasCapex.push(['D&A (Depreciação e Amortização)', hgFormatMoeda(infoCapex.depreciacao_amortizacao)]);
+            doc.autoTable({
+              startY: doc.lastAutoTable.finalY + 18,
+              head: [['', `CAPEX / D&A — acumulado no ano, fonte CVM (até ${fmtDataBr(infoCapex.dt_refer)})`]],
+              body: linhasCapex,
+              theme: 'grid',
+              styles: { fontSize: 9, cellPadding: 6 },
+              headStyles: { fillColor: [119, 119, 119], textColor: 255 },
+              columnStyles: { 0: { fontStyle: 'bold' } },
+            });
+          }
+        } catch (e) { /* sem CAPEX/D&A pra esse ativo — PDF segue sem essa tabela */ }
+
+        return doc;
+      }
+
       function renderizarFundamentos(info, containerEl = resultadoFund) {
         const statements = info.statements;
 
@@ -20969,10 +21076,16 @@
                   ${crescimentoEbitdaHtml}
                 </div>
               </div>
-              <button type="button" class="hg-btn-compartilhar" data-fund-compartilhar title="Copiar link desta análise">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-                <span class="hg-btn-compartilhar-texto">Compartilhar</span>
-              </button>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="hg-btn-compartilhar" data-fund-pdf title="Baixar PDF desta análise">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+                  <span class="hg-btn-compartilhar-texto">Baixar PDF</span>
+                </button>
+                <button type="button" class="hg-btn-compartilhar" data-fund-compartilhar title="Copiar link desta análise">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                  <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+                </button>
+              </div>
             </div>
             <div class="hg-tabela-scroll" style="overflow-x:auto; max-width:100%; -webkit-overflow-scrolling:touch;">
               <table class="hg-tabela-fundamentos" style="width:100%; min-width:560px; border-collapse:separate; border-spacing:0; font-family:'Courier New', monospace; font-size:0.85rem;">
@@ -20998,6 +21111,17 @@
           btnCompartilharFund.addEventListener('click', () =>
             hgCompartilharAtivo(info, btnCompartilharFund, { view: 'fundamentos' })
           );
+        }
+        const btnPdfFund = containerEl.querySelector('[data-fund-pdf]');
+        if (btnPdfFund) {
+          btnPdfFund.addEventListener('click', async () => {
+            const textoSpan = btnPdfFund.querySelector('.hg-btn-compartilhar-texto');
+            const textoOriginal = textoSpan?.textContent;
+            if (textoSpan) textoSpan.textContent = 'Gerando...';
+            const doc = await montarDocumentoPdfFund(info, colunas);
+            if (textoSpan && textoOriginal) textoSpan.textContent = textoOriginal;
+            if (doc) doc.save(nomeArquivoPdfFund(info));
+          });
         }
         ativarTooltipsFundamentos(containerEl);
         preencherCapexDA(info.symbol, containerEl);
