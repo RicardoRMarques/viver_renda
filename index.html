@@ -20669,6 +20669,25 @@
         return capexDaPromise;
       }
 
+      // Leitura automática da relação CAPEX x D&A: CAPEX bem acima da
+      // depreciação indica expansão da base de ativos (ou reposição de
+      // reservas, em setores como petróleo e gás); próximo, é só CAPEX de
+      // manutenção; abaixo, sobra mais caixa livre no curto prazo, mas
+      // pode sinalizar desinvestimento. Função própria (não só inline em
+      // preencherCapexDA) porque o PDF da Análise Fundamentalista precisa
+      // do mesmo texto, não só dos dois valores brutos.
+      function interpretarCapexDA(capex, da) {
+        if (capex == null || !da) return null;
+        const diffPct = ((capex - da) / Math.abs(da)) * 100;
+        if (Math.abs(diffPct) < 5) {
+          return 'O CAPEX está próximo da D&A (Depreciação e Amortização): indício de investimento de manutenção, repondo o desgaste dos ativos sem expandir muito a base.';
+        }
+        if (diffPct > 0) {
+          return `O CAPEX está ${hgFormatNumero(diffPct, 0)}% acima da D&A (Depreciação e Amortização): a empresa está investindo mais do que deprecia, sinal de expansão da base de ativos (ou de reposição de reservas, em setores de capital intensivo como petróleo e gás).`;
+        }
+        return `O CAPEX está ${hgFormatNumero(Math.abs(diffPct), 0)}% abaixo da D&A (Depreciação e Amortização): a empresa está gastando menos do que deprecia — sobra mais caixa livre no curto prazo, mas pode sinalizar desinvestimento ou maturidade.`;
+      }
+
       async function preencherCapexDA(ticker, containerEl) {
         const placeholder = containerEl.querySelector('[data-capex-da]');
         if (!placeholder) return;
@@ -20688,25 +20707,8 @@
             <strong style="font-family:'Courier New', monospace; font-size:0.95rem;">R$ ${hgFormatCompacto(valor)}</strong>
           </div>`;
 
-        // Leitura automática da relação CAPEX x D&A: CAPEX bem acima da
-        // depreciação indica expansão da base de ativos (ou reposição de
-        // reservas, em setores como petróleo e gás); próximo, é só CAPEX
-        // de manutenção; abaixo, sobra mais caixa livre no curto prazo,
-        // mas pode sinalizar desinvestimento. Só dá pra calcular com os
-        // dois valores presentes e D&A diferente de zero.
-        let leituraHtml = '';
-        if (info.capex != null && info.depreciacao_amortizacao) {
-          const diffPct = ((info.capex - info.depreciacao_amortizacao) / Math.abs(info.depreciacao_amortizacao)) * 100;
-          let leitura;
-          if (Math.abs(diffPct) < 5) {
-            leitura = 'O CAPEX está próximo da D&A (Depreciação e Amortização): indício de investimento de manutenção, repondo o desgaste dos ativos sem expandir muito a base.';
-          } else if (diffPct > 0) {
-            leitura = `O CAPEX está ${hgFormatNumero(diffPct, 0)}% acima da D&A (Depreciação e Amortização): a empresa está investindo mais do que deprecia, sinal de expansão da base de ativos (ou de reposição de reservas, em setores de capital intensivo como petróleo e gás).`;
-          } else {
-            leitura = `O CAPEX está ${hgFormatNumero(Math.abs(diffPct), 0)}% abaixo da D&A (Depreciação e Amortização): a empresa está gastando menos do que deprecia — sobra mais caixa livre no curto prazo, mas pode sinalizar desinvestimento ou maturidade.`;
-          }
-          leituraHtml = `<p style="margin:0; font-size:0.78rem; color:var(--muted); line-height:1.4;">${leitura}</p>`;
-        }
+        const leitura = interpretarCapexDA(info.capex, info.depreciacao_amortizacao);
+        const leituraHtml = leitura ? `<p style="margin:0; font-size:0.78rem; color:var(--muted); line-height:1.4;">${leitura}</p>` : '';
 
         placeholder.innerHTML = `
           <div style="margin-top:12px; padding:10px 12px; border:1px solid var(--border); border-radius:8px; display:flex; flex-direction:column; gap:10px;">
@@ -20995,6 +20997,8 @@
             const linhasCapex = [];
             if (infoCapex.capex != null) linhasCapex.push(['CAPEX', hgFormatMoeda(infoCapex.capex)]);
             if (infoCapex.depreciacao_amortizacao != null) linhasCapex.push(['D&A (Depreciação e Amortização)', hgFormatMoeda(infoCapex.depreciacao_amortizacao)]);
+            const leituraCapex = interpretarCapexDA(infoCapex.capex, infoCapex.depreciacao_amortizacao);
+            if (leituraCapex) linhasCapex.push(['Leitura', leituraCapex]);
             doc.autoTable({
               startY: doc.lastAutoTable.finalY + 18,
               head: [['', `CAPEX / D&A — acumulado no ano, fonte CVM (até ${fmtDataBr(infoCapex.dt_refer)})`]],
@@ -21002,7 +21006,7 @@
               theme: 'grid',
               styles: { fontSize: 9, cellPadding: 6 },
               headStyles: { fillColor: [119, 119, 119], textColor: 255 },
-              columnStyles: { 0: { fontStyle: 'bold' } },
+              columnStyles: { 0: { fontStyle: 'bold', cellWidth: 110 } },
             });
           }
         } catch (e) { /* sem CAPEX/D&A pra esse ativo — PDF segue sem essa tabela */ }
