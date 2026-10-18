@@ -8939,6 +8939,64 @@
           },
         });
 
+        // Legenda das cores + explicação da Nota Geral — mesmo texto que
+        // aparece na tela (balão do "?" e rodapé da tabela), repetido aqui
+        // porque o PDF costuma ser aberto sem o contexto da página ao lado.
+        const larguraPagina = doc.internal.pageSize.getWidth();
+        const alturaPagina = doc.internal.pageSize.getHeight();
+        let y = doc.lastAutoTable.finalY + 22;
+        const garantirEspaco = (linhas) => {
+          if (y + linhas * 11 > alturaPagina - 30) { doc.addPage(); y = 40; }
+        };
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        garantirEspaco(1);
+        doc.text('Legenda', 40, y);
+        y += 14;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        let x = 40;
+        const legenda = [
+          ['Saudável', COR_RGB.verde], [' · ', [90, 90, 90]],
+          ['Atenção', COR_RGB.amarelo], [' · ', [90, 90, 90]],
+          ['Fora da faixa típica', COR_RGB.vermelho], [' · ', [90, 90, 90]],
+          ['— não se aplica a esse setor.', [90, 90, 90]],
+        ];
+        for (const [texto, cor] of legenda) {
+          doc.setTextColor(...cor);
+          doc.text(texto, x, y);
+          x += doc.getTextWidth(texto);
+        }
+        doc.setTextColor(0);
+        y += 14;
+
+        const textoFaixas = 'As faixas usadas se ajustam ao setor de cada ativo — bancos usam régua própria, por isso o mesmo indicador pode sair colorido de formas diferentes entre dois ativos de setores distintos, mesmo com valores parecidos.';
+        const linhasFaixas = doc.splitTextToSize(textoFaixas, larguraPagina - 80);
+        garantirEspaco(linhasFaixas.length);
+        doc.setTextColor(90);
+        doc.text(linhasFaixas, 40, y);
+        y += linhasFaixas.length * 11 + 10;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0);
+        garantirEspaco(1);
+        doc.text('Como a Nota Geral é calculada', 40, y);
+        y += 13;
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(90);
+        const textoNota = 'Média (0 a 100) dos indicadores que se aplicam ao setor de cada ativo — verde soma mais, vermelho soma menos, e o não aplicável (—) fica de fora da conta. É um resumo rápido pra comparar, não uma recomendação.';
+        const linhasNota = doc.splitTextToSize(textoNota, larguraPagina - 80);
+        garantirEspaco(linhasNota.length);
+        doc.text(linhasNota, 40, y);
+        y += linhasNota.length * 11 + 10;
+
+        doc.setTextColor(0);
+        garantirEspaco(1);
+        doc.setFontSize(7.5);
+        doc.text('Comparação educativa baseada em faixas típicas de mercado — não é recomendação de investimento.', 40, y);
+
         return doc;
       }
 
