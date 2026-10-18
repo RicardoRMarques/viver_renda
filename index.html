@@ -7137,6 +7137,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
               Baixar PDF
             </button>
+            <button type="button" class="cmp-btn-secundario" id="crBtnCompartilhar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
           </div>
         </div>
 
@@ -13674,6 +13678,32 @@
         doc.save(nomeArquivoPdfCr());
       }
 
+      async function compartilharResultadoCr(botao) {
+        const doc = await montarDocumentoPdfCr();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoPdfCr();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        // Só no celular: no desktop o navigator.share abre o seletor de
+        // arquivos do sistema operacional, que confunde mais do que ajuda.
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Cap Rate — Imóvel x FII', files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoSpan = botao.querySelector('.hg-btn-compartilhar-texto');
+        const textoPadrao = textoSpan ? textoSpan.textContent : null;
+        if (textoSpan) textoSpan.textContent = 'PDF baixado!';
+        setTimeout(() => { if (textoSpan && textoPadrao) textoSpan.textContent = textoPadrao; }, 2500);
+      }
+
       btnAbrirMenu.addEventListener('click', () => {
         if (typeof fecharMenusNav === 'function') fecharMenusNav();
         abrirModal();
@@ -13683,6 +13713,7 @@
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
       btnPdf.addEventListener('click', gerarPdfCr);
+      document.getElementById('crBtnCompartilhar')?.addEventListener('click', (e) => compartilharResultadoCr(e.currentTarget));
 
       document.getElementById('crCompartilharLink')?.addEventListener('click', (e) =>
         hgCompartilharLinkFerramenta(e.currentTarget, {
