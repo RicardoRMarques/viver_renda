@@ -6531,6 +6531,11 @@
           <div id="cmpTabelaStatus" class="hg-status"></div>
           <div class="cmp-tabela-wrap"><table class="cmp-tabela" id="cmpTabela"></table></div>
 
+          <div id="cmpProventosBloco" hidden>
+            <h4 style="margin:18px 0 10px; font-size:0.85rem;">Proventos — últimos 12 meses</h4>
+            <div class="cmp-tabela-wrap"><table class="cmp-tabela" id="cmpTabelaProventos"></table></div>
+          </div>
+
           <div class="cmp-acoes-linha">
             <button type="button" class="cmp-btn-secundario" id="cmpBtnPdf">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
@@ -20158,6 +20163,58 @@
         return (valor === null || valor === undefined || valor === '') ? '—' : valor;
       }
 
+      // Soma os proventos em dinheiro pagos em cada mês dos últimos 12
+      // meses, via o mesmo endpoint já usado no Histórico de Dividendos
+      // (/v2/finance/dividends). Só "cash" (desconta bonificação em
+      // ações, que vem em proporção, não em R$) e só "paid" (desconta
+      // proventos já aprovados mas ainda não pagos, com data futura) —
+      // mesmo critério já usado nos outros gráficos de proventos do site.
+      // 12 meses é uma janela recente — não precisa da busca binária pelo
+      // limite histórico do plano, que só importa pra períodos longos.
+      async function buscarProventosMensais(symbol) {
+        const hoje = new Date();
+        const inicio = new Date(hoje);
+        inicio.setFullYear(inicio.getFullYear() - 1);
+        const iso = d => d.toISOString().slice(0, 10);
+        const url = `https://api.hgbrasil.com/v2/finance/dividends?format=json-cors&key=${encodeURIComponent(CHAVE_HG)}&tickers=${encodeURIComponent('B3:' + symbol)}&start_date=${iso(inicio)}&end_date=${iso(hoje)}`;
+        const porMes = {};
+        try {
+          const resp = await fetch(url);
+          const data = await resp.json();
+          const ativo = Array.isArray(data?.results) ? data.results[0] : data?.results;
+          const serie = Array.isArray(ativo?.series) ? ativo.series : [];
+          for (const ev of serie) {
+            if (ev.category !== 'cash' || ev.status !== 'paid') continue;
+            const mes = String(ev.payment_date || '').slice(0, 7); // "AAAA-MM"
+            if (!mes || typeof ev.amount !== 'number') continue;
+            porMes[mes] = (porMes[mes] || 0) + ev.amount;
+          }
+        } catch (e) {
+          // Sem histórico pra esse ativo: a tabela de proventos mostra
+          // "—" pra ele, sem derrubar a comparação inteira.
+        }
+        return porMes;
+      }
+
+      // Os 12 meses corridos mais recentes, do mais antigo pro mais novo
+      // (como uma linha do tempo), no formato "AAAA-MM" usado como chave
+      // em buscarProventosMensais.
+      function ultimosDozeMeses() {
+        const meses = [];
+        const base = new Date();
+        for (let i = 11; i >= 0; i--) {
+          const d = new Date(base.getFullYear(), base.getMonth() - i, 1);
+          meses.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+        }
+        return meses;
+      }
+
+      const MESES_ABREV = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      function rotuloMes(aaaaMm) {
+        const [ano, mes] = aaaaMm.split('-');
+        return `${MESES_ABREV[parseInt(mes, 10) - 1]}/${ano}`;
+      }
+
       async function compararAtivos() {
         if (selecionados.length < 2) {
           selecaoStatus.className = 'hg-status erro';
@@ -20236,7 +20293,41 @@
 
         tabelaEl.innerHTML = thead + tbody;
         ativarTooltipsIndicadores(linhas);
-        ultimaComparacao = { ativos: ativosValidos, linhas };
+
+        // Proventos mês a mês: busca em paralelo, depois de já ter
+        // mostrado a tabela principal (não trava a comparação esperando
+        // isso — é uma segunda chamada, por ativo, só pra essa tabela).
+        const proventosBloco = document.getElementById('cmpProventosBloco');
+        const tabelaProventosEl = document.getElementById('cmpTabelaProventos');
+        proventosBloco.hidden = true;
+        const listasProventos = await Promise.all(ativosValidos.map(a => buscarProventosMensais(a.symbol).catch(() => ({}))));
+        const proventosPorAtivo = {};
+        ativosValidos.forEach((a, i) => { proventosPorAtivo[a.symbol] = listasProventos[i]; });
+        const meses = ultimosDozeMeses();
+
+        const theadProv = `
+          <thead>
+            <tr>
+              <th>Mês</th>
+              ${ativosValidos.map(a => `<th class="cmp-ativo-col">${a.symbol}</th>`).join('')}
+            </tr>
+          </thead>`;
+        const tbodyProv = `
+          <tbody>
+            ${meses.map(m => `
+              <tr>
+                <td class="cmp-label">${rotuloMes(m)}</td>
+                ${ativosValidos.map(a => {
+                  const v = proventosPorAtivo[a.symbol]?.[m];
+                  return `<td>${typeof v === 'number' ? hgFormatMoedaPrecisa(v, a.currency) : '—'}</td>`;
+                }).join('')}
+              </tr>
+            `).join('')}
+          </tbody>`;
+        tabelaProventosEl.innerHTML = theadProv + tbodyProv;
+        proventosBloco.hidden = false;
+
+        ultimaComparacao = { ativos: ativosValidos, linhas, proventosMensais: { meses, porAtivo: proventosPorAtivo } };
       }
 
       // Tooltips dos indicadores: um único balão reaproveitado, anexado
@@ -20318,7 +20409,7 @@
           alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
           return null;
         }
-        const { ativos, linhas } = ultimaComparacao;
+        const { ativos, linhas, proventosMensais } = ultimaComparacao;
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: 'pt', format: 'a4' });
         const agora = new Date();
@@ -20359,6 +20450,28 @@
           headStyles: { fillColor: [43, 43, 43], textColor: 255 },
           columnStyles: { 0: { fontStyle: 'bold' } },
         });
+
+        // Proventos mês a mês, últimos 12 meses.
+        if (proventosMensais) {
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(11);
+          doc.text('Proventos — últimos 12 meses', 40, doc.lastAutoTable.finalY + 24);
+          doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 32,
+            head: [['Mês', ...ativos.map(a => a.symbol)]],
+            body: proventosMensais.meses.map(m => [
+              rotuloMes(m),
+              ...ativos.map(a => {
+                const v = proventosMensais.porAtivo[a.symbol]?.[m];
+                return typeof v === 'number' ? hgFormatMoedaPrecisa(v, a.currency) : '—';
+              }),
+            ]),
+            theme: 'grid',
+            styles: { fontSize: 8.5, cellPadding: 6 },
+            headStyles: { fillColor: [43, 43, 43], textColor: 255 },
+            columnStyles: { 0: { fontStyle: 'bold' } },
+          });
+        }
 
         return doc;
       }
