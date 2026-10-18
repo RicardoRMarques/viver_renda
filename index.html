@@ -8474,6 +8474,8 @@
           } catch (e) { /* segue sem o dado */ }
 
           statusEl.textContent = '';
+          hgUltimoAtivoConsultado = { symbol: (dadosQuote.symbol || ticker).toUpperCase() };
+          atualizarBotaoFavoritarEstado();
           hgRenderizarAtivoTwelveData(dadosQuote, dividendYield);
           return true;
         } catch (e) {
@@ -19630,11 +19632,12 @@
     async function buscarQuotesFavoritosCarrossel(favoritos) {
       if (!favoritos.length) return [];
       const tickers = favoritos.map(t => (t.startsWith('B3:') ? t : `B3:${t}`)).join(',');
+      let resultadosB3 = [];
       try {
         const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent(tickers)}&key=${encodeURIComponent(CHAVE_HG)}`;
         const resp = await fetch(url);
         const data = await resp.json();
-        return (data?.results || [])
+        resultadosB3 = (data?.results || [])
           .map(a => ({
             symbol: (a.symbol || '').replace('B3:', ''),
             valor: a.quote?.value,
@@ -19644,8 +19647,37 @@
           .filter(f => typeof f.valor === 'number');
       } catch (e) {
         console.error('Erro ao buscar cotações dos favoritos do carrossel:', e);
-        return [];
       }
+
+      // Favoritos que a HG Brasil não reconheceu como ticker da B3 (ex:
+      // ETFs/ações internacionais como EWZ, AAPL) — tenta cada um via
+      // TwelveData, a mesma fonte usada no fallback da Consulta Rápida.
+      const encontradosNaB3 = new Set(resultadosB3.map(f => f.symbol));
+      const faltando = favoritos
+        .map(t => t.replace('B3:', '').toUpperCase())
+        .filter(t => !encontradosNaB3.has(t));
+
+      const resultadosIntl = faltando.length
+        ? (await Promise.all(faltando.map(async (ticker) => {
+          try {
+            const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(CHAVE_TWELVEDATA)}`;
+            const resp = await fetch(url);
+            const data = await resp.json();
+            if (!resp.ok || data.status === 'error' || !data.symbol || data.close == null) return null;
+            return {
+              symbol: ticker,
+              valor: parseFloat(data.close),
+              variacao: parseFloat(data.percent_change) || 0,
+              moeda: data.currency || 'USD',
+            };
+          } catch (e) {
+            console.error(`Erro ao buscar cotação TwelveData de ${ticker} (favoritos do carrossel):`, e);
+            return null;
+          }
+        }))).filter(Boolean)
+        : [];
+
+      return [...resultadosB3, ...resultadosIntl];
     }
 
     function montarItemFavoritoCarrossel(f) {
