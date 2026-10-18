@@ -22004,9 +22004,23 @@
       // carregamento — boletins, alertas de preço, carrossel de
       // favoritos etc. ainda vão terminar de buscar seus dados e "empurrar"
       // o conteúdo pra baixo DEPOIS que já rolamos, deixando a seção alvo
-      // mais embaixo do que o esperado. Corrige de novo depois de dar
-      // tempo desses widgets assíncronos se acomodarem.
-      if (corrigirDepois) setTimeout(rolarAteSecao, 900);
+      // mais embaixo do que o esperado. Um atraso fixo não dava conta de
+      // todo caso — logado, a lista de Alertas de Preço só chega depois
+      // que a sessão do Supabase é restaurada, o que pode demorar bem
+      // mais que isso (sobretudo no celular). Em vez de "chutar" um
+      // tempo, observa a altura da página de verdade e corrige de novo
+      // toda vez que ela mudar, por até alguns segundos.
+      if (corrigirDepois && 'ResizeObserver' in window) {
+        const prazoFinal = Date.now() + 4000;
+        let debounce = null;
+        const observer = new ResizeObserver(() => {
+          if (Date.now() > prazoFinal) { observer.disconnect(); return; }
+          clearTimeout(debounce);
+          debounce = setTimeout(rolarAteSecao, 150);
+        });
+        observer.observe(document.body);
+        setTimeout(() => observer.disconnect(), 4000);
+      }
     }
     document.getElementById('listaAcoesCompartilharLink')?.addEventListener('click', (e) =>
       hgCompartilharLinkFerramenta(e.currentTarget, {
