@@ -21978,7 +21978,7 @@
       document.fonts.ready.then(atualizarTodosCabecalhosFixosMercado);
     }
 
-    function revelarSecaoMercado(id) {
+    function revelarSecaoMercado(id, { corrigirDepois = false } = {}) {
       const secao = document.getElementById(id);
       if (!secao) return;
       secao.hidden = false;
@@ -21987,7 +21987,7 @@
       // mas o cabeçalho do site é fixo — isso deixava o título e o botão
       // "✕" escondidos atrás dele. Rolando manualmente e descontando a
       // altura do cabeçalho (mesma conta já usada no menu mobile).
-      requestAnimationFrame(() => {
+      const rolarAteSecao = () => {
         const cabecalho = document.querySelector('header');
         const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 60;
         const posicao = secao.getBoundingClientRect().top + window.scrollY - alturaCabecalho - 12;
@@ -21997,7 +21997,16 @@
         // chips (pode entrar/sair de "ativo" ou mudar quantidade) só
         // depois desse frame — mede de novo pra garantir.
         atualizarCabecalhoFixoListaMercado(secao);
-      });
+      };
+      requestAnimationFrame(rolarAteSecao);
+      // Quando a seção é aberta por um link direto (ex: compartilhado,
+      // colado na barra de endereço), a página ainda está no começo do
+      // carregamento — boletins, alertas de preço, carrossel de
+      // favoritos etc. ainda vão terminar de buscar seus dados e "empurrar"
+      // o conteúdo pra baixo DEPOIS que já rolamos, deixando a seção alvo
+      // mais embaixo do que o esperado. Corrige de novo depois de dar
+      // tempo desses widgets assíncronos se acomodarem.
+      if (corrigirDepois) setTimeout(rolarAteSecao, 900);
     }
     document.getElementById('listaAcoesCompartilharLink')?.addEventListener('click', (e) =>
       hgCompartilharLinkFerramenta(e.currentTarget, {
@@ -22020,7 +22029,7 @@
     });
     // Link direto (compartilhado ou digitado na barra de endereço)
     if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#taxa-justa', '#debentures', '#rankings-fiis'].includes(window.location.hash)) {
-      revelarSecaoMercado(window.location.hash.slice(1));
+      revelarSecaoMercado(window.location.hash.slice(1), { corrigirDepois: true });
     }
     // Botão "✕" no topo de cada lista — esconde a seção de novo e rola
     // suavemente de volta pra consulta rápida, em vez de deixar o usuário
