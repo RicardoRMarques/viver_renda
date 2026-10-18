@@ -7128,6 +7128,18 @@
 
         <div id="crResultado"></div>
 
+        <div id="crAcoes" hidden>
+          <p class="calc-ajuda" style="margin:14px 0 6px;">
+            O PDF leva os valores que você informou, o Cap Rate calculado e a comparação com o FII, se preenchida.
+          </p>
+          <div class="cmp-acoes-linha">
+            <button type="button" class="cmp-btn-secundario" id="crBtnPdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+              Baixar PDF
+            </button>
+          </div>
+        </div>
+
         <details class="calc-educativo">
           <summary>📋 O que o Cap Rate NÃO mostra</summary>
           <div class="calc-educativo-corpo">
@@ -13448,12 +13460,18 @@
       const btnCalcular = document.getElementById('crBtnCalcular');
       const btnLimpar = document.getElementById('crBtnLimpar');
       const resultadoEl = document.getElementById('crResultado');
+      const acoesEl = document.getElementById('crAcoes');
+      const btnPdf = document.getElementById('crBtnPdf');
 
       if (!overlay || !btnAbrirMenu) return;
 
       hgAplicarMascaraMoeda(inValorImovel);
       hgAplicarMascaraMoeda(inAluguelMensal);
       hgAplicarMascaraMoeda(inDespesasMensais);
+
+      // Guarda o último cálculo válido, pro PDF (mesmo padrão da
+      // calculadora "Vale a Pena").
+      let ultimoCalculoCr = null;
 
       function abrirModal() {
         overlay.hidden = false;
@@ -13480,6 +13498,8 @@
 
         if (!(valorImovel > 0) || !(aluguelMensal > 0)) {
           erro('Preencha o valor do imóvel e o aluguel mensal pra calcular.');
+          ultimoCalculoCr = null;
+          acoesEl.hidden = true;
           return;
         }
 
@@ -13488,22 +13508,26 @@
         const capRateLiquido = temDespesas ? (((aluguelMensal - despesasMensais) * 12) / valorImovel) * 100 : null;
 
         let comparacaoHtml = '';
+        let leituraTexto = null;
         if (dyFii > 0) {
           const base = temDespesas ? capRateLiquido : capRateBruto;
           const rotuloBase = temDespesas ? 'Cap Rate líquido' : 'Cap Rate';
           const diferenca = base - dyFii;
-          let leitura;
+          let destaque = '';
           if (Math.abs(diferenca) < 0.3) {
-            leitura = `${rotuloBase} do imóvel (${pct(base)}) e o DY do FII (${pct(dyFii)}) estão bem próximos — olhando só a renda, a diferença entre os dois é pequena.`;
+            leituraTexto = `${rotuloBase} do imóvel (${pct(base)}) e o DY do FII (${pct(dyFii)}) estão bem próximos — olhando só a renda, a diferença entre os dois é pequena.`;
           } else if (diferenca > 0) {
-            leitura = `${rotuloBase} do imóvel (${pct(base)}) é ${pct(diferenca)} <strong>maior</strong> que o DY do FII (${pct(dyFii)}) — olhando só o retorno de renda, o imóvel paga mais.`;
+            destaque = 'maior';
+            leituraTexto = `${rotuloBase} do imóvel (${pct(base)}) é ${pct(diferenca)} ${destaque} que o DY do FII (${pct(dyFii)}) — olhando só o retorno de renda, o imóvel paga mais.`;
           } else {
-            leitura = `${rotuloBase} do imóvel (${pct(base)}) é ${pct(Math.abs(diferenca))} <strong>menor</strong> que o DY do FII (${pct(dyFii)}) — olhando só o retorno de renda, o FII paga mais.`;
+            destaque = 'menor';
+            leituraTexto = `${rotuloBase} do imóvel (${pct(base)}) é ${pct(Math.abs(diferenca))} ${destaque} que o DY do FII (${pct(dyFii)}) — olhando só o retorno de renda, o FII paga mais.`;
           }
+          const leituraHtml = destaque ? leituraTexto.replace(destaque, `<strong>${destaque}</strong>`) : leituraTexto;
           comparacaoHtml = `
             <div class="hg-status atencao-fixa" style="margin-top:12px;">
               <span>⚖️</span>
-              <span>${leitura} Isso não inclui IR, vacância, liquidez nem valorização dos dois lados — veja os detalhes logo abaixo.</span>
+              <span>${leituraHtml} Isso não inclui IR, vacância, liquidez nem valorização dos dois lados — veja os detalhes logo abaixo.</span>
             </div>`;
         }
 
@@ -13520,6 +13544,13 @@
             </div>` : ''}
           </div>
           ${comparacaoHtml}`;
+
+        ultimoCalculoCr = {
+          valorImovel, aluguelMensal, despesasMensais, temDespesas,
+          dyFii: dyFii > 0 ? dyFii : null,
+          capRateBruto, capRateLiquido, leituraTexto,
+        };
+        acoesEl.hidden = false;
       }
 
       function limpar() {
@@ -13531,6 +13562,116 @@
         inDespesasMensais.dataset.centavos = '0';
         inDyFii.value = '';
         resultadoEl.innerHTML = '';
+        ultimoCalculoCr = null;
+        acoesEl.hidden = true;
+      }
+
+      function nomeArquivoPdfCr() {
+        return 'cap-rate.pdf';
+      }
+
+      async function montarDocumentoPdfCr() {
+        if (!ultimoCalculoCr) {
+          alert('Calcule o Cap Rate antes de gerar o PDF.');
+          return null;
+        }
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+
+        const c = ultimoCalculoCr;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Cap Rate — Imóvel x FII', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
+        doc.setFontSize(8);
+        doc.text(
+          'Conteúdo educativo. Compara o retorno de renda que você informou; não indica onde investir nem substitui análise própria.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        // ---- Os dados informados ----
+        const linhasDados = [
+          ['Valor de mercado do imóvel', hgFormatMoeda(c.valorImovel)],
+          ['Aluguel mensal', hgFormatMoeda(c.aluguelMensal)],
+        ];
+        if (c.temDespesas) linhasDados.push(['Despesas mensais', hgFormatMoeda(c.despesasMensais)]);
+        if (c.dyFii) linhasDados.push(['DY anual do FII pra comparar', pct(c.dyFii)]);
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Dados informados']],
+          body: linhasDados,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        // ---- O resultado ----
+        const linhasResultado = [['Cap Rate (bruto)', pct(c.capRateBruto)]];
+        if (c.temDespesas) linhasResultado.push(['Cap Rate (líquido de despesas)', pct(c.capRateLiquido)]);
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 18,
+          head: [['', 'Resultado']],
+          body: linhasResultado,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        // ---- Comparação com o FII, se informado ----
+        if (c.leituraTexto) {
+          doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 18,
+            head: [['Comparação com o FII']],
+            body: [[c.leituraTexto]],
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 6 },
+            headStyles: { fillColor: [119, 119, 119], textColor: 255 },
+          });
+        }
+
+        // ---- O que o Cap Rate não mostra ----
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 18,
+          head: [['O que o Cap Rate NÃO mostra']],
+          body: [
+            ['Imposto de Renda — aluguel é tributado pela tabela progressiva (até 27,5%); rendimentos de FII costumam ser isentos para pessoa física.'],
+            ['Vacância e inadimplência — o cálculo assume o imóvel alugado o ano inteiro, sem atraso.'],
+            ['Liquidez — vender uma cota de FII leva segundos; vender um imóvel costuma levar meses.'],
+            ['Diversificação — 1 imóvel concentra capital alto num único ativo; o mesmo valor em FIIs permite diversificar.'],
+            ['Valorização — nem o Cap Rate nem o DY do FII incluem a variação de preço do ativo, só a renda.'],
+          ],
+          theme: 'grid',
+          styles: { fontSize: 8, cellPadding: 6, textColor: 60 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255 },
+        });
+
+        return doc;
+      }
+
+      async function gerarPdfCr() {
+        const doc = await montarDocumentoPdfCr();
+        if (!doc) return;
+        doc.save(nomeArquivoPdfCr());
       }
 
       btnAbrirMenu.addEventListener('click', () => {
@@ -13541,6 +13682,7 @@
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
       btnCalcular.addEventListener('click', calcular);
       btnLimpar.addEventListener('click', limpar);
+      btnPdf.addEventListener('click', gerarPdfCr);
 
       document.getElementById('crCompartilharLink')?.addEventListener('click', (e) =>
         hgCompartilharLinkFerramenta(e.currentTarget, {
