@@ -3397,6 +3397,13 @@
     @media (min-width: 1024px) {
       .calc-modal.vc-modal { max-width: 1040px; }
     }
+    /* Cap Rate: mesma largura da Venda Coberta, a pedido do usuário —
+       sem isso ficava no padrão estreito (480px) e os campos lado a lado
+       (valor do imóvel/aluguel, despesas/DY) ficavam apertados. */
+    .calc-modal.cr-modal { max-width: 960px; }
+    @media (min-width: 1024px) {
+      .calc-modal.cr-modal { max-width: 1040px; }
+    }
     .fire-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-top: 4px; }
     @media (max-width: 640px) {
       .fire-form-grid { grid-template-columns: 1fr; }
