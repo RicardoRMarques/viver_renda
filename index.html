@@ -8845,6 +8845,103 @@
         });
       }
 
+      function nomeArquivoComparadorRapido(lista) {
+        return lista.map(i => i.ticker).join('-').toLowerCase() + '-comparacao.pdf';
+      }
+
+      // Monta o PDF do comparador rápido (bolinhas de saúde + Nota Geral):
+      // mesmo cabeçalho padrão dos outros relatórios do site. Como o PDF
+      // não desenha a bolinha colorida (não dá pra colorir um ícone célula
+      // a célula sem desenho manual complexo no autoTable), usa rótulo de
+      // texto colorido no lugar ("Saudável"/"Atenção"/"Fora da faixa") —
+      // na prática mais claro num documento impresso do que uma bolinha
+      // sozinha, sem a legenda ao lado como tem na tela.
+      async function montarDocumentoPdfComparadorRapido(lista) {
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Comparação Rápida de Indicadores', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
+        doc.setFontSize(8);
+        doc.text(
+          'Comparação educativa baseada em faixas típicas de mercado (as faixas se ajustam ao setor de cada ativo) — não é recomendação de investimento.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        const ROTULO_COR = { verde: 'Saudável', amarelo: 'Atenção', vermelho: 'Fora da faixa', na: '—' };
+        const COR_RGB = { verde: [34, 197, 94], amarelo: [234, 179, 8], vermelho: [239, 68, 68] };
+
+        const scores = lista.map(item => {
+          const ehBanco = hgEhSetorBanco(item.setor);
+          const pontos = THRESHOLDS_INDICADORES
+            .map(def => hgClassificarIndicador(def, item.valores[def.campo], ehBanco).pontos)
+            .filter(p => p !== null);
+          return pontos.length ? Math.round(pontos.reduce((a, b) => a + b, 0) / pontos.length) : null;
+        });
+
+        const body = [['Nota Geral', ...scores.map(s => s === null ? '—' : String(s))]];
+        let grupoAtual = null;
+        for (const def of THRESHOLDS_INDICADORES) {
+          if (def.grupo !== grupoAtual) {
+            grupoAtual = def.grupo;
+            body.push([{ content: def.grupo, colSpan: lista.length + 1, styles: { fillColor: [80, 80, 80], textColor: 255, fontStyle: 'bold' } }]);
+          }
+          const linha = [def.rotulo];
+          for (const item of lista) {
+            const { cor } = hgClassificarIndicador(def, item.valores[def.campo], hgEhSetorBanco(item.setor));
+            linha.push(ROTULO_COR[cor]);
+          }
+          body.push(linha);
+        }
+
+        doc.autoTable({
+          startY: 88,
+          head: [['Indicador', ...lista.map(l => l.ticker)]],
+          body,
+          theme: 'grid',
+          styles: { fontSize: 8, cellPadding: 5, halign: 'center' },
+          headStyles: { fillColor: [43, 43, 43], textColor: 255 },
+          columnStyles: { 0: { fontStyle: 'bold', halign: 'left', cellWidth: 100 } },
+          didParseCell: (dados) => {
+            if (dados.section !== 'body' || dados.column.index === 0) return;
+            const texto = dados.cell.raw;
+            if (dados.row.index === 0) {
+              // Linha da Nota Geral: mesma régua de cor da tela (score, não rótulo).
+              const s = parseInt(texto, 10);
+              if (!isNaN(s)) {
+                dados.cell.styles.fontStyle = 'bold';
+                dados.cell.styles.textColor = s >= 75 ? [34, 197, 94] : s >= 45 ? [234, 179, 8] : [239, 68, 68];
+              }
+              return;
+            }
+            if (COR_RGB[Object.keys(ROTULO_COR).find(k => ROTULO_COR[k] === texto)]) {
+              dados.cell.styles.textColor = COR_RGB[Object.keys(ROTULO_COR).find(k => ROTULO_COR[k] === texto)];
+            }
+          },
+        });
+
+        return doc;
+      }
+
       // ------------------------------------------------------------
       // Relatório gerencial (FII/Fiagro)
       // Abre a lista oficial do Fundos.NET JÁ FILTRADA em Relatórios >
@@ -9062,6 +9159,16 @@
                   </div>
                   <div class="hg-status" id="hgCompararStatus"></div>
                   <div id="hgCompararResultado"></div>
+                  <div id="hgCompararAcoes" class="cmp-acoes-linha" style="margin-top:12px;" hidden>
+                    <button type="button" class="cmp-btn-secundario" id="hgCompararBtnPdf">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+                      Baixar PDF
+                    </button>
+                    <button type="button" class="cmp-btn-secundario" id="hgCompararBtnCompartilhar">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                      <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+                    </button>
+                  </div>
                 </div>
                 ` : ''}
               </div>
@@ -9376,6 +9483,9 @@
           setTimeout(hgCompararFecharDropdown, 150); // delay pra permitir o mousedown do item registrar
         });
 
+        let ultimaComparacaoRapida = null; // pro "Baixar PDF" / "Compartilhar"
+        const acoesComparar = document.getElementById('hgCompararAcoes');
+
         const executarComparacao = async () => {
           const statusEl = document.getElementById('hgCompararStatus');
           const resultadoEl = document.getElementById('hgCompararResultado');
@@ -9386,6 +9496,8 @@
           statusEl.className = 'hg-status';
           statusEl.textContent = `Comparando ${tickersUnicos.join(', ')}...`;
           resultadoEl.innerHTML = '';
+          ultimaComparacaoRapida = null;
+          if (acoesComparar) acoesComparar.hidden = true;
 
           try {
             const resultados = await Promise.allSettled(tickersUnicos.map(hgBuscarDadosComparacao));
@@ -9399,6 +9511,8 @@
               : '';
             resultadoEl.innerHTML = hgRenderizarComparador(ok);
             hgAtivarTooltipComparador();
+            ultimaComparacaoRapida = ok;
+            if (acoesComparar) acoesComparar.hidden = false;
           } catch (e) {
             statusEl.className = 'hg-status erro';
             statusEl.textContent = e.message || 'Erro ao comparar os ativos.';
@@ -9408,6 +9522,34 @@
 
         document.getElementById('hgCompararBtnBuscar')?.addEventListener('click', executarComparacao);
         inputComparar?.addEventListener('keydown', (e) => { if (e.key === 'Enter') executarComparacao(); });
+
+        document.getElementById('hgCompararBtnPdf')?.addEventListener('click', async () => {
+          if (!ultimaComparacaoRapida) return;
+          const doc = await montarDocumentoPdfComparadorRapido(ultimaComparacaoRapida);
+          if (doc) doc.save(nomeArquivoComparadorRapido(ultimaComparacaoRapida));
+        });
+        document.getElementById('hgCompararBtnCompartilhar')?.addEventListener('click', async (e) => {
+          if (!ultimaComparacaoRapida) return;
+          const botao = e.currentTarget;
+          const doc = await montarDocumentoPdfComparadorRapido(ultimaComparacaoRapida);
+          if (!doc) return;
+          const nomeArquivo = nomeArquivoComparadorRapido(ultimaComparacaoRapida);
+          const blob = doc.output('blob');
+          const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+          if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+            try {
+              await navigator.share({ title: 'Comparação Rápida de Indicadores', files: [arquivo] });
+              return;
+            } catch (err) {
+              if (err?.name === 'AbortError') return;
+            }
+          }
+          doc.save(nomeArquivo);
+          const textoSpan = botao.querySelector('.hg-btn-compartilhar-texto');
+          const textoPadrao = textoSpan ? textoSpan.textContent : null;
+          if (textoSpan) textoSpan.textContent = 'PDF baixado!';
+          setTimeout(() => { if (textoSpan && textoPadrao) textoSpan.textContent = textoPadrao; }, 2500);
+        });
       }
 
       // Busca o P/VP e VPA (campo "financials") no endpoint /finance/stock_price
