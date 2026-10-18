@@ -1366,7 +1366,18 @@
     @media (max-width: 900px) {
       .nav-dropdown.aberto .nav-dropdown-menu.nav-mega { grid-template-columns: repeat(2, 1fr); }
     }
-    .nav-mega-coluna { display: flex; flex-direction: column; gap: 2px; }
+    /* min-width:0 é o que de fato resolve o overflow: sem isso, uma
+       coluna de grid nunca encolhe além do min-content do texto mais
+       longo que ela contém (comportamento padrão do CSS Grid) — e como
+       os itens têm white-space:nowrap, um rótulo como "Descubra seu
+       Perfil de Investidor" sozinho já é mais largo que a fatia de 1/3
+       do grid em telas de ~960 a 1330px, empurrando a página inteira pra
+       um scroll horizontal (confirmado medindo document.scrollWidth, não
+       só a caixa do próprio menu, que não acusava nada). Deixa quebrar
+       linha dentro do mega-menu pra não depender de caber tudo numa
+       linha só. */
+    .nav-mega-coluna { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .nav-mega .nav-dropdown-item { white-space: normal; line-height: 1.3; }
     .nav-mega-titulo {
       font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
       letter-spacing: 0.05em; color: var(--primary); padding: 10px 12px 6px;
@@ -4422,7 +4433,7 @@
                 <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg> Calculadora de Venda Coberta
               </button>
               <button type="button" class="nav-dropdown-item" id="crBtnAbrir">
-                🏠 Cap Rate — Imóvel x FII
+                <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Cap Rate — Imóvel x FII
               </button>
               <button type="button" class="nav-dropdown-item" id="navAbrirConversor">
                 💱 Conversor de Moedas
@@ -4497,7 +4508,7 @@
     <button type="button" class="mobile-menu-item" data-mobile-alvo="fgcBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC</button>
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     <div class="mobile-menu-separador">Ferramentas</div>
-    <button type="button" class="mobile-menu-item" data-mobile-alvo="crBtnAbrir">🏠 Cap Rate — Imóvel x FII</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="crBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Cap Rate — Imóvel x FII</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário do Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="rpnBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)</button>
