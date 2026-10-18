@@ -2360,6 +2360,14 @@
       padding-top: 26px;
       border-top: 1px solid var(--border);
     }
+    .ranking-secao-topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .ranking-secao-topo .ranking-section-title { margin-bottom: 0; }
     .ranking-section-title {
       font-size: 0.78rem;
       font-weight: 700;
@@ -6403,8 +6411,16 @@
       <div class="coluna-explorar">
         <div class="panel-title explorar"><span class="dot"></span> Explore o mercado</div>
         <div class="search-container">
-          <div class="ranking-block">
-            <h3 class="ranking-section-title">🏢 Rankings de Ativos — FIIs</h3>
+          <div class="ranking-block" id="rankings-fiis">
+            <div class="ranking-secao-topo">
+              <h3 class="ranking-section-title">🏢 Rankings de Ativos — FIIs</h3>
+              <button type="button" id="rankingFiisCompartilharLink" class="modal-link-btn"
+                      aria-label="Compartilhar o link desta ferramenta"
+                      title="Compartilhar o link desta ferramenta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+              </button>
+            </div>
 
             <div class="ranking-acoes-colunas">
               <div class="ranking-coluna">
@@ -21793,6 +21809,13 @@
       }
     }
     carregarRanking();
+
+    document.getElementById('rankingFiisCompartilharLink')?.addEventListener('click', (e) =>
+      hgCompartilharLinkFerramenta(e.currentTarget, {
+        hash: 'rankings-fiis',
+        titulo: 'Rankings de Ativos — FIIs — Viver de Renda',
+        texto: 'Maior valor patrimonial, maior dividend yield e mais negociados entre os FIIs, atualizado todo dia.',
+      }));
 
 
     (function () {
