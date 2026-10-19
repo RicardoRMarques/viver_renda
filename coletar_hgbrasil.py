@@ -1591,13 +1591,23 @@ def verificar_e_disparar_alertas(token):
 
     precos = {}
     if tickers_b3:
-        tickers_query = ",".join(f"B3:{t}" for t in tickers_b3)
+        # Mesma chamada em LOTES de até HGBRASIL_MAX_TICKERS_POR_REQUISICAO já
+        # usada pelos rankings (_buscar_quotes_em_lotes) — reaproveitada aqui
+        # de propósito. A versão antiga mandava todos os tickers_b3 numa
+        # única chamada; com mais de 5 alertas de tickers diferentes
+        # cadastrados (ex: 7, visto em 19/10/2026), a HG Brasil recusa o
+        # pedido (erro "MAX_PER_REQUEST" do plano) SEM devolver HTTP de
+        # erro — só "results" vazio, sem nada em "errors" que acionasse o
+        # aviso daqui. O resultado: `precos` ficava vazio, TODO alerta de
+        # ação/FII era silenciosamente pulado (preco_atual None), e nenhum
+        # alerta disparava — mesmo um que já tivesse batido a condição há
+        # várias execuções, sem nenhum erro aparecer nos logs do robô.
         try:
-            url = f"https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers={tickers_query}&key={token}"
-            resp = requests.get(url, timeout=TIMEOUT)
-            resp.raise_for_status()
-            resultados = resp.json().get("results", [])
-            precos.update({r["symbol"].replace("B3:", ""): r.get("quote", {}).get("value") for r in resultados})
+            resultados = _buscar_quotes_em_lotes(tickers_b3, token)
+            precos.update({
+                r["symbol"].replace("B3:", ""): (r.get("quote") or {}).get("value")
+                for r in resultados if r.get("symbol")
+            })
         except (requests.RequestException, ValueError, KeyError) as exc:
             print(f"AVISO: falha ao buscar cotações da B3 para os alertas: {exc}", file=sys.stderr)
 
