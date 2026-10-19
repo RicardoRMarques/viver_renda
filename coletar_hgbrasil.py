@@ -1079,12 +1079,28 @@ def _mesclar_com_ultimos_indices(indices_novos, caminho=INDICES_OUTPUT_FILE):
     meses) desse arquivo e, sem ele, troca em silêncio por um valor de
     reserva de 4,5% a.a.
 
-    A recuperação vale só para os índices do tipo TAXA (valor_pct): IPCA,
+    A recuperação vale para os índices do tipo TAXA (valor_pct): IPCA,
     IGP-M, CPI, Selic, CDI. São números publicados em data marcada — repetir
-    o último continua sendo a informação correta até sair o próximo. Cotação
-    (Ibovespa, Dólar, Bitcoin: valor + variação do dia) NÃO é recuperada de
-    propósito — repetir o dólar de meia hora atrás como se fosse o de agora
-    seria mostrar um número errado, o que é pior do que mostrar nada.
+    o último continua sendo a informação correta até sair o próximo.
+
+    Também vale para Dólar e Euro (câmbio do Banco Central, série SGS) —
+    mesmo sendo "valor" + variação do dia, cada observação já vem com a
+    própria data de referência (PTAX de um dia específico), então repetir
+    o último fechamento conhecido com a variação DAQUELE dia (não "do dia
+    de hoje") ainda é uma informação real, só que de ontem — bem diferente
+    de inventar uma variação pro dia de hoje. Medido em 19/10/2026: o
+    Banco Central caiu por inteiro (timeout em toda chamada), e só Dólar/
+    Euro sumiam do boletim — Selic/CDI/IPCA/IGP-M (mesma API, mesma falha)
+    continuavam aparecendo normalmente, porque só eles eram recuperados.
+    Essa distinção não parece intencional nem é perceptível pra quem lê
+    (nenhum selo "desatualizado" aparece nos dois casos), então não faz
+    sentido um ser recuperado e o outro não.
+
+    Cotação SEM data de referência própria (Ibovespa, IFIX, Bitcoin,
+    Ethereum — preço "ao vivo" da brapi/CoinGecko, sem um "PTAX do dia X")
+    continua de fora da recuperação, de propósito: aí sim repetir o preço
+    de meia hora atrás como se fosse o de agora mostraria um número errado,
+    sem nenhuma data âncora que justifique o atraso.
     """
     if not indices_novos:
         # Falha geral (sem token, API fora do ar): quem chama já mantém o
@@ -1109,8 +1125,15 @@ def _mesclar_com_ultimos_indices(indices_novos, caminho=INDICES_OUTPUT_FILE):
         if label in presentes:
             vizinho_anterior = label
             continue
-        if not isinstance(item.get("valor_pct"), (int, float)):
-            continue  # cotação: ver explicação no docstring
+        eh_taxa = isinstance(item.get("valor_pct"), (int, float))
+        # Câmbio do Banco Central (Dólar/Euro): tem "valor" + variação do
+        # dia, mas também carrega "referencia" — a data da própria PTAX,
+        # o mesmo tipo de "data marcada" que já justifica recuperar as
+        # taxas. Cotação sem essa âncora (Ibovespa, Bitcoin...) continua
+        # de fora — ver docstring.
+        eh_cambio_com_data = isinstance(item.get("valor"), (int, float)) and bool(item.get("referencia"))
+        if not (eh_taxa or eh_cambio_com_data):
+            continue  # cotação sem data de referência própria: ver docstring
 
         idade = _idade_em_dias(item)
         if idade is not None and idade > INDICES_RECUPERACAO_MAX_DIAS:
