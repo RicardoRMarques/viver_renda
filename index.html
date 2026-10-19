@@ -1784,6 +1784,14 @@
     .hg-busca-compacta .hg-painel { padding: 10px 12px; border-radius: 14px; }
     .hg-busca-compacta .hg-titulo { font-size: 0.84rem; margin-bottom: 3px; }
     .hg-busca-compacta .hg-linha-busca { gap: 6px; }
+    .alertas-cabecalho {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 3px;
+    }
+    .alertas-cabecalho .hg-titulo { margin-bottom: 0; }
 
     .hg-btn-secundario-pequeno[id="hgBtnFavoritar"] {
       background: transparent;
@@ -6238,7 +6246,15 @@
         <!-- ALERTAS DE PREÇO: só funciona logado (o robô manda o e-mail
              pro cadastro da conta). Limite de 5 alertas por pessoa. -->
         <section class="hg-busca hg-busca-compacta" id="alertas-preco">
-          <h2 class="hg-titulo">🔔 Meus Alertas de Preço</h2>
+          <div class="alertas-cabecalho">
+            <h2 class="hg-titulo" style="margin-bottom:0;">🔔 Meus Alertas de Preço</h2>
+            <button type="button" id="alertasCompartilharLink" class="modal-link-btn"
+                    aria-label="Compartilhar o link desta ferramenta"
+                    title="Compartilhar o link desta ferramenta">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+          </div>
           <p class="calc-ajuda" style="margin:0 0 10px; white-space:nowrap;">Receba no seu e-mail o alerta <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="alertas-email" aria-label="Como recebo o alerta por e-mail?" title="">?</button></p>
           <div class="hg-painel">
             <div id="alertasDeslogado">
@@ -19863,6 +19879,13 @@
         document.getElementById('authBtnAbrir')?.click();
       });
 
+      document.getElementById('alertasCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          hash: 'alertas-preco',
+          titulo: 'Meus Alertas de Preço — Viver de Renda',
+          texto: 'Crie alertas de preço e receba por e-mail quando a ação ou FII bater o valor que você quiser.',
+        }));
+
       async function alertasCarregarLista(userId) {
         const cliente = obterSupabaseClient();
         if (!cliente) return [];
@@ -22043,7 +22066,7 @@
       });
     });
     // Link direto (compartilhado ou digitado na barra de endereço)
-    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#taxa-justa', '#debentures', '#rankings-fiis'].includes(window.location.hash)) {
+    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#taxa-justa', '#debentures', '#rankings-fiis', '#alertas-preco'].includes(window.location.hash)) {
       revelarSecaoMercado(window.location.hash.slice(1), { corrigirDepois: true });
     }
     // Botão "✕" no topo de cada lista — esconde a seção de novo e rola
