@@ -1,7 +1,7 @@
 {
   "_leia_me": "CAPEX e Depreciação/Amortização (D&A) de ações, direto dos dados abertos da CVM (ITR/DFP) — não da HG Brasil, que não tem esses campos. Valores em R$, ACUMULADOS NO ANO até 'dt_refer' de cada empresa (convenção do fluxo de caixa brasileiro — nunca isolado por trimestre). Ver coletar_cvm_capex.py.",
   "fonte": "CVM - Dados Abertos (dados.cvm.gov.br), ITR/DFP",
-  "atualizado_em": "2026-10-15T19:54:36.760217+00:00",
+  "atualizado_em": "2026-10-19T21:00:33.969267+00:00",
   "ativos": {
     "AALR3": {
       "dt_refer": "2025-12-31",
@@ -339,8 +339,8 @@
       "depreciacao_amortizacao": 6138000.0
     },
     "CAML3": {
-      "dt_refer": "2026-05-31",
-      "capex": 77541000.0,
+      "dt_refer": "2026-08-31",
+      "capex": 130115000.0,
       "depreciacao_amortizacao": null
     },
     "CASH3": {
@@ -1274,8 +1274,8 @@
       "depreciacao_amortizacao": null
     },
     "RSID3": {
-      "dt_refer": "2025-12-31",
-      "capex": 23000.0,
+      "dt_refer": "2026-06-30",
+      "capex": 0.0,
       "depreciacao_amortizacao": null
     },
     "RSUL4": {
