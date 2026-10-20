@@ -58,6 +58,28 @@ credencial está configurada).
 - Credenciais da API: Supabase → Settings → API
 - Login (Magic Link): Supabase → Authentication → Providers / Emails
 
+**⚠️ Mudança do Supabase a partir de 30/10/2026 — GRANT explícito em tabela nova:**
+A partir dessa data, o Supabase para de conceder acesso automático à API
+de Dados (supabase-js/PostgREST/GraphQL) pra tabelas NOVAS criadas no
+schema `public`. Tabelas já existentes (`calc_aportes*`, `alertas_preco`,
+`favoritos_carrossel`, `historico_indices`...) não são afetadas — continuam
+com a concessão que já tinham.
+
+Só importa pra migrações futuras: toda tabela nova precisa de um `grant`
+explícito na MESMA migração que cria ela, além da política de RLS — RLS
+sozinha não bastará mais (ela só filtra LINHAS depois que o acesso à
+tabela já foi concedido; sem o `grant`, a API nem chega a tentar, e
+devolve "permission denied"). Padrão a seguir (ver `supabase-calc-aportes.sql`
+pro resto da migração — criar tabela, RLS, políticas):
+
+```sql
+grant select, insert, update, delete on table public.<tabela_nova> to authenticated;
+-- só adicionar "anon" nessa lista se a tabela realmente precisar ser
+-- lida/escrita por visitante deslogado (ex.: historico_indices, que é
+-- leitura pública) — a maioria das tabelas do site é por usuário logado
+-- (RLS filtra por auth.uid()), então authenticated já basta.
+```
+
 ---
 
 ## 4. Envio de e-mail (login sem senha)
