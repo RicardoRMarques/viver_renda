@@ -9061,12 +9061,55 @@
         // volta a mandar esse cabeçalho (apontando pro nosso domínio); o
         // "noopener" sozinho já cobre a parte que importa de segurança
         // (bloqueia a nova aba de manipular esta via window.opener).
+        //
+        // Reportado de novo em 20/10/2026, especificamente "depois que passa
+        // um tempo" — isso não bate com Referer (seria sempre ou nunca, não
+        // "depois de um tempo"), e bate com a sessão pública do Fundos.NET
+        // EXPIRANDO por inatividade: sem sessão válida, o link direto cai em
+        // login?expired; só visitar essa página já basta pro servidor deles
+        // renovar a sessão, e o segundo clique (mesmo link) funciona. Ver o
+        // listener em hgBtnRelatorio logo abaixo, que "esquenta" a sessão com
+        // uma requisição invisível antes de navegar de vez — imita o clique
+        // duplo que a pessoa já precisava dar na mão, só que automático.
         return `
                 <a class="hg-btn-secundario-pequeno hg-btn-relatorio" id="hgBtnRelatorio" href="${url}" target="_blank" rel="noopener"
                    title="Lista oficial no Fundos.NET (B3/CVM) só com os relatórios gerenciais do fundo — o mais recente fica no topo">
                   ${HG_ICONE_DOC}<span>Relatórios gerenciais (B3/CVM)</span>
                 </a>`;
       }
+
+      // Delegado em resultadoEl (não no botão direto): o card inteiro é
+      // reconstruído via innerHTML a cada consulta, então um listener preso
+      // ao <a> de uma renderização anterior já teria sido descartado junto
+      // com o elemento — delegar no container, que nunca é substituído,
+      // cobre qualquer card renderizado dali pra frente sem precisar
+      // religar nada a cada vez.
+      resultadoEl.addEventListener('click', (e) => {
+        const botao = e.target.closest('#hgBtnRelatorio');
+        if (!botao) return;
+        e.preventDefault();
+        const url = botao.href;
+
+        // Abre a aba em branco JÁ (preserva o gesto do clique, senão o
+        // navegador bloqueia um window.open() disparado de dentro de um
+        // .then() assíncrono) e só navega ela pro link de verdade depois
+        // que o "aquecimento" da sessão terminar (ou no máximo em 2,5s,
+        // pra nunca deixar a pessoa esperando uma aba em branco à toa se
+        // a rede estiver lenta ou o Fundos.NET não responder).
+        const aba = window.open('about:blank', '_blank');
+        if (!aba) {
+          // Pop-up bloqueado — cai pro comportamento antigo (sem aquecer).
+          window.open(url, '_blank', 'noopener');
+          return;
+        }
+        aba.opener = null;
+
+        const aquecimento = fetch(url, { mode: 'no-cors', credentials: 'include' }).catch(() => {});
+        const tempoLimite = new Promise(resolve => setTimeout(resolve, 2500));
+        Promise.race([aquecimento, tempoLimite]).then(() => {
+          try { aba.location.href = url; } catch (erro) { /* aba já pode ter sido fechada pela pessoa */ }
+        });
+      });
 
       // ------------------------------------------------------------
       // Balanços (ações)
