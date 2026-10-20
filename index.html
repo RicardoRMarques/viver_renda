@@ -24564,7 +24564,21 @@
           }
           if (isNaN(ponto) || ponto <= 0) {
             amortStatus.className = 'hg-status erro';
-            amortStatus.textContent = 'Informe após qual parcela (ex: 12).';
+            // Confusão comum: depois de já ter uma amortização avulsa no
+            // histórico, a pessoa preenche o FGTS logo abaixo e clica em
+            // "+ Adicionar à lista" de novo achando que precisa desse passo
+            // pra "adicionar a segunda amortização" — mas o FGTS não entra
+            // nessa lista, ele é aplicado sozinho ao clicar em "Aplicar
+            // simulação" (ver texto de ajuda da seção). Com os campos de
+            // cima vazios e o FGTS já preenchido, o aviso genérico de
+            // "informe a parcela" não fazia sentido nenhum pra quem só
+            // queria aplicar o FGTS — troca por uma explicação direta.
+            const fgtsPreenchidoSemClicarAdicionar = amortFgtsAtivo?.checked
+              && amortFgtsInicio?.value.trim() !== ''
+              && hgValorMascarado(amortFgtsValor) > 0;
+            amortStatus.textContent = fgtsPreenchidoSemClicarAdicionar
+              ? 'O FGTS não entra nessa lista — não precisa clicar em "+ Adicionar à lista" pra ele. Pode clicar direto em "Aplicar simulação" que ele já é aplicado junto.'
+              : 'Informe após qual parcela (ex: 12).';
             return;
           }
           if (valor <= 0) {
