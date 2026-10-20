@@ -1,0 +1,15 @@
+name: TMP3 - confirmar campos API CRI/CRA
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  investigar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install requests
+      - run: python _tmp_investigar_cri_cra3.py
