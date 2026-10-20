@@ -1,0 +1,22 @@
+name: TMP2 - investigar ANBIMA Data CRI/CRA
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  investigar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - run: npm install playwright
+      - run: npx playwright install --with-deps chromium
+      - run: node _tmp_investigar_cri_cra2.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshot
+          path: anbima-data-cri-cra.png
+          if-no-files-found: ignore
