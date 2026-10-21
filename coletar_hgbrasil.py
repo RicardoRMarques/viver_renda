@@ -1483,13 +1483,15 @@ SUPABASE_URL = "https://mzknjnupizprfatfmxqg.supabase.co"
 # internacionais do index.html — não é segredo, só limitada por domínio/plano.
 CHAVE_TWELVEDATA = "034d1589162e413d9a1e9608860cb06a"
 
-# Kinds gravados pelo front-end quando o alerta é de ação/FII/Fiagro/FI-Infra/
-# ETF da B3 (ver botão "Criar alerta" no index.html, mesmo whitelist de lá).
-# Qualquer outro kind (ex: "internacional") é tratado aqui como Stock/ETF
-# americano via TwelveData. Faltavam "fund" (FI-Infra, ex: DIVS11) e "etf"
-# (ETF listado na B3, ex: BOVA11) — esses alertas caíam no ramo errado
-# (TwelveData, que não tem ticker da B3) e nunca disparavam.
-KINDS_B3 = ("stock", "fii", "fiagro", "fund", "etf")
+# Kind gravado pelo front-end quando o alerta é de um Stock/ETF americano
+# (ver botão "Criar alerta" no index.html — mesmo valor sentinela de lá).
+# Qualquer outro kind veio de um resultado real da HG Brasil pra um ticker
+# com prefixo "B3:" (ação, FII, Fiagro, FI-Infra/FIP-IE, ETF...), então já é
+# prova de que é um ativo da B3 — não vale restringir a uma lista fixa de
+# "kind" conhecidos, porque a HG Brasil usa valores diferentes pra
+# estruturas de fundo menos comuns (ex.: "fip" pro FI-Infra em formato
+# FIP-IE, como o AZIN11) e pode usar outros ainda no futuro.
+KIND_INTERNACIONAL = "internacional"
 
 
 def _obter_alertas_pendentes(service_role_key):
@@ -1542,7 +1544,7 @@ def _enviar_email_alerta(resend_key, destinatario, ticker, condicao, valor_alvo,
 
 def _obter_precos_twelvedata(tickers):
     """Cotação atual de tickers fora da B3 (Stocks/ETFs americanos, ex:
-    KBWD, AAPL), usados pelos alertas de preço com kind fora de KINDS_B3."""
+    KBWD, AAPL), usados pelos alertas de preço com kind == KIND_INTERNACIONAL."""
     if not tickers:
         return {}
     try:
@@ -1586,8 +1588,8 @@ def verificar_e_disparar_alertas(token):
     if not alertas:
         return
 
-    tickers_b3 = sorted({a["ticker"] for a in alertas if a.get("kind") in KINDS_B3})
-    tickers_intl = sorted({a["ticker"] for a in alertas if a.get("kind") not in KINDS_B3})
+    tickers_b3 = sorted({a["ticker"] for a in alertas if a.get("kind") != KIND_INTERNACIONAL})
+    tickers_intl = sorted({a["ticker"] for a in alertas if a.get("kind") == KIND_INTERNACIONAL})
 
     precos = {}
     if tickers_b3:
