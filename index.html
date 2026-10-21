@@ -19950,7 +19950,7 @@
           return;
         }
         listaEl.innerHTML = lista.map(a => {
-          const simboloMoeda = ['stock', 'fii', 'fiagro', 'fund', 'etf'].includes(a.kind) ? 'R$' : 'US$';
+          const simboloMoeda = a.kind !== 'internacional' ? 'R$' : 'US$';
           return `
           <div class="alertas-item">
             <span><strong>${a.ticker}</strong> ${a.condicao === 'abaixo' ? 'cair abaixo de' : 'subir acima de'} ${simboloMoeda} ${Number(a.valor_alvo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
@@ -20048,14 +20048,20 @@
           }
 
           // Confirma que o ticker existe antes de salvar o alerta — primeiro
-          // tenta como ação/FII/Fiagro da B3, depois como Stock/ETF
-          // internacional (via TwelveData, mesmo fallback da consulta rápida).
+          // tenta como ativo da B3 (ação, FII, Fiagro, FI-Infra/FIP-IE...),
+          // depois como Stock/ETF internacional (via TwelveData, mesmo
+          // fallback da consulta rápida). Qualquer "kind" que a HG Brasil
+          // devolver pra um ticker com prefixo "B3:" já é prova de que é um
+          // ativo válido da bolsa brasileira — não vale restringir a uma
+          // lista fixa de "kind" conhecidos, porque a HG Brasil usa valores
+          // diferentes pra estruturas de fundo menos comuns (ex.: "fip" pra
+          // FI-Infra no formato FIP-IE, como o AZIN11).
           const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent('B3:' + ticker)}&key=${encodeURIComponent(CHAVE_HG)}`;
           const resp = await fetch(url);
           const dados = await resp.json();
           const ativo = dados?.results?.[0];
 
-          let kind = (ativo && ['stock', 'fii', 'fiagro', 'fund', 'etf'].includes(ativo.kind)) ? ativo.kind : null;
+          let kind = ativo?.kind || null;
           if (!kind) {
             statusEl.textContent = `Não achei "${ticker}" na B3 — tentando como Stock/ETF americano...`;
             kind = await alertasVerificarTwelveData(ticker);
