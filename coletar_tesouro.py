@@ -60,6 +60,7 @@ Uso:
 """
 
 import csv
+import http.client
 import io
 import json
 import os
@@ -131,7 +132,13 @@ def abrir_fluxo():
             # latin-1 porque o arquivo do Tesouro não é UTF-8 e um acento
             # solto derrubaria a leitura inteira no meio.
             return io.TextIOWrapper(resposta, encoding="latin-1", newline="")
-        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as e:
+        except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, http.client.HTTPException) as e:
+            # http.client.HTTPException cobre RemoteDisconnected (o servidor
+            # do Tesouro Transparente às vezes derruba a conexão antes de
+            # responder) — o urllib só embrulha em URLError os erros do
+            # h.request() inicial, não os de h.getresponse(), então sem essa
+            # captura o erro escapava do retry e derrubava a execução inteira
+            # já na 1ª tentativa.
             ultimo_erro = e
             log(f"    falhou: {e}")
     raise SystemExit(f"ERRO: não foi possível baixar o CSV. Último erro: {ultimo_erro}")
