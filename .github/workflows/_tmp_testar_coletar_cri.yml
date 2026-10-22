@@ -1,0 +1,36 @@
+name: _tmp_testar_coletar_cri
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pip install playwright
+        timeout-minutes: 3
+      - run: python -m playwright install chromium
+        timeout-minutes: 5
+      - run: python coletar_cri.py
+        timeout-minutes: 3
+      - run: |
+          python3 -c "
+          import json
+          d = json.load(open('data/cri.json'))
+          print({k: v for k, v in d.items() if k != 'cris'})
+          print()
+          print('Exemplo [0]:', json.dumps(d['cris'][0], ensure_ascii=False, indent=2))
+          print('Exemplo [1]:', json.dumps(d['cris'][1], ensure_ascii=False, indent=2))
+          import collections
+          sem_remuneracao = sum(1 for c in d['cris'] if c['indexador'] == 'outro')
+          print('sem remuneracao reconhecida:', sem_remuneracao, 'de', len(d['cris']))
+          "
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cri-json
+          path: data/cri.json
+          retention-days: 3
