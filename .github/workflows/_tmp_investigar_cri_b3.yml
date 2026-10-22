@@ -11,8 +11,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm install playwright@1.48.0
-      - run: npx playwright install chromium
-        timeout-minutes: 5
       - run: node _tmp_investigar_cri_b3.js
-        timeout-minutes: 5
+        timeout-minutes: 3

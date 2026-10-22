@@ -1,50 +1,47 @@
-// Descartável — terceira rodada: entender o GetDownload (B3 — Consulta
-// Pública de CRIs) de verdade — URL completa, corpo da resposta, headers
-// da requisição, e se dá pra pedir mais do que o padrão sem preencher filtro.
-const { chromium } = require('playwright');
+// Descartável — quarta rodada: confirma se o GetDownload é mesmo público
+// (chamada direta, sem navegador/sessão) e decodifica o base64 pra ver a
+// estrutura real das linhas (quantas, campos, exemplos recentes/ativos).
 
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage({
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    acceptDownloads: true,
+async function main() {
+  console.log('---- Teste direto (fetch puro, sem navegador/cookies) ----');
+  const resp = await fetch('https://sistemaswebb3-balcao.b3.com.br/featuresCRIProxy/CriCall/GetDownload', {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    },
   });
+  console.log('Status:', resp.status);
+  const base64 = await resp.text();
+  console.log('Tamanho do corpo (base64):', base64.length, 'chars');
 
-  const detalhes = {};
-  page.on('request', (req) => {
-    const url = req.url();
-    if (url.includes('CriCall')) {
-      detalhes[url + '|' + req.method()] = { headers: req.headers(), postData: req.postData() };
+  const decodificado = Buffer.from(base64, 'base64').toString('latin1');
+  console.log('Tamanho decodificado:', decodificado.length, 'chars');
+
+  const linhas = decodificado.split('\r\n').filter(Boolean);
+  console.log('Total de linhas (com cabeçalho):', linhas.length);
+  console.log('\nCabeçalho:', linhas[0]);
+  console.log('\nPrimeiras 3 linhas de dados:');
+  linhas.slice(1, 4).forEach(l => console.log(' ', l));
+  console.log('\nÚltimas 3 linhas (mais recentes, provavelmente):');
+  linhas.slice(-3).forEach(l => console.log(' ', l));
+
+  // Quantas ainda não venceram (coluna "Data de Vencimento")?
+  const campos = linhas[0].split(';');
+  const idxVencimento = campos.findIndex(c => c.toLowerCase().includes('vencimento'));
+  console.log('\nÍndice da coluna de vencimento:', idxVencimento, '->', campos[idxVencimento]);
+  if (idxVencimento >= 0) {
+    const hoje = new Date();
+    let ativos = 0;
+    for (const l of linhas.slice(1)) {
+      const partes = l.split(';');
+      const dataStr = partes[idxVencimento]; // dd/mm/aaaa
+      if (!dataStr) continue;
+      const [d, m, a] = dataStr.split('/').map(Number);
+      if (!d || !m || !a) continue;
+      const dataVenc = new Date(a, m - 1, d);
+      if (dataVenc > hoje) ativos++;
     }
-  });
-  page.on('response', async (resp) => {
-    const url = resp.request().url();
-    if (url.includes('CriCall')) {
-      let corpo = '(erro ao ler)';
-      try { corpo = await resp.text(); } catch (e) {}
-      console.log(`\n>>> ${resp.request().method()} ${url}`);
-      console.log(`    status: ${resp.status()}`);
-      const chave = url + '|' + resp.request().method();
-      if (detalhes[chave]?.postData) console.log(`    postData: ${detalhes[chave].postData}`);
-      console.log(`    corpo (${corpo.length} chars): ${corpo.slice(0, 3000)}`);
-    }
-  });
-
-  await page.goto('https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/', { waitUntil: 'networkidle', timeout: 45000 }).catch(e => console.log('goto erro:', e.message));
-  await page.waitForTimeout(2500);
-
-  // Clica direto em "Exportar CSV" sem preencher nada (replica o que já
-  // funcionou na rodada anterior, mas agora capturando o corpo de verdade).
-  const botaoCsv = page.locator('button:has-text("Exportar CSV")').first();
-  try {
-    await Promise.all([
-      page.waitForEvent('download', { timeout: 8000 }),
-      botaoCsv.click({ timeout: 5000 }),
-    ]);
-  } catch (e) {
-    console.log('Sem download (ou erro):', e.message);
+    console.log('CRIs com vencimento no futuro (ainda "vivos"):', ativos, 'de', linhas.length - 1);
   }
-  await page.waitForTimeout(1500);
+}
 
-  await browser.close();
-})();
+main().catch(e => console.log('Erro:', e.message));
