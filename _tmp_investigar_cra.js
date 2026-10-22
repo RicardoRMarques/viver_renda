@@ -81,7 +81,8 @@ const CANDIDATOS = [
   }
 
   // A página de CRI pode ser o mesmo app Angular que serve CRA via rota
-  // interna (abas, menu) — procura qualquer link/texto "CRA" nela.
+  // interna (abas, menu, dropdown de tipo) — procura qualquer sinal de
+  // CRA dentro dela: links, textos e também <select>/<mat-select>.
   console.log('\n========== Procurando CRA dentro da própria página de CRI ==========');
   const page = await browser.newPage({
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
@@ -92,6 +93,21 @@ const CANDIDATOS = [
     els => els.filter(e => /CRA/i.test(e.textContent || '') || /CRA/i.test(e.href || '')).map(e => ({ tag: e.tagName, texto: (e.textContent || '').trim(), href: e.href || null }))
   );
   console.log('Elementos com "CRA":', JSON.stringify(linksCra));
+
+  const selects = await page.locator('select, mat-select, [role="combobox"], [role="listbox"]').count();
+  console.log('Elementos de seleção (select/combobox) na página:', selects);
+  if (selects) {
+    const opcoes = await page.locator('select, mat-select, [role="combobox"], [role="listbox"]').evaluateAll(
+      els => els.map(e => ({ tag: e.tagName, texto: (e.textContent || '').trim().slice(0, 200) }))
+    );
+    console.log('Conteúdo dos seletores:', JSON.stringify(opcoes));
+  }
+
+  // Todo o texto visível da página, pra ver se "CRA" aparece em algum
+  // lugar que os seletores anteriores não cobriram.
+  const textoTotal = await page.locator('body').innerText();
+  console.log('Página contém a palavra "CRA" em algum lugar:', /\bCRA\b/.test(textoTotal));
+
   await page.close();
 
   await browser.close();
