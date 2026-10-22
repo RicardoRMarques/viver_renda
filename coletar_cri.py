@@ -193,8 +193,14 @@ def rotulo_remuneracao(indexador, pct_indexador, spread, rotulo_cru):
 
 def baixar_csv_base64():
     """Abre a Consulta Pública de CRIs e chama o endpoint do "Exportar
-    CSV" reaproveitando os cookies da sessão (inclusive o do desafio do
-    Cloudflare, resolvido ao carregar a página)."""
+    CSV" de DENTRO do navegador (via page.evaluate + fetch), não com o
+    cliente HTTP separado do Playwright (context.request).
+
+    A diferença importa: testamos as duas formas e só o fetch disparado
+    de dentro da página passa pelo desafio do Cloudflare — mesmo
+    reaproveitando os cookies certos, o context.request.get() usa outro
+    cliente HTTP por baixo (fingerprint de TLS/cabeçalhos diferente do
+    navegador de verdade), e o Cloudflare rejeita com corpo vazio."""
     with sync_playwright() as navegador_ctx:
         navegador = navegador_ctx.chromium.launch()
         try:
@@ -202,11 +208,17 @@ def baixar_csv_base64():
             pagina.goto(URL_PAGINA, wait_until="networkidle", timeout=TEMPO_LIMITE_PAGINA)
             pagina.wait_for_timeout(1500)
 
-            resposta = pagina.context.request.get(URL_DOWNLOAD)
-            if resposta.status != 200:
-                raise RuntimeError(f"HTTP {resposta.status} ao chamar {URL_DOWNLOAD}")
+            resultado = pagina.evaluate(
+                """async (url) => {
+                    const resp = await fetch(url);
+                    return { status: resp.status, texto: await resp.text() };
+                }""",
+                URL_DOWNLOAD,
+            )
+            if resultado["status"] != 200:
+                raise RuntimeError(f"HTTP {resultado['status']} ao chamar {URL_DOWNLOAD}")
 
-            texto_base64 = resposta.text()
+            texto_base64 = resultado["texto"]
             if not texto_base64:
                 raise RuntimeError(
                     "corpo vazio — provável bloqueio do desafio do Cloudflare "
