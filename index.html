@@ -4417,6 +4417,7 @@
               <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC
             </button>
             <a class="nav-dropdown-item" href="#debentures"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"></rect><circle cx="12" cy="12.5" r="2.6"></circle><line x1="6" y1="10" x2="6" y2="15"></line><line x1="18" y1="10" x2="18" y2="15"></line></svg> Debêntures — taxas do mercado</a>
+            <a class="nav-dropdown-item" href="#cri"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"></path><path d="M5 21V9l7-5l7 5v12"></path><path d="M9 21v-6h6v6"></path></svg> CRI — Certificados Imobiliários</a>
             <a class="nav-dropdown-item" href="#taxa-justa"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="16" y1="20" x2="16" y2="14"></line><line x1="22" y1="20" x2="2" y2="20"></line></svg> Qual é uma taxa justa hoje?</a>
             <button type="button" class="nav-dropdown-item" id="vpBtnAbrir">
               <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"></path><path d="M5 7h14"></path><path d="M5 7l-3 6a3.5 3.5 0 0 0 6 0z"></path><path d="M19 7l3 6a3.5 3.5 0 0 1-6 0z"></path><path d="M8 21h8"></path></svg> Vale a Pena? — Analise uma oferta
@@ -4525,6 +4526,7 @@
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirCalculadoraMenu"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="9" y1="21" x2="9" y2="10"></line><line x1="15" y1="21" x2="15" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Calculadora Renda Fixa</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
     <a class="mobile-menu-item" href="#debentures"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"></rect><circle cx="12" cy="12.5" r="2.6"></circle><line x1="6" y1="10" x2="6" y2="15"></line><line x1="18" y1="10" x2="18" y2="15"></line></svg> Debêntures — taxas do mercado</a>
+    <a class="mobile-menu-item" href="#cri"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"></path><path d="M5 21V9l7-5l7 5v12"></path><path d="M9 21v-6h6v6"></path></svg> CRI — Certificados Imobiliários</a>
     <a class="mobile-menu-item" href="#taxa-justa"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="20" x2="4" y2="10"></line><line x1="10" y1="20" x2="10" y2="4"></line><line x1="16" y1="20" x2="16" y2="14"></line><line x1="22" y1="20" x2="2" y2="20"></line></svg> Qual é uma taxa justa hoje?</a>
     <a class="mobile-menu-item" href="#tesouro-direto"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="12" y1="21" x2="12" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Tesouro Direto</a>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="mmBtnAbrirMenu">📊 Marcação a Mercado</button>
@@ -4941,6 +4943,54 @@
       <div id="debResumo"></div>
       <div id="debConteudo"></div>
       <div id="debRodape"></div>
+    </section>
+
+    <section class="hg-busca" id="cri" hidden>
+      <div class="tesouro-topo">
+        <h2 class="hg-titulo">
+          <svg class="hg-titulo-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"></path><path d="M5 21V9l7-5l7 5v12"></path><path d="M9 21v-6h6v6"></path></svg>CRI — Certificados de Recebíveis Imobiliários
+        </h2>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="criCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta página" title="Compartilhar o link desta página">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button type="button" class="lista-mercado-fechar" data-fechar-secao="cri" aria-label="Fechar">✕</button>
+        </div>
+      </div>
+
+      <p class="calc-ajuda tj-intro">
+        CRI é dívida lastreada em recebíveis imobiliários (aluguéis, financiamentos de imóveis): a securitizadora
+        empacota esses recebíveis e emite o papel para captar dinheiro. Aqui está o <strong>cadastro de emissão</strong>
+        de todas as séries que a B3 lista como ainda não vencidas — nome do emissor, remuneração contratada,
+        datas e volume emitido.
+      </p>
+
+      <div class="deb-avisos">
+        <div class="vp-aviso"><span aria-hidden="true">•</span><span><strong>Não é uma oferta.</strong> É o cadastro da B3, não uma lista do que sua corretora tem disponível para comprar agora — e o investimento mínimo costuma ser alto (na casa de R$ 10 a 20 mil), o que este cadastro não informa por papel.</span></div>
+        <div class="vp-aviso"><span aria-hidden="true">•</span><span><strong>Remuneração é a de emissão, não de mercado.</strong> Diferente da tela de Debêntures, a B3 não publica uma taxa de CRI negociada no secundário todo dia — "Remuneração" é o que foi contratado quando o papel foi lançado. Para pós-fixado (DI/IPCA/IGP-M + spread) isso ainda vale hoje, porque só o indexador-base muda; para Prefixado não há garantia nenhuma.</span></div>
+        <div class="vp-aviso"><span aria-hidden="true">•</span><span><strong>Isento de IR para pessoa física</strong>, por lei — ao contrário da debênture incentivada, essa isenção vale para qualquer CRI, sem precisar checar papel por papel. Não tem FGC: quem garante é a securitizadora e os recebíveis por trás, não um fundo garantidor.</span></div>
+      </div>
+
+      <div class="deb-controles">
+        <div class="deb-chips">
+          <span class="hg-chip deb-chip ativo" data-indexador="todos">Todos</span>
+          <span class="hg-chip deb-chip" data-indexador="ipca">IPCA +</span>
+          <span class="hg-chip deb-chip" data-indexador="di">DI +</span>
+          <span class="hg-chip deb-chip" data-indexador="igp_m">IGP-M +</span>
+          <span class="hg-chip deb-chip" data-indexador="outros">Outros</span>
+        </div>
+        <div class="deb-busca-wrap">
+          <input type="text" id="criBusca" class="deb-busca" placeholder="Buscar por emissor, código ou ISIN" autocomplete="off" />
+          <button type="button" id="criBuscaLimpar" class="deb-busca-limpar" aria-label="Limpar busca" title="Limpar busca" hidden>✕</button>
+        </div>
+      </div>
+
+      <div id="criStatus" class="hg-status"></div>
+      <div id="criResumo"></div>
+      <div id="criConteudo"></div>
+      <div id="criRodape"></div>
     </section>
 
     <section class="section-noticias-mercado" id="noticias-mercado">
@@ -16620,6 +16670,318 @@
     })();
 
     // ============================================================
+    // CRI — CERTIFICADOS DE RECEBÍVEIS IMOBILIÁRIOS
+    // Cadastro de emissão da Consulta Pública da B3 (coletar_cri.py ->
+    // data/cri.json), só os papéis que ainda não venceram.
+    //
+    // Diferença chave para a tela de Debêntures, que serviu de molde:
+    // a B3 NÃO publica taxa de mercado secundário para CRI — só a
+    // remuneração CONTRATADA na emissão. Por isso não há coluna "taxa
+    // hoje", nem comparação com o Tesouro: mostrar isso como se fosse
+    // dado de hoje seria a mesma armadilha que o robô de Debêntures
+    // evita com os marcadores de resgate antecipado.
+    // ============================================================
+    (function () {
+      const secao = document.getElementById('cri');
+      const conteudoEl = document.getElementById('criConteudo');
+      const resumoEl = document.getElementById('criResumo');
+      const statusEl = document.getElementById('criStatus');
+      const rodapeEl = document.getElementById('criRodape');
+      const buscaEl = document.getElementById('criBusca');
+      const btnLimparBusca = document.getElementById('criBuscaLimpar');
+      if (!secao || !conteudoEl) return;
+
+      const POR_PAGINA = 22;
+      // Indexadores "principais" têm chip próprio; o resto cai em "Outros"
+      // — com 11 indexadores diferentes no arquivo da B3, um chip por
+      // indexador viraria uma segunda linha de filtros ilegível.
+      const PRINCIPAIS = new Set(['ipca', 'di', 'igp_m']);
+
+      let dados = null;
+      let indexador = 'todos';
+      let pagina = 1;
+      let carregando = null;
+      let ordem = { coluna: 'data_emissao', desc: true };
+
+      const COLUNAS = [
+        { chave: 'codigo',       rotulo: 'Código',      tipo: 'texto',  glos: 'cri-codigo' },
+        { chave: 'emissor',      rotulo: 'Emissor',     tipo: 'texto',  glos: 'cri-emissor' },
+        { chave: 'data_emissao', rotulo: 'Emissão',     tipo: 'data',   glos: 'cri-emissao' },
+        { chave: 'data_vencimento', rotulo: 'Vencimento', tipo: 'data', glos: 'cri-vencimento' },
+        { chave: 'spread',       rotulo: 'Remuneração', tipo: 'numero', glos: 'cri-remuneracao' },
+        { chave: 'volume_emissao', rotulo: 'Volume emitido', tipo: 'numero', glos: 'cri-volume' },
+      ];
+
+      const normalizar = (t) => (t || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toUpperCase();
+
+      function mediana(valores) {
+        const lista = valores.filter(v => typeof v === 'number').sort((a, b) => a - b);
+        if (!lista.length) return null;
+        const meio = Math.floor(lista.length / 2);
+        return lista.length % 2 ? lista[meio] : (lista[meio - 1] + lista[meio]) / 2;
+      }
+
+      function grupoIndexador(c) {
+        return PRINCIPAIS.has(c.indexador) ? c.indexador : 'outros';
+      }
+
+      function filtrar() {
+        const busca = normalizar(buscaEl.value.trim());
+        return (dados?.cris || []).filter(c => {
+          if (indexador !== 'todos' && grupoIndexador(c) !== indexador) return false;
+          if (!busca) return true;
+          return normalizar(c.emissor).includes(busca) || normalizar(c.codigo).includes(busca) || normalizar(c.isin).includes(busca);
+        });
+      }
+
+      function formatarVolume(v) {
+        if (typeof v !== 'number') return '—';
+        if (v >= 1_000_000) return 'R$ ' + hgFormatNumero(v / 1_000_000) + ' mi';
+        if (v >= 1_000) return 'R$ ' + hgFormatNumero(v / 1_000) + ' mil';
+        return hgFormatMoeda(v);
+      }
+
+      function montarResumo(lista) {
+        const porGrupo = { ipca: [], di: [], igp_m: [], outros: [] };
+        lista.forEach(c => {
+          const g = grupoIndexador(c);
+          if (porGrupo[g]) porGrupo[g].push(c);
+        });
+        const volumeTotal = lista.reduce((soma, c) => soma + (c.volume_emissao || 0), 0);
+
+        const linhasMediana = [['ipca', 'IPCA'], ['di', 'DI'], ['igp_m', 'IGP-M']]
+          .map(([chave, nome]) => {
+            const med = mediana(porGrupo[chave].map(c => c.spread));
+            return med === null ? null : `${nome} + ${hgFormatNumero(med)}%`;
+          })
+          .filter(Boolean);
+
+        resumoEl.innerHTML = `
+          <div class="deb-resumo">
+            <div class="deb-resumo-item">
+              <div class="deb-resumo-rotulo">Séries no filtro</div>
+              <div class="deb-resumo-valor">${lista.length}</div>
+              <div class="deb-resumo-nota">ainda não venceram</div>
+            </div>
+            <div class="deb-resumo-item">
+              <div class="deb-resumo-rotulo">Volume total emitido</div>
+              <div class="deb-resumo-valor">${formatarVolume(volumeTotal)}</div>
+              <div class="deb-resumo-nota">soma do valor emitido, não do que está em circulação hoje</div>
+            </div>
+            <div class="deb-resumo-item" style="flex:2 1 280px;">
+              <div class="deb-resumo-rotulo">Mediana da remuneração contratada</div>
+              <div class="deb-resumo-valor deb-resumo-multi">${linhasMediana.length ? linhasMediana.join('<br>') : '—'}</div>
+              <div class="deb-resumo-nota">na emissão — não é taxa de mercado secundário</div>
+            </div>
+          </div>`;
+      }
+
+      function ordenar(lista) {
+        const col = COLUNAS.find(c => c.chave === ordem.coluna) || COLUNAS[2];
+        const sinal = ordem.desc ? -1 : 1;
+        return [...lista].sort((a, b) => {
+          const va = a[col.chave], vb = b[col.chave];
+          const va_vazio = va === null || va === undefined || va === '';
+          const vb_vazio = vb === null || vb === undefined || vb === '';
+          if (va_vazio && vb_vazio) return 0;
+          if (va_vazio) return 1;
+          if (vb_vazio) return -1;
+          if (col.tipo === 'texto') return sinal * String(va).localeCompare(String(vb), 'pt-BR');
+          if (col.tipo === 'data') return sinal * (va < vb ? -1 : va > vb ? 1 : 0);
+          return sinal * (va - vb);
+        });
+      }
+
+      function montarPaginacao(total) {
+        const paginas = Math.max(1, Math.ceil(total / POR_PAGINA));
+        if (paginas === 1) return '';
+        const inicio = Math.max(1, Math.min(pagina - 2, paginas - 4));
+        const fim = Math.min(paginas, Math.max(pagina + 2, 5));
+        const botoes = [];
+        for (let p = inicio; p <= fim; p++) {
+          botoes.push(`<button type="button" data-pagina="${p}"${p === pagina ? ' class="ativo"' : ''}>${p}</button>`);
+        }
+        return `
+          <div class="lista-mercado-paginacao">
+            <button type="button" data-pagina="1" ${pagina === 1 ? 'disabled' : ''} aria-label="Primeira página">«</button>
+            <button type="button" data-pagina="${pagina - 1}" ${pagina === 1 ? 'disabled' : ''} aria-label="Página anterior">‹</button>
+            ${botoes.join('')}
+            <button type="button" data-pagina="${pagina + 1}" ${pagina === paginas ? 'disabled' : ''} aria-label="Próxima página">›</button>
+            <button type="button" data-pagina="${paginas}" ${pagina === paginas ? 'disabled' : ''} aria-label="Última página">»</button>
+            <span class="lm-pagina-info">página ${pagina} de ${paginas} · ${total} ${total === 1 ? 'série' : 'séries'}</span>
+          </div>`;
+      }
+
+      function montarTabela(lista) {
+        if (!lista.length) {
+          const busca = buscaEl.value.trim();
+          const chip = { todos: 'Todos', ipca: 'IPCA +', di: 'DI +', igp_m: 'IGP-M +', outros: 'Outros' }[indexador] || indexador;
+          conteudoEl.innerHTML = busca && indexador !== 'todos'
+            ? `<p class="hg-status">Nenhuma série com <strong>${hgEscapeHtml(busca)}</strong> dentro de <strong>${hgEscapeHtml(chip)}</strong>.
+                 <button type="button" class="deb-link-acao" id="criVerEmTodos">Procurar em todos os indexadores</button></p>`
+            : `<p class="hg-status">Nenhuma série encontrada com esse filtro.</p>`;
+          document.getElementById('criVerEmTodos')?.addEventListener('click', () => {
+            selecionarChip('todos', { manterBusca: true });
+          });
+          return;
+        }
+
+        const ordenada = ordenar(lista);
+        const paginas = Math.max(1, Math.ceil(ordenada.length / POR_PAGINA));
+        if (pagina > paginas) pagina = paginas;
+        const daPagina = ordenada.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
+
+        const cabecalho = COLUNAS.map(c => {
+          const classe = 'deb-ord' + (ordem.coluna === c.chave ? (ordem.desc ? ' ordenado-desc' : ' ordenado-asc') : '');
+          return `<th class="${classe}" data-coluna="${c.chave}" title="Ordenar por ${c.rotulo}">${c.rotulo}` +
+            `<button type="button" class="hg-info-btn" data-glossario="${c.glos}" aria-label="O que é ${c.rotulo}?" title="">?</button></th>`;
+        }).join('');
+
+        const linhas = daPagina.map(c => {
+          const emissao = c.data_emissao ? c.data_emissao.split('-').reverse().join('/') : '—';
+          const venc = c.data_vencimento ? c.data_vencimento.split('-').reverse().join('/') : '—';
+          return `
+            <tr>
+              <td class="deb-num" title="ISIN: ${c.isin || '—'}">${c.codigo}</td>
+              <td class="deb-emissor" title="${c.emissor}">${c.emissor}</td>
+              <td class="deb-num">${emissao}</td>
+              <td class="deb-num">${venc}</td>
+              <td class="deb-num deb-taxa">${c.rotulo_remuneracao || '—'}</td>
+              <td class="deb-num">${formatarVolume(c.volume_emissao)}</td>
+            </tr>`;
+        }).join('');
+
+        conteudoEl.innerHTML = `
+          <div class="tj-scroll" style="margin-top:14px;">
+            <table class="deb-tabela">
+              <thead><tr>${cabecalho}</tr></thead>
+              <tbody>${linhas}</tbody>
+            </table>
+          </div>
+          ${montarPaginacao(ordenada.length)}`;
+
+        if (typeof window.ligarGlossario === 'function') window.ligarGlossario(conteudoEl);
+
+        conteudoEl.querySelectorAll('th.deb-ord').forEach(th => {
+          th.addEventListener('click', () => {
+            const chave = th.dataset.coluna;
+            if (ordem.coluna === chave) {
+              ordem.desc = !ordem.desc;
+            } else {
+              const col = COLUNAS.find(c => c.chave === chave);
+              ordem = { coluna: chave, desc: col && col.tipo !== 'texto' };
+            }
+            pagina = 1;
+            render();
+          });
+        });
+
+        conteudoEl.querySelectorAll('.lista-mercado-paginacao button[data-pagina]').forEach(botao => {
+          botao.addEventListener('click', () => {
+            const alvo = Number(botao.dataset.pagina);
+            if (!alvo || alvo === pagina) return;
+            pagina = alvo;
+            render();
+            conteudoEl.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+          });
+        });
+      }
+
+      function atualizarContadores() {
+        const base = (dados?.cris || []);
+        const busca = normalizar(buscaEl.value.trim());
+        const casaBusca = (c) => !busca || normalizar(c.emissor).includes(busca) || normalizar(c.codigo).includes(busca) || normalizar(c.isin).includes(busca);
+        secao.querySelectorAll('.deb-chip').forEach(chip => {
+          const alvo = chip.dataset.indexador;
+          const quantos = base.filter(c => (alvo === 'todos' || grupoIndexador(c) === alvo) && casaBusca(c)).length;
+          chip.textContent = `${chip.dataset.rotulo} (${quantos})`;
+        });
+      }
+
+      function render() {
+        const lista = filtrar();
+        atualizarContadores();
+        montarResumo(lista);
+        montarTabela(lista);
+        rodapeEl.innerHTML = `
+          <p class="tj-rodape">
+            Fonte: ${dados.fonte || 'B3'}. "Remuneração" é a taxa contratada na emissão do papel, não uma taxa
+            de mercado secundário atualizada — a B3 não publica isso para CRI. Passe o mouse ou toque no código
+            para ver o ISIN completo. Conteúdo educativo: o site publica o cadastro público, não indica onde investir.
+          </p>`;
+      }
+
+      async function carregar() {
+        if (dados) return;
+        if (carregando) return carregando;
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Carregando o cadastro de CRIs da B3...';
+        carregando = (async () => {
+          try {
+            const resp = await fetch('data/cri.json', { cache: 'no-store' });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            dados = await resp.json();
+            statusEl.textContent = '';
+            render();
+          } catch (e) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = 'Não consegui carregar o cadastro de CRIs agora. Tente de novo em instantes.';
+            console.warn('CRI: falha ao ler data/cri.json', e);
+          } finally {
+            carregando = null;
+          }
+        })();
+        return carregando;
+      }
+
+      document.querySelectorAll('a[href="#cri"]').forEach(link => link.addEventListener('click', carregar));
+      if (window.location.hash === '#cri') carregar();
+
+      secao.querySelectorAll('.deb-chip').forEach(chip => {
+        chip.dataset.rotulo = chip.textContent.trim();
+      });
+
+      function selecionarChip(alvo, { manterBusca = false } = {}) {
+        indexador = alvo;
+        secao.querySelectorAll('.deb-chip').forEach(c =>
+          c.classList.toggle('ativo', c.dataset.indexador === alvo));
+        if (!manterBusca) buscaEl.value = '';
+        atualizarBotaoLimpar();
+        pagina = 1;
+        if (dados) render();
+      }
+
+      function atualizarBotaoLimpar() {
+        if (btnLimparBusca) btnLimparBusca.hidden = !buscaEl.value.trim();
+      }
+
+      secao.querySelectorAll('.deb-chip').forEach(chip => {
+        chip.addEventListener('click', () => selecionarChip(chip.dataset.indexador));
+      });
+
+      buscaEl?.addEventListener('input', () => {
+        pagina = 1;
+        atualizarBotaoLimpar();
+        if (dados) render();
+      });
+
+      btnLimparBusca?.addEventListener('click', () => {
+        buscaEl.value = '';
+        atualizarBotaoLimpar();
+        pagina = 1;
+        buscaEl.focus();
+        if (dados) render();
+      });
+
+      document.getElementById('criCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          hash: 'cri',
+          titulo: 'CRI — Certificados de Recebíveis Imobiliários | Viver de Renda',
+          texto: 'Cadastro de emissão dos CRIs ainda não vencidos, direto da Consulta Pública da B3.',
+        }));
+    })();
+
+    // ============================================================
     // QUIZ "DESCUBRA SEU PERFIL DE INVESTIDOR" — 6 perguntas, soma de
     // pontos (1 a 3 cada), classifica em Conservador/Moderado/Arrojado.
     // ============================================================
@@ -22119,14 +22481,14 @@
         texto: 'Cotações e indicadores de todos os Fundos Imobiliários da B3, num só lugar.',
       }));
 
-    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#tesouro-direto"], a[href="#taxa-justa"], a[href="#debentures"]').forEach(link => {
+    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#tesouro-direto"], a[href="#taxa-justa"], a[href="#debentures"], a[href="#cri"]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         revelarSecaoMercado(link.getAttribute('href').slice(1));
       });
     });
     // Link direto (compartilhado ou digitado na barra de endereço)
-    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#taxa-justa', '#debentures', '#rankings-fiis', '#alertas-preco'].includes(window.location.hash)) {
+    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#taxa-justa', '#debentures', '#cri', '#rankings-fiis', '#alertas-preco'].includes(window.location.hash)) {
       revelarSecaoMercado(window.location.hash.slice(1), { corrigirDepois: true });
     }
     // Botão "✕" no topo de cada lista — esconde a seção de novo e rola
