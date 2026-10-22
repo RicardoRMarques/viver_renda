@@ -3,10 +3,8 @@
 const { chromium } = require('playwright');
 
 const CANDIDATOS = [
-  'https://sistemaswebb3-balcao.b3.com.br/featuresCRAPage/',
-  'https://sistemaswebb3-balcao.b3.com.br/featuresCraPage/',
-  'https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/#/cra',
   'https://www.b3.com.br/pt_br/produtos-e-servicos/negociacao/renda-fixa/cra/cras-listados/',
+  'https://www.b3.com.br/pt_br/produtos-e-servicos/negociacao/renda-fixa/cra/',
 ];
 
 (async () => {
@@ -28,7 +26,7 @@ const CANDIDATOS = [
 
     let resp;
     try {
-      resp = await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+      resp = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
       console.log('status da página:', resp ? resp.status() : '(sem resposta)');
       console.log('título:', await page.title());
     } catch (e) {
@@ -40,6 +38,15 @@ const CANDIDATOS = [
 
     console.log('Chamadas CraCall/CriCall capturadas no load:', chamadas.length);
     chamadas.forEach(c => console.log(`  [${c.status}] ${c.method} ${c.url}`));
+
+    const linksRelevantes = await page.locator('a').evaluateAll(
+      els => els
+        .map(e => e.href)
+        .filter(h => /feature|balcao|consulta|pesquisa|cra/i.test(h))
+        .filter((v, i, arr) => arr.indexOf(v) === i)
+        .slice(0, 20)
+    );
+    console.log('Links relevantes na página:', JSON.stringify(linksRelevantes, null, 1));
 
     const botoes = await page.locator('button').allTextContents();
     console.log('Botões na página:', JSON.stringify(botoes));
