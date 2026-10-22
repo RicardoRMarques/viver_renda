@@ -12,9 +12,7 @@ jobs:
         with:
           node-version: '20'
       - run: npm install playwright@1.48.0
-      - run: npx playwright install --with-deps chromium
-        timeout-minutes: 10
-        env:
-          DEBIAN_FRONTEND: noninteractive
+      - run: npx playwright install chromium
+        timeout-minutes: 5
       - run: node _tmp_investigar_cri_b3.js
         timeout-minutes: 5
