@@ -30,12 +30,14 @@ credencial está configurada).
 | **Investing.com** (RSS) | Notícias de mercado (seção "destaques" do `noticias.json`) | Consumido via RSS público pelo robô, sem chave de API |
 | **InfoMoney** (RSS) | Notícias de mercado (seção "top3" do `noticias.json`) | Consumido via RSS público pelo robô, sem chave de API |
 | **[FIIs.com.br](https://fiis.com.br/noticias/)** | 1 notícia de destaque sobre Fundos Imobiliários, fixada no topo da seção de notícias | Sem API/RSS pública — o robô faz *scraping* da página (função `_buscar_noticia_fii()` em `coletar_hgbrasil.py`); se o layout do site mudar, essa função pode parar de achar a notícia (falha de forma silenciosa, sem quebrar o resto) |
+| **[B3 — Consulta Pública de CRIs](https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/)** | Cadastro de emissão dos CRIs (Certificados de Recebíveis Imobiliários) ainda não vencidos — seção "CRI" do site | Sem API pública: o robô `coletar_cri.py` abre a página com **Playwright** (navegador headless) e clica no botão "Exportar CSV" de verdade — a página está atrás de um desafio do Cloudflare, e só uma interação real de clique passa por ele (uma chamada HTTP comum ao mesmo endpoint, mesmo reaproveitando cookies, devolve corpo vazio). É o único robô do projeto que depende de navegador; se a B3 endurecer a proteção, é o primeiro a quebrar. |
 
 **Onde os dados coletados viram arquivo:**
 - `indices.json` — índices e cotações (robô roda a cada 15 min via `coletar-fiis.yml`)
 - `noticias.json` — notícias (mesmo robô, mesmo intervalo)
 - `ranking.json` — ranking de Ações/FIIs (1× por dia, 9h Brasília)
 - `boletins/` — boletim diário em PDF/HTML (robô `gerar-boletim.js`, seg. a sex., 6h05 Brasília)
+- `cri.json` — cadastro de CRIs (robô `coletar_cri.py`, 1× por dia útil, via `cri.yml`)
 
 ---
 
