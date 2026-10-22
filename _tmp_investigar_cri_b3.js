@@ -44,13 +44,29 @@ async function investigar(nome, url, acao) {
   await browser.close();
 }
 
+async function testarEndpointDireto(nome, url, headers) {
+  console.log(`\n---- Teste direto (sem navegador, sem cookies): ${nome} ----`);
+  console.log(`URL: ${url}`);
+  try {
+    const resp = await fetch(url, { headers: headers || {} });
+    const texto = await resp.text();
+    console.log(`Status: ${resp.status}`);
+    console.log(`Corpo (${texto.length} chars): ${texto.slice(0, 2000)}`);
+  } catch (e) {
+    console.log('Erro:', e.message);
+  }
+}
+
 (async () => {
   await investigar(
     'B3 — Consulta Pública de CRIs',
     'https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/',
     async (page) => {
-      // Tenta disparar uma busca sem filtro (botão "Buscar"/"Pesquisar"), se existir.
-      const botao = page.locator('button:has-text("Buscar"), button:has-text("Pesquisar"), input[type="submit"]').first();
+      // Tira um "print" do HTML renderizado pra entender a estrutura (é um
+      // app Angular — o botão pode ter outro texto ou exigir filtro antes).
+      const botoes = await page.locator('button').allTextContents();
+      console.log('Botões encontrados na página:', JSON.stringify(botoes));
+      const botao = page.locator('button:has-text("Buscar"), button:has-text("Pesquisar"), button:has-text("Consultar"), button:has-text("Filtrar")').first();
       if (await botao.count()) await botao.click({ timeout: 5000 }).catch(() => {});
     }
   );
@@ -68,5 +84,20 @@ async function investigar(nome, url, acao) {
       const botao = page.locator('button:has-text("Buscar"), button:has-text("Pesquisar"), button:has-text("Consultar")').first();
       if (await botao.count()) await botao.click({ timeout: 5000 }).catch(() => {});
     }
+  );
+
+  // O achado mais promissor: endpoint público (sem token) da B3 que lista
+  // securitizadoras de CRI/CRA, paginado. Testa direto, sem navegador, pra
+  // confirmar que é mesmo público/estável, e com um pageSize maior.
+  const paramsGrande = Buffer.from(JSON.stringify({ pageNumber: 1, pageSize: 200 })).toString('base64');
+  await testarEndpointDireto(
+    'B3 — GetListedSecuritization (pageSize 200)',
+    `https://sistemaswebb3-listados.b3.com.br/fundsListedProxy/Search/GetListedSecuritization/${paramsGrande}`
+  );
+
+  const paramsPadrao = Buffer.from(JSON.stringify({ pageNumber: 1, pageSize: 20 })).toString('base64');
+  await testarEndpointDireto(
+    'B3 — GetListedSecuritization (pageSize 20, igual ao capturado)',
+    `https://sistemaswebb3-listados.b3.com.br/fundsListedProxy/Search/GetListedSecuritization/${paramsPadrao}`
   );
 })();
