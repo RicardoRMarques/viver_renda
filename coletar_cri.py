@@ -192,15 +192,18 @@ def rotulo_remuneracao(indexador, pct_indexador, spread, rotulo_cru):
 # ---------------------------------------------------------------------
 
 def baixar_csv_base64():
-    """Abre a Consulta Pública de CRIs e chama o endpoint do "Exportar
-    CSV" de DENTRO do navegador (via page.evaluate + fetch), não com o
-    cliente HTTP separado do Playwright (context.request).
+    """Abre a Consulta Pública de CRIs e clica em "Exportar CSV" de
+    verdade, capturando a resposta do GetDownload que o clique dispara.
 
-    A diferença importa: testamos as duas formas e só o fetch disparado
-    de dentro da página passa pelo desafio do Cloudflare — mesmo
-    reaproveitando os cookies certos, o context.request.get() usa outro
-    cliente HTTP por baixo (fingerprint de TLS/cabeçalhos diferente do
-    navegador de verdade), e o Cloudflare rejeita com corpo vazio."""
+    Por que precisa ser um clique de verdade, e não um fetch programado
+    ------------------------------------------------------------------
+    Testamos três jeitos de chamar o GetDownload: context.request.get()
+    do Playwright, fetch() disparado via page.evaluate(), e clicar no
+    botão "Exportar CSV" de verdade. Só o clique passa pelo desafio do
+    Cloudflare — os outros dois devolvem 200 com corpo vazio, mesmo
+    reaproveitando os cookies certos da mesma página. O desafio parece
+    validar algo ligado à interação real (clique com user gesture), não
+    só a sessão/cookies."""
     with sync_playwright() as navegador_ctx:
         navegador = navegador_ctx.chromium.launch()
         try:
@@ -208,17 +211,17 @@ def baixar_csv_base64():
             pagina.goto(URL_PAGINA, wait_until="networkidle", timeout=TEMPO_LIMITE_PAGINA)
             pagina.wait_for_timeout(1500)
 
-            resultado = pagina.evaluate(
-                """async (url) => {
-                    const resp = await fetch(url);
-                    return { status: resp.status, texto: await resp.text() };
-                }""",
-                URL_DOWNLOAD,
-            )
-            if resultado["status"] != 200:
-                raise RuntimeError(f"HTTP {resultado['status']} ao chamar {URL_DOWNLOAD}")
+            botao = pagina.locator('button:has-text("Exportar CSV")').first
+            with pagina.expect_response(
+                lambda r: "CriCall/GetDownload" in r.url, timeout=TEMPO_LIMITE_PAGINA
+            ) as resposta_info:
+                botao.click(timeout=10_000)
+            resposta = resposta_info.value
 
-            texto_base64 = resultado["texto"]
+            if resposta.status != 200:
+                raise RuntimeError(f"HTTP {resposta.status} ao chamar {URL_DOWNLOAD}")
+
+            texto_base64 = resposta.text()
             if not texto_base64:
                 raise RuntimeError(
                     "corpo vazio — provável bloqueio do desafio do Cloudflare "
