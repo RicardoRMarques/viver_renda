@@ -5,6 +5,8 @@ const { chromium } = require('playwright');
 const CANDIDATOS = [
   'https://sistemaswebb3-balcao.b3.com.br/featuresCRAPage/',
   'https://sistemaswebb3-balcao.b3.com.br/featuresCraPage/',
+  'https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/#/cra',
+  'https://www.b3.com.br/pt_br/produtos-e-servicos/negociacao/renda-fixa/cra/cras-listados/',
 ];
 
 (async () => {
@@ -70,6 +72,20 @@ const CANDIDATOS = [
 
     await page.close();
   }
+
+  // A página de CRI pode ser o mesmo app Angular que serve CRA via rota
+  // interna (abas, menu) — procura qualquer link/texto "CRA" nela.
+  console.log('\n========== Procurando CRA dentro da própria página de CRI ==========');
+  const page = await browser.newPage({
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+  });
+  await page.goto('https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/', { waitUntil: 'networkidle', timeout: 30000 }).catch(e => console.log('goto erro:', e.message));
+  await page.waitForTimeout(1500);
+  const linksCra = await page.locator('a, button').evaluateAll(
+    els => els.filter(e => /CRA/i.test(e.textContent || '') || /CRA/i.test(e.href || '')).map(e => ({ tag: e.tagName, texto: (e.textContent || '').trim(), href: e.href || null }))
+  );
+  console.log('Elementos com "CRA":', JSON.stringify(linksCra));
+  await page.close();
 
   await browser.close();
 })();
