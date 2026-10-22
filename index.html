@@ -5571,6 +5571,17 @@
             </div>
           </div>
 
+          <div class="calc-campo" id="calcCampoRendaMensalWrap">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;">
+              <input type="checkbox" id="calcRendaMensal" style="width:16px; height:16px;" />
+              Pagamento mensal dos rendimentos (não reinveste)
+            </label>
+            <p class="calc-ajuda" style="margin:4px 0 0;">
+              Comum em LCI/LCA e CDBs "Renda Mensal": os juros caem na conta todo mês em vez de aumentar o valor
+              aplicado, e o capital só volta no vencimento. Desativa o aporte mensal — não combina com esse tipo de título.
+            </p>
+          </div>
+
           <div class="calc-campo" id="calcCampoIndexadorWrap" hidden>
             <label id="calcLabelIndexador" for="calcIndexador">Rentabilidade do CDB</label>
             <select id="calcIndexador">
@@ -22986,6 +22997,7 @@
       const selIndexador = document.getElementById('calcIndexador');
       const inValorInicial = document.getElementById('calcValorInicial');
       const inAporte = document.getElementById('calcAporteMensal');
+      const chkRendaMensal = document.getElementById('calcRendaMensal');
       const inPrazo = document.getElementById('calcPrazo');
       const selPrazoUnidade = document.getElementById('calcPrazoUnidade');
       const inTaxa = document.getElementById('calcTaxa');
@@ -23002,6 +23014,15 @@
 
       hgAplicarMascaraMoeda(inValorInicial, 1000);
       hgAplicarMascaraMoeda(inAporte, 0);
+
+      // Renda mensal (juros pagos todo mês, sem reinvestir) não combina com
+      // aporte mensal (seriam vários títulos com datas-base diferentes,
+      // cada um com seu próprio calendário de pagamento) — desativa o
+      // campo visualmente pra deixar isso claro, sem apagar o valor
+      // digitado (volta se a pessoa desmarcar de novo).
+      chkRendaMensal?.addEventListener('change', () => {
+        inAporte.disabled = chkRendaMensal.checked;
+      });
 
       // Tenta pegar Selic e IPCA já coletados pelo robô (indices.json) para
       // usar como padrão realista; se não achar, cai em valores de reserva.
@@ -23170,6 +23191,52 @@
         return { totalInvestido, valorBruto, rendimentoBruto, custodiaValor, ir, rendimentoLiquido, valorLiquido, aliquota: tributado ? aliquotaIR(dias) : 0 };
       }
 
+      // Simula um título com pagamento mensal dos juros, sem reinvestir: o
+      // capital aplicado fica parado e só volta no vencimento — cada mês
+      // "nasce" um cupom sobre o valor inicial (não sobre um saldo que
+      // cresce, como em simularProduto). Como o IR regressivo olha pro
+      // tempo desde a aplicação, cupons mais distantes no tempo pagam
+      // menos imposto — por isso o valor líquido mensal pode aumentar ao
+      // longo do prazo mesmo com taxa bruta constante (faixas abaixo).
+      function simularRendaMensal({ taxaAnualPct, tributado, custodia }, valorInicial, prazoMeses) {
+        const taxaMensal = Math.pow(1 + taxaAnualPct / 100, 1 / 12) - 1;
+        const custodiaMensal = custodia ? valorInicial * 0.002 / 12 : 0;
+        const jurosMensalBruto = valorInicial * taxaMensal;
+        const jurosAposCustodia = jurosMensalBruto - custodiaMensal;
+
+        let totalJurosBruto = 0, totalCustodia = 0, totalIR = 0, totalJurosLiquido = 0;
+        const faixas = [];
+        for (let m = 1; m <= prazoMeses; m++) {
+          const dias = Math.round(m * 30.44);
+          const aliq = tributado ? aliquotaIR(dias) : 0;
+          const ir = tributado && jurosAposCustodia > 0 ? jurosAposCustodia * aliq : 0;
+          const jurosLiquido = jurosAposCustodia - ir;
+
+          totalJurosBruto += jurosMensalBruto;
+          totalCustodia += custodiaMensal;
+          totalIR += ir;
+          totalJurosLiquido += jurosLiquido;
+
+          const faixaAtual = faixas[faixas.length - 1];
+          if (faixaAtual && faixaAtual.aliquota === aliq) {
+            faixaAtual.mesFim = m;
+          } else {
+            faixas.push({ mesInicio: m, mesFim: m, aliquota: aliq, jurosLiquido });
+          }
+        }
+
+        return {
+          totalInvestido: valorInicial,
+          totalJurosBruto,
+          totalCustodia,
+          totalIR,
+          totalJurosLiquido,
+          valorFinalPrincipal: valorInicial,
+          valorTotalRecebido: valorInicial + totalJurosLiquido,
+          faixas,
+        };
+      }
+
       function atualizarCampoTaxa() {
         const tipo = selTipo.value;
         const ehCdbOuLci = tipo === 'cdb' || tipo === 'lci';
@@ -23245,7 +23312,90 @@
         }[tipo];
       }
 
+      // Pagamento mensal dos juros, sem reinvestir — fluxo totalmente à
+      // parte de calcular(): a tabela comparativa e as duas "leituras"
+      // (equivalência LCI x CDB, ganho real) são construídas em cima do
+      // modelo de reinvestimento e não fazem sentido aqui, então esse
+      // modo mostra só o resultado direto (ver simularRendaMensal).
+      function calcularRendaMensal() {
+        const tipo = selTipo.value;
+        const valorInicial = Math.max(0, hgValorMascarado(inValorInicial));
+        const prazoInformado = Math.max(1, parseFloat(inPrazo.value) || 1);
+        const prazoMeses = Math.round(selPrazoUnidade.value === 'anos' ? prazoInformado * 12 : prazoInformado);
+        const tipoInfo = infoTipo(tipo);
+        const taxaAnual = obterTaxaAnualEfetiva();
+
+        const r = simularRendaMensal(
+          { taxaAnualPct: taxaAnual, tributado: tipoInfo.tributado, custodia: tipoInfo.custodia },
+          valorInicial, prazoMeses
+        );
+
+        const custodiaTexto = tipoInfo.custodia
+          ? `<div class="calc-resultado-linha"><span>Taxa de custódia B3 (aprox. 0,20% a.a., total no período)</span><strong>- ${hgFormatMoeda(r.totalCustodia)}</strong></div>`
+          : '';
+        const irTexto = tipoInfo.tributado
+          ? `<div class="calc-resultado-linha"><span>IR total sobre os cupons (regressivo, por faixa)</span><strong>- ${hgFormatMoeda(r.totalIR)}</strong></div>`
+          : `<div class="calc-resultado-linha"><span>Imposto de Renda</span><strong>Isento</strong></div>`;
+
+        const linhasFaixas = r.faixas.map(f => {
+          const periodo = f.mesInicio === f.mesFim ? `${f.mesInicio}º mês` : `${f.mesInicio}º ao ${f.mesFim}º mês`;
+          const aliqTexto = tipoInfo.tributado ? ` (IR ${hgFormatNumero(f.aliquota * 100)}%)` : '';
+          return `<div class="calc-resultado-linha"><span>${periodo}${aliqTexto}</span><strong>${hgFormatMoeda(f.jurosLiquido)}/mês</strong></div>`;
+        }).join('');
+
+        resultadoEl.innerHTML = `
+          <div class="calc-resultado-card">
+            <div class="calc-resultado-linha">
+              <span>Capital aplicado (volta no vencimento)</span>
+              <strong>${hgFormatMoeda(r.totalInvestido)}</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Juros brutos totais no período</span>
+              <strong>${hgFormatMoeda(r.totalJurosBruto)}</strong>
+            </div>
+            ${custodiaTexto}
+            ${irTexto}
+            <div class="calc-resultado-linha calc-destaque">
+              <span>Total líquido recebido (cupons + capital no vencimento)</span>
+              <strong>${hgFormatMoeda(r.valorTotalRecebido)}</strong>
+            </div>
+          </div>
+
+          <div class="calc-resultado-card" style="margin-top:10px;">
+            <h4 style="margin:0 0 6px;">Renda mensal líquida</h4>
+            ${linhasFaixas}
+          </div>
+
+          <p class="calc-ajuda" style="margin-top:10px;">
+            Simulação aproximada: título com pagamento mensal dos juros, sem reinvestir — o capital informado fica
+            parado e só retorna no vencimento. Taxa anual efetiva de ${hgFormatNumero(taxaAnual)}% a.a.
+            ${tipoInfo.tributado ? 'O valor líquido mensal pode crescer ao longo do prazo porque o IR regressivo cai conforme passa o tempo desde a aplicação.' : ''}
+            A tabela comparativa entre produtos e as leituras de equivalência/inflação consideram reinvestimento
+            dos juros, então não se aplicam nesse modo. Não substitui o cálculo oficial da sua corretora/banco.
+          </p>`;
+
+        const prazoTexto = selPrazoUnidade.value === 'anos'
+          ? `${prazoInformado} ano${prazoInformado > 1 ? 's' : ''}`
+          : `${prazoMeses} mes${prazoMeses > 1 ? 'es' : ''}`;
+
+        ultimoCalculo = {
+          tipoNome: tipoInfo.nome,
+          tipoTributado: tipoInfo.tributado,
+          tipoCustodia: tipoInfo.custodia,
+          valorInicial, aporteMensal: 0, prazoTexto, prazoMeses,
+          taxaAnual,
+          rendaMensal: r,
+          selicUsada: selicAnualPct(),
+          cdiUsado: cdiAnualPct(),
+          ipcaUsado: ipcaAnualPct(),
+        };
+        window.__ultimoCalculoRF = ultimoCalculo;
+
+        if (acoesWrap) acoesWrap.style.display = 'flex';
+      }
+
       function calcular() {
+        if (chkRendaMensal?.checked) { calcularRendaMensal(); return; }
         const tipo = selTipo.value;
         const valorInicial = Math.max(0, hgValorMascarado(inValorInicial));
         const aporteMensal = Math.max(0, hgValorMascarado(inAporte));
@@ -23493,6 +23643,59 @@
           40, 70
         );
         doc.setTextColor(0);
+
+        // Pagamento mensal dos juros (sem reinvestir): resumo próprio, sem
+        // a tabela comparativa nem as leituras de equivalência/inflação —
+        // ambas pressupõem reinvestimento, que não é o que esse modo simula.
+        if (c.rendaMensal) {
+          const r = c.rendaMensal;
+          const linhasResumoRm = [
+            ['Tipo de investimento', c.tipoNome + ' — Renda mensal'],
+            ['Capital aplicado', hgFormatMoeda(c.valorInicial)],
+            ['Prazo', c.prazoTexto],
+            ['Taxa anual efetiva', `${hgFormatNumero(c.taxaAnual)}% a.a.`],
+            ['Juros brutos totais no período', hgFormatMoeda(r.totalJurosBruto)],
+            ...(c.tipoCustodia ? [['Taxa de custódia B3 (aprox., total no período)', '- ' + hgFormatMoeda(r.totalCustodia)]] : []),
+            [c.tipoTributado ? 'IR total sobre os cupons (regressivo, por faixa)' : 'Imposto de Renda', c.tipoTributado ? '- ' + hgFormatMoeda(r.totalIR) : 'Isento'],
+            ['Total líquido recebido (cupons + capital no vencimento)', hgFormatMoeda(r.valorTotalRecebido)],
+          ];
+          doc.autoTable({
+            startY: 88,
+            head: [['', 'Resultado da simulação']],
+            body: linhasResumoRm,
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 6 },
+            headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+            columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+          });
+
+          const yFaixas = doc.lastAutoTable.finalY + 24;
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(11);
+          doc.text('Renda mensal líquida', 40, yFaixas);
+          doc.autoTable({
+            startY: yFaixas + 10,
+            head: [['Período', 'IR', 'Valor líquido por mês']],
+            body: r.faixas.map(f => [
+              f.mesInicio === f.mesFim ? `${f.mesInicio}º mês` : `${f.mesInicio}º ao ${f.mesFim}º mês`,
+              c.tipoTributado ? `${hgFormatNumero(f.aliquota * 100)}%` : 'Isento',
+              hgFormatMoeda(f.jurosLiquido),
+            ]),
+            theme: 'striped',
+            styles: { fontSize: 8.5, cellPadding: 5 },
+            headStyles: { fillColor: [43, 43, 43], fontSize: 9 },
+          });
+
+          const yAviso = doc.lastAutoTable.finalY + 20;
+          doc.setFont('helvetica', 'italic');
+          doc.setFontSize(8);
+          doc.setTextColor(90);
+          doc.text(
+            `Taxas de referência usadas: Selic aprox. ${hgFormatNumero(c.selicUsada)}% a.a. · CDI aprox. ${hgFormatNumero(c.cdiUsado)}% a.a. · IPCA anualizado aprox. ${hgFormatNumero(c.ipcaUsado)}% a.a.`,
+            40, yAviso
+          );
+          return doc;
+        }
 
         const linhasResumo = [
           ['Tipo de investimento', c.tipoNome],
