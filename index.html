@@ -24903,10 +24903,6 @@
           // próprio valor e modo — até 5 no total).
           const amortDaVez = amortPorPonto.get(m);
           if (amortDaVez && saldo > 0.005 && amortDaVez.valor > 0) {
-            saldo = Math.max(0, saldo - amortDaVez.valor);
-            linhas[linhas.length - 1].amortizacaoExtra = true;
-            linhas[linhas.length - 1].saldoDevedor = saldo;
-
             // Prazo restante ESTIMADO NA TRAJETÓRIA ATUAL (não o prazo
             // original menos meses corridos!) — importante porque, se já
             // houve uma amortização anterior em modo "prazo" nesta mesma
@@ -24914,6 +24910,16 @@
             // do que o original. Usar "parcelas - m" aqui ignoraria isso e
             // "desfaria" o encurtamento já conquistado, esticando o
             // financiamento de volta perto do prazo original.
+            //
+            // CRÍTICO: calcular ANTES de subtrair a amortização extra deste
+            // mês (saldo ainda é o da trajetória atual, sem o efeito do
+            // pagamento que está sendo aplicado agora). Calcular DEPOIS
+            // (como era antes desta correção) usava um saldo já reduzido
+            // pela própria amortização extra pra estimar quantos meses
+            // faltam — isso faz a conta colapsar na mesma fórmula do modo
+            // "prazo", e o modo "parcela" parava de preservar o prazo
+            // original (teste de mesa confirmou: os dois modos davam
+            // resultado idêntico, quando deveriam ser diferentes).
             let parcelasRestantesAtual;
             if (sistema === 'sac') {
               parcelasRestantesAtual = Math.max(1, Math.round(saldo / amortizacaoConstante));
@@ -24923,6 +24929,10 @@
                 ? Math.max(1, Math.round(Math.log(parcelaFixaPrice / (parcelaFixaPrice - jurosMensalSaldo)) / Math.log(1 + taxaMensal)))
                 : (parcelas - m);
             }
+
+            saldo = Math.max(0, saldo - amortDaVez.valor);
+            linhas[linhas.length - 1].amortizacaoExtra = true;
+            linhas[linhas.length - 1].saldoDevedor = saldo;
 
             if (amortDaVez.modo === 'parcela' && parcelasRestantesAtual > 0 && saldo > 0.005) {
               if (sistema === 'sac') {
@@ -25790,7 +25800,8 @@
         // Number(...) explícito: colunas "numeric" do Postgres costumam vir
         // como STRING via PostgREST (preserva precisão) — hgFormatMoeda/
         // hgFormatNumero só aceitam number, e sem isso viraria "null" na tela.
-        return `${sistemaTxt} · ${hgFormatMoeda(Number(s.valor))} · ${hgFormatNumero(Number(s.taxa_pct))}% ${periodoTxt} · ${s.parcelas}x · início ${formatMesAno(s.ano_inicio, s.mes_inicio0)}`;
+        const temAmort = s.amortizacao && (s.amortizacao.lista?.length || s.amortizacao.fgts);
+        return `${sistemaTxt} · ${hgFormatMoeda(Number(s.valor))} · ${hgFormatNumero(Number(s.taxa_pct))}% ${periodoTxt} · ${s.parcelas}x · início ${formatMesAno(s.ano_inicio, s.mes_inicio0)}${temAmort ? ' · 🔧 com amortização extra' : ''}`;
       }
 
       async function financSalvasCarregarLista(userId) {
@@ -25798,7 +25809,7 @@
         if (!cliente) return [];
         const { data, error } = await cliente
           .from('simulacoes_financiamento')
-          .select('id, valor, sistema, taxa_pct, periodo, parcelas, ano_inicio, mes_inicio0, created_at')
+          .select('id, valor, sistema, taxa_pct, periodo, parcelas, ano_inicio, mes_inicio0, amortizacao, created_at')
           .eq('user_id', userId)
           .order('created_at', { ascending: false });
         if (error) {
@@ -25836,7 +25847,11 @@
             selMesInicio.value = String(s.mes_inicio0 + 1);
             selAnoInicio.value = String(s.ano_inicio);
             sincronizarDataInicio();
-            estadoAmortizacao = { lista: [], fgts: null };
+            // Restaura a amortização extra salva (se houver) — mesmo formato
+            // de estadoAmortizacao, gravado como está em financSalvasSalvar.
+            estadoAmortizacao = s.amortizacao && (s.amortizacao.lista?.length || s.amortizacao.fgts)
+              ? { lista: Array.isArray(s.amortizacao.lista) ? s.amortizacao.lista : [], fgts: s.amortizacao.fgts || null }
+              : { lista: [], fgts: null };
             simular();
             resultadoEl.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
           });
@@ -25893,6 +25908,11 @@
             total_juros: s.totalJuros,
             primeira_parcela: s.primeiraParcela,
             ultima_parcela: s.ultimaParcela,
+            // Guarda o ESTADO da amortização extra (até 5 avulsas + regra de
+            // FGTS), não a lista mesclada/expandida que a simulação usou —
+            // é o que permite "Carregar" restaurar exatamente o que estava
+            // configurado no modal "Amortizar", não só o resultado final.
+            amortizacao: (estadoAmortizacao.lista.length > 0 || estadoAmortizacao.fgts) ? estadoAmortizacao : null,
           });
           if (error) throw error;
 
