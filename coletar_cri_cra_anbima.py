@@ -252,7 +252,7 @@ def baixar():
         raise RuntimeError(f"HTTP {resposta.status_code} ao chamar {URL_EXPORT}")
     resposta.encoding = "latin-1"
     texto = resposta.text
-    if not texto or "Código" not in texto.split("\r\n", 1)[0]:
+    if not texto or "Código" not in texto.splitlines()[0]:
         raise RuntimeError("corpo vazio ou sem a linha de cabeçalho esperada")
     return texto
 
@@ -263,7 +263,11 @@ def baixar():
 
 def interpretar(texto):
     """Transforma o texto do CSV numa lista de papéis. Devolve (papeis, data_base, ignoradas)."""
-    linhas = [l for l in texto.split("\r\n") if l.strip()]
+    # splitlines() em vez de split("\r\n"): o arquivo da B3 (coletar_cri.py)
+    # usa \r\n, mas este aqui veio só com \n — descoberto rodando contra o
+    # arquivo real (sem isso, o arquivo inteiro cai como "uma linha só" e
+    # o parser não acha nada). splitlines() cobre os dois sem apostar.
+    linhas = [l for l in texto.splitlines() if l.strip()]
     if not linhas:
         return [], None, 0
 
