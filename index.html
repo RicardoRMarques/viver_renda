@@ -25872,7 +25872,12 @@
           return;
         }
         const btn = document.getElementById('financBtnSalvar');
-        if (btn) btn.disabled = true;
+        // Mesmo padrão do botão "Compartilhar" (hgCompartilharLinkFerramenta):
+        // a confirmação aparece no PRÓPRIO botão que a pessoa acabou de
+        // clicar — o painel "Minhas simulações salvas" fica mais abaixo na
+        // tela, então um aviso só ali passava despercebido sem rolar a página.
+        const textoOriginalBtn = btn ? btn.textContent : null;
+        if (btn) { btn.disabled = true; }
         try {
           const s = ultimaSimulacao;
           const { error } = await cliente.from('simulacoes_financiamento').insert({
@@ -25898,14 +25903,20 @@
             await cliente.from('simulacoes_financiamento').delete().in('id', excedentes);
           }
 
+          if (btn) btn.textContent = '✅ Salva no seu perfil!';
           salvasStatusEl.className = 'hg-status';
           salvasStatusEl.textContent = 'Simulação salva!';
           await financSalvasAtualizarTudo();
-          setTimeout(() => { if (salvasStatusEl.textContent === 'Simulação salva!') salvasStatusEl.textContent = ''; }, 3000);
+          setTimeout(() => {
+            if (btn && textoOriginalBtn) btn.textContent = textoOriginalBtn;
+            if (salvasStatusEl.textContent === 'Simulação salva!') salvasStatusEl.textContent = '';
+          }, 3000);
         } catch (e) {
+          if (btn) btn.textContent = '⚠️ Não salvou — tente de novo';
           salvasStatusEl.className = 'hg-status erro';
           salvasStatusEl.textContent = 'Não foi possível salvar agora. Tente de novo.';
           console.error(e);
+          setTimeout(() => { if (btn && textoOriginalBtn) btn.textContent = textoOriginalBtn; }, 3000);
         } finally {
           if (btn) btn.disabled = false;
         }
