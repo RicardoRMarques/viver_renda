@@ -2,15 +2,15 @@
  "_leia_me": "Cadastro de EMISSÃO de CRIs (Certificados de Recebíveis Imobiliários) negociados na B3, só os que ainda não venceram. 'rotulo_remuneracao' é a remuneração CONTRATADA no lançamento do papel — a B3 não publica uma taxa de mercado secundário atualizada todo dia para CRI (diferente da tela de Debêntures, que usa a ANBIMA). Para papel pós-fixado (DI/IPCA/IGP-M + spread) isso ainda descreve o que o título paga hoje, porque só o indexador-base flutua; para PREFIXADO não há garantia nenhuma de que siga valendo. CRI é isento de Imposto de Renda para pessoa física por lei (diferente de debênture incentivada, que depende de cada papel) — mas não tem FGC, e a maioria exige um investimento mínimo alto (na casa de R$ 10 a 20 mil), que este arquivo não informa.",
  "fonte": "B3 — Consulta Pública de CRIs",
  "fonte_url": "https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/",
- "atualizado_em": "2026-10-22T18:58:15+00:00",
- "total": 4443,
- "total_no_arquivo_b3": 4701,
+ "atualizado_em": "2026-10-23T17:30:33+00:00",
+ "total": 4442,
+ "total_no_arquivo_b3": 4698,
  "por_indexador": {
   "di": 1241,
   "igp_m": 210,
   "tr": 60,
   "outro": 349,
-  "ipca": 2502,
+  "ipca": 2501,
   "prefixado": 13,
   "incc_di": 46,
   "inpc": 9,
@@ -18,7 +18,7 @@
   "incc_m": 5,
   "ipc_fipe": 2
  },
- "volume_total_emissao": 306145661804.27,
+ "volume_total_emissao": 305985661804.27,
  "cris": [
   {
    "codigo": "27I0000801",
@@ -62970,23 +62970,6 @@
    "data_emissao": "2021-06-08",
    "data_vencimento": "2036-06-21",
    "data_final_distribuicao": "2021-10-26"
-  },
-  {
-   "codigo": "21F0097589",
-   "isin": "BRIMWLCRI6Y8",
-   "emissor": "RIZA SECURITIZADORA S.A.",
-   "agente_fiduciario": "VORTX DTVM S.A.",
-   "numero_emissao": "4",
-   "numero_serie": "264",
-   "quantidade_emitida": 160000.0,
-   "volume_emissao": 160000000.0,
-   "indexador": "ipca",
-   "pct_indexador": null,
-   "spread": 5.8,
-   "rotulo_remuneracao": "IPCA + 5,80%",
-   "data_emissao": "2021-06-08",
-   "data_vencimento": "2036-05-20",
-   "data_final_distribuicao": "2021-12-08"
   },
   {
    "codigo": "21E0705657",
