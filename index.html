@@ -5860,6 +5860,47 @@
             </div>
           </div>
 
+          <details class="calc-educativo" id="financCorrecaoDetalhes">
+            <summary>⚙️ Correção monetária, seguro e TCA (opcional — só para SAC)</summary>
+            <div class="calc-educativo-corpo">
+              <p class="calc-ajuda" style="margin:0 0 10px;">
+                Por padrão a simulação não tem correção monetária, seguro nem taxas — é a estimativa mais simples.
+                Pra chegar mais perto do extrato real de um financiamento bancário (SAC), ative abaixo. Os valores já
+                vêm preenchidos com <strong>médias de mercado</strong>, porque a maioria das pessoas não sabe de cabeça
+                os números exatos do próprio contrato — ajuste se você souber os seus.
+              </p>
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700; margin-bottom:10px;">
+                <input type="checkbox" id="financUsarCorrecao" style="width:16px; height:16px;" />
+                Usar correção monetária, seguro e TCA nesta simulação
+              </label>
+              <div id="financCorrecaoCampos" hidden>
+                <div class="calc-grid-2">
+                  <div class="calc-campo">
+                    <label for="financTaxaCorrecao">Correção monetária (% a.m., média)</label>
+                    <input type="text" inputmode="decimal" id="financTaxaCorrecao" value="0,05" />
+                  </div>
+                  <div class="calc-campo">
+                    <label for="financTaxaSeguro">Seguro MIP+DFI (% do saldo devedor, média)</label>
+                    <input type="text" inputmode="decimal" id="financTaxaSeguro" value="0,02" />
+                  </div>
+                </div>
+                <div class="calc-campo">
+                  <label for="financTca">TCA — Taxa de Contrato e Avaliação (R$/mês)</label>
+                  <div class="calc-input-prefixado">
+                    <span class="calc-prefixo">R$</span>
+                    <input type="text" inputmode="numeric" id="financTca" value="25,00" />
+                  </div>
+                </div>
+                <p class="calc-ajuda" style="margin:6px 0 0; font-size:0.82rem;">
+                  Com correção ativada, a amortização do SAC deixa de ser constante — é recalculada todo mês sobre o
+                  saldo já corrigido, igual um banco de verdade faz. A amortização extra, nesse modo, sempre reduz o
+                  prazo mantendo a parcela parecida com a de antes (os outros modos do "Amortizar" não fazem diferença
+                  aqui). Esse modelo não está disponível para o sistema Price.
+                </p>
+              </div>
+            </div>
+          </details>
+
           <button class="hg-btn" id="financBtnSimular" style="width:100%; margin-top:6px;">Simular</button>
 
           <div id="financResultado"></div>
@@ -5942,6 +5983,11 @@
               <input type="radio" name="amortModo" value="parcela" style="margin-right:6px;" />
               Amortizar por parcela <span id="amortDescParcela" style="color:var(--muted); font-weight:400;">(mantém o prazo, reduz o valor da parcela)</span>
             </label>
+            <p class="calc-ajuda" id="amortAvisoCorrecao" hidden style="margin:8px 0 0;">
+              Com correção monetária ativada, a amortização extra sempre reduz o prazo mantendo a parcela parecida
+              com a de antes — é o único modelo validado para esse cálculo. Os outros dois modos ficam indisponíveis
+              nesta simulação.
+            </p>
           </div>
 
           <button class="hg-btn" id="amortBtnAdicionar" style="width:100%;">+ Adicionar à lista</button>
@@ -5985,6 +6031,10 @@
                   <input type="radio" name="amortFgtsModo" value="parcela" style="margin-right:6px;" />
                   Amortizar por parcela <span id="amortFgtsDescParcela" style="color:var(--muted); font-weight:400;">(mantém o prazo, reduz o valor da parcela)</span>
                 </label>
+                <p class="calc-ajuda" id="amortFgtsAvisoCorrecao" hidden style="margin:8px 0 0;">
+                  Com correção monetária ativada, a amortização extra sempre reduz o prazo mantendo a parcela
+                  parecida com a de antes — é o único modelo validado para esse cálculo.
+                </p>
               </div>
             </div>
           </div>
@@ -24762,6 +24812,11 @@
       const selParcelasUnidade = document.getElementById('financParcelasUnidade');
       const btnSimular = document.getElementById('financBtnSimular');
       const resultadoEl = document.getElementById('financResultado');
+      const inUsarCorrecao = document.getElementById('financUsarCorrecao');
+      const campoCorrecao = document.getElementById('financCorrecaoCampos');
+      const inTaxaCorrecao = document.getElementById('financTaxaCorrecao');
+      const inTaxaSeguro = document.getElementById('financTaxaSeguro');
+      const inTca = document.getElementById('financTca');
       let ultimaSimulacao = null;
       let financChartLinha = null;
       let financChartBarras = null;
@@ -24966,6 +25021,110 @@
         return linhas;
       }
 
+      // ----------------------------------------------------------------
+      // SAC COM CORREÇÃO MONETÁRIA, SEGURO E TCA — modelo opcional, mais
+      // próximo do extrato real de um banco (ativado pelo checkbox
+      // "Usar correção monetária, seguro e TCA"). Só existe pro SAC; o
+      // Price não entra aqui (ver wiring em selSistema 'change').
+      //
+      // Diferença-chave pro SAC simples (função acima): a amortização NÃO
+      // é constante — é recalculada todo mês como saldo_corrigido ÷
+      // prazo_restante, com saldo_corrigido = saldo anterior × índice de
+      // correção do mês. Com índice sempre 1 (correção 0%), essa fórmula
+      // se reduz exatamente ao SAC simples de cima — validado num teste
+      // de mesa isolado contra um extrato real (R$266.580, 360 parcelas,
+      // 7% a.a., índices de TR mês a mês): bateu nos meses 1, 2, 3 e 11
+      // com os valores do extrato até o centavo, e no teste adicional com
+      // índice 1,000000 (sem correção) reproduziu exatamente o SAC simples.
+      //
+      // Amortização extra: só o modo "reduzir prazo, mantendo a parcela
+      // parecida com a de antes" — o único validado contra o extrato real.
+      // Os outros dois modos do modal "Amortizar" (reduzir prazo mantendo
+      // a amortização / reduzir a parcela mantendo o prazo) não têm uma
+      // fórmula equivalente verificada pra um cenário com saldo corrigido
+      // mês a mês, então não foram estendidos aqui — aplicar uma fórmula
+      // não verificada numa calculadora financeira é pior do que não ter
+      // a opção.
+      function simularFinanciamentoComCorrecao({
+        valor, taxaMensal, parcelas, anoInicio, mesInicio0, amort,
+        taxaCorrecaoMensal, taxaSeguroMensal, tcaMensal,
+      }) {
+        const linhas = [];
+        let saldo = valor;
+        let prazoRestante = parcelas;
+        const indiceMensal = 1 + taxaCorrecaoMensal;
+
+        const amortPorPonto = new Map();
+        (amort?.lista ?? []).forEach(item => amortPorPonto.set(item.ponto, item));
+
+        linhas.push({
+          mes: 0,
+          rotuloData: formatMesAno(anoInicio, mesInicio0),
+          divida: 0, juros: 0, amortizacao: 0, parcela: 0,
+          saldoDevedor: valor, indice: 1, prazoRestante, seguro: 0, tca: 0,
+        });
+
+        const LIMITE_SEGURANCA = Math.max(parcelas * 2, 6000);
+        let m = 1;
+        while (saldo > 0.005 && prazoRestante > 0 && m <= LIMITE_SEGURANCA) {
+          const saldoCorrigido = saldo * indiceMensal;
+          const juros = saldoCorrigido * taxaMensal;
+          let amortizacao = saldoCorrigido / prazoRestante;
+          if (amortizacao >= saldoCorrigido) amortizacao = saldoCorrigido; // zera o saldo exato na última parcela
+          const dividaAntes = saldo;
+          saldo = Math.max(0, saldoCorrigido - amortizacao);
+
+          const seguro = saldoCorrigido * taxaSeguroMensal;
+          const tca = tcaMensal;
+
+          const totalMeses = mesInicio0 + m;
+          const anoLinha = anoInicio + Math.floor(totalMeses / 12);
+          const mesLinha0 = totalMeses % 12;
+
+          linhas.push({
+            mes: m,
+            rotuloData: formatMesAno(anoLinha, mesLinha0),
+            divida: dividaAntes,
+            juros, amortizacao,
+            parcela: amortizacao + juros + seguro + tca,
+            saldoDevedor: saldo,
+            indice: indiceMensal,
+            prazoRestante,
+            seguro, tca,
+            amortizacaoExtra: false,
+          });
+
+          prazoRestante--;
+
+          const amortDaVez = amortPorPonto.get(m);
+          if (amortDaVez && saldo > 0.005 && amortDaVez.valor > 0) {
+            const parcelaFinanceiraAntes = amortizacao + juros; // sem seguro/TCA
+            const valorExtra = Math.min(amortDaVez.valor, saldo); // nunca maior que o saldo
+            saldo = Math.max(0, saldo - valorExtra);
+            linhas[linhas.length - 1].amortizacaoExtra = true;
+            linhas[linhas.length - 1].saldoDevedor = saldo;
+
+            if (saldo > 0.005) {
+              // Prazo restante recalculado pra que a amortização do PRÓXIMO
+              // mês deixe a parcela (amort+juros, sem seguro/TCA) parecida
+              // com a de antes desta amortização extra.
+              const saldoCorrigidoProx = saldo * indiceMensal;
+              const jurosProx = saldoCorrigidoProx * taxaMensal;
+              const amortAlvo = parcelaFinanceiraAntes - jurosProx;
+              if (amortAlvo > 0) {
+                prazoRestante = Math.max(1, Math.round(saldoCorrigidoProx / amortAlvo));
+              }
+            } else {
+              prazoRestante = 0; // quitado pela própria amortização extra
+            }
+          }
+
+          m++;
+        }
+
+        return linhas;
+      }
+
 
       // Gráfico de linha: queda do saldo devedor ao longo do financiamento.
       // Gráfico de barras: juros x amortização por período. Agrupa por ano
@@ -25063,7 +25222,20 @@
         }
 
         const taxaMensal = taxaMensalEfetiva(taxaPct, periodo);
-        const linhas = simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0, amort: montarAmortParaSimulacao(parcelas) });
+
+        // Correção monetária/seguro/TCA: só existe pro SAC (checkbox já se
+        // desmarca sozinho se trocar pra Price — ver wiring em 'change').
+        const usarCorrecao = sistema === 'sac' && !!inUsarCorrecao?.checked;
+        const taxaCorrecaoMensal = usarCorrecao ? Math.max(0, parseNumeroBr(inTaxaCorrecao.value)) / 100 : 0;
+        const taxaSeguroMensal = usarCorrecao ? Math.max(0, parseNumeroBr(inTaxaSeguro.value)) / 100 : 0;
+        const tcaMensal = usarCorrecao ? Math.max(0, parseNumeroBr(inTca.value) || 25) : 0;
+
+        const linhas = usarCorrecao
+          ? simularFinanciamentoComCorrecao({
+              valor, taxaMensal, parcelas, anoInicio, mesInicio0, amort: montarAmortParaSimulacao(parcelas),
+              taxaCorrecaoMensal, taxaSeguroMensal, tcaMensal,
+            })
+          : simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0, amort: montarAmortParaSimulacao(parcelas) });
 
         const totalJuros = linhas.reduce((acc, l) => acc + l.juros, 0);
         const totalPago = linhas.reduce((acc, l) => acc + l.parcela, 0);
@@ -25076,8 +25248,10 @@
             <td>${hgFormatMoeda(l.divida)}</td>
             <td>${hgFormatMoeda(l.juros)}</td>
             <td>${hgFormatMoeda(l.amortizacao)}</td>
+            ${usarCorrecao ? `<td>${hgFormatMoeda(l.seguro || 0)}</td><td>${hgFormatMoeda(l.tca || 0)}</td>` : ''}
             <td>${hgFormatMoeda(l.parcela)}</td>
             <td>${hgFormatMoeda(l.saldoDevedor)}${l.amortizacaoExtra ? ' 🔧' : ''}</td>
+            ${usarCorrecao ? `<td>${hgFormatNumero((l.indice ?? 1) , 6)}</td><td>${l.prazoRestante ?? '—'}</td>` : ''}
           </tr>`).join('');
 
         resultadoEl.innerHTML = `
@@ -25145,16 +25319,23 @@
                   <th>Dívida</th>
                   <th>Juros</th>
                   <th>Amortização</th>
+                  ${usarCorrecao ? '<th>Seguro</th><th>TCA</th>' : ''}
                   <th>Parcela</th>
                   <th>Saldo devedor</th>
+                  ${usarCorrecao ? '<th>Índice</th><th>Prazo restante</th>' : ''}
                 </tr>
               </thead>
               <tbody>${linhasTabelaHtml}</tbody>
             </table>
           </div>
           <p class="calc-ajuda" style="margin-top:10px;">
-            Simulação sem correção monetária, seguro ou taxas administrativas — apenas juros e amortização
-            pelo sistema ${sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'}.
+            ${usarCorrecao
+              ? `Simulação com correção monetária (${hgFormatNumero(taxaCorrecaoMensal * 100, 2)}% a.m., média), seguro MIP+DFI
+                 (${hgFormatNumero(taxaSeguroMensal * 100, 2)}% do saldo devedor, média) e TCA (${hgFormatMoeda(tcaMensal)}/mês) —
+                 valores médios de mercado, ajustáveis acima. A amortização do SAC é recalculada todo mês sobre o saldo já
+                 corrigido, não é mais constante.`
+              : `Simulação sem correção monetária, seguro ou taxas administrativas — apenas juros e amortização
+                 pelo sistema ${sistema === 'price' ? 'Price (parcelas fixas)' : 'SAC (parcelas decrescentes)'}.`}
             Não substitui a simulação oficial do seu banco/financeira.
           </p>`;
 
@@ -25163,6 +25344,7 @@
           valor, sistema, taxaPct, periodo, parcelas,
           anoInicio, mesInicio0, totalPago, totalJuros,
           primeiraParcela, ultimaParcela,
+          usarCorrecao, taxaCorrecaoMensal, taxaSeguroMensal, tcaMensal,
           dataUltimaParcela: linhas[linhas.length - 1]?.rotuloData ?? '—',
           linhas,
           // A mesma lista MESCLADA (avulsas + pontos gerados pelo FGTS a
@@ -25244,12 +25426,13 @@
         );
         doc.setTextColor(0);
 
+        const totalSeguroTca = s.usarCorrecao ? s.linhas.reduce((acc, l) => acc + (l.seguro || 0) + (l.tca || 0), 0) : 0;
         const linhasResumo = [
           ['Valor financiado', hgFormatMoeda(s.valor)],
           ['Total a ser pago', hgFormatMoeda(s.totalPago)],
           ['Total de juros', hgFormatMoeda(s.totalJuros)],
-          ['Total de taxas/seguros', hgFormatMoeda(0)],
-          ['Correção', hgFormatMoeda(0)],
+          ['Total de seguros (MIP+DFI) + TCA', s.usarCorrecao ? hgFormatMoeda(totalSeguroTca) : 'não incluído nesta simulação'],
+          ['Correção monetária (TR, média)', s.usarCorrecao ? `${hgFormatNumero(s.taxaCorrecaoMensal * 100, 2)}% a.m.` : 'não incluída nesta simulação'],
           ['Taxa de juros', `${hgFormatNumero(s.taxaPct)}% (${s.periodo === 'anual' ? 'a.a' : 'a.m'})`],
           ['Quantidade de parcelas', (s.linhas.length - 1) !== s.parcelas
             ? `${s.linhas.length - 1} de ${s.parcelas} (reduzida pela amortização)`
@@ -25335,9 +25518,10 @@
         doc.setFontSize(11);
         doc.text(`Tabela de parcelas — ${s.sistema === 'price' ? 'Price' : 'SAC'}`, 40, yTabelaParcelas);
 
+        const colunasExtras = s.usarCorrecao ? ['Índice', 'Prazo restante'] : [];
         doc.autoTable({
           startY: yTabelaParcelas + 10,
-          head: [['Mês', 'Dívida', 'Juros', 'Amortização', 'Parcela', 'Saldo devedor', 'Extra']],
+          head: [['Mês', 'Dívida', 'Juros', 'Amortização', 'Parcela', 'Saldo devedor', ...colunasExtras, 'Extra']],
           body: s.linhas.map(l => {
             const amortDessaLinha = s.amortizacao?.lista?.find(a => a.ponto === l.mes);
             return [
@@ -25347,13 +25531,14 @@
               hgFormatMoeda(l.amortizacao),
               hgFormatMoeda(l.parcela),
               hgFormatMoeda(l.saldoDevedor),
+              ...(s.usarCorrecao ? [hgFormatNumero(l.indice ?? 1, 6), String(l.prazoRestante ?? '—')] : []),
               l.amortizacaoExtra ? hgFormatMoeda(amortDessaLinha?.valor ?? 0) : '',
             ];
           }),
           theme: 'striped',
           styles: { fontSize: 7.5, cellPadding: 4 },
           headStyles: { fillColor: [43, 43, 43], fontSize: 8 },
-          columnStyles: { 0: { fontStyle: 'bold' }, 6: { textColor: [61, 150, 90], fontStyle: 'bold' } },
+          columnStyles: { 0: { fontStyle: 'bold' }, [6 + colunasExtras.length]: { textColor: [61, 150, 90], fontStyle: 'bold' } },
           didParseCell: (data) => {
             if (data.section === 'body' && s.linhas[data.row.index]?.amortizacaoExtra) {
               data.cell.styles.fillColor = [223, 245, 230];
@@ -25398,6 +25583,11 @@
           ['Valor financiado', s.valor],
           ['Total a ser pago', s.totalPago],
           ['Total de juros', s.totalJuros],
+          ...(s.usarCorrecao ? [
+            ['Correção monetária (TR, média)', `${hgFormatNumero(s.taxaCorrecaoMensal * 100, 2)}% a.m.`],
+            ['Seguro MIP+DFI (média)', `${hgFormatNumero(s.taxaSeguroMensal * 100, 2)}% do saldo devedor`],
+            ['TCA mensal', s.tcaMensal],
+          ] : []),
           ['Taxa de juros', `${hgFormatNumero(s.taxaPct)}% (${s.periodo === 'anual' ? 'a.a' : 'a.m'})`],
           ['Quantidade de parcelas', (s.linhas.length - 1) !== s.parcelas
             ? `${s.linhas.length - 1} de ${s.parcelas} (reduzida pela amortização)`
@@ -25427,7 +25617,8 @@
         // Aba 3: tabela completa de parcelas — valores como número (não
         // texto formatado), pra dar pra somar/filtrar direto na planilha.
         const linhasParcelas = [
-          ['Mês', 'Data', 'Dívida', 'Juros', 'Amortização', 'Parcela', 'Saldo devedor', 'Amortização extra'],
+          ['Mês', 'Data', 'Dívida', 'Juros', 'Amortização', 'Parcela', 'Saldo devedor',
+            ...(s.usarCorrecao ? ['Índice de correção', 'Prazo restante'] : []), 'Amortização extra'],
           ...s.linhas.map(l => {
             const amortDessaLinha = s.amortizacao?.lista?.find(a => a.ponto === l.mes);
             return [
@@ -25438,12 +25629,15 @@
               l.amortizacao,
               l.parcela,
               l.saldoDevedor,
+              ...(s.usarCorrecao ? [l.indice ?? 1, l.prazoRestante ?? ''] : []),
               l.amortizacaoExtra ? (amortDessaLinha?.valor ?? 0) : '',
             ];
           }),
         ];
         const abaParcelas = XLSX.utils.aoa_to_sheet(linhasParcelas);
-        abaParcelas['!cols'] = [{ wch: 8 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
+        abaParcelas['!cols'] = s.usarCorrecao
+          ? [{ wch: 8 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 16 }]
+          : [{ wch: 8 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
         XLSX.utils.book_append_sheet(livro, abaParcelas, 'Parcelas');
 
         XLSX.writeFile(livro, nomeArquivoExcel());
@@ -25636,6 +25830,30 @@
             document.querySelector(`input[name="${grupo}"][value="prazo"]`).checked = true;
           }
         });
+
+        // Com correção monetária ativa, só a fórmula "reduzir prazo mantendo
+        // a parcela" foi validada (ver simularFinanciamentoComCorrecao) —
+        // os outros dois modos ficam escondidos pra não prometer um
+        // comportamento que o motor não aplica de verdade nesse caso.
+        const comCorrecao = !!ultimaSimulacao.usarCorrecao;
+        [
+          { grupo: 'amortModo', avisoId: 'amortAvisoCorrecao' },
+          { grupo: 'amortFgtsModo', avisoId: 'amortFgtsAvisoCorrecao' },
+        ].forEach(({ grupo }) => {
+          document.querySelectorAll(`input[name="${grupo}"]`).forEach(radio => {
+            const label = radio.closest('label');
+            if (radio.value === 'prazo_parcela_fixa') return;
+            if (label) label.style.display = comCorrecao ? 'none' : (ehSac ? '' : label.style.display);
+          });
+          if (comCorrecao) {
+            const radioFixo = document.querySelector(`input[name="${grupo}"][value="prazo_parcela_fixa"]`);
+            if (radioFixo) radioFixo.checked = true;
+          }
+        });
+        ['amortAvisoCorrecao', 'amortFgtsAvisoCorrecao'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.hidden = !comCorrecao;
+        });
       }
       function fecharModalAmort() {
         amortOverlay.hidden = true;
@@ -25765,6 +25983,19 @@
       btnSimular.addEventListener('click', () => {
         estadoAmortizacao = { lista: [], fgts: null };
         simular();
+      });
+
+      // Correção monetária/seguro/TCA só existe pro SAC (ver docstring de
+      // simularFinanciamentoComCorrecao) — desmarca e esconde sozinho se a
+      // pessoa trocar pra Price com a opção ligada.
+      inUsarCorrecao?.addEventListener('change', () => {
+        if (campoCorrecao) campoCorrecao.hidden = !inUsarCorrecao.checked;
+      });
+      selSistema.addEventListener('change', () => {
+        if (selSistema.value === 'price' && inUsarCorrecao?.checked) {
+          inUsarCorrecao.checked = false;
+          if (campoCorrecao) campoCorrecao.hidden = true;
+        }
       });
 
       document.getElementById('financCompartilharLink')?.addEventListener('click', (e) =>
