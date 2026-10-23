@@ -1,0 +1,16 @@
+name: _tmp_anbima_cri_pagina
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  investigar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pip install playwright
+      - run: python -m playwright install chromium
+      - run: python _tmp_anbima_cri_pagina.py
