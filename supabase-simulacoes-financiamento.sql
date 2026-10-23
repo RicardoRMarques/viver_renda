@@ -1,14 +1,21 @@
 -- ============================================================
 -- Simulador de Financiamento Imobiliário — últimas simulações salvas
 -- ------------------------------------------------------------
--- Guarda só os PARÂMETROS de entrada de cada simulação (não a tabela de
--- amortização inteira) — o site recalcula tudo de novo ao "carregar"
--- uma simulação salva, igual faz ao digitar os campos na mão. Até 5
--- por usuário: o site apaga a mais antiga quando salva a 6ª.
+-- Guarda os PARÂMETROS de entrada de cada simulação (não a tabela de
+-- amortização mês a mês inteira) — o site recalcula tudo de novo ao
+-- "carregar" uma simulação salva, igual faz ao digitar os campos na
+-- mão. Até 5 por usuário: o site apaga a mais antiga quando salva a 6ª.
 --
--- Já aplicado no projeto em 23/10/2026 (migração simulacoes_financiamento).
--- Este arquivo é o histórico versionado e pode ser rodado de novo sem
--- risco: tudo é "if not exists" e as políticas são recriadas.
+-- A coluna "amortizacao" guarda o ESTADO da amortização extra (até 5
+-- avulsas + regra de FGTS recorrente), não a lista expandida/mesclada
+-- que a simulação usou — é o mesmo formato de estadoAmortizacao no
+-- front-end, pra "carregar" poder restaurar exatamente o que a pessoa
+-- tinha configurado no modal "Amortizar" (e não só o resultado final).
+--
+-- Já aplicado no projeto em 23/10/2026 (migração simulacoes_financiamento)
+-- e 24/10/2026 (coluna amortizacao). Este arquivo é o histórico
+-- versionado e pode ser rodado de novo sem risco: tudo é "if not
+-- exists" e as políticas são recriadas.
 --
 -- RLS é obrigatório aqui: o site usa a chave anônima no navegador, então
 -- sem política cada visitante leria as simulações dos outros.
@@ -31,6 +38,9 @@ create table if not exists public.simulacoes_financiamento (
   created_at timestamptz not null default now()
 );
 comment on table public.simulacoes_financiamento is 'Simulador de Financiamento Imobiliário: últimas simulações salvas por usuário logado (até 5 — o site apaga a mais antiga ao salvar a 6ª).';
+
+alter table public.simulacoes_financiamento add column if not exists amortizacao jsonb;
+comment on column public.simulacoes_financiamento.amortizacao is 'Estado da amortização extra aplicada (até 5 avulsas + regra de FGTS recorrente), no mesmo formato de estadoAmortizacao no front-end: {lista: [{ponto,valor,modo}], fgts: {inicio,valor,modo}|null}. Null quando a simulação não tinha amortização extra.';
 
 create index if not exists simulacoes_financiamento_user_idx on public.simulacoes_financiamento (user_id, created_at);
 
