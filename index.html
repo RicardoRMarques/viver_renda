@@ -16757,7 +16757,11 @@
       let indexador = 'todos';
       let pagina = 1;
       let carregando = null;
-      let ordem = { coluna: 'data_emissao', desc: true };
+      // Começa ordenado pela taxa de mercado (ANBIMA), não pela emissão:
+      // só ~100 dos 4443 CRIs têm essa taxa (e por tabela o link pro
+      // histórico de preços na ANBIMA), então ordenar por emissão por
+      // padrão escondia esses papéis nas primeiras páginas quase sempre.
+      let ordem = { coluna: 'taxa_indicativa', desc: true };
 
       const COLUNAS = [
         { chave: 'codigo',       rotulo: 'Código',      tipo: 'texto',  glos: 'cri-codigo' },
