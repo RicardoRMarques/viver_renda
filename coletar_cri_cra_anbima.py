@@ -50,10 +50,13 @@ sessão, nem token. Um requests.get() direto, do zero, devolve o mesmo
 arquivo que o navegador baixa.
 
 URL:       https://www.anbima.com.br/pt_br/anbima/TaxasCriCraExport/exportarCSV
-Parâmetros: filtroTermo="" e filtroData="" (deixar os dois em branco
-            fatia pro ÚLTIMO dia disponível automaticamente — não
-            precisa adivinhar data, diferente do arquivo de debêntures).
-Encoding:  latin-1 (ISO-8859-1).
+Parâmetros: filtroTermo="" e filtroData="" (deixar os dois em branco não
+            exige adivinhar data, diferente do arquivo de debêntures —
+            mas também NÃO devolve só um dia: vem uma SÉRIE dos últimos
+            ~5 dias úteis, com cada papel repetido uma vez por dia. O
+            robô fica só com a data mais recente — ver interpretar()).
+Encoding:  latin-1 (ISO-8859-1). Linhas terminam em \n (não \r\n, ao
+           contrário do arquivo de CRI da B3 — ver coletar_cri.py).
 Separador: ; (ponto e vírgula). Decimais: vírgula. Ausente: campo vazio.
 
 Estrutura (17 colunas, confirmadas rodando contra o arquivo real):
@@ -303,7 +306,6 @@ def interpretar(texto):
         "pct_reune": indice("% Reune", 16),
     }
 
-    data_base = None
     papeis = []
     ignoradas = 0
 
@@ -322,12 +324,15 @@ def interpretar(texto):
             ignoradas += 1
             continue
 
-        if data_base is None:
-            data_base = campo("data_ref")
+        data_ref = data_iso(campo("data_ref"))
+        if not data_ref:
+            ignoradas += 1
+            continue
 
         indexador, pct_indexador, spread, rotulo_cru = classificar_indexador(campo("indice_correcao"))
 
         papeis.append({
+            "data_ref": data_ref,
             "tipo": classificar_tipo(codigo),
             "codigo": codigo,
             "risco_credito": campo("risco") or None,
@@ -350,7 +355,20 @@ def interpretar(texto):
             "pct_reune": numero(campo("pct_reune")),
         })
 
-    return papeis, data_base, ignoradas
+    # O arquivo NÃO traz só o último dia: vem uma série de ~5 dias úteis
+    # (confirmado rodando contra o arquivo real — 1671 linhas pra 336
+    # papéis distintos, igual ao padrão achado antes na planilha que o
+    # usuário exportou do site da ANBIMA). O site quer uma FOTO de hoje,
+    # não uma série histórica, então fica só a data mais recente.
+    if not papeis:
+        return [], None, ignoradas
+    data_mais_recente = max(p["data_ref"] for p in papeis)
+    papeis_do_dia = [p for p in papeis if p["data_ref"] == data_mais_recente]
+    for p in papeis_do_dia:
+        del p["data_ref"]
+    data_base = datetime.fromisoformat(data_mais_recente).strftime("%d/%m/%Y")
+
+    return papeis_do_dia, data_base, ignoradas
 
 
 # ---------------------------------------------------------------------
