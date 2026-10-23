@@ -3066,6 +3066,12 @@
       padding: 16px;
     }
     .calc-overlay[hidden] { display: none; }
+    /* O modal de login pode ser aberto de DENTRO de qualquer outro modal
+       (Alertas de Preço, Simulações salvas do Financiamento...) — sem isso,
+       os dois dividem o mesmo z-index: 2000 do .calc-overlay, e o modal que
+       já estava aberto (posterior no HTML) ganha o empate e cobre o de
+       login, que fica escondido atrás dele. */
+    #authOverlay { z-index: 2100; }
     .calc-modal {
       background: var(--bg);
       border: 1px solid var(--border);
@@ -26114,6 +26120,13 @@
         if (!cliente || !ultimaSimulacao) return;
         const { data: { session } } = await cliente.auth.getSession();
         if (!session?.user) {
+          // O modal de login abre por cima deste (ver #authOverlay no CSS) —
+          // a mensagem aqui é reforço, pra quando a pessoa fechar o login
+          // sem entrar e voltar olhar essa tela, saber por que não salvou.
+          if (salvasStatusEl) {
+            salvasStatusEl.className = 'hg-status';
+            salvasStatusEl.textContent = 'Entre com seu e-mail pra salvar esta simulação.';
+          }
           document.getElementById('authBtnAbrir')?.click();
           return;
         }
