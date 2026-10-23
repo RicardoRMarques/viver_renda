@@ -1,58 +1,30 @@
 #!/usr/bin/env python3
-"""Descartável — investiga se a página de busca de CRI/CRA da ANBIMA
-(data.anbima.com.br/busca/certificado-de-recebiveis) aceita um parâmetro
-de URL pra filtrar direto por código ou emissor, de um jeito que a gente
-possa linkar por papel/emissor sem precisar de JS/interação do usuário."""
+"""Descartável — follow-up: o parâmetro ?q=<codigo> pareceu filtrar de
+verdade (92 -> 5 linhas) no teste anterior. Confirma se é filtro real
+(checando o TEXTO das linhas, não só "aparece em algum lugar da página")
+e se fica estável numa carga fresca, sem navegador aberto antes."""
 from playwright.sync_api import sync_playwright
 
 URL_BASE = "https://data.anbima.com.br/busca/certificado-de-recebiveis?view=precos"
-
-# Códigos/emissores reais que sabemos existir no arquivo de hoje
-# (coletar_cri_cra_anbima.py -> data/cri_cra_precos.json).
 CODIGO_TESTE = "CRA025002S1"
-EMISSOR_TESTE = "OPEA"
+CODIGO_INEXISTENTE = "ZZZZZINVALIDO999"
 
 
-def inspecionar_busca(pagina):
-    pagina.goto(URL_BASE, wait_until="networkidle", timeout=45_000)
-    pagina.wait_for_timeout(2000)
-
-    campo = pagina.locator('input[type="search"], input[type="text"], input[placeholder*="usca" i]').first
-    print(f"campo de busca encontrado: {campo.count() > 0}")
-    if campo.count() == 0:
-        print("nao achei campo de busca -- abortando")
-        return
-
-    campo.click()
-    campo.fill(CODIGO_TESTE)
-    pagina.wait_for_timeout(500)
-    # tenta Enter, que é o jeito mais comum de disparar a busca
-    campo.press("Enter")
-    pagina.wait_for_timeout(2500)
-
-    print(f"\nURL apos digitar codigo '{CODIGO_TESTE}' + Enter:")
-    print(f"  {pagina.url}")
-
-    corpo = pagina.inner_text("body")
-    achou = CODIGO_TESTE in corpo
-    print(f"  o codigo aparece na pagina depois da busca: {achou}")
-
-    # conta quantas linhas de resultado existem agora (tentativa generica)
-    linhas = pagina.locator("table tbody tr, [role=row]").count()
-    print(f"  linhas/resultados visiveis: {linhas}")
-
-
-def testar_url_direta(pagina, url, rotulo):
-    print(f"\n=== Testando URL direta ({rotulo}) ===")
+def checar(pagina, url, rotulo):
+    print(f"\n=== {rotulo} ===")
     print(f"  {url}")
     pagina.goto(url, wait_until="networkidle", timeout=45_000)
     pagina.wait_for_timeout(2500)
-    corpo = pagina.inner_text("body")
-    achou = CODIGO_TESTE in corpo or EMISSOR_TESTE.upper() in corpo.upper()
-    print(f"  URL final apos load: {pagina.url}")
-    print(f"  conteudo relevante aparece: {achou}")
-    linhas = pagina.locator("table tbody tr, [role=row]").count()
-    print(f"  linhas/resultados visiveis: {linhas}")
+
+    linhas_loc = pagina.locator("table tbody tr")
+    n = linhas_loc.count()
+    print(f"  linhas na tabela: {n}")
+    for i in range(min(n, 8)):
+        try:
+            texto = linhas_loc.nth(i).inner_text().replace("\n", " | ")[:150]
+        except Exception:
+            texto = "?"
+        print(f"    linha {i}: {texto}")
 
 
 def main():
@@ -60,29 +32,14 @@ def main():
         navegador = p.chromium.launch(headless=True)
         pagina = navegador.new_page()
 
-        print("=== 1) Interagindo com o campo de busca na pagina ===")
-        inspecionar_busca(pagina)
-        url_apos_busca = pagina.url
+        checar(pagina, URL_BASE, "baseline sem filtro")
+        checar(pagina, f"{URL_BASE}&q={CODIGO_TESTE}", f"com q={CODIGO_TESTE}")
+        checar(pagina, f"{URL_BASE}&q={CODIGO_INEXISTENTE}", f"com q={CODIGO_INEXISTENTE} (nao deveria achar nada)")
 
-        print("\n=== 2) Testando se essa MESMA url funciona numa carga fresca (sem interacao) ===")
+        # segunda rodada numa pagina NOVA (sem historico de navegacao) pra
+        # garantir que nao e so cache/estado residual
         pagina2 = navegador.new_page()
-        if "?" in url_apos_busca and url_apos_busca != URL_BASE:
-            testar_url_direta(pagina2, url_apos_busca, "URL capturada apos a busca")
-        else:
-            print("  a URL nao mudou com a busca -- provavelmente eh so estado em memoria (React), sem refletir na URL")
-
-        print("\n=== 3) Tentando padroes de query string plausiveis, direto, sem interacao ===")
-        padroes = [
-            f"{URL_BASE}&busca={CODIGO_TESTE}",
-            f"{URL_BASE}&search={CODIGO_TESTE}",
-            f"{URL_BASE}&query={CODIGO_TESTE}",
-            f"{URL_BASE}&q={CODIGO_TESTE}",
-            f"{URL_BASE}&termo={CODIGO_TESTE}",
-            f"{URL_BASE}&codigo={CODIGO_TESTE}",
-            f"{URL_BASE}&filtroTermo={CODIGO_TESTE}",
-        ]
-        for url in padroes:
-            testar_url_direta(pagina2, url, url.split("&")[-1])
+        checar(pagina2, f"{URL_BASE}&q={CODIGO_TESTE}", f"pagina nova, direto com q={CODIGO_TESTE}")
 
         navegador.close()
 
