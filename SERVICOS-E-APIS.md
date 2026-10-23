@@ -52,6 +52,7 @@ credencial está configurada).
 **Tabelas em uso:**
 - `historico_indices` — histórico de valores de índices (`ativo`, `valor`, `created_at`) — leitura pública, escrita fechada
 - `favoritos_carrossel` — ativos favoritados por cada usuário logado, sincronizados entre aparelhos (`user_id`, `ticker`, `created_at`) — cada usuário só vê/mexe nos próprios (Row Level Security)
+- `simulacoes_financiamento` — últimas simulações salvas do Simulador de Financiamento Imobiliário, até 5 por usuário logado (ver `supabase-simulacoes-financiamento.sql`)
 
 **Credenciais usadas no `index.html`:**
 - `SUPABASE_URL` — URL pública do projeto (`https://mzknjnupizprfatfmxqg.supabase.co`)
