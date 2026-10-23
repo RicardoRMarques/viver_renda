@@ -5864,6 +5864,19 @@
 
           <div id="financResultado"></div>
 
+          <div class="calc-campo" id="financSalvasWrap" style="margin-top:14px;">
+            <label style="margin-bottom:6px;">💾 Minhas simulações salvas</label>
+            <div id="financSalvasDeslogado">
+              <p class="calc-ajuda" style="margin:0;"><strong>Atenção:</strong> pra salvar e consultar suas últimas simulações depois, você precisa entrar com seu e-mail (sem senha — a gente manda um link de acesso). Sem login, a simulação só fica na tela enquanto você não a fechar.</p>
+              <button type="button" class="hg-btn" id="financSalvasBtnEntrar" style="width:100%; margin-top:10px;">Entrar</button>
+            </div>
+            <div id="financSalvasLogado" hidden>
+              <p class="calc-ajuda" style="margin:0 0 8px;">Até 5 simulações — ao salvar a 6ª, a mais antiga é apagada.</p>
+              <p id="financSalvasStatus" class="hg-status"></p>
+              <div id="financSalvasLista" class="alertas-lista"></div>
+            </div>
+          </div>
+
           <details class="calc-educativo">
             <summary>📘 Tabela Price vs SAC — qual a diferença?</summary>
             <div class="calc-educativo-corpo">
@@ -25077,6 +25090,7 @@
             <button type="button" class="hg-btn" id="financBtnPdf" style="flex:1 1 140px;">📄 Baixar PDF</button>
             <button type="button" class="hg-btn" id="financBtnExcel" style="flex:1 1 140px; background:var(--deep); color:var(--text); border:1px solid var(--border);">📊 Baixar Excel</button>
             <button type="button" class="hg-btn" id="financBtnAmortizar" style="flex:1 1 140px; background:var(--deep); color:var(--text); border:1px solid var(--border);">🔧 Amortizar</button>
+            <button type="button" class="hg-btn" id="financBtnSalvar" style="flex:1 1 140px; background:var(--deep); color:var(--text); border:1px solid var(--border);">💾 Salvar simulação</button>
             <button type="button" class="hg-btn-compartilhar" id="financBtnCompartilhar" style="flex:1 1 140px; justify-content:center;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
               <span class="hg-btn-compartilhar-texto">Compartilhar</span>
@@ -25166,6 +25180,7 @@
         document.getElementById('financBtnPdf').addEventListener('click', gerarPdf);
         document.getElementById('financBtnExcel').addEventListener('click', gerarExcel);
         document.getElementById('financBtnAmortizar').addEventListener('click', abrirModalAmort);
+        document.getElementById('financBtnSalvar').addEventListener('click', financSalvasSalvar);
         document.getElementById('financBtnCompartilhar').addEventListener('click', (e) => {
           compartilharSimulacao(e.currentTarget);
         });
@@ -25750,6 +25765,173 @@
         }));
 
       hgAbrirPorLinkDeFerramenta('financiamento', abrirModal);
+
+      // ----------------------------------------------------------
+      // SIMULAÇÕES SALVAS — até 5 por usuário, só funciona logado (mesmo
+      // padrão de "Meus Alertas de Preço"): sem conta, a simulação só
+      // fica na tela enquanto o modal não é fechado. Guarda só os
+      // parâmetros de entrada; "Carregar" preenche o formulário de novo
+      // e recalcula, em vez de reler uma tabela de amortização salva.
+      // ----------------------------------------------------------
+      const SIMULACOES_MAX = 5;
+      const painelSalvasDeslogado = document.getElementById('financSalvasDeslogado');
+      const painelSalvasLogado = document.getElementById('financSalvasLogado');
+      const btnSalvasEntrar = document.getElementById('financSalvasBtnEntrar');
+      const salvasStatusEl = document.getElementById('financSalvasStatus');
+      const salvasListaEl = document.getElementById('financSalvasLista');
+
+      btnSalvasEntrar?.addEventListener('click', () => {
+        document.getElementById('authBtnAbrir')?.click();
+      });
+
+      function financSalvasRotulo(s) {
+        const sistemaTxt = s.sistema === 'price' ? 'Price' : 'SAC';
+        const periodoTxt = s.periodo === 'anual' ? 'a.a' : 'a.m';
+        // Number(...) explícito: colunas "numeric" do Postgres costumam vir
+        // como STRING via PostgREST (preserva precisão) — hgFormatMoeda/
+        // hgFormatNumero só aceitam number, e sem isso viraria "null" na tela.
+        return `${sistemaTxt} · ${hgFormatMoeda(Number(s.valor))} · ${hgFormatNumero(Number(s.taxa_pct))}% ${periodoTxt} · ${s.parcelas}x · início ${formatMesAno(s.ano_inicio, s.mes_inicio0)}`;
+      }
+
+      async function financSalvasCarregarLista(userId) {
+        const cliente = obterSupabaseClient();
+        if (!cliente) return [];
+        const { data, error } = await cliente
+          .from('simulacoes_financiamento')
+          .select('id, valor, sistema, taxa_pct, periodo, parcelas, ano_inicio, mes_inicio0, created_at')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+        if (error) {
+          console.warn('Supabase: não foi possível ler simulacoes_financiamento (tabela existe?).', error.message);
+          return [];
+        }
+        return data || [];
+      }
+
+      function financSalvasRenderizarLista(lista) {
+        if (!lista.length) {
+          salvasListaEl.innerHTML = '<p class="calc-ajuda" style="margin:4px 0 0;">Nenhuma simulação salva ainda.</p>';
+          return;
+        }
+        salvasListaEl.innerHTML = lista.map(s => `
+          <div class="alertas-item">
+            <span>${financSalvasRotulo(s)}</span>
+            <span style="display:flex; gap:10px; align-items:center;">
+              <button type="button" class="deb-link-acao" data-carregar="${s.id}">Carregar</button>
+              <button type="button" data-remover="${s.id}" aria-label="Remover esta simulação salva">✕</button>
+            </span>
+          </div>`).join('');
+
+        salvasListaEl.querySelectorAll('button[data-carregar]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const s = lista.find(x => x.id === btn.getAttribute('data-carregar'));
+            if (!s) return;
+            inValor.value = Number(s.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            inValor.dataset.centavos = String(Math.round(Number(s.valor) * 100));
+            selSistema.value = s.sistema;
+            inTaxa.value = String(s.taxa_pct).replace('.', ',');
+            selJurosPeriodo.value = s.periodo;
+            inParcelas.value = String(s.parcelas);
+            selParcelasUnidade.value = 'meses';
+            selMesInicio.value = String(s.mes_inicio0 + 1);
+            selAnoInicio.value = String(s.ano_inicio);
+            sincronizarDataInicio();
+            estadoAmortizacao = { lista: [], fgts: null };
+            simular();
+            resultadoEl.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+          });
+        });
+
+        salvasListaEl.querySelectorAll('button[data-remover]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const cliente = obterSupabaseClient();
+            if (!cliente) return;
+            btn.disabled = true;
+            await cliente.from('simulacoes_financiamento').delete().eq('id', btn.getAttribute('data-remover'));
+            await financSalvasAtualizarTudo();
+          });
+        });
+      }
+
+      async function financSalvasAtualizarTudo() {
+        const cliente = obterSupabaseClient();
+        if (!cliente) return;
+        const { data: { session } } = await cliente.auth.getSession();
+        if (!session?.user) return;
+        const lista = await financSalvasCarregarLista(session.user.id);
+        financSalvasRenderizarLista(lista);
+        return lista;
+      }
+
+      async function financSalvasSalvar() {
+        const cliente = obterSupabaseClient();
+        if (!cliente || !ultimaSimulacao) return;
+        const { data: { session } } = await cliente.auth.getSession();
+        if (!session?.user) {
+          document.getElementById('authBtnAbrir')?.click();
+          return;
+        }
+        const btn = document.getElementById('financBtnSalvar');
+        if (btn) btn.disabled = true;
+        try {
+          const s = ultimaSimulacao;
+          const { error } = await cliente.from('simulacoes_financiamento').insert({
+            user_id: session.user.id,
+            valor: s.valor,
+            sistema: s.sistema,
+            taxa_pct: s.taxaPct,
+            periodo: s.periodo,
+            parcelas: s.parcelas,
+            ano_inicio: s.anoInicio,
+            mes_inicio0: s.mesInicio0,
+            total_pago: s.totalPago,
+            total_juros: s.totalJuros,
+            primeira_parcela: s.primeiraParcela,
+            ultima_parcela: s.ultimaParcela,
+          });
+          if (error) throw error;
+
+          // Mantém só as 5 mais recentes — apaga o excedente mais antigo.
+          const listaAtual = await financSalvasCarregarLista(session.user.id);
+          if (listaAtual.length > SIMULACOES_MAX) {
+            const excedentes = listaAtual.slice(SIMULACOES_MAX).map(x => x.id);
+            await cliente.from('simulacoes_financiamento').delete().in('id', excedentes);
+          }
+
+          salvasStatusEl.className = 'hg-status';
+          salvasStatusEl.textContent = 'Simulação salva!';
+          await financSalvasAtualizarTudo();
+          setTimeout(() => { if (salvasStatusEl.textContent === 'Simulação salva!') salvasStatusEl.textContent = ''; }, 3000);
+        } catch (e) {
+          salvasStatusEl.className = 'hg-status erro';
+          salvasStatusEl.textContent = 'Não foi possível salvar agora. Tente de novo.';
+          console.error(e);
+        } finally {
+          if (btn) btn.disabled = false;
+        }
+      }
+
+      async function financSalvasAtualizarVisibilidade(session) {
+        const logado = !!session?.user;
+        painelSalvasDeslogado.hidden = logado;
+        painelSalvasLogado.hidden = !logado;
+        if (logado) await financSalvasAtualizarTudo();
+      }
+
+      if (painelSalvasDeslogado) {
+        const clienteSalvas = obterSupabaseClient();
+        if (clienteSalvas) {
+          clienteSalvas.auth.onAuthStateChange((_evento, session) => financSalvasAtualizarVisibilidade(session));
+          clienteSalvas.auth.getSession().then(({ data }) => financSalvasAtualizarVisibilidade(data.session));
+        } else {
+          setTimeout(() => {
+            const c2 = obterSupabaseClient();
+            if (!c2) return;
+            c2.auth.onAuthStateChange((_evento, session) => financSalvasAtualizarVisibilidade(session));
+            c2.auth.getSession().then(({ data }) => financSalvasAtualizarVisibilidade(data.session));
+          }, 1000);
+        }
+      }
     })();
 
 
