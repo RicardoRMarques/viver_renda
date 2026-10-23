@@ -3954,6 +3954,11 @@
       font-family: inherit; font-size: inherit;
     }
 
+    /* Código de CRI/CRA que tem link pra ANBIMA (ver tabelas de CRI/CRA) */
+    .deb-tabela a.deb-link-codigo {
+      color: var(--primary); text-decoration: underline;
+    }
+
 
     /* "Qual é uma taxa justa hoje?" — o piso vindo do Tesouro */
     .tj-intro { max-width: 900px; }
@@ -16804,6 +16809,15 @@
         return hgFormatMoeda(v);
       }
 
+      // Link pra busca de preços da ANBIMA, filtrado pro papel (?q=<código>
+      // filtra de verdade — testado com código real, código inválido e numa
+      // carga fresca, sem navegador aberto antes). Só funciona pros papéis
+      // que a ANBIMA efetivamente precifica — por isso só aparece quando
+      // anbima_tem_dados é true, nunca pros outros milhares de CRIs.
+      function linkAnbima(codigo) {
+        return 'https://data.anbima.com.br/busca/certificado-de-recebiveis?view=precos&q=' + encodeURIComponent(codigo);
+      }
+
       function montarResumo(lista) {
         const porGrupo = { ipca: [], di: [], igp_m: [], outros: [] };
         lista.forEach(c => {
@@ -16910,7 +16924,9 @@
           const venc = c.data_vencimento ? c.data_vencimento.split('-').reverse().join('/') : '—';
           return `
             <tr>
-              <td class="deb-num" title="ISIN: ${c.isin || '—'}">${c.codigo}</td>
+              <td class="deb-num" title="ISIN: ${c.isin || '—'}">${c.anbima_tem_dados
+                ? `<a href="${linkAnbima(c.codigo)}" class="deb-link-codigo" target="_blank" rel="noopener noreferrer" title="Ver este papel no site da ANBIMA">${c.codigo}</a>`
+                : c.codigo}</td>
               <td class="deb-emissor" title="${c.emissor}">${c.emissor}</td>
               <td class="deb-num">${emissao}</td>
               <td class="deb-num">${venc}</td>
@@ -16978,8 +16994,9 @@
             não uma taxa de mercado secundário atualizada — a B3 não publica isso para CRI. "Taxa hoje (ANBIMA)"
             é a taxa indicativa de mercado secundário${dados.data_base_anbima ? ` do dia ${dados.data_base_anbima}` : ''},
             quando a ANBIMA precifica o papel — a maioria dos CRIs cadastrados na B3 mostra "—" porque a ANBIMA
-            não negocia todo papel todo dia. Passe o mouse ou toque no código para ver o ISIN completo. Conteúdo
-            educativo: o site publica dados públicos, não indica onde investir.
+            não negocia todo papel todo dia. Passe o mouse ou toque no código para ver o ISIN completo; quando o
+            código vem como link, clique pra ver o histórico de preços desse papel direto no site da ANBIMA.
+            Conteúdo educativo: o site publica dados públicos, não indica onde investir.
           </p>`;
       }
 
@@ -17005,6 +17022,10 @@
                 dados.cris.forEach(c => {
                   const p = porCodigo.get(c.codigo);
                   c.taxa_indicativa = p ? p.taxa_indicativa : null;
+                  // true mesmo quando taxa_indicativa é null (papel listado pela
+                  // ANBIMA mas sem negócio no dia) — ainda assim existe um link
+                  // válido pra ele na busca da ANBIMA (ver montarTabela).
+                  c.anbima_tem_dados = !!p;
                 });
                 dados.data_base_anbima = precos.data_base;
               }
@@ -17143,6 +17164,15 @@
         return hgFormatNumero(valor) + '%';
       }
 
+      // Link pra busca de preços da ANBIMA, filtrado pro papel (?q=<código>
+      // filtra de verdade — testado com código real, código inválido e numa
+      // carga fresca, sem navegador aberto antes). Todo código desta tela
+      // vem do arquivo da ANBIMA, então o link funciona sempre aqui — ao
+      // contrário da tela de CRI, que mistura com o cadastro da B3.
+      function linkAnbima(codigo) {
+        return 'https://data.anbima.com.br/busca/certificado-de-recebiveis?view=precos&q=' + encodeURIComponent(codigo);
+      }
+
       function montarResumo(lista) {
         const comTaxa = lista.filter(c => typeof c.taxa_indicativa === 'number');
         const porGrupo = { ipca: [], di: [], igp_m: [], outros: [] };
@@ -17238,7 +17268,7 @@
           const venc = c.vencimento ? c.vencimento.split('-').reverse().join('/') : '—';
           return `
             <tr>
-              <td class="deb-num">${c.codigo}</td>
+              <td class="deb-num"><a href="${linkAnbima(c.codigo)}" class="deb-link-codigo" target="_blank" rel="noopener noreferrer" title="Ver este papel no site da ANBIMA">${c.codigo}</a></td>
               <td class="deb-emissor" title="${c.emissor || ''}">${c.risco_credito || '—'}</td>
               <td class="deb-num">${venc}</td>
               <td class="deb-num">${c.rotulo_indexador || '—'}</td>
@@ -17305,8 +17335,9 @@
             Fonte: ${dados.fonte || 'ANBIMA'}${dados.data_base ? ` — dados de ${dados.data_base}` : ''}. "Taxa hoje" é a
             taxa indicativa de mercado secundário; "—" significa que a ANBIMA lista o papel mas ele não negociou o
             bastante nesse dia para ter preço. Não existe cadastro público de emissão de CRA como o da B3 para CRI,
-            então esta tela só mostra os papéis que a ANBIMA efetivamente precifica. Conteúdo educativo: o site
-            publica dados públicos, não indica onde investir.
+            então esta tela só mostra os papéis que a ANBIMA efetivamente precifica. Clique no código pra ver o
+            histórico de preços desse papel direto no site da ANBIMA e confirmar que ele existe de verdade.
+            Conteúdo educativo: o site publica dados públicos, não indica onde investir.
           </p>`;
       }
 
@@ -19963,7 +19994,7 @@
         'deb-pct-par': 'Quanto o papel está sendo negociado em relação ao valor que ele promete pagar.\n\nO "par" é o valor de face: o que o emissor devolve no vencimento, corrigido pelo indexador. A coluna mostra o preço de mercado dividido por esse valor.\n\n• Acima de 100% — ágio: a taxa contratada é melhor que a do mercado hoje, então o papel vale mais que o valor de face.\n• 100% — negocia exatamente ao par.\n• Abaixo de 100% — deságio: o mercado pede desconto para carregar.\n\nO deságio tem duas causas bem diferentes, e a coluna "Taxa hoje" separa as duas. Desconto pequeno, com a taxa de hoje perto da contratada, é só efeito de juros — marcação a mercado, sem nada de errado com a empresa. Desconto grande, com a taxa de hoje muito acima da contratada, é risco de crédito: o mercado duvida que o emissor vá pagar.',
 
         // --- Colunas da tabela de CRI ---
-        'cri-codigo': 'Código da série do CRI no cadastro da B3. Identifica o emissor, o número da emissão e o número da série daquele papel específico — a mesma securitizadora costuma ter várias séries em aberto ao mesmo tempo, com prazos e remunerações diferentes.\n\nPasse o mouse ou toque no código para ver o ISIN completo. Diferente da ANBIMA com as debêntures, não existe uma ficha pública por CRI (classificação de risco, lastro, garantia adicional) — nem a ANBIMA nem a B3 disponibilizam isso num link por papel, então essa informação não está nesta tela.',
+        'cri-codigo': 'Código da série do CRI no cadastro da B3. Identifica o emissor, o número da emissão e o número da série daquele papel específico — a mesma securitizadora costuma ter várias séries em aberto ao mesmo tempo, com prazos e remunerações diferentes.\n\nPasse o mouse ou toque no código para ver o ISIN completo. Quando o código aparece como link (clicável), é porque a ANBIMA precifica esse papel — clique para ver o histórico de preços dele direto no site da ANBIMA, e confirmar que o papel existe de verdade. Pros outros CRIs (a maioria, sem link), não existe essa confirmação disponível: nem a ANBIMA nem a B3 publicam uma ficha pública por papel (classificação de risco, lastro, garantia adicional).',
         'cri-emissor': 'A securitizadora que emitiu o papel — não é quem gerou a dívida original.\n\nUm CRI nasce de recebíveis imobiliários (aluguéis, financiamentos) que uma incorporadora, construtora ou banco originou; a securitizadora compra esses recebíveis, empacota num papel e vende aos investidores. Quem paga o CRI, no fim, são os devedores desses recebíveis — a securitizadora é só quem estrutura e administra.',
         'cri-emissao': 'Data em que a série foi lançada no mercado — quando a securitizadora captou o dinheiro dos investidores pela primeira vez.\n\nServe para calcular há quanto tempo o papel existe, mas não diz nada sobre a remuneração: essa é a mesma do dia da emissão até hoje (coluna "Remuneração" ao lado).',
         'cri-vencimento': 'Data em que o CRI termina de pagar — quando a securitizadora devolve o que falta do valor de face.\n\nMuitos CRIs amortizam em parcelas ao longo do caminho (como um financiamento), então o dinheiro não volta tudo de uma vez nessa data. O cadastro da B3 não informa o cronograma de amortização, só a data final.',
@@ -19972,7 +20003,7 @@
         'cri-volume': 'Quanto a securitizadora captou ao emitir essa série — o valor total de face de todas as cotas/unidades do papel, somado.\n\nÉ o volume de EMISSÃO, de quando o papel nasceu — não quanto dele ainda está em circulação hoje (parte pode já ter sido amortizada) nem quanto está disponível para compra na sua corretora.',
 
         // --- Colunas da tabela de CRA ---
-        'cra-codigo': 'Código do papel no arquivo de preços da ANBIMA. Diferente do CRI, não existe um cadastro público de emissão de CRA na B3 — este código vem só da ANBIMA, junto com a taxa de mercado secundário.',
+        'cra-codigo': 'Código do papel no arquivo de preços da ANBIMA. Diferente do CRI, não existe um cadastro público de emissão de CRA na B3 — este código vem só da ANBIMA, junto com a taxa de mercado secundário.\n\nClique no código para ver o histórico de preços dele direto no site da ANBIMA — todo papel desta tela vem de lá, então o link funciona sempre.',
         'cra-risco': 'Quem efetivamente paga o CRA, no fim — o originador/devedor dos recebíveis do agronegócio que garantem o papel (uma usina, trading, produtor ou cooperativa). Diferente do "Emissor" (a securitizadora que estrutura e vende o papel), o Risco de Crédito é quem está por trás do dinheiro.\n\nQuando aparece "—", a ANBIMA não divulgou essa informação para esse papel.',
         'cra-vencimento': 'Data em que o CRA termina de pagar — quando a securitizadora devolve o que falta do valor de face. Muitos CRAs amortizam em parcelas ao longo do caminho, então o dinheiro não volta tudo de uma vez nessa data.',
         'cra-indice': 'A correção CONTRATADA do papel — não a taxa de mercado de hoje (essa é a coluna "Taxa hoje", ao lado).\n\nEx: "100% do DI" paga o CDI acumulado sem spread fixo contratado; "IPCA + 6,80%" paga a inflação mais 6,80% ao ano.',
