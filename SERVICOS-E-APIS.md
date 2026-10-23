@@ -31,12 +31,14 @@ credencial está configurada).
 | **InfoMoney** (RSS) | Notícias de mercado (seção "top3" do `noticias.json`) | Consumido via RSS público pelo robô, sem chave de API |
 | **[FIIs.com.br](https://fiis.com.br/noticias/)** | 1 notícia de destaque sobre Fundos Imobiliários, fixada no topo da seção de notícias | Sem API/RSS pública — o robô faz *scraping* da página (função `_buscar_noticia_fii()` em `coletar_hgbrasil.py`); se o layout do site mudar, essa função pode parar de achar a notícia (falha de forma silenciosa, sem quebrar o resto) |
 | **[B3 — Consulta Pública de CRIs](https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/)** | Cadastro de emissão dos CRIs (Certificados de Recebíveis Imobiliários) ainda não vencidos — seção "CRI" do site | Sem API pública: o robô `coletar_cri.py` abre a página com **Playwright** (navegador headless) e clica no botão "Exportar CSV" de verdade — a página está atrás de um desafio do Cloudflare, e só uma interação real de clique passa por ele (uma chamada HTTP comum ao mesmo endpoint, mesmo reaproveitando cookies, devolve corpo vazio). É o único robô do projeto que depende de navegador; se a B3 endurecer a proteção, é o primeiro a quebrar. |
+| **[ANBIMA — Taxas de CRI e CRA](https://www.anbima.com.br/pt_br/informar/precos-e-indices/precos/taxas-de-cri-e-cra/taxas-de-cri-e-cra.htm)** | Taxas de mercado secundário de CRI e CRA — enriquece a seção "CRI" (coluna "Taxa hoje") e é a ÚNICA fonte da seção "CRA" (a B3 não tem cadastro público de emissão para CRA) | Sem API pública, mas (ao contrário do CRI da B3) sem navegador: o robô `coletar_cri_cra_anbima.py` chama direto `www.anbima.com.br/pt_br/anbima/TaxasCriCraExport/exportarCSV` com `requests` — um GET público, sem sessão/cookie/token. O endpoint devolve uma série dos últimos ~5 dias úteis (o robô fica só com o mais recente). A ANBIMA só precifica uma fração dos CRIs/CRAs que existem (~300), então a maioria dos CRIs do cadastro da B3 aparece sem essa taxa. |
 
 **Onde os dados coletados viram arquivo:**
 - `indices.json` — índices e cotações (robô roda a cada 15 min via `coletar-fiis.yml`)
 - `noticias.json` — notícias (mesmo robô, mesmo intervalo)
 - `ranking.json` — ranking de Ações/FIIs (1× por dia, 9h Brasília)
 - `boletins/` — boletim diário em PDF/HTML (robô `gerar-boletim.js`, seg. a sex., 6h05 Brasília)
+- `cri_cra_precos.json` — taxas de CRI/CRA do mercado secundário (robô `coletar_cri_cra_anbima.py`, 1× por dia útil, via `cri_cra_anbima.yml`)
 - `cri.json` — cadastro de CRIs (robô `coletar_cri.py`, 1× por dia útil, via `cri.yml`)
 
 ---
