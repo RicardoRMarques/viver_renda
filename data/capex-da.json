@@ -1,7 +1,7 @@
 {
   "_leia_me": "CAPEX e Depreciação/Amortização (D&A) de ações, direto dos dados abertos da CVM (ITR/DFP) — não da HG Brasil, que não tem esses campos. Valores em R$, ACUMULADOS NO ANO até 'dt_refer' de cada empresa (convenção do fluxo de caixa brasileiro — nunca isolado por trimestre). Ver coletar_cvm_capex.py.",
   "fonte": "CVM - Dados Abertos (dados.cvm.gov.br), ITR/DFP",
-  "atualizado_em": "2026-10-19T21:00:33.969267+00:00",
+  "atualizado_em": "2026-10-26T20:59:33.957599+00:00",
   "ativos": {
     "AALR3": {
       "dt_refer": "2025-12-31",
@@ -24,9 +24,9 @@
       "depreciacao_amortizacao": 35079000.0
     },
     "AFLT3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
-      "depreciacao_amortizacao": null
+      "depreciacao_amortizacao": 0.0
     },
     "AGRO3": {
       "dt_refer": "2026-06-30",
@@ -184,13 +184,13 @@
       "depreciacao_amortizacao": null
     },
     "BBDC3": {
-      "dt_refer": "2026-06-30",
-      "capex": 4954000000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 7087077000.0,
       "depreciacao_amortizacao": null
     },
     "BBDC4": {
-      "dt_refer": "2026-06-30",
-      "capex": 4954000000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 7087077000.0,
       "depreciacao_amortizacao": null
     },
     "BDLL3": {
@@ -379,14 +379,14 @@
       "depreciacao_amortizacao": 15119000.0
     },
     "CEEB3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
-      "depreciacao_amortizacao": 568000000.0
+      "depreciacao_amortizacao": 872000000.0
     },
     "CEEB5": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
-      "depreciacao_amortizacao": 568000000.0
+      "depreciacao_amortizacao": 872000000.0
     },
     "CEED3": {
       "dt_refer": "2026-06-30",
@@ -569,14 +569,14 @@
       "depreciacao_amortizacao": 802284000.0
     },
     "EKTR3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
-      "depreciacao_amortizacao": 236000000.0
+      "depreciacao_amortizacao": 355000000.0
     },
     "EKTR4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
-      "depreciacao_amortizacao": 236000000.0
+      "depreciacao_amortizacao": 355000000.0
     },
     "EMAE3": {
       "dt_refer": "2026-06-30",
@@ -1029,9 +1029,9 @@
       "depreciacao_amortizacao": null
     },
     "NEOE3": {
-      "dt_refer": "2026-06-30",
-      "capex": 82000000.0,
-      "depreciacao_amortizacao": 1513000000.0
+      "dt_refer": "2026-09-30",
+      "capex": 162000000.0,
+      "depreciacao_amortizacao": 2300000000.0
     },
     "NUTR3": {
       "dt_refer": "2026-06-30",
@@ -1264,9 +1264,9 @@
       "depreciacao_amortizacao": null
     },
     "ROMI3": {
-      "dt_refer": "2026-06-30",
-      "capex": 88624000.0,
-      "depreciacao_amortizacao": 37413000.0
+      "dt_refer": "2026-09-30",
+      "capex": 129463000.0,
+      "depreciacao_amortizacao": 56728000.0
     },
     "RPMG3": {
       "dt_refer": "2025-06-30",
@@ -1284,8 +1284,8 @@
       "depreciacao_amortizacao": 3799000.0
     },
     "SAUD3": {
-      "dt_refer": "2026-06-30",
-      "capex": 71207000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 180308000.0,
       "depreciacao_amortizacao": null
     },
     "SBFG3": {
@@ -1307,6 +1307,11 @@
       "dt_refer": "2026-06-30",
       "capex": null,
       "depreciacao_amortizacao": 36990000.0
+    },
+    "SHOW3": {
+      "dt_refer": "2026-06-30",
+      "capex": 1332000.0,
+      "depreciacao_amortizacao": 3266000.0
     },
     "SHUL4": {
       "dt_refer": "2026-06-30",
@@ -1559,9 +1564,9 @@
       "depreciacao_amortizacao": null
     },
     "WEGE3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 510037000.0
+      "depreciacao_amortizacao": 772679000.0
     },
     "WEST3": {
       "dt_refer": "2026-06-30",
