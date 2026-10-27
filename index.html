@@ -5706,6 +5706,14 @@
 
           <div class="calc-campo" id="calcCampoTaxaWrap">
             <label id="calcLabelTaxa" for="calcTaxa">% do CDI</label>
+            <div id="calcModoSelicWrap" hidden style="margin:4px 0 8px;">
+              <label style="margin-right:16px; font-weight:400; cursor:pointer;">
+                <input type="radio" name="calcModoSelic" value="pct" checked style="margin-right:5px;" />% da Selic
+              </label>
+              <label style="font-weight:400; cursor:pointer;">
+                <input type="radio" name="calcModoSelic" value="spread" style="margin-right:5px;" />Selic + p.p. ao ano
+              </label>
+            </div>
             <input type="number" id="calcTaxa" min="0" step="0.01" value="100" />
             <p class="calc-ajuda" id="calcAjudaTaxa"></p>
           </div>
@@ -23919,6 +23927,7 @@
       const inTaxa = document.getElementById('calcTaxa');
       const labelTaxa = document.getElementById('calcLabelTaxa');
       const ajudaTaxa = document.getElementById('calcAjudaTaxa');
+      const modoSelicWrap = document.getElementById('calcModoSelicWrap');
       const btnCalcular = document.getElementById('calcBtnCalcular');
       const resultadoEl = document.getElementById('calcResultado');
       const acoesWrap = document.getElementById('calcAcoesWrap');
@@ -24153,6 +24162,25 @@
         };
       }
 
+      // Alterna o campo "% da Selic" / "Selic + p.p." do Tesouro Selic entre
+      // os dois jeitos comuns de anunciar a oferta: multiplicativo (comum em
+      // CDB "% do CDI") ou soma (como o Tesouro Direto mostra hoje, ex.:
+      // "Selic + 0,10% a.a."). Evita a pessoa ter que converter de cabeça.
+      function aplicarModoSelic() {
+        const modo = document.querySelector('input[name="calcModoSelic"]:checked')?.value || 'pct';
+        const selicFmt = selicAnualPct().toFixed(2).replace('.', ',');
+        if (modo === 'spread') {
+          labelTaxa.textContent = 'Spread sobre a Selic (p.p. ao ano)';
+          inTaxa.value = '0.10';
+          ajudaTaxa.textContent = `Digite só o spread anunciado na oferta — ex.: "Selic + 0,10% a.a." é 0,10. Selic atual: ${selicFmt}% a.a.; o cálculo soma os dois (e ainda desconta a custódia da B3, 0,20% a.a.).`;
+        } else {
+          labelTaxa.textContent = '% da Selic';
+          inTaxa.value = '100';
+          ajudaTaxa.textContent = 'Tesouro Selic rende próximo de 100% da taxa Selic, menos a taxa de custódia da B3 (0,20% a.a.).';
+        }
+      }
+      document.querySelectorAll('input[name="calcModoSelic"]').forEach(r => r.addEventListener('change', aplicarModoSelic));
+
       function atualizarCampoTaxa() {
         const tipo = selTipo.value;
         const ehCdbOuLci = tipo === 'cdb' || tipo === 'lci';
@@ -24168,10 +24196,16 @@
 
         const indexador = null;
 
+        modoSelicWrap.hidden = tipo !== 'tesouro_selic';
         if (tipo === 'tesouro_selic') {
-          labelTaxa.textContent = '% da Selic';
-          inTaxa.value = '100';
-          ajudaTaxa.textContent = 'Tesouro Selic rende próximo de 100% da taxa Selic, menos a taxa de custódia da B3 (0,20% a.a.).';
+          // A oferta na corretora/Tesouro Direto costuma vir como "Selic +
+          // 0,10% a.a." (soma), mas o campo histórico aqui é multiplicativo
+          // ("% da Selic") — quem digitava a oferta direto no campo errado
+          // tinha que fazer a conversão de cabeça. Reseta pro modo
+          // percentual toda vez que entra nesse tipo, pra sempre começar do
+          // mesmo lugar previsível.
+          document.querySelector('input[name="calcModoSelic"][value="pct"]').checked = true;
+          aplicarModoSelic();
         } else if (tipo === 'tesouro_pre') {
           labelTaxa.textContent = 'Taxa prefixada (% ao ano)';
           inTaxa.value = selicAnualPct().toFixed(2);
@@ -24205,7 +24239,8 @@
           return taxaEfetivaPorIndexador(t, idx);
         }
         if (tipo === 'tesouro_selic') {
-          return selicAnualPct() * (taxaInformada / 100);
+          const modoSpread = document.querySelector('input[name="calcModoSelic"]:checked')?.value === 'spread';
+          return modoSpread ? (selicAnualPct() + taxaInformada) : (selicAnualPct() * (taxaInformada / 100));
         }
         if (tipo === 'tesouro_pre') {
           return taxaInformada;
