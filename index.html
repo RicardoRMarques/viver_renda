@@ -9222,27 +9222,36 @@
       }
 
       // ------------------------------------------------------------
-      // Relatório gerencial (FII/Fiagro/FI-Infra)
-      // Abre a lista oficial do Fundos.NET JÁ FILTRADA em Relatórios >
-      // Relatório Gerencial (idCategoriaDocumento=7, idTipoDocumento=9):
-      // aparecem só os relatórios gerenciais do fundo, o mais recente no
-      // topo — nada de fato relevante, oferta pública ou informe. Conferido
-      // pelo Ricardo no navegador em 23/09/2026 com o HGLG11.
-      // Antes o botão abria a lista INTEIRA de documentos do fundo.
+      // Relatório gerencial (FII/Fiagro) / Documentos do fundo (FI-Infra)
+      // Pra FII/Fiagro, abre a lista oficial do Fundos.NET JÁ FILTRADA em
+      // Relatórios > Relatório Gerencial (idCategoriaDocumento=7,
+      // idTipoDocumento=9): aparecem só os relatórios gerenciais do fundo,
+      // o mais recente no topo — nada de fato relevante, oferta pública ou
+      // informe. Conferido pelo Ricardo no navegador em 23/09/2026 com o
+      // HGLG11. Antes o botão abria a lista INTEIRA de documentos do fundo.
       // Um robô para dar o link direto do PDF foi tentado e abandonado: o
       // Fundos.NET não responde aos servidores do GitHub Actions e a API de
       // documentos da B3 devolve lista vazia para FII (ver o doc
       // claude/relatorios-gerenciais.md do projeto).
       //
       // FI-Infra (a.kind === 'fund' na classificação da HG Brasil, ex:
-      // DIVS11) também é registrado no Fundos.NET com o mesmo CNPJ e a
-      // mesma taxonomia de documentos CVM — habilitado em 27/10/2026.
+      // DIVS11) também é registrado no Fundos.NET com o mesmo CNPJ, mas
+      // cada administrador usa sua própria taxonomia de categoria/tipo de
+      // documento — o filtro 7/9 (validado só pra FII) deu lista vazia pro
+      // CPTI11 em 27/10/2026, mesmo o fundo publicando relatórios. Por
+      // isso, pra FI-Infra o botão abre a lista INTEIRA de documentos (sem
+      // o filtro), igual o comportamento original de antes do filtro
+      // existir — pior achar o relatório no meio da lista do que a pessoa
+      // achar que o fundo não publica nada.
       // ------------------------------------------------------------
       const HG_ICONE_DOC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>';
       function hgBotaoRelatorioGerencial(a) {
         const cnpj = String(a.tax_id || '').replace(/\D/g, '');
         if (cnpj.length !== 14) return '';
-        const url = `https://fnet.bmfbovespa.com.br/fnet/publico/abrirGerenciadorDocumentosCVM?cnpjFundo=${cnpj}&idCategoriaDocumento=7&idTipoDocumento=9`;
+        const ehFiInfra = a.kind === 'fund';
+        const url = ehFiInfra
+          ? `https://fnet.bmfbovespa.com.br/fnet/publico/abrirGerenciadorDocumentosCVM?cnpjFundo=${cnpj}`
+          : `https://fnet.bmfbovespa.com.br/fnet/publico/abrirGerenciadorDocumentosCVM?cnpjFundo=${cnpj}&idCategoriaDocumento=7&idTipoDocumento=9`;
         // rel só com "noopener" (sem "noreferrer"): reportado em 02/10/2026
         // que o primeiro clique sempre cai em "login?expired" no Fundos.NET,
         // e só o segundo clique abre a lista de verdade — clássico de site
@@ -9261,10 +9270,14 @@
         // listener em hgBtnRelatorio logo abaixo, que "esquenta" a sessão com
         // uma requisição invisível antes de navegar de vez — imita o clique
         // duplo que a pessoa já precisava dar na mão, só que automático.
+        const titulo = ehFiInfra
+          ? 'Lista oficial de documentos do fundo no Fundos.NET (B3/CVM) — procure por Relatório Gerencial ou Informe Mensal na lista'
+          : 'Lista oficial no Fundos.NET (B3/CVM) só com os relatórios gerenciais do fundo — o mais recente fica no topo';
+        const rotulo = ehFiInfra ? 'Documentos do fundo (B3/CVM)' : 'Relatórios gerenciais (B3/CVM)';
         return `
                 <a class="hg-btn-secundario-pequeno hg-btn-relatorio" id="hgBtnRelatorio" href="${url}" target="_blank" rel="noopener"
-                   title="Lista oficial no Fundos.NET (B3/CVM) só com os relatórios gerenciais do fundo — o mais recente fica no topo">
-                  ${HG_ICONE_DOC}<span>Relatórios gerenciais (B3/CVM)</span>
+                   title="${titulo}">
+                  ${HG_ICONE_DOC}<span>${rotulo}</span>
                 </a>`;
       }
 
