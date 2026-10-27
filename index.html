@@ -24359,6 +24359,15 @@
         const taxaRealInformada = ehTaxaReal ? parseFloat(inTaxa.value) || 0 : null;
         const ehPctCdi = labelTaxa.textContent.indexOf('% do CDI') === 0;
         const pctCdiInformado = ((tipo === 'cdb' || tipo === 'lci') && ehPctCdi) ? parseFloat(inTaxa.value) || 0 : null;
+        // Tesouro Selic tem dois jeitos de informar a oferta (ver
+        // aplicarModoSelic) — reportado em 27/10/2026 que o relatório em
+        // PDF não dizia qual dos dois foi usado nem o spread digitado,
+        // só a "Taxa anual efetiva" já somada.
+        const ofertaSelicInformada = tipo === 'tesouro_selic'
+          ? (document.querySelector('input[name="calcModoSelic"]:checked')?.value === 'spread'
+              ? `Selic + ${hgFormatNumero(parseFloat(inTaxa.value) || 0)}% a.a.`
+              : `${hgFormatNumero(parseFloat(inTaxa.value) || 0)}% da Selic`)
+          : null;
         const resultadoPrincipal = simularProduto(
           { taxaAnualPct: taxaAnual, tributado: tipoInfo.tributado, custodia: tipoInfo.custodia },
           valorInicial, aporteMensal, prazoMeses
@@ -24519,6 +24528,7 @@
           taxaAnual,
           taxaRealInformada,
           pctCdiInformado,
+          ofertaSelicInformada,
           totalInvestido: resultadoPrincipal.totalInvestido,
           rendimentoBruto: resultadoPrincipal.rendimentoBruto + resultadoPrincipal.custodiaValor,
           custodiaValor: resultadoPrincipal.custodiaValor,
@@ -24656,6 +24666,7 @@
           ['Taxa anual efetiva', `${hgFormatNumero(c.taxaAnual)}% a.a.`],
           ...(c.taxaRealInformada !== null ? [['Taxa real (% ao ano, acima da inflação)', `${hgFormatNumero(c.taxaRealInformada)}% a.a.`]] : []),
           ...(c.pctCdiInformado !== null ? [['% do CDI', `${hgFormatNumero(c.pctCdiInformado)}%`]] : []),
+          ...(c.ofertaSelicInformada !== null ? [['Oferta informada', c.ofertaSelicInformada]] : []),
           ['Total investido', hgFormatMoeda(c.totalInvestido)],
           ['Rendimento bruto', hgFormatMoeda(c.rendimentoBruto)],
           ...(c.tipoCustodia ? [['Taxa de custódia B3 (aprox.)', '- ' + hgFormatMoeda(c.custodiaValor)]] : []),
