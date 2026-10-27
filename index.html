@@ -1235,6 +1235,7 @@
       flex-shrink: 0;
     }
     .ticker-item .ticker-nome { color: var(--muted); font-weight: 700; }
+    .ticker-item .ticker-apurado { color: #ffb800; font-weight: 700; }
     .ticker-item .ticker-valor { color: var(--text); }
     .ticker-item .ticker-var { font-weight: 700; }
     .ticker-item .ticker-var.val-up { color: #3ddc73; }
@@ -21267,9 +21268,19 @@
           const emAlta = variacao >= 0;
           const prefixo = item.prefixo === 'pontos' ? '' : (item.prefixo || '');
           const valorFormatado = `${prefixo}${item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${item.prefixo === 'pontos' ? ' pts' : ''}`;
+          // Dólar/Euro são a PTAX do Banco Central, publicada só 1x por dia —
+          // em dias de pregão volátil (ex.: 26/10/2026, alta de +9% após a
+          // reeleição do Lula) o valor da manhã seguinte ainda é o
+          // fechamento de ontem até o BCB publicar a PTAX de hoje (só sai
+          // perto das 13h de Brasília). Sem isso, não dava pra distinguir
+          // "cotação de agora" de "fechamento de ontem" só olhando o carrossel.
+          const apuradoEm = item.referencia ? indiceDataApuracao(item.referencia) : '';
+          const aviso = apuradoEm
+            ? ` title="Fechamento de ${apuradoEm} (PTAX do Banco Central, publicada 1x por dia) — ainda não saiu a cotação oficial de hoje"`
+            : '';
           return `
-            <span class="ticker-item">
-              <span class="ticker-nome">${nomeExibicao[nome] || nome}</span>
+            <span class="ticker-item"${aviso}>
+              <span class="ticker-nome">${nomeExibicao[nome] || nome}${apuradoEm ? ' <span class="ticker-apurado">*</span>' : ''}</span>
               <span class="ticker-valor">${valorFormatado}</span>
               <span class="ticker-var ${emAlta ? 'val-up' : 'val-down'}">${emAlta ? '▲' : '▼'} ${Math.abs(variacao).toFixed(2)}%</span>
             </span>`;
