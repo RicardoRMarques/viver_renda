@@ -7212,6 +7212,9 @@
               <option value="lci">LCI / LCA / LIG (isento de IR)</option>
               <option value="deb">Debênture comum</option>
               <option value="inc">Debênture incentivada / CRI / CRA (isento de IR)</option>
+              <option value="tesouro_selic">Tesouro Selic</option>
+              <option value="tesouro_pre">Tesouro Prefixado</option>
+              <option value="tesouro_ipca">Tesouro IPCA+</option>
             </select>
           </div>
           <div class="calc-campo">
@@ -7226,6 +7229,7 @@
             <label for="vpIndexador">Como rende</label>
             <select id="vpIndexador">
               <option value="cdi">% do CDI (pós-fixado)</option>
+              <option value="selic">Selic + spread (pós-fixado)</option>
               <option value="pre">Prefixado (% ao ano)</option>
               <option value="ipca">IPCA + (% ao ano)</option>
             </select>
@@ -13314,15 +13318,23 @@
       // de conservação. Abaixo de ~10,5% o banco está no osso.
       const BASILEIA_MINIMO = 10.5;
 
+      // "tesouro: true" marca os 3 títulos públicos — usado só pra não
+      // reaproveitar o aviso/cartão de FGC pensado pra risco de crédito
+      // privado (ver render(): sem FGC aqui não é risco, é o contrário —
+      // o Tesouro Nacional nem precisa do fundo garantidor).
       const TIPOS = {
         cdb: { rotulo: 'CDB / RDB / LC', tributado: true, fgc: true },
         lci: { rotulo: 'LCI / LCA / LIG', tributado: false, fgc: true },
         deb: { rotulo: 'Debênture comum', tributado: true, fgc: false },
         inc: { rotulo: 'Debênture incentivada / CRI / CRA', tributado: false, fgc: false },
+        tesouro_selic: { rotulo: 'Tesouro Selic', tributado: true, fgc: false, tesouro: true },
+        tesouro_pre: { rotulo: 'Tesouro Prefixado', tributado: true, fgc: false, tesouro: true },
+        tesouro_ipca: { rotulo: 'Tesouro IPCA+', tributado: true, fgc: false, tesouro: true },
       };
 
       const ROTULO_TAXA = {
         cdi: 'Taxa oferecida (% do CDI)',
+        selic: 'Spread sobre a Selic (p.p. ao ano)',
         pre: 'Taxa oferecida (% ao ano)',
         ipca: 'Taxa oferecida (IPCA + % ao ano)',
       };
@@ -13330,7 +13342,16 @@
       // Qual título público serve de régua para cada indexador. Pós-fixado
       // em CDI compara com Tesouro Selic: são os dois que acompanham a
       // taxa básica, então a diferença entre eles é risco de crédito puro.
-      const FAMILIA_TESOURO = { cdi: 'selic', pre: 'prefixado', ipca: 'ipca' };
+      // "selic" (o próprio Tesouro Selic como oferta) compara com ele
+      // mesmo — útil pra ver se um título específico paga acima ou abaixo
+      // da média do que o Tesouro está vendendo agora.
+      const FAMILIA_TESOURO = { cdi: 'selic', selic: 'selic', pre: 'prefixado', ipca: 'ipca' };
+
+      // Tipo do título trava o indexador quando é um dos 3 títulos
+      // públicos (Tesouro Selic só existe pós-fixado em Selic, nunca
+      // prefixado nem IPCA+) — ao contrário de CDB/LCI/debênture, que
+      // podem vir em qualquer um dos indexadores.
+      const INDEXADOR_POR_TIPO_TESOURO = { tesouro_selic: 'selic', tesouro_pre: 'pre', tesouro_ipca: 'ipca' };
 
       let tesouro = null;
       let bancosCarregados = false;
@@ -13381,6 +13402,10 @@
 
       function taxaAnualDe(indexador, taxa) {
         if (indexador === 'cdi') return cdiAnual() * taxa / 100;
+        // Selic + spread é soma direta (ex.: oferta "Selic + 0,10% a.a." ->
+        // digita 0,10) — igual à oferta real do Tesouro Direto, nunca
+        // multiplicação como o "% do CDI" acima.
+        if (indexador === 'selic') return selicAnual() + taxa;
         if (indexador === 'pre') return taxa;
         // IPCA+ é juro sobre juro, não soma: (1+inflação) × (1+taxa real).
         return ((1 + ipcaAnual() / 100) * (1 + taxa / 100) - 1) * 100;
@@ -13573,6 +13598,22 @@
                 já tem lá. Use a ferramenta Cobertura do FGC para ver o seu limite inteiro.
               </div>
             </div>`;
+        } else if (tipo.tesouro) {
+          // Sem FGC aqui não é risco — é o contrário: quem deve é o
+          // Tesouro Nacional, o devedor de menor risco do país, e o FGC
+          // só existe pra cobrir quebra de banco (ver glossário "Tesouro
+          // Direto"). Reaproveitar o aviso vermelho de crédito privado
+          // pra esse caso seria assustar a pessoa à toa.
+          fgcResumo = 'Não precisa — é o Tesouro Nacional, o menor risco de crédito do país';
+          fgcHtml = `
+            <div class="vp-cartao">
+              <div class="vp-cartao-titulo">Garantia do FGC</div>
+              <div class="vp-cartao-valor" style="color:#22c55e;">Não precisa</div>
+              <div class="vp-cartao-nota">
+                O FGC protege contra quebra de banco — aqui quem deve é o Tesouro Nacional, o devedor de
+                menor risco do país. Não é coberto pelo FGC porque não precisa.
+              </div>
+            </div>`;
         } else {
           fgcResumo = 'Não tem — ' + tipo.rotulo + ' não é coberto pelo FGC';
           fgcHtml = `
@@ -13636,7 +13677,10 @@
         if (d.indexador === 'cdi') {
           avisos.push('CDI de hoje: ' + pct(cdiAnual()) + ' ao ano. Num pós-fixado o rendimento acompanha a Selic — se o Copom cortar, os dois lados caem juntos.');
         }
-        if (!tipo.fgc) {
+        if (d.indexador === 'selic') {
+          avisos.push('Selic de hoje: ' + pct(selicAnual()) + ' ao ano. Num pós-fixado o rendimento acompanha a Selic — se o Copom cortar, os dois lados caem juntos.');
+        }
+        if (!tipo.fgc && !tipo.tesouro) {
           avisos.push('Sem FGC, a pergunta que importa não é quanto paga, e sim quem paga: leia o prospecto e veja o rating da emissão.');
         }
 
@@ -13815,6 +13859,7 @@
       // o PDF não obrigar ninguém a lembrar o que estava selecionado.
       function rotuloTaxaInformada(a) {
         if (a.indexador === 'cdi') return hgFormatNumero(a.taxa) + '% do CDI (pós-fixado)';
+        if (a.indexador === 'selic') return 'Selic + ' + hgFormatNumero(a.taxa) + '% ao ano (pós-fixado)';
         if (a.indexador === 'pre') return hgFormatNumero(a.taxa) + '% ao ano (prefixado)';
         return 'IPCA + ' + hgFormatNumero(a.taxa) + '% ao ano';
       }
@@ -13878,6 +13923,16 @@
         lblTaxa.textContent = ROTULO_TAXA[selIndexador.value] || 'Taxa oferecida';
       }
 
+      // Sugestão de valor plausível ao trocar de indexador — sem isso,
+      // trocar pra "Selic + spread" sem mexer no número deixaria "110"
+      // (de "110% do CDI") virar "Selic + 110% a.a.", um absurdo.
+      function valorPadraoParaIndexador(indexador) {
+        if (indexador === 'cdi') return '110';
+        if (indexador === 'selic') return '0.10';
+        if (indexador === 'pre') return hgFormatNumero(selicAnual()).replace(',', '.');
+        return '7.00';
+      }
+
       function abrirModal() {
         overlay.hidden = false;
         document.body.style.overflow = 'hidden';
@@ -13893,12 +13948,21 @@
 
       selIndexador.addEventListener('change', () => {
         atualizarRotuloTaxa();
-        // Trocar de indexador sem trocar o número deixaria "110" virar
-        // "110% ao ano" prefixado, que não existe. Sugere um valor
-        // plausível para o novo indexador; o campo continua editável.
-        inTaxa.value = selIndexador.value === 'cdi' ? '110'
-          : selIndexador.value === 'pre' ? hgFormatNumero(selicAnual()).replace(',', '.')
-          : '7.00';
+        inTaxa.value = valorPadraoParaIndexador(selIndexador.value);
+      });
+
+      // Tesouro Selic/Prefixado/IPCA+ só existem num indexador cada —
+      // ao escolher um desses como "Tipo do título", trava "Como rende"
+      // no valor certo (e destrava de volta pra CDB/LCI/debênture, que
+      // podem vir em qualquer indexador).
+      selTipo.addEventListener('change', () => {
+        const indexadorFixo = INDEXADOR_POR_TIPO_TESOURO[selTipo.value];
+        selIndexador.disabled = !!indexadorFixo;
+        if (indexadorFixo) {
+          selIndexador.value = indexadorFixo;
+          atualizarRotuloTaxa();
+          inTaxa.value = valorPadraoParaIndexador(indexadorFixo);
+        }
       });
 
       btnAbrir.addEventListener('click', () => { fecharMenusNav(); abrirModal(); });
