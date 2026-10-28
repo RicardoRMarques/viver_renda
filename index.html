@@ -7212,9 +7212,9 @@
               <option value="lci">LCI / LCA / LIG (isento de IR)</option>
               <option value="deb">Debênture comum</option>
               <option value="inc">Debênture incentivada / CRI / CRA (isento de IR)</option>
-              <option value="tesouro_selic">Tesouro Selic</option>
-              <option value="tesouro_pre">Tesouro Prefixado</option>
-              <option value="tesouro_ipca">Tesouro IPCA+</option>
+              <option value="tesouro_selic">Tesouro Selic (pós-fixado)</option>
+              <option value="tesouro_pre">Tesouro Prefixado (taxa fixa ao ano)</option>
+              <option value="tesouro_ipca">Tesouro IPCA+ (taxa real + inflação)</option>
             </select>
           </div>
           <div class="calc-campo">
@@ -13327,9 +13327,9 @@
         lci: { rotulo: 'LCI / LCA / LIG', tributado: false, fgc: true },
         deb: { rotulo: 'Debênture comum', tributado: true, fgc: false },
         inc: { rotulo: 'Debênture incentivada / CRI / CRA', tributado: false, fgc: false },
-        tesouro_selic: { rotulo: 'Tesouro Selic', tributado: true, fgc: false, tesouro: true },
-        tesouro_pre: { rotulo: 'Tesouro Prefixado', tributado: true, fgc: false, tesouro: true },
-        tesouro_ipca: { rotulo: 'Tesouro IPCA+', tributado: true, fgc: false, tesouro: true },
+        tesouro_selic: { rotulo: 'Tesouro Selic (pós-fixado)', tributado: true, fgc: false, tesouro: true },
+        tesouro_pre: { rotulo: 'Tesouro Prefixado (taxa fixa ao ano)', tributado: true, fgc: false, tesouro: true },
+        tesouro_ipca: { rotulo: 'Tesouro IPCA+ (taxa real + inflação)', tributado: true, fgc: false, tesouro: true },
       };
 
       const ROTULO_TAXA = {
