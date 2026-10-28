@@ -7,7 +7,8 @@ diretamente no navegador do visitante), publicando os seguintes arquivos
 na raiz do repositório:
 
 - noticias.json : últimas notícias do mercado (feed RSS, sem token)
-- indices.json  : Ibovespa, IFIX (brapi), Dólar/Euro (BCB), Bitcoin/Ethereum
+- indices.json  : Ibovespa, IFIX (brapi), Dólar/Euro (TwelveData, com
+                   fallback na PTAX do Banco Central), Bitcoin/Ethereum
                    em USD (CoinGecko) + IPCA mensal/acumulado no ano (Banco
                    Central) + CPI EUA (BLS)
 - ranking.json  : 6 melhores ações e 6 melhores FIIs do momento (HG Brasil)
@@ -124,7 +125,8 @@ HGBRASIL_INCOME_URL = "https://api.hgbrasil.com/v2/finance/income-statements"
 #
 # Câmbio e cripto NÃO vêm da brapi: os endpoints /v2/currency e
 # /v2/crypto respondem 403 FEATURE_NOT_AVAILABLE no plano gratuito.
-# Ficam no Banco Central e na CoinGecko (abaixo).
+# Câmbio vem da TwelveData (intradiário), com fallback no Banco Central
+# (ambos abaixo); cripto fica na CoinGecko (abaixo).
 #
 # Dow Jones e Nasdaq foram removidos do boletim: a brapi cobre só o
 # mercado brasileiro. CPI (EUA) vem do BLS, Selic/IPCA do Banco Central.
@@ -132,16 +134,27 @@ HGBRASIL_INCOME_URL = "https://api.hgbrasil.com/v2/finance/income-statements"
 BRAPI_BASE_URL = "https://brapi.dev/api"
 BRAPI_INDICES = [("^BVSP", "Ibovespa"), ("IFIX", "IFIX")]
 
+# Mesma chave "uso exposto" (plano free: 800 req/dia, 8/min) já usada no
+# fallback de Stocks/ETFs internacionais do index.html e nos Alertas de
+# Preço mais abaixo neste arquivo — não é segredo, só limitada por
+# domínio/plano.
+CHAVE_TWELVEDATA = "034d1589162e413d9a1e9608860cb06a"
+
 # ------------------------------------------------------------------
-# Câmbio: Banco Central (SGS), mesma fonte já usada para Selic e IPCA.
-# Oficial, gratuita, sem chave e sem limite de requisições — resolve os
-# 429 que a AwesomeAPI dava por cota compartilhada de IP no Actions.
+# Câmbio: TwelveData (intradiário, atualiza o dia todo) como fonte
+# principal, com a PTAX do Banco Central (SGS, oficial, sem chave/limite,
+# mas só publica 1x por dia) como fallback — ver coletar_cambio() logo
+# abaixo das duas funções. A AwesomeAPI (cotação em tempo real) tinha
+# sido tentada no lugar da PTAX e abandonada por dar 429 de cota
+# compartilhada de IP no Actions; a TwelveData já era usada com sucesso
+# nesse mesmo robô (Alertas de Preço) e no index.html, então não corre
+# o mesmo risco de cota surpresa — analisado e trocado em 28/10/2026.
 #
 # Série 1     = Dólar americano (venda, PTAX)
 # Série 21619 = Euro (venda, PTAX)
 #
-# Buscamos as 2 últimas observações de cada série: a mais recente é o
-# valor exibido, e a anterior serve para calcular a variação %. É PTAX
+# Buscamos as 2 últimas observações de cada série BCB: a mais recente é
+# o valor exibido, e a anterior serve para calcular a variação %. É PTAX
 # (fechamento do dia), então durante o pregão o valor fica no fechamento
 # anterior — e em fins de semana/feriados o BCB não publica, caso em que
 # a última cotação disponível é reaproveitada.
@@ -150,6 +163,14 @@ BCB_CAMBIO_SERIES = [
     # (número da série SGS, rótulo no boletim)
     (1, "Dólar"),
     (21619, "Euro"),
+]
+
+TWELVEDATA_CAMBIO_SIMBOLOS = [
+    # (símbolo na TwelveData, rótulo no boletim — mesmo rótulo usado
+    # acima no BCB, pra coletar_cambio() conseguir completar com a PTAX
+    # só a moeda que a TwelveData não trouxer)
+    ("USD/BRL", "Dólar"),
+    ("EUR/BRL", "Euro"),
 ]
 
 # ------------------------------------------------------------------
@@ -679,7 +700,7 @@ def _para_float(valor):
         return None
 
 
-def coletar_cambio_bcb():
+def coletar_cambio_bcb(series=None):
     """Dólar e Euro pelas séries SGS do Banco Central (PTAX de venda).
 
     Pede as 2 últimas observações de cada série: a mais recente vira o
@@ -688,9 +709,13 @@ def coletar_cambio_bcb():
     de ficar de fora.
 
     Cada moeda é independente — se uma série falhar, a outra ainda entra.
+
+    `series` permite restringir a busca a só algumas séries (usado por
+    coletar_cambio() pra não bater no BCB pedindo uma moeda que a
+    TwelveData já trouxe certinha) — por padrão, busca as duas.
     """
     indices = []
-    for serie, rotulo in BCB_CAMBIO_SERIES:
+    for serie, rotulo in (series if series is not None else BCB_CAMBIO_SERIES):
         url = (
             f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{serie}"
             "/dados/ultimos/2?formato=json"
@@ -728,6 +753,75 @@ def coletar_cambio_bcb():
             "referencia": (dados[-1] or {}).get("data"),
         })
 
+    return indices
+
+
+def coletar_cambio_twelvedata():
+    """Dólar e Euro "ao vivo" (intradiário) pela TwelveData — mesma chave
+    já usada pelos Alertas de Preço de Stocks/ETFs internacionais e pelo
+    index.html. Atualiza bem mais vezes ao dia que a PTAX do Banco
+    Central (publicada só 1x), e o plano free (800 req/dia, 8/min) sobra
+    folga pra 1 chamada a cada 15 min, mesmo somando com o uso dos
+    Alertas na mesma execução.
+
+    Sem "referencia" no retorno, de propósito: é cotação do momento, não
+    o fechamento de um dia marcado — se viesse com "referencia", o
+    index.html mostraria o aviso de "fechamento de ontem" (pensado pra
+    PTAX) mesmo quando o dado é fresco.
+
+    Cada moeda é independente — se uma vier sem dado, a outra ainda
+    entra; coletar_cambio() completa a que faltar com a PTAX do BCB.
+    """
+    simbolos = [s for s, _ in TWELVEDATA_CAMBIO_SIMBOLOS]
+    try:
+        url = f"https://api.twelvedata.com/quote?symbol={','.join(simbolos)}&apikey={CHAVE_TWELVEDATA}"
+        resp = requests.get(url, timeout=TIMEOUT)
+        resp.raise_for_status()
+        dados = resp.json()
+    except (requests.RequestException, ValueError) as exc:
+        print(f"AVISO: falha ao buscar câmbio na TwelveData: {exc}", file=sys.stderr)
+        return []
+
+    # Com 1 símbolo só na consulta, a TwelveData devolve o objeto direto;
+    # com vários (nosso caso), devolve um dict {simbolo: {...}} — trata os
+    # dois formatos pra não quebrar se um dia sobrar só 1 símbolo aqui.
+    if len(simbolos) == 1:
+        dados = {simbolos[0]: dados}
+    if not isinstance(dados, dict):
+        print(f"AVISO: TwelveData devolveu formato inesperado pro câmbio: {dados}", file=sys.stderr)
+        return []
+
+    indices = []
+    for simbolo, rotulo in TWELVEDATA_CAMBIO_SIMBOLOS:
+        item = dados.get(simbolo)
+        if not isinstance(item, dict) or item.get("status") == "error" or item.get("code"):
+            print(f"AVISO: TwelveData não trouxe {rotulo} ({simbolo}): {item}", file=sys.stderr)
+            continue
+        valor = _para_float(item.get("close"))
+        if valor is None:
+            print(f"AVISO: valor inválido pra {rotulo} ({simbolo}) na TwelveData: {item}", file=sys.stderr)
+            continue
+        indices.append({
+            "label": rotulo,
+            "prefixo": "R$ ",
+            "valor": valor,
+            "variacao_pct": _para_float(item.get("percent_change")),
+        })
+    return indices
+
+
+def coletar_cambio():
+    """Dólar e Euro: tenta a TwelveData primeiro (intradiário, atualiza o
+    dia todo); o que ela não trouxer (falha, cota estourada, símbolo fora
+    do plano) é completado pela PTAX do Banco Central (oficial, sem
+    limite, mas só 1x por dia) — mesma filosofia de "cada moeda é
+    independente" das duas fontes por trás disso.
+    """
+    indices = coletar_cambio_twelvedata()
+    rotulos_ok = {item["label"] for item in indices}
+    series_faltando = [(serie, rotulo) for serie, rotulo in BCB_CAMBIO_SERIES if rotulo not in rotulos_ok]
+    if series_faltando:
+        indices.extend(coletar_cambio_bcb(series_faltando))
     return indices
 
 
@@ -810,8 +904,8 @@ def coletar_indices_brapi(token):
             "variacao_pct": _para_float(dados.get("regularMarketChangePercent")),
         })
 
-    # --- Câmbio (Banco Central) e cripto (CoinGecko) ---
-    indices.extend(coletar_cambio_bcb())
+    # --- Câmbio (TwelveData, com fallback no Banco Central) e cripto (CoinGecko) ---
+    indices.extend(coletar_cambio())
     indices.extend(coletar_cripto_coingecko())
 
     return indices
@@ -1479,9 +1573,8 @@ def coletar_ranking(token):
 # ============================================================
 SUPABASE_URL = "https://mzknjnupizprfatfmxqg.supabase.co"
 
-# Mesma chave "uso exposto" (plano free) já usada no fallback de Stocks/ETFs
-# internacionais do index.html — não é segredo, só limitada por domínio/plano.
-CHAVE_TWELVEDATA = "034d1589162e413d9a1e9608860cb06a"
+# CHAVE_TWELVEDATA já foi definida lá em cima, perto de BRAPI_BASE_URL
+# (também usada pela coleta de Câmbio) — reaproveitada aqui.
 
 # Kind gravado pelo front-end quando o alerta é de um Stock/ETF americano
 # (ver botão "Criar alerta" no index.html — mesmo valor sentinela de lá).
