@@ -2118,6 +2118,19 @@
       margin-left: 4px;
     }
 
+    /* Selo "maior taxa da categoria hoje" na tabela do Tesouro Direto —
+       descritivo (é um fato: essa taxa é a maior do grupo agora), nunca
+       prescritivo ("melhor investimento"): taxa maior aqui costuma vir
+       de prazo mais longo, não de um título objetivamente superior. */
+    .tesouro-badge-melhor {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #e0b84d;
+      margin-top: 2px;
+      cursor: help;
+    }
+
     /* Preço + gráfico lado a lado (empilha no mobile) */
     .hg-preco-grafico {
       margin-bottom: 18px;
@@ -4838,6 +4851,10 @@
       <p class="calc-ajuda" style="margin-top:0;">
         Preços e taxas de referência dos títulos públicos, do Tesouro Transparente.
         A taxa quer dizer coisas diferentes conforme o título — por isso ela aparece escrita por extenso.
+        O selo <strong style="color:#e0b84d;">★ Maior taxa da categoria hoje</strong> marca, dentro de cada
+        grupo (Selic, Prefixado, IPCA+, Educa+, Renda+), quem paga mais pela taxa oficial atual — não é uma
+        recomendação: prazo mais longo costuma pagar mais só por isso, e carrega mais risco de marcação a
+        mercado se você precisar vender antes do vencimento.
       </p>
 
       <div class="hg-chips" id="tesouroFiltros"></div>
@@ -12519,6 +12536,7 @@
       let dados = null;
       let carregando = null;
       let familiaAtiva = 'todos';
+      let melhoresCategoria = new Set();
 
       // Ordenação escolhida pelo clique no cabeçalho. Começa null: até a
       // pessoa clicar, a tabela mantém a ordem do robô (por família e
@@ -12600,6 +12618,33 @@
         return t.indexador;
       }
 
+      // IDs dos títulos com a maior taxa_compra dentro do próprio grupo
+      // (familiaDe) — calculado sobre a lista INTEIRA (não a filtrada),
+      // pra não sumir/mudar quando a pessoa clica num chip de filtro.
+      // Só marca grupos com 2+ títulos: "maior" de 1 não compara nada.
+      // Puramente descritivo (ver nota no texto de abertura da seção) —
+      // nunca "melhor investimento", porque dentro do mesmo grupo quem
+      // paga mais quase sempre é só o de prazo mais longo.
+      function calcularMelhoresDaCategoria(titulos) {
+        const porGrupo = new Map();
+        for (const t of titulos) {
+          if (typeof t.taxa_compra !== 'number') continue;
+          const grupo = familiaDe(t);
+          const atual = porGrupo.get(grupo);
+          if (!atual || t.taxa_compra > atual.taxa_compra) porGrupo.set(grupo, t);
+        }
+        const contagemPorGrupo = new Map();
+        for (const t of titulos) {
+          const grupo = familiaDe(t);
+          contagemPorGrupo.set(grupo, (contagemPorGrupo.get(grupo) || 0) + 1);
+        }
+        const ids = new Set();
+        for (const [grupo, melhor] of porGrupo) {
+          if ((contagemPorGrupo.get(grupo) || 0) >= 2) ids.add(melhor.id);
+        }
+        return ids;
+      }
+
       // A taxa é o número que mais engana nesta tabela. No Tesouro Selic ela
       // é o SPREAD sobre a Selic (fica em torno de 0,1%), no IPCA+ é a taxa
       // REAL acima da inflação, e só no Prefixado é a rentabilidade cheia.
@@ -12649,6 +12694,7 @@
           const resp = await fetch('data/tesouro.json', { cache: 'no-store' });
           if (!resp.ok) throw new Error('HTTP ' + resp.status);
           dados = await resp.json();
+          melhoresCategoria = calcularMelhoresDaCategoria(dados.titulos || []);
           return dados;
         })();
         return carregando;
@@ -12700,7 +12746,11 @@
               // vencimento em 2049 parece um papel de 23 anos parado.
               (pagaEmParcelas(t) ? '<div class="tesouro-sub">último pagamento</div>' : '') +
               '</td>' +
-              '<td><span class="tesouro-taxa" title="' + (t.rotulo_taxa || '') + '">' + taxaPorExtenso(t) + '</span></td>' +
+              '<td><span class="tesouro-taxa" title="' + (t.rotulo_taxa || '') + '">' + taxaPorExtenso(t) + '</span>' +
+              (melhoresCategoria.has(t.id)
+                ? '<span class="tesouro-badge-melhor" title="A maior taxa oficial do grupo hoje — não é recomendação: prazo mais longo costuma pagar mais só por isso, e tem mais risco de marcação a mercado se você vender antes do vencimento.">★ Maior taxa da categoria hoje</span>'
+                : '') +
+              '</td>' +
               '<td class="tesouro-num">' + (typeof pu === 'number' ? hgFormatMoeda(pu) : '—') + '</td>' +
               '<td class="tesouro-num">' + (typeof t.investimento_minimo === 'number' ? hgFormatMoeda(t.investimento_minimo) : '—') + '</td>' +
               '</tr>';
