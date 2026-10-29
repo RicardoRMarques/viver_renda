@@ -205,6 +205,12 @@ def indexador_de(tipo):
     t = normalizar(tipo)
     if "SELIC" in t:
         return "selic"
+    # Tesouro Reserva (lançado 11/05/2026, só pelo BB até hoje — ver
+    # avisar_indexador_desconhecido) rende Selic Over, mas o nome do
+    # título não contém "SELIC" — cairia em "outro" sem essa regra, e o
+    # site mostraria a taxa como se fosse rentabilidade cheia.
+    if "RESERVA" in t:
+        return "selic"
     if "IGPM" in t or "IGP-M" in t:
         return "igpm"
     if "IPCA" in t or "RENDA+" in t or "EDUCA+" in t:
