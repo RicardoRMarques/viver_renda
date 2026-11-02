@@ -105,13 +105,13 @@
         "ticker": "VALE3",
         "nome": "Vale",
         "preco": 61.86,
-        "valor": 218069000000
+        "valor": 215830000000
       },
       {
         "ticker": "ABEV3",
         "nome": "Ambev",
         "preco": 14.62,
-        "valor": 88268294000
+        "valor": 89015602000
       }
     ]
   },
@@ -162,20 +162,6 @@
     ],
     "dividend_yield": [
       {
-        "ticker": "XPCA11",
-        "nome": "Fiagro XP Ca",
-        "preco": 7.08,
-        "variacao_pct": -0.4219,
-        "valor": 18.079
-      },
-      {
-        "ticker": "TRXF11",
-        "nome": "FII Trx Real",
-        "preco": 66.84,
-        "variacao_pct": -0.8014,
-        "valor": 17.654
-      },
-      {
         "ticker": "IRIM11",
         "nome": "FII Irim",
         "preco": 58.56,
@@ -188,6 +174,20 @@
         "preco": 8.97,
         "variacao_pct": 2.0478,
         "valor": 16.834
+      },
+      {
+        "ticker": "XPCA11",
+        "nome": "Fiagro XP Ca",
+        "preco": 7.08,
+        "variacao_pct": -0.4219,
+        "valor": 16.525
+      },
+      {
+        "ticker": "TRXF11",
+        "nome": "FII Trx Real",
+        "preco": 66.84,
+        "variacao_pct": -0.8014,
+        "valor": 16.263
       },
       {
         "ticker": "CPTS11",
