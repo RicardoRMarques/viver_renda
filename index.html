@@ -20786,9 +20786,21 @@
       try { localStorage.setItem(FAVORITOS_CARROSSEL_KEY, JSON.stringify(lista)); } catch (e) { /* localStorage indisponível — segue sem persistir */ }
     }
 
+    // Índices da B3 que podem estar favoritados (symbol puro, sem fonte) —
+    // precisam do prefixo INDEXB3:, não B3: (ver ALIASES_INDICE/ETF_DO_INDICE
+    // na Consulta Rápida). Sem isso, B3:BVSP dava "ticker inválido" na HG
+    // Brasil e o índice favoritado nunca aparecia no carrossel, mesmo salvo
+    // certinho na lista de favoritos (reportado em 03/11/2026 com BVSP).
+    const INDICES_B3_FAVORITAVEIS = new Set(['BVSP', 'IFIX']);
+
     async function buscarQuotesFavoritosCarrossel(favoritos) {
       if (!favoritos.length) return [];
-      const tickers = favoritos.map(t => (t.startsWith('B3:') ? t : `B3:${t}`)).join(',');
+      const tickers = favoritos
+        .map(t => {
+          if (t.startsWith('B3:') || t.startsWith('INDEXB3:')) return t;
+          return INDICES_B3_FAVORITAVEIS.has(t.toUpperCase()) ? `INDEXB3:${t}` : `B3:${t}`;
+        })
+        .join(',');
       let resultadosB3 = [];
       try {
         const url = `https://api.hgbrasil.com/v2/finance/quotes?format=json-cors&tickers=${encodeURIComponent(tickers)}&key=${encodeURIComponent(CHAVE_HG)}`;
@@ -20796,7 +20808,9 @@
         const data = await resp.json();
         resultadosB3 = (data?.results || [])
           .map(a => ({
-            symbol: (a.symbol || '').replace('B3:', ''),
+            // Prefixo primeiro (INDEXB3: contém "B3:" como substring — um
+            // replace solto trocaria "INDEXB3:BVSP" por "INDEXBVSP").
+            symbol: (a.symbol || '').replace(/^INDEXB3:/, '').replace(/^B3:/, ''),
             valor: a.quote?.value,
             variacao: a.quote?.change_percent,
             moeda: a.currency,
