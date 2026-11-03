@@ -1807,6 +1807,8 @@
     }
     .hg-btn-secundario-pequeno[id="hgBtnFavoritar"]:hover { border-color: var(--primary); color: var(--primary); }
     .hg-btn-secundario-pequeno[id="hgBtnFavoritar"].favoritado { border-color: var(--primary); color: var(--primary); background: rgba(127,127,127,0.08); }
+    .hg-btn-secundario-pequeno[id="hgBtnFavoritar"]:disabled { opacity: 0.45; cursor: not-allowed; }
+    .hg-btn-secundario-pequeno[id="hgBtnFavoritar"]:disabled:hover { border-color: var(--border); color: var(--text); }
 
     .hg-favoritos-wrap { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     .hg-favoritos-label { font-size: 0.75rem; color: var(--muted); }
@@ -4712,7 +4714,7 @@
         <div class="hg-linha-busca hg-linha-busca-favoritavel">
           <input type="text" id="hgTickerInput" placeholder="Ex: PETR4, HGLG11, AAPL, SPY..." autocomplete="off" list="sugestoesTickersB3" />
           <button class="hg-btn" id="hgBtnBuscar">Consultar</button>
-          <button class="hg-btn-secundario-pequeno" id="hgBtnFavoritar" type="button" title="Acompanhar este ativo no carrossel do topo">☆ Favoritar</button>
+          <button class="hg-btn-secundario-pequeno" id="hgBtnFavoritar" type="button" disabled title="Acompanhar este ativo no carrossel do topo">☆ Favoritar</button>
         </div>
         <p class="calc-ajuda">★ Favoritar faz o ativo aparecer no carrossel de cotações no topo do site (até 5 por vez).</p>
 
@@ -8640,6 +8642,10 @@
       // usar o MESMO card e gráfico dos outros ativos, só com a fonte certa.
       const ALIASES_INDICE = {
         IBOV: 'INDEXB3:BVSP', IBOVESPA: 'INDEXB3:BVSP', '^BVSP': 'INDEXB3:BVSP',
+        // BVSP "pelado" (sem o "^") é o próprio symbol que a HG Brasil
+        // devolve pra esse índice (a.symbol) e que o site mostra nos chips
+        // de favorito — sem esse alias, digitar "BVSP" dava "não encontrado".
+        BVSP: 'INDEXB3:BVSP',
         IFIX: 'INDEXB3:IFIX',
       };
       // ETF que replica cada índice, sugerido no aviso do card — pela
@@ -8650,6 +8656,18 @@
       async function hgBuscarAtivo() {
         const digitado = inputTicker.value.trim().toUpperCase();
         if (!digitado) return;
+
+        // Zera o ativo da consulta anterior ANTES de tentar a nova busca —
+        // sem isso, uma consulta que falha (ticker inexistente, erro de
+        // rede etc.) deixava o botão "☆ Favoritar" usando o ativo da
+        // ÚLTIMA busca bem-sucedida (ou, pior, o próprio texto digitado
+        // como fallback — ver o listener de hgBtnFavoritar), favoritando
+        // um ticker inválido ou errado sem a pessoa perceber. Reportado em
+        // 03/11/2026 com "BVSP" (ticker que não existe sozinho — ver
+        // ALIASES_INDICE) aparecendo no carrossel mesmo com a busca tendo
+        // dado "não encontrado".
+        hgUltimoAtivoConsultado = null;
+        atualizarBotaoFavoritarEstado();
 
         const tickerIndice = ALIASES_INDICE[digitado];
         const ticker = tickerIndice || (digitado.startsWith('B3:') ? digitado : `B3:${digitado}`);
@@ -20840,7 +20858,17 @@
 
     function atualizarBotaoFavoritarEstado() {
       const btn = document.getElementById('hgBtnFavoritar');
-      if (!btn || !hgUltimoAtivoConsultado) return;
+      if (!btn) return;
+      // Sem ativo consultado com sucesso (busca ainda não feita, falhou,
+      // ou está em andamento), o botão fica desabilitado — não dá pra
+      // favoritar um ticker que nem existe.
+      if (!hgUltimoAtivoConsultado) {
+        btn.disabled = true;
+        btn.classList.remove('favoritado');
+        btn.textContent = '☆ Favoritar';
+        return;
+      }
+      btn.disabled = false;
       const jaFavoritado = obterFavoritosCarrossel().includes(hgUltimoAtivoConsultado.symbol);
       btn.classList.toggle('favoritado', jaFavoritado);
       btn.textContent = jaFavoritado ? '★ Favoritado' : '☆ Favoritar';
@@ -20925,7 +20953,13 @@
     // Favoritos" — ver o comentário grande nas funções vrAlternarFavorito.
     // Ao fixar no carrossel, o ativo também entra em Meus Favoritos.
     document.getElementById('hgBtnFavoritar')?.addEventListener('click', () => {
-      const ticker = (hgUltimoAtivoConsultado?.symbol || document.getElementById('hgTickerInput').value.trim().toUpperCase());
+      // Só favorita o ativo de uma consulta que realmente deu certo — o
+      // botão já vem desabilitado (ver atualizarBotaoFavoritarEstado)
+      // quando não há nenhum, mas essa checagem é a garantia de verdade:
+      // sem ela, dava pra favoritar qualquer texto digitado no campo de
+      // busca, mesmo um ticker que não existe (reportado com "BVSP" em
+      // 03/11/2026, que tinha dado "não encontrado" na consulta).
+      const ticker = hgUltimoAtivoConsultado?.symbol;
       if (!ticker) return;
       let carrossel = obterFavoritosCarrossel();
       const jaEstava = carrossel.includes(ticker);
@@ -20952,6 +20986,7 @@
     // Estado inicial ao carregar a página
     renderizarChipsFavoritosCarrossel();
     atualizarCarrosselComFavoritos();
+    atualizarBotaoFavoritarEstado(); // sem consulta ainda feita — fica desabilitado (ver função)
 
     // ============================================================
     // ALERTAS DE PREÇO — só funciona logado (o robô manda e-mail pro
