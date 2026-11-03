@@ -9339,9 +9339,10 @@
         // EXPIRANDO por inatividade: sem sessão válida, o link direto cai em
         // login?expired; só visitar essa página já basta pro servidor deles
         // renovar a sessão, e o segundo clique (mesmo link) funciona. Ver o
-        // listener em hgBtnRelatorio logo abaixo, que "esquenta" a sessão com
-        // uma requisição invisível antes de navegar de vez — imita o clique
-        // duplo que a pessoa já precisava dar na mão, só que automático.
+        // listener em hgBtnRelatorio logo abaixo, que abre uma aba de
+        // "aquecimento" (grava o cookie de sessão) e depois uma segunda aba
+        // já com sessão válida — imita o clique duplo que a pessoa já
+        // precisava dar na mão, só que automático.
         const titulo = ehFiInfra
           ? 'Lista oficial de documentos do fundo no Fundos.NET (B3/CVM) — procure por Relatório Gerencial ou Informe Mensal na lista'
           : 'Lista oficial no Fundos.NET (B3/CVM) só com os relatórios gerenciais do fundo — o mais recente fica no topo';
@@ -9365,25 +9366,39 @@
         e.preventDefault();
         const url = botao.href;
 
-        // Abre a aba em branco JÁ (preserva o gesto do clique, senão o
-        // navegador bloqueia um window.open() disparado de dentro de um
-        // .then() assíncrono) e só navega ela pro link de verdade depois
-        // que o "aquecimento" da sessão terminar (ou no máximo em 2,5s,
-        // pra nunca deixar a pessoa esperando uma aba em branco à toa se
-        // a rede estiver lenta ou o Fundos.NET não responder).
-        const aba = window.open('about:blank', '_blank');
-        if (!aba) {
-          // Pop-up bloqueado — cai pro comportamento antigo (sem aquecer).
-          window.open(url, '_blank', 'noopener');
-          return;
-        }
-        aba.opener = null;
-
-        const aquecimento = fetch(url, { mode: 'no-cors', credentials: 'include' }).catch(() => {});
-        const tempoLimite = new Promise(resolve => setTimeout(resolve, 2500));
-        Promise.race([aquecimento, tempoLimite]).then(() => {
-          try { aba.location.href = url; } catch (erro) { /* aba já pode ter sido fechada pela pessoa */ }
-        });
+        // Reportado de novo em 03/11/2026, confirmando o padrão: a 1ª
+        // navegação cai em login?expired, a 2ª (MESMO link) mostra o
+        // relatório — ou seja, a aba já abria direto pro link e o problema
+        // não era o cabeçalho Referer nem um "aquecimento" de API. A versão
+        // anterior tentava aquecer a sessão com um fetch() cross-origin em
+        // segundo plano (credentials: 'include') antes de navegar — mas
+        // fetch/XHR de terceiro não grava Set-Cookie quando o navegador
+        // bloqueia cookie de terceiro (padrão hoje em dia); só uma
+        // NAVEGAÇÃO DE TOPO grava esse cookie de sessão.
+        //
+        // Duas formas óbvias de fazer essa 2ª navegação NÃO funcionam: (1)
+        // guardar a referência da aba e trocar aba.location.href de novo —
+        // o Chrome bloqueia ("Unsafe attempt to initiate navigation") assim
+        // que a aba já saiu pra um domínio de terceiro, o opener perde o
+        // direito de redirecioná-la (proteção contra tab-napping); (2) abrir
+        // uma 2ª aba solta (_blank de novo) e fechar a 1ª — close() cross-
+        // origin esbarra na mesma restrição e não fecha, sobrando duas abas
+        // abertas. O que funciona: window.open(url, "nome") com um TARGET
+        // NOMEADO, chamado duas vezes — a 2ª chamada não manipula a aba já
+        // aberta via opener, ela pede ao navegador pra "abrir (ou reusar) a
+        // janela chamada X", igual um <a target="x"> clicado de novo; o
+        // navegador mesmo reaproveita a mesma aba e navega sem bloqueio.
+        // Sem "aba.opener = null" aqui de propósito: isso quebra o reuso por
+        // nome (a 2ª chamada de window.open deixa de achar a aba já aberta e
+        // cria outra do zero, voltando pro mesmo bloqueio de navegação —
+        // testado e confirmado). A página de destino é o Fundos.NET oficial
+        // (B3/CVM), não uma página de terceiro não confiável, então o risco
+        // de reverse tabnabbing (a aba usar window.opener pra redirecionar
+        // esta página) foi avaliado e aceito em troca do recurso funcionar.
+        const NOME_ABA_RELATORIO = 'hgRelatorioGerencialFnet';
+        const aba = window.open(url, NOME_ABA_RELATORIO);
+        if (!aba) return; // pop-up bloqueado — já tentou abrir o link direto, nada mais a fazer
+        setTimeout(() => { window.open(url, NOME_ABA_RELATORIO); }, 1800);
       });
 
       // ------------------------------------------------------------
