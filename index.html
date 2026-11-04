@@ -404,7 +404,16 @@
       gap: 10px; padding: 5px 0; font-size: 0.86rem; flex-wrap: wrap;
     }
     .copom-linha + .copom-linha { border-top: 1px solid var(--border); }
-    .copom-data { font-weight: 700; }
+    /* flex (não só texto+span inline) de propósito: um span dentro de
+       texto corrido só quebra linha inteiro ou não quebra, e em certas
+       larguras de tela o navegador deixava o selo "acontecendo agora"
+       começar colado na borda e sair cortado, em vez de ir pra linha de
+       baixo (reportado em 04/11/2026, num Galaxy real). Mesmo padrão já
+       usado (e que já funciona) em .agenda-item-topo. */
+    .copom-data {
+      font-weight: 700;
+      display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px;
+    }
     .copom-detalhe { font-size: 0.74rem; color: var(--muted); }
     /* Glifo além da cor: a próxima reunião é destacada por texto, não só
        por tom, pelo mesmo motivo já documentado na tabela de Basileia. */
@@ -412,7 +421,7 @@
     .copom-etiqueta {
       font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.05em;
       font-weight: 700; color: var(--primary); border: 1px solid var(--primary);
-      border-radius: 999px; padding: 1px 7px; margin-left: 6px;
+      border-radius: 999px; padding: 1px 7px;
     }
     .copom-nota { font-size: 0.72rem; color: var(--muted); margin-top: 8px; }
     .copom-nota a { color: var(--primary); font-weight: 700; text-decoration: none; }
@@ -1057,8 +1066,15 @@
       .agenda-item { flex-wrap: wrap; align-items: flex-start; }
       .agenda-item-info { flex-basis: calc(100% - 60px); }
       .agenda-item-valor {
-        width: 100%; margin-left: 60px; margin-top: 8px; text-align: left;
-        display: flex; align-items: baseline; gap: 12px;
+        /* calc(100% - 60px), não 100%: width:100% SOMADO a um margin-left
+           de 60px sempre estourava a linha em exatos 60px (confirmado
+           medindo a caixa renderizada) — o valor unitário cabia, mas
+           "Total: R$ ..." saía cortado na borda da tela. flex-wrap como
+           reforço: se mesmo assim os dois não couberem lado a lado (fonte
+           grande, tela bem estreita), o Total cai pra linha de baixo em
+           vez de estourar de novo. */
+        width: calc(100% - 60px); margin-left: 60px; margin-top: 8px; text-align: left;
+        display: flex; align-items: baseline; gap: 4px 12px; flex-wrap: wrap;
       }
       .agenda-item-valor-total { margin-top: 0; }
     }
