@@ -446,6 +446,17 @@ function montarIndicadoresHtml(indices) {
 // P/VP nem P/L nesses dados (o robô de ranking não calcula isso), então
 // a coluna "Destaque" usa o nome do ativo, que é o único texto descritivo
 // disponível na fonte.
+
+// Linka o ticker de volta pra Consulta Rápida do site — "?ticker=" é o
+// mesmo parâmetro que index.html já lê sozinho (window.location.search)
+// pra auto-carregar a cotação completa e rolar até o card, sem precisar
+// de nenhum suporte novo lá; é o mesmo mecanismo usado nos links de
+// compartilhamento da própria Consulta Rápida.
+function linkTicker(ticker) {
+  if (!ticker) return '—';
+  return `<a href="https://viverderenda.dev.br/?ticker=${encodeURIComponent(ticker)}" target="_blank" rel="noopener noreferrer" class="tk-link">${ticker}</a>`;
+}
+
 function montarTabelaFiis(ranking) {
   const lista = (ranking?.fiis?.dividend_yield || []).slice(0, 6);
   if (lista.length === 0) {
@@ -453,7 +464,7 @@ function montarTabelaFiis(ranking) {
   }
   return lista.map(f => `
   <tr>
-    <td class="name">${f.ticker || '—'}</td>
+    <td class="name">${linkTicker(f.ticker)}</td>
     <td>${typeof f.valor === 'number' ? f.valor.toFixed(2) + '%' : '—'}</td>
     <td>${typeof f.preco === 'number' ? 'R$ ' + f.preco.toFixed(2) : '—'}</td>
     <td class="rationale">${f.nome || '—'}</td>
@@ -467,7 +478,7 @@ function montarTabelaAcoes(ranking) {
   }
   return lista.map(a => `
   <tr>
-    <td class="name">${a.ticker || '—'}</td>
+    <td class="name">${linkTicker(a.ticker)}</td>
     <td>${typeof a.valor === 'number' ? a.valor.toFixed(2) + '%' : '—'}</td>
     <td>${typeof a.preco === 'number' ? 'R$ ' + a.preco.toFixed(2) : '—'}</td>
     <td class="rationale">${a.nome || '—'}</td>
@@ -654,8 +665,8 @@ function montarHtml({ dataExtenso, dataArquivo, indicadoresHtml, graficoMensalHt
   .n-thumb{width:64px;height:64px;flex-shrink:0;border-radius:8px;object-fit:cover;
     background:var(--card-border);display:block;}
   .news-item .n-title{font-weight:600;font-size:13.5px;margin-bottom:4px;}
-  .n-title a.n-link, .tk a.tk-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--gold); }
-  .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
+  .n-title a.n-link, .tk a.tk-link, td.name a.tk-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--gold); }
+  .n-title a.n-link:hover, .tk a.tk-link:hover, td.name a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
   .grupo-whatsapp-card{
