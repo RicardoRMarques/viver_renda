@@ -3144,6 +3144,17 @@
        desktop, sempre que o modal era estreito — que era o caso deste. */
     .calc-grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
     .calc-grid-2 input, .calc-grid-2 select { min-width: 0; }
+    /* minmax(0,1fr) evita vazamento (texto saindo da tela), mas não evita
+       aperto: abaixo de ~520px de viewport o modal já ocupa quase a tela
+       toda (.calc-overlay tem padding:16px de cada lado) e cada coluna
+       sobra uns 140-150px — pouco pra um <select> tipo "% do CDI
+       (pós-fixado)" ou um placeholder tipo "Ex: Itaú, ABC, Bradesco...",
+       que aparecem cortados (reportado em 04/11/2026). Empilhar em 1
+       coluna só nessa faixa estreita resolve sem mudar nada no desktop/
+       tablet, onde o espaço já é suficiente. */
+    @media (max-width: 520px) {
+      .calc-grid-2 { grid-template-columns: 1fr; }
+    }
     .amort-historico-lista { display: flex; flex-direction: column; gap: 6px; }
     .amort-historico-item {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
