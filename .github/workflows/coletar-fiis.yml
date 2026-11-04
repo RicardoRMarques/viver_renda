@@ -12,9 +12,18 @@ on:
     # Consome bem mais requisições (vários lotes de tickers + endpoint
     # Beta de receita), por isso roda separado do restante.
     - cron: "0 12 * * *"
-  # Permite rodar manualmente pela aba "Actions" no GitHub. Ao disparar
-  # manualmente, sempre atualiza os rankings também (fica marcado abaixo).
-  workflow_dispatch: {}
+  # Permite rodar manualmente pela aba "Actions" no GitHub — por padrão,
+  # sempre atualiza os rankings também (fica marcado abaixo). O input
+  # existe pro gerar-boletim.js poder disparar esta coleta via API quando
+  # o indices.json está velho demais (ver HORAS_MAX_INDICES lá) SEM pedir
+  # o ranking, que é bem mais lento e não é o que o boletim precisa —
+  # nesse caso a chamada da API passa incluir_ranking: false.
+  workflow_dispatch:
+    inputs:
+      incluir_ranking:
+        description: "Também coletar os rankings de Ações/FIIs (mais lento — pula se só precisa de índices/notícias frescos)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -62,8 +71,9 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           # Só ativa a coleta de rankings quando o disparo foi o cron das
-          # 12h UTC (1x/dia) ou quando rodou manualmente pela aba Actions.
-          COLETAR_RANKING: ${{ (github.event.schedule == '0 12 * * *' || github.event_name == 'workflow_dispatch') && '1' || '0' }}
+          # 12h UTC (1x/dia), ou quando rodou manualmente (aba Actions ou
+          # API) com incluir_ranking != false — ver o input acima.
+          COLETAR_RANKING: ${{ (github.event.schedule == '0 12 * * *' || (github.event_name == 'workflow_dispatch' && github.event.inputs.incluir_ranking != 'false')) && '1' || '0' }}
         run: python coletar_hgbrasil.py
 
       - name: Commitar e enviar noticias.json, indices.json e ranking.json

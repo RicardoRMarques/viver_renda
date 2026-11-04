@@ -133,12 +133,106 @@ function lerJsonSeExistir(caminho, fallback) {
 // um motivo que ninguém previu, o pior caso vira "workflow falhou e me
 // avisou por e-mail", não "boletim errado no WhatsApp dos assinantes".
 
-// Idade máxima tolerada. O robô de coleta roda a cada 15 min, dia e noite
-// (o indices.json das 3h40 da manhã comprova), então na prática o dado
-// nunca passa de ~1h. 6h é folga larga para um soluço pontual da coleta
-// sem disparar alarme falso.
+// Idade máxima tolerada. O robô de coleta É AGENDADO pra rodar a cada 15
+// min, dia e noite — mas, medido em 04/11/2026 no histórico real de
+// execuções, o GitHub atrasa/pula agendamentos tão frequentes em períodos
+// de carga alta, e o intervalo real entre execuções já chegou a ~10h. 6h
+// cobre a maioria dos casos; quando não cobre, a auto-cura abaixo (acordar
+// o robô via API) é a segunda linha de defesa antes de desistir.
 const HORAS_MAX_INDICES = 6;
 const URL_INDICES_PUBLICADO = 'https://viverderenda.dev.br/indices.json';
+
+// ---------- Auto-cura: acorda o robô de coleta se as duas fontes vierem velhas ----------
+// GITHUB_TOKEN só existe quando este script roda dentro do próprio GitHub
+// Actions (boletim.yml passa secrets.GITHUB_TOKEN); rodando local (fora do
+// Actions) essas variáveis ficam undefined e a auto-cura é pulada de
+// propósito — sem token não tem como disparar nem checar status de nada.
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY; // "dono/repo" — já vem pronto no runner
+const MINUTOS_MAX_ESPERA_AUTOCURA = 6;
+const INTERVALO_POLL_AUTOCURA_MS = 15000;
+
+function dormir(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function chamarApiGithub(caminho, opcoes = {}) {
+  return fetch(`https://api.github.com/repos/${GITHUB_REPOSITORY}${caminho}`, {
+    ...opcoes,
+    headers: {
+      Authorization: `Bearer ${GITHUB_TOKEN}`,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(opcoes.headers || {}),
+    },
+  });
+}
+
+// Dispara coletar-fiis.yml pela API (sem o ranking — é lento e o boletim
+// não usa) e espera até MINUTOS_MAX_ESPERA_AUTOCURA por uma execução nova
+// (criada depois do disparo) terminar. Devolve true só se achou e esperou
+// essa execução terminar — não garante que o indices.json ficou fresco,
+// isso quem confere é carregarIndices() de novo depois.
+async function dispararColetaEEsperar() {
+  const antesDoDisparo = Date.now();
+  console.log('[boletim] indices.json velho nas duas fontes — tentando acordar o robô de coleta (coletar-fiis.yml) via API...');
+
+  let respDisparo;
+  try {
+    respDisparo = await chamarApiGithub('/actions/workflows/coletar-fiis.yml/dispatches', {
+      method: 'POST',
+      body: JSON.stringify({ ref: 'main', inputs: { incluir_ranking: 'false' } }),
+    });
+  } catch (e) {
+    console.warn(`[boletim] Falha de rede disparando o robô de coleta: ${e.message}. Seguindo sem auto-cura.`);
+    return false;
+  }
+  if (respDisparo.status !== 204) {
+    console.warn(`[boletim] Não consegui disparar o robô de coleta (HTTP ${respDisparo.status}). Seguindo sem auto-cura.`);
+    return false;
+  }
+
+  const prazoFinal = Date.now() + MINUTOS_MAX_ESPERA_AUTOCURA * 60000;
+  let ultimaRunVista = null;
+  while (Date.now() < prazoFinal) {
+    await dormir(INTERVALO_POLL_AUTOCURA_MS);
+    try {
+      const respRuns = await chamarApiGithub('/actions/workflows/coletar-fiis.yml/runs?event=workflow_dispatch&per_page=5');
+      const dadosRuns = await respRuns.json();
+      // "- 5000": folga pequena pro relógio do servidor da API não bater
+      // 1:1 com o Date.now() daqui.
+      const candidata = (dadosRuns.workflow_runs || []).find(r => Date.parse(r.created_at) >= antesDoDisparo - 5000);
+      if (candidata) {
+        ultimaRunVista = candidata;
+        if (candidata.status === 'completed') {
+          const segundos = ((Date.now() - antesDoDisparo) / 1000).toFixed(0);
+          console.log(`[boletim] Execução disparada (#${candidata.run_number}) terminou — ${candidata.conclusion} em ${segundos}s.`);
+          return true;
+        }
+      }
+    } catch (e) {
+      console.warn(`[boletim] Erro checando status da execução disparada: ${e.message}`);
+    }
+  }
+  console.warn(`[boletim] A execução disparada${ultimaRunVista ? ` (#${ultimaRunVista.run_number}, status "${ultimaRunVista.status}")` : ''} não terminou em ${MINUTOS_MAX_ESPERA_AUTOCURA} min — seguindo sem esperar mais.`);
+  return false;
+}
+
+// Depois que o robô de coleta commitou, traz esse commit pra árvore local
+// — mesma ideia do "git reset --hard origin/main" que o boletim.yml já
+// faz ANTES de chamar este script (ver o comentário lá); aqui é o mesmo
+// reset, só que DEPOIS de um disparo no meio da execução.
+function sincronizarComOrigin() {
+  const { execSync } = require('child_process');
+  try {
+    execSync('git fetch origin main', { cwd: RAIZ, stdio: 'pipe' });
+    execSync('git reset --hard origin/main', { cwd: RAIZ, stdio: 'pipe' });
+    return true;
+  } catch (e) {
+    console.warn(`[boletim] Não consegui sincronizar com origin/main depois da auto-cura: ${e.message}`);
+    return false;
+  }
+}
 
 // O indices.json é uma lista e cada item traz seu próprio `coletado_em`.
 // Na prática são todos iguais (a coleta grava tudo de uma vez), mas pegar
@@ -206,8 +300,25 @@ async function carregarIndices() {
     return remoto;
   }
 
+  let autocuraTentada = false;
+  if (GITHUB_TOKEN && GITHUB_REPOSITORY) {
+    autocuraTentada = true;
+    const terminou = await dispararColetaEEsperar();
+    if (terminou && sincronizarComOrigin()) {
+      const localNovo = lerJsonSeExistir(path.join(RAIZ, 'indices.json'), []);
+      const coletaNova = coletaMaisRecente(localNovo);
+      if (coletaNova !== null && horasDesde(coletaNova) <= HORAS_MAX_INDICES) {
+        console.log(`[boletim] Auto-cura funcionou — coleta de ${descreverColeta(coletaNova)}.`);
+        return localNovo;
+      }
+      console.warn(`[boletim] Mesmo depois da auto-cura, indices.json segue velho — ${descreverColeta(coletaNova)}.`);
+    }
+  } else {
+    console.warn('[boletim] Sem GITHUB_TOKEN/GITHUB_REPOSITORY no ambiente — pulando a tentativa de auto-cura.');
+  }
+
   throw new Error(
-    'indices.json desatualizado nas duas fontes — boletim NÃO gerado, para não publicar números errados.\n' +
+    `indices.json desatualizado nas duas fontes${autocuraTentada ? ' (a auto-cura também não resolveu)' : ''} — boletim NÃO gerado, para não publicar números errados.\n` +
     `  checkout : ${descreverColeta(coletaLocal)}\n` +
     `  publicado: ${remoto ? descreverColeta(coletaRemota) : 'indisponível'}\n` +
     `  tolerância: ${HORAS_MAX_INDICES}h.\n` +

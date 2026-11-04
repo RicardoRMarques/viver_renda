@@ -32,6 +32,7 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: write # necessário para commitar o boletim de volta no repo
+      actions: write # necessário pra gerar-boletim.js poder disparar o coletar-fiis.yml (auto-cura de indices.json velho) e checar o status dessa execução
 
     steps:
       - name: Checkout do repositório
@@ -74,17 +75,24 @@ jobs:
           node-version: 'lts/*' # sempre usa a LTS vigente, evitando ficar preso a uma versão depreciada
 
       # -----------------------------------------------------------------
-      # indices.json, noticias.json e ranking.json vêm do robô de coleta,
-      # que roda a cada 15 min o dia inteiro (sem pausa) — então em
-      # qualquer horário há dado fresco disponível. O passo de sincronia
-      # acima garante que é ESSE dado que chega aqui.
+      # indices.json, noticias.json e ranking.json vêm do robô de coleta
+      # (coletar-fiis.yml), agendado pra rodar a cada 15 min — mas na
+      # prática o GitHub atrasa/pula agendamentos tão frequentes em
+      # períodos de carga alta, e o intervalo real entre execuções já foi
+      # medido em até ~10h (ver histórico de runs em 04/11/2026). O passo
+      # de sincronia acima garante que o checkout reflete o main mais
+      # recente, mas não inventa dado que ainda não foi coletado.
       #
-      # Segunda linha de defesa, dentro do próprio script: ele confere o
-      # `coletado_em` do indices.json e, se ainda assim vier coisa velha,
-      # busca a cópia publicada no site; se ela também estiver velha, o
-      # script ABORTA (exit 1) em vez de publicar números errados. Ou
-      # seja: workflow vermelho e e-mail de falha, nunca um boletim com a
-      # Selic de ontem indo para os assinantes.
+      # Defesas, dentro do próprio script (gerar-boletim.js):
+      #   1. confere o `coletado_em` do indices.json; se velho, busca a
+      #      cópia publicada no site;
+      #   2. se as duas vierem velhas, TENTA ACORDAR o robô de coleta
+      #      disparando coletar-fiis.yml pela API (precisa de
+      #      permissions.actions: write, acima) e espera terminar, antes
+      #      de checar de novo;
+      #   3. só se isso também falhar, o script ABORTA (exit 1) em vez de
+      #      publicar números errados. Workflow vermelho e e-mail de
+      #      falha, nunca um boletim com a Selic de ontem pros assinantes.
       # -----------------------------------------------------------------
       - name: Gerar o boletim do dia
         env:
@@ -93,6 +101,11 @@ jobs:
           # Se não estiverem configuradas, o script pula essa etapa sozinho.
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          # Usado só pra auto-cura (disparar coletar-fiis.yml e checar seu
+          # status pela API) quando indices.json está velho demais — ver
+          # o bloco "Frescor do indices.json" no script. GITHUB_REPOSITORY
+          # já vem pronto no ambiente do runner, não precisa declarar.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node robo-boletim/gerar-boletim.js
 
       - name: Commitar e enviar o boletim gerado
