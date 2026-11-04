@@ -13790,6 +13790,15 @@
         if (!tipo.fgc && !tipo.tesouro) {
           avisos.push('Sem FGC, a pergunta que importa não é quanto paga, e sim quem paga: leia o prospecto e veja o rating da emissão.');
         }
+        if (referencia) {
+          // Mesma ressalva da tabela do Tesouro Direto (ver o aviso fixo
+          // lá): o Tesouro Nacional publica preço/taxa de referência até
+          // de papéis temporariamente fora de oferta, e a nossa fonte não
+          // distingue um do outro — o título escolhido aqui como
+          // comparação pode não estar à venda agora. Reportado em
+          // 04/11/2026 com o Tesouro Selic 2027.
+          avisos.push('O ' + referencia.nome + ' é só a referência de comparação — confira se ele está realmente à venda no <a href="https://www.tesourodireto.com.br" target="_blank" rel="noopener noreferrer">portal oficial</a> antes de decidir, alguns títulos saem temporariamente de oferta.');
+        }
 
         const avisosHtml = avisos.map(a =>
           `<div class="vp-aviso"><span aria-hidden="true">•</span><span>${a}</span></div>`).join('');
