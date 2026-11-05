@@ -1481,6 +1481,22 @@
       padding: 0 6px; font-size: 0.7rem; font-weight: 700; line-height: 1.5;
     }
 
+    /* Busca rápida por ticker/nome — empurrada pro fim da linha (sobrava
+       espaço vazio depois do "?" de Meus Favoritos em telas largas; ver
+       termoBusca). flex:1 1 160px em vez de width fixo: encolhe sem
+       empurrar os chips pra fora quando a linha aperta, e cresce pra
+       preencher o vazio quando sobra espaço. */
+    .lm-busca-ativo {
+      margin-left: auto; flex: 1 1 160px; max-width: 240px; min-width: 140px;
+      background: var(--deep); border: 1px solid var(--border); color: var(--text);
+      border-radius: 999px; padding: 6px 14px; font-size: 0.78rem; font-family: inherit;
+    }
+    .lm-busca-ativo::placeholder { color: var(--muted); }
+    .lm-busca-ativo:focus { outline: none; border-color: var(--primary); }
+    /* Some o "x" nativo de limpar do Chrome/Edge em type="search" — a UI
+       deles não segue as cores do site e destoava. */
+    .lm-busca-ativo::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+
     /* Coração de cada linha, na coluna "Ativos" */
     .lm-favorito {
       flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
@@ -23642,6 +23658,15 @@
       }
 
       let soFavoritos = false;
+      // Busca rápida por ticker/nome — pra achar e favoritar um ativo sem
+      // precisar passear pelas páginas/segmentos (reportado em 05/11/2026,
+      // com o espaço vazio à direita dos chips circulado no print). Soma
+      // com QUALQUER outro filtro ativo (segmento ou Meus Favoritos), em
+      // vez de substituí-lo — diferente do par segmento/favoritos (que SÃO
+      // mutuamente exclusivos, ver comentário mais abaixo), buscar dentro
+      // de um recorte já escolhido é um refinamento, não outro recorte
+      // concorrente, então não tem o mesmo risco de confundir.
+      let termoBusca = '';
       // Favoritar em qualquer lugar do site (aqui, ou no "☆ Favoritar" da
       // Consulta Rápida) mexe na MESMA lista — então esta tabela precisa
       // se redesenhar quando a mudança vem de fora dela.
@@ -23681,6 +23706,16 @@
       }
 
       function renderFiltros() {
+        // A caixa de busca é recriada do zero a cada render (igual tudo
+        // aqui dentro, pelo innerHTML=''), então sem isso a pessoa perdia
+        // o foco — e o cursor no meio do que estava digitando — a cada
+        // tecla, porque remover um elemento focado do DOM sempre tira o
+        // foco dele, mesmo que a gente recoloque o MESMO objeto depois.
+        // Guarda aqui, restaura no fim da função.
+        const buscaAntiga = filtrosEl.querySelector('.lm-busca-ativo');
+        const tinhaFoco = buscaAntiga && document.activeElement === buscaAntiga;
+        const cursorPos = tinhaFoco ? buscaAntiga.selectionStart : null;
+
         filtrosEl.innerHTML = '';
         const criarChip = (rotulo, valor) => {
           const b = document.createElement('button');
@@ -23760,6 +23795,26 @@
         ajudaFavoritos.textContent = '?';
         filtrosEl.appendChild(ajudaFavoritos);
         if (typeof window.ligarGlossario === 'function') window.ligarGlossario(filtrosEl);
+
+        // Busca rápida — ver comentário na declaração de termoBusca.
+        // margin-left:auto (no CSS) empurra pro fim da linha, aproveitando
+        // o espaço vazio que sobrava depois do "?" de Meus Favoritos.
+        const buscaInput = document.createElement('input');
+        buscaInput.type = 'search';
+        buscaInput.className = 'lm-busca-ativo';
+        buscaInput.placeholder = 'Buscar por ticker ou nome...';
+        buscaInput.setAttribute('aria-label', 'Buscar um ativo nesta lista pelo ticker ou nome, para favoritar');
+        buscaInput.value = termoBusca;
+        buscaInput.addEventListener('input', () => {
+          termoBusca = buscaInput.value;
+          paginaAtual = 1;
+          render();
+        });
+        filtrosEl.appendChild(buscaInput);
+        if (tinhaFoco) {
+          buscaInput.focus();
+          if (cursorPos != null) buscaInput.setSelectionRange(cursorPos, cursorPos);
+        }
       }
 
       // ---- Modal de escolha de colunas --------------------------------
@@ -23966,6 +24021,10 @@
         atualizarCabecalhoFixoListaMercado(thead.closest('.lista-mercado'));
         let lista = filtroAtivo ? dados.filter(d => d[campoFiltro] === filtroAtivo) : dados;
         if (soFavoritos) lista = lista.filter(d => vrEhFavorito(d.ticker));
+        if (termoBusca.trim()) {
+          const termo = termoBusca.trim().toUpperCase();
+          lista = lista.filter(d => (d.ticker || '').toUpperCase().includes(termo) || (d.nome || '').toUpperCase().includes(termo));
+        }
         lista = [...lista].sort((a, b) => {
           const campo = colunaOrdenada.campo;
           if (campo === 'ativo') {
@@ -23990,7 +24049,9 @@
         if (lista.length === 0) {
           const vazio = soFavoritos
             ? 'Você ainda não favoritou nenhum ativo desta lista. Clique no ♥ ao lado do ativo para favoritar.'
-            : 'Nenhum ativo encontrado nesse filtro.';
+            : termoBusca.trim()
+              ? `Nenhum ativo encontrado pra "${termoBusca.trim()}".`
+              : 'Nenhum ativo encontrado nesse filtro.';
           tbody.innerHTML = `<tr><td colspan="${colunasAtivas().length}" class="lista-mercado-carregando">${vazio}</td></tr>`;
           aplicarVisibilidadeColunas();
           if (paginacaoEl) paginacaoEl.innerHTML = '';
