@@ -23660,12 +23660,17 @@
       let soFavoritos = false;
       // Busca rápida por ticker/nome — pra achar e favoritar um ativo sem
       // precisar passear pelas páginas/segmentos (reportado em 05/11/2026,
-      // com o espaço vazio à direita dos chips circulado no print). Soma
-      // com QUALQUER outro filtro ativo (segmento ou Meus Favoritos), em
-      // vez de substituí-lo — diferente do par segmento/favoritos (que SÃO
-      // mutuamente exclusivos, ver comentário mais abaixo), buscar dentro
-      // de um recorte já escolhido é um refinamento, não outro recorte
-      // concorrente, então não tem o mesmo risco de confundir.
+      // com o espaço vazio à direita dos chips circulado no print).
+      // Pesquisa em TODOS os ativos, limpando o chip de segmento e "Meus
+      // Favoritos" de propósito (ver o listener de input do campo) — a
+      // primeira versão só refinava dentro do filtro já ativo, mas isso
+      // escondia justamente o ativo que a pessoa procurava quando ele
+      // caía fora do chip/favoritos selecionado (reportado de novo em
+      // 05/11/2026: "XPLG" sumia com o chip "Tijolo" marcado, porque
+      // XPLG11 é Logístico). O propósito da busca é achar QUALQUER ativo
+      // pra favoritar, então restringir a um recorte já escolhido não
+      // fazia sentido — diferente do par segmento/favoritos (que SÃO
+      // mutuamente exclusivos entre si, ver comentário mais abaixo).
       let termoBusca = '';
       // Favoritar em qualquer lugar do site (aqui, ou no "☆ Favoritar" da
       // Consulta Rápida) mexe na MESMA lista — então esta tabela precisa
@@ -23807,6 +23812,17 @@
         buscaInput.value = termoBusca;
         buscaInput.addEventListener('input', () => {
           termoBusca = buscaInput.value;
+          // Buscar agora limpa o chip de segmento e "Meus Favoritos", em
+          // vez de só refinar dentro deles — reportado em 05/11/2026 com
+          // "XPLG" (Logístico) não aparecendo porque o chip "Tijolo"
+          // continuava marcado. O propósito original da busca ("achar um
+          // ativo pra favoritar") só faz sentido pesquisando em TODOS os
+          // ativos: filtrar por segmento ou só pelos já favoritados
+          // escondia justamente os ativos que a pessoa ainda não tinha.
+          if (termoBusca.trim()) {
+            filtroAtivo = null;
+            soFavoritos = false;
+          }
           paginaAtual = 1;
           render();
           // Buscar pode encolher a lista de 20 linhas pra 1 — se a pessoa
