@@ -2,15 +2,15 @@
  "_leia_me": "Cadastro de EMISSÃO de CRIs (Certificados de Recebíveis Imobiliários) negociados na B3, só os que ainda não venceram. 'rotulo_remuneracao' é a remuneração CONTRATADA no lançamento do papel — a B3 não publica uma taxa de mercado secundário atualizada todo dia para CRI (diferente da tela de Debêntures, que usa a ANBIMA). Para papel pós-fixado (DI/IPCA/IGP-M + spread) isso ainda descreve o que o título paga hoje, porque só o indexador-base flutua; para PREFIXADO não há garantia nenhuma de que siga valendo. CRI é isento de Imposto de Renda para pessoa física por lei (diferente de debênture incentivada, que depende de cada papel) — mas não tem FGC, e a maioria exige um investimento mínimo alto (na casa de R$ 10 a 20 mil), que este arquivo não informa.",
  "fonte": "B3 — Consulta Pública de CRIs",
  "fonte_url": "https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/",
- "atualizado_em": "2026-11-04T20:05:27+00:00",
+ "atualizado_em": "2026-11-05T20:19:25+00:00",
  "total": 4441,
- "total_no_arquivo_b3": 4693,
+ "total_no_arquivo_b3": 4692,
  "por_indexador": {
   "di": 1249,
   "igp_m": 209,
-  "tr": 61,
+  "tr": 60,
   "outro": 350,
-  "ipca": 2492,
+  "ipca": 2493,
   "prefixado": 13,
   "incc_di": 46,
   "inpc": 8,
@@ -18,7 +18,7 @@
   "incc_m": 5,
   "ipc_fipe": 2
  },
- "volume_total_emissao": 304936781520.32,
+ "volume_total_emissao": 304777462620.48,
  "cris": [
   {
    "codigo": "27I0000801",
@@ -53,23 +53,6 @@
    "data_emissao": "2027-02-09",
    "data_vencimento": "2031-02-09",
    "data_final_distribuicao": "2026-08-10"
-  },
-  {
-   "codigo": "26K0010401",
-   "isin": "BRHBSCCRIEH2",
-   "emissor": "HABITASEC SECURITIZADORA S/A",
-   "agente_fiduciario": "OLIVEIRA TRUST DTVM S/A",
-   "numero_emissao": "115",
-   "numero_serie": "2",
-   "quantidade_emitida": 20000.0,
-   "volume_emissao": 20000000.0,
-   "indexador": "ipca",
-   "pct_indexador": null,
-   "spread": 14.0,
-   "rotulo_remuneracao": "IPCA + 14,00%",
-   "data_emissao": "2026-11-10",
-   "data_vencimento": "2046-05-10",
-   "data_final_distribuicao": "2026-11-10"
   },
   {
    "codigo": "26J7658778",
@@ -6311,6 +6294,23 @@
    "data_final_distribuicao": "2026-11-10"
   },
   {
+   "codigo": "26K0010401",
+   "isin": "BRHBSCCRIEH2",
+   "emissor": "HABITASEC SECURITIZADORA S/A",
+   "agente_fiduciario": "OLIVEIRA TRUST DTVM S/A",
+   "numero_emissao": "115",
+   "numero_serie": "2",
+   "quantidade_emitida": 20000.0,
+   "volume_emissao": 20000000.0,
+   "indexador": "ipca",
+   "pct_indexador": null,
+   "spread": 14.0,
+   "rotulo_remuneracao": "IPCA + 14,00%",
+   "data_emissao": "2026-05-05",
+   "data_vencimento": "2046-05-10",
+   "data_final_distribuicao": "2026-11-10"
+  },
+  {
    "codigo": "26D6994045",
    "isin": "BRIMWLCRIQ02",
    "emissor": "RIZA SECURITIZADORA S.A.",
@@ -6589,8 +6589,8 @@
    "agente_fiduciario": "VORTX DTVM S.A.",
    "numero_emissao": "315",
    "numero_serie": "2",
-   "quantidade_emitida": 20000.0,
-   "volume_emissao": 20000000.0,
+   "quantidade_emitida": 40000.0,
+   "volume_emissao": 40000000.0,
    "indexador": "di",
    "pct_indexador": 100.0,
    "spread": 4.0,
@@ -47502,6 +47502,23 @@
    "data_final_distribuicao": "2023-10-29"
   },
   {
+   "codigo": "23D1245828",
+   "isin": "BRHBSCCRIA35",
+   "emissor": "HABITASEC SECURITIZADORA S/A",
+   "agente_fiduciario": "VORTX DTVM S.A.",
+   "numero_emissao": "1",
+   "numero_serie": "333",
+   "quantidade_emitida": 48652.0,
+   "volume_emissao": 48652000.0,
+   "indexador": "ipca",
+   "pct_indexador": null,
+   "spread": 12.0,
+   "rotulo_remuneracao": "IPCA + 12,00%",
+   "data_emissao": "2023-04-12",
+   "data_vencimento": "2026-11-09",
+   "data_final_distribuicao": "2023-10-22"
+  },
+  {
    "codigo": "23D1610941",
    "isin": "BRAPCSCRIHO6",
    "emissor": "OPEA SECURITIZADORA S/A",
@@ -47551,23 +47568,6 @@
    "data_emissao": "2023-04-04",
    "data_vencimento": "2028-04-05",
    "data_final_distribuicao": "2023-10-19"
-  },
-  {
-   "codigo": "23D0888626",
-   "isin": "BRAPCSCRIHE7",
-   "emissor": "OPEA SECURITIZADORA S/A",
-   "agente_fiduciario": "VORTX DTVM S.A.",
-   "numero_emissao": "155",
-   "numero_serie": "2",
-   "quantidade_emitida": 132343.0,
-   "volume_emissao": 132343000.0,
-   "indexador": "ipca",
-   "pct_indexador": null,
-   "spread": 7.8529,
-   "rotulo_remuneracao": "IPCA + 7,85%",
-   "data_emissao": "2023-04-03",
-   "data_vencimento": "2027-09-15",
-   "data_final_distribuicao": "2023-10-08"
   },
   {
    "codigo": "23C1842756",
@@ -66066,6 +66066,23 @@
    "data_final_distribuicao": "2022-12-07"
   },
   {
+   "codigo": "20L0551394",
+   "isin": "BRHBSCCRI5Q7",
+   "emissor": "HABITASEC SECURITIZADORA S/A",
+   "agente_fiduciario": "VORTX DTVM S.A.",
+   "numero_emissao": "1",
+   "numero_serie": "220",
+   "quantidade_emitida": 20000.0,
+   "volume_emissao": 20000000.0,
+   "indexador": "ipca",
+   "pct_indexador": null,
+   "spread": null,
+   "rotulo_remuneracao": "IPCA",
+   "data_emissao": "2020-12-09",
+   "data_vencimento": "2026-11-09",
+   "data_final_distribuicao": "2021-06-14"
+  },
+  {
    "codigo": "20L0522095",
    "isin": "",
    "emissor": "OPEA SECURITIZADORA S/A",
@@ -73544,23 +73561,6 @@
    "data_emissao": "2014-11-27",
    "data_vencimento": "2026-11-12",
    "data_final_distribuicao": "2015-05-26"
-  },
-  {
-   "codigo": "14K0202980",
-   "isin": "",
-   "emissor": "BARI SECURITIZADORA S.A.",
-   "agente_fiduciario": "OLIVEIRA TRUST DTVM SA",
-   "numero_emissao": "1",
-   "numero_serie": "18",
-   "quantidade_emitida": 115.0,
-   "volume_emissao": 115627899.84,
-   "indexador": "tr",
-   "pct_indexador": null,
-   "spread": 9.6976,
-   "rotulo_remuneracao": "TR + 9,70%",
-   "data_emissao": "2014-11-26",
-   "data_vencimento": "2026-11-05",
-   "data_final_distribuicao": "2015-05-19"
   },
   {
    "codigo": "14K0234407",
