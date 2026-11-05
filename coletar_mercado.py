@@ -229,6 +229,25 @@ def aplicar_override_segmento(ticker, segmento_calculado):
     return OVERRIDE_SEGMENTO_TICKER.get(ticker, segmento_calculado)
 
 
+# Tickers que o Fundamentus ainda lista (com número antigo, parado no
+# tempo) mas que não são mais negociados — o fundo saiu de circulação ou
+# trocou de código, e a página deles não foi atualizada/removida. Sem essa
+# lista, esses tickers entram na tabela final com "nome" igual ao próprio
+# ticker (a HG Brasil não reconhece mais e não sobrescreve) e números às
+# vezes absurdos (PVP, patrimônio) que nunca batem com nenhuma fonte viva.
+#
+# AGCX11 — reportado em 05/11/2026 (o usuário achou no "Todos os Fundos
+# Imobiliários" com PVP 11,57 e patrimônio de R$ 19,29 bi, mas "não
+# encontrado" na Consulta Rápida, que usa a HG Brasil ao vivo). Pesquisado
+# antes de excluir: é o FII Agências Caixa (CNPJ 15.576.907/0001-70) —
+# confirmado pela Fundsexplorer como fundo que NÃO está mais sendo
+# negociado (trocou de código pra RBVA em 2019). Não é o mesmo fundo que
+# CXAG11 (FII Caixa Ag, CNPJ 40.189.596/0001-34, registrado em 2021,
+# negociado normalmente) — são dois fundos com nome parecido mas CNPJs
+# diferentes; CXAG11 já aparece certo na lista, sem precisar de nada aqui.
+TICKERS_FUNDAMENTUS_INATIVOS = {"AGCX11"}
+
+
 def log(msg):
     print(f"[coletar_mercado] {msg}", flush=True)
 
@@ -461,6 +480,9 @@ def buscar_fiis_fundamentus():
     for _, linha in tabela.iterrows():
         ticker = str(linha.get("Papel", "")).strip().upper()
         if not ticker:
+            continue
+        if ticker in TICKERS_FUNDAMENTUS_INATIVOS:
+            log(f"  ignorando {ticker}: Fundamentus ainda lista, mas o fundo não é mais negociado (ver TICKERS_FUNDAMENTUS_INATIVOS)")
             continue
         segmento_bruto = str(linha.get("Segmento", "")).strip()
         segmento_final = aplicar_override_segmento(ticker, macro_segmento_fii(segmento_bruto))
