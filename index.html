@@ -23809,6 +23809,17 @@
           termoBusca = buscaInput.value;
           paginaAtual = 1;
           render();
+          // Buscar pode encolher a lista de 20 linhas pra 1 — se a pessoa
+          // estava rolada pra dentro da tabela (vendo a linha 18, digamos),
+          // a página INTEIRA fica mais curta que a posição de rolagem
+          // atual, e o navegador força a tela de volta pro topo da página
+          // sozinho, de um jeito brusco e sem relação com o que estava
+          // sendo buscado (reportado em 05/11/2026 como "a tela se
+          // desloca"). Mesma função já usada ao clicar num chip de filtro
+          // — só age quando o título da lista saiu de vista, trazendo de
+          // volta pra um lugar estável (logo abaixo do cabeçalho) em vez
+          // de deixar o navegador escolher um ponto qualquer.
+          reposicionarListaAposMudanca();
         });
         filtrosEl.appendChild(buscaInput);
         if (tinhaFoco) {
@@ -24021,6 +24032,12 @@
         atualizarCabecalhoFixoListaMercado(thead.closest('.lista-mercado'));
         let lista = filtroAtivo ? dados.filter(d => d[campoFiltro] === filtroAtivo) : dados;
         if (soFavoritos) lista = lista.filter(d => vrEhFavorito(d.ticker));
+        // Guardado ANTES de aplicar a busca: "você ainda não favoritou
+        // nada" só é verdade quando a causa do vazio é essa — não quando
+        // a pessoa TEM favoritos, mas nenhum bate com o termo buscado
+        // (reportado em 05/11/2026 com "XPML11": a mensagem errada dizia
+        // "não favoritou nada" mesmo com 19 favoritos na lista).
+        const semFavoritosNesteFiltro = soFavoritos && lista.length === 0;
         if (termoBusca.trim()) {
           const termo = termoBusca.trim().toUpperCase();
           lista = lista.filter(d => (d.ticker || '').toUpperCase().includes(termo) || (d.nome || '').toUpperCase().includes(termo));
@@ -24047,7 +24064,7 @@
         });
 
         if (lista.length === 0) {
-          const vazio = soFavoritos
+          const vazio = semFavoritosNesteFiltro
             ? 'Você ainda não favoritou nenhum ativo desta lista. Clique no ♥ ao lado do ativo para favoritar.'
             : termoBusca.trim()
               ? `Nenhum ativo encontrado pra "${termoBusca.trim()}".`
