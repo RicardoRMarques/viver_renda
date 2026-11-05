@@ -103,6 +103,31 @@
       --zebra: rgba(255,255,255,0.035);
     }
 
+    /* Preto puro: mesma paleta de texto/destaque do modo escuro padrão
+       (--text/--primary/--accent/--gold/--danger inalterados — já têm
+       contraste validado sobre fundo escuro), só troca os tons de
+       fundo/borda do azulado (#0b1220) pra preto neutro — mesma ideia do
+       "branco puro" abaixo, espelhada pro lado escuro. */
+    html[data-theme="black"] {
+      --bg: #000000;
+      --card: #0d0d0d;
+      --deep: #000000;
+      --grad-a: #000000;
+      --grad-b: #000000;
+      --text: #e8eefc;
+      --muted: #a9b6d3;
+      --primary: #31c3ff;
+      --primary-dark: #16a0d8;
+      --accent: #7cff92;
+      --gold: #e0b84d;
+      --danger: #ff6b6b;
+      --border: rgba(255,255,255,0.08);
+      --shadow: 0 16px 40px rgba(0,0,0,0.5);
+      --btn-text: #04101a;
+      --painel-bg: rgba(10,10,10,0.75);
+      --zebra: rgba(255,255,255,0.035);
+    }
+
     html[data-theme="light"] {
       --bg: #eef2f9;
       --card: #ffffff;
@@ -162,10 +187,12 @@
       line-height: 1.6;
       min-height: 100vh;
     }
-    /* Branco puro: sem o brilho azulado no topo (ele é uma cor fixa, não
-       amarrada a --primary, então persistiria mesmo aqui sem esse
-       override — quebraria o propósito de "sem nenhuma cor de fundo"). */
-    html[data-theme="white"] body {
+    /* Branco puro e preto puro: sem o brilho azulado no topo (ele é uma
+       cor fixa, não amarrada a --primary, então persistiria mesmo aqui
+       sem esse override — quebraria o propósito de "sem nenhuma cor de
+       fundo"). */
+    html[data-theme="white"] body,
+    html[data-theme="black"] body {
       background: var(--bg);
     }
 
@@ -4414,7 +4441,7 @@
   <script>
     (function () {
       var temaSalvo = localStorage.getItem('viverderenda_tema');
-      if (temaSalvo === 'light' || temaSalvo === 'white') {
+      if (temaSalvo === 'light' || temaSalvo === 'white' || temaSalvo === 'black') {
         document.documentElement.setAttribute('data-theme', temaSalvo);
       }
     })();
@@ -23068,14 +23095,15 @@
       const botao = document.getElementById('themeToggle');
       const html = document.documentElement;
 
-      // Ordem do ciclo ao clicar: escuro -> claro (azulado) -> branco puro
-      // -> escuro de novo. O ícone sempre mostra o PRÓXIMO estado (o que
-      // vai acontecer ao clicar), não o atual — mesma lógica que já
-      // existia no botão de 2 estados.
-      const PROXIMO = { dark: 'light', light: 'white', white: 'dark' };
-      const ICONE = { dark: '☀️', light: '⚪', white: '🌙' };
+      // Ordem do ciclo ao clicar: escuro (azulado) -> preto puro -> claro
+      // (azulado) -> branco puro -> escuro de novo. O ícone sempre mostra
+      // o PRÓXIMO estado (o que vai acontecer ao clicar), não o atual —
+      // mesma lógica que já existia no botão de 2 estados.
+      const PROXIMO = { dark: 'black', black: 'light', light: 'white', white: 'dark' };
+      const ICONE = { dark: '🌑', black: '☀️', light: '⚪', white: '🌙' };
       const TITULO = {
-        dark: 'Clarear a página (fundo azulado)',
+        dark: 'Deixar o fundo preto puro',
+        black: 'Clarear a página (fundo azulado)',
         light: 'Deixar o fundo branco puro',
         white: 'Escurecer a página',
       };
