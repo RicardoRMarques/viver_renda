@@ -4938,11 +4938,23 @@
         é o jeito mais direto de acompanhar essa resposta.
       </p>
 
-      <div class="hg-status atencao-fixa" style="margin-bottom:12px;">
+      <h3 style="margin:0 0 8px;">Curva de juros futuros (ETTJ prefixada)</h3>
+      <p class="calc-ajuda" style="margin-top:0;">
+        Cada ponto é a taxa anual que o mercado precifica hoje para aquele prazo — é essa curva que a imprensa
+        chama de "curva do DI futuro" ou "curva pré". Quando ela sobe (sobretudo nos vértices mais longos), é o
+        sinal de juros mais altos pela frente — o que tende a pressionar os FIIs pra baixo.
+      </p>
+      <div id="curvaJurosStatus" class="hg-status">Carregando curva de juros...</div>
+      <div id="curvaJurosGraficoWrap" style="position:relative; height:280px; margin-bottom:8px;" hidden>
+        <canvas id="curvaJurosChart"></canvas>
+      </div>
+      <p class="calc-ajuda" id="curvaJurosFonte" style="font-size:0.78rem; margin-top:4px;" hidden></p>
+
+      <div class="hg-status atencao-fixa" style="margin:14px 0;">
         <span>🚧</span>
         <span>
-          <strong>Em construção:</strong> por enquanto esta seção traz só o histórico do IFIX. A curva de juros
-          futuros (DI) sobreposta, pra comparar visualmente os dois movimentos, é a próxima etapa.
+          <strong>Em construção:</strong> sobrepor essa curva ao histórico do IFIX no mesmo gráfico, pra comparar
+          visualmente os dois movimentos lado a lado, é a próxima etapa.
         </span>
       </div>
 
@@ -17604,6 +17616,83 @@
       window.hgConsultarAtivo?.('IFIX');
     });
 
+    // Curva de juros futuros (ETTJ prefixada) — data/curva-juros.json,
+    // coletado 1x por dia útil pelo coletar_curva_juros.py (ANBIMA). Os
+    // vértices vêm em dias (a própria ANBIMA não documenta publicamente
+    // se é dia útil ou corrido) — o rótulo abaixo só aproxima pra
+    // meses/anos, sem afirmar a convenção exata.
+    let curvaJurosChart = null;
+    let curvaJurosCarregada = false;
+    function curvaJurosRotuloVertice(dias) {
+      if (dias < 252) return `${Math.max(1, Math.round(dias / 21))}m`;
+      return `${Math.round((dias / 252) * 10) / 10}a`;
+    }
+    async function carregarCurvaJuros() {
+      if (curvaJurosCarregada) return;
+      curvaJurosCarregada = true;
+
+      const statusEl = document.getElementById('curvaJurosStatus');
+      const wrapEl = document.getElementById('curvaJurosGraficoWrap');
+      const fonteEl = document.getElementById('curvaJurosFonte');
+      if (!statusEl) return;
+
+      try {
+        const resp = await fetch('data/curva-juros.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const dados = await resp.json();
+        const pontos = Array.isArray(dados?.pontos) ? dados.pontos : [];
+        if (!pontos.length) throw new Error('curva vazia');
+
+        await hgCarregarChartJs();
+
+        const labels = pontos.map(p => curvaJurosRotuloVertice(p.dias));
+        const taxas = pontos.map(p => p.taxa);
+
+        if (curvaJurosChart) curvaJurosChart.destroy();
+        curvaJurosChart = new Chart(document.getElementById('curvaJurosChart'), {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              { label: 'Taxa prefixada (% a.a.)', data: taxas, borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, tension: 0.25 },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  title: (itens) => `Vértice: ${pontos[itens[0].dataIndex].dias} dias`,
+                  label: (c) => `${c.parsed.y.toFixed(2)}% a.a.`,
+                },
+              },
+            },
+            scales: {
+              x: { title: { display: true, text: 'Prazo', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED() }, grid: { display: false } },
+              y: { title: { display: true, text: '% a.a.', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED(), callback: (v) => `${v}%` }, grid: { color: HG_COR_GRID() } },
+            },
+          },
+        });
+
+        statusEl.hidden = true;
+        if (wrapEl) wrapEl.hidden = false;
+        if (fonteEl) {
+          const dataRef = dados.data_referencia
+            ? new Date(`${dados.data_referencia}T00:00:00`).toLocaleDateString('pt-BR')
+            : '—';
+          fonteEl.textContent = `Fonte: ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ), referente a ${dataRef}.`;
+          fonteEl.hidden = false;
+        }
+      } catch (e) {
+        console.error('Erro ao carregar a curva de juros:', e);
+        statusEl.hidden = false;
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Curva de juros ainda não disponível no momento — o robô coleta 1x por dia útil, tente novamente mais tarde.';
+        curvaJurosCarregada = false; // permite tentar de novo numa próxima visita a esta seção
+      }
+    }
+
     // ============================================================
     // CRA — CERTIFICADOS DE RECEBÍVEIS DO AGRONEGÓCIO
     // Taxas de mercado secundário da ANBIMA (coletar_cri_cra_anbima.py
@@ -23439,6 +23528,12 @@
       const secao = document.getElementById(id);
       if (!secao) return;
       secao.hidden = false;
+      // Carrega a curva de juros só agora (seção já visível) — Chart.js
+      // precisa do canvas com dimensão real pra se desenhar certo; feito
+      // aqui dentro, e não num listener separado, garante que roda DEPOIS
+      // do hidden=false de cima, sem depender da ordem de registro entre
+      // handlers do mesmo clique.
+      if (id === 'juros-x-fiis') carregarCurvaJuros();
       atualizarCabecalhoFixoListaMercado(secao);
       // scrollIntoView sozinho alinha o topo da seção com o topo da tela,
       // mas o cabeçalho do site é fixo — isso deixava o título e o botão
