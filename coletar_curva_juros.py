@@ -158,12 +158,22 @@ def interpretar_xml(texto_xml):
     except ET.ParseError:
         return [], []
 
+    # Rodando de verdade (06/11/2026) apareceu outra seção da resposta
+    # (provavelmente <CIRCULAR>, de taxas indicativas de prazo bem curto
+    # — não a ETTJ) que TAMBÉM usa a tag <VERTICES>, só que com "Vertice"
+    # significando outra coisa (vários pontos repetindo Vertice='1'/'2'
+    # com taxas diferentes entre si, o que não faz sentido pra uma curva
+    # — um vértice tem UMA taxa só por dia). Por isso busca <VERTICES>
+    # só DENTRO de <ETTJ> especificamente, não em qualquer lugar do
+    # documento — ali sim cada vértice aparece uma única vez.
+    ettj_el = raiz.find("ETTJ")
+    if ettj_el is None:
+        return [], []
+
     pontos = []
     atributos_vistos = []
 
-    for elemento in raiz.iter():
-        if elemento.tag != "VERTICES":
-            continue
+    for elemento in ettj_el.findall("VERTICES"):
         if not atributos_vistos:
             atributos_vistos = sorted(elemento.attrib.keys())
 
