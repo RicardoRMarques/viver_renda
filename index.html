@@ -17709,8 +17709,8 @@
               },
             },
             scales: {
-              x: { title: { display: true, text: 'Prazo', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED() }, grid: { display: false } },
-              y: { title: { display: true, text: '% a.a.', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(1)}%` }, grid: { color: HG_COR_GRID() } },
+              x: { title: { display: true, text: 'Prazo (anos)', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED() }, grid: { display: false } },
+              y: { title: { display: true, text: 'Juros (% a.a.)', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(1)}%` }, grid: { color: HG_COR_GRID() } },
             },
           },
         });
@@ -17800,16 +17800,16 @@
               legend: { display: true, labels: { color: HG_COR_MUTED(), boxWidth: 12 } },
             },
             scales: {
-              x: { type: 'category', ticks: { color: HG_COR_MUTED(), autoSkip: true, maxTicksLimit: 8 }, grid: { display: false } },
+              x: { type: 'category', title: { display: true, text: 'Data', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED(), autoSkip: true, maxTicksLimit: 8 }, grid: { display: false } },
               y: {
                 position: 'left',
-                title: { display: true, text: 'Juros % a.a.', color: HG_COR_PRIMARIA() },
+                title: { display: true, text: 'Juros (% a.a.)', color: HG_COR_PRIMARIA() },
                 ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(1)}%` },
                 grid: { color: HG_COR_GRID() },
               },
               y1: {
                 position: 'right',
-                title: { display: true, text: 'IFIX', color: HG_COR_ACCENT() },
+                title: { display: true, text: 'IFIX (pts)', color: HG_COR_ACCENT() },
                 ticks: { color: HG_COR_MUTED() },
                 grid: { display: false },
               },
