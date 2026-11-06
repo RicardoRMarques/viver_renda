@@ -31,29 +31,42 @@ Como foi descoberto (não documentado publicamente pela ANBIMA)
 A página institucional https://www.anbima.com.br/informacoes/est-termo/
 tem um formulário de download (XLS/CSV/TXT/XML) que posta pra um
 endpoint clássico, usado por vários projetos open-source dedicados a
-isso (ex: github.com/rafa-rod/pyettj) — não testei esse endpoint ao
-vivo (sem acesso à internet no ambiente onde este robô foi escrito),
-então o formato exato da resposta XML (nomes de atributo dentro de
-cada elemento) é a parte menos certa deste robô. Por isso a função
-`interpretar_xml` é DEFENSIVA: não assume nomes de atributo fixos,
-procura por substrings prováveis ("vertice"/"dias"/"prazo" pro prazo
-em dias, "taxa" pra taxa), e LOGA a estrutura bruta encontrada se não
-conseguir casar nada — isso dá visibilidade real no primeiro run do
-GitHub Actions (que tem internet) pra corrigir rápido se o palpite
-estiver errado, em vez de gravar silenciosamente um arquivo vazio ou
-errado.
+isso (ex: github.com/rafa-rod/pyettj). A primeira versão deste robô
+tinha sido escrita sem conseguir testar isso ao vivo (sem acesso à
+internet no ambiente onde foi escrito) e tinha suposições erradas
+sobre o formato da resposta — foi rodado de verdade via GitHub Actions
+em 06/11/2026 e corrigido com a estrutura REAL confirmada:
 
 URL:    https://www.anbima.com.br/informacoes/est-termo/CZ-down.asp
 Método: POST (application/x-www-form-urlencoded)
 Corpo:  Idioma=PT, Dt_Ref=DD/MM/AAAA, saida=xml
-Resposta esperada: XML com elementos <VERTICES> (um por par
-   vértice/taxa, agrupados por "Grupo" — PREFIXADOS, SELIC, IPCA
-   etc.), <PARAMETRO> (parâmetros do modelo ajustado, não usados
-   aqui — já usamos a curva pronta em VERTICES) e <ERRO>.
+Resposta real (exemplo, 05/11/2026):
+   <CURVAZERO>
+     <DATA_REFERENCIA>05/11/2026</DATA_REFERENCIA>
+     <PARAMETROS>
+       <PARAMETRO Grupo='PREFIXADOS' B1='...' B2='...' L1='...' L2='.../>
+       <PARAMETRO Grupo='IPCA' .../>
+     </PARAMETROS>
+     <ETTJ>
+       <VERTICES Vertice='252' IPCA='6,4273' Prefixados='14,2002' Inflacao='7,3034' />
+       <VERTICES Vertice='378' IPCA='7,2327' Prefixados='14,4879' Inflacao='...' />
+       ...
+     </ETTJ>
+   </CURVAZERO>
+Ou seja: <VERTICES> NÃO tem um atributo "Grupo" (esse só existe em
+<PARAMETRO>, que não usamos — já usamos a curva pronta, não os
+parâmetros do modelo) — cada <VERTICES> é uma linha com TODAS as
+curvas (Prefixados/IPCA/Inflacao) na mesma tag, uma coluna por curva.
+"Vertice" é o prazo — 252 ≈ 1 ano, o que indica DIAS ÚTEIS (252
+dias úteis/ano é a convenção padrão brasileira), não dias corridos,
+mas a ANBIMA não documenta isso explicitamente. Decimais vêm com
+vírgula. Quando não há curva publicada pra uma data (fim de semana,
+feriado, ou o dia ainda não fechou), a resposta inteira é só
+"<CURVAZERO>\r </CURVAZERO>" — sem nenhum <VERTICES>.
 
 A ANBIMA só mantém os últimos ~5 dias úteis disponíveis por essa via —
-por isso tenta a data de hoje e, se vier vazio (fim de semana, feriado,
-ou o dia ainda não foi publicado), volta alguns dias até achar.
+por isso tenta a data de hoje e, se vier vazio, volta alguns dias até
+achar.
 
 Saída: data/curva-juros.json
 ---------------------------------------------------------------------
@@ -92,28 +105,20 @@ TEMPO_LIMITE = 30  # segundos
 # não tiver curva publicada (fim de semana, feriado, antes do fechamento).
 MAX_DIAS_PARA_TRAS = 7
 
-# Candidatos de nome de atributo dentro de <VERTICES>, em ordem de
-# preferência — case-insensitive, por SUBSTRING (não precisa bater
-# exato: "Vertice" e "vertice_dias" batem com "vertice", por exemplo).
-# Ver cabeçalho do arquivo sobre por que isso é defensivo.
-CANDIDATOS_PRAZO = ("vertice", "dias", "prazo")
-CANDIDATOS_TAXA = ("taxa",)
-CANDIDATOS_GRUPO = ("grupo", "tipo", "curva")
-
-# Como a ANBIMA rotula a curva prefixada (a que o mercado chama de
-# "curva de juros"/"curva do DI futuro") — tentados em ordem, por
-# substring, case-insensitive.
-GRUPO_PREFIXADA_CANDIDATOS = ("prefixado", "prefixada", "pre")
-
-
-def _primeiro_valor_por_substring(attrib_lower, candidatos):
-    """Primeira chave de `attrib_lower` que CONTÉM alguma substring de
-    `candidatos` (já em minúsculo). Devolve (chave, valor) ou (None, None)."""
-    for candidato in candidatos:
-        for chave, valor in attrib_lower.items():
-            if candidato in chave:
-                return chave, valor
-    return None, None
+# Estrutura REAL confirmada rodando contra o endpoint de verdade em
+# 06/11/2026 (ver histórico do commit anterior pra o que foi tentado
+# antes, com suposições erradas): a resposta não é <ETTJ> na raiz, é
+# <CURVAZERO><DATA_REFERENCIA>.../ <PARAMETROS>...</ PARAMETROS>
+# <ETTJ><VERTICES .../></ETTJ></CURVAZERO>. Cada <VERTICES> NÃO tem um
+# atributo "Grupo" — tem um atributo "Vertice" (prazo em dias) e UMA
+# COLUNA POR CURVA na mesma linha: Prefixados, IPCA, Inflacao. Exemplo
+# real: <VERTICES Vertice='252' IPCA='6,4273' Prefixados='14,2002'
+# Inflacao='7,3034' />. Decimais vêm com vírgula. Quando a ANBIMA não
+# tem curva publicada pra uma data (fim de semana, feriado, ou o dia
+# ainda não fechou), a resposta inteira é só
+# "<CURVAZERO>\r </CURVAZERO>" (27 bytes, sem <VERTICES> nenhum).
+ATRIBUTO_VERTICE = "Vertice"
+ATRIBUTO_TAXA_PREFIXADA = "Prefixados"
 
 
 def _numero(bruto):
@@ -142,62 +147,41 @@ def baixar_xml(data_ref):
 
 
 def interpretar_xml(texto_xml):
-    """Extrai os pontos (dias, taxa) da curva PREFIXADA a partir do XML
-    da ANBIMA. Devolve (pontos, grupo_usado, grupos_vistos) — pontos
-    vazio quer dizer "não achei nada reconhecível" (data sem curva
-    publicada, ou mudança de formato — `grupos_vistos` ajuda a
-    diagnosticar qual dos dois)."""
+    """Extrai os pontos (dias, taxa prefixada) a partir do XML da
+    ANBIMA. Devolve (pontos, atributos_vistos) — pontos vazio quer
+    dizer "sem curva publicada nessa data" (comum em fim de
+    semana/feriado/antes do fechamento) OU "mudança de formato";
+    `atributos_vistos` (os nomes de atributo do primeiro <VERTICES>
+    encontrado, se houver) ajuda a diferenciar os dois casos no log."""
     try:
         raiz = ET.fromstring(texto_xml)
     except ET.ParseError:
-        return [], None, []
+        return [], []
 
-    grupos_vistos = set()
-    pontos_por_grupo = {}
+    pontos = []
+    atributos_vistos = []
 
     for elemento in raiz.iter():
-        if elemento.tag.upper() != "VERTICES":
+        if elemento.tag != "VERTICES":
             continue
-        attrib_lower = {k.lower(): v for k, v in elemento.attrib.items()}
+        if not atributos_vistos:
+            atributos_vistos = sorted(elemento.attrib.keys())
 
-        _, grupo = _primeiro_valor_por_substring(attrib_lower, CANDIDATOS_GRUPO)
-        grupo = (grupo or "").strip()
-        if grupo:
-            grupos_vistos.add(grupo)
-
-        _, prazo_bruto = _primeiro_valor_por_substring(attrib_lower, CANDIDATOS_PRAZO)
-        _, taxa_bruta = _primeiro_valor_por_substring(attrib_lower, CANDIDATOS_TAXA)
-        dias = _numero(prazo_bruto)
-        taxa = _numero(taxa_bruta)
+        dias = _numero(elemento.get(ATRIBUTO_VERTICE))
+        taxa = _numero(elemento.get(ATRIBUTO_TAXA_PREFIXADA))
         if dias is None or taxa is None:
             continue
+        pontos.append({"dias": int(dias), "taxa": taxa})
 
-        pontos_por_grupo.setdefault(grupo, []).append({"dias": int(dias), "taxa": taxa})
-
-    # Acha o grupo prefixado entre os vistos (case-insensitive, por
-    # substring) — não assume o rótulo exato.
-    grupo_usado = None
-    for candidato in GRUPO_PREFIXADA_CANDIDATOS:
-        for grupo in grupos_vistos:
-            if candidato in grupo.lower():
-                grupo_usado = grupo
-                break
-        if grupo_usado:
-            break
-
-    if not grupo_usado:
-        return [], None, sorted(grupos_vistos)
-
-    pontos = sorted(pontos_por_grupo.get(grupo_usado, []), key=lambda p: p["dias"])
-    return pontos, grupo_usado, sorted(grupos_vistos)
+    pontos.sort(key=lambda p: p["dias"])
+    return pontos, atributos_vistos
 
 
 def coletar(data_mais_recente=None):
     """Tenta baixar a curva da data mais recente possível, voltando dia
     a dia até MAX_DIAS_PARA_TRAS se vier vazia. Devolve (pontos,
-    data_usada, grupo_usado) ou (None, None, None) se esgotar as tentativas."""
+    data_usada) ou (None, None) se esgotar as tentativas."""
     data_alvo = data_mais_recente or datetime.now(timezone.utc).date()
-    ultimos_grupos_vistos = []
 
     for i in range(MAX_DIAS_PARA_TRAS):
         data_tentativa = data_alvo - timedelta(days=i)
@@ -207,60 +191,57 @@ def coletar(data_mais_recente=None):
             print(f"  {data_tentativa}: falha de rede ({exc})", file=sys.stderr)
             continue
 
-        pontos, grupo_usado, grupos_vistos = interpretar_xml(texto)
-        if grupos_vistos:
-            ultimos_grupos_vistos = grupos_vistos
+        pontos, atributos_vistos = interpretar_xml(texto)
         if pontos:
-            return pontos, data_tentativa, grupo_usado
+            return pontos, data_tentativa
 
-        if not grupos_vistos:
-            # Nem um <VERTICES> foi achado — provavelmente a resposta não é
-            # o XML esperado (página de erro, HTML, formato mudou). Loga um
-            # pedaço bruto da resposta pra dar visibilidade real no log do
-            # GitHub Actions (que tem internet pra validar, diferente de
-            # onde este robô foi escrito — ver cabeçalho do arquivo).
+        if not atributos_vistos:
+            # Nem um <VERTICES> foi achado — pode ser só "sem curva nessa
+            # data" (normal em fim de semana/feriado/antes do fechamento,
+            # a resposta vem como "<CURVAZERO></CURVAZERO>" vazio) ou a
+            # resposta não é o XML esperado de verdade. Loga um pedaço
+            # bruto pra diferenciar os dois casos no log do GitHub Actions
+            # (que tem internet pra validar, diferente de onde este robô
+            # foi escrito — ver cabeçalho do arquivo).
             amostra = texto.strip().replace("\n", " ")[:600]
-            print(f"  {data_tentativa}: resposta não reconhecida (tamanho={len(texto)} chars). "
+            print(f"  {data_tentativa}: resposta sem <VERTICES> (tamanho={len(texto)} chars). "
                   f"Primeiros 600 caracteres: {amostra!r}", file=sys.stderr)
+        else:
+            print(f"  {data_tentativa}: <VERTICES> achado, mas sem os atributos esperados "
+                  f"({ATRIBUTO_VERTICE!r}/{ATRIBUTO_TAXA_PREFIXADA!r}). "
+                  f"Atributos vistos: {atributos_vistos}", file=sys.stderr)
         print(f"  {data_tentativa}: sem curva prefixada publicada, tentando o dia anterior...", file=sys.stderr)
 
-    if ultimos_grupos_vistos:
-        print(
-            f"AVISO: a ANBIMA respondeu com dados, mas nenhum grupo pareceu ser a curva "
-            f"prefixada. Grupos vistos: {ultimos_grupos_vistos} — "
-            f"confira GRUPO_PREFIXADA_CANDIDATOS neste arquivo.",
-            file=sys.stderr,
-        )
-    return None, None, None
+    return None, None
 
 
 def main():
     print("Baixando a curva de juros (ETTJ prefixada) da ANBIMA...")
-    pontos, data_usada, grupo_usado = coletar()
+    pontos, data_usada = coletar()
 
     if not pontos:
         print("\nERRO: não consegui obter a curva prefixada dos últimos "
               f"{MAX_DIAS_PARA_TRAS} dias corridos.", file=sys.stderr)
         return 1
 
-    print(f"\n  data de referência: {data_usada} (grupo ANBIMA: \"{grupo_usado}\")")
+    print(f"\n  data de referência: {data_usada}")
     print(f"  {len(pontos)} vértice(s): {', '.join(str(p['dias']) for p in pontos)} dias")
 
     saida = {
         "_leia_me": (
             "Curva de juros futuros (ETTJ prefixada), publicada diariamente pela ANBIMA — "
             "o mercado se refere a ela como \"curva de juros\", \"curva do DI futuro\" ou "
-            "\"curva pré\". Cada ponto em 'pontos' é um vértice (prazo em dias corridos) "
-            "com a taxa anual prefixada (%) que o mercado precifica para esse prazo, "
-            "ajustada pelo modelo da própria ANBIMA (Svensson/Nelson-Siegel) a partir dos "
-            "títulos públicos negociados no dia. Quando essa curva sobe (sobretudo nos "
-            "vértices mais longos), FIIs tendem a cair — a renda fixa fica mais atraente "
-            "na comparação; quando recua, o movimento costuma ser o oposto. Ver seção "
-            "'Juros Futuros x Fundos Imobiliários' em viverderenda.dev.br."
+            "\"curva pré\". Cada ponto em 'pontos' é um vértice (prazo em dias úteis — "
+            "252 é aproximadamente 1 ano) com a taxa anual prefixada (%) que o mercado "
+            "precifica para esse prazo, ajustada pelo modelo da própria ANBIMA "
+            "(Svensson/Nelson-Siegel) a partir dos títulos públicos negociados no dia. "
+            "Quando essa curva sobe (sobretudo nos vértices mais longos), FIIs tendem a "
+            "cair — a renda fixa fica mais atraente na comparação; quando recua, o "
+            "movimento costuma ser o oposto. Ver seção 'Juros Futuros x Fundos "
+            "Imobiliários' em viverderenda.dev.br."
         ),
         "fonte": "ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ), curva prefixada",
         "fonte_url": URL_FONTE,
-        "grupo_anbima": grupo_usado,
         "data_referencia": data_usada.isoformat(),
         "atualizado_em": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "pontos": pontos,
