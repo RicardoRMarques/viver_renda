@@ -9023,6 +9023,9 @@
                   <div class="hg-setor">${a.exchange || '—'}</div>
                 </div>
               </div>
+              <div class="hg-card-topo-acoes">
+                <button type="button" class="lista-mercado-fechar" id="hgBtnFecharResultado" title="Fechar" aria-label="Fechar resultado da consulta">✕</button>
+              </div>
             </div>
             <div class="hg-grid-dados">
               <div class="hg-grupo-titulo">Cotação</div>
@@ -9049,6 +9052,15 @@
               </div>` : ''}
             </div>
           </div>`;
+
+        document.getElementById('hgBtnFecharResultado')?.addEventListener('click', () => {
+          resultadoEl.innerHTML = '';
+          statusEl.textContent = '';
+          statusEl.className = 'hg-status';
+          inputTicker.value = '';
+          hgUltimoAtivoConsultado = null;
+          atualizarBotaoFavoritarEstado();
+        });
       }
 
       // Monta o grid de "todas as variáveis" retornadas pela API, agrupadas
@@ -9720,6 +9732,7 @@
                 </button>
                 ${['fii', 'fiagro', 'fund'].includes(a.kind) && a.tax_id ? hgBotaoRelatorioGerencial(a) : ''}
                 ${a.kind === 'stock' ? hgBotaoBalancos(a) : ''}
+                <button type="button" class="lista-mercado-fechar" id="hgBtnFecharResultado" title="Fechar" aria-label="Fechar resultado da consulta">✕</button>
               </div>
             </div>
 
@@ -9856,6 +9869,7 @@
               <p class="calc-ajuda" style="margin:8px 0 0;">Considera só a variação da cotação (sem reinvestimento de dividendos). Estimativa educativa.</p>
             </div>
 
+            ${a.kind === 'index' ? '' : `
             <div class="hg-grid-dados">
               ${grupos.map(g => `
                 <div class="hg-grupo-titulo">${g.titulo}</div>
@@ -9867,6 +9881,7 @@
                 `).join('')}
               `).join('')}
             </div>
+            `}
 
             ${relacionados ? `
               <div class="hg-relacionados">
@@ -9891,6 +9906,22 @@
         const btnCompartilhar = document.getElementById('hgBtnCompartilhar');
         if (btnCompartilhar) {
           btnCompartilhar.addEventListener('click', () => hgCompartilharAtivo(a, btnCompartilhar));
+        }
+
+        // "✕" fecha o resultado: limpa o card, o campo digitado e o
+        // status, voltando a Consulta Rápida ao estado inicial (igual
+        // antes de qualquer busca) — reportado como faltando depois que
+        // os chips de índice/atalho deixaram a consulta mais usada.
+        const btnFecharResultado = document.getElementById('hgBtnFecharResultado');
+        if (btnFecharResultado) {
+          btnFecharResultado.addEventListener('click', () => {
+            resultadoEl.innerHTML = '';
+            statusEl.textContent = '';
+            statusEl.className = 'hg-status';
+            inputTicker.value = '';
+            hgUltimoAtivoConsultado = null;
+            atualizarBotaoFavoritarEstado();
+          });
         }
 
         const btnAbrirComparador = document.getElementById('hgBtnAbrirComparador');
