@@ -213,6 +213,15 @@ def coletar(data_mais_recente=None):
         if pontos:
             return pontos, data_tentativa, grupo_usado
 
+        if not grupos_vistos:
+            # Nem um <VERTICES> foi achado — provavelmente a resposta não é
+            # o XML esperado (página de erro, HTML, formato mudou). Loga um
+            # pedaço bruto da resposta pra dar visibilidade real no log do
+            # GitHub Actions (que tem internet pra validar, diferente de
+            # onde este robô foi escrito — ver cabeçalho do arquivo).
+            amostra = texto.strip().replace("\n", " ")[:600]
+            print(f"  {data_tentativa}: resposta não reconhecida (tamanho={len(texto)} chars). "
+                  f"Primeiros 600 caracteres: {amostra!r}", file=sys.stderr)
         print(f"  {data_tentativa}: sem curva prefixada publicada, tentando o dia anterior...", file=sys.stderr)
 
     if ultimos_grupos_vistos:
