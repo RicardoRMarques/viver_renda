@@ -4800,6 +4800,9 @@
           <span class="hg-chip" data-ticker="HGLG11">HGLG11</span>
           <span class="hg-chip" data-ticker="MXRF11">MXRF11</span>
           <span class="hg-chip" data-ticker="KNCR11">KNCR11</span>
+          <span class="hg-chip" data-ticker="DOW JONES">Dow Jones</span>
+          <span class="hg-chip" data-ticker="S&amp;P 500">S&amp;P 500</span>
+          <span class="hg-chip" data-ticker="NASDAQ">Nasdaq</span>
         </div>
 
         <div class="hg-status" id="hgStatus"></div>
@@ -8723,6 +8726,21 @@
       // digitou (podem ter digitado "IBOVESPA", mas a.symbol vem "BVSP").
       const ETF_DO_INDICE = { BVSP: 'BOVA11', IFIX: 'XFIX11' };
 
+      // Maiores índices da bolsa americana — a B3/HG Brasil não tem esses
+      // índices (só os da B3, via ALIASES_INDICE acima), então em vez de
+      // tentar lá à toa, já troca pelo código que a TwelveData reconhece
+      // (mesma fonte usada no fallback de Stocks/ETFs internacionais, ver
+      // hgBuscarTwelveData) e manda direto pra ela. Chave normalizada
+      // (sem espaço/pontuação) pra aceitar "Dow Jones", "S&P 500" etc.
+      const ALIASES_INDICE_EUA = {
+        DOW: 'DJI', DOWJONES: 'DJI', DJI: 'DJI', DJIA: 'DJI',
+        SP500: 'SPX', SPX: 'SPX', GSPC: 'SPX',
+        NASDAQ: 'IXIC', NASDAQCOMPOSITE: 'IXIC', IXIC: 'IXIC',
+        NASDAQ100: 'NDX', NDX: 'NDX',
+      };
+      const NOME_INDICE_EUA = { DJI: 'Dow Jones', SPX: 'S&P 500', IXIC: 'Nasdaq Composite', NDX: 'Nasdaq 100' };
+      const SIMBOLOS_INDICE_EUA = new Set(Object.keys(NOME_INDICE_EUA));
+
       async function hgBuscarAtivo() {
         const digitado = inputTicker.value.trim().toUpperCase();
         if (!digitado) return;
@@ -8740,6 +8758,24 @@
         atualizarBotaoFavoritarEstado();
 
         const tickerIndice = ALIASES_INDICE[digitado];
+
+        // Índice da bolsa americana (Dow Jones, S&P 500, Nasdaq) — não
+        // existe na B3/HG Brasil, então nem tenta lá: vai direto pra
+        // TwelveData, que é quem atende esses índices.
+        const simboloIndiceEua = !tickerIndice ? ALIASES_INDICE_EUA[digitado.replace(/[^A-Z0-9]/g, '')] : null;
+        if (simboloIndiceEua) {
+          const nomeIndice = NOME_INDICE_EUA[simboloIndiceEua] || digitado;
+          statusEl.className = 'hg-status';
+          statusEl.textContent = `Consultando ${nomeIndice}...`;
+          resultadoEl.innerHTML = '';
+          const achouIndiceEua = await hgBuscarTwelveData(simboloIndiceEua);
+          if (!achouIndiceEua) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Não encontrei dados do ${nomeIndice} agora. Tente novamente em instantes.`;
+          }
+          return;
+        }
+
         const ticker = tickerIndice || (digitado.startsWith('B3:') ? digitado : `B3:${digitado}`);
 
         statusEl.className = 'hg-status';
@@ -8812,7 +8848,9 @@
       // TwelveData, usado só quando o ticker não é encontrado na B3.
       // Retorna true se achou e já renderizou, false se não achou nada.
       async function hgBuscarTwelveData(ticker) {
-        statusEl.textContent = `Não achei "${ticker}" na B3 — tentando como Stock/ETF...`;
+        if (!SIMBOLOS_INDICE_EUA.has(ticker)) {
+          statusEl.textContent = `Não achei "${ticker}" na B3 — tentando como Stock/ETF...`;
+        }
         try {
           const urlQuote = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(CHAVE_TWELVEDATA)}`;
           const respQuote = await fetch(urlQuote);
@@ -8850,12 +8888,14 @@
       function hgRenderizarAtivoTwelveData(a, dividendYield) {
         const emAlta = parseFloat(a.percent_change) >= 0;
         const moeda = a.currency || 'USD';
+        const eIndiceEua = SIMBOLOS_INDICE_EUA.has((a.symbol || '').toUpperCase());
+        const nomeExibido = eIndiceEua ? NOME_INDICE_EUA[a.symbol.toUpperCase()] : (a.name || a.symbol);
         resultadoEl.innerHTML = `
           <div class="hg-card">
             <div class="hg-card-topo">
               <div class="hg-card-topo-info">
                 <div>
-                  <h3>${a.name || a.symbol} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span> <span class="hg-badge-fonte">Stock/ETF · TwelveData</span></h3>
+                  <h3>${nomeExibido} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span> <span class="hg-badge-fonte">${eIndiceEua ? 'Índice' : 'Stock/ETF'} · TwelveData</span></h3>
                   <div class="hg-setor">${a.exchange || '—'}</div>
                 </div>
               </div>
