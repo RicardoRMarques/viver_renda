@@ -122,8 +122,19 @@ ATRIBUTO_TAXA_PREFIXADA = "Prefixados"
 
 
 def _numero(bruto):
-    """"13,45" ou "13.45" -> 13.45. None se não for numérico."""
-    texto = (bruto or "").strip().replace(",", ".")
+    """Número no formato brasileiro: "." é separador de MILHAR, "," é
+    decimal — "1.008" é mil e oito, não um vírgula zero-zero-oito.
+    Remove os pontos ANTES de trocar a vírgula por ponto decimal; sem
+    essa ordem, "Vertice='1.008'" virava 1.008 e `int()` truncava pra
+    1 — foi exatamente esse bug que gerou vértices fantasmas de "1" e
+    "2" dias a partir de 1008/1134/.../2520 na primeira versão deste
+    robô (confirmado no log do GitHub Actions em 06/11/2026). None se
+    vazio ou não numérico (a ANBIMA deixa esses campos em branco pros
+    vértices além do alcance da curva prefixada, por exemplo)."""
+    texto = (bruto or "").strip()
+    if not texto:
+        return None
+    texto = texto.replace(".", "").replace(",", ".")
     try:
         return float(texto)
     except ValueError:
@@ -158,14 +169,17 @@ def interpretar_xml(texto_xml):
     except ET.ParseError:
         return [], []
 
-    # Rodando de verdade (06/11/2026) apareceu outra seção da resposta
-    # (provavelmente <CIRCULAR>, de taxas indicativas de prazo bem curto
-    # — não a ETTJ) que TAMBÉM usa a tag <VERTICES>, só que com "Vertice"
-    # significando outra coisa (vários pontos repetindo Vertice='1'/'2'
-    # com taxas diferentes entre si, o que não faz sentido pra uma curva
-    # — um vértice tem UMA taxa só por dia). Por isso busca <VERTICES>
-    # só DENTRO de <ETTJ> especificamente, não em qualquer lugar do
-    # documento — ali sim cada vértice aparece uma única vez.
+    # Busca <VERTICES> só DENTRO de <ETTJ> especificamente (não em
+    # qualquer lugar do documento) — defensivo, caso outra seção da
+    # resposta um dia reuse a mesma tag com outro significado.
+    #
+    # NOTA pra quem for debugar isto de novo: os vértices "fantasma" de
+    # 1/2 dias vistos na primeira versão deste robô (06/11/2026) NÃO
+    # eram de outra seção — eram os vértices longos de verdade (1008,
+    # 1134 ... 2520) truncados por um bug em `_numero()`, que não
+    # removia o "." de milhar brasileiro antes de converter: "1.008"
+    # virava 1.008 (não mil e oito) e `int()` cortava pra 1. O fix foi
+    # em `_numero()`, não aqui.
     ettj_el = raiz.find("ETTJ")
     if ettj_el is None:
         return [], []
@@ -176,13 +190,6 @@ def interpretar_xml(texto_xml):
     for elemento in ettj_el.findall("VERTICES"):
         if not atributos_vistos:
             atributos_vistos = sorted(elemento.attrib.keys())
-
-        # DEBUG TEMPORÁRIO (remover depois de diagnosticar os pontos
-        # "Vertice=1/2" que apareceram contaminando o resultado mesmo já
-        # restringindo a busca pra dentro de <ETTJ> — preciso ver TODOS
-        # os atributos de verdade pra achar o que distingue esses pontos
-        # dos vértices longos corretos).
-        print(f"  DEBUG VERTICES attrib: {dict(elemento.attrib)}", file=sys.stderr)
 
         dias = _numero(elemento.get(ATRIBUTO_VERTICE))
         taxa = _numero(elemento.get(ATRIBUTO_TAXA_PREFIXADA))
