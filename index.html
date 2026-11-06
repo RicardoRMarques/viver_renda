@@ -8782,7 +8782,7 @@
           statusEl.className = 'hg-status';
           statusEl.textContent = `Consultando ${nomeIndice}...`;
           resultadoEl.innerHTML = '';
-          const achouIndiceEua = await hgBuscarTwelveData(simboloEtf);
+          const achouIndiceEua = await hgBuscarTwelveData(simboloEtf, true);
           if (!achouIndiceEua) {
             statusEl.className = 'hg-status erro';
             statusEl.textContent = `Não encontrei dados do ${nomeIndice} agora${ultimoErroTwelveData ? ` (${ultimoErroTwelveData})` : ''}. Tente novamente em instantes.`;
@@ -8861,7 +8861,14 @@
       // Fallback pra Stocks/ETFs internacionais (ex: AAPL, SPY, QQQ) via
       // TwelveData, usado só quando o ticker não é encontrado na B3.
       // Retorna true se achou e já renderizou, false se não achou nada.
-      async function hgBuscarTwelveData(ticker) {
+      //
+      // pularEstatisticas: o plano atual da TwelveData só libera 8
+      // créditos/minuto PRA O SITE INTEIRO (todo mundo navegando ao mesmo
+      // tempo disputa a mesma cota) — e cada consulta normal já gasta 2
+      // (cotação + estatísticas, pro dividend yield). Os índices americanos
+      // (ver ALIASES_INDICE_EUA) passam true aqui pra gastar só 1, já que
+      // dividend yield não é o dado que quem busca "Dow Jones" quer ver.
+      async function hgBuscarTwelveData(ticker, pularEstatisticas) {
         if (!SIMBOLOS_ETF_PROXY_INDICE_EUA.has(ticker)) {
           statusEl.textContent = `Não achei "${ticker}" na B3 — tentando como Stock/ETF...`;
         }
@@ -8881,13 +8888,15 @@
           // travar a exibição do resto se o plano free não tiver acesso
           // (endpoint pago, rate limit, etc). Falha silenciosa de propósito.
           let dividendYield = null;
-          try {
-            const urlStats = `https://api.twelvedata.com/statistics?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(CHAVE_TWELVEDATA)}`;
-            const respStats = await fetch(urlStats);
-            const dadosStats = await respStats.json();
-            const dy = dadosStats?.statistics?.stock_statistics?.dividend_yield ?? dadosStats?.statistics?.dividends_and_splits?.dividend_yield;
-            if (typeof dy === 'number') dividendYield = dy;
-          } catch (e) { /* segue sem o dado */ }
+          if (!pularEstatisticas) {
+            try {
+              const urlStats = `https://api.twelvedata.com/statistics?symbol=${encodeURIComponent(ticker)}&apikey=${encodeURIComponent(CHAVE_TWELVEDATA)}`;
+              const respStats = await fetch(urlStats);
+              const dadosStats = await respStats.json();
+              const dy = dadosStats?.statistics?.stock_statistics?.dividend_yield ?? dadosStats?.statistics?.dividends_and_splits?.dividend_yield;
+              if (typeof dy === 'number') dividendYield = dy;
+            } catch (e) { /* segue sem o dado */ }
+          }
 
           statusEl.textContent = '';
           hgUltimoAtivoConsultado = { symbol: (dadosQuote.symbol || ticker).toUpperCase() };
