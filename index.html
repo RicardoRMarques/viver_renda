@@ -8774,15 +8774,18 @@
         // existe na B3/HG Brasil, e o índice "puro" também não está
         // disponível na TwelveData no plano atual (ver comentário em
         // ALIASES_INDICE_EUA). Consulta o ETF que replica o índice —
-        // mesmo caminho de qualquer Stock/ETF (AAPL, SPY etc).
+        // mas de um arquivo coletado pelo robô a cada 15 min (ver
+        // hgBuscarIndiceEuaCache), NÃO ao vivo: testado em produção em
+        // 06/11/2026, cada clique ao vivo gastava crédito de uma cota de
+        // 8/minuto compartilhada por TODO o tráfego do site, e estourava
+        // o limite com facilidade.
         const chaveIndiceEua = !tickerIndice ? ALIASES_INDICE_EUA[digitado.replace(/[^A-Z0-9]/g, '')] : null;
         if (chaveIndiceEua) {
           const nomeIndice = NOME_INDICE_EUA[chaveIndiceEua] || digitado;
-          const simboloEtf = ETF_PROXY_INDICE_EUA[chaveIndiceEua];
           statusEl.className = 'hg-status';
           statusEl.textContent = `Consultando ${nomeIndice}...`;
           resultadoEl.innerHTML = '';
-          const achouIndiceEua = await hgBuscarTwelveData(simboloEtf, true);
+          const achouIndiceEua = await hgBuscarIndiceEuaCache(chaveIndiceEua);
           if (!achouIndiceEua) {
             statusEl.className = 'hg-status erro';
             statusEl.textContent = `Não encontrei dados do ${nomeIndice} agora${ultimoErroTwelveData ? ` (${ultimoErroTwelveData})` : ''}. Tente novamente em instantes.`;
@@ -8856,6 +8859,35 @@
         // a.ticker quando presente, antes de cair para a.symbol.
         if (tickerIndice) ativo.ticker = tickerIndice;
         hgRenderizarAtivo(ativo);
+      }
+
+      // Índices americanos (Dow Jones/S&P 500/Nasdaq, via ETF-proxy) —
+      // lê indices-eua.json, publicado pelo robô (coletar_hgbrasil.py) a
+      // cada 15 min, em vez de consultar a TwelveData ao vivo a cada
+      // clique (ver comentário em ALIASES_INDICE_EUA sobre o limite de
+      // créditos). Só cai pro caminho ao vivo (hgBuscarTwelveData) se o
+      // arquivo ainda não existir ou não tiver esse símbolo ainda — ex:
+      // logo depois do primeiro deploy dessa funcionalidade, antes do
+      // robô rodar pela primeira vez.
+      async function hgBuscarIndiceEuaCache(chaveIndiceEua) {
+        const simboloEtf = ETF_PROXY_INDICE_EUA[chaveIndiceEua];
+        try {
+          const resp = await fetch('indices-eua.json', { cache: 'no-store' });
+          if (resp.ok) {
+            const dados = await resp.json();
+            const item = dados && dados[simboloEtf];
+            if (item && typeof item.close !== 'undefined') {
+              statusEl.textContent = '';
+              hgUltimoAtivoConsultado = { symbol: (item.symbol || simboloEtf).toUpperCase() };
+              atualizarBotaoFavoritarEstado();
+              hgRenderizarAtivoTwelveData(item, null);
+              return true;
+            }
+          }
+        } catch (e) {
+          console.error('Erro ao ler indices-eua.json:', e);
+        }
+        return hgBuscarTwelveData(simboloEtf, true);
       }
 
       // Fallback pra Stocks/ETFs internacionais (ex: AAPL, SPY, QQQ) via
