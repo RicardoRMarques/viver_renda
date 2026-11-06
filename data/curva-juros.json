@@ -1,0 +1,85 @@
+{
+ "_leia_me": "Curva de juros futuros (ETTJ prefixada), publicada diariamente pela ANBIMA — o mercado se refere a ela como \"curva de juros\", \"curva do DI futuro\" ou \"curva pré\". Cada ponto em 'pontos' é um vértice (prazo em dias úteis — 252 é aproximadamente 1 ano) com a taxa anual prefixada (%) que o mercado precifica para esse prazo, ajustada pelo modelo da própria ANBIMA (Svensson/Nelson-Siegel) a partir dos títulos públicos negociados no dia. Quando essa curva sobe (sobretudo nos vértices mais longos), FIIs tendem a cair — a renda fixa fica mais atraente na comparação; quando recua, o movimento costuma ser o oposto. Ver seção 'Juros Futuros x Fundos Imobiliários' em viverderenda.dev.br.",
+ "fonte": "ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ), curva prefixada",
+ "fonte_url": "https://www.anbima.com.br/informacoes/est-termo/",
+ "data_referencia": "2026-11-05",
+ "atualizado_em": "2026-11-06T16:35:37+00:00",
+ "pontos": [
+  {
+   "dias": 1,
+   "taxa": 15.2032
+  },
+  {
+   "dias": 1,
+   "taxa": 15.2507
+  },
+  {
+   "dias": 1,
+   "taxa": 15.2802
+  },
+  {
+   "dias": 1,
+   "taxa": 15.2956
+  },
+  {
+   "dias": 1,
+   "taxa": 15.3
+  },
+  {
+   "dias": 1,
+   "taxa": 15.296
+  },
+  {
+   "dias": 1,
+   "taxa": 15.2856
+  },
+  {
+   "dias": 1,
+   "taxa": 15.2704
+  },
+  {
+   "dias": 2,
+   "taxa": 15.2516
+  },
+  {
+   "dias": 2,
+   "taxa": 15.2302
+  },
+  {
+   "dias": 2,
+   "taxa": 15.2071
+  },
+  {
+   "dias": 2,
+   "taxa": 15.1829
+  },
+  {
+   "dias": 2,
+   "taxa": 15.158
+  },
+  {
+   "dias": 252,
+   "taxa": 14.2002
+  },
+  {
+   "dias": 378,
+   "taxa": 14.4879
+  },
+  {
+   "dias": 504,
+   "taxa": 14.7188
+  },
+  {
+   "dias": 630,
+   "taxa": 14.898
+  },
+  {
+   "dias": 756,
+   "taxa": 15.0333
+  },
+  {
+   "dias": 882,
+   "taxa": 15.1327
+  }
+ ]
+}
