@@ -177,6 +177,13 @@ def interpretar_xml(texto_xml):
         if not atributos_vistos:
             atributos_vistos = sorted(elemento.attrib.keys())
 
+        # DEBUG TEMPORÁRIO (remover depois de diagnosticar os pontos
+        # "Vertice=1/2" que apareceram contaminando o resultado mesmo já
+        # restringindo a busca pra dentro de <ETTJ> — preciso ver TODOS
+        # os atributos de verdade pra achar o que distingue esses pontos
+        # dos vértices longos corretos).
+        print(f"  DEBUG VERTICES attrib: {dict(elemento.attrib)}", file=sys.stderr)
+
         dias = _numero(elemento.get(ATRIBUTO_VERTICE))
         taxa = _numero(elemento.get(ATRIBUTO_TAXA_PREFIXADA))
         if dias is None or taxa is None:
