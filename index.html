@@ -8771,7 +8771,7 @@
           const achouIndiceEua = await hgBuscarTwelveData(simboloIndiceEua);
           if (!achouIndiceEua) {
             statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Não encontrei dados do ${nomeIndice} agora. Tente novamente em instantes.`;
+            statusEl.textContent = `Não encontrei dados do ${nomeIndice} agora${ultimoErroTwelveData ? ` (${ultimoErroTwelveData})` : ''}. Tente novamente em instantes.`;
           }
           return;
         }
@@ -8829,7 +8829,7 @@
           const achouTwelveData = await hgBuscarTwelveData(digitado);
           if (!achouTwelveData) {
             statusEl.className = 'hg-status erro';
-            statusEl.textContent = `Ticker "${digitado}" não encontrado (nem na B3, nem como Stock/ETF).`;
+            statusEl.textContent = `Ticker "${digitado}" não encontrado (nem na B3, nem como Stock/ETF)${ultimoErroTwelveData ? `: ${ultimoErroTwelveData}` : ''}.`;
           }
           return;
         }
@@ -8857,8 +8857,11 @@
           const dadosQuote = await respQuote.json();
 
           if (!respQuote.ok || dadosQuote.status === 'error' || !dadosQuote.symbol) {
+            ultimoErroTwelveData = dadosQuote?.message || `HTTP ${respQuote.status}`;
+            console.error('TwelveData não retornou dados válidos para', ticker, '— resposta:', dadosQuote);
             return false;
           }
+          ultimoErroTwelveData = null;
 
           // Dividend yield é um "extra" — tenta buscar, mas nunca deixa
           // travar a exibição do resto se o plano free não tiver acesso
@@ -20906,6 +20909,11 @@
     const FAVORITOS_CARROSSEL_MAX = 5;
     const FAVORITOS_MAX = 30;
     let hgUltimoAtivoConsultado = null; // { symbol } do último ativo pesquisado em "Consulta Rápida"
+    // Motivo (texto da própria API) da última falha da TwelveData — pra
+    // conseguir mostrar NA TELA por que um símbolo não foi encontrado
+    // (plano não cobre, símbolo inexistente, limite de chamadas etc.) sem
+    // precisar abrir o console do navegador pra diagnosticar.
+    let ultimoErroTwelveData = null;
     let tickerFavoritosCache = []; // cotações já buscadas dos favoritos, pra não refazer fetch a cada render
 
     function obterFavoritosCarrossel() {
