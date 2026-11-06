@@ -2,11 +2,11 @@
  "_leia_me": "Cadastro de EMISSÃO de CRIs (Certificados de Recebíveis Imobiliários) negociados na B3, só os que ainda não venceram. 'rotulo_remuneracao' é a remuneração CONTRATADA no lançamento do papel — a B3 não publica uma taxa de mercado secundário atualizada todo dia para CRI (diferente da tela de Debêntures, que usa a ANBIMA). Para papel pós-fixado (DI/IPCA/IGP-M + spread) isso ainda descreve o que o título paga hoje, porque só o indexador-base flutua; para PREFIXADO não há garantia nenhuma de que siga valendo. CRI é isento de Imposto de Renda para pessoa física por lei (diferente de debênture incentivada, que depende de cada papel) — mas não tem FGC, e a maioria exige um investimento mínimo alto (na casa de R$ 10 a 20 mil), que este arquivo não informa.",
  "fonte": "B3 — Consulta Pública de CRIs",
  "fonte_url": "https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/",
- "atualizado_em": "2026-11-05T20:19:25+00:00",
- "total": 4441,
- "total_no_arquivo_b3": 4692,
+ "atualizado_em": "2026-11-06T19:43:53+00:00",
+ "total": 4440,
+ "total_no_arquivo_b3": 4691,
  "por_indexador": {
-  "di": 1249,
+  "di": 1248,
   "igp_m": 209,
   "tr": 60,
   "outro": 350,
@@ -18,7 +18,7 @@
   "incc_m": 5,
   "ipc_fipe": 2
  },
- "volume_total_emissao": 304777462620.48,
+ "volume_total_emissao": 304657462620.48,
  "cris": [
   {
    "codigo": "27I0000801",
@@ -26692,23 +26692,6 @@
    "data_emissao": "2024-11-19",
    "data_vencimento": "2028-01-17",
    "data_final_distribuicao": "2025-05-26"
-  },
-  {
-   "codigo": "24K0003601",
-   "isin": "BRASTECRI3L8",
-   "emissor": "BARI SECURITIZADORA S.A.",
-   "agente_fiduciario": "OLIVEIRA TRUST DTVM S/A",
-   "numero_emissao": "35",
-   "numero_serie": "1",
-   "quantidade_emitida": 120000.0,
-   "volume_emissao": 120000000.0,
-   "indexador": "di",
-   "pct_indexador": 100.0,
-   "spread": 1.6,
-   "rotulo_remuneracao": "100% do DI + 1,60%",
-   "data_emissao": "2024-11-18",
-   "data_vencimento": "2027-11-26",
-   "data_final_distribuicao": "2025-05-20"
   },
   {
    "codigo": "24J0003802",
