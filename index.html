@@ -4950,15 +4950,19 @@
       </div>
       <p class="calc-ajuda" id="curvaJurosFonte" style="font-size:0.78rem; margin-top:4px;" hidden></p>
 
-      <div class="hg-status atencao-fixa" style="margin:14px 0;">
-        <span>🚧</span>
-        <span>
-          <strong>Em construção:</strong> sobrepor essa curva ao histórico do IFIX no mesmo gráfico, pra comparar
-          visualmente os dois movimentos lado a lado, é a próxima etapa.
-        </span>
+      <h3 style="margin:18px 0 8px;">Juros x IFIX ao longo do tempo</h3>
+      <p class="calc-ajuda" style="margin-top:0;">
+        A curva acima é só a foto de hoje — não dá pra comparar diretamente com o histórico de preço do IFIX no
+        mesmo eixo, porque um é "taxa por prazo" e o outro é "preço por data". Aqui embaixo é a comparação de
+        verdade: a taxa do vértice de 1 ano (o mais sensível a mudanças de curto prazo) dia a dia, ao lado do
+        IFIX no mesmo período — pra ver se os dois realmente se movem em direções opostas.
+      </p>
+      <div id="jurosIfixStatus" class="hg-status">Carregando comparação...</div>
+      <div id="jurosIfixGraficoWrap" style="position:relative; height:280px; margin-bottom:8px;" hidden>
+        <canvas id="jurosIfixChart"></canvas>
       </div>
 
-      <button type="button" class="hg-btn" id="jurosFiisVerIfix">📈 Ver o histórico do IFIX</button>
+      <button type="button" class="hg-btn" id="jurosFiisVerIfix">📈 Ver o histórico completo do IFIX</button>
     </section>
 
     <!-- NOTÍCIAS DO MERCADO ECONÔMICO — logo abaixo das calculadoras.
@@ -11119,6 +11123,11 @@
         document.getElementById('consulta-rapida')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         hgBuscarAtivo();
       };
+
+      // Idem — reaproveitado pela comparação Juros x IFIX (seção
+      // #juros-x-fiis), que precisa do histórico de preço do IFIX sem
+      // duplicar essa lógica de busca numa segunda função.
+      window.hgBuscarHistoricoPrecos = hgBuscarHistoricoPrecos;
 
       // Por padrão o campo de consulta abre vazio, sem buscar nada
       // automaticamente. Só dispara a busca sozinha se o link tiver
@@ -17670,7 +17679,7 @@
             },
             scales: {
               x: { title: { display: true, text: 'Prazo', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED() }, grid: { display: false } },
-              y: { title: { display: true, text: '% a.a.', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED(), callback: (v) => `${v}%` }, grid: { color: HG_COR_GRID() } },
+              y: { title: { display: true, text: '% a.a.', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(1)}%` }, grid: { color: HG_COR_GRID() } },
             },
           },
         });
@@ -17690,6 +17699,101 @@
         statusEl.className = 'hg-status';
         statusEl.textContent = 'Curva de juros ainda não disponível no momento — o robô coleta 1x por dia útil, tente novamente mais tarde.';
         curvaJurosCarregada = false; // permite tentar de novo numa próxima visita a esta seção
+      }
+    }
+
+    // Comparação Juros x IFIX ao longo do TEMPO (diferente da curva
+    // acima, que é "taxa por prazo" num único dia) — duas séries por
+    // DATA, cada uma no seu eixo Y, pra ver visualmente se uma sobe
+    // quando a outra cai. A série de juros (data/curva-juros-historico.json)
+    // só existe porque o robô foi passado a acumular 1 ponto por dia
+    // útil a partir de 06/11/2026 — então começa bem curta e cresce com
+    // o tempo; o período do IFIX buscado acompanha esse tamanho.
+    let jurosIfixChart = null;
+    let jurosIfixCarregada = false;
+    async function carregarComparacaoJurosIfix() {
+      if (jurosIfixCarregada) return;
+      jurosIfixCarregada = true;
+
+      const statusEl = document.getElementById('jurosIfixStatus');
+      const wrapEl = document.getElementById('jurosIfixGraficoWrap');
+      if (!statusEl) return;
+
+      try {
+        const resp = await fetch('data/curva-juros-historico.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const dados = await resp.json();
+        const pontosJuros = Array.isArray(dados?.pontos) ? dados.pontos : [];
+
+        if (pontosJuros.length < 2) {
+          statusEl.textContent = pontosJuros.length === 0
+            ? 'Ainda não há histórico acumulado pra essa comparação — volte em alguns dias úteis.'
+            : 'Só 1 dia de histórico acumulado até agora — volte em alguns dias úteis pra essa comparação ficar visível.';
+          jurosIfixCarregada = false;
+          return;
+        }
+
+        // Período do IFIX cobrindo pelo menos o intervalo que já temos
+        // de histórico de juros.
+        const diasDesdeInicio = Math.ceil(
+          (Date.now() - new Date(`${pontosJuros[0].data}T00:00:00`).getTime()) / 86400000
+        );
+        const periodo = diasDesdeInicio <= 7 ? '7D' : diasDesdeInicio <= 30 ? '30D' : diasDesdeInicio <= 182 ? '6M' : '1A';
+
+        await hgCarregarChartJs();
+        const amostrasIfix = await window.hgBuscarHistoricoPrecos('INDEXB3:IFIX', periodo);
+
+        if (jurosIfixChart) jurosIfixChart.destroy();
+        jurosIfixChart = new Chart(document.getElementById('jurosIfixChart'), {
+          type: 'line',
+          data: {
+            datasets: [
+              {
+                label: 'Juros (vértice de 1 ano, % a.a.)',
+                data: pontosJuros.map(p => ({ x: p.data, y: p.taxa })),
+                borderColor: HG_COR_PRIMARIA(), backgroundColor: 'transparent',
+                borderWidth: 2, pointRadius: 2, pointHoverRadius: 5, tension: 0.2, yAxisID: 'y',
+              },
+              {
+                label: 'IFIX',
+                data: (amostrasIfix || []).map(a => ({ x: String(a.date).slice(0, 10), y: a.close })),
+                borderColor: HG_COR_ACCENT(), backgroundColor: 'transparent',
+                borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2, yAxisID: 'y1',
+              },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { display: true, labels: { color: HG_COR_MUTED(), boxWidth: 12 } },
+            },
+            scales: {
+              x: { type: 'category', ticks: { color: HG_COR_MUTED(), autoSkip: true, maxTicksLimit: 8 }, grid: { display: false } },
+              y: {
+                position: 'left',
+                title: { display: true, text: 'Juros % a.a.', color: HG_COR_PRIMARIA() },
+                ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(1)}%` },
+                grid: { color: HG_COR_GRID() },
+              },
+              y1: {
+                position: 'right',
+                title: { display: true, text: 'IFIX', color: HG_COR_ACCENT() },
+                ticks: { color: HG_COR_MUTED() },
+                grid: { display: false },
+              },
+            },
+          },
+        });
+
+        statusEl.hidden = true;
+        if (wrapEl) wrapEl.hidden = false;
+      } catch (e) {
+        console.error('Erro ao carregar a comparação Juros x IFIX:', e);
+        statusEl.hidden = false;
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Comparação indisponível no momento — tente novamente mais tarde.';
+        jurosIfixCarregada = false;
       }
     }
 
@@ -23533,7 +23637,7 @@
       // aqui dentro, e não num listener separado, garante que roda DEPOIS
       // do hidden=false de cima, sem depender da ordem de registro entre
       // handlers do mesmo clique.
-      if (id === 'juros-x-fiis') carregarCurvaJuros();
+      if (id === 'juros-x-fiis') { carregarCurvaJuros(); carregarComparacaoJurosIfix(); }
       atualizarCabecalhoFixoListaMercado(secao);
       // scrollIntoView sozinho alinha o topo da seção com o topo da tela,
       // mas o cabeçalho do site é fixo — isso deixava o título e o botão
