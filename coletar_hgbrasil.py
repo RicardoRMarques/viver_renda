@@ -173,6 +173,82 @@ TWELVEDATA_CAMBIO_SIMBOLOS = [
     ("EUR/BRL", "Euro"),
 ]
 
+INDICES_EUA_OUTPUT_FILE = "indices-eua.json"
+
+# ------------------------------------------------------------------
+# Índices americanos (Dow Jones, S&P 500, Nasdaq) consultados na Consulta
+# Rápida do index.html via ETF-proxy (DIA/SPY/QQQ — ver
+# ETF_PROXY_INDICE_EUA lá). A TwelveData não libera o índice "puro"
+# (DJI/SPX/IXIC) no plano atual ("symbol ... invalid"), e consultar o ETF
+# AO VIVO a cada clique do visitante estourava o limite de 8
+# créditos/minuto da TwelveData — que é COMPARTILHADO por todo o tráfego
+# do site, não por visitante (reportado e confirmado em 06/11/2026, com
+# até 37 créditos usados num minuto só). Por isso, assim como o câmbio
+# (coletar_cambio_twelvedata acima), passou a ser coletado aqui, numa
+# única chamada batched a cada 15 min, e publicado como arquivo estático
+# — o index.html lê indices-eua.json em vez de chamar a TwelveData ao
+# vivo a cada busca.
+# ------------------------------------------------------------------
+INDICES_EUA_TWELVEDATA_SIMBOLOS = ["DIA", "SPY", "QQQ"]
+
+
+def coletar_indices_eua_twelvedata():
+    """DIA/SPY/QQQ (ETF-proxy de Dow Jones/S&P 500/Nasdaq) pela TwelveData,
+    numa única chamada batched (mesma técnica de coletar_cambio_twelvedata).
+    Retorna um dict {symbol: {...}} com os mesmos campos que a TwelveData
+    devolve em /quote, pra ser consumido pelo mesmo código que já
+    renderiza Stocks/ETFs no index.html (hgRenderizarAtivoTwelveData) —
+    só que lendo do arquivo publicado, não de uma chamada ao vivo.
+
+    Retorna {} se falhar — o index.html mantém o arquivo da execução
+    anterior (ver main()), em vez de ficar sem dado algum."""
+    try:
+        url = (
+            f"https://api.twelvedata.com/quote?"
+            f"symbol={','.join(INDICES_EUA_TWELVEDATA_SIMBOLOS)}&apikey={CHAVE_TWELVEDATA}"
+        )
+        resp = requests.get(url, timeout=TIMEOUT)
+        resp.raise_for_status()
+        dados = resp.json()
+    except (requests.RequestException, ValueError) as exc:
+        print(f"AVISO: falha ao buscar índices americanos (ETF-proxy) na TwelveData: {exc}", file=sys.stderr)
+        return {}
+
+    # Com 1 símbolo só na consulta, a TwelveData devolve o objeto direto;
+    # com vários (nosso caso), devolve um dict {simbolo: {...}} — mesmo
+    # tratamento de coletar_cambio_twelvedata, pra não quebrar se um dia
+    # sobrar só 1 símbolo aqui.
+    if len(INDICES_EUA_TWELVEDATA_SIMBOLOS) == 1:
+        dados = {INDICES_EUA_TWELVEDATA_SIMBOLOS[0]: dados}
+    if not isinstance(dados, dict):
+        print(f"AVISO: TwelveData devolveu formato inesperado pros índices americanos: {dados}", file=sys.stderr)
+        return {}
+
+    agora = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    indices_eua = {}
+    for simbolo in INDICES_EUA_TWELVEDATA_SIMBOLOS:
+        item = dados.get(simbolo)
+        if not isinstance(item, dict) or item.get("status") == "error" or item.get("code"):
+            print(f"AVISO: TwelveData não trouxe {simbolo}: {item}", file=sys.stderr)
+            continue
+        valor = _para_float(item.get("close"))
+        if valor is None:
+            print(f"AVISO: valor inválido pra {simbolo} na TwelveData: {item}", file=sys.stderr)
+            continue
+        indices_eua[simbolo] = {
+            "symbol": item.get("symbol") or simbolo,
+            "name": item.get("name"),
+            "exchange": item.get("exchange"),
+            "currency": item.get("currency") or "USD",
+            "close": item.get("close"),
+            "open": item.get("open"),
+            "high": item.get("high"),
+            "low": item.get("low"),
+            "percent_change": item.get("percent_change"),
+            "coletado_em": agora,
+        }
+    return indices_eua
+
 # ------------------------------------------------------------------
 # Cripto: CoinGecko — gratuita, sem chave. Devolve preço em BRL e a
 # variação de 24h. Vários ativos vêm na MESMA requisição, então incluir
@@ -1758,6 +1834,14 @@ def main():
         print(f"OK: {len(indices)} índices salvos em {INDICES_OUTPUT_FILE}.")
     else:
         print("AVISO: nenhum índice coletado. Mantendo arquivo anterior, se existir.", file=sys.stderr)
+
+    indices_eua = coletar_indices_eua_twelvedata()
+    if indices_eua:
+        with open(INDICES_EUA_OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(indices_eua, f, ensure_ascii=False, indent=2)
+        print(f"OK: {len(indices_eua)} índice(s) americano(s) (ETF-proxy) salvos em {INDICES_EUA_OUTPUT_FILE}.")
+    else:
+        print("AVISO: nenhum índice americano coletado. Mantendo arquivo anterior, se existir.", file=sys.stderr)
 
     if coletar_rankings_agora:
         ranking = coletar_ranking(token)
