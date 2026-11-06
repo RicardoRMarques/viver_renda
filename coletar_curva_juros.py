@@ -89,6 +89,16 @@ URL_FONTE = "https://www.anbima.com.br/informacoes/est-termo/"
 
 CAMINHO_SAIDA = os.path.join("data", "curva-juros.json")
 
+# Série histórica de um ponto representativo da curva (vértice mais
+# curto disponível, ~1 ano) — usada pra comparar visualmente, ao longo
+# do tempo, com o IFIX (ver carregarComparacaoJurosIfix no index.html).
+# A ANBIMA só devolve a foto do dia (ou, no máximo, os últimos ~5 dias
+# úteis) — não uma série longa pronta — então este robô vai acumulando
+# 1 ponto por dia útil a cada execução, igual o padrão já usado em
+# noticias-historico.json.
+CAMINHO_HISTORICO = os.path.join("data", "curva-juros-historico.json")
+HISTORICO_MAX_PONTOS = 756  # ~3 anos de dias úteis — limite generoso
+
 CABECALHOS = {
     "User-Agent": (
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -239,6 +249,51 @@ def coletar(data_mais_recente=None):
     return None, None
 
 
+def atualizar_historico(data_referencia, pontos):
+    """Acrescenta 1 ponto (data, taxa do vértice mais curto disponível —
+    o mais sensível a mudanças de curto prazo do mercado) ao arquivo de
+    série histórica, sem duplicar se já houver um ponto pra essa mesma
+    data (ex: robô rodado mais de uma vez no mesmo dia útil — nesse
+    caso substitui pelo mais recente). Devolve a lista de pontos final."""
+    vertice_dias = pontos[0]["dias"]
+    taxa = pontos[0]["taxa"]
+
+    historico = []
+    if os.path.exists(CAMINHO_HISTORICO):
+        try:
+            with open(CAMINHO_HISTORICO, "r", encoding="utf-8") as arquivo:
+                historico = (json.load(arquivo) or {}).get("pontos", [])
+        except (json.JSONDecodeError, OSError) as exc:
+            print(f"AVISO: não consegui ler o histórico anterior ({exc}); começando do zero.", file=sys.stderr)
+            historico = []
+
+    data_iso = data_referencia.isoformat()
+    historico = [p for p in historico if p.get("data") != data_iso]
+    historico.append({"data": data_iso, "taxa": taxa})
+    historico.sort(key=lambda p: p["data"])
+    historico = historico[-HISTORICO_MAX_PONTOS:]
+
+    saida = {
+        "_leia_me": (
+            "Série histórica de um ponto representativo da curva de juros futuros "
+            f"(ETTJ prefixada, vértice de {vertice_dias} dias úteis — o mais curto que a "
+            "ANBIMA publica, ~1 ano) — 1 valor por dia útil, acumulado ao longo do tempo "
+            "por este robô (a ANBIMA só disponibiliza a foto do dia, não uma série "
+            "longa pronta). Serve pra comparar visualmente com o histórico do IFIX e "
+            "ver se os dois se movem de forma inversa — ver seção 'Juros Futuros x "
+            "Fundos Imobiliários' em viverderenda.dev.br."
+        ),
+        "vertice_dias": vertice_dias,
+        "atualizado_em": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "pontos": historico,
+    }
+    os.makedirs(os.path.dirname(CAMINHO_HISTORICO), exist_ok=True)
+    with open(CAMINHO_HISTORICO, "w", encoding="utf-8") as arquivo:
+        json.dump(saida, arquivo, ensure_ascii=False, indent=1)
+
+    return historico
+
+
 def main():
     print("Baixando a curva de juros (ETTJ prefixada) da ANBIMA...")
     pontos, data_usada = coletar()
@@ -277,6 +332,10 @@ def main():
 
     tamanho = os.path.getsize(CAMINHO_SAIDA) / 1024
     print(f"\n  {CAMINHO_SAIDA} gravado ({tamanho:.1f} KB)")
+
+    historico = atualizar_historico(data_usada, pontos)
+    print(f"  {CAMINHO_HISTORICO} atualizado ({len(historico)} dia(s) de histórico acumulado)")
+
     return 0
 
 
