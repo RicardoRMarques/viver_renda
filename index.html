@@ -8727,19 +8727,30 @@
       const ETF_DO_INDICE = { BVSP: 'BOVA11', IFIX: 'XFIX11' };
 
       // Maiores índices da bolsa americana — a B3/HG Brasil não tem esses
-      // índices (só os da B3, via ALIASES_INDICE acima), então em vez de
-      // tentar lá à toa, já troca pelo código que a TwelveData reconhece
-      // (mesma fonte usada no fallback de Stocks/ETFs internacionais, ver
-      // hgBuscarTwelveData) e manda direto pra ela. Chave normalizada
-      // (sem espaço/pontuação) pra aceitar "Dow Jones", "S&P 500" etc.
+      // índices, e testando ao vivo (05/11/2026) descobri que a TwelveData
+      // TAMBÉM não: DJI/SPX/IXIC (o índice "puro", em pontos) só estão
+      // disponíveis em planos Grow ou superior, e no plano atual dão
+      // "symbol ... parameter is missing or invalid". Em vez de pedir pra
+      // pagar mais, usa o ETF que replica cada índice (mesma lógica do
+      // ETF_DO_INDICE acima, só que aqui é o PRÓPRIO dado mostrado, não só
+      // uma sugestão) — DIA/SPY/QQQ são Stocks/ETFs normais, já cobertos
+      // pelo plano atual via hgBuscarTwelveData (mesmo caminho do AAPL).
+      // Chave normalizada (sem espaço/pontuação) pra aceitar "Dow Jones",
+      // "S&P 500" etc. — e também o símbolo "puro" (DJI/SPX/IXIC), caso a
+      // pessoa digite ele diretamente.
       const ALIASES_INDICE_EUA = {
         DOW: 'DJI', DOWJONES: 'DJI', DJI: 'DJI', DJIA: 'DJI',
         SP500: 'SPX', SPX: 'SPX', GSPC: 'SPX',
         NASDAQ: 'IXIC', NASDAQCOMPOSITE: 'IXIC', IXIC: 'IXIC',
         NASDAQ100: 'NDX', NDX: 'NDX',
       };
-      const NOME_INDICE_EUA = { DJI: 'Dow Jones', SPX: 'S&P 500', IXIC: 'Nasdaq Composite', NDX: 'Nasdaq 100' };
-      const SIMBOLOS_INDICE_EUA = new Set(Object.keys(NOME_INDICE_EUA));
+      const NOME_INDICE_EUA = { DJI: 'Dow Jones', SPX: 'S&P 500', IXIC: 'Nasdaq', NDX: 'Nasdaq 100' };
+      // ETF proxy de cada índice — o que de fato é consultado na TwelveData.
+      const ETF_PROXY_INDICE_EUA = { DJI: 'DIA', SPX: 'SPY', IXIC: 'QQQ', NDX: 'QQQ' };
+      // Caminho inverso: dado o symbol que a TwelveData devolveu (DIA/SPY/
+      // QQQ), qual índice mostrar no card — usado em hgRenderizarAtivoTwelveData.
+      const INDICE_EUA_DO_ETF_PROXY = { DIA: 'DJI', SPY: 'SPX', QQQ: 'IXIC' };
+      const SIMBOLOS_ETF_PROXY_INDICE_EUA = new Set(Object.values(ETF_PROXY_INDICE_EUA));
 
       async function hgBuscarAtivo() {
         const digitado = inputTicker.value.trim().toUpperCase();
@@ -8760,15 +8771,18 @@
         const tickerIndice = ALIASES_INDICE[digitado];
 
         // Índice da bolsa americana (Dow Jones, S&P 500, Nasdaq) — não
-        // existe na B3/HG Brasil, então nem tenta lá: vai direto pra
-        // TwelveData, que é quem atende esses índices.
-        const simboloIndiceEua = !tickerIndice ? ALIASES_INDICE_EUA[digitado.replace(/[^A-Z0-9]/g, '')] : null;
-        if (simboloIndiceEua) {
-          const nomeIndice = NOME_INDICE_EUA[simboloIndiceEua] || digitado;
+        // existe na B3/HG Brasil, e o índice "puro" também não está
+        // disponível na TwelveData no plano atual (ver comentário em
+        // ALIASES_INDICE_EUA). Consulta o ETF que replica o índice —
+        // mesmo caminho de qualquer Stock/ETF (AAPL, SPY etc).
+        const chaveIndiceEua = !tickerIndice ? ALIASES_INDICE_EUA[digitado.replace(/[^A-Z0-9]/g, '')] : null;
+        if (chaveIndiceEua) {
+          const nomeIndice = NOME_INDICE_EUA[chaveIndiceEua] || digitado;
+          const simboloEtf = ETF_PROXY_INDICE_EUA[chaveIndiceEua];
           statusEl.className = 'hg-status';
           statusEl.textContent = `Consultando ${nomeIndice}...`;
           resultadoEl.innerHTML = '';
-          const achouIndiceEua = await hgBuscarTwelveData(simboloIndiceEua);
+          const achouIndiceEua = await hgBuscarTwelveData(simboloEtf);
           if (!achouIndiceEua) {
             statusEl.className = 'hg-status erro';
             statusEl.textContent = `Não encontrei dados do ${nomeIndice} agora${ultimoErroTwelveData ? ` (${ultimoErroTwelveData})` : ''}. Tente novamente em instantes.`;
@@ -8848,7 +8862,7 @@
       // TwelveData, usado só quando o ticker não é encontrado na B3.
       // Retorna true se achou e já renderizou, false se não achou nada.
       async function hgBuscarTwelveData(ticker) {
-        if (!SIMBOLOS_INDICE_EUA.has(ticker)) {
+        if (!SIMBOLOS_ETF_PROXY_INDICE_EUA.has(ticker)) {
           statusEl.textContent = `Não achei "${ticker}" na B3 — tentando como Stock/ETF...`;
         }
         try {
@@ -8891,14 +8905,19 @@
       function hgRenderizarAtivoTwelveData(a, dividendYield) {
         const emAlta = parseFloat(a.percent_change) >= 0;
         const moeda = a.currency || 'USD';
-        const eIndiceEua = SIMBOLOS_INDICE_EUA.has((a.symbol || '').toUpperCase());
-        const nomeExibido = eIndiceEua ? NOME_INDICE_EUA[a.symbol.toUpperCase()] : (a.name || a.symbol);
+        // Se o symbol devolvido é um dos ETFs-proxy (DIA/SPY/QQQ), mostra o
+        // nome do ÍNDICE que ele replica, deixando claro que é via ETF —
+        // a TwelveData não dá acesso ao índice "puro" no plano atual (ver
+        // ALIASES_INDICE_EUA).
+        const chaveIndiceEuaExibido = INDICE_EUA_DO_ETF_PROXY[(a.symbol || '').toUpperCase()];
+        const nomeExibido = chaveIndiceEuaExibido ? NOME_INDICE_EUA[chaveIndiceEuaExibido] : (a.name || a.symbol);
+        const parenteses = chaveIndiceEuaExibido ? `via ${a.symbol}` : a.symbol;
         resultadoEl.innerHTML = `
           <div class="hg-card">
             <div class="hg-card-topo">
               <div class="hg-card-topo-info">
                 <div>
-                  <h3>${nomeExibido} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${a.symbol})</span> <span class="hg-badge-fonte">${eIndiceEua ? 'Índice' : 'Stock/ETF'} · TwelveData</span></h3>
+                  <h3>${nomeExibido} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${parenteses})</span> <span class="hg-badge-fonte">Stock/ETF · TwelveData</span></h3>
                   <div class="hg-setor">${a.exchange || '—'}</div>
                 </div>
               </div>
