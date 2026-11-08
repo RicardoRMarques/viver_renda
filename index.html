@@ -17774,20 +17774,33 @@
         await hgCarregarChartJs();
         const amostrasIfix = await window.hgBuscarHistoricoPrecos('INDEXB3:IFIX', periodo);
 
+        // Eixo "category" do Chart.js monta a lista de rótulos pela ordem em
+        // que aparecem nos datasets, NÃO em ordem cronológica — com juros
+        // (poucos pontos) e IFIX (mais amostras, período mais largo) misturados
+        // via pares {x,y}, isso embaralhava as datas (ex: 05/11, 06/11, 03/11,
+        // 04/11). Fix: montar a união de datas já ORDENADA como `labels` do
+        // gráfico e alinhar cada dataset a ela (null + spanGaps onde falta).
+        const mapaJuros = new Map(pontosJuros.map(p => [p.data, p.taxa]));
+        const mapaIfix = new Map((amostrasIfix || []).map(a => [String(a.date).slice(0, 10), a.close]));
+        const todasDatas = Array.from(new Set([...mapaJuros.keys(), ...mapaIfix.keys()])).sort();
+
         if (jurosIfixChart) jurosIfixChart.destroy();
         jurosIfixChart = new Chart(document.getElementById('jurosIfixChart'), {
           type: 'line',
           data: {
+            labels: todasDatas,
             datasets: [
               {
                 label: 'Juros (vértice de 1 ano, % a.a.)',
-                data: pontosJuros.map(p => ({ x: p.data, y: p.taxa })),
+                data: todasDatas.map(d => mapaJuros.has(d) ? mapaJuros.get(d) : null),
+                spanGaps: true,
                 borderColor: HG_COR_PRIMARIA(), backgroundColor: 'transparent',
                 borderWidth: 2, pointRadius: 2, pointHoverRadius: 5, tension: 0.2, yAxisID: 'y',
               },
               {
                 label: 'IFIX',
-                data: (amostrasIfix || []).map(a => ({ x: String(a.date).slice(0, 10), y: a.close })),
+                data: todasDatas.map(d => mapaIfix.has(d) ? mapaIfix.get(d) : null),
+                spanGaps: true,
                 borderColor: HG_COR_ACCENT(), backgroundColor: 'transparent',
                 borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2, yAxisID: 'y1',
               },
