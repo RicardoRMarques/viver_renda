@@ -17784,6 +17784,15 @@
         const mapaIfix = new Map((amostrasIfix || []).map(a => [String(a.date).slice(0, 10), a.close]));
         const todasDatas = Array.from(new Set([...mapaJuros.keys(), ...mapaIfix.keys()])).sort();
 
+        // Com poucos dias de histórico, a variação do vértice de 1 ano de um
+        // dia pro outro costuma ser bem pequena (ex: 14,2002% -> 14,1829%,
+        // 0,017 ponto) — 1 casa decimal arredonda tudo pro mesmo rótulo
+        // ("14,2%" repetido no eixo inteiro). Ajusta as casas decimais à
+        // amplitude real dos dados já acumulados.
+        const taxasJuros = pontosJuros.map(p => p.taxa);
+        const amplitudeJuros = Math.max(...taxasJuros) - Math.min(...taxasJuros);
+        const casasDecimaisJuros = amplitudeJuros < 0.05 ? 3 : amplitudeJuros < 0.5 ? 2 : 1;
+
         if (jurosIfixChart) jurosIfixChart.destroy();
         jurosIfixChart = new Chart(document.getElementById('jurosIfixChart'), {
           type: 'line',
@@ -17817,7 +17826,7 @@
               y: {
                 position: 'left',
                 title: { display: true, text: 'Juros (% a.a.)', color: HG_COR_PRIMARIA() },
-                ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(1)}%` },
+                ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(casasDecimaisJuros)}%` },
                 grid: { color: HG_COR_GRID() },
               },
               y1: {
