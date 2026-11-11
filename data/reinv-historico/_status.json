@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-10T13:57:54.084970+00:00",
+  "gerado_em": "2026-11-11T13:13:18.675144+00:00",
   "ativos": {
     "ABEV3": {
       "ok": true,
@@ -339,7 +339,7 @@
       "preco_ate": "2026-11-10",
       "total_pregoes": 323,
       "dividendo_desde": "2000-06-27",
-      "total_dividendos": 94
+      "total_dividendos": 95
     },
     "GOAU4": {
       "ok": true,
@@ -347,7 +347,7 @@
       "preco_ate": "2026-11-10",
       "total_pregoes": 323,
       "dividendo_desde": "2000-06-27",
-      "total_dividendos": 91
+      "total_dividendos": 92
     },
     "HAPV3": {
       "ok": true,
@@ -608,7 +608,7 @@
     "SANB11": {
       "ok": true,
       "preco_desde": "2009-11-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 206,
       "dividendo_desde": "2010-03-23",
       "total_dividendos": 69
@@ -619,7 +619,7 @@
       "preco_ate": "2026-11-10",
       "total_pregoes": 323,
       "dividendo_desde": "2007-10-30",
-      "total_dividendos": 25
+      "total_dividendos": 26
     },
     "SLCE3": {
       "ok": true,
@@ -800,17 +800,17 @@
     "03BK11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "48 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "52 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "10BK11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "47 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "50 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "3PRE11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "93 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "94 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "5PRE11": {
       "ok": false,
@@ -820,7 +820,7 @@
     "AAGR11": {
       "ok": true,
       "preco_desde": "2024-02-19",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 144,
       "dividendo_desde": "2024-03-11",
       "total_dividendos": 32
@@ -836,7 +836,7 @@
     "ABCP11": {
       "ok": true,
       "preco_desde": "2010-10-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 195,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -854,8 +854,8 @@
     "ADSH11": {
       "ok": true,
       "preco_desde": "2026-03-23",
-      "preco_ate": "2026-11-05",
-      "total_pregoes": 137,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 138,
       "dividendo_desde": "2026-03-26",
       "total_dividendos": 6
     },
@@ -878,7 +878,7 @@
     "AGGX11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "70 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "77 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "AGRI11": {
       "ok": false,
@@ -901,7 +901,7 @@
     "AJFI11": {
       "ok": true,
       "preco_desde": "2023-11-06",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 159,
       "dividendo_desde": "2023-12-08",
       "total_dividendos": 35
@@ -909,7 +909,7 @@
     "ALMI11": {
       "ok": true,
       "preco_desde": "2006-06-01",
-      "preco_ate": "2026-11-09",
+      "preco_ate": "2026-11-10",
       "total_pregoes": 247,
       "dividendo_desde": "2024-07-01",
       "total_dividendos": 27
@@ -922,7 +922,7 @@
     "ALZC11": {
       "ok": true,
       "preco_desde": "2023-08-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 171,
       "dividendo_desde": "2023-08-16",
       "total_dividendos": 38
@@ -930,7 +930,7 @@
     "AMAB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "276 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "281 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "ANCR11": {
       "ok": true,
@@ -943,7 +943,7 @@
     "APTO11": {
       "ok": true,
       "preco_desde": "2022-03-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 245,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 55
@@ -951,8 +951,8 @@
     "APXM11": {
       "ok": true,
       "preco_desde": "2026-07-17",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 79,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 80,
       "dividendo_desde": "2026-07-20",
       "total_dividendos": 4
     },
@@ -964,13 +964,13 @@
     "APXU11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "318 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "319 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "AREA11": {
       "ok": true,
       "preco_desde": "2025-10-27",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 251,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 252,
       "dividendo_desde": "2025-11-18",
       "total_dividendos": 9
     },
@@ -982,7 +982,7 @@
     "AROA11": {
       "ok": true,
       "preco_desde": "2023-12-18",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 153,
       "dividendo_desde": "2024-01-02",
       "total_dividendos": 35
@@ -990,7 +990,7 @@
     "ARRI11": {
       "ok": true,
       "preco_desde": "2019-11-11",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 367,
       "dividendo_desde": "2022-05-02",
       "total_dividendos": 54
@@ -1006,7 +1006,7 @@
     "ARXD11": {
       "ok": true,
       "preco_desde": "2023-05-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 186,
       "dividendo_desde": "2023-05-02",
       "total_dividendos": 42
@@ -1022,7 +1022,7 @@
     "AUMT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "10 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "8 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "AUPO11": {
       "ok": false,
@@ -1045,15 +1045,15 @@
     "AVUR11": {
       "ok": true,
       "preco_desde": "2026-03-11",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 167,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 168,
       "dividendo_desde": "2026-04-01",
       "total_dividendos": 8
     },
     "AZIN11": {
       "ok": true,
       "preco_desde": "2024-01-15",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 149,
       "dividendo_desde": "2024-02-19",
       "total_dividendos": 33
@@ -1061,7 +1061,7 @@
     "AZPL11": {
       "ok": true,
       "preco_desde": "2024-09-02",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 116,
       "dividendo_desde": "2024-10-01",
       "total_dividendos": 25
@@ -1084,7 +1084,7 @@
     "BBFO11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 34
@@ -1100,7 +1100,7 @@
     "BBIG11": {
       "ok": true,
       "preco_desde": "2024-05-06",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 133,
       "dividendo_desde": "2024-06-03",
       "total_dividendos": 30
@@ -1118,7 +1118,7 @@
     "BBRC11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -1137,14 +1137,14 @@
       "ok": true,
       "preco_desde": "2026-08-05",
       "preco_ate": "2026-11-10",
-      "total_pregoes": 448,
+      "total_pregoes": 452,
       "dividendo_desde": "2026-08-10",
       "total_dividendos": 2
     },
     "BCIA11": {
       "ok": true,
       "preco_desde": "2017-10-09",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 476,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -1152,12 +1152,12 @@
     "BCIC11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "171 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "172 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "BCRI11": {
       "ok": true,
       "preco_desde": "2017-10-09",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 476,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 57
@@ -1165,7 +1165,7 @@
     "BDAP11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "319 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "320 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "BDEF11": {
       "ok": false,
@@ -1175,7 +1175,7 @@
     "BDIF11": {
       "ok": true,
       "preco_desde": "2021-04-19",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 292,
       "dividendo_desde": "2021-06-24",
       "total_dividendos": 64
@@ -1183,7 +1183,7 @@
     "BDIV11": {
       "ok": true,
       "preco_desde": "2020-11-30",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 312,
       "dividendo_desde": "2021-02-02",
       "total_dividendos": 25
@@ -1209,23 +1209,23 @@
     "BFCC11": {
       "ok": true,
       "preco_desde": "2025-12-29",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 215,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 216,
       "dividendo_desde": "2026-02-02",
       "total_dividendos": 10
     },
     "BGRB11": {
       "ok": true,
       "preco_desde": "2025-01-03",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 462,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 463,
       "dividendo_desde": "2025-02-03",
       "total_dividendos": 20
     },
     "BIDB11": {
       "ok": true,
       "preco_desde": "2021-10-04",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 268,
       "dividendo_desde": "2021-11-01",
       "total_dividendos": 57
@@ -1233,15 +1233,15 @@
     "BIME11": {
       "ok": true,
       "preco_desde": "2022-02-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 249,
       "dividendo_desde": "2022-04-07",
-      "total_dividendos": 54
+      "total_dividendos": 55
     },
     "BINC11": {
       "ok": true,
       "preco_desde": "2024-10-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 110,
       "dividendo_desde": "2024-11-01",
       "total_dividendos": 23
@@ -1282,12 +1282,12 @@
     "BLFT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "264 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "265 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "BLMG11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-08",
       "total_dividendos": 32
@@ -1311,7 +1311,7 @@
     "BMLC11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-09",
+      "preco_ate": "2026-11-10",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-09",
       "total_dividendos": 57
@@ -1319,7 +1319,7 @@
     "BMLT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "347 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "348 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "BMMT11": {
       "ok": false,
@@ -1342,12 +1342,12 @@
     "BNKS11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "365 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "369 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "BODB11": {
       "ok": true,
       "preco_desde": "2022-05-02",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 238,
       "dividendo_desde": "2022-06-02",
       "total_dividendos": 56
@@ -1355,15 +1355,15 @@
     "BODI11": {
       "ok": true,
       "preco_desde": "2026-02-27",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 176,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 177,
       "dividendo_desde": "2026-04-01",
       "total_dividendos": 8
     },
     "BOL511": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "262 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "263 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "BOVA": {
       "ok": false,
@@ -1403,7 +1403,7 @@
     "BPML11": {
       "ok": true,
       "preco_desde": "2019-11-04",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 368,
       "dividendo_desde": "2022-03-21",
       "total_dividendos": 47
@@ -1411,7 +1411,7 @@
     "BPRE11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "263 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "264 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "BRAX11": {
       "ok": false,
@@ -1426,7 +1426,7 @@
     "BRCO11": {
       "ok": true,
       "preco_desde": "2019-12-02",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 364,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 57
@@ -1434,7 +1434,7 @@
     "BRCR11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-09",
       "total_dividendos": 63
@@ -1447,8 +1447,8 @@
     "BRFT11": {
       "ok": true,
       "preco_desde": "2023-12-04",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 154,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 155,
       "dividendo_desde": "2024-06-05",
       "total_dividendos": 30
     },
@@ -1502,7 +1502,7 @@
     "BTAL11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-22",
       "total_dividendos": 33
@@ -1510,8 +1510,8 @@
     "BTCI11": {
       "ok": true,
       "preco_desde": "2019-01-01",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 411,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 412,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 55
     },
@@ -1523,7 +1523,7 @@
     "BTHI11": {
       "ok": true,
       "preco_desde": "2023-09-11",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 167,
       "dividendo_desde": "2023-11-07",
       "total_dividendos": 37
@@ -1531,15 +1531,18 @@
     "BTRA11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-23",
       "total_dividendos": 30
     },
     "BTRU11": {
-      "ok": false,
-      "filtrado_qualidade": true,
-      "motivo": "4 pregões / 4 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "ok": true,
+      "preco_desde": "2024-01-29",
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 139,
+      "dividendo_desde": "2024-02-01",
+      "total_dividendos": 32
     },
     "BTWR11": {
       "ok": true,
@@ -1567,12 +1570,12 @@
     "BZEQ11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "83 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "89 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "CACR11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 29
@@ -1580,7 +1583,7 @@
     "CAPE11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "331 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "332 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "CARE11": {
       "ok": false,
@@ -1606,7 +1609,7 @@
     "CBOP11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -1614,7 +1617,7 @@
     "CCME11": {
       "ok": true,
       "preco_desde": "2023-01-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 200,
       "dividendo_desde": "2023-02-09",
       "total_dividendos": 44
@@ -1622,12 +1625,12 @@
     "CDIB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "94 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "95 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "CDII11": {
       "ok": true,
       "preco_desde": "2023-05-22",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 183,
       "dividendo_desde": "2023-06-01",
       "total_dividendos": 40
@@ -1635,7 +1638,7 @@
     "CEOC11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 54
@@ -1656,7 +1659,7 @@
     "CLIN11": {
       "ok": true,
       "preco_desde": "2023-11-06",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 159,
       "dividendo_desde": "2023-11-10",
       "total_dividendos": 36
@@ -1664,7 +1667,7 @@
     "CLOB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "127 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "CMDB11": {
       "ok": false,
@@ -1674,7 +1677,7 @@
     "CNES11": {
       "ok": true,
       "preco_desde": "2011-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 184,
       "dividendo_desde": "2017-10-24",
       "total_dividendos": 53
@@ -1713,15 +1716,15 @@
     "CPOF11": {
       "ok": true,
       "preco_desde": "2023-07-03",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 176,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 177,
       "dividendo_desde": "2023-12-18",
       "total_dividendos": 29
     },
     "CPSH11": {
       "ok": true,
       "preco_desde": "2023-07-03",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 177,
       "dividendo_desde": "2023-07-19",
       "total_dividendos": 39
@@ -1729,7 +1732,7 @@
     "CPTI11": {
       "ok": true,
       "preco_desde": "2021-04-26",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 291,
       "dividendo_desde": "2021-05-05",
       "total_dividendos": 63
@@ -1737,7 +1740,7 @@
     "CPTR11": {
       "ok": true,
       "preco_desde": "2022-06-20",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 231,
       "dividendo_desde": "2022-07-13",
       "total_dividendos": 48
@@ -1745,7 +1748,7 @@
     "CPUR11": {
       "ok": true,
       "preco_desde": "2024-02-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 146,
       "dividendo_desde": "2024-03-01",
       "total_dividendos": 31
@@ -1753,7 +1756,7 @@
     "CRAA11": {
       "ok": true,
       "preco_desde": "2023-04-03",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 190,
       "dividendo_desde": "2023-04-11",
       "total_dividendos": 43
@@ -1761,8 +1764,8 @@
     "CRFF11": {
       "ok": true,
       "preco_desde": "2019-09-16",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 374,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 375,
       "dividendo_desde": "2022-04-04",
       "total_dividendos": 55
     },
@@ -1787,7 +1790,7 @@
     "CXAG11": {
       "ok": true,
       "preco_desde": "2022-03-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 245,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 55
@@ -1795,7 +1798,7 @@
     "CXCE11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 56
@@ -1803,7 +1806,7 @@
     "CXCI11": {
       "ok": true,
       "preco_desde": "2022-04-11",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 241,
       "dividendo_desde": "2022-05-02",
       "total_dividendos": 53
@@ -1819,7 +1822,7 @@
     "CXRI11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-09",
+      "preco_ate": "2026-11-10",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-03",
       "total_dividendos": 57
@@ -1827,7 +1830,7 @@
     "CXTL11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-06",
+      "preco_ate": "2026-11-10",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 49
@@ -1835,7 +1838,7 @@
     "CYCR11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-03-01",
       "total_dividendos": 33
@@ -1843,7 +1846,7 @@
     "DAMA11": {
       "ok": true,
       "preco_desde": "2024-07-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 121,
       "dividendo_desde": "2024-08-08",
       "total_dividendos": 23
@@ -1872,7 +1875,7 @@
     "DCRA11": {
       "ok": true,
       "preco_desde": "2022-02-07",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 250,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 55
@@ -1890,7 +1893,7 @@
     "DEVA11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-03-08",
       "total_dividendos": 32
@@ -1903,7 +1906,7 @@
     "DINF11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "63 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "64 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "DIVD11": {
       "ok": true,
@@ -1926,8 +1929,8 @@
     "DIVS11": {
       "ok": true,
       "preco_desde": "2025-05-09",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 378,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 379,
       "dividendo_desde": "2025-06-02",
       "total_dividendos": 18
     },
@@ -1949,20 +1952,20 @@
     "DPRO11": {
       "ok": true,
       "preco_desde": "2023-01-16",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 200,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 201,
       "dividendo_desde": "2023-02-08",
       "total_dividendos": 44
     },
     "DVER11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "143 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "144 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "DVFF11": {
       "ok": true,
       "preco_desde": "2022-03-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 245,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 52
@@ -1985,7 +1988,7 @@
     "EDFO11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-03",
+      "preco_ate": "2026-11-10",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 57
@@ -1993,7 +1996,7 @@
     "EDGA11": {
       "ok": true,
       "preco_desde": "2012-10-01",
-      "preco_ate": "2026-11-09",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 171,
       "dividendo_desde": "2017-10-25",
       "total_dividendos": 53
@@ -2001,8 +2004,8 @@
     "EDGE11": {
       "ok": true,
       "preco_desde": "2025-05-08",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 378,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 379,
       "dividendo_desde": "2026-01-02",
       "total_dividendos": 3
     },
@@ -2014,7 +2017,7 @@
     "EGAF11": {
       "ok": true,
       "preco_desde": "2022-01-24",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 252,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 50
@@ -2032,21 +2035,21 @@
     "EIRA11": {
       "ok": true,
       "preco_desde": "2025-05-05",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 381,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 382,
       "dividendo_desde": "2025-07-07",
       "total_dividendos": 15
     },
     "ELAS11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "245 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "246 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "EMET11": {
       "ok": true,
       "preco_desde": "2024-08-19",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 117,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 118,
       "dividendo_desde": "2025-08-08",
       "total_dividendos": 15
     },
@@ -2061,7 +2064,7 @@
     "EQIR11": {
       "ok": true,
       "preco_desde": "2024-02-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 146,
       "dividendo_desde": "2024-02-22",
       "total_dividendos": 33
@@ -2102,12 +2105,12 @@
     "EUAT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "167 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "168 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "EURO11": {
       "ok": true,
       "preco_desde": "2010-09-01",
-      "preco_ate": "2026-11-09",
+      "preco_ate": "2026-11-10",
       "total_pregoes": 196,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 56
@@ -2115,12 +2118,12 @@
     "EWBZ11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "331 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "332 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "EXES11": {
       "ok": true,
       "preco_desde": "2022-06-27",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 230,
       "dividendo_desde": "2022-07-20",
       "total_dividendos": 51
@@ -2136,7 +2139,7 @@
     "FAED11": {
       "ok": true,
       "preco_desde": "2010-03-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 202,
       "dividendo_desde": "2017-11-09",
       "total_dividendos": 56
@@ -2144,7 +2147,7 @@
     "FAMB11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-09",
+      "preco_ate": "2026-11-10",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 6
@@ -2152,10 +2155,10 @@
     "FATN11": {
       "ok": true,
       "preco_desde": "2022-03-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 245,
       "dividendo_desde": "2022-04-07",
-      "total_dividendos": 55
+      "total_dividendos": 56
     },
     "FBOV11": {
       "ok": false,
@@ -2170,11 +2173,6 @@
       "dividendo_desde": "2017-10-19",
       "total_dividendos": 57
     },
-    "FDES11": {
-      "ok": false,
-      "filtrado_qualidade": true,
-      "motivo": "34 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
-    },
     "FDES11F": {
       "ok": false,
       "filtrado_qualidade": true,
@@ -2188,7 +2186,7 @@
     "FGAA11": {
       "ok": true,
       "preco_desde": "2023-02-13",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 197,
       "dividendo_desde": "2023-03-08",
       "total_dividendos": 44
@@ -2204,7 +2202,7 @@
     "FIIB11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 57
@@ -2212,7 +2210,7 @@
     "FIIP11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 55
@@ -2233,7 +2231,7 @@
       "preco_ate": "2026-11-10",
       "total_pregoes": 414,
       "dividendo_desde": "2022-10-07",
-      "total_dividendos": 47
+      "total_dividendos": 48
     },
     "FIVN11": {
       "ok": false,
@@ -2253,7 +2251,7 @@
     "FLCR11": {
       "ok": true,
       "preco_desde": "2024-02-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 146,
       "dividendo_desde": "2024-02-08",
       "total_dividendos": 31
@@ -2261,15 +2259,15 @@
     "FLMA11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-08",
-      "total_dividendos": 53
+      "total_dividendos": 54
     },
     "FLRP11": {
       "ok": true,
       "preco_desde": "2009-12-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 205,
       "dividendo_desde": "2017-10-23",
       "total_dividendos": 58
@@ -2277,7 +2275,7 @@
     "FMOF11": {
       "ok": true,
       "preco_desde": "2009-07-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 210,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 23
@@ -2285,7 +2283,7 @@
     "FMUN11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "39 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "42 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "FNAM11": {
       "ok": false,
@@ -2300,7 +2298,7 @@
     "FOMO11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "370 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "371 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "FPAB11": {
       "ok": true,
@@ -2313,8 +2311,8 @@
     "FPNG11": {
       "ok": true,
       "preco_desde": "2021-12-27",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 255,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 256,
       "dividendo_desde": "2022-04-07",
       "total_dividendos": 25
     },
@@ -2329,7 +2327,7 @@
     "FSPE11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "76 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "77 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "FSPY11": {
       "ok": false,
@@ -2339,13 +2337,13 @@
     "FSRF11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "206 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "210 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "FTCA11": {
       "ok": true,
       "preco_desde": "2026-06-01",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 113,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 114,
       "dividendo_desde": "2026-06-18",
       "total_dividendos": 5
     },
@@ -2360,7 +2358,7 @@
     "FYTO11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 54
@@ -2368,15 +2366,15 @@
     "FZDA11": {
       "ok": true,
       "preco_desde": "2022-09-05",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 206,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 207,
       "dividendo_desde": "2023-05-02",
       "total_dividendos": 4
     },
     "GAME11": {
       "ok": true,
       "preco_desde": "2024-02-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 146,
       "dividendo_desde": "2024-02-14",
       "total_dividendos": 32
@@ -2384,12 +2382,12 @@
     "GBIT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "122 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "123 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GBTC11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "297 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "298 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GCDL11": {
       "ok": false,
@@ -2399,7 +2397,7 @@
     "GCRA11": {
       "ok": true,
       "preco_desde": "2023-11-27",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 156,
       "dividendo_desde": "2023-12-08",
       "total_dividendos": 35
@@ -2407,7 +2405,7 @@
     "GCRI11": {
       "ok": true,
       "preco_desde": "2022-03-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 245,
       "dividendo_desde": "2022-04-14",
       "total_dividendos": 53
@@ -2415,7 +2413,7 @@
     "GDIV11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "123 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "124 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GENB11": {
       "ok": false,
@@ -2425,15 +2423,15 @@
     "GFDL11": {
       "ok": true,
       "preco_desde": "2025-05-28",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 364,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 365,
       "dividendo_desde": "2025-07-15",
       "total_dividendos": 1
     },
     "GGRC11": {
       "ok": true,
       "preco_desde": "2017-10-09",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 476,
       "dividendo_desde": "2017-11-03",
       "total_dividendos": 56
@@ -2441,20 +2439,20 @@
     "GICP11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "269 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "270 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GLCR11": {
       "ok": true,
       "preco_desde": "2025-05-19",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 371,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 372,
       "dividendo_desde": "2025-06-16",
       "total_dividendos": 17
     },
     "GLDI11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "250 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "251 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GLDX11": {
       "ok": false,
@@ -2464,30 +2462,30 @@
     "GLFT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "266 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "267 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GLMP11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "97 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "98 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GLPF11": {
       "ok": true,
       "preco_desde": "2025-02-07",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 437,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 438,
       "dividendo_desde": "2025-03-12",
       "total_dividendos": 19
     },
     "GOAT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "284 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GOLB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "99 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "100 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GOLD11": {
       "ok": false,
@@ -2512,17 +2510,17 @@
     "GPCA11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "84 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "85 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GPOS11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "114 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "120 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GPUS11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "284 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GRSO11": {
       "ok": false,
@@ -2532,7 +2530,7 @@
     "GRUL11": {
       "ok": true,
       "preco_desde": "2024-10-07",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 111,
       "dividendo_desde": "2024-11-01",
       "total_dividendos": 25
@@ -2540,7 +2538,7 @@
     "GRWA11": {
       "ok": true,
       "preco_desde": "2023-03-06",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 194,
       "dividendo_desde": "2023-04-11",
       "total_dividendos": 42
@@ -2548,7 +2546,7 @@
     "GSFI11": {
       "ok": true,
       "preco_desde": "2019-04-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 395,
       "dividendo_desde": "2026-10-01",
       "total_dividendos": 2
@@ -2556,12 +2554,12 @@
     "GSRF11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "244 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "245 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "GTWR11": {
       "ok": true,
       "preco_desde": "2019-06-24",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 387,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 55
@@ -2590,7 +2588,7 @@
     "HABT11": {
       "ok": true,
       "preco_desde": "2019-08-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 381,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -2600,14 +2598,6 @@
       "filtrado_qualidade": true,
       "motivo": "291 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
-    "HBCR11": {
-      "ok": true,
-      "preco_desde": "2024-02-05",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 145,
-      "dividendo_desde": "2024-03-01",
-      "total_dividendos": 34
-    },
     "HCRA20": {
       "ok": false,
       "filtrado_qualidade": true,
@@ -2616,7 +2606,7 @@
     "HCRI11": {
       "ok": true,
       "preco_desde": "2006-06-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 247,
       "dividendo_desde": "2017-10-16",
       "total_dividendos": 52
@@ -2629,7 +2619,7 @@
     "HCTR11": {
       "ok": true,
       "preco_desde": "2019-07-08",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 385,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 54
@@ -2650,7 +2640,7 @@
     "HGBL11": {
       "ok": true,
       "preco_desde": "2024-04-15",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 136,
       "dividendo_desde": "2024-05-03",
       "total_dividendos": 30
@@ -2658,12 +2648,12 @@
     "HGBR11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "285 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "286 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "HGBS11": {
       "ok": true,
       "preco_desde": "2012-04-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 177,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 57
@@ -2671,7 +2661,7 @@
     "HGCR11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -2682,12 +2672,12 @@
       "preco_ate": "2026-11-10",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-05",
-      "total_dividendos": 32
+      "total_dividendos": 33
     },
     "HGRE11": {
       "ok": true,
       "preco_desde": "2009-03-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 214,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -2695,7 +2685,7 @@
     "HGRU11": {
       "ok": true,
       "preco_desde": "2018-07-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 435,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 55
@@ -2713,7 +2703,7 @@
     "HLOG11": {
       "ok": true,
       "preco_desde": "2019-12-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 361,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -2721,12 +2711,12 @@
     "HODL11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "282 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "HOFC11": {
       "ok": true,
       "preco_desde": "2023-01-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 200,
       "dividendo_desde": "2023-02-01",
       "total_dividendos": 13
@@ -2734,21 +2724,21 @@
     "HOMS11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "98 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "99 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "HOSI11": {
       "ok": true,
       "preco_desde": "2020-02-17",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 352,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 353,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 53
     },
     "HPDP11": {
       "ok": true,
       "preco_desde": "2019-12-23",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 360,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 361,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
     },
@@ -2760,7 +2750,7 @@
     "HREC11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 34
@@ -2768,7 +2758,7 @@
     "HSAF11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 33
@@ -2776,7 +2766,7 @@
     "HSLG11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 34
@@ -2784,7 +2774,7 @@
     "HSML11": {
       "ok": true,
       "preco_desde": "2019-08-12",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 380,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -2797,7 +2787,7 @@
     "HTMX11": {
       "ok": true,
       "preco_desde": "2008-01-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 228,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 53
@@ -2813,20 +2803,20 @@
     "HUSC11": {
       "ok": true,
       "preco_desde": "2018-08-20",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 430,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 431,
       "dividendo_desde": "2022-05-02",
       "total_dividendos": 51
     },
     "HYBR11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "285 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "286 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "IAAG11": {
       "ok": true,
       "preco_desde": "2023-07-03",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 177,
       "dividendo_desde": "2023-08-01",
       "total_dividendos": 38
@@ -2834,7 +2824,7 @@
     "IAGR11": {
       "ok": true,
       "preco_desde": "2023-02-13",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 197,
       "dividendo_desde": "2023-03-01",
       "total_dividendos": 27
@@ -2847,15 +2837,15 @@
     "IBBP11": {
       "ok": true,
       "preco_desde": "2024-12-19",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 470,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 471,
       "dividendo_desde": "2025-01-09",
       "total_dividendos": 22
     },
     "IBCR11": {
       "ok": true,
       "preco_desde": "2024-02-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 146,
       "dividendo_desde": "2024-02-14",
       "total_dividendos": 33
@@ -2878,15 +2868,15 @@
     "ICNE11": {
       "ok": true,
       "preco_desde": "2025-11-28",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 234,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 235,
       "dividendo_desde": "2025-12-17",
       "total_dividendos": 11
     },
     "ICRI11": {
       "ok": true,
       "preco_desde": "2024-02-19",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 144,
       "dividendo_desde": "2024-03-01",
       "total_dividendos": 33
@@ -2899,7 +2889,7 @@
     "IFRA11": {
       "ok": true,
       "preco_desde": "2020-12-07",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 311,
       "dividendo_desde": "2021-05-03",
       "total_dividendos": 60
@@ -2907,7 +2897,7 @@
     "IFRI11": {
       "ok": true,
       "preco_desde": "2024-06-17",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 127,
       "dividendo_desde": "2024-07-01",
       "total_dividendos": 26
@@ -2920,33 +2910,38 @@
     "IMBB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "362 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "363 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "IMMB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "199 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "200 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+    },
+    "INDE11": {
+      "ok": false,
+      "filtrado_qualidade": true,
+      "motivo": "335 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "INFB11": {
       "ok": true,
       "preco_desde": "2024-09-02",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 114,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 115,
       "dividendo_desde": "2024-10-09",
       "total_dividendos": 21
     },
     "INHF11": {
       "ok": true,
       "preco_desde": "2026-08-27",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 229,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 235,
       "dividendo_desde": "2026-09-01",
       "total_dividendos": 3
     },
     "INLG11": {
       "ok": true,
       "preco_desde": "2019-12-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 361,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -2959,20 +2954,20 @@
     "IRIF11": {
       "ok": true,
       "preco_desde": "2026-06-01",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 113,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 114,
       "dividendo_desde": "2026-06-09",
       "total_dividendos": 5
     },
     "ISEN11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "353 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "354 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "ISET11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "322 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "323 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "ISNN11": {
       "ok": false,
@@ -3002,7 +2997,7 @@
     "ITIT11": {
       "ok": true,
       "preco_desde": "2022-03-21",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 244,
       "dividendo_desde": "2022-05-02",
       "total_dividendos": 54
@@ -3010,7 +3005,7 @@
     "ITRI11": {
       "ok": true,
       "preco_desde": "2024-08-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 120,
       "dividendo_desde": "2024-09-02",
       "total_dividendos": 27
@@ -3028,13 +3023,13 @@
     "IVWO11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "129 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "IWMI11": {
       "ok": true,
       "preco_desde": "2024-12-13",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 474,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 475,
       "dividendo_desde": "2024-12-26",
       "total_dividendos": 18
     },
@@ -3049,7 +3044,7 @@
     "JCCJ11": {
       "ok": true,
       "preco_desde": "2023-07-24",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 174,
       "dividendo_desde": "2023-08-14",
       "total_dividendos": 38
@@ -3065,7 +3060,7 @@
     "JGPX11": {
       "ok": true,
       "preco_desde": "2021-11-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 260,
       "dividendo_desde": "2022-01-03",
       "total_dividendos": 55
@@ -3086,7 +3081,7 @@
     "JSAF11": {
       "ok": true,
       "preco_desde": "2022-02-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 249,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -3094,7 +3089,7 @@
     "JSCR11": {
       "ok": true,
       "preco_desde": "2024-08-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 120,
       "dividendo_desde": "2024-09-02",
       "total_dividendos": 27
@@ -3102,7 +3097,7 @@
     "JSRE11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-09-01",
       "total_dividendos": 59
@@ -3110,7 +3105,7 @@
     "JURO11": {
       "ok": true,
       "preco_desde": "2021-12-20",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 257,
       "dividendo_desde": "2022-02-01",
       "total_dividendos": 54
@@ -3118,7 +3113,7 @@
     "KCRE11": {
       "ok": true,
       "preco_desde": "2022-07-11",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 228,
       "dividendo_desde": "2022-08-01",
       "total_dividendos": 51
@@ -3126,7 +3121,7 @@
     "KDIF11": {
       "ok": true,
       "preco_desde": "2024-06-17",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 120,
       "dividendo_desde": "2024-08-01",
       "total_dividendos": 26
@@ -3134,15 +3129,15 @@
     "KDOL11": {
       "ok": true,
       "preco_desde": "2024-11-25",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 486,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 487,
       "dividendo_desde": "2024-12-02",
       "total_dividendos": 23
     },
     "KFOF11": {
       "ok": true,
       "preco_desde": "2019-02-25",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 404,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -3150,7 +3145,7 @@
     "KIVO11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 33
@@ -3158,7 +3153,7 @@
     "KNCA11": {
       "ok": true,
       "preco_desde": "2022-01-17",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 253,
       "dividendo_desde": "2022-02-01",
       "total_dividendos": 56
@@ -3166,15 +3161,15 @@
     "KNDI11": {
       "ok": true,
       "preco_desde": "2024-11-28",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 485,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 486,
       "dividendo_desde": "2024-12-02",
       "total_dividendos": 23
     },
     "KNHF11": {
       "ok": true,
       "preco_desde": "2023-08-21",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 170,
       "dividendo_desde": "2023-09-01",
       "total_dividendos": 38
@@ -3182,7 +3177,7 @@
     "KNHY11": {
       "ok": true,
       "preco_desde": "2018-08-06",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 433,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -3190,7 +3185,7 @@
     "KNIP11": {
       "ok": true,
       "preco_desde": "2017-10-09",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 476,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -3198,15 +3193,15 @@
     "KNOX11": {
       "ok": true,
       "preco_desde": "2021-03-22",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 294,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 295,
       "dividendo_desde": "2021-05-21",
       "total_dividendos": 11
     },
     "KNRE11": {
       "ok": true,
       "preco_desde": "2017-10-09",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 476,
       "dividendo_desde": "2017-12-01",
       "total_dividendos": 7
@@ -3214,7 +3209,7 @@
     "KNRI11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -3222,7 +3217,7 @@
     "KNUQ11": {
       "ok": true,
       "preco_desde": "2023-10-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 161,
       "dividendo_desde": "2023-11-01",
       "total_dividendos": 37
@@ -3238,7 +3233,7 @@
     "KORE11": {
       "ok": true,
       "preco_desde": "2023-12-04",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 155,
       "dividendo_desde": "2024-01-02",
       "total_dividendos": 34
@@ -3267,17 +3262,17 @@
     "LFIX11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "186 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "187 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "LFTB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "275 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "276 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "LFTI11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "129 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "LFTS11": {
       "ok": false,
@@ -3287,12 +3282,12 @@
     "LFTX11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "156 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "157 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "LIFE11": {
       "ok": true,
       "preco_desde": "2022-10-24",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 213,
       "dividendo_desde": "2022-11-01",
       "total_dividendos": 48
@@ -3300,12 +3295,12 @@
     "LIQB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "346 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "352 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "LLBR11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "54 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "60 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "LLFT11": {
       "ok": false,
@@ -3326,21 +3321,21 @@
       "preco_ate": "2026-11-09",
       "total_pregoes": 145,
       "dividendo_desde": "2024-03-07",
-      "total_dividendos": 32
+      "total_dividendos": 33
     },
     "LRDI11": {
       "ok": true,
       "preco_desde": "2024-09-16",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 113,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 114,
       "dividendo_desde": "2025-04-30",
       "total_dividendos": 9
     },
     "LSAG11": {
       "ok": true,
       "preco_desde": "2022-04-25",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 233,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 234,
       "dividendo_desde": "2022-05-02",
       "total_dividendos": 54
     },
@@ -3352,15 +3347,15 @@
     "LSOP11": {
       "ok": true,
       "preco_desde": "2025-11-27",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 235,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 236,
       "dividendo_desde": "2026-01-09",
       "total_dividendos": 2
     },
     "LTBX11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "129 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "LTNB11": {
       "ok": false,
@@ -3370,7 +3365,7 @@
     "LVBI11": {
       "ok": true,
       "preco_desde": "2020-03-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 348,
       "dividendo_desde": "2022-05-02",
       "total_dividendos": 55
@@ -3383,15 +3378,15 @@
     "MAGM11": {
       "ok": true,
       "preco_desde": "2025-08-21",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 305,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 306,
       "dividendo_desde": "2025-10-15",
       "total_dividendos": 12
     },
     "MANA11": {
       "ok": true,
       "preco_desde": "2022-08-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 221,
       "dividendo_desde": "2022-10-03",
       "total_dividendos": 49
@@ -3409,7 +3404,7 @@
     "MAXR11": {
       "ok": true,
       "preco_desde": "2010-08-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 197,
       "dividendo_desde": "2017-11-09",
       "total_dividendos": 56
@@ -3417,23 +3412,23 @@
     "MCLO11": {
       "ok": true,
       "preco_desde": "2025-01-17",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 452,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 453,
       "dividendo_desde": "2025-02-06",
       "total_dividendos": 21
     },
     "MCRE11": {
       "ok": true,
       "preco_desde": "2024-11-21",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 490,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 491,
       "dividendo_desde": "2024-12-17",
       "total_dividendos": 23
     },
     "MFII11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 62
@@ -3441,7 +3436,7 @@
     "MGHT11": {
       "ok": true,
       "preco_desde": "2022-03-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 245,
       "dividendo_desde": "2022-04-13",
       "total_dividendos": 27
@@ -3449,13 +3444,13 @@
     "MIDB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "181 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "182 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "MIDW11": {
       "ok": true,
       "preco_desde": "2026-01-19",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 202,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 203,
       "dividendo_desde": "2026-03-25",
       "total_dividendos": 7
     },
@@ -3467,7 +3462,7 @@
     "MUND11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "72 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "79 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "NASD11": {
       "ok": false,
@@ -3477,22 +3472,22 @@
     "NB0211": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "388 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "394 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "NB0511": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "96 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "102 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "NB1011": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "355 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "361 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "NBIT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "306 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "307 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "NBOV11": {
       "ok": false,
@@ -3507,10 +3502,10 @@
     "NCRI11": {
       "ok": true,
       "preco_desde": "2023-01-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 200,
       "dividendo_desde": "2023-02-07",
-      "total_dividendos": 43
+      "total_dividendos": 44
     },
     "NDIV11": {
       "ok": false,
@@ -3520,7 +3515,7 @@
     "NEWL11": {
       "ok": true,
       "preco_desde": "2019-12-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 361,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 55
@@ -3528,23 +3523,28 @@
     "NEWU11": {
       "ok": true,
       "preco_desde": "2020-06-22",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 334,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 335,
       "dividendo_desde": "2022-12-01",
       "total_dividendos": 48
     },
     "NEXG11": {
       "ok": true,
       "preco_desde": "2023-12-04",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 153,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 154,
       "dividendo_desde": "2024-01-09",
       "total_dividendos": 34
     },
     "NLFA11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "99 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "100 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+    },
+    "NMKS11": {
+      "ok": false,
+      "filtrado_qualidade": true,
+      "motivo": "231 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "NSDV11": {
       "ok": false,
@@ -3554,7 +3554,7 @@
     "NSLU11": {
       "ok": true,
       "preco_desde": "2006-11-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 242,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 56
@@ -3562,7 +3562,7 @@
     "NTNF11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "347 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "350 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "NTNS11": {
       "ok": false,
@@ -3577,8 +3577,8 @@
     "NUIF11": {
       "ok": true,
       "preco_desde": "2026-06-01",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 112,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 113,
       "dividendo_desde": "2026-06-01",
       "total_dividendos": 6
     },
@@ -3595,6 +3595,14 @@
       "filtrado_qualidade": true,
       "motivo": "76 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
+    "OCRE11": {
+      "ok": true,
+      "preco_desde": "2023-06-19",
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 179,
+      "dividendo_desde": "2023-07-12",
+      "total_dividendos": 41
+    },
     "OGIN11": {
       "ok": true,
       "preco_desde": "2022-10-24",
@@ -3606,7 +3614,7 @@
     "OIAG11": {
       "ok": true,
       "preco_desde": "2022-05-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 235,
       "dividendo_desde": "2022-06-08",
       "total_dividendos": 54
@@ -3614,25 +3622,25 @@
     "OLEO11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "72 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "75 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "ONDA11": {
       "ok": true,
       "preco_desde": "2025-08-08",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 313,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 314,
       "dividendo_desde": "2025-08-08",
       "total_dividendos": 14
     },
     "OROF11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "93 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "94 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "OUJP11": {
       "ok": true,
       "preco_desde": "2017-10-09",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 476,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -3640,15 +3648,15 @@
     "OURO11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "206 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "207 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "OXRL11": {
       "ok": true,
       "preco_desde": "2025-10-08",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 270,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 271,
       "dividendo_desde": "2025-11-07",
-      "total_dividendos": 12
+      "total_dividendos": 13
     },
     "PABY11": {
       "ok": false,
@@ -3658,12 +3666,12 @@
     "PACB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "371 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "372 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "PACC11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "274 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "275 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "PACG11": {
       "ok": false,
@@ -3686,7 +3694,7 @@
     "PATC11": {
       "ok": true,
       "preco_desde": "2019-04-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 399,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 62
@@ -3694,7 +3702,7 @@
     "PCIP11": {
       "ok": true,
       "preco_desde": "2019-09-23",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 374,
       "dividendo_desde": "2022-04-11",
       "total_dividendos": 53
@@ -3702,8 +3710,8 @@
     "PDBM11": {
       "ok": true,
       "preco_desde": "2025-08-11",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 312,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 313,
       "dividendo_desde": "2025-09-01",
       "total_dividendos": 16
     },
@@ -3723,7 +3731,7 @@
     "PFIN11": {
       "ok": true,
       "preco_desde": "2020-01-20",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 357,
       "dividendo_desde": "2020-08-10",
       "total_dividendos": 26
@@ -3731,12 +3739,12 @@
     "PFJR11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "78 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "79 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "PHIP11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "211 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "212 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "PIBB11": {
       "ok": false,
@@ -3746,7 +3754,7 @@
     "PICE11": {
       "ok": true,
       "preco_desde": "2021-03-08",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 298,
       "dividendo_desde": "2021-07-01",
       "total_dividendos": 38
@@ -3754,17 +3762,17 @@
     "PIPE11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "129 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "PKIN11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "282 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "PLAG11": {
       "ok": true,
       "preco_desde": "2019-12-09",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 363,
       "dividendo_desde": "2022-04-04",
       "total_dividendos": 54
@@ -3772,7 +3780,7 @@
     "PLCA11": {
       "ok": true,
       "preco_desde": "2022-08-08",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 224,
       "dividendo_desde": "2022-09-01",
       "total_dividendos": 49
@@ -3788,7 +3796,7 @@
     "PMIS11": {
       "ok": true,
       "preco_desde": "2024-02-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 146,
       "dividendo_desde": "2024-03-01",
       "total_dividendos": 33
@@ -3796,7 +3804,7 @@
     "PMLL11": {
       "ok": true,
       "preco_desde": "2018-12-10",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 415,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 54
@@ -3804,23 +3812,15 @@
     "PMRL11": {
       "ok": true,
       "preco_desde": "2025-12-30",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 214,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 215,
       "dividendo_desde": "2026-01-14",
       "total_dividendos": 1
-    },
-    "PNDL11": {
-      "ok": true,
-      "preco_desde": "2023-04-24",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 186,
-      "dividendo_desde": "2023-07-03",
-      "total_dividendos": 5
     },
     "PORD11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -3828,12 +3828,12 @@
     "POSB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "129 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "PPEI11": {
       "ok": true,
       "preco_desde": "2020-10-26",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 317,
       "dividendo_desde": "2021-02-10",
       "total_dividendos": 19
@@ -3841,7 +3841,7 @@
     "PQAG11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 33
@@ -3857,7 +3857,7 @@
     "PRAF11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "93 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "94 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "PREE11": {
       "ok": false,
@@ -3867,7 +3867,7 @@
     "PREX11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "83 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "84 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "PRIF11": {
       "ok": true,
@@ -3888,7 +3888,7 @@
     "PSEC11": {
       "ok": true,
       "preco_desde": "2020-02-10",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 354,
       "dividendo_desde": "2022-04-11",
       "total_dividendos": 50
@@ -3901,7 +3901,7 @@
     "PVBI11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 34
@@ -3924,17 +3924,17 @@
     "QLBR11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "99 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "100 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "QQQI11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "284 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "QQQQ11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "470 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "471 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "QSOL11": {
       "ok": false,
@@ -3944,12 +3944,12 @@
     "RARA11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "79 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "80 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "RBDS11": {
       "ok": true,
       "preco_desde": "2011-01-01",
-      "preco_ate": "2026-11-05",
+      "preco_ate": "2026-11-10",
       "total_pregoes": 192,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 2
@@ -3957,7 +3957,7 @@
     "RBFM11": {
       "ok": true,
       "preco_desde": "2020-06-22",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 335,
       "dividendo_desde": "2022-05-02",
       "total_dividendos": 55
@@ -3965,15 +3965,15 @@
     "RBFY11": {
       "ok": true,
       "preco_desde": "2025-10-08",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 270,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 271,
       "dividendo_desde": "2025-11-03",
       "total_dividendos": 5
     },
     "RBHG11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 33
@@ -3981,7 +3981,7 @@
     "RBHY11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 33
@@ -3994,12 +3994,12 @@
     "RBIC11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "1 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "25 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "RBIF11": {
       "ok": true,
       "preco_desde": "2022-06-20",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 231,
       "dividendo_desde": "2022-08-11",
       "total_dividendos": 48
@@ -4007,7 +4007,7 @@
     "RBIR11": {
       "ok": true,
       "preco_desde": "2020-03-02",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 351,
       "dividendo_desde": "2022-07-01",
       "total_dividendos": 31
@@ -4015,7 +4015,7 @@
     "RBOP11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-09",
+      "preco_ate": "2026-11-10",
       "total_pregoes": 148,
       "dividendo_desde": "2022-04-07",
       "total_dividendos": 44
@@ -4023,7 +4023,7 @@
     "RBRD11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -4047,10 +4047,18 @@
     "RBRP11": {
       "ok": true,
       "preco_desde": "2018-08-13",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 432,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 55
+    },
+    "RBRR11": {
+      "ok": true,
+      "preco_desde": "2018-04-30",
+      "preco_ate": "2026-11-09",
+      "total_pregoes": 446,
+      "dividendo_desde": "2022-04-12",
+      "total_dividendos": 54
     },
     "RBRS11": {
       "ok": true,
@@ -4063,7 +4071,7 @@
     "RBRX11": {
       "ok": true,
       "preco_desde": "2022-09-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 220,
       "dividendo_desde": "2022-09-16",
       "total_dividendos": 49
@@ -4071,7 +4079,7 @@
     "RBRY11": {
       "ok": true,
       "preco_desde": "2019-05-20",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 392,
       "dividendo_desde": "2022-04-12",
       "total_dividendos": 55
@@ -4079,15 +4087,15 @@
     "RBTS11": {
       "ok": true,
       "preco_desde": "2020-04-06",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 345,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 346,
       "dividendo_desde": "2022-10-03",
       "total_dividendos": 24
     },
     "RBVA11": {
       "ok": true,
       "preco_desde": "2019-04-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 395,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 54
@@ -4100,7 +4108,7 @@
     "RCRB11": {
       "ok": true,
       "preco_desde": "2019-11-04",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 368,
       "dividendo_desde": "2022-04-07",
       "total_dividendos": 56
@@ -4108,15 +4116,15 @@
     "RCRI11": {
       "ok": true,
       "preco_desde": "2025-07-09",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 335,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 337,
       "dividendo_desde": "2025-08-14",
       "total_dividendos": 15
     },
     "REAL11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "42 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "44 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "RECD11": {
       "ok": true,
@@ -4129,15 +4137,15 @@
     "RECM11": {
       "ok": true,
       "preco_desde": "2024-11-21",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 485,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 486,
       "dividendo_desde": "2024-12-09",
       "total_dividendos": 23
     },
     "RECT11": {
       "ok": true,
       "preco_desde": "2019-04-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 395,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 54
@@ -4145,7 +4153,7 @@
     "RENV11": {
       "ok": true,
       "preco_desde": "2024-08-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 120,
       "dividendo_desde": "2024-10-08",
       "total_dividendos": 20
@@ -4158,12 +4166,12 @@
     "RICO11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "340 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "341 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "RIFF11": {
       "ok": true,
       "preco_desde": "2024-09-30",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 112,
       "dividendo_desde": "2024-11-01",
       "total_dividendos": 22
@@ -4171,15 +4179,10 @@
     "RINV11": {
       "ok": true,
       "preco_desde": "2023-03-06",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 194,
       "dividendo_desde": "2023-04-03",
       "total_dividendos": 42
-    },
-    "RJDA11": {
-      "ok": false,
-      "filtrado_qualidade": true,
-      "motivo": "213 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "RJDA15": {
       "ok": false,
@@ -4197,7 +4200,7 @@
     "RNGO11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -4205,10 +4208,18 @@
     "ROCA11": {
       "ok": true,
       "preco_desde": "2026-07-02",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 80,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 81,
       "dividendo_desde": "2026-09-09",
       "total_dividendos": 2
+    },
+    "RPRI11": {
+      "ok": true,
+      "preco_desde": "2022-08-15",
+      "preco_ate": "2026-11-09",
+      "total_pregoes": 222,
+      "dividendo_desde": "2022-09-01",
+      "total_dividendos": 50
     },
     "RSPD11": {
       "ok": true,
@@ -4234,7 +4245,7 @@
     "RURA11": {
       "ok": true,
       "preco_desde": "2022-03-07",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 246,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 54
@@ -4242,12 +4253,12 @@
     "RVDI11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "74 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "75 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "RZAG11": {
       "ok": true,
       "preco_desde": "2021-10-11",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 267,
       "dividendo_desde": "2021-12-01",
       "total_dividendos": 59
@@ -4255,7 +4266,7 @@
     "RZAK11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-19",
       "total_dividendos": 32
@@ -4263,15 +4274,15 @@
     "RZAT11": {
       "ok": true,
       "preco_desde": "2025-04-08",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 398,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 399,
       "dividendo_desde": "2025-04-15",
       "total_dividendos": 19
     },
     "RZDL11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "52 pregões / 21 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "53 pregões / 21 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "RZEO11": {
       "ok": false,
@@ -4289,7 +4300,7 @@
     "RZTR11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 34
@@ -4310,7 +4321,7 @@
     "SAPI11": {
       "ok": true,
       "preco_desde": "2023-10-16",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 162,
       "dividendo_desde": "2023-11-01",
       "total_dividendos": 37
@@ -4318,7 +4329,7 @@
     "SCPF11": {
       "ok": true,
       "preco_desde": "2016-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 124,
       "dividendo_desde": "2017-11-08",
       "total_dividendos": 25
@@ -4336,12 +4347,12 @@
     "SELI11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "83 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "84 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "SEQR11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-08",
       "total_dividendos": 33
@@ -4362,8 +4373,8 @@
     "SHPP11": {
       "ok": true,
       "preco_desde": "2025-06-25",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 345,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 347,
       "dividendo_desde": "2025-07-11",
       "total_dividendos": 15
     },
@@ -4375,7 +4386,7 @@
     "SJAU11": {
       "ok": true,
       "preco_desde": "2022-03-28",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 243,
       "dividendo_desde": "2024-07-01",
       "total_dividendos": 3
@@ -4421,7 +4432,7 @@
     "SNAG11": {
       "ok": true,
       "preco_desde": "2022-08-08",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 224,
       "dividendo_desde": "2022-09-16",
       "total_dividendos": 52
@@ -4429,7 +4440,7 @@
     "SNCI11": {
       "ok": true,
       "preco_desde": "2022-02-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 249,
       "dividendo_desde": "2022-04-18",
       "total_dividendos": 55
@@ -4437,7 +4448,7 @@
     "SNEL11": {
       "ok": true,
       "preco_desde": "2023-12-11",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 154,
       "dividendo_desde": "2024-01-16",
       "total_dividendos": 32
@@ -4445,7 +4456,7 @@
     "SNFZ11": {
       "ok": true,
       "preco_desde": "2024-08-12",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 119,
       "dividendo_desde": "2024-09-16",
       "total_dividendos": 26
@@ -4453,7 +4464,7 @@
     "SNID11": {
       "ok": true,
       "preco_desde": "2023-02-06",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 198,
       "dividendo_desde": "2023-02-16",
       "total_dividendos": 43
@@ -4461,7 +4472,7 @@
     "SNME11": {
       "ok": true,
       "preco_desde": "2023-12-18",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 153,
       "dividendo_desde": "2023-12-18",
       "total_dividendos": 34
@@ -4469,7 +4480,7 @@
     "SOLH11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "465 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "466 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "SPBZ11": {
       "ok": false,
@@ -4479,7 +4490,7 @@
     "SPTW11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 57
@@ -4487,12 +4498,12 @@
     "SPUB11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "282 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "SPVT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "282 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "SPXB11": {
       "ok": false,
@@ -4502,7 +4513,7 @@
     "SPXH11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "99 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "100 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "SPXI11": {
       "ok": false,
@@ -4512,12 +4523,12 @@
     "SPXR11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "284 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "SPXS11": {
       "ok": true,
       "preco_desde": "2022-08-08",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 224,
       "dividendo_desde": "2022-09-09",
       "total_dividendos": 50
@@ -4530,7 +4541,7 @@
     "SPYI11": {
       "ok": true,
       "preco_desde": "2024-02-19",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 144,
       "dividendo_desde": "2024-02-21",
       "total_dividendos": 27
@@ -4543,13 +4554,13 @@
     "STYI11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "271 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "272 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "SUIN11": {
       "ok": true,
       "preco_desde": "2025-11-05",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 251,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 252,
       "dividendo_desde": "2025-12-01",
       "total_dividendos": 11
     },
@@ -4571,12 +4582,12 @@
     "TD5011": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "127 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "TD6011": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "127 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "TECK11": {
       "ok": false,
@@ -4586,20 +4597,20 @@
     "TECX11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "282 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "TELM11": {
       "ok": true,
       "preco_desde": "2025-01-13",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 457,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 458,
       "dividendo_desde": "2025-01-14",
       "total_dividendos": 23
     },
     "TEPP11": {
       "ok": true,
       "preco_desde": "2020-05-04",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 342,
       "dividendo_desde": "2022-05-02",
       "total_dividendos": 55
@@ -4607,7 +4618,7 @@
     "TGAR11": {
       "ok": true,
       "preco_desde": "2017-08-21",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 483,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 58
@@ -4623,7 +4634,7 @@
     "TMPS11": {
       "ok": true,
       "preco_desde": "2023-07-03",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 177,
       "dividendo_desde": "2023-08-01",
       "total_dividendos": 41
@@ -4639,20 +4650,20 @@
     "TOPY11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "93 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "95 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "TORD11": {
       "ok": true,
       "preco_desde": "2022-02-14",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 248,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 249,
       "dividendo_desde": "2022-04-08",
       "total_dividendos": 28
     },
     "TRBL11": {
       "ok": true,
       "preco_desde": "2023-08-21",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 170,
       "dividendo_desde": "2023-09-01",
       "total_dividendos": 39
@@ -4662,18 +4673,10 @@
       "filtrado_qualidade": true,
       "motivo": "263 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
-    "TRNT11": {
-      "ok": true,
-      "preco_desde": "2006-06-01",
-      "preco_ate": "2026-11-01",
-      "total_pregoes": 246,
-      "dividendo_desde": "2017-10-16",
-      "total_dividendos": 28
-    },
     "TRPL11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "208 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "209 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "TRUE11": {
       "ok": false,
@@ -4683,7 +4686,7 @@
     "TRXB11": {
       "ok": true,
       "preco_desde": "2024-02-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 146,
       "dividendo_desde": "2024-03-01",
       "total_dividendos": 33
@@ -4691,15 +4694,15 @@
     "TRXY11": {
       "ok": true,
       "preco_desde": "2025-01-13",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 457,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 458,
       "dividendo_desde": "2025-02-03",
       "total_dividendos": 22
     },
     "TVRI11": {
       "ok": true,
       "preco_desde": "2023-11-06",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 159,
       "dividendo_desde": "2023-12-01",
       "total_dividendos": 36
@@ -4707,15 +4710,15 @@
     "URHF11": {
       "ok": true,
       "preco_desde": "2024-07-15",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 122,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 123,
       "dividendo_desde": "2024-08-01",
       "total_dividendos": 28
     },
     "URPR11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 34
@@ -4738,13 +4741,13 @@
     "UTLI11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "79 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "85 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "UTLL11": {
       "ok": true,
       "preco_desde": "2025-09-19",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 284,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 285,
       "dividendo_desde": "2025-12-02",
       "total_dividendos": 6
     },
@@ -4753,10 +4756,18 @@
       "filtrado_qualidade": true,
       "motivo": "15 pregões / 9 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
+    "VCJR11": {
+      "ok": true,
+      "preco_desde": "2020-01-27",
+      "preco_ate": "2026-11-09",
+      "total_pregoes": 355,
+      "dividendo_desde": "2022-04-01",
+      "total_dividendos": 55
+    },
     "VCRA11": {
       "ok": true,
       "preco_desde": "2022-06-27",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 230,
       "dividendo_desde": "2022-07-01",
       "total_dividendos": 51
@@ -4764,7 +4775,7 @@
     "VCRI11": {
       "ok": true,
       "preco_desde": "2023-01-16",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 201,
       "dividendo_desde": "2023-02-01",
       "total_dividendos": 46
@@ -4780,7 +4791,7 @@
     "VGHF11": {
       "ok": true,
       "preco_desde": "2024-02-05",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 146,
       "dividendo_desde": "2024-03-01",
       "total_dividendos": 32
@@ -4788,7 +4799,7 @@
     "VGIA11": {
       "ok": true,
       "preco_desde": "2021-12-13",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 258,
       "dividendo_desde": "2022-01-13",
       "total_dividendos": 58
@@ -4796,7 +4807,7 @@
     "VGIP11": {
       "ok": true,
       "preco_desde": "2020-03-16",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 349,
       "dividendo_desde": "2022-04-13",
       "total_dividendos": 53
@@ -4809,7 +4820,7 @@
     "VGRI11": {
       "ok": true,
       "preco_desde": "2024-04-15",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 136,
       "dividendo_desde": "2024-05-02",
       "total_dividendos": 31
@@ -4825,8 +4836,8 @@
     "VIGT11": {
       "ok": true,
       "preco_desde": "2026-05-25",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 118,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 119,
       "dividendo_desde": "2026-06-01",
       "total_dividendos": 6
     },
@@ -4841,15 +4852,15 @@
     "VINF11": {
       "ok": true,
       "preco_desde": "2025-10-13",
-      "preco_ate": "2026-11-10",
-      "total_pregoes": 267,
+      "preco_ate": "2026-11-11",
+      "total_pregoes": 268,
       "dividendo_desde": "2025-11-03",
       "total_dividendos": 12
     },
     "VINO11": {
       "ok": true,
       "preco_desde": "2019-11-25",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 365,
       "dividendo_desde": "2022-05-02",
       "total_dividendos": 55
@@ -4857,7 +4868,7 @@
     "VIUR11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-01",
       "total_dividendos": 26
@@ -4873,7 +4884,7 @@
     "VPPR11": {
       "ok": true,
       "preco_desde": "2019-12-09",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 363,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 34
@@ -4881,7 +4892,7 @@
     "VRTA11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 57
@@ -4889,7 +4900,7 @@
     "VRTM11": {
       "ok": true,
       "preco_desde": "2023-11-20",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 157,
       "dividendo_desde": "2023-12-01",
       "total_dividendos": 36
@@ -4897,7 +4908,7 @@
     "VSHO11": {
       "ok": true,
       "preco_desde": "2019-01-14",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 410,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -4905,7 +4916,7 @@
     "VSLH11": {
       "ok": true,
       "preco_desde": "2024-01-29",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 147,
       "dividendo_desde": "2024-02-08",
       "total_dividendos": 32
@@ -4913,20 +4924,20 @@
     "VTBR11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "66 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "74 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "VTOT11": {
       "ok": true,
       "preco_desde": "2026-10-09",
       "preco_ate": "2026-11-10",
-      "total_pregoes": 98,
+      "total_pregoes": 102,
       "dividendo_desde": "2026-10-15",
       "total_dividendos": 1
     },
     "VTUS11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "66 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "72 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "VVCO11": {
       "ok": false,
@@ -4936,8 +4947,8 @@
     "VVCR11": {
       "ok": true,
       "preco_desde": "2018-04-30",
-      "preco_ate": "2026-11-09",
-      "total_pregoes": 446,
+      "preco_ate": "2026-11-10",
+      "total_pregoes": 447,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 54
     },
@@ -4949,7 +4960,7 @@
     "VVMR11": {
       "ok": true,
       "preco_desde": "2024-02-12",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 145,
       "dividendo_desde": "2024-03-01",
       "total_dividendos": 25
@@ -4957,7 +4968,7 @@
     "VVRI11": {
       "ok": true,
       "preco_desde": "2023-05-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 186,
       "dividendo_desde": "2023-05-18",
       "total_dividendos": 39
@@ -4965,7 +4976,7 @@
     "VWRA11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "277 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "278 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "VXXV11": {
       "ok": true,
@@ -4983,12 +4994,12 @@
     "WEJR11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "243 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "244 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "WHGR11": {
       "ok": true,
       "preco_desde": "2022-07-11",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 228,
       "dividendo_desde": "2022-08-01",
       "total_dividendos": 52
@@ -5009,7 +5020,7 @@
     "WTSP11": {
       "ok": true,
       "preco_desde": "2018-09-03",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 429,
       "dividendo_desde": "2022-04-18",
       "total_dividendos": 46
@@ -5027,27 +5038,27 @@
     "XB4511": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "127 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XB5011": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "225 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "226 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XB6011": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "127 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XBCI11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "122 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "123 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XBIT11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "108 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "109 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XBOV": {
       "ok": false,
@@ -5062,22 +5073,22 @@
     "XCAP11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "64 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "69 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XETH11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "108 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "109 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XF3311": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "8 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "9 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XF3711": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "8 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "9 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XFIX11": {
       "ok": false,
@@ -5100,7 +5111,7 @@
     "XPCI11": {
       "ok": true,
       "preco_desde": "2019-12-16",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 362,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -5108,7 +5119,7 @@
     "XPCM11": {
       "ok": true,
       "preco_desde": "2014-09-01",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 148,
       "dividendo_desde": "2017-11-01",
       "total_dividendos": 24
@@ -5116,7 +5127,7 @@
     "XPID11": {
       "ok": true,
       "preco_desde": "2021-04-12",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 293,
       "dividendo_desde": "2021-05-03",
       "total_dividendos": 63
@@ -5124,7 +5135,7 @@
     "XPIE11": {
       "ok": true,
       "preco_desde": "2019-07-15",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 384,
       "dividendo_desde": "2019-11-01",
       "total_dividendos": 52
@@ -5132,7 +5143,7 @@
     "XPSF11": {
       "ok": true,
       "preco_desde": "2020-02-17",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 353,
       "dividendo_desde": "2022-04-01",
       "total_dividendos": 56
@@ -5140,27 +5151,22 @@
     "XRPH11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "282 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "283 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XSPI11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "128 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "129 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "XVAL11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "147 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
-    },
-    "YEES11": {
-      "ok": false,
-      "filtrado_qualidade": true,
-      "motivo": "136 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "153 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "ZAGH11": {
       "ok": true,
       "preco_desde": "2024-04-15",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 136,
       "dividendo_desde": "2024-05-15",
       "total_dividendos": 31
@@ -5176,7 +5182,7 @@
     "ZAVI11": {
       "ok": true,
       "preco_desde": "2022-10-31",
-      "preco_ate": "2026-11-10",
+      "preco_ate": "2026-11-11",
       "total_pregoes": 212,
       "dividendo_desde": "2022-11-01",
       "total_dividendos": 49
