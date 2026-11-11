@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+
+# Claude Code grava aprovações de comando ("don't ask again") em texto puro
+# nesse arquivo — vazamento de credenciais já reportado publicamente quando
+# ele acaba commitado sem querer (ver Apiiro, nov/2026).
+.claude/settings.local.json
