@@ -17765,9 +17765,15 @@
         }
 
         // Período do IFIX cobrindo pelo menos o intervalo que já temos
-        // de histórico de juros.
-        const diasDesdeInicio = Math.ceil(
-          (Date.now() - new Date(`${pontosJuros[0].data}T00:00:00`).getTime()) / 86400000
+        // de histórico de juros. Usa só a data (meia-noite a meia-noite),
+        // não Date.now() — comparar um timestamp com hora contra uma data
+        // "pura" sempre deixava sobrar uma fração de dia, e Math.ceil
+        // arredondava isso pra cima (7 dias virava 8), pulando de "7D" pra
+        // "30D" antes da hora e trazendo IFIX de um mês inteiro só pra
+        // cobrir uma semana de juros.
+        const hojeISO = new Date().toISOString().slice(0, 10);
+        const diasDesdeInicio = Math.round(
+          (new Date(`${hojeISO}T00:00:00`) - new Date(`${pontosJuros[0].data}T00:00:00`)) / 86400000
         );
         const periodo = diasDesdeInicio <= 7 ? '7D' : diasDesdeInicio <= 30 ? '30D' : diasDesdeInicio <= 182 ? '6M' : '1A';
 
@@ -17822,7 +17828,30 @@
               legend: { display: true, labels: { color: HG_COR_MUTED(), boxWidth: 12 } },
             },
             scales: {
-              x: { type: 'category', title: { display: true, text: 'Data', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED(), autoSkip: true, maxTicksLimit: 8 }, grid: { display: false } },
+              x: {
+                type: 'category',
+                title: { display: true, text: 'Data', color: HG_COR_MUTED() },
+                ticks: {
+                  color: HG_COR_MUTED(),
+                  autoSkip: false,
+                  maxRotation: 0,
+                  // O autoSkip padrão do Chart.js não garante incluir o
+                  // último rótulo (data mais recente) quando o passo não
+                  // "bate certinho" no índice final — fazia o eixo parecer
+                  // parado, sem mostrar os dias mais atuais. Escolhe os
+                  // índices manualmente garantindo que o primeiro e o
+                  // último apareçam sempre.
+                  callback: function (valor, indice) {
+                    const total = todasDatas.length;
+                    const passo = Math.max(1, Math.ceil(total / 8));
+                    if (indice === 0 || indice === total - 1 || indice % passo === 0) {
+                      return todasDatas[indice];
+                    }
+                    return '';
+                  },
+                },
+                grid: { display: false },
+              },
               y: {
                 position: 'left',
                 title: { display: true, text: 'Juros (% a.a.)', color: HG_COR_PRIMARIA() },
