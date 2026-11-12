@@ -2,9 +2,9 @@
  "_leia_me": "Cadastro de EMISSÃO de CRIs (Certificados de Recebíveis Imobiliários) negociados na B3, só os que ainda não venceram. 'rotulo_remuneracao' é a remuneração CONTRATADA no lançamento do papel — a B3 não publica uma taxa de mercado secundário atualizada todo dia para CRI (diferente da tela de Debêntures, que usa a ANBIMA). Para papel pós-fixado (DI/IPCA/IGP-M + spread) isso ainda descreve o que o título paga hoje, porque só o indexador-base flutua; para PREFIXADO não há garantia nenhuma de que siga valendo. CRI é isento de Imposto de Renda para pessoa física por lei (diferente de debênture incentivada, que depende de cada papel) — mas não tem FGC, e a maioria exige um investimento mínimo alto (na casa de R$ 10 a 20 mil), que este arquivo não informa.",
  "fonte": "B3 — Consulta Pública de CRIs",
  "fonte_url": "https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/",
- "atualizado_em": "2026-11-11T19:53:36+00:00",
+ "atualizado_em": "2026-11-12T20:29:56+00:00",
  "total": 4446,
- "total_no_arquivo_b3": 4699,
+ "total_no_arquivo_b3": 4700,
  "por_indexador": {
   "di": 1258,
   "igp_m": 209,
@@ -18,7 +18,7 @@
   "incc_m": 5,
   "ipc_fipe": 2
  },
- "volume_total_emissao": 304993619094.96,
+ "volume_total_emissao": 304902319094.96,
  "cris": [
   {
    "codigo": "27I0000801",
@@ -53,6 +53,40 @@
    "data_emissao": "2027-02-09",
    "data_vencimento": "2031-02-09",
    "data_final_distribuicao": "2026-08-10"
+  },
+  {
+   "codigo": "26K2319333",
+   "isin": "BRPVSCCRICV8",
+   "emissor": "COMPANHIA PROVINCIA DE SECURITIZACAO",
+   "agente_fiduciario": "VORTX DTVM S.A.",
+   "numero_emissao": "79",
+   "numero_serie": "2",
+   "quantidade_emitida": 7350.0,
+   "volume_emissao": 7350000.0,
+   "indexador": "ipca",
+   "pct_indexador": null,
+   "spread": 14.0,
+   "rotulo_remuneracao": "IPCA + 14,00%",
+   "data_emissao": "2026-11-04",
+   "data_vencimento": "2029-11-21",
+   "data_final_distribuicao": "2027-05-09"
+  },
+  {
+   "codigo": "26K2323639",
+   "isin": "BRPVSCCRICW6",
+   "emissor": "COMPANHIA PROVINCIA DE SECURITIZACAO",
+   "agente_fiduciario": "VORTX DTVM S.A.",
+   "numero_emissao": "79",
+   "numero_serie": "3",
+   "quantidade_emitida": 7350.0,
+   "volume_emissao": 7350000.0,
+   "indexador": "di",
+   "pct_indexador": 100.0,
+   "spread": 4.5,
+   "rotulo_remuneracao": "100% do DI + 4,50%",
+   "data_emissao": "2026-11-04",
+   "data_vencimento": "2028-12-19",
+   "data_final_distribuicao": "2027-05-09"
   },
   {
    "codigo": "26J7658778",
@@ -31673,23 +31707,6 @@
    "data_emissao": "2024-08-13",
    "data_vencimento": "2029-08-17",
    "data_final_distribuicao": "2025-03-17"
-  },
-  {
-   "codigo": "24H1396116",
-   "isin": "BRRBRACRIPD2",
-   "emissor": "OPEA SECURITIZADORA S/A",
-   "agente_fiduciario": "VORTX DTVM S.A.",
-   "numero_emissao": "290",
-   "numero_serie": "1",
-   "quantidade_emitida": 40000.0,
-   "volume_emissao": 40000000.0,
-   "indexador": "di",
-   "pct_indexador": 100.0,
-   "spread": 4.2,
-   "rotulo_remuneracao": "100% do DI + 4,20%",
-   "data_emissao": "2024-08-09",
-   "data_vencimento": "2028-08-31",
-   "data_final_distribuicao": "2028-08-30"
   },
   {
    "codigo": "24H1453741",
@@ -73629,23 +73646,6 @@
    "data_emissao": "2014-12-08",
    "data_vencimento": "2029-12-06",
    "data_final_distribuicao": "2015-06-05"
-  },
-  {
-   "codigo": "14K0209085",
-   "isin": "BRNSECCRI0I4",
-   "emissor": "RIZA SECURITIZADORA S.A.",
-   "agente_fiduciario": "PENTAGONO S.A. DTVM",
-   "numero_emissao": "1",
-   "numero_serie": "19",
-   "quantidade_emitida": 220.0,
-   "volume_emissao": 66000000.0,
-   "indexador": "ipca",
-   "pct_indexador": null,
-   "spread": 7.4,
-   "rotulo_remuneracao": "IPCA + 7,40%",
-   "data_emissao": "2014-11-27",
-   "data_vencimento": "2026-11-12",
-   "data_final_distribuicao": "2015-05-26"
   },
   {
    "codigo": "14K0234407",
