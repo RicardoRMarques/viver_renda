@@ -89,15 +89,29 @@ URL_FONTE = "https://www.anbima.com.br/informacoes/est-termo/"
 
 CAMINHO_SAIDA = os.path.join("data", "curva-juros.json")
 
-# Série histórica de um ponto representativo da curva (vértice mais
-# curto disponível, ~1 ano) — usada pra comparar visualmente, ao longo
-# do tempo, com o IFIX (ver carregarComparacaoJurosIfix no index.html).
-# A ANBIMA só devolve a foto do dia (ou, no máximo, os últimos ~5 dias
-# úteis) — não uma série longa pronta — então este robô vai acumulando
-# 1 ponto por dia útil a cada execução, igual o padrão já usado em
+# Série histórica de um ponto representativo da curva — usada pra
+# comparar visualmente, ao longo do tempo, com o IFIX (ver
+# carregarComparacaoJurosIfix no index.html). A ANBIMA só devolve a
+# foto do dia (ou, no máximo, os últimos ~5 dias úteis) — não uma
+# série longa pronta — então este robô vai acumulando 1 ponto por dia
+# útil a cada execução, igual o padrão já usado em
 # noticias-historico.json.
 CAMINHO_HISTORICO = os.path.join("data", "curva-juros-historico.json")
 HISTORICO_MAX_PONTOS = 756  # ~3 anos de dias úteis — limite generoso
+
+# Vértice FIXO (não "o mais curto disponível"!) — descoberto em
+# 12/11/2026: a ANBIMA passou a publicar também um vértice de 126 dias
+# (~6 meses), mais curto que o de 252 (~1 ano) que vinha sendo usado
+# até então. Como atualizar_historico() pegava `pontos[0]` (o vértice
+# mais curto da lista, não um prazo fixo), a série de "taxa do vértice
+# de 1 ano" trocou de prazo silenciosamente num único dia, misturando
+# uma taxa de 6 meses no meio de uma série de taxas de 1 ano — queda
+# "real" de 14,04% pra 13,79% que na verdade era, em boa parte, só o
+# efeito de comparar prazos diferentes (o vértice de 252 dias nesse
+# mesmo dia estava em 14,14%, bem mais parecido com o dia anterior).
+# Fixar o vértice evita que isso se repita se a ANBIMA publicar um
+# vértice ainda mais curto no futuro.
+VERTICE_ALVO_DIAS = 252
 
 CABECALHOS = {
     "User-Agent": (
@@ -250,13 +264,15 @@ def coletar(data_mais_recente=None):
 
 
 def atualizar_historico(data_referencia, pontos):
-    """Acrescenta 1 ponto (data, taxa do vértice mais curto disponível —
-    o mais sensível a mudanças de curto prazo do mercado) ao arquivo de
-    série histórica, sem duplicar se já houver um ponto pra essa mesma
-    data (ex: robô rodado mais de uma vez no mesmo dia útil — nesse
-    caso substitui pelo mais recente). Devolve a lista de pontos final."""
-    vertice_dias = pontos[0]["dias"]
-    taxa = pontos[0]["taxa"]
+    """Acrescenta 1 ponto (data, taxa do vértice FIXO de VERTICE_ALVO_DIAS
+    dias — não o mais curto disponível, ver comentário na constante) ao
+    arquivo de série histórica, sem duplicar se já houver um ponto pra
+    essa mesma data (ex: robô rodado mais de uma vez no mesmo dia útil —
+    nesse caso substitui pelo mais recente). Se a curva do dia não tiver
+    esse vértice específico, NÃO mexe no histórico (evita misturar
+    prazos diferentes na mesma série) e devolve o histórico como estava.
+    """
+    ponto_alvo = next((p for p in pontos if p["dias"] == VERTICE_ALVO_DIAS), None)
 
     historico = []
     if os.path.exists(CAMINHO_HISTORICO):
@@ -267,23 +283,31 @@ def atualizar_historico(data_referencia, pontos):
             print(f"AVISO: não consegui ler o histórico anterior ({exc}); começando do zero.", file=sys.stderr)
             historico = []
 
+    if ponto_alvo is None:
+        disponiveis = [p["dias"] for p in pontos]
+        print(f"AVISO: vértice de {VERTICE_ALVO_DIAS} dias não veio na curva de "
+              f"{data_referencia} (vértices disponíveis: {disponiveis}) — não atualizando "
+              "o histórico hoje, pra não misturar prazos diferentes na mesma série.",
+              file=sys.stderr)
+        return historico
+
     data_iso = data_referencia.isoformat()
     historico = [p for p in historico if p.get("data") != data_iso]
-    historico.append({"data": data_iso, "taxa": taxa})
+    historico.append({"data": data_iso, "taxa": ponto_alvo["taxa"]})
     historico.sort(key=lambda p: p["data"])
     historico = historico[-HISTORICO_MAX_PONTOS:]
 
     saida = {
         "_leia_me": (
             "Série histórica de um ponto representativo da curva de juros futuros "
-            f"(ETTJ prefixada, vértice de {vertice_dias} dias úteis — o mais curto que a "
-            "ANBIMA publica, ~1 ano) — 1 valor por dia útil, acumulado ao longo do tempo "
-            "por este robô (a ANBIMA só disponibiliza a foto do dia, não uma série "
-            "longa pronta). Serve pra comparar visualmente com o histórico do IFIX e "
-            "ver se os dois se movem de forma inversa — ver seção 'Juros Futuros x "
-            "Fundos Imobiliários' em viverderenda.dev.br."
+            f"(ETTJ prefixada, vértice fixo de {VERTICE_ALVO_DIAS} dias úteis, ~1 ano) — "
+            "1 valor por dia útil, acumulado ao longo do tempo por este robô (a ANBIMA só "
+            "disponibiliza a foto do dia, não uma série longa pronta). Serve pra comparar "
+            "visualmente com o histórico do IFIX e ver se os dois se movem de forma "
+            "inversa — ver seção 'Juros Futuros x Fundos Imobiliários' em "
+            "viverderenda.dev.br."
         ),
-        "vertice_dias": vertice_dias,
+        "vertice_dias": VERTICE_ALVO_DIAS,
         "atualizado_em": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "pontos": historico,
     }
