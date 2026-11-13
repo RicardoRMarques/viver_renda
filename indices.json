@@ -2,62 +2,63 @@
   {
     "label": "Ibovespa",
     "prefixo": "pontos",
-    "valor": 171324.31,
-    "variacao_pct": -0.43,
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "valor": 172295.8,
+    "variacao_pct": 0.57,
+    "coletado_em": "2026-11-13T18:25:04+00:00"
   },
   {
     "label": "Selic (meta)",
     "valor_pct": 13.75,
     "referencia": "09/12/2026",
-    "coletado_em": "2026-11-13T10:59:01+00:00"
-  },
-  {
-    "label": "CDI",
-    "valor_pct": 13.65,
-    "referencia": "11/11/2026",
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "coletado_em": "2026-11-13T10:59:01+00:00",
+    "desatualizado": true
   },
   {
     "label": "IFIX",
     "prefixo": "pontos",
-    "valor": 3566.57,
-    "variacao_pct": -0.88,
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "valor": 3600.48,
+    "variacao_pct": 0.95,
+    "coletado_em": "2026-11-13T18:25:04+00:00"
   },
   {
     "label": "Dólar",
     "prefixo": "R$ ",
-    "valor": 5.64168,
-    "variacao_pct": -0.1628065,
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "valor": 5.64418,
+    "variacao_pct": -0.1185656,
+    "coletado_em": "2026-11-13T18:25:04+00:00"
   },
   {
     "label": "Euro",
     "prefixo": "R$ ",
-    "valor": 6.23389,
-    "variacao_pct": -0.21369437,
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "valor": 6.2282,
+    "variacao_pct": -0.30477459,
+    "coletado_em": "2026-11-13T18:25:04+00:00"
   },
   {
     "label": "Bitcoin",
     "prefixo": "US$ ",
-    "valor": 69342.0,
-    "variacao_pct": -5.528310209986082,
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "valor": 68836.0,
+    "variacao_pct": -4.134381166675731,
+    "coletado_em": "2026-11-13T18:25:04+00:00"
   },
   {
     "label": "Ethereum",
     "prefixo": "US$ ",
-    "valor": 1951.57,
-    "variacao_pct": -4.495293385282359,
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "valor": 1937.6,
+    "variacao_pct": -3.8786683416714105,
+    "coletado_em": "2026-11-13T18:25:04+00:00"
+  },
+  {
+    "label": "CDI",
+    "valor_pct": 13.65,
+    "referencia": "12/11/2026",
+    "coletado_em": "2026-11-13T18:25:04+00:00"
   },
   {
     "label": "IPCA (mensal)",
     "valor_pct": 0.14,
     "referencia": "01/10/2026",
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "coletado_em": "2026-11-13T18:25:04+00:00"
   },
   {
     "label": "IPCA (12 meses)",
@@ -71,12 +72,12 @@
     "label": "IGP-M (mensal)",
     "valor_pct": 1.47,
     "referencia": "01/10/2026",
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "coletado_em": "2026-11-13T18:25:04+00:00"
   },
   {
     "label": "CPI (EUA, mensal)",
     "valor_pct": 0.16946637383511198,
     "referencia": "October",
-    "coletado_em": "2026-11-13T10:59:01+00:00"
+    "coletado_em": "2026-11-13T18:25:04+00:00"
   }
 ]
