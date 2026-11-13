@@ -6884,6 +6884,9 @@
         <div class="card">
           <h3>Estratégia</h3>
           <p>O segredo da diversificação e dos aportes constantes para gerar renda passiva vitalícia.</p>
+          <button type="button" class="hg-btn-secundario-pequeno" id="sfnBtnAbrir" style="margin-top:12px;">
+            🏛️ Quem regula o mercado financeiro?
+          </button>
         </div>
       </div>
 
@@ -7225,6 +7228,50 @@
           📈 Ver o gráfico real de um Tesouro IPCA+
         </button>
         <div id="mmStatus" class="hg-status" style="margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Quem regula o mercado financeiro (SFN) — explicador da seção Educação (card Estratégia) -->
+  <div id="sfnOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="sfnTitulo" hidden>
+    <div class="calc-modal tdg-modal">
+      <div class="calc-modal-topo">
+        <h3 id="sfnTitulo">🏛️ Quem regula o mercado financeiro?</h3>
+        <button id="sfnFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+      </div>
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Os principais órgãos que regulam, fiscalizam e organizam a economia e o mercado financeiro no Brasil fazem
+          parte do <strong>Sistema Financeiro Nacional (SFN)</strong> — e se dividem em três camadas: órgãos
+          normativos, supervisores e autorreguladores.
+        </p>
+
+        <div class="hg-status atencao-fixa">
+          <span>🏛️</span>
+          <span>
+            <strong>A lógica em 3 camadas:</strong> o <strong>normativo</strong> define as regras gerais do jogo, sem
+            fiscalizar ninguém diretamente; os <strong>supervisores</strong> fiscalizam o dia a dia de bancos,
+            corretoras, fundos e emissores, cada um na sua área; e os <strong>autorreguladores</strong> são regras
+            extras que o próprio mercado se impõe, além da lei.
+          </span>
+        </div>
+
+        <table class="ir-tabela-regras">
+          <thead><tr><th>Órgão</th><th>O que faz, na prática</th></tr></thead>
+          <tbody>
+            <tr><td>CMN <span style="color:var(--muted); font-weight:400;">(normativo)</span></td><td>Conselho Monetário Nacional — define as diretrizes de política monetária, cambial e de crédito do país</td></tr>
+            <tr><td>Banco Central <span style="color:var(--muted); font-weight:400;">(supervisor)</span></td><td>Fiscaliza bancos e financeiras, executa a política monetária (define a Selic) e administra o FGC</td></tr>
+            <tr><td>CVM <span style="color:var(--muted); font-weight:400;">(supervisor)</span></td><td>Fiscaliza o mercado de capitais — ações, FIIs, fundos de investimento, ETFs e BDRs</td></tr>
+            <tr><td>SUSEP <span style="color:var(--muted); font-weight:400;">(supervisor)</span></td><td>Fiscaliza seguros, previdência privada aberta e capitalização</td></tr>
+            <tr><td>PREVIC <span style="color:var(--muted); font-weight:400;">(supervisor)</span></td><td>Fiscaliza os fundos de pensão (previdência complementar fechada)</td></tr>
+            <tr><td>B3 / ANBIMA <span style="color:var(--muted); font-weight:400;">(autorregulador)</span></td><td>Regras adicionais que o próprio mercado se impõe — ex: como as negociações acontecem na bolsa</td></tr>
+          </tbody>
+        </table>
+
+        <p class="calc-ajuda" style="margin-top:0;">
+          No dia a dia deste site, a maior parte do que você consulta passa pela <strong>CVM</strong> (ações, FIIs,
+          ETFs/BDRs) ou pelo <strong>Banco Central</strong> (CDBs, LCIs/LCAs, Tesouro Direto e o próprio FGC).
+        </p>
       </div>
     </div>
   </div>
@@ -12850,6 +12897,30 @@
           statusEl.textContent = 'Não consegui carregar o gráfico agora. Tente de novo em instantes.';
         }
       });
+    })();
+
+    // ============================================================
+    // "QUEM REGULA O MERCADO FINANCEIRO" — explicador estático da seção
+    // Educação (card Estratégia). Sem dado dinâmico, só abre/fecha.
+    // ============================================================
+    (function () {
+      const btnAbrir = document.getElementById('sfnBtnAbrir');
+      const overlay = document.getElementById('sfnOverlay');
+      const btnFechar = document.getElementById('sfnFechar');
+      if (!btnAbrir || !overlay) return;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnFechar.addEventListener('click', fecharModal);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
     })();
 
     // ============================================================
