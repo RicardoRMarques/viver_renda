@@ -4534,7 +4534,15 @@
           </div>
         </div>
         <a href="#boletins-semana">Boletim de Mercado Diário</a>
-        <a href="#educacao">Educação</a>
+        <div class="nav-dropdown" id="navEducacaoDropdown">
+          <button type="button" class="nav-dropdown-btn" id="navEducacaoBtn" aria-haspopup="true" aria-expanded="false">
+            Educação <span class="nav-dropdown-seta">▾</span>
+          </button>
+          <div class="nav-dropdown-menu" id="navEducacaoMenu">
+            <a class="nav-dropdown-item" href="#educacao">🎓 Aprenda a investir</a>
+            <button type="button" class="nav-dropdown-item" id="sfnBtnAbrirMenu">🏛️ Quem regula o mercado financeiro?</button>
+          </div>
+        </div>
         <div class="nav-dropdown" id="navSimuladoresDropdown">
           <button type="button" class="nav-dropdown-btn" id="navSimuladoresBtn" aria-haspopup="true" aria-expanded="false">
             Ferramentas <span class="nav-dropdown-seta">▾</span>
@@ -4607,6 +4615,7 @@
     <a href="#alertas-preco" class="mobile-menu-item">🔔 Meus Alertas de Preço</a>
     <a href="#simuladorVisual" class="mobile-menu-item">📈 Veja o poder dos juros compostos</a>
     <a href="#educacao" class="mobile-menu-item">🎓 Educação</a>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="sfnBtnAbrirMenu">🏛️ Quem regula o mercado financeiro?</button>
     <div class="mobile-menu-separador">Mercado</div>
     <a href="#consulta-rapida" class="mobile-menu-item">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
     <a href="#consulta-rapida" class="mobile-menu-item">📊 Análise Fundamentalista</a>
@@ -12905,6 +12914,7 @@
     // ============================================================
     (function () {
       const btnAbrir = document.getElementById('sfnBtnAbrir');
+      const btnAbrirMenu = document.getElementById('sfnBtnAbrirMenu');
       const overlay = document.getElementById('sfnOverlay');
       const btnFechar = document.getElementById('sfnFechar');
       if (!btnAbrir || !overlay) return;
@@ -12919,6 +12929,10 @@
       }
 
       btnAbrir.addEventListener('click', abrirModal);
+      // Mesmo modal, dois pontos de entrada: o card "Estratégia" da seção
+      // Educação e o novo menu "Educação" do cabeçalho — igual à Marcação
+      // a Mercado, que também abre pelos dois lugares.
+      btnAbrirMenu?.addEventListener('click', () => { fecharMenusNav(); abrirModal(); });
       btnFechar.addEventListener('click', fecharModal);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
     })();
