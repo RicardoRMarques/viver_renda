@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   coletar:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20   # o download costuma dominar o tempo
     steps:
       # v5+ roda em Node 24; a v4 ainda aponta para o Node 20, que o

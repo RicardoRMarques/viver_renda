@@ -40,7 +40,7 @@ concurrency:
 
 jobs:
   coletar:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Trava de segurança: se por algum motivo o script travar de vez (rede
     # pendurada, etc), o GitHub mata o job sozinho depois de 10 min, em vez
     # de ficar preso e atrasando a fila pras próximas execuções.

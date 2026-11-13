@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   atualizar:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # v5+ roda em Node 24; a v4 ainda aponta para o Node 20, que o
       # GitHub marcou como obsoleto (set/2025) e hoje força para o 24
