@@ -7246,7 +7246,15 @@
     <div class="calc-modal tdg-modal">
       <div class="calc-modal-topo">
         <h3 id="sfnTitulo">🏛️ Quem regula o mercado financeiro?</h3>
-        <button id="sfnFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="sfnCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button id="sfnFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
       </div>
       <div class="calc-corpo">
         <p class="calc-ajuda" style="margin-top:0;">
@@ -12935,6 +12943,14 @@
       btnAbrirMenu?.addEventListener('click', () => { fecharMenusNav(); abrirModal(); });
       btnFechar.addEventListener('click', fecharModal);
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+
+      document.getElementById('sfnCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'sfn',
+          titulo: 'Quem regula o mercado financeiro? — Viver de Renda',
+          texto: 'A estrutura do Sistema Financeiro Nacional: órgãos normativos, supervisores e autorreguladores.',
+        }));
+      hgAbrirPorLinkDeFerramenta('sfn', abrirModal);
     })();
 
     // ============================================================
