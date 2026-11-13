@@ -2,82 +2,80 @@
   {
     "label": "Ibovespa",
     "prefixo": "pontos",
-    "valor": 172295.8,
-    "variacao_pct": 0.57,
-    "coletado_em": "2026-11-13T18:25:04+00:00"
+    "valor": 172343.12,
+    "variacao_pct": 0.59,
+    "coletado_em": "2026-11-13T18:55:56+00:00"
   },
   {
     "label": "Selic (meta)",
     "valor_pct": 13.75,
     "referencia": "09/12/2026",
-    "coletado_em": "2026-11-13T10:59:01+00:00",
-    "desatualizado": true
-  },
-  {
-    "label": "IFIX",
-    "prefixo": "pontos",
-    "valor": 3600.48,
-    "variacao_pct": 0.95,
-    "coletado_em": "2026-11-13T18:25:04+00:00"
-  },
-  {
-    "label": "Dólar",
-    "prefixo": "R$ ",
-    "valor": 5.64418,
-    "variacao_pct": -0.1185656,
-    "coletado_em": "2026-11-13T18:25:04+00:00"
-  },
-  {
-    "label": "Euro",
-    "prefixo": "R$ ",
-    "valor": 6.2282,
-    "variacao_pct": -0.30477459,
-    "coletado_em": "2026-11-13T18:25:04+00:00"
-  },
-  {
-    "label": "Bitcoin",
-    "prefixo": "US$ ",
-    "valor": 68836.0,
-    "variacao_pct": -4.134381166675731,
-    "coletado_em": "2026-11-13T18:25:04+00:00"
-  },
-  {
-    "label": "Ethereum",
-    "prefixo": "US$ ",
-    "valor": 1937.6,
-    "variacao_pct": -3.8786683416714105,
-    "coletado_em": "2026-11-13T18:25:04+00:00"
+    "coletado_em": "2026-11-13T18:55:56+00:00"
   },
   {
     "label": "CDI",
     "valor_pct": 13.65,
     "referencia": "12/11/2026",
-    "coletado_em": "2026-11-13T18:25:04+00:00"
+    "coletado_em": "2026-11-13T18:55:56+00:00"
+  },
+  {
+    "label": "IFIX",
+    "prefixo": "pontos",
+    "valor": 3600.26,
+    "variacao_pct": 0.94,
+    "coletado_em": "2026-11-13T18:55:56+00:00"
+  },
+  {
+    "label": "Dólar",
+    "prefixo": "R$ ",
+    "valor": 5.64719,
+    "variacao_pct": -0.065299564,
+    "coletado_em": "2026-11-13T18:55:56+00:00"
+  },
+  {
+    "label": "Euro",
+    "prefixo": "R$ ",
+    "valor": 6.22851,
+    "variacao_pct": -0.2998124,
+    "coletado_em": "2026-11-13T18:55:56+00:00"
+  },
+  {
+    "label": "Bitcoin",
+    "prefixo": "US$ ",
+    "valor": 68846.0,
+    "variacao_pct": -3.9069010667686226,
+    "coletado_em": "2026-11-13T18:55:56+00:00"
+  },
+  {
+    "label": "Ethereum",
+    "prefixo": "US$ ",
+    "valor": 1939.9,
+    "variacao_pct": -3.582731844802505,
+    "coletado_em": "2026-11-13T18:55:56+00:00"
   },
   {
     "label": "IPCA (mensal)",
     "valor_pct": 0.14,
     "referencia": "01/10/2026",
-    "coletado_em": "2026-11-13T18:25:04+00:00"
+    "coletado_em": "2026-11-13T18:55:56+00:00"
   },
   {
     "label": "IPCA (12 meses)",
     "valor_pct": 4.628360717970881,
     "referencia": "01/10/2026",
     "meses": 12,
-    "coletado_em": "2026-11-13T03:11:19+00:00",
-    "desatualizado": true
+    "coletado_em": "2026-11-13T18:55:56+00:00"
   },
   {
     "label": "IGP-M (mensal)",
     "valor_pct": 1.47,
     "referencia": "01/10/2026",
-    "coletado_em": "2026-11-13T18:25:04+00:00"
+    "coletado_em": "2026-11-13T18:55:56+00:00"
   },
   {
     "label": "CPI (EUA, mensal)",
     "valor_pct": 0.16946637383511198,
     "referencia": "October",
-    "coletado_em": "2026-11-13T18:25:04+00:00"
+    "coletado_em": "2026-11-13T18:55:56+00:00"
   }
 ]
