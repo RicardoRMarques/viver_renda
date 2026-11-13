@@ -17792,14 +17792,18 @@
         // pra "30D", trazendo até 3 semanas de IFIX ANTES do primeiro ponto
         // de juros. Sem cortar isso, o eixo fica bem mais largo que o
         // histórico de juros, e a linha de juros parece "encolhida" numa
-        // ponta só. Descarta qualquer amostra de IFIX anterior à primeira
-        // data de juros, pra as duas séries sempre começarem juntas.
+        // ponta só. Descarta qualquer amostra de IFIX fora do intervalo que
+        // o histórico de juros já cobre, pra as duas séries sempre
+        // começarem E terminarem juntas (a curva de juros só é publicada no
+        // fim do dia, então sem esse corte o IFIX sempre ficaria "um dia à
+        // frente" no final do gráfico).
         const primeiraDataJuros = pontosJuros[0].data;
+        const ultimaDataJuros = pontosJuros[pontosJuros.length - 1].data;
         const mapaJuros = new Map(pontosJuros.map(p => [p.data, p.taxa]));
         const mapaIfix = new Map(
           (amostrasIfix || [])
             .map(a => [String(a.date).slice(0, 10), a.close])
-            .filter(([data]) => data >= primeiraDataJuros)
+            .filter(([data]) => data >= primeiraDataJuros && data <= ultimaDataJuros)
         );
         const todasDatas = Array.from(new Set([...mapaJuros.keys(), ...mapaIfix.keys()])).sort();
 
