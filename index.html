@@ -3497,6 +3497,13 @@
     /* Modal largo, formulário em 2 colunas — reaproveitado por várias
        calculadoras (Calculadora de Imposto de Renda, entre outras) */
     .fire-modal { max-width: 720px; }
+    /* No desktop, os 20px padrão do .calc-corpo deixavam o texto da
+       tabela de regras de IR quase colado na borda do modal — aumenta
+       a margem lateral só aqui (no celular já tem a redução própria
+       pra 14px, então não mexe nesse breakpoint). */
+    @media (min-width: 641px) {
+      .fire-modal .calc-corpo { padding-left: 32px; padding-right: 32px; }
+    }
     /* Venda Coberta: alargado além do .fire-modal padrão — o bloco
        educativo (tabela de 3 colunas + gráfico) ficava apertado em
        720px. Regra precisa vir DEPOIS de .fire-modal pra vencer no
@@ -6730,6 +6737,7 @@
                   <tr><td>Tesouro Prefixado</td><td>22,5% a 15%, regressivo pelo prazo (ver tabela abaixo)</td></tr>
                   <tr><td>Ações (comum)</td><td>15% sobre o lucro (isento até R$ 20 mil vendidos/mês)</td></tr>
                   <tr><td>Ações (day-trade)</td><td>20% sobre o lucro, sem isenção</td></tr>
+                  <tr><td>Units (ex: TAEE11, KLBN11)</td><td>Segue a mesma regra de ações — 15% sobre o lucro (isento até R$ 20 mil vendidos/mês), ou 20% sem isenção se for day-trade</td></tr>
                   <tr><td>FIIs (rendimentos mensais)</td><td>Isento*</td></tr>
                   <tr><td>FIIs (venda de cotas c/ lucro)</td><td>20%, sem faixa de isenção</td></tr>
                   <tr><td>FI-Infra (rendimentos e venda de cotas)</td><td>Isento**</td></tr>
