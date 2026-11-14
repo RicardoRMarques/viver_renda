@@ -4822,6 +4822,7 @@
           <span class="hg-chip" data-ticker="DOW JONES">Dow Jones</span>
           <span class="hg-chip" data-ticker="S&amp;P 500">S&amp;P 500</span>
           <span class="hg-chip" data-ticker="NASDAQ">Nasdaq</span>
+          <span class="hg-chip" data-ticker="BITCOIN">Bitcoin</span>
         </div>
 
         <div class="hg-status" id="hgStatus"></div>
@@ -8558,7 +8559,11 @@
     // rápida, índices, análise fundamentalista). Escopo global —
     // fora das IIFEs — para não repetir/perder acesso entre os blocos.
     function hgFormatMoeda(valor, moeda = 'BRL') {
-      if (typeof valor !== 'number') return null;
+      // NaN É do tipo "number" em JS — sem o Number.isNaN aqui, um campo
+      // ausente virando parseFloat(undefined) (ex: abertura/máxima/mínima
+      // que a CoinGecko não fornece pro card de cripto) passava direto e
+      // virava o texto literal "US$ NaN" em vez do fallback "—".
+      if (typeof valor !== 'number' || Number.isNaN(valor)) return null;
       const simbolo = moeda === 'BRL' ? 'R$ ' : (moeda === 'USD' ? 'US$ ' : '');
       return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
@@ -8569,7 +8574,7 @@
     // centavos fracionados). Não mexe em hgFormatMoeda pra não afetar
     // preços/totais no resto do site, que continuam com 2 casas.
     function hgFormatMoedaPrecisa(valor, moeda = 'BRL') {
-      if (typeof valor !== 'number') return null;
+      if (typeof valor !== 'number' || Number.isNaN(valor)) return null;
       const simbolo = moeda === 'BRL' ? 'R$ ' : (moeda === 'USD' ? 'US$ ' : '');
       return simbolo + valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
     }
@@ -8897,6 +8902,16 @@
       const INDICE_EUA_DO_ETF_PROXY = { DIA: 'DJI', SPY: 'SPX', QQQ: 'IXIC' };
       const SIMBOLOS_ETF_PROXY_INDICE_EUA = new Set(Object.values(ETF_PROXY_INDICE_EUA));
 
+      // Criptomoedas (Bitcoin, Ethereum) — não existem na B3/HG Brasil, e a
+      // TwelveData não cobre par cripto no plano atual. Usa a CoinGecko
+      // (gratuita, sem chave), igual ao robô já usa pro boletim — mesma
+      // chave normalizada (sem espaço/pontuação) pra aceitar "Bitcoin",
+      // "BTC" etc.
+      const ALIASES_CRIPTO = { BITCOIN: 'bitcoin', BTC: 'bitcoin', ETHEREUM: 'ethereum', ETH: 'ethereum' };
+      const NOME_CRIPTO = { bitcoin: 'Bitcoin', ethereum: 'Ethereum' };
+      const SIMBOLO_CRIPTO = { bitcoin: 'BTC/USD', ethereum: 'ETH/USD' };
+      const SIMBOLOS_CRIPTO = new Set(Object.values(SIMBOLO_CRIPTO));
+
       async function hgBuscarAtivo() {
         const digitado = inputTicker.value.trim().toUpperCase();
         if (!digitado) return;
@@ -8934,6 +8949,21 @@
           if (!achouIndiceEua) {
             statusEl.className = 'hg-status erro';
             statusEl.textContent = `Não encontrei dados do ${nomeIndice} agora${ultimoErroTwelveData ? ` (${ultimoErroTwelveData})` : ''}. Tente novamente em instantes.`;
+          }
+          return;
+        }
+
+        // Criptomoeda (Bitcoin, Ethereum) — ver ALIASES_CRIPTO acima.
+        const chaveCripto = !tickerIndice && !chaveIndiceEua ? ALIASES_CRIPTO[digitado.replace(/[^A-Z0-9]/g, '')] : null;
+        if (chaveCripto) {
+          const nomeCripto = NOME_CRIPTO[chaveCripto] || digitado;
+          statusEl.className = 'hg-status';
+          statusEl.textContent = `Consultando ${nomeCripto}...`;
+          resultadoEl.innerHTML = '';
+          const achouCripto = await hgBuscarCriptoCache(chaveCripto);
+          if (!achouCripto) {
+            statusEl.className = 'hg-status erro';
+            statusEl.textContent = `Não encontrei dados do ${nomeCripto} agora${ultimoErroTwelveData ? ` (${ultimoErroTwelveData})` : ''}. Tente novamente em instantes.`;
           }
           return;
         }
@@ -9035,6 +9065,61 @@
         return hgBuscarTwelveData(simboloEtf, true);
       }
 
+      // Criptomoedas (Bitcoin, Ethereum) — mesma lógica de cache do
+      // indice-eua.json, só que lendo cripto.json (robô coletar_hgbrasil.py,
+      // fonte CoinGecko). Se o cache ainda não existir ou não tiver essa
+      // moeda, cai pro fallback ao vivo (CoinGecko é gratuita/sem chave,
+      // sem o problema de cota compartilhada da TwelveData).
+      async function hgBuscarCriptoCache(criptoId) {
+        try {
+          const resp = await fetch('cripto.json', { cache: 'no-store' });
+          if (resp.ok) {
+            const dados = await resp.json();
+            const item = dados?.moedas?.[criptoId];
+            if (item && typeof item.close !== 'undefined') {
+              statusEl.textContent = '';
+              hgUltimoAtivoConsultado = { symbol: (item.symbol || SIMBOLO_CRIPTO[criptoId] || criptoId).toUpperCase() };
+              atualizarBotaoFavoritarEstado();
+              hgRenderizarAtivoTwelveData(item, null);
+              return true;
+            }
+          }
+        } catch (e) {
+          console.error('Erro ao ler cripto.json:', e);
+        }
+        return hgBuscarCriptoAoVivo(criptoId);
+      }
+
+      async function hgBuscarCriptoAoVivo(criptoId) {
+        try {
+          const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(criptoId)}&vs_currencies=usd&include_24hr_change=true`;
+          const resp = await fetch(url);
+          const dados = await resp.json();
+          const item = dados?.[criptoId];
+          const valor = item ? parseFloat(item.usd) : NaN;
+          if (!item || Number.isNaN(valor)) {
+            ultimoErroTwelveData = 'CoinGecko não retornou essa moeda agora.';
+            return false;
+          }
+          ultimoErroTwelveData = null;
+          const objetoCard = {
+            symbol: SIMBOLO_CRIPTO[criptoId] || criptoId.toUpperCase(),
+            name: NOME_CRIPTO[criptoId] || criptoId,
+            exchange: 'CoinGecko',
+            currency: 'USD',
+            close: valor,
+            percent_change: typeof item.usd_24h_change === 'number' ? item.usd_24h_change : null,
+          };
+          hgUltimoAtivoConsultado = { symbol: objetoCard.symbol.toUpperCase() };
+          atualizarBotaoFavoritarEstado();
+          hgRenderizarAtivoTwelveData(objetoCard, null);
+          return true;
+        } catch (e) {
+          console.error('Erro na consulta ao vivo da CoinGecko:', e);
+          return false;
+        }
+      }
+
       // Fallback pra Stocks/ETFs internacionais (ex: AAPL, SPY, QQQ) via
       // TwelveData, usado só quando o ticker não é encontrado na B3.
       // Retorna true se achou e já renderizou, false se não achou nada.
@@ -9098,12 +9183,14 @@
         const chaveIndiceEuaExibido = INDICE_EUA_DO_ETF_PROXY[(a.symbol || '').toUpperCase()];
         const nomeExibido = chaveIndiceEuaExibido ? NOME_INDICE_EUA[chaveIndiceEuaExibido] : (a.name || a.symbol);
         const parenteses = chaveIndiceEuaExibido ? `via ${a.symbol}` : a.symbol;
+        const ehCripto = SIMBOLOS_CRIPTO.has((a.symbol || '').toUpperCase());
+        const badgeFonte = ehCripto ? 'Criptomoeda · CoinGecko' : 'Stock/ETF · TwelveData';
         resultadoEl.innerHTML = `
           <div class="hg-card">
             <div class="hg-card-topo">
               <div class="hg-card-topo-info">
                 <div>
-                  <h3>${nomeExibido} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${parenteses})</span> <span class="hg-badge-fonte">Stock/ETF · TwelveData</span></h3>
+                  <h3>${nomeExibido} <span style="color:var(--muted); font-weight:400; font-size:0.9rem;">(${parenteses})</span> <span class="hg-badge-fonte">${badgeFonte}</span></h3>
                   <div class="hg-setor">${a.exchange || '—'}</div>
                 </div>
               </div>
