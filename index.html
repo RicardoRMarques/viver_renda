@@ -8907,7 +8907,13 @@
       // (gratuita, sem chave), igual ao robô já usa pro boletim — mesma
       // chave normalizada (sem espaço/pontuação) pra aceitar "Bitcoin",
       // "BTC" etc.
-      const ALIASES_CRIPTO = { BITCOIN: 'bitcoin', BTC: 'bitcoin', ETHEREUM: 'ethereum', ETH: 'ethereum' };
+      // BTCUSD/ETHUSD (sem barra) cobrem o link compartilhado (?ticker=BTC/USD
+      // normaliza pra "BTCUSD" aqui embaixo) — sem isso, reabrir um link
+      // compartilhado do card de cripto não reconhecia o ticker de volta.
+      const ALIASES_CRIPTO = {
+        BITCOIN: 'bitcoin', BTC: 'bitcoin', BTCUSD: 'bitcoin',
+        ETHEREUM: 'ethereum', ETH: 'ethereum', ETHUSD: 'ethereum',
+      };
       const NOME_CRIPTO = { bitcoin: 'Bitcoin', ethereum: 'Ethereum' };
       const SIMBOLO_CRIPTO = { bitcoin: 'BTC/USD', ethereum: 'ETH/USD' };
       const SIMBOLOS_CRIPTO = new Set(Object.values(SIMBOLO_CRIPTO));
@@ -9195,6 +9201,10 @@
                 </div>
               </div>
               <div class="hg-card-topo-acoes">
+                <button type="button" class="hg-btn-secundario-pequeno" id="hgBtnCompartilhar" title="Copiar link desta consulta">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                  <span id="hgBtnCompartilharTexto" class="hg-btn-compartilhar-texto">Compartilhar</span>
+                </button>
                 <button type="button" class="lista-mercado-fechar" id="hgBtnFecharResultado" title="Fechar" aria-label="Fechar resultado da consulta">✕</button>
               </div>
             </div>
@@ -9223,6 +9233,11 @@
               </div>` : ''}
             </div>
           </div>`;
+
+        const btnCompartilharTwelveData = document.getElementById('hgBtnCompartilhar');
+        if (btnCompartilharTwelveData) {
+          btnCompartilharTwelveData.addEventListener('click', () => hgCompartilharAtivo(a, btnCompartilharTwelveData));
+        }
 
         document.getElementById('hgBtnFecharResultado')?.addEventListener('click', () => {
           resultadoEl.innerHTML = '';
