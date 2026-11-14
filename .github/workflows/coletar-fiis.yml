@@ -76,13 +76,14 @@ jobs:
           COLETAR_RANKING: ${{ (github.event.schedule == '0 12 * * *' || (github.event_name == 'workflow_dispatch' && github.event.inputs.incluir_ranking != 'false')) && '1' || '0' }}
         run: python coletar_hgbrasil.py
 
-      - name: Commitar e enviar noticias.json, indices.json e ranking.json
+      - name: Commitar e enviar noticias.json, indices.json, cripto.json e ranking.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add noticias.json
           if [ -f indices.json ]; then git add indices.json; fi
           if [ -f indices-eua.json ]; then git add indices-eua.json; fi
+          if [ -f cripto.json ]; then git add cripto.json; fi
           if [ -f ranking.json ]; then git add ranking.json; fi
           # Memória de quais notícias já foram publicadas. Precisa ser
           # commitada: o runner do Actions é descartado no fim do job, e
