@@ -261,6 +261,12 @@ COINGECKO_MOEDAS = [
     ("ethereum", "Ethereum"),
 ]
 
+# Mesmas duas moedas, mas pro cache da Consulta Rápida (ver
+# coletar_cripto_consulta_rapida mais abaixo) — símbolo no formato que
+# o card de Stock/ETF (hgRenderizarAtivoTwelveData) já sabe desenhar.
+CRIPTO_OUTPUT_FILE = "cripto.json"
+SIMBOLO_CRIPTO = {"bitcoin": "BTC/USD", "ethereum": "ETH/USD"}
+
 # ------------------------------------------------------------------
 # Memória de notícias já publicadas. Sem isso, o robô sempre pegava o
 # item do TOPO de cada feed — e feeds de baixo volume (como o de FIIs do
@@ -944,6 +950,55 @@ def coletar_cripto_coingecko():
             "variacao_pct": _para_float(item.get("usd_24h_change")),
         })
     return indices
+
+
+def coletar_cripto_consulta_rapida():
+    """Bitcoin/Ethereum pela CoinGecko (mesma fonte de
+    coletar_cripto_coingecko, mas formatados no shape de card que
+    hgRenderizarAtivoTwelveData no index.html já sabe desenhar —
+    symbol/name/exchange/currency/close/percent_change), salvos em
+    cripto.json pra Consulta Rápida achar "Bitcoin"/"BTC" sem bater
+    direto na CoinGecko a cada clique de visitante. Open/high/low não
+    existem nesse endpoint da CoinGecko — o card mostra "—" pra eles,
+    tudo bem, o principal (preço e variação do dia) continua presente.
+
+    É uma segunda chamada à CoinGecko (a primeira é a de
+    coletar_cripto_coingecko, pro boletim) — aceitável: é um endpoint
+    público gratuito sem chave, sem o problema de cota COMPARTILHADA
+    que motivou o cache de indices-eua.json (lá o problema era a
+    TwelveData, com 1 chave só pro site inteiro)."""
+    ids = ",".join(m[0] for m in COINGECKO_MOEDAS)
+    try:
+        resp = requests.get(
+            COINGECKO_URL,
+            params={"ids": ids, "vs_currencies": "usd", "include_24hr_change": "true"},
+            headers={"User-Agent": HEADERS_NAVEGADOR["User-Agent"], "Accept": "application/json"},
+            timeout=TIMEOUT,
+        )
+        resp.raise_for_status()
+        dados = resp.json()
+    except (requests.RequestException, ValueError) as exc:
+        print(f"AVISO: falha ao buscar cripto (consulta rápida) na CoinGecko: {exc}", file=sys.stderr)
+        return {}
+
+    agora = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    moedas = {}
+    for cripto_id, rotulo in COINGECKO_MOEDAS:
+        item = (dados or {}).get(cripto_id) or {}
+        valor = _para_float(item.get("usd"))
+        if valor is None:
+            print(f"AVISO: CoinGecko não retornou o preço de {rotulo} ({cripto_id}) pra consulta rápida.", file=sys.stderr)
+            continue
+        moedas[cripto_id] = {
+            "symbol": SIMBOLO_CRIPTO.get(cripto_id, cripto_id.upper()),
+            "name": rotulo,
+            "exchange": "CoinGecko",
+            "currency": "USD",
+            "close": valor,
+            "percent_change": _para_float(item.get("usd_24h_change")),
+            "coletado_em": agora,
+        }
+    return moedas
 
 
 def coletar_indices_brapi(token):
@@ -1842,6 +1897,14 @@ def main():
         print(f"OK: {len(indices_eua)} índice(s) americano(s) (ETF-proxy) salvos em {INDICES_EUA_OUTPUT_FILE}.")
     else:
         print("AVISO: nenhum índice americano coletado. Mantendo arquivo anterior, se existir.", file=sys.stderr)
+
+    cripto_consulta = coletar_cripto_consulta_rapida()
+    if cripto_consulta:
+        with open(CRIPTO_OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump({"moedas": cripto_consulta}, f, ensure_ascii=False, indent=2)
+        print(f"OK: {len(cripto_consulta)} criptomoeda(s) salvas em {CRIPTO_OUTPUT_FILE}.")
+    else:
+        print("AVISO: nenhuma criptomoeda coletada pra consulta rápida. Mantendo arquivo anterior, se existir.", file=sys.stderr)
 
     if coletar_rankings_agora:
         ranking = coletar_ranking(token)
