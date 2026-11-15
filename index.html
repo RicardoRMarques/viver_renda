@@ -3520,6 +3520,12 @@
       .calc-modal.cr-modal { max-width: 1040px; }
     }
     .fire-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-top: 4px; }
+    /* Bug pré-existente achado testando o come-cotas do Fundo DI: sem essa
+       regra, [hidden] (ex: irCampoDatasWrap.hidden = true ao trocar pra
+       Ações/FIIs/LCI-LCA) perdia pro "display: grid" da classe acima —
+       mesma especificidade, e a regra de classe vem depois no CSS, então
+       sempre vencia. Os campos de data nunca escondiam de verdade. */
+    .fire-form-grid[hidden] { display: none; }
     @media (max-width: 640px) {
       .fire-form-grid { grid-template-columns: 1fr; }
     }
@@ -6688,7 +6694,8 @@
               <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="ir-tipos-investimento" aria-label="O que é cada um desses?" title="">?</button>
             </label>
             <select id="irTipo">
-              <option value="cdb_tesouro">CDB / Tesouro Direto / Fundo DI</option>
+              <option value="cdb_tesouro">CDB / Tesouro Direto</option>
+              <option value="fundo_di">Fundo DI / Renda Fixa (curto prazo)</option>
               <option value="lci_lca">LCI / LCA</option>
               <option value="acoes">Ações (venda em bolsa)</option>
               <option value="fiis">Fundos Imobiliários (venda de cotas)</option>
@@ -6762,6 +6769,7 @@
                   <tr><td>Tesouro Selic</td><td>22,5% a 15%, regressivo pelo prazo (ver tabela abaixo)</td></tr>
                   <tr><td>Tesouro IPCA+</td><td>22,5% a 15%, regressivo pelo prazo (ver tabela abaixo)</td></tr>
                   <tr><td>Tesouro Prefixado</td><td>22,5% a 15%, regressivo pelo prazo (ver tabela abaixo)</td></tr>
+                  <tr><td>Fundo DI / Renda Fixa (curto prazo)</td><td>22,5% ou 20% (tabela regressiva de curto prazo, só 2 faixas) + come-cotas de 20% a cada maio/novembro, abatido no resgate</td></tr>
                   <tr><td>Ações (comum)</td><td>15% sobre o lucro (isento até R$ 20 mil vendidos/mês)</td></tr>
                   <tr><td>Ações (day-trade)</td><td>20% sobre o lucro, sem isenção</td></tr>
                   <tr><td>Units (ex: TAEE11, KLBN11)</td><td>Segue a mesma regra de ações — 15% sobre o lucro (isento até R$ 20 mil vendidos/mês), ou 20% sem isenção se for day-trade</td></tr>
@@ -20457,9 +20465,10 @@
 
       function atualizarCamposVisiveis() {
         const tipo = selTipo.value;
-        campoDatasWrap.hidden = tipo !== 'cdb_tesouro';
-        campoResgateParcialWrap.hidden = tipo !== 'cdb_tesouro';
-        campoValorTotalHojeWrap.hidden = tipo !== 'cdb_tesouro' || !inResgateParcial.checked;
+        const temDatas = tipo === 'cdb_tesouro' || tipo === 'fundo_di';
+        campoDatasWrap.hidden = !temDatas;
+        campoResgateParcialWrap.hidden = !temDatas;
+        campoValorTotalHojeWrap.hidden = !temDatas || !inResgateParcial.checked;
         campoTotalVendidoWrap.hidden = tipo !== 'acoes';
         campoDayTradeWrap.hidden = tipo !== 'acoes';
       }
@@ -20467,13 +20476,47 @@
       inResgateParcial.addEventListener('change', atualizarCamposVisiveis);
       atualizarCamposVisiveis();
 
-      // Tabela regressiva de IR pra renda fixa (CDB, Tesouro, Fundo DI):
+      // Tabela regressiva de IR pra renda fixa (CDB, Tesouro Direto):
       // quanto mais tempo o dinheiro fica aplicado, menor a alíquota.
       function aliquotaRegressiva(dias) {
         if (dias <= 180) return 22.5;
         if (dias <= 360) return 20;
         if (dias <= 720) return 17.5;
         return 15;
+      }
+
+      // Fundos "curto prazo" (carteira com prazo médio ≤ 365 dias — caso do
+      // Fundo DI) usam uma tabela regressiva DIFERENTE e mais curta: só 2
+      // faixas, nunca chega nos 17,5%/15% da tabela de CDB/Tesouro.
+      function aliquotaRegressivaCurtoPrazo(dias) {
+        return dias <= 180 ? 22.5 : 20;
+      }
+
+      // Último dia ÚTIL (seg-sex, sem feriados — simplificação deste
+      // simulador educativo) de um mês/ano — maio e novembro são as datas
+      // de come-cotas de fundos (exceto ações), fixas no calendário, não
+      // "a cada 6 meses" a partir da data de aplicação de cada pessoa.
+      function ultimoDiaUtilDoMes(ano, mesIndiceZero) {
+        const data = new Date(ano, mesIndiceZero + 1, 0);
+        while (data.getDay() === 0 || data.getDay() === 6) {
+          data.setDate(data.getDate() - 1);
+        }
+        return data;
+      }
+
+      // Todas as datas de come-cotas (31/mai e 29(ou próx. dia útil)/nov)
+      // em que o investidor ainda estava com o dinheiro aplicado — ou seja,
+      // estritamente entre a data de aplicação e a de resgate.
+      function datasComeCotasEntre(dataApl, dataRes) {
+        const datas = [];
+        for (let ano = dataApl.getFullYear(); ano <= dataRes.getFullYear(); ano++) {
+          [4, 10].forEach(mes => {
+            const d = ultimoDiaUtilDoMes(ano, mes);
+            if (d > dataApl && d < dataRes) datas.push(d);
+          });
+        }
+        datas.sort((a, b) => a - b);
+        return datas;
       }
 
       function calcular() {
@@ -20494,10 +20537,13 @@
         let resgateParcial = false;
         let valorTotalHoje = null;
 
+        let comeCotasTotal = 0;
+        let comeCotasDatas = [];
+
         if (tipo === 'lci_lca') {
           aliquota = 0;
           motivo = 'LCI e LCA são isentas de Imposto de Renda para pessoa física, qualquer que seja o prazo.';
-        } else if (tipo === 'cdb_tesouro') {
+        } else if (tipo === 'cdb_tesouro' || tipo === 'fundo_di') {
           const dataApl = hgParseDataBr(inDataAplicacao.value);
           const dataRes = hgParseDataBr(inDataResgate.value);
           if (!dataApl || !dataRes) {
@@ -20511,8 +20557,11 @@
             ultimoCalculoIr = null;
             return;
           }
-          aliquota = aliquotaRegressiva(diasAplicado);
-          motivo = `Alíquota da tabela regressiva pra ${diasAplicado} dia(s) de aplicação.`;
+          // Fundo DI entra na tabela regressiva de "curto prazo" (só 2
+          // faixas, nunca chega em 15%) — diferente de CDB/Tesouro, que
+          // usam a tabela de 4 faixas (aliquotaRegressiva).
+          aliquota = tipo === 'fundo_di' ? aliquotaRegressivaCurtoPrazo(diasAplicado) : aliquotaRegressiva(diasAplicado);
+          motivo = `Alíquota da tabela regressiva${tipo === 'fundo_di' ? ' de curto prazo' : ''} pra ${diasAplicado} dia(s) de aplicação.`;
 
           resgateParcial = inResgateParcial.checked;
           if (resgateParcial) {
@@ -20537,6 +20586,28 @@
             lucro = rendimentoTotal * (valorVenda / valorTotalHoje);
             motivo += ` Resgate parcial: dos R$ ${hgFormatNumero(rendimentoTotal)} de rendimento acumulado no investimento inteiro, essa retirada representa ${hgFormatNumero((valorVenda / valorTotalHoje) * 100)}% dele.`;
           }
+
+          // Come-cotas: só fundos (Fundo DI) têm — CDB e Tesouro Direto não.
+          // Acontece em datas FIXAS (último dia útil de maio e novembro, não
+          // "a cada 6 meses" a partir da aplicação), antecipando 20% sobre o
+          // lucro acumulado até cada uma dessas datas. Não é imposto extra:
+          // no resgate, a tabela regressiva incide sobre o lucro TOTAL e o
+          // que já foi recolhido via come-cotas é abatido do valor devido.
+          if (tipo === 'fundo_di') {
+            comeCotasDatas = datasComeCotasEntre(dataApl, dataRes);
+            if (comeCotasDatas.length > 0) {
+              const duracaoTotalMs = dataRes - dataApl;
+              let lucroAteAData = 0;
+              comeCotasDatas.forEach(d => {
+                const fracao = Math.min(1, Math.max(0, (d - dataApl) / duracaoTotalMs));
+                const lucroAcumulado = lucro * fracao;
+                const incremento = Math.max(0, lucroAcumulado - lucroAteAData);
+                comeCotasTotal += incremento * 0.20;
+                lucroAteAData = lucroAcumulado;
+              });
+              motivo += ` Come-cotas de 20% recolhido em ${comeCotasDatas.length} data(s) ao longo do período (estimativa, supondo rendimento linear) — abatido do imposto devido no resgate.`;
+            }
+          }
         } else if (tipo === 'acoes') {
           const dayTrade = inDayTrade.checked;
           const totalVendido = hgValorMascarado(inTotalVendidoMes);
@@ -20560,7 +20631,11 @@
           motivo = 'FI-Infra é isento de IR para pessoa física tanto nos rendimentos distribuídos quanto no ganho de capital na venda de cotas (Lei 12.431/2011) — diferente do FII, onde só o rendimento mensal costuma ser isento.';
         }
 
-        const ir = lucro * (aliquota / 100);
+        // Come-cotas é uma ANTECIPAÇÃO, não imposto extra: o que já foi
+        // recolhido ao longo do período é abatido do total devido (cobrado
+        // pela alíquota regressiva sobre o lucro INTEIRO) — só a diferença
+        // (se sobrar alguma) é cobrada no resgate.
+        const ir = Math.max(0, lucro * (aliquota / 100) - comeCotasTotal);
         const valorLiquido = valorVenda - ir;
 
         ultimoCalculoIr = {
@@ -20569,6 +20644,7 @@
           dayTrade: tipo === 'acoes' && inDayTrade.checked,
           totalVendidoMes: tipo === 'acoes' ? hgValorMascarado(inTotalVendidoMes) : null,
           resgateParcial, valorTotalHoje,
+          comeCotasTotal, qtdComeCotas: comeCotasDatas.length,
         };
 
         resultadoEl.innerHTML = `
@@ -20595,8 +20671,13 @@
               <span>Tempo aplicado</span>
               <strong>${diasAplicado} dias</strong>
             </div>` : ''}
+            ${comeCotasTotal > 0 ? `
             <div class="calc-resultado-linha">
-              <span>Imposto de Renda devido</span>
+              <span>Come-cotas já recolhido (${comeCotasDatas.length}x)</span>
+              <strong>${hgFormatMoeda(comeCotasTotal)}</strong>
+            </div>` : ''}
+            <div class="calc-resultado-linha">
+              <span>${comeCotasTotal > 0 ? 'Imposto complementar no resgate' : 'Imposto de Renda devido'}</span>
               <strong>${hgFormatMoeda(ir)}</strong>
             </div>
             <div class="calc-resultado-linha calc-destaque">
@@ -20688,7 +20769,10 @@
           linhas.push(['Operação', 'Day-trade']);
         }
         linhas.push(['Alíquota de IR aplicada', `${hgFormatNumero(c.aliquota)}%`]);
-        linhas.push(['Imposto de Renda devido', hgFormatMoeda(c.ir)]);
+        if (c.comeCotasTotal > 0) {
+          linhas.push([`Come-cotas já recolhido (${c.qtdComeCotas}x)`, hgFormatMoeda(c.comeCotasTotal)]);
+        }
+        linhas.push([c.comeCotasTotal > 0 ? 'Imposto complementar no resgate' : 'Imposto de Renda devido', hgFormatMoeda(c.ir)]);
         linhas.push(['Valor líquido recebido', hgFormatMoeda(c.valorLiquido)]);
 
         doc.autoTable({
