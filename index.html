@@ -6718,6 +6718,23 @@
             </div>
           </div>
 
+          <div class="calc-campo" id="irCampoResgateParcialWrap" hidden>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="checkbox" id="irResgateParcial" style="width:auto;" />
+              É um resgate PARCIAL? (vou deixar parte do dinheiro aplicada)
+            </label>
+          </div>
+
+          <div class="calc-campo" id="irCampoValorTotalHojeWrap" hidden>
+            <label for="irValorTotalHoje">Valor TOTAL do investimento hoje (se resgatasse tudo agora)</label>
+            <div class="calc-input-prefixado"><span class="calc-prefixo">R$</span><input type="text" id="irValorTotalHoje" inputmode="decimal" placeholder="52.000,00" /></div>
+            <p class="calc-ajuda" style="margin:2px 0 0;">
+              No resgate parcial, "Valor investido" continua sendo o total que você aplicou originalmente, e "Valor
+              da venda/resgate" vira só o quanto você vai sacar AGORA (não precisa ser o valor total). O lucro dessa
+              retirada é calculado proporcionalmente ao rendimento acumulado no investimento inteiro.
+            </p>
+          </div>
+
           <div class="calc-campo" id="irCampoTotalVendidoWrap" hidden>
             <label for="irTotalVendidoMes">
               Total vendido em ações neste mês (todas as operações)
@@ -20404,6 +20421,10 @@
       const campoDatasWrap = document.getElementById('irCampoDatasWrap');
       const inDataAplicacao = document.getElementById('irDataAplicacao');
       const inDataResgate = document.getElementById('irDataResgate');
+      const campoResgateParcialWrap = document.getElementById('irCampoResgateParcialWrap');
+      const inResgateParcial = document.getElementById('irResgateParcial');
+      const campoValorTotalHojeWrap = document.getElementById('irCampoValorTotalHojeWrap');
+      const inValorTotalHoje = document.getElementById('irValorTotalHoje');
       const campoTotalVendidoWrap = document.getElementById('irCampoTotalVendidoWrap');
       const inTotalVendidoMes = document.getElementById('irTotalVendidoMes');
       const campoDayTradeWrap = document.getElementById('irCampoDayTradeWrap');
@@ -20420,6 +20441,7 @@
 
       hgAplicarMascaraMoeda(inCompra, 10000);
       hgAplicarMascaraMoeda(inVenda, 11200);
+      hgAplicarMascaraMoeda(inValorTotalHoje, 11200);
       hgAplicarMascaraMoeda(inTotalVendidoMes, 0);
       hgAplicarMascaraData(inDataAplicacao);
       hgAplicarMascaraData(inDataResgate);
@@ -20436,10 +20458,13 @@
       function atualizarCamposVisiveis() {
         const tipo = selTipo.value;
         campoDatasWrap.hidden = tipo !== 'cdb_tesouro';
+        campoResgateParcialWrap.hidden = tipo !== 'cdb_tesouro';
+        campoValorTotalHojeWrap.hidden = tipo !== 'cdb_tesouro' || !inResgateParcial.checked;
         campoTotalVendidoWrap.hidden = tipo !== 'acoes';
         campoDayTradeWrap.hidden = tipo !== 'acoes';
       }
       selTipo.addEventListener('change', atualizarCamposVisiveis);
+      inResgateParcial.addEventListener('change', atualizarCamposVisiveis);
       atualizarCamposVisiveis();
 
       // Tabela regressiva de IR pra renda fixa (CDB, Tesouro, Fundo DI):
@@ -20462,10 +20487,12 @@
           return;
         }
 
-        const lucro = Math.max(0, valorVenda - valorCompra);
+        let lucro = Math.max(0, valorVenda - valorCompra);
         let aliquota = 0;
         let motivo = '';
         let diasAplicado = null;
+        let resgateParcial = false;
+        let valorTotalHoje = null;
 
         if (tipo === 'lci_lca') {
           aliquota = 0;
@@ -20486,6 +20513,30 @@
           }
           aliquota = aliquotaRegressiva(diasAplicado);
           motivo = `Alíquota da tabela regressiva pra ${diasAplicado} dia(s) de aplicação.`;
+
+          resgateParcial = inResgateParcial.checked;
+          if (resgateParcial) {
+            valorTotalHoje = hgValorMascarado(inValorTotalHoje);
+            if (valorTotalHoje <= 0) {
+              resultadoEl.innerHTML = '<p class="hg-status erro">Informe o valor TOTAL do investimento hoje, pra calcular o resgate parcial.</p>';
+              ultimoCalculoIr = null;
+              return;
+            }
+            if (valorVenda > valorTotalHoje) {
+              resultadoEl.innerHTML = '<p class="hg-status erro">O valor que vai sacar agora não pode ser maior que o valor total do investimento hoje.</p>';
+              ultimoCalculoIr = null;
+              return;
+            }
+            // "Valor investido (compra)" continua sendo o total aplicado
+            // originalmente — o rendimento acumulado no investimento INTEIRO
+            // é repartido proporcionalmente entre o que sai agora e o que
+            // fica aplicado (mesma lógica de um resgate parcial de Tesouro
+            // Direto ou CDB: você "vende" uma fração das suas cotas/saldo,
+            // não um pedaço isolado do principal).
+            const rendimentoTotal = Math.max(0, valorTotalHoje - valorCompra);
+            lucro = rendimentoTotal * (valorVenda / valorTotalHoje);
+            motivo += ` Resgate parcial: dos R$ ${hgFormatNumero(rendimentoTotal)} de rendimento acumulado no investimento inteiro, essa retirada representa ${hgFormatNumero((valorVenda / valorTotalHoje) * 100)}% dele.`;
+          }
         } else if (tipo === 'acoes') {
           const dayTrade = inDayTrade.checked;
           const totalVendido = hgValorMascarado(inTotalVendidoMes);
@@ -20517,12 +20568,22 @@
           valorCompra, valorVenda, lucro, aliquota, diasAplicado, ir, valorLiquido, motivo,
           dayTrade: tipo === 'acoes' && inDayTrade.checked,
           totalVendidoMes: tipo === 'acoes' ? hgValorMascarado(inTotalVendidoMes) : null,
+          resgateParcial, valorTotalHoje,
         };
 
         resultadoEl.innerHTML = `
           <div class="calc-resultado-card">
+            ${resgateParcial ? `
             <div class="calc-resultado-linha">
-              <span>Lucro bruto (venda − compra)</span>
+              <span>Valor total do investimento hoje</span>
+              <strong>${hgFormatMoeda(valorTotalHoje)}</strong>
+            </div>
+            <div class="calc-resultado-linha">
+              <span>Valor sacado agora</span>
+              <strong>${hgFormatMoeda(valorVenda)}</strong>
+            </div>` : ''}
+            <div class="calc-resultado-linha">
+              <span>${resgateParcial ? 'Lucro bruto (proporcional a este saque)' : 'Lucro bruto (venda − compra)'}</span>
               <strong>${hgFormatMoeda(lucro)}</strong>
             </div>
             <div class="calc-resultado-linha">
@@ -20560,6 +20621,10 @@
         inDataAplicacao.value = '';
         inDataResgate.value = '';
         inDayTrade.checked = false;
+        inResgateParcial.checked = false;
+        inValorTotalHoje.value = '';
+        inValorTotalHoje.dataset.centavos = '0';
+        atualizarCamposVisiveis();
         resultadoEl.innerHTML = '';
         ultimoCalculoIr = null;
       }
@@ -20607,9 +20672,12 @@
         const linhas = [
           ['Tipo de investimento', c.tipoNome],
           ['Valor investido (compra)', hgFormatMoeda(c.valorCompra)],
-          ['Valor da venda/resgate', hgFormatMoeda(c.valorVenda)],
-          ['Lucro bruto (venda − compra)', hgFormatMoeda(c.lucro)],
+          [c.resgateParcial ? 'Valor sacado agora' : 'Valor da venda/resgate', hgFormatMoeda(c.valorVenda)],
         ];
+        if (c.resgateParcial) {
+          linhas.push(['Valor total do investimento hoje', hgFormatMoeda(c.valorTotalHoje)]);
+        }
+        linhas.push([c.resgateParcial ? 'Lucro bruto (proporcional a este saque)' : 'Lucro bruto (venda − compra)', hgFormatMoeda(c.lucro)]);
         if (c.diasAplicado !== null) {
           linhas.push(['Tempo aplicado', `${c.diasAplicado} dias`]);
         }
