@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-11-14T12:43:31.113783+00:00",
+  "gerado_em": "2026-11-15T13:10:38.717334+00:00",
   "ativos": {
     "ABEV3": {
       "ok": true,
@@ -467,7 +467,7 @@
       "preco_ate": "2026-11-13",
       "total_pregoes": 363,
       "dividendo_desde": "2022-04-13",
-      "total_dividendos": 55
+      "total_dividendos": 56
     },
     "MGLU3": {
       "ok": true,
@@ -723,7 +723,7 @@
       "preco_ate": "2026-11-13",
       "total_pregoes": 434,
       "dividendo_desde": "2022-04-13",
-      "total_dividendos": 54
+      "total_dividendos": 55
     },
     "VILG11": {
       "ok": true,
@@ -2557,7 +2557,7 @@
       "preco_ate": "2026-11-13",
       "total_pregoes": 247,
       "dividendo_desde": "2017-10-16",
-      "total_dividendos": 52
+      "total_dividendos": 53
     },
     "HCST11": {
       "ok": false,
@@ -3233,7 +3233,7 @@
     "LFTX11": {
       "ok": false,
       "filtrado_qualidade": true,
-      "motivo": "2 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
+      "motivo": "129 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "LIFE11": {
       "ok": true,
@@ -3943,12 +3943,9 @@
       "motivo": "1 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "RBIC11": {
-      "ok": true,
-      "preco_desde": "2019-11-18",
-      "preco_ate": "2026-11-13",
-      "total_pregoes": 366,
-      "dividendo_desde": "2022-04-01",
-      "total_dividendos": 56
+      "ok": false,
+      "filtrado_qualidade": true,
+      "motivo": "1 pregões / 0 dividendos (mínimo: 60 pregões, 1 dividendo)"
     },
     "RBIF11": {
       "ok": true,
@@ -4267,7 +4264,7 @@
       "preco_ate": "2026-11-13",
       "total_pregoes": 146,
       "dividendo_desde": "2024-02-14",
-      "total_dividendos": 33
+      "total_dividendos": 34
     },
     "S1BK11": {
       "ok": false,
@@ -4574,7 +4571,7 @@
       "preco_ate": "2026-11-13",
       "total_pregoes": 460,
       "dividendo_desde": "2025-01-14",
-      "total_dividendos": 23
+      "total_dividendos": 24
     },
     "TEPP11": {
       "ok": true,
@@ -4782,7 +4779,7 @@
       "preco_ate": "2026-11-13",
       "total_pregoes": 349,
       "dividendo_desde": "2022-04-13",
-      "total_dividendos": 53
+      "total_dividendos": 54
     },
     "VGRH11": {
       "ok": false,
