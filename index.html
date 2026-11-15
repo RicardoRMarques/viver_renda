@@ -6696,7 +6696,7 @@
             <select id="irTipo">
               <option value="cdb_tesouro">CDB / Tesouro Direto</option>
               <option value="fundo_di">Fundo DI / Renda Fixa (curto prazo)</option>
-              <option value="lci_lca">LCI / LCA</option>
+              <option value="lci_lca">LCI / LCA / CRI / CRA</option>
               <option value="acoes">Ações (venda em bolsa)</option>
               <option value="fiis">Fundos Imobiliários (venda de cotas)</option>
               <option value="fi_infra">FI-Infra (rendimentos ou venda de cotas)</option>
@@ -6778,6 +6778,8 @@
                   <tr><td>FI-Infra (rendimentos e venda de cotas)</td><td>Isento**</td></tr>
                   <tr><td>LCI</td><td>Isento</td></tr>
                   <tr><td>LCA</td><td>Isento</td></tr>
+                  <tr><td>CRI</td><td>Isento</td></tr>
+                  <tr><td>CRA</td><td>Isento</td></tr>
                 </tbody>
               </table>
 
@@ -20542,7 +20544,7 @@
 
         if (tipo === 'lci_lca') {
           aliquota = 0;
-          motivo = 'LCI e LCA são isentas de Imposto de Renda para pessoa física, qualquer que seja o prazo.';
+          motivo = 'LCI, LCA, CRI e CRA são isentos de Imposto de Renda para pessoa física, qualquer que seja o prazo.';
         } else if (tipo === 'cdb_tesouro' || tipo === 'fundo_di') {
           const dataApl = hgParseDataBr(inDataAplicacao.value);
           const dataRes = hgParseDataBr(inDataResgate.value);
