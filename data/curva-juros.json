@@ -1,9 +1,9 @@
 {
- "_leia_me": "Curva de juros futuros (ETTJ prefixada), publicada diariamente pela ANBIMA — o mercado se refere a ela como \"curva de juros\", \"curva do DI futuro\" ou \"curva pré\". Cada ponto em 'pontos' é um vértice (prazo em dias úteis — 252 é aproximadamente 1 ano) com a taxa anual prefixada (%) que o mercado precifica para esse prazo, ajustada pelo modelo da própria ANBIMA (Svensson/Nelson-Siegel) a partir dos títulos públicos negociados no dia. Quando essa curva sobe (sobretudo nos vértices mais longos), FIIs tendem a cair — a renda fixa fica mais atraente na comparação; quando recua, o movimento costuma ser o oposto. Ver seção 'Juros Futuros x Fundos Imobiliários' em viverderenda.dev.br.",
+ "_leia_me": "Curva de juros futuros (ETTJ prefixada), publicada diariamente pela ANBIMA — o mercado se refere a ela como \"curva de juros\", \"curva do DI futuro\" ou \"curva pré\" (nos contratos futuros negociados na B3, cada vencimento tem um código DI1 + letra do mês + ano, ex: DI1F27 = janeiro/2027 — a ETTJ da ANBIMA é a versão dessa mesma curva já ajustada por modelo, suave, a partir desses títulos). Cada ponto em 'pontos' é um vértice (prazo em dias úteis — 252 é aproximadamente 1 ano) com a taxa anual prefixada (%) que o mercado precifica para esse prazo, ajustada pelo modelo da própria ANBIMA (Svensson/Nelson-Siegel) a partir dos títulos públicos negociados no dia. Quando essa curva sobe (sobretudo nos vértices mais longos), FIIs tendem a cair — a renda fixa fica mais atraente na comparação; quando recua, o movimento costuma ser o oposto. Ver seção 'Juros Futuros x Fundos Imobiliários' em viverderenda.dev.br.",
  "fonte": "ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ), curva prefixada",
  "fonte_url": "https://www.anbima.com.br/informacoes/est-termo/",
  "data_referencia": "2026-11-13",
- "atualizado_em": "2026-11-14T03:17:36+00:00",
+ "atualizado_em": "2026-11-16T00:15:34+00:00",
  "pontos": [
   {
    "dias": 126,
