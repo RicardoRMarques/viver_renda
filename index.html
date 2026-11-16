@@ -17933,28 +17933,72 @@
         const pontos = Array.isArray(dados?.pontos) ? dados.pontos : [];
         if (!pontos.length) throw new Error('curva vazia');
 
+        // Curva do dia ANTERIOR (data/curva-juros-anterior.json, gravada
+        // pelo robô antes de sobrescrever a de hoje) — opcional: se não
+        // existir ainda (primeira vez que esse recurso roda) ou vier
+        // quebrada, mostra só a curva de hoje, sem travar o gráfico.
+        let pontosAnterior = [];
+        let dataRefAnterior = null;
+        try {
+          const respAnt = await fetch('data/curva-juros-anterior.json', { cache: 'no-store' });
+          if (respAnt.ok) {
+            const dadosAnt = await respAnt.json();
+            pontosAnterior = Array.isArray(dadosAnt?.pontos) ? dadosAnt.pontos : [];
+            dataRefAnterior = dadosAnt?.data_referencia || null;
+          }
+        } catch (e) { /* segue só com a curva de hoje */ }
+
         await hgCarregarChartJs();
 
-        const labels = pontos.map(p => curvaJurosRotuloVertice(p.dias));
-        const taxas = pontos.map(p => p.taxa);
+        // Os vértices publicados podem variar de um dia pro outro (ex: a
+        // ANBIMA passou a incluir um vértice de 126 dias em 12/11/2026,
+        // que não existia antes) — monta a união ordenada, igual já feito
+        // no gráfico Juros x IFIX, em vez de assumir que os dois dias têm
+        // exatamente os mesmos prazos.
+        const mapaHoje = new Map(pontos.map(p => [p.dias, p.taxa]));
+        const mapaAnterior = new Map(pontosAnterior.map(p => [p.dias, p.taxa]));
+        const todosDias = Array.from(new Set([...mapaHoje.keys(), ...mapaAnterior.keys()])).sort((a, b) => a - b);
+        const labels = todosDias.map(curvaJurosRotuloVertice);
+
+        const dataRefHoje = dados.data_referencia
+          ? new Date(`${dados.data_referencia}T00:00:00`).toLocaleDateString('pt-BR')
+          : 'hoje';
+        const dataRefAnteriorFormatada = dataRefAnterior
+          ? new Date(`${dataRefAnterior}T00:00:00`).toLocaleDateString('pt-BR')
+          : null;
+
+        const datasets = [
+          {
+            label: `Hoje (${dataRefHoje})`,
+            data: todosDias.map(d => mapaHoje.has(d) ? mapaHoje.get(d) : null),
+            spanGaps: true,
+            borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true,
+            borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, tension: 0.25,
+          },
+        ];
+        if (mapaAnterior.size > 0) {
+          datasets.push({
+            label: `Dia anterior${dataRefAnteriorFormatada ? ` (${dataRefAnteriorFormatada})` : ''}`,
+            data: todosDias.map(d => mapaAnterior.has(d) ? mapaAnterior.get(d) : null),
+            spanGaps: true,
+            borderColor: HG_COR_MUTED(), backgroundColor: 'transparent', borderDash: [5, 4],
+            borderWidth: 2, pointRadius: 2, pointHoverRadius: 5, tension: 0.25,
+          });
+        }
 
         if (curvaJurosChart) curvaJurosChart.destroy();
         curvaJurosChart = new Chart(document.getElementById('curvaJurosChart'), {
           type: 'line',
-          data: {
-            labels,
-            datasets: [
-              { label: 'Taxa prefixada (% a.a.)', data: taxas, borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, tension: 0.25 },
-            ],
-          },
+          data: { labels, datasets },
           options: {
             responsive: true, maintainAspectRatio: false, animation: false,
+            interaction: { mode: 'index', intersect: false },
             plugins: {
-              legend: { display: false },
+              legend: { display: mapaAnterior.size > 0, labels: { color: HG_COR_MUTED(), boxWidth: 12 } },
               tooltip: {
                 callbacks: {
-                  title: (itens) => `Vértice: ${pontos[itens[0].dataIndex].dias} dias`,
-                  label: (c) => `${c.parsed.y.toFixed(2)}% a.a.`,
+                  title: (itens) => `Vértice: ${todosDias[itens[0].dataIndex]} dias`,
+                  label: (c) => `${c.dataset.label}: ${c.parsed.y === null ? '—' : c.parsed.y.toFixed(2) + '% a.a.'}`,
                 },
               },
             },
@@ -17968,10 +18012,8 @@
         statusEl.hidden = true;
         if (wrapEl) wrapEl.hidden = false;
         if (fonteEl) {
-          const dataRef = dados.data_referencia
-            ? new Date(`${dados.data_referencia}T00:00:00`).toLocaleDateString('pt-BR')
-            : '—';
-          fonteEl.textContent = `Fonte: ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ), referente a ${dataRef}.`;
+          fonteEl.textContent = `Fonte: ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ), referente a ${dataRefHoje}` +
+            (dataRefAnteriorFormatada ? `, comparada com a curva de ${dataRefAnteriorFormatada}.` : '.');
           fonteEl.hidden = false;
         }
       } catch (e) {
