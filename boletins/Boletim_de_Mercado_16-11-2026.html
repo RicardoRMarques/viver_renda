@@ -97,8 +97,8 @@
   .n-thumb{width:64px;height:64px;flex-shrink:0;border-radius:8px;object-fit:cover;
     background:var(--card-border);display:block;}
   .news-item .n-title{font-weight:600;font-size:13.5px;margin-bottom:4px;}
-  .n-title a.n-link, .tk a.tk-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--gold); }
-  .n-title a.n-link:hover, .tk a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
+  .n-title a.n-link, .tk a.tk-link, td.name a.tk-link { color: var(--text); text-decoration: none; border-bottom: 1px dashed var(--gold); }
+  .n-title a.n-link:hover, .tk a.tk-link:hover, td.name a.tk-link:hover { color: var(--gold-soft); border-bottom-style: solid; }
   .news-item .n-body{font-size:12.5px;color:var(--muted);line-height:1.5;}
   .alert{margin-top:30px;background:linear-gradient(135deg,#0f2438,#0a1a2b);border:1px solid var(--gold);border-radius:12px;padding:16px;font-size:12.5px;color:var(--gold-soft);line-height:1.6;}
   .grupo-whatsapp-card{
@@ -127,7 +127,7 @@
 <header>
   <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   <div class="brand">DIVIDENDOS | VIVER DE RENDA</div>
-  <div class="sub">Boletim de Mercado · Quinta-feira, 15 de Outubro de 2026</div>
+  <div class="sub">Boletim de Mercado · Segunda-feira, 16 de Novembro de 2026</div>
 </header>
 
 <h2 class="section">Indicadores Principais</h2>
@@ -141,25 +141,25 @@
 </a>
 
 <div class="grid">
-  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value down">206.505,98 pts ▼ 0.18%</div></div>
-  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.953,80 pts ▲ 0.07%</div></div>
-  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,04 ▲ 0.69%</div></div>
-  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 5,61 ▲ 0.03%</div></div>
-  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 80.690,00 ▼ 3.24%</div></div>
-  <div class="indicator"><div class="label">Ethereum</div><div class="value down">US$ 2.351,86 ▼ 6.05%</div></div>
+  <div class="indicator"><div class="label">Ibovespa <button type="button" class="info-btn" data-tip="Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras." aria-label="O que é Ibovespa? Principal índice da bolsa brasileira (B3). Mede a variação média de preço das ações mais negociadas — um &quot;termômetro&quot; do humor do mercado com ações brasileiras.">?</button></div><div class="value up">172.457,77 pts ▲ 0.66%</div></div>
+  <div class="indicator"><div class="label">IFIX <button type="button" class="info-btn" data-tip="Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários." aria-label="O que é IFIX? Índice de Fundos Imobiliários da B3. Mede a variação média das cotas dos FIIs mais negociados — o equivalente ao Ibovespa, mas para fundos imobiliários.">?</button></div><div class="value up">3.615,23 pts ▲ 1.36%</div></div>
+  <div class="indicator"><div class="label">Dólar (USD/BRL)</div><div class="value up">R$ 5,67 ▲ 0.06%</div></div>
+  <div class="indicator"><div class="label">Euro (EUR/BRL)</div><div class="value up">R$ 6,24 ▲ 0.02%</div></div>
+  <div class="indicator"><div class="label">Bitcoin</div><div class="value down">US$ 64.644,00 ▼ 0.30%</div></div>
+  <div class="indicator"><div class="label">Ethereum</div><div class="value up">US$ 1.812,58 ▲ 0.22%</div></div>
   <div class="indicator"><div class="label">Selic <button type="button" class="info-btn" data-tip="Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil." aria-label="O que é Selic? Sigla de Sistema Especial de Liquidação e de Custódia — o sistema onde o Banco Central e os bancos negociam títulos públicos entre si. A taxa Selic é o custo médio dessas operações e a taxa básica de juros da economia, definida pelo Copom a cada ~45 dias. Baliza o custo do crédito e o rendimento de toda a renda fixa no Brasil.">?</button></div><div class="value">13,75% a.a.</div></div>
   <div class="indicator"><div class="label">CDI <button type="button" class="info-btn" data-tip="Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico." aria-label="O que é CDI? Taxa dos empréstimos entre bancos de um dia para o outro. Acompanha de perto a Selic e é a referência mais usada em CDB, LCI, LCA e fundos DI — &quot;render 100% do CDI&quot; é o parâmetro clássico.">?</button></div><div class="value">13,65% a.a.</div></div>
-  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,58%</div></div>
-  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">1,57%</div></div>
+  <div class="indicator"><div class="label">IPCA (12 meses) <button type="button" class="info-btn" data-tip="Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic." aria-label="O que é IPCA (12 meses)? Índice oficial de inflação do Brasil (IBGE), acumulado nos últimos 12 meses. É a inflação que o Banco Central mira ao definir a Selic.">?</button></div><div class="value">4,63%</div></div>
+  <div class="indicator"><div class="label">IGP-M (mensal) <button type="button" class="info-btn" data-tip="Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado." aria-label="O que é IGP-M (mensal)? Índice de preços da FGV, variação do mês. Muito usado para reajustar contratos de aluguel e algumas tarifas — por isso é acompanhado de perto por quem aluga ou tem imóvel alugado.">?</button></div><div class="value">1,47%</div></div>
 </div>
 
 
 
 <h2 class="section">Destaques da Bolsa</h2>
 <div class="movers">
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEB9606Q_M.jpg" alt="Cicor mantém perspectivas para 2026 com forte carteira de pedidos no Q4" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/cicor-mantem-perspectivas-para-2026-com-forte-carteira-de-pedidos-no-q4-93CH-2092201" target="_blank" rel="noopener noreferrer" class="tk-link">Cicor mantém perspectivas para 2026 com forte carteira de pedidos no Q4</a></span><span class="pct">Investing.com (Ações)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXMPEA7P0D2_M.jpg" alt="Rendimentos dos títulos do Tesouro dos EUA recuam após alta com dados de inflação" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/rendimentos-dos-titulos-do-tesouro-dos-eua-recuam-apos-alta-com-dados-de-inflacao-2092189" target="_blank" rel="noopener noreferrer" class="tk-link">Rendimentos dos títulos do Tesouro dos EUA recuam após alta com dados de inflação</a></span><span class="pct">Investing.com (Economia)</span></div>
-  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEE7J009_M.jpg" alt="Austrália - Ações fecharam o pregão em queda e o Índice S&P/ASX 200 recuou 0,09%" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/australia--acoes-fecharam-o-pregao-em-queda-e-o-indice-spasx-200-recuou-009-2092199" target="_blank" rel="noopener noreferrer" class="tk-link">Austrália - Ações fecharam o pregão em queda e o Índice S&P/ASX 200 recuou 0,09%</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEB6U08A_M.jpg" alt="ZAI e Minimax da China despencam com temores de novas restrições a chips" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/zai-e-minimax-da-china-despencam-com-temores-de-novas-restricoes-a-chips-2127650" target="_blank" rel="noopener noreferrer" class="tk-link">ZAI e Minimax da China despencam com temores de novas restrições a chips</a></span><span class="pct">Investing.com (Ações)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/general-use-news-image2_M_1440049474.jpg" alt="Cúpula trilateral EUA-China-Rússia acontece em Shenzhen em 19 de novembro" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/economy-news/cupula-trilateral-euachinarussia-acontece-em-shenzhen-em-19-de-novembro-2127621" target="_blank" rel="noopener noreferrer" class="tk-link">Cúpula trilateral EUA-China-Rússia acontece em Shenzhen em 19 de novembro</a></span><span class="pct">Investing.com (Economia)</span></div>
+  <div class="mover-row com-thumb"><img src="https://content-media.investing.com/news/LYNXNPEC3B0CQ_M.jpg" alt="Por que as ações da New World Development estão despencando hoje?" class="tk-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><span class="tk"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-new-world-development-estao-despencando-hoje-93CH-2127646" target="_blank" rel="noopener noreferrer" class="tk-link">Por que as ações da New World Development estão despencando hoje?</a></span><span class="pct">Investing.com (Ações)</span></div>
 </div>
 
 <h2 class="section">FIIs - Maiores Dividend Yield</h2>
@@ -167,39 +167,39 @@
   <tr><th>Ticker</th><th>DY (12m)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
-    <td class="name">XPCA11</td>
-    <td>17.04%</td>
-    <td>R$ 7.51</td>
-    <td class="rationale">Fiagro XP Ca</td>
-  </tr>
-  <tr>
-    <td class="name">TRXF11</td>
-    <td>16.43%</td>
-    <td>R$ 71.80</td>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=TRXF11" target="_blank" rel="noopener noreferrer" class="tk-link">TRXF11</a></td>
+    <td>21.15%</td>
+    <td>R$ 55.79</td>
     <td class="rationale">FII Trx Real</td>
   </tr>
   <tr>
-    <td class="name">IRIM11</td>
-    <td>15.23%</td>
-    <td>R$ 65.86</td>
-    <td class="rationale">FII Irim</td>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=XPCA11" target="_blank" rel="noopener noreferrer" class="tk-link">XPCA11</a></td>
+    <td>18.56%</td>
+    <td>R$ 6.79</td>
+    <td class="rationale">Fiagro XP Ca</td>
   </tr>
   <tr>
-    <td class="name">VGIR11</td>
-    <td>14.27%</td>
-    <td>R$ 9.67</td>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=VGIR11" target="_blank" rel="noopener noreferrer" class="tk-link">VGIR11</a></td>
+    <td>17.64%</td>
+    <td>R$ 8.50</td>
     <td class="rationale">FII Valreiii</td>
   </tr>
   <tr>
-    <td class="name">RECR11</td>
-    <td>14.15%</td>
-    <td>R$ 75.78</td>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=IRIM11" target="_blank" rel="noopener noreferrer" class="tk-link">IRIM11</a></td>
+    <td>17.20%</td>
+    <td>R$ 58.26</td>
+    <td class="rationale">FII Irim</td>
+  </tr>
+  <tr>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=RECR11" target="_blank" rel="noopener noreferrer" class="tk-link">RECR11</a></td>
+    <td>15.55%</td>
+    <td>R$ 68.70</td>
     <td class="rationale">FII Rec Rece</td>
   </tr>
   <tr>
-    <td class="name">BTHF11</td>
-    <td>13.50%</td>
-    <td>R$ 8.88</td>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=BTHF11" target="_blank" rel="noopener noreferrer" class="tk-link">BTHF11</a></td>
+    <td>14.75%</td>
+    <td>R$ 8.19</td>
     <td class="rationale">FII BTHF</td>
   </tr>
 </table>
@@ -209,65 +209,65 @@
   <tr><th>Ticker</th><th>DY (TTM)</th><th>Preço</th><th>Nome</th></tr>
   
   <tr>
-    <td class="name">BBSE3</td>
-    <td>11.09%</td>
-    <td>R$ 41.38</td>
-    <td class="rationale">BB Seguridade</td>
-  </tr>
-  <tr>
-    <td class="name">ALOS3</td>
-    <td>9.66%</td>
-    <td>R$ 34.35</td>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=ALOS3" target="_blank" rel="noopener noreferrer" class="tk-link">ALOS3</a></td>
+    <td>12.97%</td>
+    <td>R$ 27.05</td>
     <td class="rationale">ALLOS</td>
   </tr>
   <tr>
-    <td class="name">CMIG4</td>
-    <td>9.64%</td>
-    <td>R$ 11.82</td>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=BBSE3" target="_blank" rel="noopener noreferrer" class="tk-link">BBSE3</a></td>
+    <td>12.30%</td>
+    <td>R$ 37.33</td>
+    <td class="rationale">BB Seguridade</td>
+  </tr>
+  <tr>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=BBDC4" target="_blank" rel="noopener noreferrer" class="tk-link">BBDC4</a></td>
+    <td>11.12%</td>
+    <td>R$ 14.52</td>
+    <td class="rationale">Banco Bradesco</td>
+  </tr>
+  <tr>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=CMIG4" target="_blank" rel="noopener noreferrer" class="tk-link">CMIG4</a></td>
+    <td>10.33%</td>
+    <td>R$ 11.03</td>
     <td class="rationale">CEMIG</td>
   </tr>
   <tr>
-    <td class="name">VALE3</td>
-    <td>8.47%</td>
-    <td>R$ 66.26</td>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=VALE3" target="_blank" rel="noopener noreferrer" class="tk-link">VALE3</a></td>
+    <td>8.84%</td>
+    <td>R$ 63.50</td>
     <td class="rationale">Vale</td>
   </tr>
   <tr>
-    <td class="name">TAEE11</td>
-    <td>6.60%</td>
-    <td>R$ 45.52</td>
-    <td class="rationale">Taesa</td>
-  </tr>
-  <tr>
-    <td class="name">ITUB4</td>
-    <td>6.49%</td>
-    <td>R$ 48.77</td>
-    <td class="rationale">Banco Itaú Unibanco</td>
+    <td class="name"><a href="https://viverderenda.dev.br/?ticker=PETR4" target="_blank" rel="noopener noreferrer" class="tk-link">PETR4</a></td>
+    <td>8.07%</td>
+    <td>R$ 45.30</td>
+    <td class="rationale">Petrobras</td>
   </tr>
 </table>
 
 <h2 class="section">Top 3 Notícias</h2>
 
 <div class="news-item com-thumb">
-  <img src="https://content-media.investing.com/news/LYNXNPEE7J009_M.jpg" alt="Austrália - Ações fecharam o pregão em queda e o Índice S&P/ASX 200 recuou 0,09%" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://content-media.investing.com/news/LYNXNPEC3B0CQ_M.jpg" alt="Por que as ações da New World Development estão despencando hoje?" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://br.investing.com/news/stock-market-news/australia--acoes-fecharam-o-pregao-em-queda-e-o-indice-spasx-200-recuou-009-2092199" target="_blank" rel="noopener noreferrer" class="n-link">1. Austrália - Ações fecharam o pregão em queda e o Índice S&P/ASX 200 recuou 0,09%</a></div>
+    <div class="n-title"><a href="https://br.investing.com/news/stock-market-news/por-que-as-acoes-da-new-world-development-estao-despencando-hoje-93CH-2127646" target="_blank" rel="noopener noreferrer" class="n-link">1. Por que as ações da New World Development estão despencando hoje?</a></div>
     <div class="n-body">Fonte: Investing.com (Ações)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://content-media.investing.com/news/general-use-news-image2_M_1440049474.jpg" alt="Ucrânia retomará ataques a refinarias russas, diz Zelensky ao FT" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2025/05/correios.jpg?fit=300%2C179&amp;quality=70&amp;strip=all" alt="Correios têm prejuízo de R$ 1,9 bilhão no terceiro trimestre, alta de 19% em um ano" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://br.investing.com/news/economy-news/ucrania-retomara-ataques-a-refinarias-russas-diz-zelensky-ao-ft-2092181" target="_blank" rel="noopener noreferrer" class="n-link">2. Ucrânia retomará ataques a refinarias russas, diz Zelensky ao FT</a></div>
-    <div class="n-body">Fonte: Investing.com (Economia)</div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/mercados/correios-tem-prejuizo-de-r-19-bilhao-no-terceiro-trimestre-alta-de-19-em-um-ano/" target="_blank" rel="noopener noreferrer" class="n-link">2. Correios têm prejuízo de R$ 1,9 bilhão no terceiro trimestre, alta de 19% em um ano</a></div>
+    <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
 
 <div class="news-item com-thumb">
-  <img src="https://www.infomoney.com.br/wp-content/uploads/2026/07/dia_de_sorte.png?fit=300%2C170&amp;quality=70&amp;strip=all" alt="Dia de Sorte: confira o resultado do concurso 1322 sorteado nesta quarta-feira (14)" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
+  <img src="https://www.infomoney.com.br/wp-content/uploads/2025/08/Captura-de-tela-2025-08-21-103635.png?fit=300%2C207&amp;quality=70&amp;strip=all" alt="Inflação nos EUA está ‘caminhando na direção errada’, alerta dirigente do Fed" class="n-thumb" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">
   <div class="n-conteudo">
-    <div class="n-title"><a href="https://www.infomoney.com.br/consumo/dia-de-sorte-confira-o-resultado-do-concurso-1322-sorteado-nesta-quarta-feira-14/" target="_blank" rel="noopener noreferrer" class="n-link">3. Dia de Sorte: confira o resultado do concurso 1322 sorteado nesta quarta-feira (14)</a></div>
+    <div class="n-title"><a href="https://www.infomoney.com.br/economia/inflacao-nos-eua-esta-caminhando-na-direcao-errada-alerta-dirigente-do-fed/" target="_blank" rel="noopener noreferrer" class="n-link">3. Inflação nos EUA está ‘caminhando na direção errada’, alerta dirigente do Fed</a></div>
     <div class="n-body">Fonte: InfoMoney (geral)</div>
   </div>
 </div>
