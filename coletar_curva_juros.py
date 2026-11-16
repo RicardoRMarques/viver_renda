@@ -89,6 +89,12 @@ URL_FONTE = "https://www.anbima.com.br/informacoes/est-termo/"
 
 CAMINHO_SAIDA = os.path.join("data", "curva-juros.json")
 
+# Guarda a curva do dia ANTERIOR antes de sobrescrever CAMINHO_SAIDA com a
+# de hoje — permite ao index.html mostrar as duas curvas sobrepostas (onde
+# ela subiu/desceu em cada prazo), já que a ANBIMA só devolve a foto mais
+# recente, nunca "curva de ontem" sob demanda.
+CAMINHO_ANTERIOR = os.path.join("data", "curva-juros-anterior.json")
+
 # Série histórica de um ponto representativo da curva — usada pra
 # comparar visualmente, ao longo do tempo, com o IFIX (ver
 # carregarComparacaoJurosIfix no index.html). A ANBIMA só devolve a
@@ -334,7 +340,10 @@ def main():
         "_leia_me": (
             "Curva de juros futuros (ETTJ prefixada), publicada diariamente pela ANBIMA — "
             "o mercado se refere a ela como \"curva de juros\", \"curva do DI futuro\" ou "
-            "\"curva pré\". Cada ponto em 'pontos' é um vértice (prazo em dias úteis — "
+            "\"curva pré\" (nos contratos futuros negociados na B3, cada vencimento tem um "
+            "código DI1 + letra do mês + ano, ex: DI1F27 = janeiro/2027 — a ETTJ da ANBIMA "
+            "é a versão dessa mesma curva já ajustada por modelo, suave, a partir desses "
+            "títulos). Cada ponto em 'pontos' é um vértice (prazo em dias úteis — "
             "252 é aproximadamente 1 ano) com a taxa anual prefixada (%) que o mercado "
             "precifica para esse prazo, ajustada pelo modelo da própria ANBIMA "
             "(Svensson/Nelson-Siegel) a partir dos títulos públicos negociados no dia. "
@@ -349,6 +358,21 @@ def main():
         "atualizado_em": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "pontos": pontos,
     }
+
+    # Antes de sobrescrever com a curva de hoje, guarda a que estava lá
+    # (se for de um dia DIFERENTE — senão, rodar o robô 2x no mesmo dia útil
+    # apagaria a curva de ontem com uma cópia dela mesma) como "anterior",
+    # pro index.html poder mostrar as duas sobrepostas.
+    if os.path.exists(CAMINHO_SAIDA):
+        try:
+            with open(CAMINHO_SAIDA, "r", encoding="utf-8") as arquivo:
+                anterior = json.load(arquivo)
+            if anterior.get("data_referencia") != saida["data_referencia"]:
+                with open(CAMINHO_ANTERIOR, "w", encoding="utf-8") as arquivo:
+                    json.dump(anterior, arquivo, ensure_ascii=False, indent=1)
+                print(f"  {CAMINHO_ANTERIOR} atualizado (curva de {anterior.get('data_referencia')}).")
+        except (json.JSONDecodeError, OSError) as exc:
+            print(f"AVISO: não consegui preservar a curva anterior ({exc}).", file=sys.stderr)
 
     os.makedirs(os.path.dirname(CAMINHO_SAIDA), exist_ok=True)
     with open(CAMINHO_SAIDA, "w", encoding="utf-8") as arquivo:
