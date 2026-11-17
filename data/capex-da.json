@@ -1,7 +1,7 @@
 {
   "_leia_me": "CAPEX e Depreciação/Amortização (D&A) de ações, direto dos dados abertos da CVM (ITR/DFP) — não da HG Brasil, que não tem esses campos. Valores em R$, ACUMULADOS NO ANO até 'dt_refer' de cada empresa (convenção do fluxo de caixa brasileiro — nunca isolado por trimestre). Ver coletar_cvm_capex.py.",
   "fonte": "CVM - Dados Abertos (dados.cvm.gov.br), ITR/DFP",
-  "atualizado_em": "2026-11-10T00:12:23.524047+00:00",
+  "atualizado_em": "2026-11-17T00:11:22.336582+00:00",
   "ativos": {
     "AALR3": {
       "dt_refer": "2025-12-31",
@@ -19,9 +19,9 @@
       "depreciacao_amortizacao": 4824460000.0
     },
     "AERI3": {
-      "dt_refer": "2026-06-30",
-      "capex": 32920000.0,
-      "depreciacao_amortizacao": 35079000.0
+      "dt_refer": "2026-09-30",
+      "capex": 51834000.0,
+      "depreciacao_amortizacao": 52217000.0
     },
     "AFLT3": {
       "dt_refer": "2026-09-30",
@@ -39,9 +39,9 @@
       "depreciacao_amortizacao": 99207000.0
     },
     "ALLD3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 20760000.0
+      "depreciacao_amortizacao": 30657000.0
     },
     "ALOS3": {
       "dt_refer": "2026-09-30",
@@ -74,14 +74,14 @@
       "depreciacao_amortizacao": 161845000.0
     },
     "AMAR3": {
-      "dt_refer": "2026-06-30",
-      "capex": 15511000.0,
-      "depreciacao_amortizacao": 13726000.0
+      "dt_refer": "2026-09-30",
+      "capex": 21905000.0,
+      "depreciacao_amortizacao": 20201000.0
     },
     "AMER3": {
-      "dt_refer": "2026-06-30",
-      "capex": 80000000.0,
-      "depreciacao_amortizacao": 375000000.0
+      "dt_refer": "2026-09-30",
+      "capex": null,
+      "depreciacao_amortizacao": 558000000.0
     },
     "AMOB3": {
       "dt_refer": "2026-09-30",
@@ -94,9 +94,9 @@
       "depreciacao_amortizacao": 172665000.0
     },
     "ARML3": {
-      "dt_refer": "2026-06-30",
-      "capex": 921000.0,
-      "depreciacao_amortizacao": 187438000.0
+      "dt_refer": "2026-09-30",
+      "capex": 405000.0,
+      "depreciacao_amortizacao": 281008000.0
     },
     "ASAI3": {
       "dt_refer": "2026-09-30",
@@ -104,19 +104,19 @@
       "depreciacao_amortizacao": 1390000000.0
     },
     "AUAU3": {
-      "dt_refer": "2026-06-30",
-      "capex": 69642000.0,
-      "depreciacao_amortizacao": 167128000.0
+      "dt_refer": "2026-09-30",
+      "capex": 63924000.0,
+      "depreciacao_amortizacao": 246260000.0
     },
     "AURE3": {
-      "dt_refer": "2026-06-30",
-      "capex": 264402000.0,
-      "depreciacao_amortizacao": 770275000.0
+      "dt_refer": "2026-09-30",
+      "capex": 367981000.0,
+      "depreciacao_amortizacao": 1153187000.0
     },
     "AVLL3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
-      "depreciacao_amortizacao": 779000.0
+      "depreciacao_amortizacao": 1166000.0
     },
     "AXIA3": {
       "dt_refer": "2026-09-30",
@@ -144,19 +144,19 @@
       "depreciacao_amortizacao": 12827000.0
     },
     "AZUL54": {
-      "dt_refer": "2026-06-30",
-      "capex": 220078000.0,
-      "depreciacao_amortizacao": 1401490000.0
+      "dt_refer": "2026-09-30",
+      "capex": 673340000.0,
+      "depreciacao_amortizacao": 2045656000.0
     },
     "AZZA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 137954000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 249820000.0,
       "depreciacao_amortizacao": null
     },
     "B3SA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 14161000.0,
-      "depreciacao_amortizacao": 190955000.0
+      "dt_refer": "2026-09-30",
+      "capex": 48211000.0,
+      "depreciacao_amortizacao": 286244000.0
     },
     "BALM3": {
       "dt_refer": "2026-06-30",
@@ -179,8 +179,8 @@
       "depreciacao_amortizacao": null
     },
     "BBAS3": {
-      "dt_refer": "2026-06-30",
-      "capex": 1722822000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 3369545000.0,
       "depreciacao_amortizacao": null
     },
     "BBDC3": {
@@ -194,38 +194,38 @@
       "depreciacao_amortizacao": null
     },
     "BDLL3": {
-      "dt_refer": "2026-06-30",
-      "capex": 0.0,
-      "depreciacao_amortizacao": 941000.0
+      "dt_refer": "2026-09-30",
+      "capex": 11000.0,
+      "depreciacao_amortizacao": 1405000.0
     },
     "BDLL4": {
-      "dt_refer": "2026-06-30",
-      "capex": 0.0,
-      "depreciacao_amortizacao": 941000.0
+      "dt_refer": "2026-09-30",
+      "capex": 11000.0,
+      "depreciacao_amortizacao": 1405000.0
     },
     "BEEF3": {
-      "dt_refer": "2026-06-30",
-      "capex": 478198000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 693052000.0,
       "depreciacao_amortizacao": null
     },
     "BEES3": {
-      "dt_refer": "2026-06-30",
-      "capex": 68403000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 109882000.0,
       "depreciacao_amortizacao": null
     },
     "BEES4": {
-      "dt_refer": "2026-06-30",
-      "capex": 68403000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 109882000.0,
       "depreciacao_amortizacao": null
     },
     "BGIP3": {
-      "dt_refer": "2026-06-30",
-      "capex": 9256000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 13043000.0,
       "depreciacao_amortizacao": null
     },
     "BGIP4": {
-      "dt_refer": "2026-06-30",
-      "capex": 9256000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 13043000.0,
       "depreciacao_amortizacao": null
     },
     "BHIA3": {
@@ -239,8 +239,8 @@
       "depreciacao_amortizacao": 3587000.0
     },
     "BLAU3": {
-      "dt_refer": "2026-06-30",
-      "capex": 142050000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 235613000.0,
       "depreciacao_amortizacao": null
     },
     "BMEB3": {
@@ -264,34 +264,34 @@
       "depreciacao_amortizacao": null
     },
     "BMOB3": {
-      "dt_refer": "2026-06-30",
-      "capex": 27947000.0,
-      "depreciacao_amortizacao": 37126000.0
+      "dt_refer": "2026-09-30",
+      "capex": 44794000.0,
+      "depreciacao_amortizacao": 54919000.0
     },
     "BOBR3": {
-      "dt_refer": "2025-12-31",
-      "capex": 34073000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 31173000.0,
       "depreciacao_amortizacao": null
     },
     "BOBR4": {
-      "dt_refer": "2025-12-31",
-      "capex": 34073000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 31173000.0,
       "depreciacao_amortizacao": null
     },
     "BRAP3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
       "depreciacao_amortizacao": null
     },
     "BRAP4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
       "depreciacao_amortizacao": null
     },
     "BRAV3": {
-      "dt_refer": "2026-06-30",
-      "capex": 1162716000.0,
-      "depreciacao_amortizacao": 1542582000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1858020000.0,
+      "depreciacao_amortizacao": null
     },
     "BRBI11": {
       "dt_refer": "2026-09-30",
@@ -299,44 +299,44 @@
       "depreciacao_amortizacao": 7672000.0
     },
     "BRFS3": {
-      "dt_refer": "2026-06-30",
-      "capex": 1197946000.0,
-      "depreciacao_amortizacao": 1871628000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1896624000.0,
+      "depreciacao_amortizacao": 2867572000.0
     },
     "BRKM3": {
-      "dt_refer": "2026-06-30",
-      "capex": 166000000.0,
-      "depreciacao_amortizacao": 2332000000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1992000000.0,
+      "depreciacao_amortizacao": 3551000000.0
     },
     "BRKM5": {
-      "dt_refer": "2026-06-30",
-      "capex": 166000000.0,
-      "depreciacao_amortizacao": 2332000000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1992000000.0,
+      "depreciacao_amortizacao": 3551000000.0
     },
     "BRKM6": {
-      "dt_refer": "2026-06-30",
-      "capex": 166000000.0,
-      "depreciacao_amortizacao": 2332000000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1992000000.0,
+      "depreciacao_amortizacao": 3551000000.0
     },
     "BRSR3": {
-      "dt_refer": "2026-06-30",
-      "capex": 1342502000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 1382396000.0,
       "depreciacao_amortizacao": null
     },
     "BRSR5": {
-      "dt_refer": "2026-06-30",
-      "capex": 1342502000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 1382396000.0,
       "depreciacao_amortizacao": null
     },
     "BRSR6": {
-      "dt_refer": "2026-06-30",
-      "capex": 1342502000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 1382396000.0,
       "depreciacao_amortizacao": null
     },
     "CAMB3": {
-      "dt_refer": "2026-06-30",
-      "capex": 9141000.0,
-      "depreciacao_amortizacao": 6138000.0
+      "dt_refer": "2026-09-30",
+      "capex": 12865000.0,
+      "depreciacao_amortizacao": 9127000.0
     },
     "CAML3": {
       "dt_refer": "2026-08-31",
@@ -349,9 +349,9 @@
       "depreciacao_amortizacao": null
     },
     "CASN3": {
-      "dt_refer": "2026-06-30",
-      "capex": 411658000.0,
-      "depreciacao_amortizacao": 96116000.0
+      "dt_refer": "2026-09-30",
+      "capex": 691901000.0,
+      "depreciacao_amortizacao": 143738000.0
     },
     "CBAV3": {
       "dt_refer": "2026-09-30",
@@ -369,14 +369,14 @@
       "depreciacao_amortizacao": 276314000.0
     },
     "CEDO3": {
-      "dt_refer": "2026-06-30",
-      "capex": 10917000.0,
-      "depreciacao_amortizacao": 15119000.0
+      "dt_refer": "2026-09-30",
+      "capex": 15330000.0,
+      "depreciacao_amortizacao": 22540000.0
     },
     "CEDO4": {
-      "dt_refer": "2026-06-30",
-      "capex": 10917000.0,
-      "depreciacao_amortizacao": 15119000.0
+      "dt_refer": "2026-09-30",
+      "capex": 15330000.0,
+      "depreciacao_amortizacao": 22540000.0
     },
     "CEEB3": {
       "dt_refer": "2026-09-30",
@@ -389,12 +389,12 @@
       "depreciacao_amortizacao": 872000000.0
     },
     "CEED3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
       "depreciacao_amortizacao": null
     },
     "CEED4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
       "depreciacao_amortizacao": null
     },
@@ -404,29 +404,29 @@
       "depreciacao_amortizacao": null
     },
     "CLSC3": {
-      "dt_refer": "2026-06-30",
-      "capex": 2750000.0,
-      "depreciacao_amortizacao": 206413000.0
+      "dt_refer": "2026-09-30",
+      "capex": 4994000.0,
+      "depreciacao_amortizacao": 311520000.0
     },
     "CLSC4": {
-      "dt_refer": "2026-06-30",
-      "capex": 2750000.0,
-      "depreciacao_amortizacao": 206413000.0
+      "dt_refer": "2026-09-30",
+      "capex": 4994000.0,
+      "depreciacao_amortizacao": 311520000.0
     },
     "CMIG3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 811390000.0
+      "depreciacao_amortizacao": 1239072000.0
     },
     "CMIG4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 811390000.0
+      "depreciacao_amortizacao": 1239072000.0
     },
     "CMIN3": {
-      "dt_refer": "2026-06-30",
-      "capex": 1082365000.0,
-      "depreciacao_amortizacao": 715614000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1721217000.0,
+      "depreciacao_amortizacao": 1065322000.0
     },
     "COCE3": {
       "dt_refer": "2026-09-30",
@@ -439,89 +439,69 @@
       "depreciacao_amortizacao": 487439000.0
     },
     "COGN3": {
-      "dt_refer": "2026-06-30",
-      "capex": 286434000.0,
-      "depreciacao_amortizacao": 220865000.0
+      "dt_refer": "2026-09-30",
+      "capex": 427642000.0,
+      "depreciacao_amortizacao": 337468000.0
     },
     "CPFE3": {
-      "dt_refer": "2026-06-30",
-      "capex": 141543000.0,
-      "depreciacao_amortizacao": 1254876000.0
+      "dt_refer": "2026-09-30",
+      "capex": 212194000.0,
+      "depreciacao_amortizacao": 1884150000.0
     },
     "CPLE3": {
-      "dt_refer": "2026-06-30",
-      "capex": 418658000.0,
-      "depreciacao_amortizacao": 809272000.0
+      "dt_refer": "2026-09-30",
+      "capex": 657274000.0,
+      "depreciacao_amortizacao": 1221068000.0
     },
     "CPLE5": {
-      "dt_refer": "2026-06-30",
-      "capex": 418658000.0,
-      "depreciacao_amortizacao": 809272000.0
+      "dt_refer": "2026-09-30",
+      "capex": 657274000.0,
+      "depreciacao_amortizacao": 1221068000.0
     },
     "CPLE6": {
-      "dt_refer": "2026-06-30",
-      "capex": 418658000.0,
-      "depreciacao_amortizacao": 809272000.0
-    },
-    "CRPG3": {
-      "dt_refer": "2026-06-30",
-      "capex": 20659000.0,
-      "depreciacao_amortizacao": 17195000.0
-    },
-    "CRPG5": {
-      "dt_refer": "2026-06-30",
-      "capex": 20659000.0,
-      "depreciacao_amortizacao": 17195000.0
-    },
-    "CRPG6": {
-      "dt_refer": "2026-06-30",
-      "capex": 20659000.0,
-      "depreciacao_amortizacao": 17195000.0
+      "dt_refer": "2026-09-30",
+      "capex": 657274000.0,
+      "depreciacao_amortizacao": 1221068000.0
     },
     "CSAN3": {
-      "dt_refer": "2026-06-30",
-      "capex": 4402276000.0,
-      "depreciacao_amortizacao": 1967528000.0
+      "dt_refer": "2026-09-30",
+      "capex": 6269490000.0,
+      "depreciacao_amortizacao": 3041396000.0
     },
     "CSED3": {
-      "dt_refer": "2026-06-30",
-      "capex": 32519000.0,
-      "depreciacao_amortizacao": 72809000.0
+      "dt_refer": "2026-09-30",
+      "capex": 75063000.0,
+      "depreciacao_amortizacao": 113261000.0
     },
     "CSMG3": {
-      "dt_refer": "2026-06-30",
-      "capex": 836418000.0,
-      "depreciacao_amortizacao": 519595000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1104424000.0,
+      "depreciacao_amortizacao": 787179000.0
     },
     "CSNA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 2503969000.0,
-      "depreciacao_amortizacao": 2277156000.0
+      "dt_refer": "2026-09-30",
+      "capex": 3887707000.0,
+      "depreciacao_amortizacao": 3354956000.0
     },
     "CSUD3": {
-      "dt_refer": "2026-06-30",
-      "capex": 44555000.0,
-      "depreciacao_amortizacao": 34207000.0
+      "dt_refer": "2026-09-30",
+      "capex": 66735000.0,
+      "depreciacao_amortizacao": 52113000.0
     },
     "CTKA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 16860000.0,
-      "depreciacao_amortizacao": 10793000.0
+      "dt_refer": "2026-09-30",
+      "capex": 32662000.0,
+      "depreciacao_amortizacao": 16271000.0
     },
     "CTKA4": {
-      "dt_refer": "2026-06-30",
-      "capex": 16860000.0,
-      "depreciacao_amortizacao": 10793000.0
-    },
-    "CURY3": {
-      "dt_refer": "2026-06-30",
-      "capex": null,
-      "depreciacao_amortizacao": 16900000.0
+      "dt_refer": "2026-09-30",
+      "capex": 32662000.0,
+      "depreciacao_amortizacao": 16271000.0
     },
     "CVCB3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 106584000.0
+      "depreciacao_amortizacao": 161042000.0
     },
     "DASA3": {
       "dt_refer": "2026-09-30",
@@ -529,14 +509,14 @@
       "depreciacao_amortizacao": 702997000.0
     },
     "DESK3": {
-      "dt_refer": "2026-06-30",
-      "capex": 137085000.0,
-      "depreciacao_amortizacao": 105231000.0
+      "dt_refer": "2026-09-30",
+      "capex": 197455000.0,
+      "depreciacao_amortizacao": 159340000.0
     },
     "DMVF3": {
-      "dt_refer": "2026-06-30",
-      "capex": 47704000.0,
-      "depreciacao_amortizacao": 26966000.0
+      "dt_refer": "2026-09-30",
+      "capex": 75963000.0,
+      "depreciacao_amortizacao": 40807000.0
     },
     "DOHL3": {
       "dt_refer": "2026-06-30",
@@ -549,14 +529,14 @@
       "depreciacao_amortizacao": 11065000.0
     },
     "DOTZ3": {
-      "dt_refer": "2026-06-30",
-      "capex": 3555000.0,
-      "depreciacao_amortizacao": 12962000.0
+      "dt_refer": "2026-09-30",
+      "capex": null,
+      "depreciacao_amortizacao": 18990000.0
     },
     "DTCY3": {
-      "dt_refer": "2026-06-30",
-      "capex": null,
-      "depreciacao_amortizacao": 51000.0
+      "dt_refer": "2026-09-30",
+      "capex": 0.0,
+      "depreciacao_amortizacao": 72000.0
     },
     "EALT3": {
       "dt_refer": "2026-09-30",
@@ -569,14 +549,14 @@
       "depreciacao_amortizacao": 16560000.0
     },
     "ECOR3": {
-      "dt_refer": "2026-06-30",
-      "capex": 2314746000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 4163850000.0,
       "depreciacao_amortizacao": null
     },
     "EGIE3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 802284000.0
+      "depreciacao_amortizacao": 1227757000.0
     },
     "EKTR3": {
       "dt_refer": "2026-09-30",
@@ -599,49 +579,49 @@
       "depreciacao_amortizacao": 10919000.0
     },
     "EMBJ3": {
-      "dt_refer": "2026-06-30",
-      "capex": 1386116000.0,
-      "depreciacao_amortizacao": 611485000.0
+      "dt_refer": "2026-09-30",
+      "capex": 2412401000.0,
+      "depreciacao_amortizacao": 967851000.0
     },
     "ENEV3": {
-      "dt_refer": "2026-06-30",
-      "capex": 3707487000.0,
-      "depreciacao_amortizacao": 1050354000.0
+      "dt_refer": "2026-09-30",
+      "capex": 5300929000.0,
+      "depreciacao_amortizacao": 1557614000.0
     },
     "ENJU3": {
-      "dt_refer": "2026-06-30",
-      "capex": 6573000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 10992000.0,
       "depreciacao_amortizacao": null
     },
     "EPAR3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
-      "depreciacao_amortizacao": 315000.0
+      "depreciacao_amortizacao": 438000.0
     },
     "EQTL3": {
-      "dt_refer": "2026-06-30",
-      "capex": 124635000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 179807000.0,
       "depreciacao_amortizacao": null
     },
     "ESPA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 31336000.0,
-      "depreciacao_amortizacao": 51611000.0
+      "dt_refer": "2026-09-30",
+      "capex": 48559000.0,
+      "depreciacao_amortizacao": 78172000.0
     },
     "ETER3": {
-      "dt_refer": "2026-06-30",
-      "capex": 30965000.0,
-      "depreciacao_amortizacao": 24705000.0
+      "dt_refer": "2026-09-30",
+      "capex": 42495000.0,
+      "depreciacao_amortizacao": 41360000.0
     },
     "EUCA3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 69189000.0
+      "depreciacao_amortizacao": 102734000.0
     },
     "EUCA4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 69189000.0
+      "depreciacao_amortizacao": 102734000.0
     },
     "EZTC3": {
       "dt_refer": "2026-09-30",
@@ -649,24 +629,24 @@
       "depreciacao_amortizacao": null
     },
     "FESA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 77791000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 139854000.0,
       "depreciacao_amortizacao": null
     },
     "FESA4": {
-      "dt_refer": "2026-06-30",
-      "capex": 77791000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 139854000.0,
       "depreciacao_amortizacao": null
     },
     "FHER3": {
-      "dt_refer": "2026-06-30",
-      "capex": 5712000.0,
-      "depreciacao_amortizacao": 42237000.0
+      "dt_refer": "2026-09-30",
+      "capex": 5958000.0,
+      "depreciacao_amortizacao": 61850000.0
     },
     "FIQE3": {
-      "dt_refer": "2026-06-30",
-      "capex": 164145000.0,
-      "depreciacao_amortizacao": 131695000.0
+      "dt_refer": "2026-09-30",
+      "capex": 274558000.0,
+      "depreciacao_amortizacao": 201071000.0
     },
     "FLRY3": {
       "dt_refer": "2026-09-30",
@@ -674,24 +654,24 @@
       "depreciacao_amortizacao": null
     },
     "FRAS3": {
-      "dt_refer": "2026-06-30",
-      "capex": 42878000.0,
-      "depreciacao_amortizacao": 127866000.0
+      "dt_refer": "2026-09-30",
+      "capex": 93364000.0,
+      "depreciacao_amortizacao": 192027000.0
     },
     "FRIO3": {
-      "dt_refer": "2026-06-30",
-      "capex": 42712000.0,
-      "depreciacao_amortizacao": 39479000.0
+      "dt_refer": "2026-09-30",
+      "capex": 61763000.0,
+      "depreciacao_amortizacao": 60032000.0
     },
     "GEPA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 11452000.0,
-      "depreciacao_amortizacao": 171320000.0
+      "dt_refer": "2026-09-30",
+      "capex": 28096000.0,
+      "depreciacao_amortizacao": 256282000.0
     },
     "GEPA4": {
-      "dt_refer": "2026-06-30",
-      "capex": 11452000.0,
-      "depreciacao_amortizacao": 171320000.0
+      "dt_refer": "2026-09-30",
+      "capex": 28096000.0,
+      "depreciacao_amortizacao": 256282000.0
     },
     "GFSA3": {
       "dt_refer": "2026-03-31",
@@ -709,14 +689,14 @@
       "depreciacao_amortizacao": 2761070000.0
     },
     "GGPS3": {
-      "dt_refer": "2026-06-30",
-      "capex": 117610000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 160883000.0,
       "depreciacao_amortizacao": null
     },
     "GMAT3": {
-      "dt_refer": "2026-06-30",
-      "capex": 381832000.0,
-      "depreciacao_amortizacao": 336139000.0
+      "dt_refer": "2026-09-30",
+      "capex": 472112000.0,
+      "depreciacao_amortizacao": 506619000.0
     },
     "GOAU3": {
       "dt_refer": "2026-09-30",
@@ -734,34 +714,34 @@
       "depreciacao_amortizacao": 74222000.0
     },
     "HAPV3": {
-      "dt_refer": "2026-06-30",
-      "capex": 363223000.0,
-      "depreciacao_amortizacao": 494181000.0
+      "dt_refer": "2026-09-30",
+      "capex": 529875000.0,
+      "depreciacao_amortizacao": 969634000.0
     },
     "HBSA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 75343000.0,
-      "depreciacao_amortizacao": null
+      "dt_refer": "2026-09-30",
+      "capex": 25814000.0,
+      "depreciacao_amortizacao": 236649000.0
     },
     "HBTS5": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 1317000.0
+      "depreciacao_amortizacao": 1982000.0
     },
     "HETA3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
       "depreciacao_amortizacao": 0.0
     },
     "HETA4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
       "depreciacao_amortizacao": 0.0
     },
     "HOOT4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 6417000.0
+      "depreciacao_amortizacao": 9381000.0
     },
     "HYPE3": {
       "dt_refer": "2026-09-30",
@@ -769,24 +749,24 @@
       "depreciacao_amortizacao": 245600000.0
     },
     "IFCM3": {
-      "dt_refer": "2026-06-30",
-      "capex": 8442000.0,
-      "depreciacao_amortizacao": 28378000.0
+      "dt_refer": "2026-09-30",
+      "capex": 10674000.0,
+      "depreciacao_amortizacao": null
     },
     "IGTI11": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 72364000.0
+      "depreciacao_amortizacao": 111402000.0
     },
     "IGTI3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 72364000.0
+      "depreciacao_amortizacao": 111402000.0
     },
     "IGTI4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 72364000.0
+      "depreciacao_amortizacao": 111402000.0
     },
     "INEP3": {
       "dt_refer": "2026-06-30",
@@ -799,9 +779,9 @@
       "depreciacao_amortizacao": 3525000.0
     },
     "IRBR3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 25113000.0
+      "depreciacao_amortizacao": 34711000.0
     },
     "ISAE3": {
       "dt_refer": "2026-09-30",
@@ -814,43 +794,43 @@
       "depreciacao_amortizacao": 33072000.0
     },
     "ITSA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 403000000.0,
-      "depreciacao_amortizacao": 726000000.0
+      "dt_refer": "2026-09-30",
+      "capex": 675000000.0,
+      "depreciacao_amortizacao": 1152000000.0
     },
     "ITSA4": {
-      "dt_refer": "2026-06-30",
-      "capex": 403000000.0,
-      "depreciacao_amortizacao": 726000000.0
+      "dt_refer": "2026-09-30",
+      "capex": 675000000.0,
+      "depreciacao_amortizacao": 1152000000.0
     },
     "JALL3": {
-      "dt_refer": "2026-06-30",
-      "capex": 26419000.0,
-      "depreciacao_amortizacao": 202681000.0
+      "dt_refer": "2026-09-30",
+      "capex": 69407000.0,
+      "depreciacao_amortizacao": 394062000.0
     },
     "JBSS3": {
-      "dt_refer": "2026-06-30",
-      "capex": 6069398000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 8947814000.0,
       "depreciacao_amortizacao": null
     },
     "JFEN3": {
-      "dt_refer": "2026-06-30",
-      "capex": 114000.0,
-      "depreciacao_amortizacao": 465000.0
+      "dt_refer": "2026-09-30",
+      "capex": 167000.0,
+      "depreciacao_amortizacao": 3375000.0
     },
     "JHSF3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 50831000.0
+      "depreciacao_amortizacao": 70735000.0
     },
     "JOPA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 81939000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 119774000.0,
       "depreciacao_amortizacao": null
     },
     "JOPA4": {
-      "dt_refer": "2026-06-30",
-      "capex": 81939000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 119774000.0,
       "depreciacao_amortizacao": null
     },
     "JSLG3": {
@@ -859,9 +839,9 @@
       "depreciacao_amortizacao": 650700000.0
     },
     "KEPL3": {
-      "dt_refer": "2026-06-30",
-      "capex": 19007000.0,
-      "depreciacao_amortizacao": 22078000.0
+      "dt_refer": "2026-09-30",
+      "capex": 30963000.0,
+      "depreciacao_amortizacao": 33225000.0
     },
     "KLBN11": {
       "dt_refer": "2026-09-30",
@@ -879,19 +859,19 @@
       "depreciacao_amortizacao": 1771705000.0
     },
     "LAND3": {
-      "dt_refer": "2026-06-30",
-      "capex": 617000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 865000.0,
       "depreciacao_amortizacao": null
     },
     "LEVE3": {
-      "dt_refer": "2026-06-30",
-      "capex": 47358000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 87607000.0,
       "depreciacao_amortizacao": null
     },
     "LIGT3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 481971000.0
+      "depreciacao_amortizacao": 761033000.0
     },
     "LJQQ3": {
       "dt_refer": "2026-09-30",
@@ -899,14 +879,14 @@
       "depreciacao_amortizacao": 104900000.0
     },
     "LOGN3": {
-      "dt_refer": "2026-06-30",
-      "capex": 64969000.0,
-      "depreciacao_amortizacao": 154359000.0
+      "dt_refer": "2026-09-30",
+      "capex": 101584000.0,
+      "depreciacao_amortizacao": 232342000.0
     },
     "LPSB3": {
-      "dt_refer": "2026-06-30",
-      "capex": 8139000.0,
-      "depreciacao_amortizacao": 10445000.0
+      "dt_refer": "2026-09-30",
+      "capex": 10492000.0,
+      "depreciacao_amortizacao": 16076000.0
     },
     "LREN3": {
       "dt_refer": "2026-09-30",
@@ -919,24 +899,24 @@
       "depreciacao_amortizacao": 1036000.0
     },
     "LWSA3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 72196000.0
+      "depreciacao_amortizacao": 106889000.0
     },
     "MATD3": {
-      "dt_refer": "2026-06-30",
-      "capex": 38554000.0,
-      "depreciacao_amortizacao": 58212000.0
+      "dt_refer": "2026-09-30",
+      "capex": 77231000.0,
+      "depreciacao_amortizacao": 87731000.0
     },
     "MBRF3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 3261613000.0
+      "depreciacao_amortizacao": 4963115000.0
     },
     "MDIA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 199191000.0,
-      "depreciacao_amortizacao": 200478000.0
+      "dt_refer": "2026-09-30",
+      "capex": 337483000.0,
+      "depreciacao_amortizacao": 304872000.0
     },
     "MDNE3": {
       "dt_refer": "2026-09-30",
@@ -944,14 +924,14 @@
       "depreciacao_amortizacao": 14538000.0
     },
     "MEAL3": {
-      "dt_refer": "2026-06-30",
-      "capex": 15419000.0,
-      "depreciacao_amortizacao": 35384000.0
+      "dt_refer": "2026-09-30",
+      "capex": 26833000.0,
+      "depreciacao_amortizacao": 52579000.0
     },
     "MELK3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 3352000.0
+      "depreciacao_amortizacao": 5058000.0
     },
     "MGEL4": {
       "dt_refer": "2026-06-30",
@@ -959,9 +939,9 @@
       "depreciacao_amortizacao": 11094000.0
     },
     "MGLU3": {
-      "dt_refer": "2026-06-30",
-      "capex": 344665000.0,
-      "depreciacao_amortizacao": 664148000.0
+      "dt_refer": "2026-09-30",
+      "capex": 515759000.0,
+      "depreciacao_amortizacao": 1001508000.0
     },
     "MILS3": {
       "dt_refer": "2026-09-30",
@@ -969,14 +949,14 @@
       "depreciacao_amortizacao": 244408000.0
     },
     "MLAS3": {
-      "dt_refer": "2026-06-30",
-      "capex": 1426000.0,
-      "depreciacao_amortizacao": 27121000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1370000.0,
+      "depreciacao_amortizacao": 40730000.0
     },
     "MNDL3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 7912000.0
+      "depreciacao_amortizacao": 12238000.0
     },
     "MOTV3": {
       "dt_refer": "2026-09-30",
@@ -989,9 +969,9 @@
       "depreciacao_amortizacao": 2030739000.0
     },
     "MRVE3": {
-      "dt_refer": "2026-06-30",
-      "capex": 151422000.0,
-      "depreciacao_amortizacao": 117422000.0
+      "dt_refer": "2026-09-30",
+      "capex": 234076000.0,
+      "depreciacao_amortizacao": 180680000.0
     },
     "MSPA3": {
       "dt_refer": "2026-06-30",
@@ -1004,14 +984,14 @@
       "depreciacao_amortizacao": 12086000.0
     },
     "MTSA3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 7480945.0
+      "depreciacao_amortizacao": 11078800.0
     },
     "MTSA4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 7480945.0
+      "depreciacao_amortizacao": 11078800.0
     },
     "MULT3": {
       "dt_refer": "2026-09-30",
@@ -1019,14 +999,14 @@
       "depreciacao_amortizacao": null
     },
     "MWET3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 3664000.0
+      "depreciacao_amortizacao": 9438000.0
     },
     "MWET4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 3664000.0
+      "depreciacao_amortizacao": 9438000.0
     },
     "MYPK3": {
       "dt_refer": "2026-09-30",
@@ -1034,8 +1014,8 @@
       "depreciacao_amortizacao": 398451000.0
     },
     "NATU3": {
-      "dt_refer": "2026-06-30",
-      "capex": 87279000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 183845000.0,
       "depreciacao_amortizacao": null
     },
     "NEOE3": {
@@ -1049,9 +1029,9 @@
       "depreciacao_amortizacao": 466000.0
     },
     "OFSA3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 20033000.0
+      "depreciacao_amortizacao": 30330000.0
     },
     "ONCO3": {
       "dt_refer": "2026-06-30",
@@ -1059,33 +1039,33 @@
       "depreciacao_amortizacao": 141329000.0
     },
     "OPCT3": {
-      "dt_refer": "2026-06-30",
-      "capex": 412526000.0,
-      "depreciacao_amortizacao": 194487000.0
+      "dt_refer": "2026-09-30",
+      "capex": 549890000.0,
+      "depreciacao_amortizacao": 289574000.0
     },
     "ORVR3": {
-      "dt_refer": "2026-06-30",
-      "capex": 401911000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 732712000.0,
       "depreciacao_amortizacao": null
     },
     "OSXB3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 67000.0
+      "depreciacao_amortizacao": 101000.0
     },
     "PASS3": {
-      "dt_refer": "2026-06-30",
-      "capex": 964211000.0,
-      "depreciacao_amortizacao": 711710000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1491913000.0,
+      "depreciacao_amortizacao": 1079703000.0
     },
     "PATI3": {
-      "dt_refer": "2026-06-30",
-      "capex": 13387000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 17172000.0,
       "depreciacao_amortizacao": null
     },
     "PATI4": {
-      "dt_refer": "2026-06-30",
-      "capex": 13387000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 17172000.0,
       "depreciacao_amortizacao": null
     },
     "PCAR3": {
@@ -1094,9 +1074,9 @@
       "depreciacao_amortizacao": 763000000.0
     },
     "PDGR3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
-      "depreciacao_amortizacao": 91000.0
+      "depreciacao_amortizacao": 136000.0
     },
     "PDTC3": {
       "dt_refer": "2026-09-30",
@@ -1104,28 +1084,28 @@
       "depreciacao_amortizacao": 12746000.0
     },
     "PEAB3": {
-      "dt_refer": "2026-06-30",
-      "capex": 6902000.0,
-      "depreciacao_amortizacao": 9773000.0
+      "dt_refer": "2026-09-30",
+      "capex": 9447000.0,
+      "depreciacao_amortizacao": 14918000.0
     },
     "PEAB4": {
-      "dt_refer": "2026-06-30",
-      "capex": 6902000.0,
-      "depreciacao_amortizacao": 9773000.0
+      "dt_refer": "2026-09-30",
+      "capex": 9447000.0,
+      "depreciacao_amortizacao": 14918000.0
     },
     "PETR3": {
-      "dt_refer": "2026-06-30",
-      "capex": 46774000000.0,
-      "depreciacao_amortizacao": 43117000000.0
+      "dt_refer": "2026-09-30",
+      "capex": 74523000000.0,
+      "depreciacao_amortizacao": 66145000000.0
     },
     "PETR4": {
-      "dt_refer": "2026-06-30",
-      "capex": 46774000000.0,
-      "depreciacao_amortizacao": 43117000000.0
+      "dt_refer": "2026-09-30",
+      "capex": 74523000000.0,
+      "depreciacao_amortizacao": 66145000000.0
     },
     "PFRM3": {
-      "dt_refer": "2026-06-30",
-      "capex": 84099000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 146608000.0,
       "depreciacao_amortizacao": null
     },
     "PGMN3": {
@@ -1134,9 +1114,9 @@
       "depreciacao_amortizacao": 417573000.0
     },
     "PLPL3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 12750000.0
+      "depreciacao_amortizacao": 18809000.0
     },
     "PMAM3": {
       "dt_refer": "2026-06-30",
@@ -1159,9 +1139,9 @@
       "depreciacao_amortizacao": null
     },
     "POSI3": {
-      "dt_refer": "2026-06-30",
-      "capex": 15920000.0,
-      "depreciacao_amortizacao": 41492000.0
+      "dt_refer": "2026-09-30",
+      "capex": 34248000.0,
+      "depreciacao_amortizacao": 66004000.0
     },
     "PRIO3": {
       "dt_refer": "2026-09-30",
@@ -1169,9 +1149,9 @@
       "depreciacao_amortizacao": 5329054000.0
     },
     "PRNR3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 73259000.0
+      "depreciacao_amortizacao": 108339000.0
     },
     "PSSA3": {
       "dt_refer": "2026-09-30",
@@ -1179,23 +1159,23 @@
       "depreciacao_amortizacao": null
     },
     "PTBL3": {
-      "dt_refer": "2026-06-30",
-      "capex": 63565000.0,
-      "depreciacao_amortizacao": 107736000.0
+      "dt_refer": "2026-09-30",
+      "capex": 81950000.0,
+      "depreciacao_amortizacao": 154530000.0
     },
     "PTNT3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 39020412.0
+      "depreciacao_amortizacao": 10128546.0
     },
     "PTNT4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 39020412.0
+      "depreciacao_amortizacao": 10128546.0
     },
     "QUAL3": {
-      "dt_refer": "2026-06-30",
-      "capex": 67979000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 110594000.0,
       "depreciacao_amortizacao": null
     },
     "RADL3": {
@@ -1204,14 +1184,14 @@
       "depreciacao_amortizacao": null
     },
     "RAIL3": {
-      "dt_refer": "2026-06-30",
-      "capex": 3370831000.0,
-      "depreciacao_amortizacao": 1048203000.0
+      "dt_refer": "2026-09-30",
+      "capex": 4674176000.0,
+      "depreciacao_amortizacao": 1654579000.0
     },
     "RAIZ4": {
-      "dt_refer": "2026-06-30",
-      "capex": 599089000.0,
-      "depreciacao_amortizacao": 1847213000.0
+      "dt_refer": "2026-09-30",
+      "capex": 1271211000.0,
+      "depreciacao_amortizacao": 3838094000.0
     },
     "RANI3": {
       "dt_refer": "2026-09-30",
@@ -1219,34 +1199,34 @@
       "depreciacao_amortizacao": 182379000.0
     },
     "RAPT3": {
-      "dt_refer": "2026-06-30",
-      "capex": 113269000.0,
-      "depreciacao_amortizacao": 254796000.0
+      "dt_refer": "2026-09-30",
+      "capex": 213112000.0,
+      "depreciacao_amortizacao": 384037000.0
     },
     "RAPT4": {
-      "dt_refer": "2026-06-30",
-      "capex": 113269000.0,
-      "depreciacao_amortizacao": 254796000.0
+      "dt_refer": "2026-09-30",
+      "capex": 213112000.0,
+      "depreciacao_amortizacao": 384037000.0
     },
     "RCSL3": {
-      "dt_refer": "2026-06-30",
-      "capex": 0.0,
+      "dt_refer": "2026-09-30",
+      "capex": 83000.0,
       "depreciacao_amortizacao": null
     },
     "RCSL4": {
-      "dt_refer": "2026-06-30",
-      "capex": 0.0,
+      "dt_refer": "2026-09-30",
+      "capex": 83000.0,
       "depreciacao_amortizacao": null
     },
     "RDNI3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
-      "depreciacao_amortizacao": null
+      "depreciacao_amortizacao": 1944000.0
     },
     "RDOR3": {
-      "dt_refer": "2026-06-30",
-      "capex": 1532891000.0,
-      "depreciacao_amortizacao": 945080000.0
+      "dt_refer": "2026-09-30",
+      "capex": 2325035000.0,
+      "depreciacao_amortizacao": 1352870000.0
     },
     "RECV3": {
       "dt_refer": "2026-09-30",
@@ -1259,19 +1239,19 @@
       "depreciacao_amortizacao": null
     },
     "RNEW11": {
-      "dt_refer": "2026-06-30",
-      "capex": 59097000.0,
-      "depreciacao_amortizacao": null
+      "dt_refer": "2026-09-30",
+      "capex": 98548000.0,
+      "depreciacao_amortizacao": 115431000.0
     },
     "RNEW3": {
-      "dt_refer": "2026-06-30",
-      "capex": 59097000.0,
-      "depreciacao_amortizacao": null
+      "dt_refer": "2026-09-30",
+      "capex": 98548000.0,
+      "depreciacao_amortizacao": 115431000.0
     },
     "RNEW4": {
-      "dt_refer": "2026-06-30",
-      "capex": 59097000.0,
-      "depreciacao_amortizacao": null
+      "dt_refer": "2026-09-30",
+      "capex": 98548000.0,
+      "depreciacao_amortizacao": 115431000.0
     },
     "ROMI3": {
       "dt_refer": "2026-09-30",
@@ -1284,14 +1264,14 @@
       "depreciacao_amortizacao": null
     },
     "RSID3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": 0.0,
       "depreciacao_amortizacao": null
     },
     "RSUL4": {
-      "dt_refer": "2026-06-30",
-      "capex": 17073000.0,
-      "depreciacao_amortizacao": 3799000.0
+      "dt_refer": "2026-09-30",
+      "capex": 23799000.0,
+      "depreciacao_amortizacao": 5785000.0
     },
     "SAUD3": {
       "dt_refer": "2026-09-30",
@@ -1299,9 +1279,9 @@
       "depreciacao_amortizacao": null
     },
     "SBFG3": {
-      "dt_refer": "2026-06-30",
-      "capex": 168016000.0,
-      "depreciacao_amortizacao": 134262000.0
+      "dt_refer": "2026-09-30",
+      "capex": 272292000.0,
+      "depreciacao_amortizacao": 204281000.0
     },
     "SBSP3": {
       "dt_refer": "2026-09-30",
@@ -1309,14 +1289,14 @@
       "depreciacao_amortizacao": 2171223000.0
     },
     "SEER3": {
-      "dt_refer": "2026-06-30",
-      "capex": 47503000.0,
-      "depreciacao_amortizacao": 109696000.0
+      "dt_refer": "2026-09-30",
+      "capex": 72824000.0,
+      "depreciacao_amortizacao": 165927000.0
     },
     "SEQL3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 36990000.0
+      "depreciacao_amortizacao": 49179000.0
     },
     "SHOW3": {
       "dt_refer": "2026-06-30",
@@ -1324,9 +1304,9 @@
       "depreciacao_amortizacao": 3266000.0
     },
     "SHUL4": {
-      "dt_refer": "2026-06-30",
-      "capex": 66192000.0,
-      "depreciacao_amortizacao": 52598000.0
+      "dt_refer": "2026-09-30",
+      "capex": 74751000.0,
+      "depreciacao_amortizacao": 78856000.0
     },
     "SIMH3": {
       "dt_refer": "2026-09-30",
@@ -1334,9 +1314,9 @@
       "depreciacao_amortizacao": 4056791000.0
     },
     "SLCE3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 187963000.0
+      "depreciacao_amortizacao": 282644000.0
     },
     "SMFT3": {
       "dt_refer": "2026-09-30",
@@ -1344,9 +1324,9 @@
       "depreciacao_amortizacao": null
     },
     "SMTO3": {
-      "dt_refer": "2026-06-30",
-      "capex": 190133000.0,
-      "depreciacao_amortizacao": 196901000.0
+      "dt_refer": "2026-09-30",
+      "capex": 404957000.0,
+      "depreciacao_amortizacao": 447146000.0
     },
     "SNSY3": {
       "dt_refer": "2026-09-30",
@@ -1364,74 +1344,69 @@
       "depreciacao_amortizacao": 16261000.0
     },
     "SOJA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 66218000.0,
-      "depreciacao_amortizacao": null
+      "dt_refer": "2026-09-30",
+      "capex": 32452000.0,
+      "depreciacao_amortizacao": 36746000.0
     },
     "SOND3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 3716000.0
+      "depreciacao_amortizacao": 5285000.0
     },
     "SOND5": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 3716000.0
+      "depreciacao_amortizacao": 5285000.0
     },
     "SOND6": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 3716000.0
+      "depreciacao_amortizacao": 5285000.0
     },
     "STBP3": {
-      "dt_refer": "2026-06-30",
-      "capex": 94644000.0,
-      "depreciacao_amortizacao": 175865000.0
+      "dt_refer": "2026-09-30",
+      "capex": 157687000.0,
+      "depreciacao_amortizacao": 266399000.0
     },
     "SUZB3": {
       "dt_refer": "2026-09-30",
       "capex": 2691839000.0,
       "depreciacao_amortizacao": 9674850000.0
     },
-    "SYNE3": {
-      "dt_refer": "2026-06-30",
-      "capex": null,
-      "depreciacao_amortizacao": 644000.0
-    },
     "TAEE11": {
-      "dt_refer": "2026-06-30",
-      "capex": 18441000.0,
-      "depreciacao_amortizacao": 38299000.0
+      "dt_refer": "2026-09-30",
+      "capex": 29008000.0,
+      "depreciacao_amortizacao": 53707000.0
     },
     "TAEE3": {
-      "dt_refer": "2026-06-30",
-      "capex": 18441000.0,
-      "depreciacao_amortizacao": 38299000.0
+      "dt_refer": "2026-09-30",
+      "capex": 29008000.0,
+      "depreciacao_amortizacao": 53707000.0
     },
     "TAEE4": {
-      "dt_refer": "2026-06-30",
-      "capex": 18441000.0,
-      "depreciacao_amortizacao": 38299000.0
+      "dt_refer": "2026-09-30",
+      "capex": 29008000.0,
+      "depreciacao_amortizacao": 53707000.0
     },
     "TASA3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 31739000.0
+      "depreciacao_amortizacao": 49195000.0
     },
     "TASA4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 31739000.0
+      "depreciacao_amortizacao": 49195000.0
     },
     "TELB3": {
-      "dt_refer": "2026-06-30",
-      "capex": 14512000.0,
-      "depreciacao_amortizacao": 126772000.0
+      "dt_refer": "2026-09-30",
+      "capex": 23487000.0,
+      "depreciacao_amortizacao": 190021000.0
     },
     "TELB4": {
-      "dt_refer": "2026-06-30",
-      "capex": 14512000.0,
-      "depreciacao_amortizacao": 126772000.0
+      "dt_refer": "2026-09-30",
+      "capex": 23487000.0,
+      "depreciacao_amortizacao": 190021000.0
     },
     "TEND3": {
       "dt_refer": "2026-09-30",
@@ -1439,9 +1414,9 @@
       "depreciacao_amortizacao": 63497000.0
     },
     "TFCO4": {
-      "dt_refer": "2026-06-30",
-      "capex": 25641000.0,
-      "depreciacao_amortizacao": 21650000.0
+      "dt_refer": "2026-09-30",
+      "capex": 37615000.0,
+      "depreciacao_amortizacao": 33459000.0
     },
     "TGMA3": {
       "dt_refer": "2026-09-30",
@@ -1449,9 +1424,9 @@
       "depreciacao_amortizacao": 25884000.0
     },
     "TIMS3": {
-      "dt_refer": "2026-06-30",
-      "capex": 2288751000.0,
-      "depreciacao_amortizacao": 3535006000.0
+      "dt_refer": "2026-09-30",
+      "capex": 3266593000.0,
+      "depreciacao_amortizacao": 5393315000.0
     },
     "TOTS3": {
       "dt_refer": "2026-09-30",
@@ -1464,14 +1439,14 @@
       "depreciacao_amortizacao": null
     },
     "TRIS3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 1908000.0
+      "depreciacao_amortizacao": 27828000.0
     },
     "TTEN3": {
-      "dt_refer": "2026-06-30",
-      "capex": 474653000.0,
-      "depreciacao_amortizacao": 78442000.0
+      "dt_refer": "2026-09-30",
+      "capex": 638422000.0,
+      "depreciacao_amortizacao": 133293000.0
     },
     "TUPY3": {
       "dt_refer": "2026-09-30",
@@ -1479,29 +1454,29 @@
       "depreciacao_amortizacao": 283670000.0
     },
     "UCAS3": {
-      "dt_refer": "2026-06-30",
-      "capex": 16697000.0,
-      "depreciacao_amortizacao": 9807000.0
+      "dt_refer": "2026-09-30",
+      "capex": 25738000.0,
+      "depreciacao_amortizacao": 14779000.0
     },
     "UGPA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 779986000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 1239618000.0,
       "depreciacao_amortizacao": null
     },
     "UNIP3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 116381000.0
+      "depreciacao_amortizacao": 181468000.0
     },
     "UNIP5": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 116381000.0
+      "depreciacao_amortizacao": 181468000.0
     },
     "UNIP6": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 116381000.0
+      "depreciacao_amortizacao": 181468000.0
     },
     "USIM3": {
       "dt_refer": "2026-09-30",
@@ -1534,9 +1509,9 @@
       "depreciacao_amortizacao": 1017000000.0
     },
     "VITT3": {
-      "dt_refer": "2026-06-30",
-      "capex": 15222000.0,
-      "depreciacao_amortizacao": 12038000.0
+      "dt_refer": "2026-09-30",
+      "capex": 22291000.0,
+      "depreciacao_amortizacao": 18316000.0
     },
     "VIVA3": {
       "dt_refer": "2026-09-30",
@@ -1544,33 +1519,33 @@
       "depreciacao_amortizacao": 125815865.0
     },
     "VIVR3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 169000.0
+      "depreciacao_amortizacao": 253000.0
     },
     "VIVT3": {
-      "dt_refer": "2026-06-30",
-      "capex": 4672144000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 7106889000.0,
       "depreciacao_amortizacao": null
     },
     "VLID3": {
-      "dt_refer": "2026-06-30",
-      "capex": 33000000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 81349000.0,
       "depreciacao_amortizacao": null
     },
     "VTRU3": {
-      "dt_refer": "2026-06-30",
-      "capex": 7024000.0,
-      "depreciacao_amortizacao": 114418000.0
+      "dt_refer": "2026-09-30",
+      "capex": 29001000.0,
+      "depreciacao_amortizacao": 173111000.0
     },
     "VULC3": {
-      "dt_refer": "2026-06-30",
-      "capex": 81508000.0,
-      "depreciacao_amortizacao": 67944000.0
+      "dt_refer": "2026-09-30",
+      "capex": 108357000.0,
+      "depreciacao_amortizacao": 102440000.0
     },
     "VVEO3": {
-      "dt_refer": "2026-06-30",
-      "capex": 73321000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 110396000.0,
       "depreciacao_amortizacao": null
     },
     "WEGE3": {
@@ -1579,19 +1554,19 @@
       "depreciacao_amortizacao": 772679000.0
     },
     "WEST3": {
-      "dt_refer": "2026-06-30",
-      "capex": 1671000.0,
-      "depreciacao_amortizacao": 11957000.0
+      "dt_refer": "2026-09-30",
+      "capex": 2000000.0,
+      "depreciacao_amortizacao": 15709000.0
     },
     "WHRL3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 94845000.0
+      "depreciacao_amortizacao": 145101000.0
     },
     "WHRL4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 94845000.0
+      "depreciacao_amortizacao": 145101000.0
     },
     "WIZC3": {
       "dt_refer": "2026-09-30",
@@ -1599,19 +1574,19 @@
       "depreciacao_amortizacao": 77470000.0
     },
     "WLMM3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 4792000.0
+      "depreciacao_amortizacao": 7080000.0
     },
     "WLMM4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 4792000.0
+      "depreciacao_amortizacao": 7080000.0
     },
     "YDUQ3": {
-      "dt_refer": "2026-06-30",
-      "capex": 218642000.0,
-      "depreciacao_amortizacao": 392174000.0
+      "dt_refer": "2026-09-30",
+      "capex": 339487000.0,
+      "depreciacao_amortizacao": 595384000.0
     }
   }
 }
