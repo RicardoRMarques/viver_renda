@@ -25900,6 +25900,12 @@
           ganhoRealAnual: taxaLiquidaAnual === null ? null
             : ((1 + taxaLiquidaAnual / 100) / (1 + ipcaAnualPct() / 100) - 1) * 100,
           equivalencia: equivalenciaPdf,
+          // Aba "Mês a mês" da tela — vai pro PDF também (pedido do
+          // usuário: o relatório baixado não trazia essa tabela ainda).
+          mesAMes: linhasCdbMes.map((lc, i) => ({
+            mes: lc.mes, aliquota: lc.aliquota, totalInvestido: lc.totalInvestido,
+            cdbBruto: lc.valorBruto, cdbLiquido: lc.valorLiquido, lciLiquido: linhasLciMes[i].valorLiquido,
+          })),
         };
         // Espelho para os testes automatizados lerem o que vai no PDF.
         window.__ultimoCalculoRF = ultimoCalculo;
@@ -26094,6 +26100,33 @@
               0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255, cellWidth: 150 },
               1: { cellWidth: 'auto' },
             },
+          });
+        }
+
+        // "Mês a mês" (mesma tabela da aba na tela) — pedido do usuário,
+        // o relatório baixado não trazia essa evolução ainda. Pode render
+        // em várias páginas (ex: 120 linhas pra um prazo de 10 anos); o
+        // autoTable já pagina sozinho.
+        if (c.mesAMes && c.mesAMes.length) {
+          const yMesAMes = doc.lastAutoTable.finalY + 24;
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(11);
+          doc.setTextColor(0);
+          doc.text('Mês a mês — CDB x LCI/LCA', 40, yMesAMes);
+          doc.autoTable({
+            startY: yMesAMes + 10,
+            head: [['Mês', 'Alíquota IR', 'Investido', 'CDB bruto', 'CDB líquido', 'LCI/LCA']],
+            body: c.mesAMes.map(l => [
+              l.mes,
+              `${hgFormatNumero(l.aliquota * 100)}%`,
+              hgFormatMoeda(l.totalInvestido),
+              hgFormatMoeda(l.cdbBruto),
+              hgFormatMoeda(l.cdbLiquido),
+              hgFormatMoeda(l.lciLiquido),
+            ]),
+            theme: 'striped',
+            styles: { fontSize: 7.5, cellPadding: 4 },
+            headStyles: { fillColor: [43, 43, 43], fontSize: 8 },
           });
         }
 
