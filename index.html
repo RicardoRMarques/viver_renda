@@ -3532,6 +3532,28 @@
     @media (min-width: 1024px) {
       .calc-modal.cr-modal { max-width: 1040px; }
     }
+    /* Comparação visual "casa x FII" do Cap Rate — dois cards lado a
+       lado, cada um com um ícone representando o ativo. */
+    .cr-visual-comparacao { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    @media (max-width: 480px) {
+      .cr-visual-comparacao { grid-template-columns: 1fr; }
+    }
+    .cr-visual-lado {
+      background: var(--card); border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 14px 12px; display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: 10px;
+    }
+    .cr-visual-icone {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .cr-visual-icone svg { width: 24px; height: 24px; }
+    .cr-visual-icone.cr-icone-imovel { background: color-mix(in srgb, var(--primary) 16%, transparent); color: var(--primary); }
+    .cr-visual-icone.cr-icone-fii { background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent); }
+    .cr-visual-titulo { font-size: 0.85rem; font-weight: 800; color: var(--text); }
+    .cr-visual-linhas { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .cr-visual-linha span { display: block; font-size: 0.6rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+    .cr-visual-linha strong { display: block; font-size: 0.92rem; font-weight: 800; color: var(--text); font-family: "Courier New", monospace; }
     .fire-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-top: 4px; }
     /* Bug pré-existente achado testando o come-cotas do Fundo DI: sem essa
        regra, [hidden] (ex: irCampoDatasWrap.hidden = true ao trocar pra
@@ -14743,6 +14765,46 @@
             </div>`;
         }
 
+        // Comparação visual: a mesma lógica dos cards acima, mas lado a
+        // lado com um ícone de casa e um de FII — pra bater o olho sem
+        // precisar ler números soltos. A "renda mensal equivalente" do
+        // FII é o que o mesmo capital do imóvel renderia investido no
+        // FII, no DY informado — fica direto comparável com o aluguel.
+        let rendaFiiEquivalente = null;
+        let visualHtml = '';
+        if (dyFii > 0) {
+          rendaFiiEquivalente = (valorImovel * (dyFii / 100)) / 12;
+          const alugelLabel = temDespesas ? 'Aluguel líquido de despesas' : 'Aluguel mensal';
+          const aluguelValor = temDespesas ? (aluguelMensal - despesasMensais) : aluguelMensal;
+          const capRateLabel = temDespesas ? 'Cap Rate (líquido)' : 'Cap Rate (bruto)';
+          const capRateValor = temDespesas ? capRateLiquido : capRateBruto;
+          visualHtml = `
+            <div class="cr-visual-comparacao">
+              <div class="cr-visual-lado">
+                <div class="cr-visual-icone cr-icone-imovel">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg>
+                </div>
+                <div class="cr-visual-titulo">Imóvel</div>
+                <div class="cr-visual-linhas">
+                  <div class="cr-visual-linha"><span>Valor de mercado</span><strong>${hgFormatMoeda(valorImovel)}</strong></div>
+                  <div class="cr-visual-linha"><span>${alugelLabel}</span><strong>${hgFormatMoeda(aluguelValor)}</strong></div>
+                  <div class="cr-visual-linha"><span>${capRateLabel}</span><strong>${pct(capRateValor)}</strong></div>
+                </div>
+              </div>
+              <div class="cr-visual-lado">
+                <div class="cr-visual-icone cr-icone-fii">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="1"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M12 6h.01"></path><path d="M16 6h.01"></path><path d="M8 10h.01"></path><path d="M12 10h.01"></path><path d="M16 10h.01"></path><path d="M8 14h.01"></path><path d="M12 14h.01"></path><path d="M16 14h.01"></path></svg>
+                </div>
+                <div class="cr-visual-titulo">FII (mesmo capital)</div>
+                <div class="cr-visual-linhas">
+                  <div class="cr-visual-linha"><span>Capital investido</span><strong>${hgFormatMoeda(valorImovel)}</strong></div>
+                  <div class="cr-visual-linha"><span>Renda mensal (DY ${pct(dyFii)})</span><strong>${hgFormatMoeda(rendaFiiEquivalente)}</strong></div>
+                  <div class="cr-visual-linha"><span>DY anual</span><strong>${pct(dyFii)}</strong></div>
+                </div>
+              </div>
+            </div>`;
+        }
+
         resultadoEl.innerHTML = `
           <div class="carteira-resumo-cards">
             <div class="carteira-resumo-card">
@@ -14755,12 +14817,13 @@
               <strong>${pct(capRateLiquido)}</strong>
             </div>` : ''}
           </div>
-          ${comparacaoHtml}`;
+          ${comparacaoHtml}
+          ${visualHtml}`;
 
         ultimoCalculoCr = {
           valorImovel, aluguelMensal, despesasMensais, temDespesas,
           dyFii: dyFii > 0 ? dyFii : null,
-          capRateBruto, capRateLiquido, leituraTexto,
+          capRateBruto, capRateLiquido, leituraTexto, rendaFiiEquivalente,
         };
         acoesEl.hidden = false;
       }
@@ -14858,6 +14921,19 @@
             theme: 'grid',
             styles: { fontSize: 9, cellPadding: 6 },
             headStyles: { fillColor: [119, 119, 119], textColor: 255 },
+          });
+        }
+        if (c.rendaFiiEquivalente != null) {
+          doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 18,
+            head: [['Imóvel', 'FII (mesmo capital)']],
+            body: [[
+              `${hgFormatMoeda(c.valorImovel)} de imóvel\n${hgFormatMoeda(c.temDespesas ? c.aluguelMensal - c.despesasMensais : c.aluguelMensal)}/mês de aluguel`,
+              `${hgFormatMoeda(c.valorImovel)} no FII\n${hgFormatMoeda(c.rendaFiiEquivalente)}/mês (DY ${pct(c.dyFii)})`,
+            ]],
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 8, halign: 'center', valign: 'middle' },
+            headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
           });
         }
 
