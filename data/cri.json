@@ -2,15 +2,15 @@
  "_leia_me": "Cadastro de EMISSÃO de CRIs (Certificados de Recebíveis Imobiliários) negociados na B3, só os que ainda não venceram. 'rotulo_remuneracao' é a remuneração CONTRATADA no lançamento do papel — a B3 não publica uma taxa de mercado secundário atualizada todo dia para CRI (diferente da tela de Debêntures, que usa a ANBIMA). Para papel pós-fixado (DI/IPCA/IGP-M + spread) isso ainda descreve o que o título paga hoje, porque só o indexador-base flutua; para PREFIXADO não há garantia nenhuma de que siga valendo. CRI é isento de Imposto de Renda para pessoa física por lei (diferente de debênture incentivada, que depende de cada papel) — mas não tem FGC, e a maioria exige um investimento mínimo alto (na casa de R$ 10 a 20 mil), que este arquivo não informa.",
  "fonte": "B3 — Consulta Pública de CRIs",
  "fonte_url": "https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/",
- "atualizado_em": "2026-11-16T22:34:43+00:00",
- "total": 4448,
+ "atualizado_em": "2026-11-17T21:24:10+00:00",
+ "total": 4449,
  "total_no_arquivo_b3": 4701,
  "por_indexador": {
   "di": 1258,
   "igp_m": 209,
-  "tr": 60,
+  "tr": 59,
   "outro": 349,
-  "ipca": 2492,
+  "ipca": 2494,
   "prefixado": 13,
   "incc_di": 46,
   "inpc": 8,
@@ -18,7 +18,7 @@
   "incc_m": 5,
   "ipc_fipe": 2
  },
- "volume_total_emissao": 305047121908.96,
+ "volume_total_emissao": 304992121908.96,
  "cris": [
   {
    "codigo": "27I0000801",
@@ -55,6 +55,40 @@
    "data_final_distribuicao": "2026-08-10"
   },
   {
+   "codigo": "26H3196611",
+   "isin": "BRBSIPCRI0N9",
+   "emissor": "BSI CAPITAL SECURITIZADORA S.A.",
+   "agente_fiduciario": "VORTX DTVM S.A.",
+   "numero_emissao": "27",
+   "numero_serie": "1",
+   "quantidade_emitida": 12500.0,
+   "volume_emissao": 12500000.0,
+   "indexador": "di",
+   "pct_indexador": 100.0,
+   "spread": 5.0,
+   "rotulo_remuneracao": "100% do DI + 5,00%",
+   "data_emissao": "2026-11-06",
+   "data_vencimento": "2030-10-06",
+   "data_final_distribuicao": "2027-05-05"
+  },
+  {
+   "codigo": "26H3197459",
+   "isin": "BRBSIPCRI0O7",
+   "emissor": "BSI CAPITAL SECURITIZADORA S.A.",
+   "agente_fiduciario": "VORTX DTVM S.A.",
+   "numero_emissao": "27",
+   "numero_serie": "2",
+   "quantidade_emitida": 12500.0,
+   "volume_emissao": 12500000.0,
+   "indexador": "ipca",
+   "pct_indexador": null,
+   "spread": 13.5,
+   "rotulo_remuneracao": "IPCA + 13,50%",
+   "data_emissao": "2026-11-06",
+   "data_vencimento": "2030-10-06",
+   "data_final_distribuicao": "2027-05-05"
+  },
+  {
    "codigo": "SEIS01IX33",
    "isin": "BRLSECCRI7I1",
    "emissor": "LEVERAGE COMPANHIA SECURITIZADORA",
@@ -82,8 +116,8 @@
    "volume_emissao": 21789000.0,
    "indexador": "ipca",
    "pct_indexador": null,
-   "spread": 0.1,
-   "rotulo_remuneracao": "IPCA + 0,10%",
+   "spread": null,
+   "rotulo_remuneracao": "IPCA",
    "data_emissao": "2026-11-06",
    "data_vencimento": "2033-11-23",
    "data_final_distribuicao": "2027-05-11"
@@ -3486,7 +3520,7 @@
    "rotulo_remuneracao": "100% do DI + 3,80%",
    "data_emissao": "2026-07-27",
    "data_vencimento": "2031-07-28",
-   "data_final_distribuicao": "2027-01-10"
+   "data_final_distribuicao": "2027-01-24"
   },
   {
    "codigo": "26G4824689",
@@ -35194,23 +35228,6 @@
    "data_final_distribuicao": "2027-02-15"
   },
   {
-   "codigo": "24E1280914",
-   "isin": "BRRBRACRIN31",
-   "emissor": "OPEA SECURITIZADORA S/A",
-   "agente_fiduciario": "VORTX DTVM S.A.",
-   "numero_emissao": "253",
-   "numero_serie": "1",
-   "quantidade_emitida": 80000.0,
-   "volume_emissao": 80000000.0,
-   "indexador": "di",
-   "pct_indexador": 100.0,
-   "spread": 4.2,
-   "rotulo_remuneracao": "100% do DI + 4,20%",
-   "data_emissao": "2024-05-07",
-   "data_vencimento": "2026-11-17",
-   "data_final_distribuicao": "2024-11-18"
-  },
-  {
    "codigo": "24D3464295",
    "isin": "BRPVSCCRI4A0",
    "emissor": "COMPANHIA PROVINCIA DE SECURITIZACAO",
@@ -49368,7 +49385,7 @@
    "spread": 5.75,
    "rotulo_remuneracao": "100% do DI + 5,75%",
    "data_emissao": "2022-12-29",
-   "data_vencimento": "2026-11-17",
+   "data_vencimento": "2026-12-15",
    "data_final_distribuicao": "2023-06-29"
   },
   {
@@ -51131,10 +51148,10 @@
    "numero_serie": "1",
    "quantidade_emitida": 20500.0,
    "volume_emissao": 20500000.0,
-   "indexador": "tr",
+   "indexador": "ipca",
    "pct_indexador": null,
-   "spread": 12.0,
-   "rotulo_remuneracao": "TR + 12,00%",
+   "spread": 14.0,
+   "rotulo_remuneracao": "IPCA + 14,00%",
    "data_emissao": "2022-11-04",
    "data_vencimento": "2027-10-26",
    "data_final_distribuicao": "2023-11-04"
