@@ -2257,6 +2257,19 @@
     }
     .hg-periodo-tab:hover { border-color: var(--primary); color: var(--primary); }
     .hg-periodo-tab.hg-periodo-ativo { background: var(--primary); border-color: var(--primary); color: var(--btn-text); }
+    /* Abas "Resultado" / "Mês a mês" da Calculadora Renda Fixa — mesmo
+       padrão visual das .hg-periodo-tab acima, só maiores (são a navegação
+       principal do resultado, não um detalhe secundário). */
+    .calc-abas-resultado { display: flex; gap: 6px; margin-bottom: 10px; }
+    .calc-aba-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--muted);
+      border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; font-weight: 700;
+      font-family: inherit; cursor: pointer; flex: 1;
+    }
+    .calc-aba-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .calc-aba-btn.calc-aba-ativa { background: var(--primary); border-color: var(--primary); color: var(--btn-text); }
+    .calc-tabela-mes-a-mes th, .calc-tabela-mes-a-mes td { white-space: nowrap; }
+    .calc-tabela-mes-a-mes thead th { position: sticky; top: 0; background: var(--card); z-index: 1; }
     /* Botões de abrir/fechar do cartão (histórico de dividendos, Análise
        Fundamentalista, comparador): o que está ABERTO fica em destaque, no
        mesmo azul do "1 ano"/"30D" selecionado — dá para ver de relance
@@ -25360,6 +25373,39 @@
         return { totalInvestido, valorBruto, rendimentoBruto, custodiaValor, ir, rendimentoLiquido, valorLiquido, aliquota: tributado ? aliquotaIR(dias) : 0 };
       }
 
+      // Mesma simulação de simularProduto, mas devolvendo uma linha por MÊS
+      // (não só o total final) — usada na aba "Mês a mês". O loop é
+      // idêntico de propósito: a última linha precisa bater exatamente com
+      // o resultado final que simularProduto() calcularia pro mesmo prazo.
+      function simularProdutoMesAMes({ taxaAnualPct, tributado, custodia }, valorInicial, aporteMensal, prazoMeses) {
+        const taxaMensal = Math.pow(1 + taxaAnualPct / 100, 1 / 12) - 1;
+        let saldo = valorInicial;
+        const linhas = [];
+        for (let m = 0; m < prazoMeses; m++) {
+          saldo = saldo * (1 + taxaMensal) + aporteMensal;
+          const mes = m + 1;
+          const totalInvestido = valorInicial + aporteMensal * mes;
+          const valorBruto = saldo;
+          let rendimentoBruto = valorBruto - totalInvestido;
+
+          let custodiaValor = 0;
+          if (custodia) {
+            const saldoMedio = (valorInicial + valorBruto) / 2;
+            custodiaValor = saldoMedio * 0.002 * (mes / 12);
+            rendimentoBruto -= custodiaValor;
+          }
+
+          const dias = Math.round(mes * 30.44);
+          const aliquota = tributado ? aliquotaIR(dias) : 0;
+          const ir = tributado && rendimentoBruto > 0 ? rendimentoBruto * aliquota : 0;
+          const rendimentoLiquido = rendimentoBruto - ir;
+          const valorLiquido = totalInvestido + rendimentoLiquido;
+
+          linhas.push({ mes, totalInvestido, valorBruto, rendimentoBruto, custodiaValor, aliquota, ir, rendimentoLiquido, valorLiquido });
+        }
+        return linhas;
+      }
+
       // Simula um título com pagamento mensal dos juros, sem reinvestir: o
       // capital aplicado fica parado e só volta no vencimento — cada mês
       // "nasce" um cupom sobre o valor inicial (não sobre um saldo que
@@ -25643,6 +25689,24 @@
         const lciTaxaTela = parseFloat(document.getElementById('calcLciTaxaCompara')?.value) || 0;
         const lciIndexadorTela = document.getElementById('calcLciIndexadorCompara')?.value || 'cdi';
 
+        // Aba "Mês a mês": evolução mês a mês do CDB e da LCI/LCA
+        // informados nos campos dedicados da comparação (mesmos de sempre),
+        // mostrando a alíquota de IR mudando ao longo do prazo — não só o
+        // resultado final que a aba "Resultado" já mostra.
+        const cdbTaxaEfetivaMes = taxaEfetivaPorIndexador(cdbTaxaTela, cdbIndexadorTela);
+        const lciTaxaEfetivaMes = taxaEfetivaPorIndexador(lciTaxaTela, lciIndexadorTela);
+        const linhasCdbMes = simularProdutoMesAMes({ taxaAnualPct: cdbTaxaEfetivaMes, tributado: true, custodia: false }, valorInicial, aporteMensal, prazoMeses);
+        const linhasLciMes = simularProdutoMesAMes({ taxaAnualPct: lciTaxaEfetivaMes, tributado: false, custodia: false }, valorInicial, aporteMensal, prazoMeses);
+        const linhasMesAMesHtml = linhasCdbMes.map((lc, i) => `
+          <tr>
+            <td>${lc.mes}</td>
+            <td>${hgFormatNumero(lc.aliquota * 100)}%</td>
+            <td>${hgFormatMoeda(lc.totalInvestido)}</td>
+            <td>${hgFormatMoeda(lc.valorBruto)}</td>
+            <td>${hgFormatMoeda(lc.valorLiquido)}</td>
+            <td>${hgFormatMoeda(linhasLciMes[i].valorLiquido)}</td>
+          </tr>`).join('');
+
         const linhasTabela = produtos.map(p => {
           const rotulo = p.id === 'cdb' ? rotuloTaxaIndexador(cdbTaxaTela, cdbIndexadorTela)
             : p.id === 'lci' ? rotuloTaxaIndexador(lciTaxaTela, lciIndexadorTela)
@@ -25717,40 +25781,75 @@
         }
 
         resultadoEl.innerHTML = `
-          <div class="calc-resultado-card">
-            <div class="calc-resultado-linha">
-              <span>Total investido</span>
-              <strong>${hgFormatMoeda(resultadoPrincipal.totalInvestido)}</strong>
-            </div>
-            <div class="calc-resultado-linha">
-              <span>Rendimento bruto</span>
-              <strong>${hgFormatMoeda(resultadoPrincipal.rendimentoBruto + resultadoPrincipal.custodiaValor)}</strong>
-            </div>
-            ${custodiaTexto}
-            ${irTexto}
-            <div class="calc-resultado-linha calc-destaque">
-              <span>Valor líquido final</span>
-              <strong>${hgFormatMoeda(resultadoPrincipal.valorLiquido)}</strong>
-            </div>
+          <div class="calc-abas-resultado">
+            <button type="button" class="calc-aba-btn calc-aba-ativa" id="calcAbaBtnResultado" data-aba="calcAbaResultado">Resultado</button>
+            <button type="button" class="calc-aba-btn" id="calcAbaBtnMesAMes" data-aba="calcAbaMesAMes">Mês a mês</button>
           </div>
 
-          <div class="calc-tabela-comp-wrap">
-            <table class="calc-tabela-comp">
-              <thead>
-                <tr><th>Produto</th><th>Valor líquido</th><th>Rendimento líquido</th></tr>
-              </thead>
-              <tbody>${linhasTabela}</tbody>
-            </table>
-          </div>
-          ${blocoEquivalencia}
-          ${blocoGanhoReal}
+          <div id="calcAbaResultado">
+            <div class="calc-resultado-card">
+              <div class="calc-resultado-linha">
+                <span>Total investido</span>
+                <strong>${hgFormatMoeda(resultadoPrincipal.totalInvestido)}</strong>
+              </div>
+              <div class="calc-resultado-linha">
+                <span>Rendimento bruto</span>
+                <strong>${hgFormatMoeda(resultadoPrincipal.rendimentoBruto + resultadoPrincipal.custodiaValor)}</strong>
+              </div>
+              ${custodiaTexto}
+              ${irTexto}
+              <div class="calc-resultado-linha calc-destaque">
+                <span>Valor líquido final</span>
+                <strong>${hgFormatMoeda(resultadoPrincipal.valorLiquido)}</strong>
+              </div>
+            </div>
 
-          <p class="calc-ajuda" style="margin-top:10px;">
-            Simulação aproximada (capitalização mensal composta), com base em Selic ≈ ${hgFormatNumero(selicAnualPct())}% a.a.,
-            CDI ≈ ${hgFormatNumero(cdiAnualPct())}% a.a. (Selic − 0,10 p.p. de spread) e IPCA anualizado ≈ ${hgFormatNumero(ipcaAnualPct())}% a.a.
-            Os demais produtos da tabela usam taxas de mercado estimadas para efeito de comparação.
-            Não substitui o cálculo oficial da sua corretora.
-          </p>`;
+            <div class="calc-tabela-comp-wrap">
+              <table class="calc-tabela-comp">
+                <thead>
+                  <tr><th>Produto</th><th>Valor líquido</th><th>Rendimento líquido</th></tr>
+                </thead>
+                <tbody>${linhasTabela}</tbody>
+              </table>
+            </div>
+            ${blocoEquivalencia}
+            ${blocoGanhoReal}
+
+            <p class="calc-ajuda" style="margin-top:10px;">
+              Simulação aproximada (capitalização mensal composta), com base em Selic ≈ ${hgFormatNumero(selicAnualPct())}% a.a.,
+              CDI ≈ ${hgFormatNumero(cdiAnualPct())}% a.a. (Selic − 0,10 p.p. de spread) e IPCA anualizado ≈ ${hgFormatNumero(ipcaAnualPct())}% a.a.
+              Os demais produtos da tabela usam taxas de mercado estimadas para efeito de comparação.
+              Não substitui o cálculo oficial da sua corretora.
+            </p>
+          </div>
+
+          <div id="calcAbaMesAMes" hidden>
+            <p class="calc-ajuda" style="margin-top:0;">
+              Evolução mês a mês do CDB (<strong>${rotuloTaxaIndexador(cdbTaxaTela, cdbIndexadorTela)}</strong>) e da
+              LCI/LCA (<strong>${rotuloTaxaIndexador(lciTaxaTela, lciIndexadorTela)}</strong>) informados na comparação —
+              "CDB líquido" é quanto você resgataria se vendesse naquele mês exato, já descontado o IR da faixa
+              correspondente (por isso a alíquota cai ao longo da tabela).
+            </p>
+            <div class="calc-tabela-comp-wrap" style="max-height:420px; overflow-y:auto;">
+              <table class="calc-tabela-comp calc-tabela-mes-a-mes">
+                <thead>
+                  <tr><th>Mês</th><th>Alíquota IR</th><th>Investido</th><th>CDB bruto</th><th>CDB líquido</th><th>LCI/LCA</th></tr>
+                </thead>
+                <tbody>${linhasMesAMesHtml}</tbody>
+              </table>
+            </div>
+          </div>`;
+
+        resultadoEl.querySelectorAll('.calc-aba-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            resultadoEl.querySelectorAll('.calc-aba-btn').forEach(b => b.classList.remove('calc-aba-ativa'));
+            btn.classList.add('calc-aba-ativa');
+            const alvo = btn.getAttribute('data-aba');
+            resultadoEl.querySelectorAll('#calcAbaResultado, #calcAbaMesAMes').forEach(painel => {
+              painel.hidden = painel.id !== alvo;
+            });
+          });
+        });
 
         const prazoTexto = selPrazoUnidade.value === 'anos'
           ? `${prazoInformado} ano${prazoInformado > 1 ? 's' : ''}`
