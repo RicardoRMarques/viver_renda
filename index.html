@@ -498,6 +498,18 @@
     button.tesouro-nome:hover { color: var(--primary); text-decoration: underline; }
     button.tesouro-nome svg { width: 13px; height: 13px; color: var(--muted); flex-shrink: 0; }
     button.tesouro-nome:hover svg { color: var(--primary); }
+    .tesouro-titulo-linha { display: flex; align-items: center; gap: 6px; }
+    /* Botão de PDF por título — mesma lógica do botão de gráfico ao lado
+       (ícone herdando a cor do texto, fica azul no hover), mas como
+       elemento IRMÃO do .tesouro-nome, não aninhado dentro dele: dois
+       <button> um dentro do outro é HTML inválido e o clique de um
+       dispararia os dois. */
+    button.tesouro-pdf-btn {
+      color: var(--muted); background: none; border: none; padding: 2px;
+      cursor: pointer; display: inline-flex; align-items: center; flex-shrink: 0;
+    }
+    button.tesouro-pdf-btn:hover { color: var(--primary); }
+    button.tesouro-pdf-btn svg { width: 14px; height: 14px; }
 
     /* ---------- Marcação a mercado ---------- */
     .calc-modal.tdg-modal { max-width: 960px; }
@@ -13299,6 +13311,119 @@
           '<div class="tesouro-sub">bruto ' + hgFormatMoeda(r.bruto) + ' · IR ' + hgFormatNumero(r.aliquota) + '%</div>';
       }
 
+      function nomeArquivoPdfTitulo(t) {
+        const slug = (t.nome || 'tesouro-direto')
+          .normalize('NFD').replace(/[̀-ͯ]/g, '')
+          .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-+|-+$)/g, '');
+        return `${slug || 'tesouro-direto'}.pdf`;
+      }
+
+      // PDF de UM título só — pedido do usuário ao lado do nome na tabela,
+      // com os dados do título e a simulação (mesmo valor digitado em
+      // "Simular com quanto?"), pra quem quer guardar/imprimir/mandar por
+      // WhatsApp sem precisar printar a tela.
+      async function montarDocumentoPdfTitulo(t) {
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text(t.nome, 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
+        doc.setFontSize(8);
+        doc.text(
+          'Conteúdo educativo. Preço e taxa de referência do dia — não é garantia de disponibilidade nem recomendação de compra.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        const pu = puDe(t);
+        const linhasDados = [
+          ['Vencimento', dataBr(t.vencimento)],
+          ['Rentabilidade', taxaPorExtenso(t)],
+          ['Preço unitário', typeof pu === 'number' ? hgFormatMoeda(pu) : '—'],
+          ['Investimento mínimo', typeof t.investimento_minimo === 'number' ? hgFormatMoeda(t.investimento_minimo) : '—'],
+          ['Como paga', descricaoPagamento(t)],
+        ];
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Características do título']],
+          body: linhasDados,
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        const valorSimulado = hgValorMascarado(inSimular);
+        if (pagaEmParcelas(t)) {
+          doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 18,
+            head: [['Simulação']],
+            body: [['Este título paga renda mensal por anos, não um valor único no vencimento — a simulação de valor final não se aplica aqui.']],
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 6 },
+            headStyles: { fillColor: [119, 119, 119], textColor: 255 },
+          });
+        } else if (valorSimulado > 0) {
+          const r = simularTitulo(t, valorSimulado);
+          if (r) {
+            doc.autoTable({
+              startY: doc.lastAutoTable.finalY + 18,
+              head: [['', `Simulação com ${hgFormatMoeda(valorSimulado)}`]],
+              body: [
+                ['Dias até o vencimento', String(r.dias)],
+                ['Valor bruto estimado', hgFormatMoeda(r.bruto)],
+                ['IR estimado', `${hgFormatNumero(r.aliquota)}%`],
+                ['Valor líquido estimado', hgFormatMoeda(r.liquido)],
+              ],
+              theme: 'grid',
+              styles: { fontSize: 9, cellPadding: 6 },
+              headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+              columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+            });
+          }
+        }
+
+        const larguraUtil = doc.internal.pageSize.getWidth() - 80;
+        const yRodape = doc.lastAutoTable.finalY + 20;
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(90);
+        doc.text(
+          `Posição de ${dados?.data_base ? dataBr(dados.data_base) : '—'} · Fonte: ${dados?.fonte || 'Tesouro Transparente — Tesouro Nacional'}.`,
+          40, yRodape
+        );
+        doc.text(
+          'Simulação aproximada com a taxa de hoje — não considera mudança de Selic/IPCA no caminho nem marcação a mercado se vender antes do vencimento. Confirme disponibilidade e preço final no portal oficial antes de investir.',
+          40, yRodape + 12, { maxWidth: larguraUtil }
+        );
+
+        return doc;
+      }
+
+      async function gerarPdfTitulo(t) {
+        const doc = await montarDocumentoPdfTitulo(t);
+        if (!doc) return;
+        doc.save(nomeArquivoPdfTitulo(t));
+      }
+
       function valorPara(t, chave) {
         if (chave === 'titulo') return t.nome || null;
         if (chave === 'vencimento') return t.vencimento || null;
@@ -13337,6 +13462,9 @@
       const SVG_GRAFICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" '
         + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
         + '<polyline points="3 17 9 11 13 15 21 7"></polyline></svg>';
+      const SVG_PDF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+        + 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+        + '<path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>';
 
       // Famílias que fazem sentido pra quem escolhe título — não é o
       // indexador cru: Educa+ e Renda+ são corrigidos pelo IPCA, mas quem
@@ -13476,8 +13604,12 @@
           lista.map(t => {
             const pu = puDe(t);
             return '<tr>' +
-              '<td><button type="button" class="tesouro-nome" data-titulo="' + t.id + '"' +
+              '<td><div class="tesouro-titulo-linha">' +
+              '<button type="button" class="tesouro-nome" data-titulo="' + t.id + '"' +
               ' title="Ver o histórico de preço deste título">' + SVG_GRAFICO + '<span>' + t.nome + '</span></button>' +
+              '<button type="button" class="tesouro-pdf-btn" data-pdf-titulo="' + t.id + '"' +
+              ' title="Baixar PDF deste título" aria-label="Baixar PDF deste título">' + SVG_PDF + '</button>' +
+              '</div>' +
               '<div class="tesouro-sub">' + descricaoPagamento(t) + '</div></td>' +
               '<td>' + dataBr(t.vencimento) +
               // Nesses títulos a data não é "quando você recebe", é quando
@@ -13550,6 +13682,12 @@
             ordem = { coluna: chave, desc: col.tipo === 'numero' || col.tipo === 'taxa' };
           }
           montarTabela();
+          return;
+        }
+        const idPdf = e.target.closest('[data-pdf-titulo]')?.dataset.pdfTitulo;
+        if (idPdf) {
+          const titulo = (dados?.titulos || []).find(t => t.id === idPdf);
+          if (titulo) gerarPdfTitulo(titulo);
           return;
         }
         const id = e.target.closest('[data-titulo]')?.dataset.titulo;
