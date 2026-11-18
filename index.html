@@ -485,6 +485,17 @@
     @media (max-width: 760px) {
       .tesouro-comparar-combos { grid-template-columns: 1fr; }
     }
+    /* Nomes como "Tesouro IPCA+ com Juros Semestrais 2032 — vencimento
+       15/08/2032" são mais longos que "Tesouro Selic 2031..." — um
+       <select> sem min-width:0 vira "min-content" no grid (não encolhe
+       abaixo do próprio conteúdo) e empurra a grade inteira pra fora da
+       página, trazendo rolagem horizontal mesmo com grid-template-columns
+       em fr. O truncamento com reticências deixa a opção comprida visível
+       por inteiro só no menu aberto (title também ajuda no hover). */
+    .tesouro-comparar-combos .calc-campo { min-width: 0; }
+    .tesouro-comparar-combos select {
+      min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
     .tesouro-comparar-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
     @media (max-width: 760px) {
       .tesouro-comparar-cards { grid-template-columns: 1fr; }
@@ -13531,7 +13542,15 @@
           ).join('');
           const padrao = tituloMaisProximoDoPrazo(lista, 5 * 365);
           if (padrao) select.value = padrao.id;
+          atualizarTituloComboComparar(select);
         });
+      }
+
+      // O texto trunca com reticências (CSS acima) porque alguns nomes
+      // são mais longos que "Tesouro Selic 2031" — o title mostra a
+      // opção inteira no hover, sem precisar abrir o menu.
+      function atualizarTituloComboComparar(select) {
+        select.title = select.selectedOptions?.[0]?.text || '';
       }
 
       function tituloSelecionadoComparar(familia) {
@@ -13990,7 +14009,11 @@
       });
 
       FAMILIAS_COMPARAR.forEach(({ selectId }) => {
-        document.getElementById(selectId)?.addEventListener('change', montarComparacao);
+        const select = document.getElementById(selectId);
+        select?.addEventListener('change', () => {
+          atualizarTituloComboComparar(select);
+          montarComparacao();
+        });
       });
       document.getElementById('tesouroCompararBtnPdf')?.addEventListener('click', gerarPdfComparar);
 
