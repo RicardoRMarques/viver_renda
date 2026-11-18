@@ -3554,6 +3554,19 @@
     .cr-visual-linhas { display: flex; flex-direction: column; gap: 6px; width: 100%; }
     .cr-visual-linha span { display: block; font-size: 0.6rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
     .cr-visual-linha strong { display: block; font-size: 0.92rem; font-weight: 800; color: var(--text); font-family: "Courier New", monospace; }
+    /* Boletim Focus (#boletim-focus) — tabela de medianas por ano +
+       grade de mini-gráficos (um por indicador). */
+    .focus-tabela-wrap { overflow-x: auto; margin: 10px 0 4px; }
+    .focus-tabela { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .focus-tabela th, .focus-tabela td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+    .focus-tabela th:first-child, .focus-tabela td:first-child { text-align: left; }
+    .focus-tabela thead th { color: var(--muted); font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+    .focus-tabela tbody th, .focus-tabela tbody td:first-child { font-weight: 700; color: var(--text); }
+    .focus-tabela tbody td { font-family: "Courier New", monospace; font-weight: 700; color: var(--text); }
+    .focus-mini-graficos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 10px; }
+    .focus-mini-grafico-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px 6px; }
+    .focus-mini-grafico-card h4 { margin: 0 0 6px; font-size: 0.82rem; font-weight: 800; color: var(--text); }
+    .focus-mini-grafico-canvas-wrap { position: relative; height: 170px; }
     .fire-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-top: 4px; }
     /* Bug pré-existente achado testando o come-cotas do Fundo DI: sem essa
        regra, [hidden] (ex: irCampoDatasWrap.hidden = true ao trocar pra
@@ -4545,6 +4558,7 @@
             </div>
             <div class="nav-dropdown-separador"></div>
             <a class="nav-dropdown-item" href="#juros-x-fiis">📉 Juros Futuros x Fundos Imobiliários</a>
+            <a class="nav-dropdown-item" href="#boletim-focus">🏦 O que o mercado espera (Boletim Focus)</a>
           </div>
         </div>
         <div class="nav-dropdown" id="navRendaFixaDropdown">
@@ -4680,6 +4694,7 @@
       <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Híbrido">↳ Híbrido</button>
     </div>
     <a href="#juros-x-fiis" class="mobile-menu-item">📉 Juros Futuros x Fundos Imobiliários</a>
+    <a href="#boletim-focus" class="mobile-menu-item">🏦 O que o mercado espera (Boletim Focus)</a>
     <div class="mobile-menu-separador">Renda Fixa</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirCalculadoraMenu"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="21" x2="21" y2="21"></line><line x1="5" y1="21" x2="5" y2="10"></line><line x1="19" y1="21" x2="19" y2="10"></line><line x1="9" y1="21" x2="9" y2="10"></line><line x1="15" y1="21" x2="15" y2="10"></line><polygon points="12 3 3 8 21 8 12 3"></polygon></svg> Calculadora Renda Fixa</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="basBtnAbrir">🏦 Índice de Basileia dos Bancos</button>
@@ -5021,6 +5036,56 @@
       </div>
 
       <button type="button" class="hg-btn" id="jurosFiisVerIfix">📈 Ver o histórico completo do IFIX</button>
+    </section>
+
+    <!-- O QUE O MERCADO ESPERA (BOLETIM FOCUS) — mediana das expectativas
+         de mercado do Banco Central pra PIB, IPCA, Selic e Câmbio. Mesmo
+         conteúdo do PDF semanal do Focus, só que vindo da API oficial
+         "Expectativas de Mercado" do BCB (Olinda/Dados Abertos) — sem
+         precisar interpretar PDF. Robô: coletar_boletim_focus.py. -->
+    <section class="hg-busca" id="boletim-focus" hidden>
+      <div class="tesouro-topo">
+        <h2 class="hg-titulo">
+          <svg class="hg-titulo-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon></svg>O que o mercado espera (Boletim Focus)
+        </h2>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="focusCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button type="button" class="lista-mercado-fechar" data-fechar-secao="boletim-focus" aria-label="Fechar">✕</button>
+        </div>
+      </div>
+
+      <p class="calc-ajuda" style="margin-top:0;">
+        Toda semana o Banco Central consulta centenas de bancos, gestoras e corretoras sobre pra onde PIB,
+        inflação, juros e câmbio devem ir — é o <strong>Boletim Focus</strong>. A <strong>mediana</strong> dessas
+        respostas é o consenso mais próximo que existe do que o mercado profissional está precificando pro
+        futuro — não é uma previsão garantida, mas ajuda a entender o cenário por trás de ações, FIIs e renda
+        fixa.
+      </p>
+
+      <div id="focusStatus" class="hg-status">Carregando Boletim Focus...</div>
+
+      <div id="focusConteudo" hidden>
+        <div class="focus-tabela-wrap">
+          <table class="focus-tabela" id="focusTabela">
+            <thead><tr><th>Indicador</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="calc-ajuda" id="focusFonte" style="font-size:0.78rem;"></p>
+
+        <h3 style="margin:18px 0 8px;">Evolução da mediana ao longo do tempo</h3>
+        <p class="calc-ajuda" style="margin-top:0;">
+          Cada gráfico mostra como a mediana pro ano corrente (linha cheia) e pro ano seguinte (linha tracejada)
+          foi mudando nos últimos meses — dá pra ver se o mercado está ficando mais otimista, mais pessimista,
+          ou mais ancorado numa expectativa de juros/inflação mais alta ou mais baixa.
+        </p>
+        <div class="focus-mini-graficos" id="focusMiniGraficos"></div>
+      </div>
     </section>
 
     <!-- NOTÍCIAS DO MERCADO ECONÔMICO — logo abaixo das calculadoras.
@@ -17987,6 +18052,142 @@
         titulo: 'Juros Futuros x Fundos Imobiliários — Viver de Renda',
         texto: 'Como a curva de juros futuros (DI) influencia o IFIX e os Fundos Imobiliários.',
       }));
+
+    // ============================================================
+    // O QUE O MERCADO ESPERA (BOLETIM FOCUS) — mediana das
+    // expectativas de mercado do BCB pra PIB/IPCA/Selic/Câmbio
+    // (data/boletim-focus.json, gerado por coletar_boletim_focus.py).
+    // Diferente da curva de juros (ANBIMA sem API de histórico), aqui
+    // o robô já entrega a série histórica pronta — não precisa montar
+    // união de vértices nem lidar com "anterior" separado.
+    // ============================================================
+    const FOCUS_INDICADORES = [
+      { chave: 'PIB Total', titulo: 'PIB Total', formato: (v) => `${hgFormatNumero(v)}%` },
+      { chave: 'IPCA', titulo: 'IPCA', formato: (v) => `${hgFormatNumero(v)}%` },
+      { chave: 'Selic', titulo: 'Selic', formato: (v) => `${hgFormatNumero(v)}%` },
+      { chave: 'Câmbio', titulo: 'Câmbio (R$/US$)', formato: (v) => `R$ ${hgFormatNumero(v)}` },
+    ];
+    let focusCarregada = false;
+    let focusCharts = [];
+    async function carregarBoletimFocus() {
+      if (focusCarregada) return;
+      focusCarregada = true;
+
+      const statusEl = document.getElementById('focusStatus');
+      const conteudoEl = document.getElementById('focusConteudo');
+      if (!statusEl) return;
+
+      try {
+        const resp = await fetch('data/boletim-focus.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const dados = await resp.json();
+        const indicadores = dados?.indicadores || {};
+
+        const indicadoresDisponiveis = FOCUS_INDICADORES.filter(ind => indicadores[ind.chave]);
+        if (!indicadoresDisponiveis.length) throw new Error('sem indicadores');
+
+        const anos = Object.keys(indicadores[indicadoresDisponiveis[0].chave].anos || {}).sort();
+        if (!anos.length) throw new Error('sem anos');
+
+        const tabela = document.getElementById('focusTabela');
+        tabela.querySelector('thead tr').innerHTML =
+          '<th>Indicador</th>' + anos.map(a => `<th>${a}</th>`).join('');
+        tabela.querySelector('tbody').innerHTML = indicadoresDisponiveis.map(ind => {
+          const dadosInd = indicadores[ind.chave];
+          const celulas = anos.map(a => {
+            const v = dadosInd.anos?.[a]?.mediana;
+            return `<td>${v != null ? ind.formato(v) : '—'}</td>`;
+          }).join('');
+          return `<tr><td>${ind.titulo}</td>${celulas}</tr>`;
+        }).join('');
+
+        const fonteEl = document.getElementById('focusFonte');
+        if (fonteEl) {
+          const dataFmt = dados.data_pesquisa
+            ? new Date(`${dados.data_pesquisa}T00:00:00`).toLocaleDateString('pt-BR')
+            : null;
+          fonteEl.textContent = 'Fonte: Banco Central do Brasil — Boletim Focus (mediana das expectativas de mercado)' +
+            (dataFmt ? `, pesquisa de ${dataFmt}.` : '.');
+        }
+
+        await hgCarregarChartJs();
+
+        const graficosEl = document.getElementById('focusMiniGraficos');
+        graficosEl.innerHTML = indicadoresDisponiveis.map((ind, i) => `
+          <div class="focus-mini-grafico-card">
+            <h4>${ind.titulo}</h4>
+            <div class="focus-mini-grafico-canvas-wrap"><canvas id="focusMiniChart${i}"></canvas></div>
+          </div>`).join('');
+
+        focusCharts.forEach(c => c.destroy());
+        focusCharts = [];
+        const [anoAtual, anoSeguinte] = anos;
+
+        indicadoresDisponiveis.forEach((ind, i) => {
+          const dadosInd = indicadores[ind.chave];
+          const histAtual = dadosInd.historico?.[anoAtual] || [];
+          const histSeguinte = anoSeguinte ? (dadosInd.historico?.[anoSeguinte] || []) : [];
+          const todasDatas = Array.from(new Set([
+            ...histAtual.map(p => p.data),
+            ...histSeguinte.map(p => p.data),
+          ])).sort();
+          if (!todasDatas.length) return;
+          const mapaAtual = new Map(histAtual.map(p => [p.data, p.mediana]));
+          const mapaSeguinte = new Map(histSeguinte.map(p => [p.data, p.mediana]));
+          const labels = todasDatas.map(d => new Date(`${d}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
+
+          const canvas = document.getElementById(`focusMiniChart${i}`);
+          if (!canvas) return;
+          const datasets = [{
+            label: anoAtual,
+            data: todasDatas.map(d => mapaAtual.has(d) ? mapaAtual.get(d) : null),
+            spanGaps: true, borderColor: HG_COR_PRIMARIA(), backgroundColor: 'transparent',
+            borderWidth: 2, pointRadius: 0, tension: 0.2,
+          }];
+          if (anoSeguinte && mapaSeguinte.size > 0) {
+            datasets.push({
+              label: anoSeguinte,
+              data: todasDatas.map(d => mapaSeguinte.has(d) ? mapaSeguinte.get(d) : null),
+              spanGaps: true, borderColor: HG_COR_MUTED(), backgroundColor: 'transparent',
+              borderDash: [5, 4], borderWidth: 2, pointRadius: 0, tension: 0.2,
+            });
+          }
+
+          const chart = new Chart(canvas, {
+            type: 'line',
+            data: { labels, datasets },
+            options: {
+              responsive: true, maintainAspectRatio: false, animation: false,
+              interaction: { mode: 'index', intersect: false },
+              plugins: {
+                legend: { display: datasets.length > 1, labels: { color: HG_COR_MUTED(), boxWidth: 10, font: { size: 10 } } },
+                tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.parsed.y === null ? '—' : ind.formato(c.parsed.y)}` } },
+              },
+              scales: {
+                x: { ticks: { color: HG_COR_MUTED(), maxTicksLimit: 6, font: { size: 9 } }, grid: { display: false } },
+                y: { ticks: { color: HG_COR_MUTED(), font: { size: 9 }, callback: (v) => ind.formato(Number(v)) }, grid: { color: HG_COR_GRID() } },
+              },
+            },
+          });
+          focusCharts.push(chart);
+        });
+
+        statusEl.hidden = true;
+        if (conteudoEl) conteudoEl.hidden = false;
+      } catch (e) {
+        console.error('Erro ao carregar o Boletim Focus:', e);
+        statusEl.hidden = false;
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Boletim Focus ainda não disponível no momento — tente novamente mais tarde.';
+        focusCarregada = false;
+      }
+    }
+    document.getElementById('focusCompartilharLink')?.addEventListener('click', (e) =>
+      hgCompartilharLinkFerramenta(e.currentTarget, {
+        hash: 'boletim-focus',
+        titulo: 'O que o mercado espera (Boletim Focus) — Viver de Renda',
+        texto: 'Mediana das expectativas de mercado pra PIB, IPCA, Selic e Câmbio, direto do Boletim Focus do Banco Central.',
+      }));
     // Reaproveita o card + gráfico que a Consulta Rápida já tem pronto pra
     // índice (INDEXB3:IFIX via ALIASES_INDICE) em vez de duplicar a busca
     // de histórico/desenho do gráfico numa segunda instância — menor risco
@@ -24245,6 +24446,7 @@
       // do hidden=false de cima, sem depender da ordem de registro entre
       // handlers do mesmo clique.
       if (id === 'juros-x-fiis') { carregarCurvaJuros(); carregarComparacaoJurosIfix(); }
+      if (id === 'boletim-focus') { carregarBoletimFocus(); }
       atualizarCabecalhoFixoListaMercado(secao);
       // scrollIntoView sozinho alinha o topo da seção com o topo da tela,
       // mas o cabeçalho do site é fixo — isso deixava o título e o botão
@@ -24298,14 +24500,14 @@
         texto: 'Cotações e indicadores de todos os Fundos Imobiliários da B3, num só lugar.',
       }));
 
-    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#tesouro-direto"], a[href="#taxa-justa"], a[href="#debentures"], a[href="#cri"], a[href="#cra"], a[href="#juros-x-fiis"]').forEach(link => {
+    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#tesouro-direto"], a[href="#taxa-justa"], a[href="#debentures"], a[href="#cri"], a[href="#cra"], a[href="#juros-x-fiis"], a[href="#boletim-focus"]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         revelarSecaoMercado(link.getAttribute('href').slice(1));
       });
     });
     // Link direto (compartilhado ou digitado na barra de endereço)
-    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#taxa-justa', '#debentures', '#cri', '#cra', '#rankings-fiis', '#alertas-preco', '#juros-x-fiis'].includes(window.location.hash)) {
+    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#taxa-justa', '#debentures', '#cri', '#cra', '#rankings-fiis', '#alertas-preco', '#juros-x-fiis', '#boletim-focus'].includes(window.location.hash)) {
       revelarSecaoMercado(window.location.hash.slice(1), { corrigirDepois: true });
     }
     // Botão "✕" no topo de cada lista — esconde a seção de novo e rola
