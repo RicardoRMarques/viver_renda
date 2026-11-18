@@ -13666,9 +13666,14 @@
             if (campo === 'ir') return `${hgFormatNumero(r.aliquota)}%`;
             return hgFormatMoeda(r.liquido);
           };
+          const ySimulacao = doc.lastAutoTable.finalY + 24;
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(11);
+          doc.setTextColor(0);
+          doc.text(`Simulação com ${hgFormatMoeda(valorSimulado)}`, 40, ySimulacao);
           doc.autoTable({
-            startY: doc.lastAutoTable.finalY + 18,
-            head: [['', ...titulos.map(() => '')]],
+            startY: ySimulacao + 10,
+            head: [cabecalho],
             body: [
               ['Valor investido', ...titulos.map(t => t ? hgFormatMoeda(valorSimulado) : '—')],
               ['Valor bruto estimado', ...titulos.map(t => t ? celulaSim(t, 'bruto') : '—')],
