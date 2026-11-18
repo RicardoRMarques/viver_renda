@@ -139,7 +139,24 @@ BANCOS = [
     {"ticker": "FIBRA",    "nome": "Banco Fibra",         "grupo": "emissor", "busca": ["FIBRA"]},
     {"ticker": "BARI",     "nome": "Banco Bari",          "grupo": "emissor", "busca": ["BANCO BARI", "BARI"]},
     {"ticker": "XP",       "nome": "Banco XP",            "grupo": "emissor", "busca": ["XP"]},
+    {"ticker": "TOPAZIO",  "nome": "Banco Topázio",       "grupo": "emissor", "busca": ["TOPAZIO"]},
+    {"ticker": "BOCOM",    "nome": "Banco BOCOM BBM",     "grupo": "emissor", "busca": ["BOCOM", "BBM"]},
+    {"ticker": "OURIBANK", "nome": "Ouribank",            "grupo": "emissor", "busca": ["OURIBANK", "OURINVEST"]},
+    # Paraná Banco: tinha ação na B3 (PRBC4), mas o símbolo não existe
+    # mais na HG Brasil (conferido: "852 - Símbolo não encontrado") — foi
+    # fechado capital. Por isso 'emissor', não 'listado': sem ticker
+    # vivo pra buscar valor de mercado/P-L/P-VP/ROE/DY.
+    {"ticker": "PRBC",     "nome": "Paraná Banco",        "grupo": "emissor", "busca": ["PARANA BANCO"]},
+    {"ticker": "BBCDIGITAL", "nome": "Banco BBC Digital", "grupo": "emissor", "busca": ["BBC DIGITAL", "BBC"]},
 ]
+
+# Pedidos pelo usuário mas NÃO entraram na lista acima — conferido contra
+# o IF.data de verdade (--dry-run) e nenhum dos dois apareceu em nenhum
+# dos três tipos de cadastro (1009 prudencial, 1005 conglomerado
+# financeiro, 1006 individual): "InfinitePay" (é instituição de
+# pagamento, não reporta Basileia como banco) e "Agroland" (não consta
+# em nenhum cadastro do IF.data desta data-base). Se um dia aparecerem
+# lá (ex: InfinitePay conseguir uma licença bancária), é só adicionar.
 
 # Empresas do mesmo grupo que NÃO são o banco. O índice de uma corretora
 # não diz nada sobre a solidez do banco e costuma ser bem mais alto —

@@ -1,6 +1,6 @@
 {
   "_leia_me": "Índice de Basileia dos bancos, usado na tabela do site. Os bancos vêm em dois grupos: 'listado' (tem ação na B3 — o site busca também valor de mercado, P/L, P/VP, ROE e DY) e 'emissor' (não tem ação, mas emite CDB/LCI/LCA — só a coluna de Basileia é preenchida). Enquanto não houver coleta automática, este arquivo é atualizado à mão a cada divulgação trimestral. O site monta o seletor a partir de 'periodos': basta acrescentar um período novo no TOPO da lista que ele aparece sozinho, sem mexer no index.html.",
-  "atualizado_em": "2026-09-15",
+  "atualizado_em": "2026-11-18",
   "fonte": "IF.data — Banco Central do Brasil",
   "bancos": [
     {
@@ -157,6 +157,31 @@
       "ticker": "XP",
       "nome": "Banco XP",
       "grupo": "emissor"
+    },
+    {
+      "ticker": "TOPAZIO",
+      "nome": "Banco Topázio",
+      "grupo": "emissor"
+    },
+    {
+      "ticker": "BOCOM",
+      "nome": "Banco BOCOM BBM",
+      "grupo": "emissor"
+    },
+    {
+      "ticker": "OURIBANK",
+      "nome": "Ouribank",
+      "grupo": "emissor"
+    },
+    {
+      "ticker": "PRBC",
+      "nome": "Paraná Banco",
+      "grupo": "emissor"
+    },
+    {
+      "ticker": "BBCDIGITAL",
+      "nome": "Banco BBC Digital",
+      "grupo": "emissor"
     }
   ],
   "periodos": [
@@ -176,6 +201,7 @@
         "BEES3": 14.89,
         "BMGB4": 13.32,
         "SANB11": 15.34,
+        "PRBC": 15.69,
         "SFSA4": 16.5,
         "ABCB4": 16.18,
         "BBAS3": 13.91,
@@ -185,10 +211,14 @@
         "BARI": 20.98,
         "BRBI11": 21.59,
         "INTER": 14.4,
+        "OURIBANK": 17.56,
         "FIBRA": 11.23,
+        "TOPAZIO": 23.45,
         "DAYCOVAL": 12.84,
         "XP": 13.28,
         "AGIBANK": 13.89,
+        "BBCDIGITAL": 11.31,
+        "BOCOM": 17.21,
         "NUBANK": 15.51,
         "PAGBANK": 15.04,
         "C6": 12.57,
