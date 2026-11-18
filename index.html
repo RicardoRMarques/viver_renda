@@ -465,6 +465,9 @@
        tabela de Basileia: o overflow-x do wrap interno vira o bloco de
        referência do position:sticky, e o `top:0` passa a valer em relação
        a um elemento que não rola verticalmente — ou seja, não gruda nada. */
+    .tesouro-simular-wrap { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+    .tesouro-simular-wrap .calc-campo { margin: 0; min-width: 180px; }
+    .tesouro-simular-wrap .calc-ajuda { flex: 1; min-width: 200px; font-size: 0.78rem; }
     .tesouro-tabela-wrap { max-height: 60vh; overflow: auto; margin-top: 10px; }
     .tesouro-tabela { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
     .tesouro-tabela th, .tesouro-tabela td { padding: 9px 10px; text-align: left; white-space: nowrap; }
@@ -5126,6 +5129,17 @@
           <a href="https://www.tesourodireto.com.br" target="_blank" rel="noopener noreferrer">portal oficial</a>
           antes de investir.
         </span>
+      </div>
+
+      <div class="tesouro-simular-wrap">
+        <div class="calc-campo">
+          <label for="tesouroSimularValor">Simular com quanto?</label>
+          <div class="calc-input-prefixado">
+            <span class="calc-prefixo">R$</span>
+            <input type="text" inputmode="numeric" id="tesouroSimularValor" placeholder="10.000,00" />
+          </div>
+        </div>
+        <span class="calc-ajuda" style="margin:0;">preenche a coluna "Simulação" com o valor líquido estimado no vencimento de cada título, pela taxa de hoje.</span>
       </div>
 
       <div class="hg-chips" id="tesouroFiltros"></div>
@@ -13208,7 +13222,13 @@
       const filtrosEl = document.getElementById('tesouroFiltros');
       const statusEl = document.getElementById('tesouroStatus');
       const rodapeEl = document.getElementById('tesouroRodape');
+      const inSimular = document.getElementById('tesouroSimularValor');
       if (!secao || !tabelaEl) return;
+
+      // Valor digitado pra simular — pré-preenchido com um valor redondo
+      // só pra a coluna já nascer com números, em vez de uma tabela cheia
+      // de "—" na primeira visita.
+      hgAplicarMascaraMoeda(inSimular, 10000);
 
       let dados = null;
       let carregando = null;
@@ -13234,15 +13254,51 @@
         { chave: 'rentabilidade', rotulo: 'Rentabilidade',       tipo: 'taxa',   num: false, glossario: 'tesouro-rentabilidade-col' },
         { chave: 'pu',            rotulo: 'Preço unitário',      tipo: 'numero', num: true,  glossario: 'tesouro-pu-col' },
         { chave: 'minimo',        rotulo: 'Investimento mínimo', tipo: 'numero', num: true,  glossario: 'tesouro-minimo-col' },
+        { chave: 'simulacao',     rotulo: 'Simulação',           tipo: 'numero', num: true,  glossario: 'tesouro-simulacao-col' },
       ];
 
       const puDe = (t) => (typeof t.pu_compra === 'number' ? t.pu_compra : t.pu_venda);
+
+      // Projeta quanto o valor digitado renderia até o vencimento, pela
+      // taxa de HOJE (sem considerar que Selic/IPCA/custódia podem mudar
+      // no caminho — é uma estimativa, igual a calculadora "Vale a
+      // Pena" já deixa claro). Reaproveita window.vrRendaFixa em vez de
+      // duplicar a conta de taxaDoTesouro/custódia/IR aqui: é a mesma
+      // regra "só pode haver uma conta" já usada nessa comparação.
+      function simularTitulo(t, valor) {
+        if (!(valor > 0) || !t.vencimento || !window.vrRendaFixa) return null;
+        if (pagaEmParcelas(t)) return null; // paga renda mensal, não 1 valor único no vencimento
+        const dias = Math.round((new Date(t.vencimento + 'T00:00:00') - new Date()) / 86400000);
+        if (!(dias > 0)) return null;
+        const taxaBruta = window.vrRendaFixa.taxaDoTesouro(t);
+        const custodia = window.vrRendaFixa.custodiaAnualPct(t, valor);
+        const taxaLiquidaCustodia = taxaBruta - custodia;
+        const bruto = valor * Math.pow(1 + taxaLiquidaCustodia / 100, dias / 365);
+        const rendimento = bruto - valor;
+        const aliquota = window.vrRendaFixa.aliquotaIrRegressiva(dias);
+        const ir = rendimento > 0 ? rendimento * aliquota / 100 : 0;
+        const liquido = bruto - ir;
+        return { dias, bruto, liquido, aliquota };
+      }
+
+      function celulaSimulacao(t) {
+        const valor = hgValorMascarado(inSimular);
+        if (!(valor > 0)) return '—';
+        if (pagaEmParcelas(t)) {
+          return '<span class="tesouro-sub" title="Este título paga renda mensal, não um valor único no vencimento — a simulação de valor final não se aplica aqui.">paga em parcelas</span>';
+        }
+        const r = simularTitulo(t, valor);
+        if (!r) return '—';
+        return hgFormatMoeda(r.liquido) +
+          '<div class="tesouro-sub">bruto ' + hgFormatMoeda(r.bruto) + ' · IR ' + hgFormatNumero(r.aliquota) + '%</div>';
+      }
 
       function valorPara(t, chave) {
         if (chave === 'titulo') return t.nome || null;
         if (chave === 'vencimento') return t.vencimento || null;
         if (chave === 'pu') return typeof puDe(t) === 'number' ? puDe(t) : null;
         if (chave === 'minimo') return typeof t.investimento_minimo === 'number' ? t.investimento_minimo : null;
+        if (chave === 'simulacao') return simularTitulo(t, hgValorMascarado(inSimular))?.liquido ?? null;
         return null;
       }
 
@@ -13430,6 +13486,7 @@
               '</td>' +
               '<td class="tesouro-num">' + (typeof pu === 'number' ? hgFormatMoeda(pu) : '—') + '</td>' +
               '<td class="tesouro-num">' + (typeof t.investimento_minimo === 'number' ? hgFormatMoeda(t.investimento_minimo) : '—') + '</td>' +
+              '<td class="tesouro-num">' + celulaSimulacao(t) + '</td>' +
               '</tr>';
           }).join('') +
           '</tbody>';
@@ -13509,6 +13566,8 @@
         montarFiltros();
         montarTabela();
       });
+
+      inSimular?.addEventListener('input', () => { if (dados) montarTabela(); });
 
       // Só busca o JSON quando a seção é realmente revelada — ela nasce
       // [hidden] e a maior parte das visitas nunca abre essa parte do site.
@@ -21529,6 +21588,7 @@
         'tesouro-rentabilidade-col': 'A taxa combinada na compra, mas o que ela significa muda com o indexador — por isso vem escrita por extenso:\n\n• Tesouro Selic: um spread sobre a Selic (ex: "Selic + 0,05%") — rende perto da taxa básica de juros.\n• Tesouro IPCA+: uma taxa REAL acima da inflação (ex: "IPCA + 6,68%") — o que sobra depois de corrigir pelo IPCA.\n• Tesouro Prefixado: a taxa nominal cheia (ex: "13,27% a.a.") — já inclui a inflação esperada, sem reajuste.\n\nNão dá pra comparar os três pelo número cru: 0,05% do Selic não é "pior" que 6,68% do IPCA+, são grandezas diferentes.',
         'tesouro-pu-col': 'Preço Unitário (PU) = quanto custa 1 título inteiro hoje, se você comprasse 100% dele.\n\nNinguém precisa pagar esse valor todo: o Tesouro Direto permite comprar frações (a partir de 1%), que é exatamente o que a coluna "Investimento mínimo" ao lado mostra.',
         'tesouro-minimo-col': 'O menor valor que dá pra investir nesse título — geralmente 1% do Preço Unitário (PU).\n\nCálculo: PU ÷ 100. É por isso que títulos de PU mais alto (como os IPCA+ de vencimento distante) ainda têm investimento mínimo baixo.',
+        'tesouro-simulacao-col': 'Quanto o valor digitado em "Simular com quanto?" renderia LÍQUIDO (já descontado IR e a custódia da B3) se ficasse parado até o vencimento, pela taxa de HOJE.\n\nÉ uma estimativa, não uma promessa: a Selic pode mudar, o IPCA acumulado até lá é só uma projeção, e quem vende o título antes do vencimento pode receber mais ou menos por causa da marcação a mercado.\n\nTítulos que pagam renda mensal (Educa+, Renda+) aparecem como "paga em parcelas" aqui, porque não entregam um valor único no fim — o cálculo de "valor final" não se aplica a eles.',
 
         'dy-acoes': 'Dividend Yield (DY) = quanto a empresa pagou em dividendos/proventos nos últimos 12 meses, em relação à cotação atual da ação.\n\nCálculo: dividendos pagos em 12 meses / cotação atual × 100',
         'valor-mercado': 'Valor de Mercado (Market Cap) = valor total da empresa negociado na bolsa.\n\nCálculo: cotação atual × número total de ações em circulação.',
