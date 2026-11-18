@@ -479,6 +479,32 @@
        pro tamanho do valor principal (bem mais curto) e o detalhe cai
        pra uma segunda linha por baixo. */
     .tesouro-tabela td .tesouro-sub { white-space: normal; }
+    /* Comparador "Selic x Prefixado x IPCA+" — 3 combos + 3 cards lado a
+       lado, empilhando em telas estreitas. */
+    .tesouro-comparar-combos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 4px; }
+    @media (max-width: 760px) {
+      .tesouro-comparar-combos { grid-template-columns: 1fr; }
+    }
+    .tesouro-comparar-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+    @media (max-width: 760px) {
+      .tesouro-comparar-cards { grid-template-columns: 1fr; }
+    }
+    .tesouro-comparar-card {
+      background: var(--card); border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 12px 14px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .tesouro-comparar-card-titulo { font-weight: 800; font-size: 0.9rem; color: var(--text); margin-bottom: 2px; }
+    .tesouro-comparar-card-linha { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; }
+    .tesouro-comparar-card-linha span { color: var(--muted); }
+    .tesouro-comparar-card-linha strong { text-align: right; font-family: "Courier New", monospace; }
+    .tesouro-comparar-card-destaque {
+      margin-top: 6px; padding-top: 8px; border-top: 1px dashed var(--border);
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .tesouro-comparar-card-destaque span { font-size: 0.68rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+    .tesouro-comparar-card-destaque strong { font-size: 1.05rem; font-weight: 800; color: var(--primary); font-family: "Courier New", monospace; }
+    .tesouro-comparar-card-destaque small { font-size: 0.74rem; color: var(--muted); }
+    .tesouro-comparar-acoes { margin-top: 12px; }
     .tesouro-tabela thead th {
       font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;
       color: var(--primary); font-weight: 700;
@@ -5174,6 +5200,33 @@
         Educa+ e o Renda+ pagam renda mensal por anos, não um valor único no vencimento — por isso aparecem
         como "paga em parcelas" na coluna Simulação.
       </p>
+
+      <h3 style="margin:24px 0 8px;">Comparar Selic x Prefixado x IPCA+</h3>
+      <p class="calc-ajuda" style="margin-top:0;">
+        Escolha um título de cada tipo pra ver lado a lado: o Selic acompanha a Selic dia a dia, o Prefixado
+        trava uma taxa fixa até o vencimento, e o IPCA+ garante um ganho real acima da inflação — cada um reage
+        diferente ao que acontece com os juros e a inflação pela frente. Usa o mesmo valor de "Simular com
+        quanto?" acima.
+      </p>
+      <div class="tesouro-comparar-combos">
+        <div class="calc-campo">
+          <label for="tesouroCompararSelic">Tesouro Selic</label>
+          <select id="tesouroCompararSelic"></select>
+        </div>
+        <div class="calc-campo">
+          <label for="tesouroCompararPre">Tesouro Prefixado</label>
+          <select id="tesouroCompararPre"></select>
+        </div>
+        <div class="calc-campo">
+          <label for="tesouroCompararIpca">Tesouro IPCA+</label>
+          <select id="tesouroCompararIpca"></select>
+        </div>
+      </div>
+      <div id="tesouroCompararStatus" class="hg-status"></div>
+      <div id="tesouroCompararCards" class="tesouro-comparar-cards"></div>
+      <div class="tesouro-comparar-acoes" id="tesouroCompararAcoes" hidden>
+        <button type="button" class="hg-btn" id="tesouroCompararBtnPdf">📄 Baixar PDF comparativo</button>
+      </div>
 
       <!-- Tesouro Reserva: título novo (11/05/2026), ainda só disponível
            via Banco do Brasil e sem marcação a mercado — por isso não
@@ -13433,6 +13486,214 @@
         doc.save(nomeArquivoPdfTitulo(t));
       }
 
+      // ============================================================
+      // COMPARAR SELIC x PREFIXADO x IPCA+ — 3 combos (um por família),
+      // cada um deixando escolher QUALQUER título daquele tipo (podem
+      // ter vencimentos bem diferentes entre si, de propósito — é o
+      // usuário quem decide o que comparar, não o site). Reaproveita
+      // puDe/taxaPorExtenso/dataBr/simularTitulo já definidos acima.
+      // ============================================================
+      const FAMILIAS_COMPARAR = [
+        { familia: 'selic', selectId: 'tesouroCompararSelic', rotulo: 'Tesouro Selic' },
+        { familia: 'prefixado', selectId: 'tesouroCompararPre', rotulo: 'Tesouro Prefixado' },
+        { familia: 'ipca', selectId: 'tesouroCompararIpca', rotulo: 'Tesouro IPCA+' },
+      ];
+
+      function titulosDaFamilia(familia) {
+        return (dados?.titulos || [])
+          .filter(t => familiaDe(t) === familia && t.vencimento)
+          .sort((a, b) => a.vencimento < b.vencimento ? -1 : a.vencimento > b.vencimento ? 1 : 0);
+      }
+
+      // Pré-seleciona um título de cada família perto de 5 anos pela
+      // frente — só um ponto de partida razoável pra comparação "justa"
+      // (prazos parecidos); o usuário troca livremente em cada combo.
+      function tituloMaisProximoDoPrazo(lista, diasAlvo) {
+        if (!lista.length) return null;
+        const alvo = Date.now() + diasAlvo * 86400000;
+        const dist = (t) => Math.abs(new Date(t.vencimento + 'T00:00:00').getTime() - alvo);
+        return lista.reduce((melhor, t) => (dist(t) < dist(melhor) ? t : melhor));
+      }
+
+      function montarCombosComparar() {
+        FAMILIAS_COMPARAR.forEach(({ familia, selectId }) => {
+          const select = document.getElementById(selectId);
+          if (!select) return;
+          const lista = titulosDaFamilia(familia);
+          if (!lista.length) {
+            select.innerHTML = '<option value="">Nenhum título disponível</option>';
+            select.disabled = true;
+            return;
+          }
+          select.disabled = false;
+          select.innerHTML = lista.map(t =>
+            `<option value="${t.id}">${t.nome} — vencimento ${dataBr(t.vencimento)}</option>`
+          ).join('');
+          const padrao = tituloMaisProximoDoPrazo(lista, 5 * 365);
+          if (padrao) select.value = padrao.id;
+        });
+      }
+
+      function tituloSelecionadoComparar(familia) {
+        const info = FAMILIAS_COMPARAR.find(f => f.familia === familia);
+        const select = info && document.getElementById(info.selectId);
+        const id = select?.value;
+        if (!id) return null;
+        return (dados?.titulos || []).find(t => t.id === id) || null;
+      }
+
+      function montarCardComparar(t) {
+        if (!t) {
+          return '<div class="tesouro-comparar-card"><span class="calc-ajuda" style="margin:0;">Nenhum título disponível nesta categoria.</span></div>';
+        }
+        const pu = puDe(t);
+        const valor = hgValorMascarado(inSimular);
+        let destaqueHtml = '<span class="calc-ajuda" style="margin:0;">Preencha "Simular com quanto?" acima.</span>';
+        if (pagaEmParcelas(t)) {
+          destaqueHtml = '<span class="calc-ajuda" style="margin:0;" title="Este título paga renda mensal, não um valor único no vencimento.">Paga em parcelas — não se aplica</span>';
+        } else if (valor > 0) {
+          const r = simularTitulo(t, valor);
+          if (r) {
+            destaqueHtml =
+              '<span>Valor líquido estimado</span>' +
+              '<strong>' + hgFormatMoeda(r.liquido) + '</strong>' +
+              '<small>bruto ' + hgFormatMoeda(r.bruto) + ' · IR ' + hgFormatNumero(r.aliquota) + '%</small>';
+          }
+        }
+        return (
+          '<div class="tesouro-comparar-card">' +
+          '<div class="tesouro-comparar-card-titulo">' + t.nome + '</div>' +
+          '<div class="tesouro-comparar-card-linha"><span>Vencimento</span><strong>' + dataBr(t.vencimento) + '</strong></div>' +
+          '<div class="tesouro-comparar-card-linha"><span>Rentabilidade</span><strong>' + taxaPorExtenso(t) + '</strong></div>' +
+          '<div class="tesouro-comparar-card-linha"><span>Preço unitário</span><strong>' + (typeof pu === 'number' ? hgFormatMoeda(pu) : '—') + '</strong></div>' +
+          '<div class="tesouro-comparar-card-linha"><span>Investimento mínimo</span><strong>' + (typeof t.investimento_minimo === 'number' ? hgFormatMoeda(t.investimento_minimo) : '—') + '</strong></div>' +
+          '<div class="tesouro-comparar-card-destaque">' + destaqueHtml + '</div>' +
+          '</div>'
+        );
+      }
+
+      function montarComparacao() {
+        const cardsEl = document.getElementById('tesouroCompararCards');
+        const acoesEl = document.getElementById('tesouroCompararAcoes');
+        if (!cardsEl) return;
+        const titulos = FAMILIAS_COMPARAR.map(f => tituloSelecionadoComparar(f.familia));
+        cardsEl.innerHTML = titulos.map(montarCardComparar).join('');
+        if (acoesEl) acoesEl.hidden = !titulos.some(t => t);
+      }
+
+      function nomeArquivoPdfComparar() {
+        return 'tesouro-direto-comparativo.pdf';
+      }
+
+      async function montarDocumentoPdfComparar() {
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+        const titulos = FAMILIAS_COMPARAR.map(f => tituloSelecionadoComparar(f.familia));
+        if (!titulos.some(t => t)) return null;
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Tesouro Direto — Selic x Prefixado x IPCA+', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
+        doc.setFontSize(8);
+        doc.text(
+          'Conteúdo educativo. Preço e taxa de referência do dia — não é garantia de disponibilidade nem recomendação de compra.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        const cabecalho = ['', ...titulos.map(t => t ? t.nome : '—')];
+        const linha = (rotulo, fn) => [rotulo, ...titulos.map(t => t ? fn(t) : '—')];
+        const linhasDados = [
+          linha('Vencimento', t => dataBr(t.vencimento)),
+          linha('Rentabilidade', t => taxaPorExtenso(t)),
+          linha('Preço unitário', t => { const pu = puDe(t); return typeof pu === 'number' ? hgFormatMoeda(pu) : '—'; }),
+          linha('Investimento mínimo', t => typeof t.investimento_minimo === 'number' ? hgFormatMoeda(t.investimento_minimo) : '—'),
+        ];
+        doc.autoTable({
+          startY: 88,
+          head: [cabecalho],
+          body: linhasDados,
+          theme: 'grid',
+          styles: { fontSize: 8.5, cellPadding: 6, halign: 'center' },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255 },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255, halign: 'left' } },
+        });
+
+        const valorSimulado = hgValorMascarado(inSimular);
+        if (valorSimulado > 0) {
+          const celulaSim = (t, campo) => {
+            if (pagaEmParcelas(t)) return campo === 'liquido' ? 'paga em parcelas' : '—';
+            const r = simularTitulo(t, valorSimulado);
+            if (!r) return '—';
+            if (campo === 'bruto') return hgFormatMoeda(r.bruto);
+            if (campo === 'ir') return `${hgFormatNumero(r.aliquota)}%`;
+            return hgFormatMoeda(r.liquido);
+          };
+          doc.autoTable({
+            startY: doc.lastAutoTable.finalY + 18,
+            head: [['', ...titulos.map(() => '')]],
+            body: [
+              ['Valor investido', ...titulos.map(t => t ? hgFormatMoeda(valorSimulado) : '—')],
+              ['Valor bruto estimado', ...titulos.map(t => t ? celulaSim(t, 'bruto') : '—')],
+              ['IR estimado', ...titulos.map(t => t ? celulaSim(t, 'ir') : '—')],
+              ['Valor líquido estimado', ...titulos.map(t => t ? celulaSim(t, 'liquido') : '—')],
+            ],
+            theme: 'grid',
+            styles: { fontSize: 8.5, cellPadding: 6, halign: 'center' },
+            didParseCell: (data) => {
+              if (data.row.index === 0) {
+                data.cell.styles.fillColor = [119, 119, 119];
+                data.cell.styles.textColor = 255;
+              }
+            },
+            columnStyles: { 0: { fontStyle: 'bold', halign: 'left' } },
+          });
+        }
+
+        const larguraUtil = doc.internal.pageSize.getWidth() - 80;
+        const yRodape = doc.lastAutoTable.finalY + 20;
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(90);
+        doc.text(
+          `Posição de ${dados?.data_base ? dataBr(dados.data_base) : '—'} · Fonte: ${dados?.fonte || 'Tesouro Transparente — Tesouro Nacional'}.`,
+          40, yRodape
+        );
+        doc.text(
+          'Simulação aproximada com a taxa de hoje — não considera mudança de Selic/IPCA no caminho nem marcação a mercado se vender antes do vencimento. Confirme disponibilidade e preço final no portal oficial antes de investir.',
+          40, yRodape + 12, { maxWidth: larguraUtil }
+        );
+
+        return doc;
+      }
+
+      async function gerarPdfComparar() {
+        const doc = await montarDocumentoPdfComparar();
+        if (!doc) {
+          if (window.jspdf) alert('Escolha ao menos um título pra gerar o comparativo.');
+          return;
+        }
+        doc.save(nomeArquivoPdfComparar());
+      }
+
       function valorPara(t, chave) {
         if (chave === 'titulo') return t.nome || null;
         if (chave === 'vencimento') return t.vencimento || null;
@@ -13676,6 +13937,8 @@
         montarFiltros();
         montarTabela();
         montarRodape();
+        montarCombosComparar();
+        montarComparacao();
       }
 
       tabelaEl.addEventListener('click', (e) => {
@@ -13720,7 +13983,16 @@
         montarTabela();
       });
 
-      inSimular?.addEventListener('input', () => { if (dados) montarTabela(); });
+      inSimular?.addEventListener('input', () => {
+        if (!dados) return;
+        montarTabela();
+        montarComparacao();
+      });
+
+      FAMILIAS_COMPARAR.forEach(({ selectId }) => {
+        document.getElementById(selectId)?.addEventListener('change', montarComparacao);
+      });
+      document.getElementById('tesouroCompararBtnPdf')?.addEventListener('click', gerarPdfComparar);
 
       // Só busca o JSON quando a seção é realmente revelada — ela nasce
       // [hidden] e a maior parte das visitas nunca abre essa parte do site.
