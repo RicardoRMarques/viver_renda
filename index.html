@@ -13388,6 +13388,7 @@
               startY: doc.lastAutoTable.finalY + 18,
               head: [['', `Simulação com ${hgFormatMoeda(valorSimulado)}`]],
               body: [
+                ['Valor investido', hgFormatMoeda(valorSimulado)],
                 ['Dias até o vencimento', String(r.dias)],
                 ['Valor bruto estimado', hgFormatMoeda(r.bruto)],
                 ['IR estimado', `${hgFormatNumero(r.aliquota)}%`],
