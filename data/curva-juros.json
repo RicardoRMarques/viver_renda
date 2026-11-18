@@ -2,88 +2,88 @@
  "_leia_me": "Curva de juros futuros (ETTJ prefixada), publicada diariamente pela ANBIMA — o mercado se refere a ela como \"curva de juros\", \"curva do DI futuro\" ou \"curva pré\" (nos contratos futuros negociados na B3, cada vencimento tem um código DI1 + letra do mês + ano, ex: DI1F27 = janeiro/2027 — a ETTJ da ANBIMA é a versão dessa mesma curva já ajustada por modelo, suave, a partir desses títulos). Cada ponto em 'pontos' é um vértice (prazo em dias úteis — 252 é aproximadamente 1 ano) com a taxa anual prefixada (%) que o mercado precifica para esse prazo, ajustada pelo modelo da própria ANBIMA (Svensson/Nelson-Siegel) a partir dos títulos públicos negociados no dia. Quando essa curva sobe (sobretudo nos vértices mais longos), FIIs tendem a cair — a renda fixa fica mais atraente na comparação; quando recua, o movimento costuma ser o oposto. Ver seção 'Juros Futuros x Fundos Imobiliários' em viverderenda.dev.br.",
  "fonte": "ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ), curva prefixada",
  "fonte_url": "https://www.anbima.com.br/informacoes/est-termo/",
- "data_referencia": "2026-11-16",
- "atualizado_em": "2026-11-17T05:05:55+00:00",
+ "data_referencia": "2026-11-17",
+ "atualizado_em": "2026-11-18T04:22:35+00:00",
  "pontos": [
   {
    "dias": 126,
-   "taxa": 13.9605
+   "taxa": 13.8986
   },
   {
    "dias": 252,
-   "taxa": 14.3974
+   "taxa": 14.2752
   },
   {
    "dias": 378,
-   "taxa": 14.7502
+   "taxa": 14.592
   },
   {
    "dias": 504,
-   "taxa": 15.0103
+   "taxa": 14.8287
   },
   {
    "dias": 630,
-   "taxa": 15.1966
+   "taxa": 14.9992
   },
   {
    "dias": 756,
-   "taxa": 15.3284
+   "taxa": 15.1206
   },
   {
    "dias": 882,
-   "taxa": 15.4203
+   "taxa": 15.2061
   },
   {
    "dias": 1008,
-   "taxa": 15.4828
+   "taxa": 15.2654
   },
   {
    "dias": 1134,
-   "taxa": 15.5237
+   "taxa": 15.3053
   },
   {
    "dias": 1260,
-   "taxa": 15.5482
+   "taxa": 15.3308
   },
   {
    "dias": 1386,
-   "taxa": 15.5604
+   "taxa": 15.3453
   },
   {
    "dias": 1512,
-   "taxa": 15.5634
+   "taxa": 15.3517
   },
   {
    "dias": 1638,
-   "taxa": 15.5595
+   "taxa": 15.3519
   },
   {
    "dias": 1764,
-   "taxa": 15.5505
+   "taxa": 15.3475
   },
   {
    "dias": 1890,
-   "taxa": 15.5377
+   "taxa": 15.3396
   },
   {
    "dias": 2016,
-   "taxa": 15.5222
+   "taxa": 15.3293
   },
   {
    "dias": 2142,
-   "taxa": 15.5048
+   "taxa": 15.3172
   },
   {
    "dias": 2268,
-   "taxa": 15.4862
+   "taxa": 15.3039
   },
   {
    "dias": 2394,
-   "taxa": 15.4669
+   "taxa": 15.2898
   },
   {
    "dias": 2520,
-   "taxa": 15.4473
+   "taxa": 15.2753
   }
  ]
 }

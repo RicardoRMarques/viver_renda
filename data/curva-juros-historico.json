@@ -1,7 +1,7 @@
 {
  "_leia_me": "Série histórica de um ponto representativo da curva de juros futuros (ETTJ prefixada, vértice fixo de 252 dias úteis, ~1 ano) — 1 valor por dia útil, acumulado ao longo do tempo por este robô (a ANBIMA só disponibiliza a foto do dia, não uma série longa pronta). Serve pra comparar visualmente com o histórico do IFIX e ver se os dois se movem de forma inversa — ver seção 'Juros Futuros x Fundos Imobiliários' em viverderenda.dev.br.",
  "vertice_dias": 252,
- "atualizado_em": "2026-11-17T05:05:55+00:00",
+ "atualizado_em": "2026-11-18T04:22:35+00:00",
  "pontos": [
   {
    "data": "2026-11-05",
@@ -34,6 +34,10 @@
   {
    "data": "2026-11-16",
    "taxa": 14.3974
+  },
+  {
+   "data": "2026-11-17",
+   "taxa": 14.2752
   }
  ]
 }
