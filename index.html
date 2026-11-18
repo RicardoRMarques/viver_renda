@@ -25635,7 +25635,7 @@
         return [
           { id: 'cdb', nome: 'CDB', tributado: true, custodia: false, taxaAnual: taxaEfetivaPorIndexador(cdbTaxaInformada, cdbIndexador) },
           { id: 'lci', nome: 'LCI/LCA', tributado: false, custodia: false, taxaAnual: taxaEfetivaPorIndexador(lciTaxaInformada, lciIndexador) },
-          { id: 'tesouro_selic', nome: 'Tesouro Selic', tributado: true, custodia: true, taxaAnual: selic * 1.00 },
+          { id: 'tesouro_selic', nome: 'Tesouro Selic', tributado: true, custodia: true, ehSelic: true, taxaAnual: selic * 1.00 },
           { id: 'tesouro_pre', nome: 'Tesouro Prefixado', tributado: true, custodia: true, taxaAnual: selic + 0.5 },
           { id: 'tesouro_ipca', nome: 'Tesouro IPCA+', tributado: true, custodia: true, taxaAnual: TAXA_REAL_IPCA_PADRAO + ipca },
           { id: 'poupanca', nome: 'Poupança', tributado: false, custodia: false, taxaAnual: selic > 8.5 ? 6.17 : selic * 0.70 },
@@ -25690,8 +25690,25 @@
         return 0.15;
       }
 
+      // Taxa de custódia B3 (% a.a.) sobre um saldo médio — reaproveita
+      // window.vrRendaFixa.custodiaAnualPct (calculadora "Vale a Pena") em
+      // vez de repetir a regra aqui: ela já sabe que só o Tesouro SELIC
+      // tem isenção nos primeiros R$ 10.000 (Prefixado/IPCA+ pagam 0,20%
+      // desde o primeiro real). Sem isso, um Tesouro Selic de R$ 50 mil
+      // simulado aqui pagava 0,20% sobre TUDO, cobrando custódia a mais
+      // do que o real — foi o que gerou a divergência encontrada ao
+      // comparar esta calculadora com a coluna "Simulação" do Tesouro
+      // Direto (mesmo valor, título real Selic 2031): esta calculadora
+      // cobrava ~R$120 de custódia a mais só por não aplicar a isenção.
+      function custodiaPctAnual(ehSelic, saldoMedio) {
+        if (window.vrRendaFixa) {
+          return window.vrRendaFixa.custodiaAnualPct({ indexador: ehSelic ? 'selic' : 'outro' }, saldoMedio);
+        }
+        return 0.20; // fallback só se a outra calculadora não tiver carregado
+      }
+
       // Simula um produto: retorna { totalInvestido, valorBruto, ir, custodia, valorLiquido }
-      function simularProduto({ taxaAnualPct, tributado, custodia }, valorInicial, aporteMensal, prazoMeses) {
+      function simularProduto({ taxaAnualPct, tributado, custodia, ehSelic }, valorInicial, aporteMensal, prazoMeses) {
         const taxaMensal = Math.pow(1 + taxaAnualPct / 100, 1 / 12) - 1;
         let saldo = valorInicial;
         for (let m = 0; m < prazoMeses; m++) {
@@ -25703,9 +25720,8 @@
 
         let custodiaValor = 0;
         if (custodia) {
-          // Aproximação simples: 0,20% a.a. sobre o saldo médio, pró-rata do prazo.
           const saldoMedio = (valorInicial + valorBruto) / 2;
-          custodiaValor = saldoMedio * 0.002 * (prazoMeses / 12);
+          custodiaValor = saldoMedio * (custodiaPctAnual(ehSelic, saldoMedio) / 100) * (prazoMeses / 12);
           rendimentoBruto -= custodiaValor;
         }
 
@@ -25721,7 +25737,7 @@
       // (não só o total final) — usada na aba "Mês a mês". O loop é
       // idêntico de propósito: a última linha precisa bater exatamente com
       // o resultado final que simularProduto() calcularia pro mesmo prazo.
-      function simularProdutoMesAMes({ taxaAnualPct, tributado, custodia }, valorInicial, aporteMensal, prazoMeses) {
+      function simularProdutoMesAMes({ taxaAnualPct, tributado, custodia, ehSelic }, valorInicial, aporteMensal, prazoMeses) {
         const taxaMensal = Math.pow(1 + taxaAnualPct / 100, 1 / 12) - 1;
         let saldo = valorInicial;
         const linhas = [];
@@ -25735,7 +25751,7 @@
           let custodiaValor = 0;
           if (custodia) {
             const saldoMedio = (valorInicial + valorBruto) / 2;
-            custodiaValor = saldoMedio * 0.002 * (mes / 12);
+            custodiaValor = saldoMedio * (custodiaPctAnual(ehSelic, saldoMedio) / 100) * (mes / 12);
             rendimentoBruto -= custodiaValor;
           }
 
@@ -25757,9 +25773,13 @@
       // tempo desde a aplicação, cupons mais distantes no tempo pagam
       // menos imposto — por isso o valor líquido mensal pode aumentar ao
       // longo do prazo mesmo com taxa bruta constante (faixas abaixo).
-      function simularRendaMensal({ taxaAnualPct, tributado, custodia }, valorInicial, prazoMeses) {
+      function simularRendaMensal({ taxaAnualPct, tributado, custodia, ehSelic }, valorInicial, prazoMeses) {
         const taxaMensal = Math.pow(1 + taxaAnualPct / 100, 1 / 12) - 1;
-        const custodiaMensal = custodia ? valorInicial * 0.002 / 12 : 0;
+        // Nesse modo o principal não muda mês a mês (os juros caem como
+        // renda, não se reinvestem) — então a isenção do Tesouro Selic
+        // pode ser calculada uma vez só sobre valorInicial, em vez de
+        // recalcular por mês como em simularProduto().
+        const custodiaMensal = custodia ? valorInicial * (custodiaPctAnual(ehSelic, valorInicial) / 100) / 12 : 0;
         const jurosMensalBruto = valorInicial * taxaMensal;
         const jurosAposCustodia = jurosMensalBruto - custodiaMensal;
 
@@ -25890,7 +25910,7 @@
         return {
           cdb: { nome: 'CDB', tributado: true, custodia: false },
           lci: { nome: 'LCI/LCA', tributado: false, custodia: false },
-          tesouro_selic: { nome: 'Tesouro Selic', tributado: true, custodia: true },
+          tesouro_selic: { nome: 'Tesouro Selic', tributado: true, custodia: true, ehSelic: true },
           tesouro_pre: { nome: 'Tesouro Prefixado', tributado: true, custodia: true },
           tesouro_ipca: { nome: 'Tesouro IPCA+', tributado: true, custodia: true },
           poupanca: { nome: 'Poupança', tributado: false, custodia: false },
@@ -25911,12 +25931,12 @@
         const taxaAnual = obterTaxaAnualEfetiva();
 
         const r = simularRendaMensal(
-          { taxaAnualPct: taxaAnual, tributado: tipoInfo.tributado, custodia: tipoInfo.custodia },
+          { taxaAnualPct: taxaAnual, tributado: tipoInfo.tributado, custodia: tipoInfo.custodia, ehSelic: tipoInfo.ehSelic },
           valorInicial, prazoMeses
         );
 
         const custodiaTexto = tipoInfo.custodia
-          ? `<div class="calc-resultado-linha"><span>Taxa de custódia B3 (aprox. 0,20% a.a., total no período)</span><strong>- ${hgFormatMoeda(r.totalCustodia)}</strong></div>`
+          ? `<div class="calc-resultado-linha"><span>Taxa de custódia B3 (${tipoInfo.ehSelic ? 'isenta até R$ 10.000; 0,20% a.a. sobre o excedente' : 'aprox. 0,20% a.a.'}, total no período)</span><strong>- ${hgFormatMoeda(r.totalCustodia)}</strong></div>`
           : '';
         const irTexto = tipoInfo.tributado
           ? `<div class="calc-resultado-linha"><span>IR total sobre os cupons (regressivo, por faixa)</span><strong>- ${hgFormatMoeda(r.totalIR)}</strong></div>`
@@ -26003,7 +26023,7 @@
               : `${hgFormatNumero(parseFloat(inTaxa.value) || 0)}% da Selic`)
           : null;
         const resultadoPrincipal = simularProduto(
-          { taxaAnualPct: taxaAnual, tributado: tipoInfo.tributado, custodia: tipoInfo.custodia },
+          { taxaAnualPct: taxaAnual, tributado: tipoInfo.tributado, custodia: tipoInfo.custodia, ehSelic: tipoInfo.ehSelic },
           valorInicial, aporteMensal, prazoMeses
         );
 
@@ -26012,7 +26032,7 @@
           : `<div class="calc-resultado-linha"><span>Imposto de Renda</span><strong>Isento</strong></div>`;
 
         const custodiaTexto = tipoInfo.custodia
-          ? `<div class="calc-resultado-linha"><span>Taxa de custódia B3 (aprox. 0,20% a.a.)</span><strong>- ${hgFormatMoeda(resultadoPrincipal.custodiaValor)}</strong></div>`
+          ? `<div class="calc-resultado-linha"><span>Taxa de custódia B3 (${tipoInfo.ehSelic ? 'isenta até R$ 10.000; 0,20% a.a. sobre o excedente' : 'aprox. 0,20% a.a.'})</span><strong>- ${hgFormatMoeda(resultadoPrincipal.custodiaValor)}</strong></div>`
           : '';
 
         // Tabela comparativa: todos os produtos, mesmo valor/prazo/aportes.
@@ -26024,7 +26044,7 @@
         const produtos = produtosComparaveis().map(p => {
           const ehPrincipalNaoCdbLci = p.id === tipo && p.id !== 'cdb' && p.id !== 'lci';
           const taxaUsada = ehPrincipalNaoCdbLci ? taxaAnual : p.taxaAnual;
-          const r = simularProduto({ taxaAnualPct: taxaUsada, tributado: p.tributado, custodia: p.custodia }, valorInicial, aporteMensal, prazoMeses);
+          const r = simularProduto({ taxaAnualPct: taxaUsada, tributado: p.tributado, custodia: p.custodia, ehSelic: p.ehSelic }, valorInicial, aporteMensal, prazoMeses);
           return { ...p, ...r };
         }).sort((a, b) => b.valorLiquido - a.valorLiquido);
 
