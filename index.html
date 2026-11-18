@@ -471,6 +471,14 @@
     .tesouro-tabela-wrap { max-height: 60vh; overflow: auto; margin-top: 10px; }
     .tesouro-tabela { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
     .tesouro-tabela th, .tesouro-tabela td { padding: 9px 10px; text-align: left; white-space: nowrap; }
+    /* Os subtítulos (ex: "bruto R$ 86.645,70 · IR 15,00%" na coluna
+       Simulação) herdavam o nowrap do <td> e forçavam a coluna inteira a
+       abrir pra caber numa linha só — isso sozinho estourava a largura
+       da tabela e trazia a barra de rolagem horizontal mesmo em telas
+       largas. Deixando só o subtítulo quebrar linha, a coluna encolhe
+       pro tamanho do valor principal (bem mais curto) e o detalhe cai
+       pra uma segunda linha por baixo. */
+    .tesouro-tabela td .tesouro-sub { white-space: normal; }
     .tesouro-tabela thead th {
       font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;
       color: var(--primary); font-weight: 700;
