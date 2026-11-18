@@ -80,6 +80,11 @@
     background: rgba(224,184,77,0.1);
     border-color: rgba(224,184,77,0.25);
   }
+  .item .tag.novo {
+    color: var(--accent);
+    background: rgba(124,255,146,0.1);
+    border-color: rgba(124,255,146,0.25);
+  }
 
   footer { text-align: center; margin-top: 50px; color: var(--muted); font-size: 0.78rem; }
   footer a { color: var(--primary); text-decoration: none; }
@@ -91,7 +96,7 @@
       <div class="logo">Dividendos | Viver de Renda</div>
       <h1>Funcionalidades do site</h1>
       <p>Resumo de tudo que o site oferece hoje: consultas de mercado, calculadoras, ferramentas de renda fixa, acompanhamento de carteira e conteúdo educativo.</p>
-      <div class="data">Gerado em 28/09/2026</div>
+      <div class="data">Gerado em 18/11/2026</div>
     </header>
 
     <section class="grupo">
@@ -99,7 +104,7 @@
       <div class="lista">
         <div class="item">
           <strong>Consulta rápida</strong>
-          <span>Ações, FIIs e Stocks/ETFs americanos — cotação, variação, indicadores, gráfico (1D/7D/30D/6M/YTD/1A) e "se você tivesse investido" há X tempo.</span>
+          <span>Ações, FIIs, Stocks/ETFs americanos, Bitcoin e Ethereum — cotação, variação, indicadores, gráfico (1D/7D/30D/6M/YTD/1A), "se você tivesse investido" há X tempo e botão de compartilhar.</span>
         </div>
         <div class="item">
           <strong>Análise Fundamentalista</strong>
@@ -119,7 +124,17 @@
         </div>
         <div class="item">
           <strong>Carrossel de índices</strong>
-          <span>Ibovespa, IFIX, Dólar, Euro, Bitcoin e Selic em tempo real.</span>
+          <span>Ibovespa, Selic, CDI, IFIX, Dólar, Euro, Bitcoin, Ethereum, IPCA, IGP-M, CPI e taxas do Tesouro, em tempo real.</span>
+        </div>
+        <div class="item">
+          <strong>Juros Futuros x Fundos Imobiliários</strong>
+          <span>Curva de juros futuros (ETTJ) de hoje sobreposta à do dia anterior, e a comparação da taxa de juros com o IFIX ao longo do tempo.</span>
+          <span class="tag novo">novo</span>
+        </div>
+        <div class="item">
+          <strong>O que o mercado espera (Boletim Focus)</strong>
+          <span>Mediana das expectativas de mercado do Banco Central pra PIB, IPCA, Selic e Câmbio, com gráfico da evolução ao longo do tempo.</span>
+          <span class="tag novo">novo</span>
         </div>
         <div class="item">
           <strong>Boletim de Mercado Diário</strong>
@@ -150,23 +165,45 @@
         <div class="item"><strong>Juros Compostos</strong><span>Simula o crescimento de um aporte ao longo do tempo.</span></div>
         <div class="item"><strong>Aposentadoria (INSS)</strong><span>Estimativa da aposentadoria pelo regime geral.</span></div>
         <div class="item"><strong>Aposentadoria / Renda Passiva (FIRE)</strong><span>Quanto patrimônio é preciso para viver de renda.</span></div>
-        <div class="item"><strong>Financiamento Imobiliário</strong><span>Simulador SAC/Price, com amortização extra.</span></div>
+        <div class="item"><strong>Financiamento Imobiliário</strong><span>Simulador SAC/Price, com amortização extra e exportação da tabela de parcelas em planilha.</span></div>
         <div class="item"><strong>Empréstimo</strong><span>Simulação de parcelas e juros.</span></div>
-        <div class="item"><strong>Renda Fixa</strong><span>CDB, LCI/LCA e Tesouro Direto.</span></div>
+        <div class="item">
+          <strong>Renda Fixa</strong>
+          <span>Compara CDB, LCI/LCA e Tesouro Direto, com aba "Mês a mês" mostrando alíquota de IR, investido e rendimento líquido mês a mês — tudo incluído no PDF.</span>
+          <span class="tag novo">atualizado</span>
+        </div>
         <div class="item"><strong>Calculadora de Aportes</strong><span>Planeja aportes recorrentes por ativo.</span></div>
         <div class="item"><strong>Calculadora Financeira (RPN)</strong><span>Estilo HP-12C, para cálculos financeiros manuais.</span></div>
-        <div class="item"><strong>Imposto de Renda</strong><span>Estima o IR devido sobre investimentos.</span></div>
+        <div class="item"><strong>Calculadora de Venda Coberta</strong><span>Simula o prêmio recebido ao vender opções cobertas por uma posição em ações.</span></div>
+        <div class="item">
+          <strong>Cap Rate — Imóvel x FII</strong>
+          <span>Compara o retorno de alugar um imóvel com o DY de um FII, com comparação visual lado a lado (casa x FII) e no PDF.</span>
+        </div>
+        <div class="item">
+          <strong>Imposto de Renda</strong>
+          <span>Estima o IR sobre investimentos — cobre resgate parcial de CDB/Tesouro, come-cotas do Fundo DI e isenção de CRI/CRA.</span>
+          <span class="tag novo">atualizado</span>
+        </div>
       </div>
     </section>
 
     <section class="grupo">
       <div class="grupo-titulo"><span class="emoji">💰</span> Renda fixa e crédito privado</div>
       <div class="lista">
-        <div class="item"><strong>Tesouro Direto</strong><span>Preços e taxas de referência em tempo real.</span></div>
+        <div class="item">
+          <strong>Tesouro Direto</strong>
+          <span>Preços e taxas de referência em tempo real, com coluna "Simulação" (valor líquido projetado pro valor que você digitar) e PDF por título.</span>
+          <span class="tag novo">atualizado</span>
+        </div>
         <div class="item"><strong>Debêntures</strong><span>Taxas de mercado atualizadas.</span></div>
+        <div class="item"><strong>CRI — Certificados de Recebíveis Imobiliários</strong><span>Taxas de mercado atualizadas, isentos de IR para pessoa física.</span></div>
+        <div class="item"><strong>CRA — Certificados do Agronegócio</strong><span>Taxas de mercado atualizadas, isentos de IR para pessoa física.</span></div>
         <div class="item"><strong>Qual é uma taxa justa hoje?</strong><span>Piso de referência (Tesouro descontado de IR/custódia) para comparar ofertas.</span></div>
         <div class="item"><strong>Vale a Pena?</strong><span>Analisa uma oferta específica de CDB/LCI/debênture, cruzando com a Basileia do emissor.</span></div>
-        <div class="item"><strong>Índice de Basileia dos Bancos</strong><span>Atualizado semanalmente.</span></div>
+        <div class="item">
+          <strong>Índice de Basileia dos Bancos</strong>
+          <span>Atualizado trimestralmente (IF.data/BCB) — mais de 30 bancos com ação na B3 ou que emitem CDB/LCI/LCA no varejo.</span>
+        </div>
         <div class="item"><strong>Cobertura do FGC</strong><span>Checa o limite de garantia do Fundo Garantidor de Créditos.</span></div>
         <div class="item"><strong>Marcação a mercado</strong><span>Explica por que o preço de um título muda antes do vencimento.</span></div>
       </div>
@@ -177,7 +214,12 @@
       <div class="lista">
         <div class="item">
           <strong>Carteira de Rendimentos</strong>
-          <span>Monta a carteira, calcula proventos/mês e % por ativo, exporta em PDF/Excel.</span>
+          <span>Monta a carteira, calcula proventos/mês e % por ativo, exporta em PDF e compartilha.</span>
+          <span class="tag login">requer login</span>
+        </div>
+        <div class="item">
+          <strong>Gráficos da Carteira de Rendimentos</strong>
+          <span>Visualização gráfica da composição e evolução da carteira.</span>
           <span class="tag login">requer login</span>
         </div>
         <div class="item">
@@ -206,8 +248,8 @@
         <div class="item"><strong>Glossário do Investidor</strong><span>Explicações rápidas dos termos do mercado.</span></div>
         <div class="item"><strong>Quiz de Perfil de Investidor</strong><span>Descubra seu perfil (conservador, moderado, arrojado...).</span></div>
         <div class="item"><strong>Conversor de Moedas</strong><span>Conversão rápida entre moedas.</span></div>
-        <div class="item"><strong>Seção Educação</strong><span>Renda Fixa, Renda Variável e Estratégia — com apresentação paga complementar.</span></div>
-        <div class="item"><strong>Assistente de IA</strong><span>Chat flutuante para tirar dúvidas sobre investimentos, indicadores e conceitos de mercado.</span></div>
+        <div class="item"><strong>Seção Educação</strong><span>Renda Fixa, Renda Variável e Estratégia, com explicador "Quem regula o mercado financeiro?" — e apresentação paga complementar.</span></div>
+        <div class="item"><strong>Assistente Viver de Renda</strong><span>Chat flutuante com respostas geradas por IA sobre investimentos e mercado.</span></div>
       </div>
     </section>
 
