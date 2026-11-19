@@ -505,9 +505,13 @@
       padding: 12px 14px; display: flex; flex-direction: column; gap: 6px;
     }
     .tesouro-comparar-card-titulo { font-weight: 800; font-size: 0.9rem; color: var(--text); margin-bottom: 2px; }
-    .tesouro-comparar-card-linha { display: flex; justify-content: space-between; gap: 8px; font-size: 0.8rem; }
-    .tesouro-comparar-card-linha span { color: var(--muted); }
-    .tesouro-comparar-card-linha strong { text-align: right; font-family: "Courier New", monospace; }
+    /* Rótulo em cima, valor embaixo (não lado a lado): valores como
+       "Selic + 0,11% a.a." quebravam o "a.a." pra uma segunda linha
+       quando os 3 cards ficavam espremidos (tablet) — com os dois lado
+       a lado e dividindo a largura, sobrava pouco espaço pro valor. */
+    .tesouro-comparar-card-linha { font-size: 0.8rem; }
+    .tesouro-comparar-card-linha span { display: block; color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.02em; }
+    .tesouro-comparar-card-linha strong { display: block; font-family: "Courier New", monospace; }
     .tesouro-comparar-card-destaque {
       margin-top: 6px; padding-top: 8px; border-top: 1px dashed var(--border);
       display: flex; flex-direction: column; gap: 2px;
@@ -515,7 +519,7 @@
     .tesouro-comparar-card-destaque span { font-size: 0.68rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
     .tesouro-comparar-card-destaque strong { font-size: 1.05rem; font-weight: 800; color: var(--primary); font-family: "Courier New", monospace; }
     .tesouro-comparar-card-destaque small { font-size: 0.74rem; color: var(--muted); }
-    .tesouro-comparar-acoes { margin-top: 12px; }
+    .tesouro-comparar-acoes { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
     .tesouro-tabela thead th {
       font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;
       color: var(--primary); font-weight: 700;
@@ -5212,7 +5216,7 @@
         como "paga em parcelas" na coluna Simulação.
       </p>
 
-      <h3 style="margin:24px 0 8px;">Comparar Selic x Prefixado x IPCA+</h3>
+      <h3 style="margin:24px 0 8px;">Comparar Tesouro Selic x Prefixado x IPCA+</h3>
       <p class="calc-ajuda" style="margin-top:0;">
         Escolha um título de cada tipo pra ver lado a lado: o Selic acompanha a Selic dia a dia, o Prefixado
         trava uma taxa fixa até o vencimento, e o IPCA+ garante um ganho real acima da inflação — cada um reage
@@ -5236,7 +5240,11 @@
       <div id="tesouroCompararStatus" class="hg-status"></div>
       <div id="tesouroCompararCards" class="tesouro-comparar-cards"></div>
       <div class="tesouro-comparar-acoes" id="tesouroCompararAcoes" hidden>
-        <button type="button" class="hg-btn" id="tesouroCompararBtnPdf">📄 Baixar PDF comparativo</button>
+        <button type="button" class="hg-btn" id="tesouroCompararBtnPdf" style="flex:1 1 180px;">📄 Baixar PDF comparativo</button>
+        <button type="button" class="hg-btn-compartilhar" id="tesouroCompararBtnCompartilhar" style="flex:1 1 140px; justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; vertical-align:-3px; margin-right:6px;"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+        </button>
       </div>
 
       <!-- Tesouro Reserva: título novo (11/05/2026), ainda só disponível
@@ -13722,6 +13730,37 @@
         doc.save(nomeArquivoPdfComparar());
       }
 
+      // Mesmo padrão já usado no Cap Rate/Renda Fixa: no celular, manda o
+      // PDF pelo navigator.share (WhatsApp, etc.); no desktop, só baixa
+      // (lá o navigator.share abriria o seletor de arquivos do sistema,
+      // que confunde mais do que ajuda).
+      async function compartilharResultadoComparar(botao) {
+        const doc = await montarDocumentoPdfComparar();
+        if (!doc) {
+          if (window.jspdf) alert('Escolha ao menos um título pra gerar o comparativo.');
+          return;
+        }
+
+        const nomeArquivo = nomeArquivoPdfComparar();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Tesouro Direto — Selic x Prefixado x IPCA+', files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoSpan = botao.querySelector('.hg-btn-compartilhar-texto');
+        const textoPadrao = textoSpan ? textoSpan.textContent : null;
+        if (textoSpan) textoSpan.textContent = 'PDF baixado!';
+        setTimeout(() => { if (textoSpan && textoPadrao) textoSpan.textContent = textoPadrao; }, 2500);
+      }
+
       function valorPara(t, chave) {
         if (chave === 'titulo') return t.nome || null;
         if (chave === 'vencimento') return t.vencimento || null;
@@ -14025,6 +14064,8 @@
         });
       });
       document.getElementById('tesouroCompararBtnPdf')?.addEventListener('click', gerarPdfComparar);
+      document.getElementById('tesouroCompararBtnCompartilhar')?.addEventListener('click', (e) =>
+        compartilharResultadoComparar(e.currentTarget));
 
       // Só busca o JSON quando a seção é realmente revelada — ela nasce
       // [hidden] e a maior parte das visitas nunca abre essa parte do site.
