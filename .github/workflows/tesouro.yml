@@ -1,11 +1,19 @@
 name: Atualizar Tesouro Direto
 
-# O Tesouro publica as taxas uma vez por dia útil. 12h UTC = 9h BR, depois da
-# abertura. Segunda a sexta apenas — fim de semana não tem data-base nova e
-# o download é pesado (o CSV é o histórico inteiro desde 2009).
+# O Tesouro publica as taxas uma vez por dia útil — o CSV do Tesouro
+# Transparente é um "retrato da manhã", calculado durante a manutenção
+# diária do Tesouro Direto (5h às 9h30 BR), com base no fechamento do
+# pregão anterior, pra deixar pronto pra abertura das 9h30. 12h45 UTC =
+# 9h45 BR: dá uma margem de ~15min depois do fim da manutenção, pra não
+# correr o risco de pegar o arquivo um pouco antes de fechar (o horário
+# antigo, 9h BR, era ANTES das 9h30 — minuto não-redondo de propósito,
+# mesma lógica dos outros robôs: horários "redondos" pegam a fila
+# pesada do GitHub Actions). Segunda a sexta apenas — fim de semana não
+# tem data-base nova e o download é pesado (o CSV é o histórico inteiro
+# desde 2009).
 on:
   schedule:
-    - cron: '0 12 * * 1-5'
+    - cron: '45 12 * * 1-5'
   workflow_dispatch:
 
 permissions:
