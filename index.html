@@ -13338,7 +13338,10 @@
 
       let dados = null;
       let carregando = null;
-      let familiaAtiva = 'todos';
+      // Padrão "Selic" (não "Todos") ao abrir — a lista inteira (Selic +
+      // Prefixado + IPCA+ + Educa+ + Renda+) é grande demais pra primeira
+      // vista; Selic é o mais procurado/genérico dos 3 tipos principais.
+      let familiaAtiva = 'selic';
       let melhoresCategoria = new Set();
 
       // Ordenação escolhida pelo clique no cabeçalho. Começa null: até a
