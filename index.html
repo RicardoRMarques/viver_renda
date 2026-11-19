@@ -5216,7 +5216,15 @@
         como "paga em parcelas" na coluna Simulação.
       </p>
 
-      <h3 style="margin:24px 0 8px;">Comparar Tesouro Selic x Prefixado x IPCA+</h3>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:24px 0 8px;">
+        <h3 id="tesouro-comparar" style="margin:0;">Comparar Tesouro Selic x Prefixado x IPCA+</h3>
+        <button type="button" id="tesouroCompararCompartilharLink" class="modal-link-btn"
+                aria-label="Compartilhar o link desta comparação"
+                title="Compartilhar o link desta comparação">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+          <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+        </button>
+      </div>
       <p class="calc-ajuda" style="margin-top:0;">
         Escolha um título de cada tipo pra ver lado a lado: o Selic acompanha a Selic dia a dia, o Prefixado
         trava uma taxa fixa até o vencimento, e o IPCA+ garante um ganho real acima da inflação — cada um reage
@@ -14040,6 +14048,12 @@
           hash: 'tesouro-direto',
           titulo: 'Tesouro Direto — Viver de Renda',
           texto: 'Preços e taxas dos títulos públicos, com a rentabilidade escrita por extenso.',
+        }));
+      document.getElementById('tesouroCompararCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          hash: 'tesouro-comparar',
+          titulo: 'Comparar Tesouro Selic x Prefixado x IPCA+ — Viver de Renda',
+          texto: 'Compare lado a lado um título Selic, um Prefixado e um IPCA+ do Tesouro Direto.',
         }));
 
       filtrosEl.addEventListener('click', (e) => {
@@ -24994,8 +25008,15 @@
       document.fonts.ready.then(atualizarTodosCabecalhosFixosMercado);
     }
 
+    // Hashes que não são o id de uma <section> inteira, e sim de um
+    // pedaço DENTRO de uma — "link de acesso" a um sub-bloco específico
+    // (ex: o comparador Selic x Prefixado x IPCA+ dentro de Tesouro
+    // Direto) sem inventar outra seção isolada pra isso.
+    const ALIAS_SECAO_MERCADO = { 'tesouro-comparar': 'tesouro-direto' };
+
     function revelarSecaoMercado(id, { corrigirDepois = false } = {}) {
-      const secao = document.getElementById(id);
+      const secaoId = ALIAS_SECAO_MERCADO[id] || id;
+      const secao = document.getElementById(secaoId);
       if (!secao) return;
       secao.hidden = false;
       // Carrega a curva de juros só agora (seção já visível) — Chart.js
@@ -25003,17 +25024,18 @@
       // aqui dentro, e não num listener separado, garante que roda DEPOIS
       // do hidden=false de cima, sem depender da ordem de registro entre
       // handlers do mesmo clique.
-      if (id === 'juros-x-fiis') { carregarCurvaJuros(); carregarComparacaoJurosIfix(); }
-      if (id === 'boletim-focus') { carregarBoletimFocus(); }
+      if (secaoId === 'juros-x-fiis') { carregarCurvaJuros(); carregarComparacaoJurosIfix(); }
+      if (secaoId === 'boletim-focus') { carregarBoletimFocus(); }
       atualizarCabecalhoFixoListaMercado(secao);
-      // scrollIntoView sozinho alinha o topo da seção com o topo da tela,
-      // mas o cabeçalho do site é fixo — isso deixava o título e o botão
-      // "✕" escondidos atrás dele. Rolando manualmente e descontando a
-      // altura do cabeçalho (mesma conta já usada no menu mobile).
+      // Rola até o ALVO (que pode ser um sub-bloco, via o alias acima —
+      // não necessariamente o topo da seção inteira), descontando o
+      // cabeçalho fixo do site. scrollIntoView sozinho não dá pra
+      // descontar isso, por isso a conta manual (mesma do menu mobile).
+      const alvo = document.getElementById(id) || secao;
       const rolarAteSecao = () => {
         const cabecalho = document.querySelector('header');
         const alturaCabecalho = cabecalho ? cabecalho.getBoundingClientRect().height : 60;
-        const posicao = secao.getBoundingClientRect().top + window.scrollY - alturaCabecalho - 12;
+        const posicao = alvo.getBoundingClientRect().top + window.scrollY - alturaCabecalho - 12;
         window.scrollTo({ top: posicao, behavior: 'smooth' });
         // O clique que abriu a lista pode ter vindo do submenu com um
         // filtro já aplicado (aplicarFiltro), o que muda a altura dos
@@ -25065,7 +25087,7 @@
       });
     });
     // Link direto (compartilhado ou digitado na barra de endereço)
-    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#taxa-justa', '#debentures', '#cri', '#cra', '#rankings-fiis', '#alertas-preco', '#juros-x-fiis', '#boletim-focus'].includes(window.location.hash)) {
+    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#tesouro-comparar', '#taxa-justa', '#debentures', '#cri', '#cra', '#rankings-fiis', '#alertas-preco', '#juros-x-fiis', '#boletim-focus'].includes(window.location.hash)) {
       revelarSecaoMercado(window.location.hash.slice(1), { corrigirDepois: true });
     }
     // Botão "✕" no topo de cada lista — esconde a seção de novo e rola
