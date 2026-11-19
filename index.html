@@ -13579,6 +13579,9 @@
               '<small>bruto ' + hgFormatMoeda(r.bruto) + ' · IR ' + hgFormatNumero(r.aliquota) + '%</small>';
           }
         }
+        const linhaValorInvestido = valor > 0
+          ? '<div class="tesouro-comparar-card-linha"><span>Valor investido</span><strong>' + hgFormatMoeda(valor) + '</strong></div>'
+          : '';
         return (
           '<div class="tesouro-comparar-card">' +
           '<div class="tesouro-comparar-card-titulo">' + t.nome + '</div>' +
@@ -13586,6 +13589,7 @@
           '<div class="tesouro-comparar-card-linha"><span>Rentabilidade</span><strong>' + taxaPorExtenso(t) + '</strong></div>' +
           '<div class="tesouro-comparar-card-linha"><span>Preço unitário</span><strong>' + (typeof pu === 'number' ? hgFormatMoeda(pu) : '—') + '</strong></div>' +
           '<div class="tesouro-comparar-card-linha"><span>Investimento mínimo</span><strong>' + (typeof t.investimento_minimo === 'number' ? hgFormatMoeda(t.investimento_minimo) : '—') + '</strong></div>' +
+          linhaValorInvestido +
           '<div class="tesouro-comparar-card-destaque">' + destaqueHtml + '</div>' +
           '</div>'
         );
