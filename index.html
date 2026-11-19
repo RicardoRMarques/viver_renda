@@ -512,6 +512,10 @@
     .tesouro-comparar-card-linha { font-size: 0.8rem; }
     .tesouro-comparar-card-linha span { display: block; color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.02em; }
     .tesouro-comparar-card-linha strong { display: block; font-family: "Courier New", monospace; }
+    /* Rentabilidade é o dado que mais importa pra escolher entre os 3 —
+       destaca mais que os outros campos do card (que só usam o negrito
+       padrão do <strong>). */
+    .tesouro-comparar-card-rentabilidade { font-weight: 800; color: var(--accent); font-size: 0.88rem; }
     .tesouro-comparar-card-destaque {
       margin-top: 6px; padding-top: 8px; border-top: 1px dashed var(--border);
       display: flex; flex-direction: column; gap: 2px;
@@ -13605,7 +13609,7 @@
           '<div class="tesouro-comparar-card">' +
           '<div class="tesouro-comparar-card-titulo">' + t.nome + '</div>' +
           '<div class="tesouro-comparar-card-linha"><span>Vencimento</span><strong>' + dataBr(t.vencimento) + '</strong></div>' +
-          '<div class="tesouro-comparar-card-linha"><span>Rentabilidade</span><strong>' + taxaPorExtenso(t) + '</strong></div>' +
+          '<div class="tesouro-comparar-card-linha"><span>Rentabilidade</span><strong class="tesouro-comparar-card-rentabilidade">' + taxaPorExtenso(t) + '</strong></div>' +
           '<div class="tesouro-comparar-card-linha"><span>Preço unitário</span><strong>' + (typeof pu === 'number' ? hgFormatMoeda(pu) : '—') + '</strong></div>' +
           '<div class="tesouro-comparar-card-linha"><span>Investimento mínimo</span><strong>' + (typeof t.investimento_minimo === 'number' ? hgFormatMoeda(t.investimento_minimo) : '—') + '</strong></div>' +
           linhaValorInvestido +
