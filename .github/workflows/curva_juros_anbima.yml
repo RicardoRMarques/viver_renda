@@ -56,7 +56,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nada novo — a ANBIMA ainda não publicou a curva de hoje."
           else
-            git commit -m "Curva de juros (ANBIMA): atualiza ETTJ prefixada $(date -u -d '-3 hours' '+%d-%m-%Y')"
+            git commit -m "Curva de juros (ANBIMA): atualiza ETTJ (prefixada, IPCA e inflação implícita) $(date -u -d '-3 hours' '+%d-%m-%Y')"
 
             # Retry: outros robôs do repo podem ter commitado entre o
             # checkout e agora. Em vez de falhar o job, rebaseia e tenta
