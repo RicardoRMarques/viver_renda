@@ -5157,11 +5157,17 @@
         é o jeito mais direto de acompanhar essa resposta.
       </p>
 
-      <h3 style="margin:0 0 8px;">Curva de juros futuros (ETTJ prefixada)</h3>
+      <h3 style="margin:0 0 8px;">Curva de juros e inflação implícita (ETTJ)</h3>
       <p class="calc-ajuda" style="margin-top:0;">
-        Cada ponto é a taxa anual que o mercado precifica hoje para aquele prazo — é essa curva que a imprensa
-        chama de "curva do DI futuro" ou "curva pré". Quando ela sobe (sobretudo nos vértices mais longos), é o
-        sinal de juros mais altos pela frente — o que tende a pressionar os FIIs pra baixo.
+        A <strong>Prefixada</strong> é a taxa anual que o mercado precifica hoje para cada prazo — é essa curva que
+        a imprensa chama de "curva do DI futuro" ou "curva pré". Quando ela sobe (sobretudo nos vértices mais
+        longos), é sinal de juros mais altos pela frente, o que tende a pressionar os FIIs pra baixo. A
+        <strong>Real (IPCA)</strong> é a mesma conta, mas a partir dos títulos indexados à inflação — o que sobra
+        de juro depois de descontar o IPCA. A diferença entre as duas é a <strong>inflação implícita</strong>: a
+        inflação média que o mercado espera para aquele prazo, embutida nos preços desses títulos (não é uma
+        previsão do IBGE nem do Boletim Focus — é o que o próprio mercado está "apostando" ao negociar prefixado
+        contra IPCA+). A curva real e a inflação implícita só existem a partir de prazos mais longos (a ANBIMA não
+        publica esse recorte pros vencimentos mais curtos).
       </p>
       <div id="curvaJurosStatus" class="hg-status">Carregando curva de juros...</div>
       <div id="curvaJurosGraficoWrap" style="position:relative; height:280px; margin-bottom:8px;" hidden>
@@ -8978,6 +8984,7 @@
     }
     function HG_COR_PRIMARIA() { return hgCssVar('--primary') || '#31c3ff'; }
     function HG_COR_ACCENT() { return hgCssVar('--accent') || '#7cff92'; }
+    function HG_COR_GOLD() { return hgCssVar('--gold') || '#e0b84d'; }
     function HG_COR_MUTED() { return hgCssVar('--muted') || '#a9b6d3'; }
     function HG_COR_GRID() {
       const tema = document.documentElement.getAttribute('data-theme');
@@ -18904,7 +18911,13 @@
         // exatamente os mesmos prazos.
         const mapaHoje = new Map(pontos.map(p => [p.dias, p.taxa]));
         const mapaAnterior = new Map(pontosAnterior.map(p => [p.dias, p.taxa]));
-        const todosDias = Array.from(new Set([...mapaHoje.keys(), ...mapaAnterior.keys()])).sort((a, b) => a - b);
+        // IPCA (real) e inflação implícita só existem na curva de HOJE — a
+        // ANBIMA não manda essas duas no arquivo "anterior" que este robô
+        // guarda (só a prefixada, ver coletar_curva_juros.py), então não dá
+        // pra comparar dia-a-dia ainda; mostra só a foto de hoje pra essas duas.
+        const mapaIpca = new Map(pontos.filter(p => p.taxa_ipca != null).map(p => [p.dias, p.taxa_ipca]));
+        const mapaInflacao = new Map(pontos.filter(p => p.inflacao_implicita != null).map(p => [p.dias, p.inflacao_implicita]));
+        const todosDias = Array.from(new Set([...mapaHoje.keys(), ...mapaAnterior.keys(), ...mapaIpca.keys(), ...mapaInflacao.keys()])).sort((a, b) => a - b);
         const labels = todosDias.map(curvaJurosRotuloVertice);
 
         const dataRefHoje = dados.data_referencia
@@ -18914,22 +18927,47 @@
           ? new Date(`${dataRefAnterior}T00:00:00`).toLocaleDateString('pt-BR')
           : null;
 
+        // 4 séries possíveis no mesmo gráfico — cor sozinha não separa bem
+        // todos os pares pra quem tem deuteranopia (testado com o validador
+        // de paleta da skill dataviz), por isso cada série também tem um
+        // traço e um marcador DIFERENTES (contínuo/bolinha, tracejado/sem
+        // marcador, traço-ponto/triângulo, pontilhado/quadrado) — ninguém
+        // depende só do matiz pra distinguir as linhas, e a legenda (sempre
+        // visível) nomeia cada uma por extenso.
         const datasets = [
           {
-            label: `Hoje (${dataRefHoje})`,
+            label: `Prefixada — hoje (${dataRefHoje})`,
             data: todosDias.map(d => mapaHoje.has(d) ? mapaHoje.get(d) : null),
             spanGaps: true,
             borderColor: HG_COR_PRIMARIA(), backgroundColor: hgCorPrimariaFundo(), fill: true,
-            borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, tension: 0.25,
+            borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, pointStyle: 'circle', tension: 0.25,
           },
         ];
         if (mapaAnterior.size > 0) {
           datasets.push({
-            label: `Dia anterior${dataRefAnteriorFormatada ? ` (${dataRefAnteriorFormatada})` : ''}`,
+            label: `Prefixada — dia anterior${dataRefAnteriorFormatada ? ` (${dataRefAnteriorFormatada})` : ''}`,
             data: todosDias.map(d => mapaAnterior.has(d) ? mapaAnterior.get(d) : null),
             spanGaps: true,
             borderColor: HG_COR_MUTED(), backgroundColor: 'transparent', borderDash: [5, 4],
-            borderWidth: 2, pointRadius: 2, pointHoverRadius: 5, tension: 0.25,
+            borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, pointStyle: false, tension: 0.25,
+          });
+        }
+        if (mapaIpca.size > 0) {
+          datasets.push({
+            label: 'Real (IPCA) — hoje',
+            data: todosDias.map(d => mapaIpca.has(d) ? mapaIpca.get(d) : null),
+            spanGaps: true,
+            borderColor: HG_COR_ACCENT(), backgroundColor: 'transparent', borderDash: [2, 3],
+            borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, pointStyle: 'triangle', tension: 0.25,
+          });
+        }
+        if (mapaInflacao.size > 0) {
+          datasets.push({
+            label: 'Inflação implícita — hoje',
+            data: todosDias.map(d => mapaInflacao.has(d) ? mapaInflacao.get(d) : null),
+            spanGaps: true,
+            borderColor: HG_COR_GOLD(), backgroundColor: 'transparent', borderDash: [1, 3],
+            borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, pointStyle: 'rect', tension: 0.25,
           });
         }
 
@@ -18941,7 +18979,7 @@
             responsive: true, maintainAspectRatio: false, animation: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-              legend: { display: mapaAnterior.size > 0, labels: { color: HG_COR_MUTED(), boxWidth: 12 } },
+              legend: { display: true, labels: { color: HG_COR_MUTED(), boxWidth: 12, usePointStyle: true } },
               tooltip: {
                 callbacks: {
                   title: (itens) => `Vértice: ${todosDias[itens[0].dataIndex]} dias`,
@@ -18951,7 +18989,7 @@
             },
             scales: {
               x: { title: { display: true, text: 'Prazo (anos)', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED() }, grid: { display: false } },
-              y: { title: { display: true, text: 'Juros (% a.a.)', color: HG_COR_PRIMARIA() }, ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(1)}%` }, grid: { color: HG_COR_GRID() } },
+              y: { title: { display: true, text: 'Taxa (% a.a.)', color: HG_COR_MUTED() }, ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(1)}%` }, grid: { color: HG_COR_GRID() } },
             },
           },
         });

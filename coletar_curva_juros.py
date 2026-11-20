@@ -3,10 +3,11 @@
 """
 coletar_curva_juros.py
 ---------------------------------------------------------------------
-Baixa a Estrutura a Termo da Taxa de Juros (ETTJ) — a "curva de juros
-futuros" — publicada pela ANBIMA todo dia útil, e grava a curva
-PREFIXADA (a que o mercado associa a juros/DI futuro) em
-data/curva-juros.json.
+Baixa a Estrutura a Termo da Taxa de Juros (ETTJ) publicada pela ANBIMA
+todo dia útil, e grava TRÊS curvas em data/curva-juros.json: a
+PREFIXADA (a que o mercado associa a juros/DI futuro), a REAL (IPCA) e
+a INFLAÇÃO IMPLÍCITA (a diferença entre as duas, pela equação de
+Fisher — já vem calculada pela própria ANBIMA, não é recalculada aqui).
 
 Por que este robô existe
 -------------------------
@@ -14,8 +15,9 @@ A seção "Juros Futuros x Fundos Imobiliários" do site (index.html,
 #juros-x-fiis) existe pra mostrar visualmente por que FIIs reagem à
 curva de juros: quando o mercado projeta juros mais altos pra frente,
 FIIs tendem a cair, e vice-versa. A fase 1 dessa seção só mostrava o
-histórico do IFIX (reaproveitando a Consulta Rápida); esta é a fase 2,
-que traz a curva de juros em si.
+histórico do IFIX (reaproveitando a Consulta Rápida); a fase 2 trouxe a
+curva prefixada; esta é a fase 3, que completa com IPCA real e
+inflação implícita — as três curvas que a própria ANBIMA publica juntas.
 
 A B3 negocia contratos futuros de DI (DI1), mas não publica um arquivo
 simples de "vertice x taxa" pronto — o arquivo real (TaxaSwap) vem
@@ -149,6 +151,16 @@ MAX_DIAS_PARA_TRAS = 7
 # "<CURVAZERO>\r </CURVAZERO>" (27 bytes, sem <VERTICES> nenhum).
 ATRIBUTO_VERTICE = "Vertice"
 ATRIBUTO_TAXA_PREFIXADA = "Prefixados"
+# A mesma resposta já traz a curva REAL (IPCA) e a inflação implícita
+# (a própria ANBIMA calcula essa última a partir das outras duas, pela
+# equação de Fisher — não é recalculada aqui) — só não eram lidas antes
+# porque a fase anterior só precisava da curva prefixada. Nem todo
+# vértice tem as três: a curva IPCA cobre prazos mais longos (a partir
+# de ~2 anos) e não aparece nos vértices curtos (6 meses, 1 ano) onde só
+# a prefixada é publicada — por isso os campos ficam None quando ausentes,
+# em vez de descartar o vértice inteiro.
+ATRIBUTO_TAXA_IPCA = "IPCA"
+ATRIBUTO_INFLACAO_IMPLICITA = "Inflacao"
 
 
 def _numero(bruto):
@@ -223,9 +235,20 @@ def interpretar_xml(texto_xml):
 
         dias = _numero(elemento.get(ATRIBUTO_VERTICE))
         taxa = _numero(elemento.get(ATRIBUTO_TAXA_PREFIXADA))
-        if dias is None or taxa is None:
+        taxa_ipca = _numero(elemento.get(ATRIBUTO_TAXA_IPCA))
+        inflacao_implicita = _numero(elemento.get(ATRIBUTO_INFLACAO_IMPLICITA))
+        # Mantém o vértice se tiver PELO MENOS uma das três curvas — a
+        # prefixada manda no vértice (é ela que decide se o dia "tem
+        # curva publicada", ver coletar()), mas um vértice sem prefixada
+        # e só com IPCA/inflação ainda é informação útil pro gráfico.
+        if dias is None or (taxa is None and taxa_ipca is None and inflacao_implicita is None):
             continue
-        pontos.append({"dias": int(dias), "taxa": taxa})
+        pontos.append({
+            "dias": int(dias),
+            "taxa": taxa,
+            "taxa_ipca": taxa_ipca,
+            "inflacao_implicita": inflacao_implicita,
+        })
 
     pontos.sort(key=lambda p: p["dias"])
     return pontos, atributos_vistos
@@ -325,7 +348,7 @@ def atualizar_historico(data_referencia, pontos):
 
 
 def main():
-    print("Baixando a curva de juros (ETTJ prefixada) da ANBIMA...")
+    print("Baixando a curva de juros (ETTJ prefixada, IPCA e inflação implícita) da ANBIMA...")
     pontos, data_usada = coletar()
 
     if not pontos:
@@ -335,24 +358,32 @@ def main():
 
     print(f"\n  data de referência: {data_usada}")
     print(f"  {len(pontos)} vértice(s): {', '.join(str(p['dias']) for p in pontos)} dias")
+    com_ipca = sum(1 for p in pontos if p["taxa_ipca"] is not None)
+    print(f"  {com_ipca} vértice(s) com curva IPCA/inflação implícita")
 
     saida = {
         "_leia_me": (
-            "Curva de juros futuros (ETTJ prefixada), publicada diariamente pela ANBIMA — "
-            "o mercado se refere a ela como \"curva de juros\", \"curva do DI futuro\" ou "
-            "\"curva pré\" (nos contratos futuros negociados na B3, cada vencimento tem um "
-            "código DI1 + letra do mês + ano, ex: DI1F27 = janeiro/2027 — a ETTJ da ANBIMA "
-            "é a versão dessa mesma curva já ajustada por modelo, suave, a partir desses "
-            "títulos). Cada ponto em 'pontos' é um vértice (prazo em dias úteis — "
-            "252 é aproximadamente 1 ano) com a taxa anual prefixada (%) que o mercado "
-            "precifica para esse prazo, ajustada pelo modelo da própria ANBIMA "
-            "(Svensson/Nelson-Siegel) a partir dos títulos públicos negociados no dia. "
-            "Quando essa curva sobe (sobretudo nos vértices mais longos), FIIs tendem a "
-            "cair — a renda fixa fica mais atraente na comparação; quando recua, o "
+            "Três curvas da Estrutura a Termo da Taxa de Juros (ETTJ), publicadas "
+            "diariamente pela ANBIMA. 'taxa' é a curva PREFIXADA — o mercado se refere a "
+            "ela como \"curva de juros\", \"curva do DI futuro\" ou \"curva pré\" (nos "
+            "contratos futuros negociados na B3, cada vencimento tem um código DI1 + letra "
+            "do mês + ano, ex: DI1F27 = janeiro/2027 — a ETTJ da ANBIMA é a versão dessa "
+            "mesma curva já ajustada por modelo, suave, a partir desses títulos). "
+            "'taxa_ipca' é a curva REAL (acima da inflação) — a mesma lógica, mas a partir "
+            "dos títulos indexados ao IPCA (as NTN-B/Tesouro IPCA+); só existe a partir dos "
+            "vértices mais longos (grosso modo, 2 anos em diante), por isso vem None nos "
+            "vértices curtos. 'inflacao_implicita' é a inflação que o mercado está "
+            "precificando para cada prazo, calculada pela própria ANBIMA (não por este "
+            "robô) pela equação de Fisher: (1+prefixada)/(1+real) − 1 — por isso só existe "
+            "onde as outras duas também existem. Cada ponto em 'pontos' é um vértice (prazo "
+            "em dias úteis — 252 é aproximadamente 1 ano), ajustado pelo modelo da própria "
+            "ANBIMA (Svensson/Nelson-Siegel) a partir dos títulos públicos negociados no "
+            "dia. Quando a curva prefixada sobe (sobretudo nos vértices mais longos), FIIs "
+            "tendem a cair — a renda fixa fica mais atraente na comparação; quando recua, o "
             "movimento costuma ser o oposto. Ver seção 'Juros Futuros x Fundos "
             "Imobiliários' em viverderenda.dev.br."
         ),
-        "fonte": "ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ), curva prefixada",
+        "fonte": "ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ): prefixada, IPCA e inflação implícita",
         "fonte_url": URL_FONTE,
         "data_referencia": data_usada.isoformat(),
         "atualizado_em": datetime.now(timezone.utc).isoformat(timespec="seconds"),
