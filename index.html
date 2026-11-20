@@ -4676,19 +4676,7 @@
             <a class="nav-dropdown-item" href="#consulta-rapida">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
             <div class="nav-dropdown-separador"></div>
             <a class="nav-dropdown-item" href="#lista-acoes">📈 Lista de Ações</a>
-            <div class="nav-submenu">
-              <button type="button" class="nav-submenu-item" data-lista="acoes" data-filtro="Financeiro">Financeiro</button>
-              <button type="button" class="nav-submenu-item" data-lista="acoes" data-filtro="Energia Elétrica">Energia elétrica</button>
-              <button type="button" class="nav-submenu-item" data-lista="acoes" data-filtro="Saúde">Saúde</button>
-              <button type="button" class="nav-submenu-item" data-lista="acoes" data-filtro="Materiais Básicos">Materiais básicos</button>
-            </div>
             <a class="nav-dropdown-item" href="#lista-fiis">🏢 Lista de Fundos Imobiliários</a>
-            <div class="nav-submenu">
-              <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Tijolo">Tijolo</button>
-              <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Papel">Papel</button>
-              <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Logístico">Logístico</button>
-              <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Híbrido">Híbrido</button>
-            </div>
             <a class="nav-dropdown-item" href="#mapa-de-calor">🔥 Mapa de Calor do Mercado</a>
             <div class="nav-dropdown-separador"></div>
             <a class="nav-dropdown-item" href="#juros-x-fiis">📉 Juros Futuros x Fundos Imobiliários</a>
@@ -4808,25 +4796,8 @@
     <div class="mobile-menu-separador">Mercado</div>
     <a href="#consulta-rapida" class="mobile-menu-item">🔎 Consulta Ações, FIIs, Stocks e ETFs</a>
     <a href="#consulta-rapida" class="mobile-menu-item">📊 Análise Fundamentalista</a>
-    <!-- Os setores ficam recolhidos: tocar em "Lista de Ações" / "Lista de
-         Fundos Imobiliários" só abre a lista de setores (a seta gira). A lista
-         completa continua a um toque, no primeiro item ("Todas as ..."). -->
-    <button type="button" class="mobile-menu-item mobile-menu-grupo" aria-expanded="false" aria-controls="mmSubAcoes">📈 Lista de Ações <span class="mm-seta" aria-hidden="true">▾</span></button>
-    <div id="mmSubAcoes" class="mobile-menu-sub" hidden>
-      <a href="#lista-acoes" class="mobile-menu-item mobile-menu-subitem">↳ Todas as ações</a>
-      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Financeiro">↳ Financeiro</button>
-      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Energia Elétrica">↳ Energia elétrica</button>
-      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Saúde">↳ Saúde</button>
-      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="acoes" data-filtro="Materiais Básicos">↳ Materiais básicos</button>
-    </div>
-    <button type="button" class="mobile-menu-item mobile-menu-grupo" aria-expanded="false" aria-controls="mmSubFiis">🏢 Lista de Fundos Imobiliários <span class="mm-seta" aria-hidden="true">▾</span></button>
-    <div id="mmSubFiis" class="mobile-menu-sub" hidden>
-      <a href="#lista-fiis" class="mobile-menu-item mobile-menu-subitem">↳ Todos os fundos imobiliários</a>
-      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Tijolo">↳ Tijolo</button>
-      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Papel">↳ Papel</button>
-      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Logístico">↳ Logístico</button>
-      <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Híbrido">↳ Híbrido</button>
-    </div>
+    <a href="#lista-acoes" class="mobile-menu-item">📈 Lista de Ações</a>
+    <a href="#lista-fiis" class="mobile-menu-item">🏢 Lista de Fundos Imobiliários</a>
     <a href="#mapa-de-calor" class="mobile-menu-item">🔥 Mapa de Calor do Mercado</a>
     <a href="#juros-x-fiis" class="mobile-menu-item">📉 Juros Futuros x Fundos Imobiliários</a>
     <a href="#boletim-focus" class="mobile-menu-item">🏦 O que o mercado espera (Boletim Focus)</a>
@@ -5144,11 +5115,11 @@
       </div>
 
       <div class="mc-legenda">
-        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-queda-forte)"></span>≤ -2%</span>
-        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-queda)"></span>-2% a -0,1%</span>
-        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-neutro)"></span>~0%</span>
-        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-alta)"></span>0,1% a 2%</span>
-        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-alta-forte)"></span>≥ 2%</span>
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-queda-forte)"></span>≤ -2% <button type="button" class="hg-info-btn" data-glossario="mc-faixa-queda-forte" aria-label="O que é queda forte?" title="">?</button></span>
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-queda)"></span>-2% a -0,1% <button type="button" class="hg-info-btn" data-glossario="mc-faixa-queda" aria-label="O que é queda?" title="">?</button></span>
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-neutro)"></span>~0% <button type="button" class="hg-info-btn" data-glossario="mc-faixa-neutro" aria-label="O que é praticamente estável?" title="">?</button></span>
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-alta)"></span>0,1% a 2% <button type="button" class="hg-info-btn" data-glossario="mc-faixa-alta" aria-label="O que é alta?" title="">?</button></span>
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-alta-forte)"></span>≥ 2% <button type="button" class="hg-info-btn" data-glossario="mc-faixa-alta-forte" aria-label="O que é alta forte?" title="">?</button></span>
       </div>
 
       <div class="mc-status" id="mcStatus">Carregando mapa de calor…</div>
@@ -22286,6 +22257,11 @@
 
         'ap-proventos-12m': 'Soma dos dividendos e rendimentos dos últimos 12 meses dos ativos da carteira.\n\nQuando você informa o valor recebido (coluna Proventos da tabela), é esse valor que entra. Quando não informa, o site estima: cotas × preço atual × DY 12M, e marca o número com ≈.\n\nCuidado com a estimativa: ela supõe que você tinha essas cotas o ano inteiro. Se você comprou no meio do caminho, o número sai maior do que você realmente recebeu — informe o valor recebido para corrigir.\n\nO DY 12M vem dos robôs do site (ou da HG Brasil). Rendimento passado não é promessa de rendimento futuro.',
 
+        'mc-faixa-queda-forte': 'Queda forte = o ativo caiu 2% ou mais no pregão de hoje em relação ao fechamento de ontem.\n\nSão faixas fixas, só para colorir o Mapa de Calor — não são uma classificação oficial da B3 nem um alerta de risco.',
+        'mc-faixa-queda': 'Queda = o ativo caiu entre 0,1% e 2% no pregão de hoje em relação ao fechamento de ontem.\n\nFaixa fixa, usada só para colorir o Mapa de Calor.',
+        'mc-faixa-neutro': 'Praticamente estável = o ativo variou menos de 0,1% (para mais ou para menos) no pregão de hoje — pequeno o bastante para contar como "sem mudança" neste mapa.',
+        'mc-faixa-alta': 'Alta = o ativo subiu entre 0,1% e 2% no pregão de hoje em relação ao fechamento de ontem.\n\nFaixa fixa, usada só para colorir o Mapa de Calor.',
+        'mc-faixa-alta-forte': 'Alta forte = o ativo subiu 2% ou mais no pregão de hoje em relação ao fechamento de ontem.\n\nSão faixas fixas, só para colorir o Mapa de Calor — não são uma classificação oficial da B3.',
         'ap-dy-on-cost': 'Dividend yield sobre o custo: quanto os proventos de 12 meses representam do que VOCÊ pagou.\n\nConta: proventos 12 meses ÷ custo de aquisição.\n\nÉ o retorno em renda sobre o seu dinheiro, não sobre o preço de hoje. Quem comprou barato tem DY on cost maior do que o DY de quem compra agora — e ele tende a crescer com o tempo, mesmo que o fundo pague sempre o mesmo valor por cota.\n\nLogo abaixo vem o DY sobre o mercado: os mesmos proventos divididos pelo valor de mercado de hoje, ou seja, o que um investidor receberia comprando agora. DY on cost acima dele significa que seus ativos valorizaram desde a compra.',
 
         'ap-carteira-proventos': 'O retorno total da carteira: a valorização mais os proventos, tudo sobre o custo.\n\nConta: (valor de mercado − custo + proventos 12 meses) ÷ custo.\n\nÉ a visão mais completa das seis, porque junta o que o preço rendeu com o que caiu na sua conta em dividendos e rendimentos. Por isso ela pode ficar positiva mesmo com a Valorização negativa: os proventos compensam a queda do preço.\n\nDuas ressalvas: os proventos são só dos últimos 12 meses, enquanto a valorização é desde a compra (que pode ser de muitos anos) — então este número não é uma rentabilidade anual. E entram só os ativos que têm preço médio.',
@@ -26327,17 +26303,6 @@
         { campo: 'variacao_dia_pct', rotulo: 'Variação do dia', grupo: 'Cotação', render: d => variacaoColoridaGlobal(d.variacao_dia_pct) },
         { campo: 'segmento', rotulo: 'Segmento', grupo: 'Classificação', classe: 'lm-setor-tag', render: d => d.segmento || '—' },
       ],
-    });
-
-    // Botões do submenu "Mercado" (Financeiro, Energia elétrica... /
-    // Tijolo, Papel...): revela a seção certa e já aplica o filtro.
-    document.querySelectorAll('[data-lista][data-filtro]').forEach(botao => {
-      botao.addEventListener('click', () => {
-        const idSecao = botao.dataset.lista === 'acoes' ? 'lista-acoes' : 'lista-fiis';
-        revelarSecaoMercado(idSecao);
-        const tabela = window.tabelasMercado[botao.dataset.lista];
-        if (tabela) tabela.aplicarFiltro(botao.dataset.filtro);
-      });
     });
 
     // ============================================================
