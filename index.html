@@ -5167,7 +5167,9 @@
         inflação média que o mercado espera para aquele prazo, embutida nos preços desses títulos (não é uma
         previsão do IBGE nem do Boletim Focus — é o que o próprio mercado está "apostando" ao negociar prefixado
         contra IPCA+). A curva real e a inflação implícita só existem a partir de prazos mais longos (a ANBIMA não
-        publica esse recorte pros vencimentos mais curtos).
+        publica esse recorte pros vencimentos mais curtos) — e aqui no gráfico elas param no mesmo prazo em que a
+        prefixada termina, mesmo a ANBIMA publicando a curva real bem mais longe (acima de 30 anos, por causa das
+        NTN-B mais longas), pra não comparar com um trecho onde não há mais curva pré.
       </p>
       <div id="curvaJurosStatus" class="hg-status">Carregando curva de juros...</div>
       <div id="curvaJurosGraficoWrap" style="position:relative; height:280px; margin-bottom:8px;" hidden>
@@ -18909,14 +18911,28 @@
         // que não existia antes) — monta a união ordenada, igual já feito
         // no gráfico Juros x IFIX, em vez de assumir que os dois dias têm
         // exatamente os mesmos prazos.
-        const mapaHoje = new Map(pontos.map(p => [p.dias, p.taxa]));
-        const mapaAnterior = new Map(pontosAnterior.map(p => [p.dias, p.taxa]));
+        // Filtra por taxa != null (não só "existe no array"): um vértice
+        // que só tem IPCA (sem prefixada) ainda aparece em `pontos`/
+        // `pontosAnterior` — ver coletar_curva_juros.py — e entraria aqui
+        // com valor null se não fosse filtrado, esticando o eixo de novo
+        // pela entrada (mesmo problema que o corte abaixo resolve pro lado
+        // do IPCA).
+        const mapaHoje = new Map(pontos.filter(p => p.taxa != null).map(p => [p.dias, p.taxa]));
+        const mapaAnterior = new Map(pontosAnterior.filter(p => p.taxa != null).map(p => [p.dias, p.taxa]));
         // IPCA (real) e inflação implícita só existem na curva de HOJE — a
         // ANBIMA não manda essas duas no arquivo "anterior" que este robô
         // guarda (só a prefixada, ver coletar_curva_juros.py), então não dá
         // pra comparar dia-a-dia ainda; mostra só a foto de hoje pra essas duas.
-        const mapaIpca = new Map(pontos.filter(p => p.taxa_ipca != null).map(p => [p.dias, p.taxa_ipca]));
-        const mapaInflacao = new Map(pontos.filter(p => p.inflacao_implicita != null).map(p => [p.dias, p.inflacao_implicita]));
+        //
+        // A curva IPCA/inflação implícita da ANBIMA vai bem mais longe que a
+        // prefixada (passa de 30 anos, por causa das NTN-B mais longas) — sem
+        // cortar isso, o gráfico ficava com a maior parte do eixo mostrando
+        // só essas duas linhas esticadas e retas, sem a prefixada (que é a
+        // curva principal) pra comparar. Trunca as duas no mesmo alcance da
+        // prefixada de hoje.
+        const diasMaxPrefixada = pontos.reduce((max, p) => p.taxa != null ? Math.max(max, p.dias) : max, 0);
+        const mapaIpca = new Map(pontos.filter(p => p.taxa_ipca != null && p.dias <= diasMaxPrefixada).map(p => [p.dias, p.taxa_ipca]));
+        const mapaInflacao = new Map(pontos.filter(p => p.inflacao_implicita != null && p.dias <= diasMaxPrefixada).map(p => [p.dias, p.inflacao_implicita]));
         const todosDias = Array.from(new Set([...mapaHoje.keys(), ...mapaAnterior.keys(), ...mapaIpca.keys(), ...mapaInflacao.keys()])).sort((a, b) => a - b);
         const labels = todosDias.map(curvaJurosRotuloVertice);
 
