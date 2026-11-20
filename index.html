@@ -1784,6 +1784,71 @@
       .lm-ativo-nome { max-width: 78px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     }
 
+    /* ---------- Mapa de Calor do Mercado ----------
+       Paleta divergente fixa (mesma cor nos dois temas — um vermelho é um
+       vermelho independente do fundo claro/escuro, como Finviz/Status
+       Invest fazem). Validada com o validador de paleta da skill dataviz
+       (CVD deutan/protan + contraste de texto branco/escuro sobre cada
+       cor) — por isso os 5 tons não são um gradiente "olhômetro" nem o
+       --accent/--danger originais do site (que falham a separação CVD
+       em claro e a faixa de luminosidade em escuro). A cor nunca é o
+       único sinal: todo bloco sempre mostra o ticker e o % como texto. */
+    .mapa-calor {
+      --mc-queda-forte: #8f1623;
+      --mc-queda: #d6495a;
+      --mc-neutro: #c2c4c8;
+      --mc-alta: #258048;
+      --mc-alta-forte: #09512a;
+      --mc-texto-claro: #ffffff;
+      --mc-texto-escuro: #17181a;
+    }
+    .mc-explicacao { color: var(--muted); font-size: 0.86rem; margin: 0 0 16px; max-width: 760px; }
+    .mc-controles {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px; margin-bottom: 14px;
+    }
+    .mc-abas { display: flex; gap: 6px; border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+    .mc-aba {
+      border: none; background: transparent; color: var(--muted); font-family: inherit;
+      font-size: 0.84rem; font-weight: 600; padding: 7px 14px; border-radius: 8px; cursor: pointer;
+    }
+    .mc-aba.ativa { background: var(--primary); color: var(--btn-text); }
+    .mc-aba:hover:not(.ativa) { color: var(--text); }
+    .mc-ver-tabela { font-size: 0.82rem; color: var(--primary); text-decoration: none; white-space: nowrap; }
+    .mc-ver-tabela:hover { text-decoration: underline; }
+    .mc-legenda {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+      margin-bottom: 18px; font-size: 0.78rem; color: var(--muted);
+    }
+    .mc-legenda-item { display: inline-flex; align-items: center; gap: 6px; }
+    .mc-swatch { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+    .mc-status { padding: 24px 0; color: var(--muted); font-size: 0.85rem; text-align: center; }
+    .mc-grade { display: flex; flex-direction: column; gap: 18px; }
+    .mc-setor-bloco {
+      border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: var(--card);
+    }
+    .mc-setor-cabecalho {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+      margin-bottom: 10px; padding: 0 2px;
+    }
+    .mc-setor-nome { font-weight: 700; font-size: 0.88rem; color: var(--text); }
+    .mc-setor-media { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; }
+    .mc-setor-grade {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 4px;
+    }
+    .mc-tile {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; border: none; border-radius: 7px; padding: 10px 6px; cursor: pointer;
+      font-family: inherit; min-height: 54px; transition: transform 0.12s ease;
+    }
+    .mc-tile:hover, .mc-tile:focus-visible { transform: scale(1.05); outline: 2px solid var(--primary); outline-offset: 1px; }
+    .mc-tile-ticker { font-weight: 700; font-size: 0.78rem; font-family: 'IBM Plex Mono', monospace; }
+    .mc-tile-pct { font-size: 0.72rem; font-family: 'IBM Plex Mono', monospace; }
+    @media (max-width: 640px) {
+      .mc-setor-grade { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
+      .mc-tile { min-height: 48px; padding: 8px 4px; }
+    }
+
     .theme-toggle {
       display: inline-flex;
       align-items: center;
@@ -4624,6 +4689,7 @@
               <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Logístico">Logístico</button>
               <button type="button" class="nav-submenu-item" data-lista="fiis" data-filtro="Híbrido">Híbrido</button>
             </div>
+            <a class="nav-dropdown-item" href="#mapa-de-calor">🔥 Mapa de Calor do Mercado</a>
             <div class="nav-dropdown-separador"></div>
             <a class="nav-dropdown-item" href="#juros-x-fiis">📉 Juros Futuros x Fundos Imobiliários</a>
             <a class="nav-dropdown-item" href="#boletim-focus">🏦 O que o mercado espera (Boletim Focus)</a>
@@ -4761,6 +4827,7 @@
       <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Logístico">↳ Logístico</button>
       <button type="button" class="mobile-menu-item mobile-menu-subitem" data-lista="fiis" data-filtro="Híbrido">↳ Híbrido</button>
     </div>
+    <a href="#mapa-de-calor" class="mobile-menu-item">🔥 Mapa de Calor do Mercado</a>
     <a href="#juros-x-fiis" class="mobile-menu-item">📉 Juros Futuros x Fundos Imobiliários</a>
     <a href="#boletim-focus" class="mobile-menu-item">🏦 O que o mercado espera (Boletim Focus)</a>
     <div class="mobile-menu-separador">Renda Fixa</div>
@@ -5046,6 +5113,46 @@
         </table>
       </div>
       <div class="lista-mercado-paginacao" id="paginacaoListaFiis"></div>
+    </section>
+
+    <!-- MAPA DE CALOR DO MERCADO — menu "Mercado". Reaproveita os mesmos
+         mercado-acoes.json / mercado-fiis.json das listas acima: agrupa
+         por setor (ou segmento, nos FIIs) e colore cada bloco pela
+         variação do dia. Nenhum robô novo — só os dados que já existem,
+         olhados de um jeito diferente. -->
+    <section class="hg-busca mapa-calor" id="mapa-de-calor" hidden>
+      <div class="lista-mercado-topo">
+        <h2 class="hg-titulo">🔥 Mapa de Calor do Mercado</h2>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="mapaCalorCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button type="button" class="lista-mercado-fechar" data-fechar-secao="mapa-de-calor" aria-label="Fechar mapa de calor">✕</button>
+        </div>
+      </div>
+      <p class="mc-explicacao">Cada bloco é um ativo, agrupado por setor (ou segmento, nos FIIs) e colorido pela variação do preço no dia. Passe o mouse ou toque num bloco pra ver os detalhes; toque de novo (ou tecle Enter) abre a consulta completa do ativo.</p>
+
+      <div class="mc-controles">
+        <div class="mc-abas" role="tablist" aria-label="Mapa de calor: Ações ou Fundos Imobiliários">
+          <button type="button" class="mc-aba ativa" data-mc-aba="acoes" role="tab" aria-selected="true">📈 Ações</button>
+          <button type="button" class="mc-aba" data-mc-aba="fiis" role="tab" aria-selected="false">🏢 FIIs</button>
+        </div>
+        <a href="#lista-acoes" class="mc-ver-tabela" id="mcVerTabela">Ver em tabela ⇅</a>
+      </div>
+
+      <div class="mc-legenda">
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-queda-forte)"></span>≤ -2%</span>
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-queda)"></span>-2% a -0,1%</span>
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-neutro)"></span>~0%</span>
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-alta)"></span>0,1% a 2%</span>
+        <span class="mc-legenda-item"><span class="mc-swatch" style="background:var(--mc-alta-forte)"></span>≥ 2%</span>
+      </div>
+
+      <div class="mc-status" id="mcStatus">Carregando mapa de calor…</div>
+      <div class="mc-grade" id="mcGrade"></div>
     </section>
 
     <!-- JUROS FUTUROS x FUNDOS IMOBILIÁRIOS — fase 1: só a curva (histórico)
@@ -25044,6 +25151,183 @@
     // Direto) sem inventar outra seção isolada pra isso.
     const ALIAS_SECAO_MERCADO = { 'tesouro-comparar': 'tesouro-direto' };
 
+    // ============================================================
+    // MAPA DE CALOR DO MERCADO — menu "Mercado".
+    // Mesmos mercado-acoes.json / mercado-fiis.json das listas abaixo,
+    // agrupados por setor/segmento e coloridos pela variação do dia.
+    // Paleta fixa (5 faixas, mesma cor nos dois temas) validada pra
+    // separação de CVD e contraste de texto — ver comentário no CSS
+    // (.mapa-calor). Cor nunca é o único sinal: todo bloco mostra o
+    // ticker e o % como texto, e "Ver em tabela" leva pra tabela
+    // acessível (Lista de Ações/FIIs) com a mesma coluna de variação.
+    //
+    // Fica ANTES de revelarSecaoMercado (que chama carregarMapaDeCalor
+    // de propósito: um link direto pra #mapa-de-calor roda esse trecho
+    // já na carga da página, antes de numeroGlobal/moedaGlobal existirem
+    // — mas essas só são usadas dentro do .then() do fetch, que só roda
+    // depois do script inteiro já ter terminado de executar, então a
+    // ordem não importa pra elas. O que importa é mcEstado (const):
+    // acessá-lo antes desta declaração rodar é ReferenceError (TDZ), e
+    // um link direto chega em revelarSecaoMercado ainda hoje síncrono.
+    // ============================================================
+    const MC_FAIXAS = [
+      { max: -2, cor: 'var(--mc-queda-forte)', texto: 'var(--mc-texto-claro)' },
+      { max: -0.1, cor: 'var(--mc-queda)', texto: 'var(--mc-texto-claro)' },
+      { max: 0.1, cor: 'var(--mc-neutro)', texto: 'var(--mc-texto-escuro)' },
+      { max: 2, cor: 'var(--mc-alta)', texto: 'var(--mc-texto-claro)' },
+      { max: Infinity, cor: 'var(--mc-alta-forte)', texto: 'var(--mc-texto-claro)' },
+    ];
+    function mcFaixaDe(variacao) {
+      return MC_FAIXAS.find(f => variacao <= f.max) || MC_FAIXAS[MC_FAIXAS.length - 1];
+    }
+    function mcFormatarPct(v) {
+      const sinal = v > 0 ? '+' : '';
+      return sinal + v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
+    }
+
+    const mcEstado = {
+      aba: 'acoes',
+      dados: { acoes: null, fiis: null },
+      carregando: { acoes: false, fiis: false },
+      inicializado: false,
+    };
+
+    function mcCarregarDataset(tipo) {
+      if (mcEstado.dados[tipo] || mcEstado.carregando[tipo]) return;
+      mcEstado.carregando[tipo] = true;
+      const url = tipo === 'acoes' ? 'mercado-acoes.json' : 'mercado-fiis.json';
+      fetch(`${url}?v=${Date.now()}`, { cache: 'no-store' })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(json => {
+          mcEstado.dados[tipo] = (json.ativos || []).filter(a => typeof a.variacao_dia_pct === 'number' && !isNaN(a.variacao_dia_pct));
+          mcEstado.carregando[tipo] = false;
+          if (mcEstado.aba === tipo) mcRenderizar();
+        })
+        .catch(err => {
+          console.error('Mapa de calor: falha ao carregar ' + url, err);
+          mcEstado.carregando[tipo] = false;
+          if (mcEstado.aba === tipo) {
+            const status = document.getElementById('mcStatus');
+            if (status) { status.hidden = false; status.textContent = 'Não foi possível carregar os dados agora. Tenta de novo mais tarde.'; }
+          }
+        });
+    }
+
+    function mcRenderizar() {
+      const grade = document.getElementById('mcGrade');
+      const status = document.getElementById('mcStatus');
+      if (!grade || !status) return;
+      const tipo = mcEstado.aba;
+      const lista = mcEstado.dados[tipo];
+      if (!lista) {
+        status.hidden = false;
+        status.textContent = 'Carregando mapa de calor…';
+        grade.innerHTML = '';
+        return;
+      }
+      if (lista.length === 0) {
+        status.hidden = false;
+        status.textContent = 'Nenhum dado disponível agora.';
+        grade.innerHTML = '';
+        return;
+      }
+      status.hidden = true;
+
+      const campoGrupo = tipo === 'acoes' ? 'setor' : 'segmento';
+      const campoTamanho = tipo === 'acoes' ? 'valor_mercado' : 'patrimonio_liquido';
+      const grupos = new Map();
+      for (const ativo of lista) {
+        const chave = ativo[campoGrupo] || 'Outros';
+        if (!grupos.has(chave)) grupos.set(chave, []);
+        grupos.get(chave).push(ativo);
+      }
+
+      // Setores maiores (soma do tamanho dos ativos) primeiro, e dentro de
+      // cada setor os ativos maiores primeiro — mesma lógica da coluna
+      // "padrão" das tabelas (Val. Mercado / Patrim. Líq.), só que aqui
+      // organiza o layout em vez de ordenar linhas.
+      //
+      // Mediana, não média: alguns ativos ilíquidos (sobretudo FIIs) têm
+      // variação do dia claramente fora da curva — provavelmente ruído
+      // do pregão anterior/preço de referência, não um movimento real —
+      // e isso é problema de DADO (fonte HG Brasil), não desta tela. Uma
+      // média simples deixaria um único ativo assim distorcer o número
+      // de resumo do setor inteiro; a mediana ignora esses extremos. O
+      // bloco em si mostra o valor de cada ativo sem filtrar nada — só o
+      // resumo do setor é que precisa ser robusto.
+      const tamanhoDe = a => a[campoTamanho] || 0;
+      const medianaDe = ativos => {
+        const ordenadas = ativos.map(a => a.variacao_dia_pct).sort((a, b) => a - b);
+        const meio = Math.floor(ordenadas.length / 2);
+        return ordenadas.length % 2 ? ordenadas[meio] : (ordenadas[meio - 1] + ordenadas[meio]) / 2;
+      };
+      const setores = [...grupos.entries()]
+        .map(([nome, ativos]) => ({
+          nome,
+          ativos: ativos.slice().sort((a, b) => tamanhoDe(b) - tamanhoDe(a)),
+          tamanhoTotal: ativos.reduce((soma, a) => soma + tamanhoDe(a), 0),
+          medianaVariacao: medianaDe(ativos),
+        }))
+        .sort((a, b) => b.tamanhoTotal - a.tamanhoTotal);
+
+      grade.innerHTML = setores.map(s => `
+        <div class="mc-setor-bloco">
+          <div class="mc-setor-cabecalho">
+            <span class="mc-setor-nome">${hgEscapeHtml(s.nome)}</span>
+            <span class="mc-setor-media ${s.medianaVariacao >= 0 ? 'lm-variacao-pos' : 'lm-variacao-neg'}" title="Mediana da variação do dia dos ativos deste setor — não é afetada por um ou outro ativo com variação fora da curva.">${mcFormatarPct(s.medianaVariacao)} mediana</span>
+          </div>
+          <div class="mc-setor-grade">
+            ${s.ativos.map(a => {
+              const faixa = mcFaixaDe(a.variacao_dia_pct);
+              const detalhes = tipo === 'acoes'
+                ? `${a.nome || a.ticker} — ${a.setor || '—'} — Var. dia: ${mcFormatarPct(a.variacao_dia_pct)} — DY: ${a.dy_pct != null ? numeroGlobal(a.dy_pct) + '%' : '—'} — P/L: ${a.pl != null ? numeroGlobal(a.pl) : '—'}`
+                : `${a.nome || a.ticker} — ${a.segmento || '—'} — Var. dia: ${mcFormatarPct(a.variacao_dia_pct)} — DY: ${a.dy_pct != null ? numeroGlobal(a.dy_pct) + '%' : '—'} — P/VP: ${a.pvp != null ? numeroGlobal(a.pvp) : '—'}`;
+              return `
+                <button type="button" class="mc-tile" data-ticker="${hgEscapeHtml(a.ticker)}"
+                        style="background:${faixa.cor}; color:${faixa.texto};"
+                        title="${hgEscapeHtml(detalhes)}"
+                        aria-label="${hgEscapeHtml(a.ticker)}, ${hgEscapeHtml(detalhes)}. Toque ou tecle Enter pra ver a consulta completa.">
+                  <span class="mc-tile-ticker">${hgEscapeHtml(a.ticker)}</span>
+                  <span class="mc-tile-pct">${mcFormatarPct(a.variacao_dia_pct)}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      grade.querySelectorAll('.mc-tile').forEach(tile => {
+        tile.addEventListener('click', () => {
+          if (window.hgConsultarAtivo) window.hgConsultarAtivo(tile.dataset.ticker);
+        });
+      });
+    }
+
+    function mcTrocarAba(aba) {
+      if (mcEstado.aba === aba) return;
+      mcEstado.aba = aba;
+      document.querySelectorAll('.mc-aba').forEach(botao => {
+        const ativa = botao.dataset.mcAba === aba;
+        botao.classList.toggle('ativa', ativa);
+        botao.setAttribute('aria-selected', String(ativa));
+      });
+      const linkTabela = document.getElementById('mcVerTabela');
+      if (linkTabela) {
+        linkTabela.setAttribute('href', aba === 'acoes' ? '#lista-acoes' : '#lista-fiis');
+      }
+      if (!mcEstado.dados[aba]) mcCarregarDataset(aba);
+      else mcRenderizar();
+    }
+    document.querySelectorAll('.mc-aba').forEach(botao => {
+      botao.addEventListener('click', () => mcTrocarAba(botao.dataset.mcAba));
+    });
+
+    function carregarMapaDeCalor() {
+      if (mcEstado.inicializado) return;
+      mcEstado.inicializado = true;
+      mcCarregarDataset('acoes');
+    }
+
     function revelarSecaoMercado(id, { corrigirDepois = false } = {}) {
       const secaoId = ALIAS_SECAO_MERCADO[id] || id;
       const secao = document.getElementById(secaoId);
@@ -25056,6 +25340,7 @@
       // handlers do mesmo clique.
       if (secaoId === 'juros-x-fiis') { carregarCurvaJuros(); carregarComparacaoJurosIfix(); }
       if (secaoId === 'boletim-focus') { carregarBoletimFocus(); }
+      if (secaoId === 'mapa-de-calor') { carregarMapaDeCalor(); }
       atualizarCabecalhoFixoListaMercado(secao);
       // Rola até o ALVO (que pode ser um sub-bloco, via o alias acima —
       // não necessariamente o topo da seção inteira), descontando o
@@ -25109,15 +25394,21 @@
         titulo: 'Todos os Fundos Imobiliários — Viver de Renda',
         texto: 'Cotações e indicadores de todos os Fundos Imobiliários da B3, num só lugar.',
       }));
+    document.getElementById('mapaCalorCompartilharLink')?.addEventListener('click', (e) =>
+      hgCompartilharLinkFerramenta(e.currentTarget, {
+        hash: 'mapa-de-calor',
+        titulo: 'Mapa de Calor do Mercado — Viver de Renda',
+        texto: 'Ações e Fundos Imobiliários da B3, agrupados por setor e coloridos pela variação do dia.',
+      }));
 
-    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#tesouro-direto"], a[href="#taxa-justa"], a[href="#debentures"], a[href="#cri"], a[href="#cra"], a[href="#juros-x-fiis"], a[href="#boletim-focus"]').forEach(link => {
+    document.querySelectorAll('a[href="#lista-acoes"], a[href="#lista-fiis"], a[href="#mapa-de-calor"], a[href="#tesouro-direto"], a[href="#taxa-justa"], a[href="#debentures"], a[href="#cri"], a[href="#cra"], a[href="#juros-x-fiis"], a[href="#boletim-focus"]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         revelarSecaoMercado(link.getAttribute('href').slice(1));
       });
     });
     // Link direto (compartilhado ou digitado na barra de endereço)
-    if (['#lista-acoes', '#lista-fiis', '#tesouro-direto', '#tesouro-comparar', '#taxa-justa', '#debentures', '#cri', '#cra', '#rankings-fiis', '#alertas-preco', '#juros-x-fiis', '#boletim-focus'].includes(window.location.hash)) {
+    if (['#lista-acoes', '#lista-fiis', '#mapa-de-calor', '#tesouro-direto', '#tesouro-comparar', '#taxa-justa', '#debentures', '#cri', '#cra', '#rankings-fiis', '#alertas-preco', '#juros-x-fiis', '#boletim-focus'].includes(window.location.hash)) {
       revelarSecaoMercado(window.location.hash.slice(1), { corrigirDepois: true });
     }
     // Botão "✕" no topo de cada lista — esconde a seção de novo e rola
