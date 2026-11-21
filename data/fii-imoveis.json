@@ -2,7 +2,7 @@
  "_leia_me": "Vacância e inadimplência de FIIs de tijolo, por imóvel e agregado por fundo (média ponderada pela participação de cada imóvel na receita do fundo), direto do Informe Trimestral de FIIs da CVM (dados abertos, não scraping) — ver coletar_cvm_fii_imoveis.py. 'resumo_ia' é um texto curto gerado pelo mesmo Worker de IA que atende o Assistente do site, descrevendo os números em linguagem simples; null quando a chamada falhou ou ainda não rodou pra esse fundo. Só fundos com propriedades 'Imóveis para renda acabados' aparecem aqui — fundos de papel/recebíveis (sem imóvel físico) não têm esse dado na CVM, por isso não entram neste arquivo. Consulte 'fatos relevantes' e 'relatórios gerenciais' direto no Fundos.NET (fnet.bmfbovespa.com.br) — não automatizado aqui (Cloudflare + CAPTCHA na fonte).",
  "fonte": "CVM — Dados Abertos, Informe Trimestral de FIIs (inf_trimestral_fii_imovel)",
  "fonte_url": "https://dados.cvm.gov.br/dados/FII/DOC/INF_TRIMESTRAL/DADOS/",
- "atualizado_em": "2026-11-21T01:13:21+00:00",
+ "atualizado_em": "2026-11-21T01:34:59+00:00",
  "fundos": {
   "FVPQ11": {
    "data_referencia": "2026-09-30",
