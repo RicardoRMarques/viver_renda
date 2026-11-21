@@ -1823,6 +1823,25 @@
     .mc-legenda-item { display: inline-flex; align-items: center; gap: 6px; }
     .mc-swatch { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
     .mc-status { padding: 24px 0; color: var(--muted); font-size: 0.85rem; text-align: center; }
+
+    /* Legenda da Curva de juros — cada marca imita o pointStyle da série
+       correspondente no Chart.js (círculo/tracejado/triângulo/quadrado),
+       pra quem olha a legenda reconhecer a linha no gráfico pela forma,
+       não só pela cor (mesmo motivo do traço/marcador distintos no
+       gráfico — ver carregarCurvaJuros no script). */
+    .cj-legenda {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+      margin: 10px 0 14px; font-size: 0.78rem; color: var(--muted);
+    }
+    .cj-legenda-item { display: inline-flex; align-items: center; gap: 6px; }
+    .cj-marca { flex-shrink: 0; }
+    .cj-marca-circulo { width: 12px; height: 12px; border-radius: 50%; }
+    .cj-marca-tracejada { width: 16px; height: 0; border-top: 2px dashed var(--muted); }
+    .cj-marca-triangulo {
+      width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent;
+      border-bottom: 11px solid; /* cor via border-bottom-color inline, ver HTML */
+    }
+    .cj-marca-quadrado { width: 11px; height: 11px; }
     .mc-grade { display: flex; flex-direction: column; gap: 18px; }
     .mc-setor-bloco {
       border: 1px solid var(--border); border-radius: 12px; padding: 12px; background: var(--card);
@@ -5171,6 +5190,12 @@
         prefixada termina, mesmo a ANBIMA publicando a curva real bem mais longe (acima de 30 anos, por causa das
         NTN-B mais longas), pra não comparar com um trecho onde não há mais curva pré.
       </p>
+      <div class="cj-legenda">
+        <span class="cj-legenda-item"><span class="cj-marca cj-marca-circulo" style="background:var(--primary)"></span>Prefixada — hoje <button type="button" class="hg-info-btn" data-glossario="curva-prefixada" aria-label="O que é a curva Prefixada?" title="">?</button></span>
+        <span class="cj-legenda-item"><span class="cj-marca cj-marca-tracejada"></span>Prefixada — dia anterior <button type="button" class="hg-info-btn" data-glossario="curva-prefixada-anterior" aria-label="O que é a curva Prefixada do dia anterior?" title="">?</button></span>
+        <span class="cj-legenda-item"><span class="cj-marca cj-marca-triangulo" style="border-bottom-color:var(--accent)"></span>Real (IPCA) — hoje <button type="button" class="hg-info-btn" data-glossario="curva-ipca-real" aria-label="O que é a curva Real (IPCA)?" title="">?</button></span>
+        <span class="cj-legenda-item"><span class="cj-marca cj-marca-quadrado" style="background:var(--gold)"></span>Inflação implícita — hoje <button type="button" class="hg-info-btn" data-glossario="curva-inflacao-implicita" aria-label="O que é a inflação implícita?" title="">?</button></span>
+      </div>
       <div id="curvaJurosStatus" class="hg-status">Carregando curva de juros...</div>
       <div id="curvaJurosGraficoWrap" style="position:relative; height:280px; margin-bottom:8px;" hidden>
         <canvas id="curvaJurosChart"></canvas>
@@ -22311,6 +22336,10 @@
 
         'ap-proventos-12m': 'Soma dos dividendos e rendimentos dos últimos 12 meses dos ativos da carteira.\n\nQuando você informa o valor recebido (coluna Proventos da tabela), é esse valor que entra. Quando não informa, o site estima: cotas × preço atual × DY 12M, e marca o número com ≈.\n\nCuidado com a estimativa: ela supõe que você tinha essas cotas o ano inteiro. Se você comprou no meio do caminho, o número sai maior do que você realmente recebeu — informe o valor recebido para corrigir.\n\nO DY 12M vem dos robôs do site (ou da HG Brasil). Rendimento passado não é promessa de rendimento futuro.',
 
+        'curva-prefixada': 'Taxa anual que o mercado precifica HOJE para esse prazo — a curva que a imprensa chama de "curva do DI futuro" ou "curva pré". Vem da Estrutura a Termo da Taxa de Juros (ETTJ), publicada diariamente pela ANBIMA, que ajusta um modelo (Svensson/Nelson-Siegel) aos títulos públicos prefixados negociados no dia. Quando essa curva sobe (sobretudo nos vértices mais longos), é sinal de juros mais altos pela frente — o que tende a pressionar os FIIs pra baixo.',
+        'curva-prefixada-anterior': 'A mesma curva Prefixada, só que do pregão anterior — pra comparar visualmente onde o mercado mudou de ideia de um dia pro outro, prazo a prazo.',
+        'curva-ipca-real': 'A mesma conta da curva Prefixada, mas a partir dos títulos públicos indexados ao IPCA (NTN-B/Tesouro IPCA+) — o juro REAL, isto é, o que sobra depois de descontar a inflação esperada. Só existe a partir de prazos mais longos (a ANBIMA não publica esse recorte pros vencimentos mais curtos), e por isso o gráfico corta as duas no mesmo prazo em que a Prefixada termina.',
+        'curva-inflacao-implicita': 'A inflação média que o mercado está precificando para esse prazo, embutida no preço desses títulos — não é uma previsão do IBGE nem do Boletim Focus, é o que o próprio mercado está "apostando" ao negociar prefixado contra IPCA+.\n\nJá vem calculada pela própria ANBIMA (este site só lê o número) pela equação de Fisher — NÃO é a subtração direta das duas taxas:\n\ninflação implícita = (1 + Prefixada) ÷ (1 + Real) − 1\n\nEx: Prefixada 14,66% e Real 6,06% dão (1,1466 ÷ 1,0606) − 1 = 8,11% — a subtração direta (14,66 − 6,06 = 8,60%) dá um número diferente, porque ignora o efeito de juro sobre juro. Essa diferença entre as duas contas é pequena em prazos curtos e cresce nos prazos mais longos.',
         'mc-faixa-queda-forte': 'Queda forte = o ativo caiu 2% ou mais no pregão de hoje em relação ao fechamento de ontem.\n\nSão faixas fixas, só para colorir o Mapa de Calor — não são uma classificação oficial da B3 nem um alerta de risco.',
         'mc-faixa-queda': 'Queda = o ativo caiu entre 0,1% e 2% no pregão de hoje em relação ao fechamento de ontem.\n\nFaixa fixa, usada só para colorir o Mapa de Calor.',
         'mc-faixa-neutro': 'Praticamente estável = o ativo variou menos de 0,1% (para mais ou para menos) no pregão de hoje — pequeno o bastante para contar como "sem mudança" neste mapa.',
