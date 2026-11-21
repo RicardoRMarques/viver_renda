@@ -3754,6 +3754,23 @@
     .pgbl-cenario-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 0.86rem; padding: 3px 0; }
     .pgbl-cenario-linha span { color: var(--muted); }
     .pgbl-cenario-liquido { font-size: 1.08rem; font-weight: 700; margin-top: 6px; }
+    /* Comprar x Alugar: 2 cards lado a lado (comprando x alugando) —
+       mesmo visual dos cenários do PGBL x VGBL. */
+    .calc-modal.cxa-modal { max-width: 960px; }
+    @media (min-width: 1024px) {
+      .calc-modal.cxa-modal { max-width: 1040px; }
+    }
+    .cxa-cenarios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    @media (max-width: 560px) {
+      .cxa-cenarios-grid { grid-template-columns: 1fr; }
+    }
+    .cxa-cenario-card { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; background: var(--surface, rgba(255,255,255,0.02)); }
+    .cxa-cenario-card.cxa-cenario-melhor { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+    .cxa-cenario-titulo { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 6px; }
+    .cxa-cenario-card.cxa-cenario-melhor .cxa-cenario-titulo { color: var(--accent); }
+    .cxa-cenario-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 0.86rem; padding: 3px 0; }
+    .cxa-cenario-linha span { color: var(--muted); }
+    .cxa-cenario-liquido { font-size: 1.08rem; font-weight: 700; margin-top: 6px; }
     /* Comparação visual "casa x FII" do Cap Rate — dois cards lado a
        lado, cada um com um ícone representando o ativo. */
     .cr-visual-comparacao { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
@@ -4831,6 +4848,9 @@
             </div>
             <div class="nav-mega-coluna">
               <div class="nav-mega-titulo">Calculadoras</div>
+              <button type="button" class="nav-dropdown-item" id="cxaBtnAbrir">
+                <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Comprar x Alugar Imóvel
+              </button>
               <button type="button" class="nav-dropdown-item" id="rpnBtnAbrir">
                 <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)
               </button>
@@ -4905,6 +4925,7 @@
     <button type="button" class="mobile-menu-item" data-mobile-alvo="fgcBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.9-8 9c-4.8-1.1-8-4.5-8-9V6z"></path><path d="M9 12l2 2l4-4"></path></svg> Cobertura do FGC</button>
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     <div class="mobile-menu-separador">Ferramentas</div>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="cxaBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Comprar x Alugar Imóvel</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="crBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Cap Rate — Imóvel x FII</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="pgblBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8.5-8 9c-4.5-.5-8-4-8-9V7z"></path><path d="M9 12l2 2l4-4"></path></svg> PGBL x VGBL — Qual Previdência Vale Mais?</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
@@ -8288,6 +8309,169 @@
                 Taxas de administração e carregamento do plano, portabilidade entre fundos, resgate parcial ou em
                 renda mensal (só simula resgate único), mudanças futuras na legislação e a hipótese de reinvestir a
                 economia de IR do PGBL em outro ativo (aqui ela aparece separada, não soma ao saldo acumulado).
+              </p>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       COMPRAR x ALUGAR IMÓVEL — compara comprar um imóvel financiado
+       (Price) com alugar um equivalente e investir a diferença (a
+       entrada + o que sobrar todo mês entre a parcela e o aluguel).
+       Metodologia padrão de calculadoras de "rent vs. buy": ao final do
+       prazo, compara o patrimônio em imóvel (quitado, já valorizado,
+       menos custo de venda) com o saldo investido. Não inclui IR sobre
+       ganho de capital na venda nem sobre os rendimentos investidos —
+       ver aviso no bloco educativo.
+       ============================================================ -->
+  <div id="cxaOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="cxaTitulo" hidden>
+    <div class="calc-modal cxa-modal">
+      <div class="calc-modal-topo">
+        <h3 id="cxaTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg>Comprar x Alugar Imóvel
+        </h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="cxaCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button id="cxaFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+      </div>
+
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Compara comprar um imóvel financiado com alugar um equivalente e investir a entrada + a diferença mensal
+          entre a parcela e o aluguel. Simulação em Price (parcelas fixas) — use a <strong>Calculadora Financiamento
+          Imobiliário</strong> pra ver a tabela de amortização completa (SAC ou Price).
+        </p>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="cxaValorImovel">Valor do imóvel</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="cxaValorImovel" placeholder="500.000,00" />
+            </div>
+          </div>
+          <div class="calc-campo">
+            <label for="cxaEntrada">Valor de entrada</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="cxaEntrada" placeholder="100.000,00" />
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="cxaPrazoAnos">Prazo do financiamento / da comparação (anos)</label>
+            <input type="number" id="cxaPrazoAnos" min="1" max="60" step="1" placeholder="30" />
+          </div>
+          <div class="calc-campo">
+            <label for="cxaTaxaJuros">Taxa de juros do financiamento (% a.a.)</label>
+            <input type="number" id="cxaTaxaJuros" min="0" step="0.1" placeholder="11,5" />
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="cxaAluguel">Aluguel mensal de um imóvel equivalente</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="cxaAluguel" placeholder="2.200,00" />
+            </div>
+          </div>
+          <div class="calc-campo">
+            <label for="cxaReajusteAluguel">Reajuste anual esperado do aluguel (%)</label>
+            <input type="number" id="cxaReajusteAluguel" min="0" step="0.1" placeholder="4,5" />
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="cxaValorizacao">Valorização anual esperada do imóvel (%)</label>
+            <input type="number" id="cxaValorizacao" min="0" step="0.1" placeholder="4" />
+          </div>
+          <div class="calc-campo">
+            <label for="cxaRentabilidade">Rentabilidade anual esperada do que seria investido (%)</label>
+            <input type="number" id="cxaRentabilidade" min="0" step="0.1" placeholder="10" />
+          </div>
+        </div>
+
+        <details class="calc-educativo">
+          <summary>⚙️ Custos extras (opcional, mas mudam bastante o resultado)</summary>
+          <div class="calc-educativo-corpo">
+            <div class="calc-campo">
+              <label for="cxaCustosPosse">Condomínio + IPTU + manutenção (R$/mês, de quem compra)</label>
+              <div class="calc-input-prefixado">
+                <span class="calc-prefixo">R$</span>
+                <input type="text" inputmode="numeric" id="cxaCustosPosse" placeholder="0,00" />
+              </div>
+            </div>
+            <div class="calc-grid-2">
+              <div class="calc-campo">
+                <label for="cxaCustosAquisicao">Custos de aquisição (ITBI, cartório — % do valor)</label>
+                <input type="number" id="cxaCustosAquisicao" min="0" step="0.1" placeholder="4" />
+              </div>
+              <div class="calc-campo">
+                <label for="cxaCustosVenda">Custos de venda ao final (corretagem — % do valor)</label>
+                <input type="number" id="cxaCustosVenda" min="0" step="0.1" placeholder="6" />
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <div class="cmp-acoes-linha" style="margin-top:14px;">
+          <button type="button" class="hg-btn" id="cxaBtnCalcular">Comparar</button>
+          <button type="button" class="cmp-btn-secundario" id="cxaBtnLimpar">Limpar</button>
+        </div>
+
+        <div id="cxaResultado"></div>
+
+        <div id="cxaAcoes" hidden>
+          <p class="calc-ajuda" style="margin:14px 0 6px;">
+            O PDF leva os dados informados e a comparação completa entre comprar e alugar.
+          </p>
+          <div class="cmp-acoes-linha">
+            <button type="button" class="cmp-btn-secundario" id="cxaBtnPdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+              Baixar PDF
+            </button>
+            <button type="button" class="cmp-btn-secundario" id="cxaBtnCompartilhar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+          </div>
+        </div>
+
+        <details class="calc-educativo">
+          <summary>📋 Como esta simulação calcula (e o que ela não cobre)</summary>
+          <div class="calc-educativo-corpo">
+            <div class="calc-educativo-item">
+              <strong>Como calculamos</strong>
+              <p>
+                Comprando: a entrada + os custos de aquisição ficam "presos" no imóvel; o financiamento é em Price
+                (parcelas fixas). Ao fim do prazo, a dívida está quitada e o patrimônio é o valor do imóvel valorizado,
+                menos o custo de venda. Alugando: a entrada + os custos de aquisição ficam investidos desde o início, e
+                todo mês a diferença entre (parcela + custos de posse) e o aluguel também é investida (ou retirada, se
+                o aluguel for mais caro naquele mês) — o aluguel reajusta uma vez por ano.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>O que esta simulação não cobre</strong>
+              <p>
+                Imposto de Renda sobre o ganho de capital na venda do imóvel (há isenção de até R$ 440 mil para quem só
+                tem um imóvel, ou ao reinvestir em outro residencial em até 180 dias — regras à parte) e sobre os
+                rendimentos de quem investiu a diferença (depende do ativo escolhido). Também não inclui seguro
+                obrigatório do financiamento (MIP/DFI), financiamento em SAC, liquidez (vender um imóvel leva muito
+                mais tempo que resgatar um investimento) nem a possibilidade de o imóvel ficar vago, no caso de quem
+                aluga, por algum período entre contratos.
               </p>
             </div>
           </div>
@@ -16532,6 +16716,348 @@
         }));
 
       hgAbrirPorLinkDeFerramenta('pgbl', abrirModal);
+    })();
+
+    // ============================================================
+    // COMPRAR x ALUGAR IMÓVEL — compara comprar (financiado, Price) com
+    // alugar um equivalente e investir a entrada + a diferença mensal
+    // entre a parcela e o aluguel. Metodologia padrão de "rent vs. buy":
+    // ao final do prazo, compara o imóvel quitado e valorizado (menos
+    // custo de venda) com o saldo investido. Não inclui IR — ver aviso
+    // no bloco educativo do modal.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('cxaOverlay');
+      const btnAbrirMenu = document.getElementById('cxaBtnAbrir');
+      const btnFechar = document.getElementById('cxaFechar');
+      const inValorImovel = document.getElementById('cxaValorImovel');
+      const inEntrada = document.getElementById('cxaEntrada');
+      const inPrazo = document.getElementById('cxaPrazoAnos');
+      const inTaxaJuros = document.getElementById('cxaTaxaJuros');
+      const inAluguel = document.getElementById('cxaAluguel');
+      const inReajusteAluguel = document.getElementById('cxaReajusteAluguel');
+      const inValorizacao = document.getElementById('cxaValorizacao');
+      const inRentabilidade = document.getElementById('cxaRentabilidade');
+      const inCustosPosse = document.getElementById('cxaCustosPosse');
+      const inCustosAquisicao = document.getElementById('cxaCustosAquisicao');
+      const inCustosVenda = document.getElementById('cxaCustosVenda');
+      const btnCalcular = document.getElementById('cxaBtnCalcular');
+      const btnLimpar = document.getElementById('cxaBtnLimpar');
+      const resultadoEl = document.getElementById('cxaResultado');
+      const acoesEl = document.getElementById('cxaAcoes');
+      const btnPdf = document.getElementById('cxaBtnPdf');
+
+      if (!overlay || !btnAbrirMenu) return;
+
+      hgAplicarMascaraMoeda(inValorImovel);
+      hgAplicarMascaraMoeda(inEntrada);
+      hgAplicarMascaraMoeda(inAluguel);
+      hgAplicarMascaraMoeda(inCustosPosse);
+
+      let ultimoCalculoCxa = null;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function moeda(v) { return hgFormatMoeda(v); }
+      function pct(v) { return v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
+
+      function erro(msg) {
+        resultadoEl.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a; margin-top:14px;">${msg}</p>`;
+        ultimoCalculoCxa = null;
+        acoesEl.hidden = true;
+      }
+
+      function calcular() {
+        const valorImovel = hgValorMascarado(inValorImovel);
+        const entrada = hgValorMascarado(inEntrada);
+        const anos = parseInt(inPrazo.value, 10);
+        const taxaJurosAnual = parseFloat((inTaxaJuros.value || '').replace(',', '.'));
+        const aluguelMensal = hgValorMascarado(inAluguel);
+        const reajusteAluguelAnual = parseFloat((inReajusteAluguel.value || '').replace(',', '.'));
+        const valorizacaoAnual = parseFloat((inValorizacao.value || '').replace(',', '.'));
+        const rentabilidadeAnual = parseFloat((inRentabilidade.value || '').replace(',', '.'));
+        const custosPosseMensal = hgValorMascarado(inCustosPosse) || 0;
+        const custosAquisicaoPct = parseFloat((inCustosAquisicao.value || '0').replace(',', '.')) || 0;
+        const custosVendaPct = parseFloat((inCustosVenda.value || '0').replace(',', '.')) || 0;
+
+        if (!(valorImovel > 0) || !(anos > 0) || !(taxaJurosAnual >= 0) || !(aluguelMensal > 0)
+          || !(reajusteAluguelAnual >= 0) || !(valorizacaoAnual >= 0) || !(rentabilidadeAnual >= 0)) {
+          erro('Preencha o valor do imóvel, o prazo, as taxas e o aluguel pra comparar.');
+          return;
+        }
+        if (!(entrada >= 0) || entrada >= valorImovel) {
+          erro('A entrada precisa ser menor que o valor do imóvel.');
+          return;
+        }
+
+        const financiamento = valorImovel - entrada;
+        const n = anos * 12;
+        const iMensalFinanc = Math.pow(1 + taxaJurosAnual / 100, 1 / 12) - 1;
+        const parcela = iMensalFinanc > 0
+          ? financiamento * iMensalFinanc / (1 - Math.pow(1 + iMensalFinanc, -n))
+          : financiamento / n;
+
+        const custosAquisicao = valorImovel * (custosAquisicaoPct / 100);
+        const desembolsoInicial = entrada + custosAquisicao;
+
+        // ---- Comprando: dívida quitada ao final, patrimônio = imóvel
+        // valorizado menos custo de venda ----
+        const valorImovelFinal = valorImovel * Math.pow(1 + valorizacaoAnual / 100, anos);
+        const custosVenda = valorImovelFinal * (custosVendaPct / 100);
+        const patrimonioComprar = valorImovelFinal - custosVenda;
+        const totalPagoComprar = desembolsoInicial + parcela * n + custosPosseMensal * n;
+
+        // ---- Alugando: a entrada+custos de aquisição ficam investidos
+        // desde o início; todo mês, a diferença entre o custo de
+        // comprar (parcela + custos de posse) e o aluguel também é
+        // investida (ou sacada, se o aluguel for mais caro) ----
+        const iMensalInvest = Math.pow(1 + rentabilidadeAnual / 100, 1 / 12) - 1;
+        let saldoInvestido = desembolsoInicial;
+        let aluguelAtual = aluguelMensal;
+        let totalPagoAlugar = 0;
+        for (let m = 1; m <= n; m++) {
+          if (m > 1 && (m - 1) % 12 === 0) aluguelAtual *= (1 + reajusteAluguelAnual / 100);
+          const custoComprarMes = parcela + custosPosseMensal;
+          const diferenca = custoComprarMes - aluguelAtual;
+          saldoInvestido = saldoInvestido * (1 + iMensalInvest) + diferenca;
+          totalPagoAlugar += aluguelAtual;
+        }
+        const patrimonioAlugar = saldoInvestido;
+
+        const cenarios = [
+          { chave: 'comprar', titulo: 'Comprando', patrimonio: patrimonioComprar, totalPago: totalPagoComprar },
+          { chave: 'alugar', titulo: 'Alugando e investindo a diferença', patrimonio: patrimonioAlugar, totalPago: totalPagoAlugar },
+        ];
+        const melhor = cenarios.reduce((a, b) => (b.patrimonio > a.patrimonio ? b : a));
+        const diferencaPatrimonio = Math.abs(cenarios[0].patrimonio - cenarios[1].patrimonio);
+
+        const cardsHtml = cenarios.map(c => `
+          <div class="cxa-cenario-card${c === melhor ? ' cxa-cenario-melhor' : ''}">
+            <div class="cxa-cenario-titulo">${c === melhor ? '🏆 ' : ''}${c.titulo}</div>
+            <div class="cxa-cenario-linha"><span>${c.chave === 'comprar' ? 'Total pago (parcelas + custos)' : 'Total pago em aluguel'}</span><strong>${moeda(c.totalPago)}</strong></div>
+            <div class="cxa-cenario-linha"><span>Patrimônio ao final</span><strong>${moeda(c.patrimonio)}</strong></div>
+            <div class="cxa-cenario-liquido">${moeda(c.patrimonio)}</div>
+          </div>`).join('');
+
+        resultadoEl.innerHTML = `
+          <div class="carteira-resumo-cards">
+            <div class="carteira-resumo-card">
+              <span>Valor financiado</span>
+              <strong>${moeda(financiamento)}</strong>
+            </div>
+            <div class="carteira-resumo-card">
+              <span>Parcela mensal (Price)</span>
+              <strong>${moeda(parcela)}</strong>
+            </div>
+            <div class="carteira-resumo-card carteira-resumo-destaque">
+              <span>Capital investido de início (quem aluga)</span>
+              <strong>${moeda(desembolsoInicial)}</strong>
+            </div>
+          </div>
+
+          <p class="calc-ajuda" style="margin-top:14px; margin-bottom:0;">
+            Depois de ${anos} ano${anos > 1 ? 's' : ''}, <strong>${melhor.titulo === 'Comprando' ? 'comprar' : 'alugar e investir a diferença'}</strong>
+            deixaria ${moeda(diferencaPatrimonio)} a mais de patrimônio, nas premissas que você informou:
+          </p>
+          <div class="cxa-cenarios-grid">${cardsHtml}</div>
+          <p class="calc-ajuda" style="margin-top:10px;">
+            O resultado é bem sensível à rentabilidade do investimento e à valorização do imóvel — vale testar
+            cenários diferentes pra cada uma. 🏆 marca o de maior patrimônio final, com os dados informados.
+          </p>`;
+
+        ultimoCalculoCxa = {
+          valorImovel, entrada, anos, taxaJurosAnual, aluguelMensal, reajusteAluguelAnual,
+          valorizacaoAnual, rentabilidadeAnual, custosPosseMensal, custosAquisicaoPct, custosVendaPct,
+          financiamento, parcela, desembolsoInicial, cenarios, melhor, diferencaPatrimonio,
+        };
+        acoesEl.hidden = false;
+      }
+
+      function limpar() {
+        inValorImovel.value = '';
+        inValorImovel.dataset.centavos = '0';
+        inEntrada.value = '';
+        inEntrada.dataset.centavos = '0';
+        inPrazo.value = '';
+        inTaxaJuros.value = '';
+        inAluguel.value = '';
+        inAluguel.dataset.centavos = '0';
+        inReajusteAluguel.value = '';
+        inValorizacao.value = '';
+        inRentabilidade.value = '';
+        inCustosPosse.value = '';
+        inCustosPosse.dataset.centavos = '0';
+        inCustosAquisicao.value = '';
+        inCustosVenda.value = '';
+        resultadoEl.innerHTML = '';
+        ultimoCalculoCxa = null;
+        acoesEl.hidden = true;
+      }
+
+      function nomeArquivoPdfCxa() {
+        return 'comprar-x-alugar-imovel.pdf';
+      }
+
+      async function montarDocumentoPdfCxa() {
+        if (!ultimoCalculoCxa) {
+          alert('Compare antes de gerar o PDF.');
+          return null;
+        }
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+
+        const c = ultimoCalculoCxa;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Comprar x Alugar Imóvel', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
+        doc.setFontSize(8);
+        doc.text(
+          'Conteúdo educativo, não é recomendação. Não inclui IR sobre ganho de capital na venda nem sobre o investimento.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Dados informados']],
+          body: [
+            ['Valor do imóvel', moeda(c.valorImovel)],
+            ['Entrada', moeda(c.entrada)],
+            ['Prazo', `${c.anos} ano${c.anos > 1 ? 's' : ''}`],
+            ['Taxa de juros do financiamento', pct(c.taxaJurosAnual)],
+            ['Aluguel mensal equivalente', moeda(c.aluguelMensal)],
+            ['Reajuste anual do aluguel', pct(c.reajusteAluguelAnual)],
+            ['Valorização anual do imóvel', pct(c.valorizacaoAnual)],
+            ['Rentabilidade anual do investimento', pct(c.rentabilidadeAnual)],
+            ['Condomínio + IPTU + manutenção', `${moeda(c.custosPosseMensal)}/mês`],
+            ['Custos de aquisição', pct(c.custosAquisicaoPct)],
+            ['Custos de venda ao final', pct(c.custosVendaPct)],
+          ],
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 18,
+          head: [['', 'Financiamento (Price)']],
+          body: [
+            ['Valor financiado', moeda(c.financiamento)],
+            ['Parcela mensal', moeda(c.parcela)],
+            ['Capital investido de início (quem aluga)', moeda(c.desembolsoInicial)],
+          ],
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 18,
+          head: [['Cenário', 'Total pago', 'Patrimônio ao final']],
+          body: c.cenarios.map(cen => [
+            `${cen === c.melhor ? '★ ' : ''}${cen.titulo}`,
+            moeda(cen.totalPago),
+            moeda(cen.patrimonio),
+          ]),
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6, halign: 'center' },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { halign: 'left', fontStyle: 'bold' } },
+        });
+
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 18,
+          head: [['O que esta simulação NÃO cobre']],
+          body: [
+            ['IR sobre o ganho de capital na venda do imóvel (há isenção de até R$ 440 mil para imóvel único) e sobre os rendimentos de quem investiu a diferença.'],
+            ['Seguro obrigatório do financiamento (MIP/DFI) e financiamento em SAC — aqui só simulamos Price.'],
+            ['Liquidez — vender um imóvel leva muito mais tempo que resgatar um investimento.'],
+            ['Período de imóvel vago entre contratos, para quem aluga.'],
+          ],
+          theme: 'grid',
+          styles: { fontSize: 8, cellPadding: 6, textColor: 60 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255 },
+        });
+
+        return doc;
+      }
+
+      async function gerarPdfCxa() {
+        const doc = await montarDocumentoPdfCxa();
+        if (!doc) return;
+        doc.save(nomeArquivoPdfCxa());
+      }
+
+      async function compartilharResultadoCxa(botao) {
+        const doc = await montarDocumentoPdfCxa();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoPdfCxa();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Comprar x Alugar Imóvel — Viver de Renda', files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoSpan = botao.querySelector('.hg-btn-compartilhar-texto');
+        const textoPadrao = textoSpan ? textoSpan.textContent : null;
+        if (textoSpan) textoSpan.textContent = 'PDF baixado!';
+        setTimeout(() => { if (textoSpan && textoPadrao) textoSpan.textContent = textoPadrao; }, 2500);
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
+      btnLimpar.addEventListener('click', limpar);
+      btnPdf.addEventListener('click', gerarPdfCxa);
+      document.getElementById('cxaBtnCompartilhar')?.addEventListener('click', (e) => compartilharResultadoCxa(e.currentTarget));
+
+      document.getElementById('cxaCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'cxa',
+          titulo: 'Comprar x Alugar Imóvel — Viver de Renda',
+          texto: 'Compare comprar um imóvel financiado com alugar e investir a diferença.',
+        }));
+
+      hgAbrirPorLinkDeFerramenta('cxa', abrirModal);
     })();
 
     // ============================================================
