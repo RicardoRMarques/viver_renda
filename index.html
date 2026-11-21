@@ -10426,10 +10426,12 @@
                   <button type="button" class="hg-btn-secundario-pequeno" id="hgDividendosBtnToggle">
                     📊 Ver histórico de dividendos
                   </button>
-                  ${a.kind === 'stock' ? `
+                  ${a.kind === 'stock' || a.kind === 'fii' ? `
                   <button type="button" class="hg-btn-secundario-pequeno" id="hgFundInlineBtnToggle">
                     📊 Ver Análise Fundamentalista completa
                   </button>
+                  ` : ''}
+                  ${a.kind === 'stock' ? `
                   <button type="button" class="hg-btn-secundario-pequeno" id="hgCompararBtnToggle">
                     ⚖️ Comparar com outros ativos
                   </button>
@@ -10438,12 +10440,14 @@
 
                 <div id="hgDividendosConteudo"></div>
 
-                ${a.kind === 'stock' ? `
+                ${a.kind === 'stock' || a.kind === 'fii' ? `
                 <div id="hgFundInlineWrap" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
                   <div class="hg-status" id="hgFundInlineStatus"></div>
                   <div id="hgFundInlineResultado"></div>
                 </div>
+                ` : ''}
 
+                ${a.kind === 'stock' ? `
                 <div id="hgCompararWrap" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
                   <div class="hg-linha-busca" style="margin-bottom:10px; position:relative;">
                     <input type="text" id="hgCompararTickersInput" placeholder="Ex: BPAC11, ABCB4, WEGE3 (até 3 ativos, separados por vírgula)" autocomplete="off" />
