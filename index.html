@@ -454,6 +454,43 @@
     .copom-nota a { color: var(--primary); font-weight: 700; text-decoration: none; }
     .copom-nota a:hover { text-decoration: underline; }
 
+    /* ---------- Calendário Econômico (IPCA/PIB/Payroll/Fed) ----------
+       Mesma linguagem visual do bloco do Copom logo acima, mas com classe
+       própria em vez de reaproveitar .copom-* — são dados de fontes e
+       robôs diferentes (na real, nenhum robô: é lista chumbada igual o
+       Copom, pelo mesmo motivo), então deixar cada bloco com seu próprio
+       CSS evita que um ajuste futuro num vaze sem querer pro outro. */
+    .caleco-bloco {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; margin: 12px 0 16px; background: var(--deep);
+    }
+    .caleco-titulo {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--muted); font-weight: 700; margin-bottom: 8px;
+    }
+    .caleco-ipca-nota {
+      font-size: 0.78rem; color: var(--text); background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin-bottom: 8px;
+    }
+    .caleco-ipca-nota a { color: var(--primary); font-weight: 700; text-decoration: none; }
+    .caleco-ipca-nota a:hover { text-decoration: underline; }
+    .caleco-linha {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 10px; padding: 5px 0; font-size: 0.86rem; flex-wrap: wrap;
+    }
+    .caleco-linha + .caleco-linha { border-top: 1px solid var(--border); }
+    .caleco-data { font-weight: 700; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; }
+    .caleco-detalhe { font-size: 0.74rem; color: var(--muted); }
+    .caleco-proxima .caleco-data { color: var(--primary); }
+    .caleco-etiqueta {
+      font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.05em;
+      font-weight: 700; color: var(--primary); border: 1px solid var(--primary);
+      border-radius: 999px; padding: 1px 7px;
+    }
+    .caleco-nota { font-size: 0.72rem; color: var(--muted); margin-top: 8px; }
+    .caleco-nota a { color: var(--primary); font-weight: 700; text-decoration: none; }
+    .caleco-nota a:hover { text-decoration: underline; }
+
     /* ---------- Tesouro Direto ----------
        Seção própria, NÃO reaproveita .lista-mercado: aquela classe carrega
        junto o mecanismo de cabeçalho fixo que está congelado por decisão do
@@ -8655,6 +8692,24 @@
           </div>
         </div>
 
+        <div class="caleco-bloco" id="calecoBloco" hidden>
+          <div class="caleco-titulo">Calendário Econômico</div>
+          <div class="caleco-ipca-nota">
+            <strong>IPCA</strong> — o IBGE divulga todo mês, geralmente entre o 8º e o 12º dia útil, referente ao mês
+            anterior (a inflação de outubro/2026, por exemplo, saiu em 12/11/2026). Não dá pra cravar o dia exato de
+            cada mês aqui com segurança — confira a data certa no
+            <a href="https://www.ibge.gov.br/calendario/conjunturais.html" target="_blank" rel="noopener noreferrer">calendário do IBGE</a>.
+          </div>
+          <div id="calecoLista"></div>
+          <div class="caleco-nota">
+            PIB e FOMC conferidos direto nos calendários oficiais do IBGE e do Federal Reserve. O payroll dos EUA
+            segue o calendário anual já divulgado pelo BLS, mas o próprio bls.gov bloqueia acesso automatizado — essas
+            datas não foram conferidas linha a linha na fonte; vale checar em
+            <a href="https://www.bls.gov/schedule/news_release/empsit.htm" target="_blank" rel="noopener noreferrer">bls.gov</a>
+            antes de decisões importantes. Datas marcadas "previsto" podem mudar.
+          </div>
+        </div>
+
         <div id="agendaSemAtivos" class="agenda-vazio" style="display:none;">
           Nenhum ativo encontrado nos seus favoritos ⭐ ou na Carteira de Rendimentos ainda. Favorite um ativo na
           Consulta Rápida ou adicione algo à Carteira pra essa agenda se preencher sozinha.
@@ -13056,6 +13111,124 @@
                 String(ata.getDate()).padStart(2, '0')}/${String(ata.getMonth() + 1).padStart(2, '0')}</span>
             </div>`;
         }).join('');
+        bloco.hidden = false;
+      }
+
+      render();
+    })();
+
+    // ============================================================
+    // CALENDÁRIO ECONÔMICO (IPCA / PIB / Payroll dos EUA / Fed)
+    //
+    // Mesma lógica do bloco do Copom logo acima: listas chumbadas,
+    // atualizadas à mão quando a fonte oficial publica mais datas — um
+    // robô custaria mais manutenção do que acrescentar linhas aqui.
+    //
+    // Confiança dos dados (verificado em 21/11/2026):
+    //   - FOMC: confirmado direto em federalreserve.gov/monetarypolicy/
+    //     fomccalendars.htm (calendário revisado, "Last Update: November
+    //     18, 2026" na própria página). A reunião de 26-27/10/2027 é só
+    //     de estratégia de longo prazo, sem decisão de juros — a própria
+    //     página do Fed diz isso.
+    //   - Payroll (Employment Situation, BLS): bls.gov bloqueia acesso
+    //     automatizado na própria página ("automated retrieval programs
+    //     ... prohibited") — não dá pra confirmar direto na fonte. Datas
+    //     abaixo vieram de busca na web (sempre caem numa sexta-feira,
+    //     conferido manualmente mês a mês) — confira contra o calendário
+    //     oficial antes de decisões importantes.
+    //   - PIB (Contas Nacionais Trimestrais, IBGE): o ibge.gov.br também
+    //     tem proteção anti-robô (desafio Cloudflare) — só uma data saiu
+    //     com confiança razoável da busca.
+    //   - IPCA: não entra como data chumbada aqui (ver nota no HTML,
+    //     .caleco-ipca-nota) — é mensal, a busca não achou um calendário
+    //     confiável pra cravar o dia exato de cada mês, e chumbar 12+
+    //     datas por ano que ninguém conferiu seria pior que não ter nada.
+    //
+    // >>> QUANDO AS FONTES OFICIAIS PUBLICAREM MAIS DATAS, ACRESCENTE NOS
+    // >>> ARRAYS ABAIXO (mesmo padrão do Copom).
+    // ============================================================
+    (function () {
+      const bloco = document.getElementById('calecoBloco');
+      const listaEl = document.getElementById('calecoLista');
+      if (!bloco || !listaEl) return;
+
+      const PIB = [
+        { data: '2027-02-19', rotulo: '🇧🇷 PIB — 4º tri/2026 e fechamento do ano' },
+      ];
+
+      const PAYROLL = [
+        { data: '2026-12-04', rotulo: '🇺🇸 Payroll — referente a novembro/2026' },
+        { data: '2027-01-08', rotulo: '🇺🇸 Payroll — referente a dezembro/2026' },
+        { data: '2027-02-05', rotulo: '🇺🇸 Payroll — referente a janeiro/2027' },
+        { data: '2027-03-05', rotulo: '🇺🇸 Payroll — referente a fevereiro/2027' },
+        { data: '2027-04-02', rotulo: '🇺🇸 Payroll — referente a março/2027' },
+        { data: '2027-05-07', rotulo: '🇺🇸 Payroll — referente a abril/2027' },
+        { data: '2027-06-04', rotulo: '🇺🇸 Payroll — referente a maio/2027' },
+        { data: '2027-07-02', rotulo: '🇺🇸 Payroll — referente a junho/2027' },
+        { data: '2027-08-06', rotulo: '🇺🇸 Payroll — referente a julho/2027' },
+        { data: '2027-09-03', rotulo: '🇺🇸 Payroll — referente a agosto/2027' },
+        { data: '2027-10-08', rotulo: '🇺🇸 Payroll — referente a setembro/2027' },
+        { data: '2027-11-05', rotulo: '🇺🇸 Payroll — referente a outubro/2027' },
+        { data: '2027-12-03', rotulo: '🇺🇸 Payroll — referente a novembro/2027' },
+      ];
+
+      // [primeiro dia, segundo dia, rótulo] — igual ao formato de
+      // REUNIOES_COPOM, só que com um rótulo por linha (aqui tem uma
+      // reunião — out/2027 — que não é "igual às outras").
+      const FOMC = [
+        ['2026-12-08', '2026-12-09', '🇺🇸 Fed (FOMC)'],
+        ['2027-01-26', '2027-01-27', '🇺🇸 Fed (FOMC)'],
+        ['2027-03-16', '2027-03-17', '🇺🇸 Fed (FOMC)'],
+        ['2027-04-27', '2027-04-28', '🇺🇸 Fed (FOMC)'],
+        ['2027-06-08', '2027-06-09', '🇺🇸 Fed (FOMC)'],
+        ['2027-07-27', '2027-07-28', '🇺🇸 Fed (FOMC)'],
+        ['2027-09-14', '2027-09-15', '🇺🇸 Fed (FOMC)'],
+        ['2027-10-26', '2027-10-27', '🇺🇸 Fed (FOMC) — reunião só de estratégia, sem decisão de juros'],
+        ['2027-11-16', '2027-11-17', '🇺🇸 Fed (FOMC)'],
+      ];
+
+      const MAX_ITENS = 8;
+
+      function dataLocal(iso) {
+        const [a, m, d] = iso.split('-').map(Number);
+        return new Date(a, m - 1, d);
+      }
+      function fmtCurta(d) {
+        return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+      }
+
+      function render() {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        // Une os três tipos numa única linha do tempo — "calendário
+        // econômico" é isso: um timeline só, não três listas separadas.
+        const itens = [
+          ...PIB.map(p => ({ ordenar: dataLocal(p.data), texto: fmtCurta(dataLocal(p.data)), rotulo: p.rotulo })),
+          ...PAYROLL.map(p => ({ ordenar: dataLocal(p.data), texto: fmtCurta(dataLocal(p.data)), rotulo: p.rotulo })),
+          ...FOMC.map(([inicio, fim, rotulo]) => {
+            const i = dataLocal(inicio), f = dataLocal(fim);
+            const texto = i.getMonth() === f.getMonth()
+              ? `${i.getDate()}-${f.getDate()}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`
+              : `${fmtCurta(i)}-${fmtCurta(f)}`;
+            return { ordenar: f, texto, rotulo };
+          }),
+        ]
+          .filter(item => item.ordenar >= hoje)
+          .sort((a, b) => a.ordenar - b.ordenar)
+          .slice(0, MAX_ITENS);
+
+        if (!itens.length) {
+          listaEl.innerHTML = '<div class="caleco-detalhe">Nenhuma data futura chumbada aqui ainda — confira os calendários oficiais linkados abaixo.</div>';
+          bloco.hidden = false;
+          return;
+        }
+
+        listaEl.innerHTML = itens.map((item, indice) => `
+          <div class="caleco-linha${indice === 0 ? ' caleco-proxima' : ''}">
+            <span class="caleco-data">${item.texto}${indice === 0 ? '<span class="caleco-etiqueta">próxima</span>' : ''}</span>
+            <span class="caleco-detalhe">${item.rotulo}</span>
+          </div>`).join('');
         bloco.hidden = false;
       }
 
