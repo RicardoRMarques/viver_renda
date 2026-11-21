@@ -1,0 +1,67 @@
+name: Coletar Vacância/Inadimplência de FIIs (CVM)
+
+# A CVM só atualiza o Informe Trimestral de um fundo quando ele entrega
+# um novo informe (prazo legal de ~45 dias após o fim de cada
+# trimestre) — não há motivo pra checar isso mais que 1x/semana. Roda
+# um dia depois do robô de CAPEX/D&A (cvm-capex.yml), mesma lógica de
+# não disputar o runner no mesmo horário. Minuto quebrado de propósito
+# (mesmo motivo do boletim.yml e do mercado.yml).
+on:
+  schedule:
+    - cron: '27 13 * * 2'
+      timezone: 'America/Sao_Paulo'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cvm-fii-imoveis
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20   # ~220 fundos com dado novo podem chamar a IA, 1x cada
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # Sem dependência externa: só biblioteca padrão (urllib, csv, zipfile).
+      - name: Coletar vacância/inadimplência e gerar resumos por IA
+        run: python3 coletar_cvm_fii_imoveis.py
+
+      - name: Publicar se mudou
+        run: |
+          if [ -z "$(git status --porcelain data/fii-imoveis.json)" ]; then
+            echo "Nada mudou — sem commit."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/fii-imoveis.json
+          git commit -m "FIIs (CVM): atualiza vacância/inadimplência e resumos por IA"
+
+          # Mesma corrida já vista no boletim e no Tesouro Direto: se
+          # outro robô commitar na main entre o checkout e este push, o
+          # push simples falha porque main avançou. Como este arquivo é
+          # exclusivo deste robô, o rebase nunca dá conflito de verdade —
+          # só precisa reaplicar o commit em cima da main atual.
+          tentativas=5
+          ok=0
+          for i in $(seq 1 $tentativas); do
+            if git pull --rebase -X theirs origin main && git push; then
+              ok=1
+              break
+            fi
+            echo "Tentativa $i/$tentativas falhou (provável corrida com outro robô), tentando de novo..."
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "::error::Não foi possível publicar vacância/inadimplência de FIIs após $tentativas tentativas."
+            exit 1
+          fi

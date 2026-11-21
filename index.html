@@ -2368,6 +2368,21 @@
       margin-left: 4px;
     }
 
+    /* ---------- Vacância/inadimplência de FII (data/fii-imoveis.json, CVM) ---------- */
+    .fii-vacancia-bloco { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+    .fii-vacancia-titulo { font-weight: 700; margin-bottom: 10px; }
+    .fii-resumo-ia {
+      font-size: 0.85rem; line-height: 1.5; color: var(--text);
+      background: rgba(127,127,127,0.06); border-radius: 10px;
+      padding: 10px 12px; margin: 12px 0 0;
+    }
+    .fii-imoveis-detalhe { margin-top: 10px; font-size: 0.84rem; }
+    .fii-imoveis-detalhe summary { cursor: pointer; color: var(--primary); font-weight: 600; }
+    .fii-imoveis-lista { margin: 8px 0 0; padding-left: 18px; }
+    .fii-imoveis-lista li { margin-bottom: 8px; }
+    .fii-imovel-endereco { display: block; font-size: 0.78rem; color: var(--muted); }
+    .fii-imovel-numeros { display: block; font-size: 0.78rem; color: var(--muted); font-family: 'Courier New', monospace; }
+
     /* Selo "maior taxa da categoria hoje" na tabela do Tesouro Direto —
        descritivo (é um fato: essa taxa é a maior do grupo agora), nunca
        prescritivo ("melhor investimento"): taxa maior aqui costuma vir
@@ -24537,7 +24552,7 @@
               <h3>${nome} (${ativo.symbol})</h3>
               ${setor ? `<span class="hg-badge">${setor}</span>` : ''}
             </div>
-            <p class="hg-aviso-suave">
+            <p class="hg-aviso-suave" id="fiiAvisoSemDados">
               Para FIIs, a HG Brasil traz só a cotação atual — sem série histórica trimestral
               nem dados de patrimônio, vacância ou composição da carteira do fundo.
             </p>
@@ -24548,7 +24563,94 @@
                   <span class="hg-mini-valor">${v}</span>
                 </div>`).join('')}
             </div>
+            <div id="fiiVacanciaWrap"></div>
           </div>`;
+        preencherVacanciaInadimplenciaFII(ativo.symbol, containerEl);
+      }
+
+      // data/fii-imoveis.json (vacância/inadimplência por imóvel, direto
+      // da CVM, com resumo por IA — ver coletar_cvm_fii_imoveis.py) só
+      // cobre FIIs de tijolo com imóvel físico (a maioria dos fundos de
+      // papel/recebíveis não tem esse dado na CVM, então nem aparece no
+      // arquivo). Busca 1x por carregamento de página, reaproveitada em
+      // toda consulta de FII — mesmo padrão já usado por
+      // hgCodigosCvmPromessa, um pouco acima neste arquivo.
+      let fiiImoveisPromessa = null;
+      function carregarFiiImoveis() {
+        if (!fiiImoveisPromessa) {
+          fiiImoveisPromessa = fetch(`data/fii-imoveis.json?v=${Date.now()}`, { cache: 'no-store' })
+            .then(r => r.ok ? r.json() : null)
+            .catch(e => { console.warn('FII: não consegui ler data/fii-imoveis.json', e); return null; });
+        }
+        return fiiImoveisPromessa;
+      }
+
+      async function preencherVacanciaInadimplenciaFII(ticker, containerEl) {
+        const wrapEl = containerEl.querySelector('#fiiVacanciaWrap');
+        if (!wrapEl) return;
+        const dados = await carregarFiiImoveis();
+        const fundo = dados?.fundos?.[ticker];
+        if (!fundo) return; // sem dado da CVM pra esse fundo — mantém o aviso original, sem mexer em nada
+
+        const avisoEl = containerEl.querySelector('#fiiAvisoSemDados');
+        if (avisoEl) {
+          avisoEl.innerHTML = 'Para FIIs, a HG Brasil traz só a cotação atual — sem série histórica trimestral ' +
+            'nem dados de patrimônio ou composição da carteira do fundo. Vacância e inadimplência abaixo vêm ' +
+            'direto da CVM.';
+        }
+
+        const dataRef = fundo.data_referencia
+          ? new Date(`${fundo.data_referencia}T00:00:00`).toLocaleDateString('pt-BR')
+          : null;
+        const linhasVacancia = [
+          ['Vacância', fundo.vacancia_pct != null ? `${numeroGlobalFii(fundo.vacancia_pct)}%` : '—'],
+          ['Inadimplência', fundo.inadimplencia_pct != null ? `${numeroGlobalFii(fundo.inadimplencia_pct)}%` : '—'],
+          ['Imóveis considerados', fundo.n_imoveis ?? '—'],
+        ];
+
+        const imoveisHtml = (fundo.imoveis || []).map(im => `
+          <li>
+            <strong>${hgEscapeHtml(im.nome || 'Imóvel sem nome')}</strong>
+            ${im.endereco ? `<span class="fii-imovel-endereco">${hgEscapeHtml(im.endereco)}</span>` : ''}
+            <span class="fii-imovel-numeros">
+              ${im.vacancia_pct != null ? `vacância ${numeroGlobalFii(im.vacancia_pct)}%` : ''}
+              ${im.inadimplencia_pct != null ? ` · inadimplência ${numeroGlobalFii(im.inadimplencia_pct)}%` : ''}
+              ${im.participacao_receita_pct != null ? ` · ${numeroGlobalFii(im.participacao_receita_pct)}% da receita do fundo` : ''}
+            </span>
+          </li>`).join('');
+
+        wrapEl.innerHTML = `
+          <div class="fii-vacancia-bloco">
+            <div class="fii-vacancia-titulo">Vacância e inadimplência${dataRef ? ` — trimestre encerrado em ${dataRef}` : ''}</div>
+            <div class="hg-mini-grid">
+              ${linhasVacancia.map(([r, v]) => `
+                <div class="hg-mini-item">
+                  <span class="hg-mini-rotulo">${r}</span>
+                  <span class="hg-mini-valor">${v}</span>
+                </div>`).join('')}
+            </div>
+            ${fundo.resumo_ia ? `<p class="fii-resumo-ia">🤖 ${hgEscapeHtml(fundo.resumo_ia)}</p>` : ''}
+            ${imoveisHtml ? `
+              <details class="fii-imoveis-detalhe">
+                <summary>Ver ${fundo.n_imoveis} imóve${fundo.n_imoveis === 1 ? 'l' : 'is'} considerado${fundo.n_imoveis === 1 ? '' : 's'}</summary>
+                <ul class="fii-imoveis-lista">${imoveisHtml}</ul>
+              </details>` : ''}
+            <p class="hg-aviso-suave" style="font-size:0.72rem; margin-bottom:0;">
+              Fonte: CVM — Informe Trimestral de Fundos Imobiliários (dados abertos).
+              ${fundo.resumo_ia ? 'O parágrafo com 🤖 foi gerado por IA a partir desses números — pode conter imprecisões; os números acima são o dado oficial.' : ''}
+              Fatos relevantes e relatórios gerenciais completos ficam no
+              <a href="https://fnet.bmfbovespa.com.br/fnet/publico/abrirGerenciadorDocumentosCVM" target="_blank" rel="noopener noreferrer">Fundos.NET</a>.
+            </p>
+          </div>`;
+      }
+
+      // Versão só deste bloco — "numeroGlobal" já existe lá embaixo no
+      // script (seção Listas de Mercado), mas é definida DEPOIS deste
+      // ponto do arquivo; em vez de mover a definição original (usada em
+      // vários outros lugares) ou duplicar o nome, esta função local
+      // evita depender da ordem de execução entre as duas seções.
+      function numeroGlobalFii(v) {
+        return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
 
       function nomeArquivoPdfFund(info) {
