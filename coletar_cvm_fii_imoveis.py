@@ -231,35 +231,60 @@ def agregar_fundo(linhas):
     }
 
 
+def classificar_percentual(valor, baixo_ate, moderado_ate):
+    if valor is None:
+        return "sem dado"
+    if valor <= baixo_ate:
+        return "baixa"
+    if valor <= moderado_ate:
+        return "moderada"
+    return "alta"
+
+
 def gerar_resumo_ia(ticker, nome_fundo, data_referencia, agregado):
     """Pede pro Worker (mesma IA do Assistente do site) escrever 2-3
     frases em português simples sobre a vacância/inadimplência do
     fundo. None se a chamada falhar — o site mostra os números mesmo
-    sem o resumo, nunca trava por causa disso."""
+    sem o resumo, nunca trava por causa disso.
+
+    O prompt NÃO deixa a IA repetir os percentuais com casas decimais —
+    testado em produção (21/11/2026): num caso real (ZAVI11, vacância
+    0,21%), o modelo reescreveu o mesmo número errado na frase seguinte
+    ("0,21%... ou seja, 2,1%"), uma casa decimal fora do que foi dado.
+    Como os números exatos já aparecem no card ao lado (hg-mini-grid),
+    pedir que a IA só classifique qualitativamente (baixa/moderada/alta,
+    contra faixas fixas passadas aqui) elimina essa classe de erro sem
+    perder a parte útil do resumo — a interpretação em linguagem simples."""
+    vac_classe = classificar_percentual(agregado["vacancia_pct"], 5, 15)
+    inad_classe = classificar_percentual(agregado["inadimplencia_pct"], 2, 5)
     imoveis_txt = "; ".join(
-        f"{i['nome'] or 'imóvel sem nome'} ({i['participacao_receita_pct']}% da receita, "
-        f"vacância {i['vacancia_pct']}%)"
+        f"{i['nome'] or 'imóvel sem nome'} ({i['participacao_receita_pct']}% da receita do fundo)"
         for i in agregado["imoveis"][:5]
-        if i["vacancia_pct"] is not None
     )
     prompt = (
-        f"Resuma em português, em no máximo 3 frases curtas e sem jargão, a situação de "
-        f"vacância e inadimplência do Fundo Imobiliário {ticker} ({nome_fundo}) para um "
-        f"investidor não especialista. NÃO dê recomendação de compra ou venda, só descreva "
-        f"os números abaixo.\n\n"
+        f"Escreva em português, em no máximo 3 frases curtas e sem jargão, uma interpretação "
+        f"da situação de vacância e inadimplência do Fundo Imobiliário {ticker} ({nome_fundo}) "
+        f"para um investidor não especialista. NÃO dê recomendação de compra ou venda.\n\n"
+        f"REGRA MAIS IMPORTANTE: NÃO escreva nenhum número com casas decimais no texto (nem "
+        f"vacância, nem inadimplência, nem percentual de receita) — esses números exatos já "
+        f"aparecem na tela ao lado do seu texto, escritos à mão a partir do dado oficial; "
+        f"você escrevendo de novo só arrisca errar uma casa decimal. Em vez de repetir o "
+        f"número, use só as palavras 'baixa', 'moderada' ou 'alta' (classificação já pronta "
+        f"abaixo) e explique o que isso quer dizer na prática.\n\n"
         f"IMPORTANTE — não confunda os dois conceitos:\n"
-        f"- Vacância = percentual da área do(s) imóvel(is) que está DESOCUPADA, sem "
-        f"inquilino nenhum pagando aluguel por ela.\n"
-        f"- Inadimplência = percentual dos aluguéis COBRADOS que não foram pagos por "
-        f"inquilinos que ESTÃO ocupando o imóvel. São coisas diferentes: um imóvel pode "
-        f"ter vacância baixa e inadimplência alta (ocupado, mas inquilino não paga), ou o "
-        f"contrário.\n\n"
-        f"Dados do trimestre encerrado em {data_referencia}:\n"
-        f"- Vacância média do fundo (ponderada pela receita de cada imóvel): "
-        f"{agregado['vacancia_pct']}%\n"
-        f"- Inadimplência média: {agregado['inadimplencia_pct']}%\n"
+        f"- Vacância = parte da área do(s) imóvel(is) que está DESOCUPADA, sem inquilino "
+        f"nenhum pagando aluguel por ela.\n"
+        f"- Inadimplência = parte dos aluguéis COBRADOS que não foram pagos por inquilinos "
+        f"que ESTÃO ocupando o imóvel. São coisas diferentes: dá pra ter vacância baixa e "
+        f"inadimplência alta (ocupado, mas inquilino não paga), ou o contrário.\n\n"
+        f"Dados do trimestre encerrado em {data_referencia} (classificação contra a faixa "
+        f"típica de FIIs de tijolo: vacância até 5% é baixa, até 15% é moderada, acima é "
+        f"alta; inadimplência até 2% é baixa, até 5% é moderada, acima é alta):\n"
+        f"- Vacância do fundo: {vac_classe}\n"
+        f"- Inadimplência do fundo: {inad_classe}\n"
         f"- Número de imóveis considerados: {agregado['n_imoveis']}\n"
-        f"- Principais imóveis: {imoveis_txt or 'sem detalhamento disponível'}"
+        f"- Principais imóveis (sem repetir os percentuais de receita no texto): "
+        f"{imoveis_txt or 'sem detalhamento disponível'}"
     )
     payload = json.dumps({"messages": [{"role": "user", "content": prompt}]}).encode("utf-8")
     req = urllib.request.Request(
