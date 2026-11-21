@@ -3736,6 +3736,24 @@
     @media (min-width: 1024px) {
       .calc-modal.cr-modal { max-width: 1040px; }
     }
+    /* PGBL x VGBL: mesma largura do Cap Rate — 4 cenários lado a lado
+       no resultado (regressiva/progressiva x PGBL/VGBL) não cabem no
+       padrão estreito. */
+    .calc-modal.pgbl-modal { max-width: 960px; }
+    @media (min-width: 1024px) {
+      .calc-modal.pgbl-modal { max-width: 1040px; }
+    }
+    .pgbl-cenarios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    @media (max-width: 560px) {
+      .pgbl-cenarios-grid { grid-template-columns: 1fr; }
+    }
+    .pgbl-cenario-card { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; background: var(--surface, rgba(255,255,255,0.02)); }
+    .pgbl-cenario-card.pgbl-cenario-melhor { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+    .pgbl-cenario-titulo { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 6px; }
+    .pgbl-cenario-card.pgbl-cenario-melhor .pgbl-cenario-titulo { color: var(--accent); }
+    .pgbl-cenario-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 0.86rem; padding: 3px 0; }
+    .pgbl-cenario-linha span { color: var(--muted); }
+    .pgbl-cenario-liquido { font-size: 1.08rem; font-weight: 700; margin-top: 6px; }
     /* Comparação visual "casa x FII" do Cap Rate — dois cards lado a
        lado, cada um com um ícone representando o ativo. */
     .cr-visual-comparacao { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
@@ -4822,6 +4840,9 @@
               <button type="button" class="nav-dropdown-item" id="crBtnAbrir">
                 <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Cap Rate — Imóvel x FII
               </button>
+              <button type="button" class="nav-dropdown-item" id="pgblBtnAbrir">
+                <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8.5-8 9c-4.5-.5-8-4-8-9V7z"></path><path d="M9 12l2 2l4-4"></path></svg> PGBL x VGBL — Qual Previdência Vale Mais?
+              </button>
               <button type="button" class="nav-dropdown-item" id="navAbrirConversor">
                 💱 Conversor de Moedas
               </button>
@@ -4885,6 +4906,7 @@
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     <div class="mobile-menu-separador">Ferramentas</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="crBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Cap Rate — Imóvel x FII</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="pgblBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8.5-8 9c-4.5-.5-8-4-8-9V7z"></path><path d="M9 12l2 2l4-4"></path></svg> PGBL x VGBL — Qual Previdência Vale Mais?</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirGlossario">📖 Glossário do Investidor</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="rpnBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)</button>
@@ -8102,6 +8124,154 @@
                 valorizar mais que a cota de um FII num ciclo de alta do mercado imobiliário local, ou desvalorizar
                 numa região em declínio; o mesmo vale pro preço da cota do fundo. Esta calculadora não tenta prever
                 nenhum dos dois.
+              </p>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PGBL x VGBL — compara os dois planos de previdência privada em
+       duas frentes: o abatimento no IR na hora de contribuir, e o
+       imposto na hora de resgatar (tabela regressiva específica de
+       previdência x tabela progressiva, com o resgate "empilhado"
+       sobre as outras rendas tributáveis do ano). Só matemática sobre
+       o que a pessoa digita — não é recomendação de produto.
+       ============================================================ -->
+  <div id="pgblOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="pgblTitulo" hidden>
+    <div class="calc-modal pgbl-modal">
+      <div class="calc-modal-topo">
+        <h3 id="pgblTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M12 3l8 4v5c0 5-3.5 8.5-8 9c-4.5-.5-8-4-8-9V7z"></path><path d="M9 12l2 2l4-4"></path></svg>PGBL x VGBL — Qual Previdência Vale Mais?
+        </h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="pgblCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button id="pgblFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+      </div>
+
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Simule o acúmulo num plano de previdência privada e compare
+          <button type="button" class="hg-info-btn" data-glossario="pgbl-vgbl-pgbl" aria-label="O que é PGBL?" title="">?</button>
+          PGBL x
+          <button type="button" class="hg-info-btn" data-glossario="pgbl-vgbl-vgbl" aria-label="O que é VGBL?" title="">?</button>
+          VGBL e
+          <button type="button" class="hg-info-btn" data-glossario="pgbl-vgbl-regressiva" aria-label="Tabela regressiva da previdência" title="">?</button>
+          regressiva x
+          <button type="button" class="hg-info-btn" data-glossario="pgbl-vgbl-progressiva" aria-label="Tabela progressiva na previdência" title="">?</button>
+          progressiva — tanto no abatimento do IR ao contribuir quanto no imposto ao resgatar.
+        </p>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="pgblAporteMensal">Aporte mensal</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="pgblAporteMensal" placeholder="500,00" />
+            </div>
+          </div>
+          <div class="calc-campo">
+            <label for="pgblPrazoAnos">Prazo até o resgate (anos)</label>
+            <input type="number" id="pgblPrazoAnos" min="1" max="60" step="1" placeholder="15" />
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="pgblRentabilidade">Rentabilidade anual esperada (%)</label>
+            <input type="number" id="pgblRentabilidade" min="0" step="0.1" placeholder="8" />
+          </div>
+          <div class="calc-campo">
+            <label for="pgblRendaAnual">Sua renda tributável anual hoje</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="pgblRendaAnual" placeholder="90.000,00" />
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="pgblDeclaracao">Você faz declaração de IR completa?
+              <button type="button" class="hg-info-btn" data-glossario="pgbl-vgbl-declaracao" aria-label="Qual a diferença?" title="">?</button>
+            </label>
+            <select id="pgblDeclaracao">
+              <option value="sim">Sim, completa</option>
+              <option value="nao">Não, simplificada (ou não declaro)</option>
+            </select>
+          </div>
+          <div class="calc-campo">
+            <label for="pgblInss">Contribui para o INSS ou regime próprio (RPPS)?</label>
+            <select id="pgblInss">
+              <option value="sim">Sim</option>
+              <option value="nao">Não</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="calc-campo">
+          <label for="pgblOutrasRendas">Outras rendas tributáveis esperadas no ANO do resgate <span style="color:var(--muted); font-weight:400;">(se não souber, repita a renda de hoje)</span></label>
+          <div class="calc-input-prefixado">
+            <span class="calc-prefixo">R$</span>
+            <input type="text" inputmode="numeric" id="pgblOutrasRendas" placeholder="90.000,00" />
+          </div>
+        </div>
+
+        <div class="cmp-acoes-linha" style="margin-top:14px;">
+          <button type="button" class="hg-btn" id="pgblBtnCalcular">Simular</button>
+          <button type="button" class="cmp-btn-secundario" id="pgblBtnLimpar">Limpar</button>
+        </div>
+
+        <div id="pgblResultado"></div>
+
+        <details class="calc-educativo">
+          <summary>📋 Como esta simulação calcula (e o que ela não cobre)</summary>
+          <div class="calc-educativo-corpo">
+            <div class="calc-educativo-item">
+              <strong>Dedução do PGBL na contribuição</strong>
+              <p>
+                Só entra na conta se você faz declaração completa E contribui para o INSS/RPPS — sem os dois, o PGBL
+                não deduz nada, e nesse caso o VGBL é sempre a escolha melhor. Quando elegível, o limite é 12% da
+                renda tributável anual; a economia de IR é estimada aplicando sua alíquota marginal (pela tabela
+                anual do IR) sobre o valor deduzido. Aportar além dos 12% em PGBL não deduz o excedente — ele carrega
+                a desvantagem do PGBL no resgate (IR sobre o valor todo) sem ganhar nada na entrada.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>Imposto no resgate</strong>
+              <p>
+                Na tabela regressiva, a alíquota (35% a 10%, conforme os anos) incide sobre o saldo total no PGBL e
+                só sobre o rendimento no VGBL, de forma definitiva (Lei 11.053/2004). Na tabela progressiva, 15% é
+                retido na fonte, mas o valor que entra na conta aqui é o IR recalculado na declaração anual: a
+                diferença entre o imposto sobre (outras rendas + resgate) e o imposto só sobre as outras rendas —
+                ou seja, o resgate "empilhado" em cima do que você já ganha naquele ano. Desde a Lei 14.803/2024, a
+                escolha entre progressiva e regressiva pode ser feita no momento do resgate, não só na adesão.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>Tabela usada no cálculo da progressiva</strong>
+              <p>
+                Usamos a tabela anual tradicional do IR (inalterada pela reforma — confirmado pela Receita Federal),
+                sem o redutor adicional criado para 2026. Esse redutor pode reduzir ainda mais o imposto de quem tem
+                renda mais baixa no ano do resgate; como suas regras de cálculo dependem de outras deduções (INSS,
+                dependentes), não entram aqui — o valor mostrado tende a ser, no máximo, uma estimativa um pouco
+                CONSERVADORA (igual ou maior que o imposto real) para esse cenário.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>O que esta simulação não cobre</strong>
+              <p>
+                Taxas de administração e carregamento do plano, portabilidade entre fundos, resgate parcial ou em
+                renda mensal (só simula resgate único), mudanças futuras na legislação e a hipótese de reinvestir a
+                economia de IR do PGBL em outro ativo (aqui ela aparece separada, não soma ao saldo acumulado).
               </p>
             </div>
           </div>
@@ -15958,6 +16128,229 @@
     })();
 
     // ============================================================
+    // PGBL x VGBL — compara os dois planos de previdência privada:
+    // (1) abatimento no IR na contribuição (só PGBL, com elegibilidade);
+    // (2) imposto no resgate, tabela regressiva (específica de
+    // previdência, Lei 11.053/2004) x tabela progressiva (resgate
+    // empilhado sobre as outras rendas do ano, tabela anual tradicional
+    // do IR — valores confirmados direto na Receita Federal via
+    // Agência Gov, 06/01/2026; sem o redutor de 2026 porque a base de
+    // cálculo dele depende de outras deduções que não pedimos aqui).
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('pgblOverlay');
+      const btnAbrirMenu = document.getElementById('pgblBtnAbrir');
+      const btnFechar = document.getElementById('pgblFechar');
+      const inAporte = document.getElementById('pgblAporteMensal');
+      const inPrazo = document.getElementById('pgblPrazoAnos');
+      const inRentabilidade = document.getElementById('pgblRentabilidade');
+      const inRendaAnual = document.getElementById('pgblRendaAnual');
+      const selDeclaracao = document.getElementById('pgblDeclaracao');
+      const selInss = document.getElementById('pgblInss');
+      const inOutrasRendas = document.getElementById('pgblOutrasRendas');
+      const btnCalcular = document.getElementById('pgblBtnCalcular');
+      const btnLimpar = document.getElementById('pgblBtnLimpar');
+      const resultadoEl = document.getElementById('pgblResultado');
+
+      if (!overlay || !btnAbrirMenu) return;
+
+      hgAplicarMascaraMoeda(inAporte);
+      hgAplicarMascaraMoeda(inRendaAnual);
+      hgAplicarMascaraMoeda(inOutrasRendas);
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      // Tabela anual tradicional do IR — inalterada pela reforma de
+      // 2026 (confirmado pela Receita Federal). Não inclui o redutor
+      // adicional de 2026: ver aviso no bloco educativo do modal.
+      const IR_ANUAL_FAIXAS = [
+        { limite: 28467.20, aliquota: 0, deducao: 0 },
+        { limite: 33919.80, aliquota: 0.075, deducao: 2135.04 },
+        { limite: 45012.60, aliquota: 0.15, deducao: 4679.03 },
+        { limite: 55976.16, aliquota: 0.225, deducao: 8054.97 },
+        { limite: Infinity, aliquota: 0.275, deducao: 10853.78 },
+      ];
+
+      function faixaAnual(renda) {
+        return IR_ANUAL_FAIXAS.find(f => renda <= f.limite) || IR_ANUAL_FAIXAS[IR_ANUAL_FAIXAS.length - 1];
+      }
+      function impostoAnualTradicional(renda) {
+        if (!(renda > 0)) return 0;
+        const f = faixaAnual(renda);
+        return Math.max(0, renda * f.aliquota - f.deducao);
+      }
+      function aliquotaMarginalAnual(renda) {
+        return faixaAnual(Math.max(renda, 0)).aliquota;
+      }
+
+      // Tabela regressiva específica de previdência privada (PGBL/VGBL),
+      // Lei 11.053/2004 — 35% a 10%, bem mais ampla que a do CDB/Tesouro.
+      function aliquotaRegressivaPrevidencia(anos) {
+        if (anos <= 2) return 0.35;
+        if (anos <= 4) return 0.30;
+        if (anos <= 6) return 0.25;
+        if (anos <= 8) return 0.20;
+        if (anos <= 10) return 0.15;
+        return 0.10;
+      }
+
+      function moeda(v) { return hgFormatMoeda(v); }
+      function pct(v) { return v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
+
+      function erro(msg) {
+        resultadoEl.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a; margin-top:14px;">${msg}</p>`;
+      }
+
+      function calcular() {
+        const aporteMensal = hgValorMascarado(inAporte);
+        const anos = parseInt(inPrazo.value, 10);
+        const rentabilidade = parseFloat((inRentabilidade.value || '').replace(',', '.'));
+        const rendaAnual = hgValorMascarado(inRendaAnual);
+        const outrasRendasInput = hgValorMascarado(inOutrasRendas);
+        const outrasRendas = outrasRendasInput > 0 ? outrasRendasInput : rendaAnual;
+        const declaracaoCompleta = selDeclaracao.value === 'sim';
+        const contribuiInss = selInss.value === 'sim';
+
+        if (!(aporteMensal > 0) || !(anos > 0) || !(rentabilidade >= 0) || !(rendaAnual > 0)) {
+          erro('Preencha o aporte mensal, o prazo, a rentabilidade esperada e sua renda tributável anual pra simular.');
+          return;
+        }
+
+        // ---- Acúmulo (igual nos dois planos: mesmo aporte, mesma
+        // rentabilidade — a diferença entre PGBL e VGBL está só no IR) ----
+        const taxaMensal = Math.pow(1 + rentabilidade / 100, 1 / 12) - 1;
+        let saldo = 0;
+        const meses = anos * 12;
+        for (let m = 0; m < meses; m++) saldo = saldo * (1 + taxaMensal) + aporteMensal;
+        const totalAportado = aporteMensal * 12 * anos;
+        const rendimento = Math.max(0, saldo - totalAportado);
+
+        // ---- Fase de contribuição: dedução do PGBL ----
+        const elegivelDeducao = declaracaoCompleta && contribuiInss;
+        const aporteAnual = aporteMensal * 12;
+        const limiteDedutivel = rendaAnual * 0.12;
+        const dedutivelAnual = elegivelDeducao ? Math.min(aporteAnual, limiteDedutivel) : 0;
+        const aliquotaMarginalHoje = aliquotaMarginalAnual(rendaAnual);
+        const economiaAnual = dedutivelAnual * aliquotaMarginalHoje;
+        const economiaTotal = economiaAnual * anos;
+        const aporteExcedeLimite = elegivelDeducao && aporteAnual > limiteDedutivel;
+
+        // ---- Fase de resgate: 4 cenários ----
+        const aliqRegressiva = aliquotaRegressivaPrevidencia(anos);
+        const impostoPgblRegressiva = saldo * aliqRegressiva;
+        const impostoVgblRegressiva = rendimento * aliqRegressiva;
+        const impostoPgblProgressiva = Math.max(0, impostoAnualTradicional(outrasRendas + saldo) - impostoAnualTradicional(outrasRendas));
+        const impostoVgblProgressiva = Math.max(0, impostoAnualTradicional(outrasRendas + rendimento) - impostoAnualTradicional(outrasRendas));
+
+        const cenarios = [
+          { chave: 'pgbl-reg', titulo: 'PGBL — Regressiva', imposto: impostoPgblRegressiva, pgbl: true },
+          { chave: 'pgbl-prog', titulo: 'PGBL — Progressiva', imposto: impostoPgblProgressiva, pgbl: true },
+          { chave: 'vgbl-reg', titulo: 'VGBL — Regressiva', imposto: impostoVgblRegressiva, pgbl: false },
+          { chave: 'vgbl-prog', titulo: 'VGBL — Progressiva', imposto: impostoVgblProgressiva, pgbl: false },
+        ];
+        cenarios.forEach(c => {
+          c.liquido = saldo - c.imposto;
+          c.liquidoAjustado = c.liquido + (c.pgbl ? economiaTotal : 0);
+        });
+        const melhor = cenarios.reduce((a, b) => (b.liquidoAjustado > a.liquidoAjustado ? b : a));
+
+        const cardsHtml = cenarios.map(c => `
+          <div class="pgbl-cenario-card${c === melhor ? ' pgbl-cenario-melhor' : ''}">
+            <div class="pgbl-cenario-titulo">${c === melhor ? '🏆 ' : ''}${c.titulo}</div>
+            <div class="pgbl-cenario-linha"><span>IR no resgate</span><strong>${moeda(c.imposto)}</strong></div>
+            <div class="pgbl-cenario-linha"><span>Líquido no resgate</span><strong>${moeda(c.liquido)}</strong></div>
+            ${c.pgbl ? `<div class="pgbl-cenario-linha"><span>+ economia de IR acumulada</span><strong>${moeda(economiaTotal)}</strong></div>` : ''}
+            <div class="pgbl-cenario-liquido">${moeda(c.liquidoAjustado)}</div>
+          </div>`).join('');
+
+        let avisoElegibilidade = '';
+        if (!elegivelDeducao) {
+          avisoElegibilidade = `
+            <div class="hg-status atencao-fixa" style="margin-top:12px;">
+              <span>⚠️</span>
+              <span>Pelo que você informou, o PGBL <strong>não deduz nada</strong> do seu IR (precisa de declaração completa E contribuição ao INSS/RPPS). Nesse caso, o VGBL tende a valer mais — o PGBL só traria a desvantagem do IR sobre o valor total no resgate, sem ganhar nada na contribuição.</span>
+            </div>`;
+        } else if (aporteExcedeLimite) {
+          avisoElegibilidade = `
+            <div class="hg-status atencao-fixa" style="margin-top:12px;">
+              <span>ℹ️</span>
+              <span>Seu aporte anual (${moeda(aporteAnual)}) passa do limite dedutível de 12% da renda informada (${moeda(limiteDedutivel)}). Só a parte até o limite entra na dedução — o excedente, se for pro PGBL, não deduz nada e ainda paga IR sobre o valor todo no resgate.</span>
+            </div>`;
+        }
+
+        resultadoEl.innerHTML = `
+          <div class="carteira-resumo-cards">
+            <div class="carteira-resumo-card">
+              <span>Total aportado em ${anos} ano${anos > 1 ? 's' : ''}</span>
+              <strong>${moeda(totalAportado)}</strong>
+            </div>
+            <div class="carteira-resumo-card">
+              <span>Saldo bruto acumulado</span>
+              <strong>${moeda(saldo)}</strong>
+            </div>
+            <div class="carteira-resumo-card carteira-resumo-destaque">
+              <span>Rendimento no período</span>
+              <strong>${moeda(rendimento)}</strong>
+            </div>
+          </div>
+
+          <p class="calc-ajuda" style="margin-top:14px;">
+            <strong>Na contribuição:</strong> ${elegivelDeducao
+              ? `você pode deduzir até ${moeda(dedutivelAnual)}/ano no PGBL, economizando por volta de ${moeda(economiaAnual)}/ano de IR (alíquota marginal de ${pct(aliquotaMarginalHoje * 100)}) — ${moeda(economiaTotal)} ao longo dos ${anos} anos, se você usar a dedução todo ano. No VGBL, essa economia não existe.`
+              : `nem PGBL nem VGBL deduzem nada da sua renda tributável, no seu caso.`}
+          </p>
+          ${avisoElegibilidade}
+
+          <p class="calc-ajuda" style="margin-top:14px; margin-bottom:0;">
+            <strong>No resgate</strong> (saldo bruto de ${moeda(saldo)}, após ${anos} ano${anos > 1 ? 's' : ''} — alíquota regressiva de ${pct(aliqRegressiva * 100)}):
+          </p>
+          <div class="pgbl-cenarios-grid">${cardsHtml}</div>
+          <p class="calc-ajuda" style="margin-top:10px;">
+            O valor em destaque de cada cenário já soma a economia de IR da contribuição (quando for PGBL), pra comparar os quatro de forma justa. 🏆 marca o de maior valor final, com os dados que você informou.
+          </p>`;
+      }
+
+      function limpar() {
+        inAporte.value = '';
+        inAporte.dataset.centavos = '0';
+        inPrazo.value = '';
+        inRentabilidade.value = '';
+        inRendaAnual.value = '';
+        inRendaAnual.dataset.centavos = '0';
+        inOutrasRendas.value = '';
+        inOutrasRendas.dataset.centavos = '0';
+        selDeclaracao.value = 'sim';
+        selInss.value = 'sim';
+        resultadoEl.innerHTML = '';
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
+      btnLimpar.addEventListener('click', limpar);
+
+      document.getElementById('pgblCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'pgbl',
+          titulo: 'PGBL x VGBL — Viver de Renda',
+          texto: 'Compare PGBL x VGBL e tabela progressiva x regressiva na previdência privada.',
+        }));
+
+      hgAbrirPorLinkDeFerramenta('pgbl', abrirModal);
+    })();
+
+    // ============================================================
     // CALCULADORA DE APORTES
     // ------------------------------------------------------------
     // Pergunta que ela responde: "tenho R$ X este mês — quantas cotas
@@ -21083,7 +21476,7 @@
         { termo: 'Liquidez Diária', cat: 'rf', definicao: 'O título permite resgate a qualquer dia útil, com o dinheiro na conta no mesmo dia ou no dia seguinte.\n\nA liquidez tem preço: CDBs com liquidez diária costumam pagar menos que os de prazo travado. Para reserva de emergência ela é indispensável; para dinheiro que você não vai usar, abrir mão dela rende mais.' },
         { termo: 'Marcação a Mercado', cat: 'rf', definicao: 'Quanto o seu título valeria HOJE se você o vendesse antes do vencimento.\n\nSe os juros do mercado subiram desde a sua compra, títulos prefixados e IPCA+ passam a valer menos — porque existem títulos novos pagando mais. Se caíram, valem mais. Isso só afeta quem vende antes: levando até o vencimento, você recebe exatamente o contratado.' },
         { termo: 'Marcação na Curva', cat: 'rf', definicao: 'O oposto da marcação a mercado: o título é avaliado pela taxa que você contratou, subindo um pouquinho todo dia até o vencimento, sem sustos.\n\nCDBs e outros títulos bancários costumam aparecer assim no extrato — o que esconde o fato de que, se você pedir resgate antecipado, o preço praticado pode ser outro.' },
-        { termo: 'Tabela Regressiva de IR', cat: 'rf', definicao: 'O imposto sobre o lucro da renda fixa cai conforme o tempo que você deixa o dinheiro aplicado:\n\n• até 180 dias: 22,5%\n• 181 a 360 dias: 20%\n• 361 a 720 dias: 17,5%\n• acima de 720 dias: 15%\n\nVale para CDB, RDB, LC, Tesouro Direto, debêntures comuns e fundos de renda fixa. O IR incide só sobre o RENDIMENTO, nunca sobre o valor investido, e é retido automaticamente no resgate. LCI, LCA, CRI, CRA, LIG e debêntures incentivadas são isentos para pessoa física.' },
+        { termo: 'Tabela Regressiva de IR', cat: 'rf', definicao: 'O imposto sobre o lucro da renda fixa cai conforme o tempo que você deixa o dinheiro aplicado:\n\n• até 180 dias: 22,5%\n• 181 a 360 dias: 20%\n• 361 a 720 dias: 17,5%\n• acima de 720 dias: 15%\n\nVale para CDB, RDB, LC, Tesouro Direto, debêntures comuns e fundos de renda fixa. O IR incide só sobre o RENDIMENTO, nunca sobre o valor investido, e é retido automaticamente no resgate. LCI, LCA, CRI, CRA, LIG e debêntures incentivadas são isentos para pessoa física.\n\nNão confundir com a tabela regressiva de previdência privada (PGBL/VGBL), que usa outra escala (35% a 10%) e outros prazos — veja "Tabela Regressiva da Previdência Privada".' },
         { termo: 'Come-cotas', cat: 'rf', definicao: 'Antecipação semestral do Imposto de Renda que atinge FUNDOS de investimento — no último dia útil de maio e de novembro, a Receita recolhe o imposto devido reduzindo a quantidade de cotas.\n\nAlíquota: 15% em fundos de longo prazo, 20% nos de curto prazo; o restante é ajustado no resgate.\n\nNÃO existe em CDB, LCI, LCA nem Tesouro Direto — nesses, o imposto só é cobrado quando você resgata, o que deixa mais dinheiro rendendo pelo caminho.' },
         { termo: 'IOF (na renda fixa)', cat: 'rf', definicao: 'Imposto que morde o rendimento em resgates feitos nos primeiros 30 DIAS: começa em 96% do lucro no primeiro dia e cai até zero no trigésimo.\n\nRegra prática: não resgatar antes de um mês. Passados os 30 dias, o IOF deixa de existir e sobra só o IR.' },
         { termo: 'Taxa de Custódia', cat: 'rf', definicao: 'Tarifa cobrada pela B3 para guardar seus títulos do Tesouro Direto: 0,20% ao ano sobre o valor investido.\n\nOs primeiros R$ 10 mil aplicados em Tesouro Selic são ISENTOS. A cobrança acontece na venda, no vencimento ou no pagamento de cupom — não é debitada da sua conta.' },
@@ -21123,6 +21516,11 @@
         { termo: 'Small Cap', cat: 'acoes', definicao: 'Ações de empresas de menor valor de mercado (small = pequena capitalização). Tendem a ter mais potencial de crescimento, mas também mais risco e menos liquidez que as blue chips — o nome vem do inglês "small market capitalization".' },
         { termo: 'Day Trade', cat: 'acoes', definicao: 'Compra e venda da mesma ação no MESMO pregão (mesmo dia). Tributação diferente do investimento comum: 20% de IR sobre o lucro, sem nenhuma faixa de isenção — recolhido via DARF até o último dia útil do mês seguinte, com responsabilidade do próprio investidor (não tem retenção automática como no JCP).' },
         { termo: 'Isenção de IR em Ações', cat: 'acoes', definicao: 'Vendas de ações (fora de day-trade) até R$ 20.000,00 no mês são isentas de Imposto de Renda sobre o lucro — essa regra vale só pra ações, não pra FIIs, e é por mês, somando todas as vendas.\n\nSe o total vendido no mês passar de R$ 20.000, o IR de 15% incide sobre o lucro de TODAS as vendas do mês, não só sobre o excedente.' },
+        { termo: 'PGBL (Plano Gerador de Benefício Livre)', cat: 'geral', definicao: 'Plano de previdência privada em que as contribuições podem ser deduzidas da base de cálculo do IR, até o limite de 12% da sua renda bruta tributável anual — mas só pra quem faz a declaração COMPLETA (não o desconto simplificado) E contribui para o INSS ou um regime próprio de previdência (RPPS).\n\nEm troca dessa vantagem na contribuição, no resgate o IR incide sobre o valor TOTAL retirado (aportes + rendimento), não só sobre o lucro. Só compensa, na prática, pra quem de fato usa a dedução pra pagar menos IR todo ano (ou reinveste essa economia) — contribuir além dos 12%, ou sem direito à dedução, dá a desvantagem do PGBL no resgate sem o benefício na entrada.' },
+        { termo: 'VGBL (Vida Gerador de Benefício Livre)', cat: 'geral', definicao: 'Plano de previdência privada sem dedução na contribuição — não abate o IR em nenhum tipo de declaração. Em compensação, no resgate o IR incide só sobre o RENDIMENTO (o que a aplicação rendeu), nunca sobre o valor que você aportou.\n\nCostuma ser a opção melhor pra quem faz declaração simplificada, não contribui pro INSS/RPPS, ou já aportou o que podia deduzir em outro PGBL.' },
+        { termo: 'Declaração Completa x Simplificada', cat: 'geral', definicao: 'Na hora de declarar o IR, você escolhe entre dois modelos, e o próprio programa aponta qual dá mais restituição:\n\n• Simplificada: troca TODAS as deduções (saúde, educação, dependentes, PGBL...) por um desconto único de 20% da renda tributável, até um teto.\n• Completa: deduz item por item, com comprovante — inclusive os 12% de renda tributável anual que podem ir pro PGBL.\n\nA dedução do PGBL só existe pra quem usa a declaração COMPLETA. Quem usa a simplificada perde esse benefício — nesse caso, o VGBL costuma ser a escolha melhor.' },
+        { termo: 'Tabela Progressiva do IR na Previdência (PGBL/VGBL)', cat: 'geral', definicao: 'No resgate de um PGBL ou VGBL, 15% de IR é retido na fonte como antecipação; na declaração anual, esse valor entra na soma com os outros rendimentos tributáveis do ano e o imposto é recalculado pela tabela progressiva normal do IR (a mesma dos salários, com alíquotas de até 27,5%).\n\nCostuma compensar mais pra quem vai resgatar com renda tributável baixa ou moderada naquele ano, ou pra prazos mais curtos (a tabela regressiva da previdência começa em 35%). Desde a Lei 14.803/2024, dá pra escolher entre a tabela progressiva e a regressiva no momento do benefício ou do primeiro resgate, não só na adesão ao plano.' },
+        { termo: 'Tabela Regressiva da Previdência Privada (PGBL/VGBL)', cat: 'geral', definicao: 'Alíquota de IR que cai conforme o tempo que o dinheiro fica aplicado no plano, criada pela Lei 11.053/2004:\n\n• até 2 anos: 35%\n• de 2 a 4 anos: 30%\n• de 4 a 6 anos: 25%\n• de 6 a 8 anos: 20%\n• de 8 a 10 anos: 15%\n• acima de 10 anos: 10%\n\nÉ definitiva (não entra na declaração anual) e incide sobre o valor TOTAL no PGBL, mas só sobre o RENDIMENTO no VGBL.\n\nNão confundir com a tabela regressiva de CDB/Tesouro Direto (22,5% a 15%, outra escala, outros prazos) — são tabelas diferentes, de leis diferentes, para produtos diferentes.' },
       ].sort((a, b) => a.termo.localeCompare(b.termo, 'pt-BR'));
 
       let letraAtiva = 'todos';
@@ -22562,6 +22960,13 @@
         'tj-taxa-hoje-titulo': 'A taxa de compra deste título, negociada no Tesouro Direto hoje.',
         'tj-cdb-mais-que': 'A taxa mínima que um CDB de prazo parecido precisa pagar pra empatar com este título público — abaixo disso, está cobrando o risco de crédito de uma empresa/banco sem remunerar por isso.',
         'tj-lci-cri-cra-mais-que': 'A taxa mínima que um título isento de Imposto de Renda (LCI, LCA, CRI ou CRA) de prazo parecido precisa pagar — já descontando o imposto que o título público paga e que esses isentos não pagam.',
+
+        // --- PGBL x VGBL ---
+        'pgbl-vgbl-pgbl': 'Plano de previdência privada em que as contribuições podem ser deduzidas da base de cálculo do IR, até 12% da sua renda bruta tributável anual — mas só pra quem faz a declaração COMPLETA e contribui para o INSS ou um regime próprio (RPPS).\n\nEm troca dessa vantagem na contribuição, no resgate o IR incide sobre o valor TOTAL retirado (aportes + rendimento), não só sobre o lucro.',
+        'pgbl-vgbl-vgbl': 'Plano de previdência privada sem dedução na contribuição — não abate o IR em nenhum tipo de declaração. Em compensação, no resgate o IR incide só sobre o RENDIMENTO (o que a aplicação rendeu), nunca sobre o valor que você aportou.',
+        'pgbl-vgbl-regressiva': 'Alíquota de IR que cai conforme o tempo no plano, criada pela Lei 11.053/2004: até 2 anos 35%; 2 a 4 anos 30%; 4 a 6 anos 25%; 6 a 8 anos 20%; 8 a 10 anos 15%; acima de 10 anos 10%.\n\nÉ definitiva (não entra na declaração anual). Incide sobre o valor TOTAL no PGBL, só sobre o RENDIMENTO no VGBL.\n\nNão confundir com a tabela regressiva de CDB/Tesouro Direto (22,5% a 15%, outra escala, outros prazos).',
+        'pgbl-vgbl-progressiva': 'No resgate, 15% de IR é retido na fonte como antecipação; na declaração anual, esse valor entra na soma com os outros rendimentos tributáveis do ano e o imposto é recalculado pela tabela progressiva normal (a mesma dos salários, até 27,5%).\n\nCostuma compensar mais pra prazos curtos ou renda baixa/moderada no ano do resgate. Desde a Lei 14.803/2024, dá pra escolher entre progressiva e regressiva no momento do resgate, não só na adesão ao plano.',
+        'pgbl-vgbl-declaracao': 'Simplificada: troca todas as deduções (saúde, educação, dependentes, PGBL...) por um desconto único de 20% da renda tributável, até um teto.\n\nCompleta: deduz item por item, com comprovante — inclusive os 12% de renda tributável anual que podem ir pro PGBL. A dedução do PGBL só existe pra quem usa a declaração completa.',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
