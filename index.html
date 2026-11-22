@@ -6663,6 +6663,24 @@
 
           <button class="hg-btn" id="amortBtnAdicionar" style="width:100%;">+ Adicionar à lista</button>
 
+          <details class="calc-educativo" style="margin-top:14px;">
+            <summary>💡 Vale mais a pena amortizar esse valor ou deixar investido?</summary>
+            <div class="calc-educativo-corpo">
+              <p class="calc-ajuda" style="margin:0 0 10px;">
+                Usa o <strong>"Após qual parcela?"</strong>, o <strong>valor</strong> e o <strong>modo</strong> que você
+                preencheu acima (não precisa clicar em "+ Adicionar à lista" antes). Compara o juro que essa
+                amortização economizaria com o que o mesmo valor renderia aplicado, pelo tempo que faltaria de
+                financiamento.
+              </p>
+              <div class="calc-campo">
+                <label for="amortRentabilidadeAlt">Rentabilidade líquida esperada da alternativa (renda fixa/Tesouro, já com IR descontado) (% a.a.)</label>
+                <input type="number" id="amortRentabilidadeAlt" min="0" step="0.1" placeholder="10" />
+              </div>
+              <button type="button" class="hg-btn" id="amortBtnComparar" style="width:100%;">Comparar</button>
+              <div id="amortComparacaoResultado"></div>
+            </div>
+          </details>
+
           <div class="calc-campo" style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;">
               <input type="checkbox" id="amortFgtsAtivo" style="width:16px; height:16px;" />
@@ -30421,6 +30439,9 @@
       const amortFgtsCampos = document.getElementById('amortFgtsCampos');
       const amortFgtsInicio = document.getElementById('amortFgtsInicio');
       const amortFgtsValor = document.getElementById('amortFgtsValor');
+      const amortRentabilidadeAlt = document.getElementById('amortRentabilidadeAlt');
+      const amortBtnComparar = document.getElementById('amortBtnComparar');
+      const amortComparacaoResultado = document.getElementById('amortComparacaoResultado');
       const MAX_AMORTIZACOES = 5;
 
       function amortFgtsModoSelecionado() {
@@ -30591,6 +30612,144 @@
           amortValor.value = '';
           amortValor.dataset.centavos = '0';
           renderizarHistoricoAmort();
+        });
+      }
+
+      // "Vale mais a pena amortizar ou investir?" — reaproveita a MESMA
+      // engine de simulação (simularFinanciamento /
+      // simularFinanciamentoComCorrecao) já validada, rodando duas vezes:
+      // uma com a configuração atual de amortizações (base) e outra com a
+      // nova amortização candidata somada a ela. A diferença de juro
+      // total entre as duas é exatamente quanto essa amortização
+      // economizaria — e isso vale pros 3 modos (prazo, prazo com parcela
+      // fixa, parcela), porque cada um já reflete corretamente no total de
+      // linhas/juros devolvido pela engine, sem precisar de fórmula à
+      // parte por modo.
+      if (amortBtnComparar) {
+        amortBtnComparar.addEventListener('click', () => {
+          amortComparacaoResultado.innerHTML = '';
+          const ponto = parseInt(amortSequencia.value, 10);
+          const valorNovo = hgValorMascarado(amortValor);
+          const modo = document.querySelector('input[name="amortModo"]:checked')?.value || 'prazo';
+          const rentabilidadeAnual = parseFloat((amortRentabilidadeAlt.value || '').replace(',', '.'));
+
+          function erroComparacao(msg) {
+            amortComparacaoResultado.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a; margin-top:10px;">${msg}</p>`;
+          }
+
+          if (valorFinanciamentoNumero() <= 0) {
+            erroComparacao('Preencha o valor do financiamento (acima) antes de comparar.');
+            return;
+          }
+          if (isNaN(ponto) || ponto <= 0) {
+            erroComparacao('Informe após qual parcela (ex: 12).');
+            return;
+          }
+          if (!(valorNovo > 0)) {
+            erroComparacao('Informe o valor a ser amortizado.');
+            return;
+          }
+          if (!(rentabilidadeAnual >= 0)) {
+            erroComparacao('Informe a rentabilidade líquida esperada da alternativa.');
+            return;
+          }
+
+          // Mesmos parâmetros-base que simular() usa, pra rodar a engine
+          // exatamente como a simulação principal rodaria.
+          const valor = Math.max(0, valorFinanciamentoNumero());
+          const sistema = selSistema.value;
+          const taxaPct = Math.max(0, parseNumeroBr(inTaxa.value));
+          const periodo = selJurosPeriodo.value;
+          const parcelasInformadas = Math.max(1, Math.round(parseFloat(inParcelas.value) || 1));
+          const parcelas = selParcelasUnidade.value === 'anos' ? parcelasInformadas * 12 : parcelasInformadas;
+          let anoInicio, mesInicio0;
+          if (inDataInicio.value) {
+            const [a, m] = inDataInicio.value.split('-').map(Number);
+            anoInicio = a; mesInicio0 = m - 1;
+          } else {
+            const hoje = new Date();
+            anoInicio = hoje.getFullYear(); mesInicio0 = hoje.getMonth();
+          }
+          const taxaMensal = taxaMensalEfetiva(taxaPct, periodo);
+          const usarCorrecao = sistema === 'sac' && !!inUsarCorrecao?.checked;
+          const taxaCorrecaoMensal = usarCorrecao ? Math.max(0, parseNumeroBr(inTaxaCorrecao.value)) / 100 : 0;
+          const taxaSeguroMensal = usarCorrecao ? Math.max(0, parseNumeroBr(inTaxaSeguro.value)) / 100 : 0;
+          const tcaMensal = usarCorrecao ? Math.max(0, parseNumeroBr(inTca.value) || 25) : 0;
+
+          function rodar(amort) {
+            return usarCorrecao
+              ? simularFinanciamentoComCorrecao({ valor, taxaMensal, parcelas, anoInicio, mesInicio0, amort, taxaCorrecaoMensal, taxaSeguroMensal, tcaMensal })
+              : simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0, amort });
+          }
+
+          const amortBase = montarAmortParaSimulacao(parcelas);
+          const linhasBase = rodar(amortBase);
+          const prazoBase = linhasBase.length - 1;
+
+          if (ponto >= prazoBase) {
+            erroComparacao(`Esse financiamento (com as amortizações já cadastradas) termina na parcela ${prazoBase} — escolha um ponto antes disso.`);
+            return;
+          }
+
+          const listaComNova = (amortBase?.lista ?? []).filter(a => a.ponto !== ponto);
+          listaComNova.push({ ponto, valor: valorNovo, modo });
+          const linhasComNova = rodar({ lista: listaComNova });
+          const novoFim = linhasComNova.length - 1;
+
+          // Compara as duas opções no MESMO instante futuro (o mês em que
+          // o financiamento original, sem essa amortização, terminaria) —
+          // só assim dá pra somar valores que aconteceriam em meses
+          // diferentes sem misturar maçãs com laranjas:
+          //
+          // "Investir": aplica o valor de uma vez, rende até lá.
+          //
+          // "Amortizar": cada mês, a partir daqui, sua parcela real (a da
+          // simulação COM a amortização, ou zero se o financiamento já
+          // quitou antes do fim original) fica menor que a parcela que
+          // você pagaria SEM essa amortização — essa diferença, mês a
+          // mês, é dinheiro liberado. Reinveste cada uma dessas diferenças
+          // na mesma taxa até o mesmo mês final, pra comparar de forma
+          // justa com investir o valor todo de uma vez.
+          const taxaLiquidaMensal = Math.pow(1 + rentabilidadeAnual / 100, 1 / 12) - 1;
+
+          let patrimonioAmortizar = 0;
+          for (let m = ponto + 1; m <= prazoBase; m++) {
+            const parcelaBaseMes = linhasBase[m]?.parcela ?? 0;
+            const parcelaComNovaMes = m <= novoFim ? (linhasComNova[m]?.parcela ?? 0) : 0;
+            const diferencaMes = parcelaBaseMes - parcelaComNovaMes;
+            patrimonioAmortizar += diferencaMes * Math.pow(1 + taxaLiquidaMensal, prazoBase - m);
+          }
+
+          const mesesInvestimento = prazoBase - ponto;
+          const patrimonioInvestir = valorNovo * Math.pow(1 + taxaLiquidaMensal, mesesInvestimento);
+
+          const amortizarGanha = patrimonioAmortizar >= patrimonioInvestir;
+          const diferenca = Math.abs(patrimonioAmortizar - patrimonioInvestir);
+
+          amortComparacaoResultado.innerHTML = `
+            <div class="carteira-resumo-cards" style="margin-top:10px;">
+              <div class="carteira-resumo-card${amortizarGanha ? ' carteira-resumo-destaque' : ''}">
+                <span>${amortizarGanha ? '🏆 ' : ''}Amortizando (economia reinvestida)</span>
+                <strong>${hgFormatMoeda(patrimonioAmortizar)}</strong>
+              </div>
+              <div class="carteira-resumo-card${!amortizarGanha ? ' carteira-resumo-destaque' : ''}">
+                <span>${!amortizarGanha ? '🏆 ' : ''}Investindo o valor todo</span>
+                <strong>${hgFormatMoeda(patrimonioInvestir)}</strong>
+              </div>
+            </div>
+            <p class="calc-ajuda" style="margin-top:10px;">
+              Projetando até o mês ${prazoBase} (quando o financiamento, sem essa amortização, terminaria),
+              <strong>${amortizarGanha ? 'amortizar' : 'investir'}</strong> deixaria ${hgFormatMoeda(diferenca)} a
+              mais — ${amortizarGanha
+                ? 'a taxa do seu financiamento supera a rentabilidade líquida informada'
+                : 'a rentabilidade líquida informada supera a taxa do seu financiamento'}.
+              No lado de amortizar, supomos que você reinveste, todo mês, a diferença entre a parcela que pagaria sem
+              essa amortização e a que passa a pagar com ela (inclusive o valor cheio da parcela, se o financiamento
+              acabar antes do prazo original) — pra comparar de forma justa com investir o valor todo de uma vez.
+              Isso considera só o valor financeiro: amortizar também reduz o risco de ficar com uma dívida maior se a
+              sua renda cair no meio do caminho, e investir mantém o dinheiro disponível (liquidez) se você precisar
+              dele antes do fim do prazo.
+            </p>`;
         });
       }
 
