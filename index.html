@@ -3771,6 +3771,28 @@
     .cxa-cenario-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 0.86rem; padding: 3px 0; }
     .cxa-cenario-linha span { color: var(--muted); }
     .cxa-cenario-liquido { font-size: 1.08rem; font-weight: 700; margin-top: 6px; }
+    /* Consórcio x Financiamento: 2 cards (parcela/custo total) + 3
+       cards de cenário de contemplação (cedo/médio/tardio) — mesmo
+       visual dos cards de cenário já usado no Comprar x Alugar. */
+    .calc-modal.cxf-modal { max-width: 960px; }
+    @media (min-width: 1024px) {
+      .calc-modal.cxf-modal { max-width: 1040px; }
+    }
+    .cxf-cenarios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    @media (max-width: 560px) {
+      .cxf-cenarios-grid { grid-template-columns: 1fr; }
+    }
+    .cxf-cenarios-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 12px; }
+    @media (max-width: 720px) {
+      .cxf-cenarios-grid-3 { grid-template-columns: 1fr; }
+    }
+    .cxf-cenario-card { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; background: var(--surface, rgba(255,255,255,0.02)); }
+    .cxf-cenario-card.cxf-cenario-destaque { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+    .cxf-cenario-titulo { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 6px; }
+    .cxf-cenario-card.cxf-cenario-destaque .cxf-cenario-titulo { color: var(--accent); }
+    .cxf-cenario-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 0.86rem; padding: 3px 0; }
+    .cxf-cenario-linha span { color: var(--muted); }
+    .cxf-cenario-liquido { font-size: 1.02rem; font-weight: 700; margin-top: 6px; }
     /* Comparação visual "casa x FII" do Cap Rate — dois cards lado a
        lado, cada um com um ícone representando o ativo. */
     .cr-visual-comparacao { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
@@ -4851,6 +4873,9 @@
               <button type="button" class="nav-dropdown-item" id="cxaBtnAbrir">
                 <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Comprar x Alugar Imóvel
               </button>
+              <button type="button" class="nav-dropdown-item" id="cxfBtnAbrir">
+                <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> Consórcio x Financiamento
+              </button>
               <button type="button" class="nav-dropdown-item" id="rpnBtnAbrir">
                 <svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><rect x="7" y="5" width="10" height="4"></rect><line x1="8" y1="13" x2="8" y2="13"></line><line x1="12" y1="13" x2="12" y2="13"></line><line x1="16" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="8" y2="17"></line><line x1="12" y1="17" x2="12" y2="17"></line><line x1="16" y1="17" x2="16" y2="17"></line></svg> Calculadora Financeira (RPN)
               </button>
@@ -4926,6 +4951,7 @@
     <a class="mobile-menu-item" href="https://yubb.com.br/" target="_blank" rel="noopener noreferrer">🔎 Busca Investimento</a>
     <div class="mobile-menu-separador">Ferramentas</div>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="cxaBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Comprar x Alugar Imóvel</button>
+    <button type="button" class="mobile-menu-item" data-mobile-alvo="cxfBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> Consórcio x Financiamento</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="crBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9 21v-6h6v6"></path></svg> Cap Rate — Imóvel x FII</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="pgblBtnAbrir"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8.5-8 9c-4.5-.5-8-4-8-9V7z"></path><path d="M9 12l2 2l4-4"></path></svg> PGBL x VGBL — Qual Previdência Vale Mais?</button>
     <button type="button" class="mobile-menu-item" data-mobile-alvo="navAbrirConversor">💱 Conversor de Moedas</button>
@@ -8472,6 +8498,152 @@
                 obrigatório do financiamento (MIP/DFI), financiamento em SAC, liquidez (vender um imóvel leva muito
                 mais tempo que resgatar um investimento) nem a possibilidade de o imóvel ficar vago, no caso de quem
                 aluga, por algum período entre contratos.
+              </p>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CONSÓRCIO x FINANCIAMENTO — compara a parcela e o custo total do
+       consórcio (taxa de administração + fundo de reserva, corrigidos
+       anualmente, sem juros) com um financiamento equivalente (Price).
+       O grande "mas" do consórcio é que o bem só chega quando a carta é
+       contemplada — por sorteio ou lance — o que é incerto por
+       natureza. Por isso não damos um único número: mostramos 3
+       cenários de quando a contemplação pode acontecer (cedo, na média
+       esperada de um sorteio puro, e no último mês do grupo).
+       ============================================================ -->
+  <div id="cxfOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="cxfTitulo" hidden>
+    <div class="calc-modal cxf-modal">
+      <div class="calc-modal-topo">
+        <h3 id="cxfTitulo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>Consórcio x Financiamento
+        </h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" id="cxfCompartilharLink" class="modal-link-btn"
+                  aria-label="Compartilhar o link desta ferramenta"
+                  title="Compartilhar o link desta ferramenta">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+          </button>
+          <button id="cxfFechar" class="calc-fechar" aria-label="Fechar" title="Fechar">✕</button>
+        </div>
+      </div>
+
+      <div class="calc-corpo">
+        <p class="calc-ajuda" style="margin-top:0;">
+          Compara a parcela e o custo total de um consórcio (sem juros, só taxa de administração) com um
+          financiamento equivalente (Price). O consórcio não garante QUANDO você recebe o bem — por isso mostramos
+          3 cenários de contemplação, em vez de um número só.
+        </p>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="cxfValorBem">Valor do bem (carta de crédito)</label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="cxfValorBem" placeholder="100.000,00" />
+            </div>
+          </div>
+          <div class="calc-campo">
+            <label for="cxfPrazoConsorcio">Prazo do grupo de consórcio (meses)</label>
+            <input type="number" id="cxfPrazoConsorcio" min="1" max="240" step="1" placeholder="180" />
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="cxfTaxaAdm">Taxa de administração total do consórcio (%)
+              <button type="button" class="hg-info-btn" data-glossario="cxf-taxa-administracao" aria-label="O que é a taxa de administração?" title="">?</button>
+            </label>
+            <input type="number" id="cxfTaxaAdm" min="0" step="0.1" placeholder="18" />
+          </div>
+          <div class="calc-campo">
+            <label for="cxfCorrecaoAnual">Correção anual esperada do saldo (% a.a.)
+              <button type="button" class="hg-info-btn" data-glossario="cxf-correcao-consorcio" aria-label="Como funciona a correção do consórcio?" title="">?</button>
+            </label>
+            <input type="number" id="cxfCorrecaoAnual" min="0" step="0.1" placeholder="4" />
+          </div>
+        </div>
+
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="cxfPrazoFinanc">Prazo do financiamento (anos)</label>
+            <input type="number" id="cxfPrazoFinanc" min="1" max="40" step="1" placeholder="15" />
+          </div>
+          <div class="calc-campo">
+            <label for="cxfTaxaJurosFinanc">Taxa de juros do financiamento (% a.a.)</label>
+            <input type="number" id="cxfTaxaJurosFinanc" min="0" step="0.1" placeholder="11,5" />
+          </div>
+        </div>
+
+        <details class="calc-educativo">
+          <summary>⚙️ Fundo de reserva (opcional)</summary>
+          <div class="calc-educativo-corpo">
+            <div class="calc-campo">
+              <label for="cxfFundoReserva">Fundo de reserva do consórcio (%, cobrado junto com a taxa de administração)
+                <button type="button" class="hg-info-btn" data-glossario="cxf-fundo-reserva" aria-label="O que é o fundo de reserva?" title="">?</button>
+              </label>
+              <input type="number" id="cxfFundoReserva" min="0" step="0.1" placeholder="2" />
+            </div>
+          </div>
+        </details>
+
+        <div class="cmp-acoes-linha" style="margin-top:14px;">
+          <button type="button" class="hg-btn" id="cxfBtnCalcular">Comparar</button>
+          <button type="button" class="cmp-btn-secundario" id="cxfBtnLimpar">Limpar</button>
+        </div>
+
+        <div id="cxfResultado"></div>
+
+        <div id="cxfAcoes" hidden>
+          <p class="calc-ajuda" style="margin:14px 0 6px;">
+            O PDF leva os dados informados e a comparação completa entre consórcio e financiamento.
+          </p>
+          <div class="cmp-acoes-linha">
+            <button type="button" class="cmp-btn-secundario" id="cxfBtnPdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+              Baixar PDF
+            </button>
+            <button type="button" class="cmp-btn-secundario" id="cxfBtnCompartilhar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <span class="hg-btn-compartilhar-texto">Compartilhar</span>
+            </button>
+          </div>
+        </div>
+
+        <details class="calc-educativo">
+          <summary>📋 Como esta simulação calcula (e o que ela não cobre)</summary>
+          <div class="calc-educativo-corpo">
+            <div class="calc-educativo-item">
+              <strong>Como calculamos</strong>
+              <p>
+                Consórcio: a parcela inicial é o valor do bem × (1 + taxa de administração + fundo de reserva) ÷
+                prazo do grupo, reajustada uma vez por ano pela correção informada — sem juros, diferente do
+                financiamento. Financiamento: parcelas fixas em Price, com a taxa de juros informada.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>Por que 3 cenários, e não um número só</strong>
+              <p>
+                No consórcio, você só recebe o bem quando sua carta é contemplada — por sorteio (aleatório) ou lance
+                (quem oferece mais, ou antecipa parcelas, fura a fila). Isso é incerto por natureza: por sorteio
+                puro, a expectativa estatística é contemplar na metade do prazo do grupo, mas pode ser no primeiro
+                mês (sorte ou lance forte) ou só no último. Enquanto isso, você paga a parcela do consórcio sem
+                ainda ter o bem — já no financiamento, você recebe o bem no primeiro mês.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>O que esta simulação não cobre</strong>
+              <p>
+                O valor do lance (recursos próprios ou FGTS) que muitos usam pra antecipar a contemplação, Imposto
+                de Renda e seguros, o custo de oportunidade específico de cada mês de espera (quanto você deixaria
+                de ganhar, ou de economizar em aluguel, por ainda não ter o bem) e a possibilidade de desistir do
+                consórcio e receber de volta o que pagou, com deduções. É uma comparação do custo nominal das duas
+                formas de pagamento, não uma recomendação de qual escolher.
               </p>
             </div>
           </div>
@@ -17061,6 +17233,333 @@
     })();
 
     // ============================================================
+    // CONSÓRCIO x FINANCIAMENTO — compara parcela e custo total do
+    // consórcio (taxa de administração + fundo de reserva, corrigidos
+    // anualmente, sem juros) com um financiamento equivalente (Price).
+    // Mostra 3 cenários de contemplação (cedo/médio/tardio), já que o
+    // momento da contemplação no consórcio é incerto por natureza.
+    // ============================================================
+    (function () {
+      const overlay = document.getElementById('cxfOverlay');
+      const btnAbrirMenu = document.getElementById('cxfBtnAbrir');
+      const btnFechar = document.getElementById('cxfFechar');
+      const inValorBem = document.getElementById('cxfValorBem');
+      const inPrazoConsorcio = document.getElementById('cxfPrazoConsorcio');
+      const inTaxaAdm = document.getElementById('cxfTaxaAdm');
+      const inCorrecaoAnual = document.getElementById('cxfCorrecaoAnual');
+      const inPrazoFinanc = document.getElementById('cxfPrazoFinanc');
+      const inTaxaJurosFinanc = document.getElementById('cxfTaxaJurosFinanc');
+      const inFundoReserva = document.getElementById('cxfFundoReserva');
+      const btnCalcular = document.getElementById('cxfBtnCalcular');
+      const btnLimpar = document.getElementById('cxfBtnLimpar');
+      const resultadoEl = document.getElementById('cxfResultado');
+      const acoesEl = document.getElementById('cxfAcoes');
+      const btnPdf = document.getElementById('cxfBtnPdf');
+
+      if (!overlay || !btnAbrirMenu) return;
+
+      hgAplicarMascaraMoeda(inValorBem);
+
+      let ultimoCalculoCxf = null;
+
+      function abrirModal() {
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+      function fecharModal() {
+        overlay.hidden = true;
+        document.body.style.overflow = '';
+      }
+
+      function moeda(v) { return hgFormatMoeda(v); }
+      function pct(v) { return v.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
+      function mesesParaTexto(m) {
+        const anos = Math.floor(m / 12);
+        const resto = m % 12;
+        const partes = [];
+        if (anos > 0) partes.push(`${anos} ano${anos > 1 ? 's' : ''}`);
+        if (resto > 0 || anos === 0) partes.push(`${resto} ${resto === 1 ? 'mês' : 'meses'}`);
+        return partes.join(' e ');
+      }
+
+      function erro(msg) {
+        resultadoEl.innerHTML = `<p class="calc-ajuda" style="color:#ff5a5a; margin-top:14px;">${msg}</p>`;
+        ultimoCalculoCxf = null;
+        acoesEl.hidden = true;
+      }
+
+      // Soma, mês a mês, as parcelas do consórcio (reajustadas uma vez
+      // por ano) do mês 1 até `ateOMes` (inclusive).
+      function somaParcelasConsorcio(parcelaInicial, correcaoAnual, ateOMes) {
+        let parcelaAtual = parcelaInicial;
+        let total = 0;
+        for (let m = 1; m <= ateOMes; m++) {
+          if (m > 1 && (m - 1) % 12 === 0) parcelaAtual *= (1 + correcaoAnual / 100);
+          total += parcelaAtual;
+        }
+        return total;
+      }
+
+      function calcular() {
+        const valorBem = hgValorMascarado(inValorBem);
+        const prazoConsorcioMeses = parseInt(inPrazoConsorcio.value, 10);
+        const taxaAdmPct = parseFloat((inTaxaAdm.value || '').replace(',', '.'));
+        const correcaoAnual = parseFloat((inCorrecaoAnual.value || '').replace(',', '.'));
+        const prazoFinancAnos = parseInt(inPrazoFinanc.value, 10);
+        const taxaJurosFinancAnual = parseFloat((inTaxaJurosFinanc.value || '').replace(',', '.'));
+        const fundoReservaPct = parseFloat((inFundoReserva.value || '0').replace(',', '.')) || 0;
+
+        if (!(valorBem > 0) || !(prazoConsorcioMeses > 0) || !(taxaAdmPct >= 0) || !(correcaoAnual >= 0)
+          || !(prazoFinancAnos > 0) || !(taxaJurosFinancAnual >= 0)) {
+          erro('Preencha o valor do bem, o prazo do consórcio, a taxa de administração, a correção esperada e os dados do financiamento pra comparar.');
+          return;
+        }
+
+        // ---- Consórcio: parcela inicial, sem juros ----
+        const parcelaConsorcioInicial = valorBem * (1 + (taxaAdmPct + fundoReservaPct) / 100) / prazoConsorcioMeses;
+        const custoTotalConsorcio = somaParcelasConsorcio(parcelaConsorcioInicial, correcaoAnual, prazoConsorcioMeses);
+
+        // ---- Financiamento: Price ----
+        const nFinanc = prazoFinancAnos * 12;
+        const iMensalFinanc = Math.pow(1 + taxaJurosFinancAnual / 100, 1 / 12) - 1;
+        const parcelaFinanc = iMensalFinanc > 0
+          ? valorBem * iMensalFinanc / (1 - Math.pow(1 + iMensalFinanc, -nFinanc))
+          : valorBem / nFinanc;
+        const custoTotalFinanc = parcelaFinanc * nFinanc;
+
+        const consorcioMaisBarato = custoTotalConsorcio < custoTotalFinanc;
+        const diferencaCustoTotal = Math.abs(custoTotalConsorcio - custoTotalFinanc);
+
+        // ---- 3 cenários de contemplação ----
+        const mesCedo = 1;
+        const mesMedio = Math.max(1, Math.round(prazoConsorcioMeses / 2));
+        const mesTardio = prazoConsorcioMeses;
+        const cenarios = [
+          { chave: 'cedo', titulo: 'Contemplação cedo', mes: mesCedo, detalhe: 'sorte no sorteio, ou lance forte' },
+          { chave: 'medio', titulo: 'Contemplação na média', mes: mesMedio, detalhe: 'expectativa estatística de um sorteio puro' },
+          { chave: 'tardio', titulo: 'Contemplação tardia', mes: mesTardio, detalhe: 'último mês do grupo' },
+        ];
+        cenarios.forEach(c => {
+          c.pagoAteContemplar = somaParcelasConsorcio(parcelaConsorcioInicial, correcaoAnual, c.mes);
+        });
+
+        const cardsHtml = cenarios.map(c => `
+          <div class="cxf-cenario-card${c.chave === 'medio' ? ' cxf-cenario-destaque' : ''}">
+            <div class="cxf-cenario-titulo">${c.chave === 'medio' ? '📊 ' : ''}${c.titulo}</div>
+            <div class="cxf-cenario-linha"><span>Quando</span><strong>mês ${c.mes}</strong></div>
+            <div class="cxf-cenario-linha"><span>Tempo esperando o bem</span><strong>${mesesParaTexto(c.mes)}</strong></div>
+            <div class="cxf-cenario-liquido">${moeda(c.pagoAteContemplar)} pagos sem o bem</div>
+            <p class="calc-ajuda" style="margin:6px 0 0; font-size:0.74rem;">${c.detalhe}</p>
+          </div>`).join('');
+
+        resultadoEl.innerHTML = `
+          <div class="carteira-resumo-cards">
+            <div class="carteira-resumo-card">
+              <span>Parcela inicial do consórcio</span>
+              <strong>${moeda(parcelaConsorcioInicial)}</strong>
+            </div>
+            <div class="carteira-resumo-card">
+              <span>Parcela do financiamento</span>
+              <strong>${moeda(parcelaFinanc)}</strong>
+            </div>
+          </div>
+
+          <div class="cxf-cenarios-grid" style="margin-top:14px;">
+            <div class="cxf-cenario-card${consorcioMaisBarato ? ' cxf-cenario-destaque' : ''}">
+              <div class="cxf-cenario-titulo">${consorcioMaisBarato ? '🏆 ' : ''}Custo total — Consórcio</div>
+              <div class="cxf-cenario-linha"><span>Soma de todas as parcelas, prazo completo</span><strong>${moeda(custoTotalConsorcio)}</strong></div>
+              <div class="cxf-cenario-liquido">${moeda(custoTotalConsorcio)}</div>
+            </div>
+            <div class="cxf-cenario-card${!consorcioMaisBarato ? ' cxf-cenario-destaque' : ''}">
+              <div class="cxf-cenario-titulo">${!consorcioMaisBarato ? '🏆 ' : ''}Custo total — Financiamento</div>
+              <div class="cxf-cenario-linha"><span>Soma de todas as parcelas, prazo completo</span><strong>${moeda(custoTotalFinanc)}</strong></div>
+              <div class="cxf-cenario-liquido">${moeda(custoTotalFinanc)}</div>
+            </div>
+          </div>
+          <p class="calc-ajuda" style="margin-top:10px;">
+            ${consorcioMaisBarato ? 'O consórcio' : 'O financiamento'} sai ${moeda(diferencaCustoTotal)} mais barato no total — mas o 🏆
+            aqui é só sobre custo nominal, sem levar em conta QUANDO você recebe o bem (veja os cenários abaixo).
+            O financiamento entrega o bem logo no primeiro mês; o consórcio, só quando a carta for contemplada.
+          </p>
+
+          <p class="calc-ajuda" style="margin-top:14px; margin-bottom:0;">
+            <strong>Quando a contemplação pode acontecer</strong> (o grande "mas" do consórcio):
+          </p>
+          <div class="cxf-cenarios-grid-3">${cardsHtml}</div>`;
+
+        ultimoCalculoCxf = {
+          valorBem, prazoConsorcioMeses, taxaAdmPct, correcaoAnual, fundoReservaPct,
+          prazoFinancAnos, taxaJurosFinancAnual,
+          parcelaConsorcioInicial, custoTotalConsorcio, parcelaFinanc, custoTotalFinanc,
+          consorcioMaisBarato, diferencaCustoTotal, cenarios,
+        };
+        acoesEl.hidden = false;
+      }
+
+      function limpar() {
+        inValorBem.value = '';
+        inValorBem.dataset.centavos = '0';
+        inPrazoConsorcio.value = '';
+        inTaxaAdm.value = '';
+        inCorrecaoAnual.value = '';
+        inPrazoFinanc.value = '';
+        inTaxaJurosFinanc.value = '';
+        inFundoReserva.value = '';
+        resultadoEl.innerHTML = '';
+        ultimoCalculoCxf = null;
+        acoesEl.hidden = true;
+      }
+
+      function nomeArquivoPdfCxf() {
+        return 'consorcio-x-financiamento.pdf';
+      }
+
+      async function montarDocumentoPdfCxf() {
+        if (!ultimoCalculoCxf) {
+          alert('Compare antes de gerar o PDF.');
+          return null;
+        }
+        if (!window.jspdf) {
+          alert('O gerador de PDF ainda está carregando, tente novamente em alguns segundos.');
+          return null;
+        }
+
+        const c = ultimoCalculoCxf;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const agora = new Date();
+        const dataHora = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+
+        const logoBase64 = await carregarLogoSiteBase64();
+        if (logoBase64) {
+          const larguraPagina = doc.internal.pageSize.getWidth();
+          doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(15);
+        doc.text('Consórcio x Financiamento', 40, 40);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(`Dividendos | Viver de Renda — viverderenda.dev.br  ·  Gerado em ${dataHora}`, 40, 58);
+        doc.setFontSize(8);
+        doc.text(
+          'Conteúdo educativo, não é recomendação. O momento da contemplação no consórcio é incerto por natureza.',
+          40, 70
+        );
+        doc.setTextColor(0);
+
+        doc.autoTable({
+          startY: 88,
+          head: [['', 'Dados informados']],
+          body: [
+            ['Valor do bem', moeda(c.valorBem)],
+            ['Prazo do consórcio', `${c.prazoConsorcioMeses} meses`],
+            ['Taxa de administração total', pct(c.taxaAdmPct)],
+            ['Fundo de reserva', pct(c.fundoReservaPct)],
+            ['Correção anual esperada', pct(c.correcaoAnual)],
+            ['Prazo do financiamento', `${c.prazoFinancAnos} ano${c.prazoFinancAnos > 1 ? 's' : ''}`],
+            ['Taxa de juros do financiamento', pct(c.taxaJurosFinancAnual)],
+          ],
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { fontStyle: 'bold', fillColor: [119, 119, 119], textColor: 255 }, 1: { halign: 'center' } },
+        });
+
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 18,
+          head: [['', 'Consórcio', 'Financiamento']],
+          body: [
+            ['Parcela inicial', moeda(c.parcelaConsorcioInicial), moeda(c.parcelaFinanc)],
+            ['Custo total (prazo completo)', moeda(c.custoTotalConsorcio), moeda(c.custoTotalFinanc)],
+          ],
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6, halign: 'center' },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { halign: 'left', fontStyle: 'bold' } },
+        });
+
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 18,
+          head: [['Cenário de contemplação', 'Mês', 'Pago sem ainda ter o bem']],
+          body: c.cenarios.map(cen => [cen.titulo, `mês ${cen.mes}`, moeda(cen.pagoAteContemplar)]),
+          theme: 'grid',
+          styles: { fontSize: 9, cellPadding: 6, halign: 'center' },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255, halign: 'center' },
+          columnStyles: { 0: { halign: 'left', fontStyle: 'bold' } },
+        });
+
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 18,
+          head: [['O que esta simulação NÃO cobre']],
+          body: [
+            ['O valor de um lance (recursos próprios ou FGTS) pra antecipar a contemplação.'],
+            ['Imposto de Renda, seguros e o custo de oportunidade específico de cada mês de espera.'],
+            ['A possibilidade de desistir do consórcio e receber de volta o que pagou, com deduções.'],
+          ],
+          theme: 'grid',
+          styles: { fontSize: 8, cellPadding: 6, textColor: 60 },
+          headStyles: { fillColor: [119, 119, 119], textColor: 255 },
+        });
+
+        return doc;
+      }
+
+      async function gerarPdfCxf() {
+        const doc = await montarDocumentoPdfCxf();
+        if (!doc) return;
+        doc.save(nomeArquivoPdfCxf());
+      }
+
+      async function compartilharResultadoCxf(botao) {
+        const doc = await montarDocumentoPdfCxf();
+        if (!doc) return;
+
+        const nomeArquivo = nomeArquivoPdfCxf();
+        const blob = doc.output('blob');
+        const arquivo = new File([blob], nomeArquivo, { type: 'application/pdf' });
+
+        if (ehDispositivoMovel() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+          try {
+            await navigator.share({ title: 'Consórcio x Financiamento — Viver de Renda', files: [arquivo] });
+            return;
+          } catch (e) {
+            if (e?.name === 'AbortError') return;
+          }
+        }
+
+        doc.save(nomeArquivo);
+        const textoSpan = botao.querySelector('.hg-btn-compartilhar-texto');
+        const textoPadrao = textoSpan ? textoSpan.textContent : null;
+        if (textoSpan) textoSpan.textContent = 'PDF baixado!';
+        setTimeout(() => { if (textoSpan && textoPadrao) textoSpan.textContent = textoPadrao; }, 2500);
+      }
+
+      btnAbrirMenu.addEventListener('click', () => {
+        if (typeof fecharMenusNav === 'function') fecharMenusNav();
+        abrirModal();
+      });
+      btnFechar.addEventListener('click', fecharModal);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) fecharModal(); });
+      btnCalcular.addEventListener('click', calcular);
+      btnLimpar.addEventListener('click', limpar);
+      btnPdf.addEventListener('click', gerarPdfCxf);
+      document.getElementById('cxfBtnCompartilhar')?.addEventListener('click', (e) => compartilharResultadoCxf(e.currentTarget));
+
+      document.getElementById('cxfCompartilharLink')?.addEventListener('click', (e) =>
+        hgCompartilharLinkFerramenta(e.currentTarget, {
+          view: 'cxf',
+          titulo: 'Consórcio x Financiamento — Viver de Renda',
+          texto: 'Compare a parcela e o custo total do consórcio com um financiamento equivalente.',
+        }));
+
+      hgAbrirPorLinkDeFerramenta('cxf', abrirModal);
+    })();
+
+    // ============================================================
     // CALCULADORA DE APORTES
     // ------------------------------------------------------------
     // Pergunta que ela responde: "tenho R$ X este mês — quantas cotas
@@ -23677,6 +24176,11 @@
         'pgbl-vgbl-regressiva': 'Alíquota de IR que cai conforme o tempo no plano, criada pela Lei 11.053/2004: até 2 anos 35%; 2 a 4 anos 30%; 4 a 6 anos 25%; 6 a 8 anos 20%; 8 a 10 anos 15%; acima de 10 anos 10%.\n\nÉ definitiva (não entra na declaração anual). Incide sobre o valor TOTAL no PGBL, só sobre o RENDIMENTO no VGBL.\n\nNão confundir com a tabela regressiva de CDB/Tesouro Direto (22,5% a 15%, outra escala, outros prazos).',
         'pgbl-vgbl-progressiva': 'No resgate, 15% de IR é retido na fonte como antecipação; na declaração anual, esse valor entra na soma com os outros rendimentos tributáveis do ano e o imposto é recalculado pela tabela progressiva normal (a mesma dos salários, até 27,5%).\n\nCostuma compensar mais pra prazos curtos ou renda baixa/moderada no ano do resgate. Desde a Lei 14.803/2024, dá pra escolher entre progressiva e regressiva no momento do resgate, não só na adesão ao plano.',
         'pgbl-vgbl-declaracao': 'Simplificada: troca todas as deduções (saúde, educação, dependentes, PGBL...) por um desconto único de 20% da renda tributável, até um teto.\n\nCompleta: deduz item por item, com comprovante — inclusive os 12% de renda tributável anual que podem ir pro PGBL. A dedução do PGBL só existe pra quem usa a declaração completa.',
+
+        // --- Consórcio x Financiamento ---
+        'cxf-taxa-administracao': 'O que a administradora do consórcio cobra pra organizar o grupo — é o "lucro" dela, já que o consórcio em si não cobra juros. Normalmente expressa como um percentual TOTAL sobre o valor do bem (ex: 18%), diluído em todas as parcelas do grupo.\n\nDiferente de juros: não cresce com o tempo que falta pagar, é sempre a mesma fatia do valor do bem.',
+        'cxf-correcao-consorcio': 'Tanto o valor do bem (carta de crédito) quanto o saldo devedor e as parcelas do consórcio são corrigidos periodicamente por um índice — geralmente o INCC para imóveis, ou uma tabela de preços do fabricante para veículos.\n\nIsso existe pra manter o poder de compra da carta: se o preço do bem sobe, o crédito sobe junto, e as parcelas futuras também.',
+        'cxf-fundo-reserva': 'Um percentual a mais, cobrado junto com a taxa de administração, que forma uma reserva pra cobrir calotes de outros participantes do grupo (quem para de pagar). Normalmente pequeno (1% a 3%) e pode ser devolvido ao fim do grupo, se sobrar saldo — depende do regulamento de cada administradora.',
       };
 
       let glossarioTooltipEl = document.getElementById('glossarioTooltipGlobal');
