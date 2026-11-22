@@ -3783,6 +3783,12 @@
       .cxf-cenarios-grid { grid-template-columns: 1fr; }
     }
     .cxf-cenarios-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 12px; }
+    /* Tablet: 3 colunas ficam estreitas demais pro texto de cada card
+       ("Tempo esperando: 17 anos e 6 meses") sem quebrar feio — passa
+       pra 2 colunas antes de ir pra 1 só no celular. */
+    @media (max-width: 1024px) {
+      .cxf-cenarios-grid-3 { grid-template-columns: 1fr 1fr; }
+    }
     @media (max-width: 720px) {
       .cxf-cenarios-grid-3 { grid-template-columns: 1fr; }
     }
@@ -3792,6 +3798,12 @@
     .cxf-cenario-card.cxf-cenario-destaque .cxf-cenario-titulo { color: var(--accent); }
     .cxf-cenario-linha { display: flex; justify-content: space-between; gap: 10px; font-size: 0.86rem; padding: 3px 0; }
     .cxf-cenario-linha span { color: var(--muted); }
+    /* Nos 3 cards de cenário de contemplação, label e valor lado a
+       lado quebravam feio (rótulo e número se intercalando em 2
+       linhas) quando o card fica estreito — empilha os dois em vez
+       de forçar a mesma linha. */
+    .cxf-cenario-linha-col { display: flex; flex-direction: column; gap: 2px; font-size: 0.86rem; padding: 3px 0; }
+    .cxf-cenario-linha-col span { color: var(--muted); }
     .cxf-cenario-liquido { font-size: 1.02rem; font-weight: 700; margin-top: 6px; }
     /* Comparação visual "casa x FII" do Cap Rate — dois cards lado a
        lado, cada um com um ícone representando o ativo. */
@@ -8557,8 +8569,14 @@
             </div>
           </div>
           <div class="calc-campo">
-            <label for="cxfPrazoConsorcio">Prazo do grupo de consórcio (meses)</label>
-            <input type="number" id="cxfPrazoConsorcio" min="1" max="240" step="1" placeholder="180" />
+            <label for="cxfPrazoConsorcio">Prazo do grupo de consórcio</label>
+            <div class="calc-grid-2" style="gap:8px;">
+              <input type="number" id="cxfPrazoConsorcio" min="1" step="1" placeholder="180" />
+              <select id="cxfPrazoConsorcioUnidade">
+                <option value="meses" selected>Meses</option>
+                <option value="anos">Anos</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -17277,6 +17295,7 @@
       const btnFechar = document.getElementById('cxfFechar');
       const inValorBem = document.getElementById('cxfValorBem');
       const inPrazoConsorcio = document.getElementById('cxfPrazoConsorcio');
+      const selPrazoConsorcioUnidade = document.getElementById('cxfPrazoConsorcioUnidade');
       const inTaxaAdm = document.getElementById('cxfTaxaAdm');
       const inCorrecaoAnual = document.getElementById('cxfCorrecaoAnual');
       const inPrazoFinanc = document.getElementById('cxfPrazoFinanc');
@@ -17334,7 +17353,8 @@
 
       function calcular() {
         const valorBem = hgValorMascarado(inValorBem);
-        const prazoConsorcioMeses = parseInt(inPrazoConsorcio.value, 10);
+        const prazoConsorcioInformado = parseInt(inPrazoConsorcio.value, 10);
+        const prazoConsorcioMeses = selPrazoConsorcioUnidade.value === 'anos' ? prazoConsorcioInformado * 12 : prazoConsorcioInformado;
         const taxaAdmPct = parseFloat((inTaxaAdm.value || '').replace(',', '.'));
         const correcaoAnual = parseFloat((inCorrecaoAnual.value || '').replace(',', '.'));
         const prazoFinancAnos = parseInt(inPrazoFinanc.value, 10);
@@ -17378,8 +17398,8 @@
         const cardsHtml = cenarios.map(c => `
           <div class="cxf-cenario-card${c.chave === 'medio' ? ' cxf-cenario-destaque' : ''}">
             <div class="cxf-cenario-titulo">${c.chave === 'medio' ? '📊 ' : ''}${c.titulo}</div>
-            <div class="cxf-cenario-linha"><span>Quando</span><strong>mês ${c.mes}</strong></div>
-            <div class="cxf-cenario-linha"><span>Tempo esperando o bem</span><strong>${mesesParaTexto(c.mes)}</strong></div>
+            <div class="cxf-cenario-linha-col"><span>Quando</span><strong>mês ${c.mes}</strong></div>
+            <div class="cxf-cenario-linha-col"><span>Tempo esperando</span><strong>${mesesParaTexto(c.mes)}</strong></div>
             <div class="cxf-cenario-liquido">${moeda(c.pagoAteContemplar)} pagos sem o bem</div>
             <p class="calc-ajuda" style="margin:6px 0 0; font-size:0.74rem;">${c.detalhe}</p>
           </div>`).join('');
@@ -17432,6 +17452,7 @@
         inValorBem.value = '';
         inValorBem.dataset.centavos = '0';
         inPrazoConsorcio.value = '';
+        selPrazoConsorcioUnidade.value = 'meses';
         inTaxaAdm.value = '';
         inCorrecaoAnual.value = '';
         inPrazoFinanc.value = '';
