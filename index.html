@@ -8372,9 +8372,9 @@
 
       <div class="calc-corpo">
         <p class="calc-ajuda" style="margin-top:0;">
-          Compara comprar um imóvel financiado com alugar um equivalente e investir a entrada + a diferença mensal
-          entre a parcela e o aluguel. Simulação em Price (parcelas fixas) — use a <strong>Calculadora Financiamento
-          Imobiliário</strong> pra ver a tabela de amortização completa (SAC ou Price).
+          Compara comprar um imóvel financiado (SAC ou Price) com alugar um equivalente e investir a entrada + a
+          diferença mensal entre a parcela e o aluguel. Pra ver a tabela de amortização mês a mês, use a
+          <strong>Calculadora Financiamento Imobiliário</strong>.
         </p>
 
         <div class="calc-grid-2">
@@ -8403,6 +8403,14 @@
             <label for="cxaTaxaJuros">Taxa de juros do financiamento (% a.a.)</label>
             <input type="number" id="cxaTaxaJuros" min="0" step="0.1" placeholder="11,5" />
           </div>
+        </div>
+
+        <div class="calc-campo">
+          <label for="cxaSistema">Sistema de amortização</label>
+          <select id="cxaSistema">
+            <option value="sac" selected>SAC — parcelas decrescentes</option>
+            <option value="price">Price — parcelas fixas</option>
+          </select>
         </div>
 
         <div class="calc-grid-2">
@@ -8495,9 +8503,9 @@
                 Imposto de Renda sobre o ganho de capital na venda do imóvel (há isenção de até R$ 440 mil para quem só
                 tem um imóvel, ou ao reinvestir em outro residencial em até 180 dias — regras à parte) e sobre os
                 rendimentos de quem investiu a diferença (depende do ativo escolhido). Também não inclui seguro
-                obrigatório do financiamento (MIP/DFI), financiamento em SAC, liquidez (vender um imóvel leva muito
-                mais tempo que resgatar um investimento) nem a possibilidade de o imóvel ficar vago, no caso de quem
-                aluga, por algum período entre contratos.
+                obrigatório do financiamento (MIP/DFI), correção monetária do saldo devedor (TR ou outro índice),
+                liquidez (vender um imóvel leva muito mais tempo que resgatar um investimento) nem a possibilidade de
+                o imóvel ficar vago, no caso de quem aluga, por algum período entre contratos.
               </p>
             </div>
           </div>
@@ -16906,6 +16914,7 @@
       const inEntrada = document.getElementById('cxaEntrada');
       const inPrazo = document.getElementById('cxaPrazoAnos');
       const inTaxaJuros = document.getElementById('cxaTaxaJuros');
+      const selSistema = document.getElementById('cxaSistema');
       const inAluguel = document.getElementById('cxaAluguel');
       const inReajusteAluguel = document.getElementById('cxaReajusteAluguel');
       const inValorizacao = document.getElementById('cxaValorizacao');
@@ -16951,6 +16960,7 @@
         const entrada = hgValorMascarado(inEntrada);
         const anos = parseInt(inPrazo.value, 10);
         const taxaJurosAnual = parseFloat((inTaxaJuros.value || '').replace(',', '.'));
+        const sistema = selSistema.value;
         const aluguelMensal = hgValorMascarado(inAluguel);
         const reajusteAluguelAnual = parseFloat((inReajusteAluguel.value || '').replace(',', '.'));
         const valorizacaoAnual = parseFloat((inValorizacao.value || '').replace(',', '.'));
@@ -16972,9 +16982,22 @@
         const financiamento = valorImovel - entrada;
         const n = anos * 12;
         const iMensalFinanc = Math.pow(1 + taxaJurosAnual / 100, 1 / 12) - 1;
-        const parcela = iMensalFinanc > 0
+
+        // SAC: amortização fixa, juros sobre o saldo devedor — parcela
+        // decresce mês a mês. Price: parcela fixa (mesma lógica de
+        // sempre). parcelaMes(m) devolve a parcela daquele mês (1-indexed)
+        // em qualquer um dos dois sistemas.
+        const amortizacaoMensalSac = financiamento / n;
+        const parcelaPrice = iMensalFinanc > 0
           ? financiamento * iMensalFinanc / (1 - Math.pow(1 + iMensalFinanc, -n))
           : financiamento / n;
+        function parcelaMes(m) {
+          if (sistema === 'price') return parcelaPrice;
+          const saldoDevedorAntes = financiamento - amortizacaoMensalSac * (m - 1);
+          return amortizacaoMensalSac + saldoDevedorAntes * iMensalFinanc;
+        }
+        const parcelaInicial = parcelaMes(1);
+        const parcelaFinal = parcelaMes(n);
 
         const custosAquisicao = valorImovel * (custosAquisicaoPct / 100);
         const desembolsoInicial = entrada + custosAquisicao;
@@ -16984,7 +17007,6 @@
         const valorImovelFinal = valorImovel * Math.pow(1 + valorizacaoAnual / 100, anos);
         const custosVenda = valorImovelFinal * (custosVendaPct / 100);
         const patrimonioComprar = valorImovelFinal - custosVenda;
-        const totalPagoComprar = desembolsoInicial + parcela * n + custosPosseMensal * n;
 
         // ---- Alugando: a entrada+custos de aquisição ficam investidos
         // desde o início; todo mês, a diferença entre o custo de
@@ -16994,14 +17016,18 @@
         let saldoInvestido = desembolsoInicial;
         let aluguelAtual = aluguelMensal;
         let totalPagoAlugar = 0;
+        let totalPagoParcelas = 0;
         for (let m = 1; m <= n; m++) {
           if (m > 1 && (m - 1) % 12 === 0) aluguelAtual *= (1 + reajusteAluguelAnual / 100);
-          const custoComprarMes = parcela + custosPosseMensal;
+          const parcelaDoMes = parcelaMes(m);
+          totalPagoParcelas += parcelaDoMes;
+          const custoComprarMes = parcelaDoMes + custosPosseMensal;
           const diferenca = custoComprarMes - aluguelAtual;
           saldoInvestido = saldoInvestido * (1 + iMensalInvest) + diferenca;
           totalPagoAlugar += aluguelAtual;
         }
         const patrimonioAlugar = saldoInvestido;
+        const totalPagoComprar = desembolsoInicial + totalPagoParcelas + custosPosseMensal * n;
 
         const cenarios = [
           { chave: 'comprar', titulo: 'Comprando', patrimonio: patrimonioComprar, totalPago: totalPagoComprar },
@@ -17025,8 +17051,8 @@
               <strong>${moeda(financiamento)}</strong>
             </div>
             <div class="carteira-resumo-card">
-              <span>Parcela mensal (Price)</span>
-              <strong>${moeda(parcela)}</strong>
+              <span>${sistema === 'sac' ? 'Parcela inicial → final (SAC)' : 'Parcela mensal (Price, fixa)'}</span>
+              <strong>${sistema === 'sac' ? `${moeda(parcelaInicial)} → ${moeda(parcelaFinal)}` : moeda(parcelaInicial)}</strong>
             </div>
             <div class="carteira-resumo-card carteira-resumo-destaque">
               <span>Capital investido de início (quem aluga)</span>
@@ -17045,9 +17071,9 @@
           </p>`;
 
         ultimoCalculoCxa = {
-          valorImovel, entrada, anos, taxaJurosAnual, aluguelMensal, reajusteAluguelAnual,
+          valorImovel, entrada, anos, taxaJurosAnual, sistema, aluguelMensal, reajusteAluguelAnual,
           valorizacaoAnual, rentabilidadeAnual, custosPosseMensal, custosAquisicaoPct, custosVendaPct,
-          financiamento, parcela, desembolsoInicial, cenarios, melhor, diferencaPatrimonio,
+          financiamento, parcelaInicial, parcelaFinal, desembolsoInicial, cenarios, melhor, diferencaPatrimonio,
         };
         acoesEl.hidden = false;
       }
@@ -17059,6 +17085,7 @@
         inEntrada.dataset.centavos = '0';
         inPrazo.value = '';
         inTaxaJuros.value = '';
+        selSistema.value = 'sac';
         inAluguel.value = '';
         inAluguel.dataset.centavos = '0';
         inReajusteAluguel.value = '';
@@ -17099,6 +17126,8 @@
           doc.addImage(logoBase64, 'PNG', larguraPagina - 70, 15, 30, 30);
         }
 
+        const nomeSistema = c.sistema === 'sac' ? 'SAC' : 'Price';
+
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(15);
         doc.text('Comprar x Alugar Imóvel', 40, 40);
@@ -17121,6 +17150,7 @@
             ['Valor do imóvel', moeda(c.valorImovel)],
             ['Entrada', moeda(c.entrada)],
             ['Prazo', `${c.anos} ano${c.anos > 1 ? 's' : ''}`],
+            ['Sistema de amortização', nomeSistema],
             ['Taxa de juros do financiamento', pct(c.taxaJurosAnual)],
             ['Aluguel mensal equivalente', moeda(c.aluguelMensal)],
             ['Reajuste anual do aluguel', pct(c.reajusteAluguelAnual)],
@@ -17138,10 +17168,12 @@
 
         doc.autoTable({
           startY: doc.lastAutoTable.finalY + 18,
-          head: [['', 'Financiamento (Price)']],
+          head: [['', `Financiamento (${nomeSistema})`]],
           body: [
             ['Valor financiado', moeda(c.financiamento)],
-            ['Parcela mensal', moeda(c.parcela)],
+            c.sistema === 'sac'
+              ? ['Parcela inicial → final', `${moeda(c.parcelaInicial)} → ${moeda(c.parcelaFinal)}`]
+              : ['Parcela mensal (fixa)', moeda(c.parcelaInicial)],
             ['Capital investido de início (quem aluga)', moeda(c.desembolsoInicial)],
           ],
           theme: 'grid',
@@ -17169,7 +17201,7 @@
           head: [['O que esta simulação NÃO cobre']],
           body: [
             ['IR sobre o ganho de capital na venda do imóvel (há isenção de até R$ 440 mil para imóvel único) e sobre os rendimentos de quem investiu a diferença.'],
-            ['Seguro obrigatório do financiamento (MIP/DFI) e financiamento em SAC — aqui só simulamos Price.'],
+            ['Seguro obrigatório do financiamento (MIP/DFI) e correção monetária do saldo devedor (TR ou outro índice).'],
             ['Liquidez — vender um imóvel leva muito mais tempo que resgatar um investimento.'],
             ['Período de imóvel vago entre contratos, para quem aluga.'],
           ],
