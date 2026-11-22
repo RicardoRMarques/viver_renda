@@ -16818,7 +16818,7 @@
           startY: doc.lastAutoTable.finalY + 18,
           head: [['Cenário no resgate', 'IR', 'Líquido', 'Líquido + economia de IR']],
           body: c.cenarios.map(cen => [
-            `${cen === c.melhor ? '★ ' : ''}${cen.titulo}`,
+            `${cen === c.melhor ? '[MELHOR] ' : ''}${cen.titulo}`,
             moeda(cen.imposto),
             moeda(cen.liquido),
             moeda(cen.liquidoAjustado),
@@ -17172,7 +17172,7 @@
           body: [
             ['Valor financiado', moeda(c.financiamento)],
             c.sistema === 'sac'
-              ? ['Parcela inicial → final', `${moeda(c.parcelaInicial)} → ${moeda(c.parcelaFinal)}`]
+              ? ['Parcela inicial e final (decrescente)', `${moeda(c.parcelaInicial)} ate ${moeda(c.parcelaFinal)}`]
               : ['Parcela mensal (fixa)', moeda(c.parcelaInicial)],
             ['Capital investido de início (quem aluga)', moeda(c.desembolsoInicial)],
           ],
@@ -17186,7 +17186,7 @@
           startY: doc.lastAutoTable.finalY + 18,
           head: [['Cenário', 'Total pago', 'Patrimônio ao final']],
           body: c.cenarios.map(cen => [
-            `${cen === c.melhor ? '★ ' : ''}${cen.titulo}`,
+            `${cen === c.melhor ? '[MELHOR] ' : ''}${cen.titulo}`,
             moeda(cen.totalPago),
             moeda(cen.patrimonio),
           ]),
