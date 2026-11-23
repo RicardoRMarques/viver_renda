@@ -5259,9 +5259,15 @@
       <p class="mc-explicacao">Cada bloco é um ativo, agrupado por setor (ou segmento, nos FIIs) e colorido pela variação do preço no dia. Passe o mouse ou toque num bloco pra ver os detalhes; toque de novo (ou tecle Enter) abre a consulta completa do ativo.</p>
 
       <div class="mc-controles">
-        <div class="mc-abas" role="tablist" aria-label="Mapa de calor: Ações ou Fundos Imobiliários">
-          <button type="button" class="mc-aba ativa" data-mc-aba="acoes" role="tab" aria-selected="true">📈 Ações</button>
-          <button type="button" class="mc-aba" data-mc-aba="fiis" role="tab" aria-selected="false">🏢 FIIs</button>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div class="mc-abas" role="tablist" aria-label="Mapa de calor: Ações ou Fundos Imobiliários">
+            <button type="button" class="mc-aba ativa" data-mc-aba="acoes" role="tab" aria-selected="true">📈 Ações</button>
+            <button type="button" class="mc-aba" data-mc-aba="fiis" role="tab" aria-selected="false">🏢 FIIs</button>
+          </div>
+          <button type="button" class="lm-btn-favoritos" id="mcBtnFavoritos" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.5-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.5 12c-2 4.3-9.5 9-9.5 9z"/></svg>Meus Favoritos
+          </button>
+          <button type="button" class="hg-info-btn lm-ajuda-favoritos" data-glossario="favoritos-login" aria-label="Como funcionam os favoritos?" title="">?</button>
         </div>
         <a href="#lista-acoes" class="mc-ver-tabela" id="mcVerTabela">Ver em tabela ⇅</a>
       </div>
@@ -27291,7 +27297,23 @@
       dados: { acoes: null, fiis: null },
       carregando: { acoes: false, fiis: false },
       inicializado: false,
+      soFavoritos: false,
     };
+
+    // Botão "Meus Favoritos" do mapa de calor reaproveita a mesma lista
+    // pessoal (vrEhFavorito/VR_FAVORITOS_KEY) que o coração ♥ das tabelas
+    // de Ações/FIIs já usa — favoritar em um lugar reflete no outro. O
+    // contador só considera os ativos DESTA aba (mesma lógica do botão
+    // equivalente na Lista de Mercado — ver renderFiltros).
+    function mcAtualizarBotaoFavoritos() {
+      const btn = document.getElementById('mcBtnFavoritos');
+      if (!btn) return;
+      const listaAtual = mcEstado.dados[mcEstado.aba] || [];
+      const totalFavoritos = listaAtual.filter(a => vrEhFavorito(a.ticker)).length;
+      btn.classList.toggle('ativo', mcEstado.soFavoritos);
+      btn.setAttribute('aria-pressed', String(mcEstado.soFavoritos));
+      btn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.5-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.5 12c-2 4.3-9.5 9-9.5 9z"/></svg>Meus Favoritos${totalFavoritos ? ` <span class="lm-fav-contador">${totalFavoritos}</span>` : ''}`;
+    }
 
     function mcCarregarDataset(tipo) {
       if (mcEstado.dados[tipo] || mcEstado.carregando[tipo]) return;
@@ -27319,16 +27341,21 @@
       const status = document.getElementById('mcStatus');
       if (!grade || !status) return;
       const tipo = mcEstado.aba;
-      const lista = mcEstado.dados[tipo];
-      if (!lista) {
+      const listaCompleta = mcEstado.dados[tipo];
+      if (!listaCompleta) {
         status.hidden = false;
         status.textContent = 'Carregando mapa de calor…';
         grade.innerHTML = '';
+        mcAtualizarBotaoFavoritos();
         return;
       }
+      mcAtualizarBotaoFavoritos();
+      const lista = mcEstado.soFavoritos ? listaCompleta.filter(a => vrEhFavorito(a.ticker)) : listaCompleta;
       if (lista.length === 0) {
         status.hidden = false;
-        status.textContent = 'Nenhum dado disponível agora.';
+        status.textContent = mcEstado.soFavoritos
+          ? 'Nenhum dos seus favoritos está aqui. Favorite ativos (♥) na tabela de Ações/FIIs pra acompanhar no mapa de calor.'
+          : 'Nenhum dado disponível agora.';
         grade.innerHTML = '';
         return;
       }
@@ -27416,11 +27443,22 @@
       if (linkTabela) {
         linkTabela.setAttribute('href', aba === 'acoes' ? '#lista-acoes' : '#lista-fiis');
       }
+      mcAtualizarBotaoFavoritos();
       if (!mcEstado.dados[aba]) mcCarregarDataset(aba);
       else mcRenderizar();
     }
     document.querySelectorAll('.mc-aba').forEach(botao => {
       botao.addEventListener('click', () => mcTrocarAba(botao.dataset.mcAba));
+    });
+    document.getElementById('mcBtnFavoritos')?.addEventListener('click', () => {
+      mcEstado.soFavoritos = !mcEstado.soFavoritos;
+      mcRenderizar();
+    });
+    // Favoritar/desfavoritar em qualquer lugar do site (tabela de Ações/FIIs,
+    // Consulta Rápida) deve refletir no mapa de calor na hora, inclusive o
+    // contador do botão e a grade filtrada, se "Meus Favoritos" estiver ligado.
+    document.addEventListener('vr:favoritos-alterados', () => {
+      if (mcEstado.inicializado) mcRenderizar();
     });
 
     function carregarMapaDeCalor() {
