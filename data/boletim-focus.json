@@ -2,22 +2,22 @@
  "_leia_me": "Mediana das expectativas de mercado (Boletim Focus) do Banco Central — pesquisa semanal com centenas de bancos, gestoras e corretoras sobre pra onde PIB, inflação, juros e câmbio devem ir. Mesmos números do PDF publicado em bcb.gov.br/publicacoes/focus, obtidos pela API aberta 'Expectativas de Mercado' (Olinda/Dados Abertos), não por leitura de PDF. Em 'indicadores', cada chave é um indicador (PIB Total, IPCA, Selic, Câmbio); 'anos' traz a mediana mais recente por ano de referência (ano atual + 3 seguintes); 'historico' traz a série diária da mediana dos últimos ~365 dias, só pros 2 anos de referência mais próximos (os mais acompanhados). Ver seção 'O que o mercado espera' em viverderenda.dev.br.",
  "fonte": "Banco Central do Brasil — Boletim Focus (Expectativas de Mercado)",
  "fonte_url": "https://www.bcb.gov.br/publicacoes/focus",
- "data_pesquisa": "2026-11-13",
- "atualizado_em": "2026-11-21T21:38:42+00:00",
+ "data_pesquisa": "2026-11-19",
+ "atualizado_em": "2026-11-23T18:30:03+00:00",
  "indicadores": {
   "PIB Total": {
    "anos": {
     "2026": {
-     "mediana": 1.7215,
+     "mediana": 1.7018,
      "numeroRespondentes": 119
     },
     "2027": {
-     "mediana": 1.0224,
+     "mediana": 0.9995,
      "numeroRespondentes": 118
     },
     "2028": {
-     "mediana": 1.8,
-     "numeroRespondentes": 89
+     "mediana": 1.7071,
+     "numeroRespondentes": 90
     },
     "2029": {
      "mediana": 2.0,
@@ -26,10 +26,6 @@
    },
    "historico": {
     "2026": [
-     {
-      "data": "2025-11-21",
-      "mediana": 1.7788
-     },
      {
       "data": "2025-11-24",
       "mediana": 1.7789
@@ -1005,13 +1001,25 @@
      {
       "data": "2026-11-13",
       "mediana": 1.7215
+     },
+     {
+      "data": "2026-11-16",
+      "mediana": 1.7204
+     },
+     {
+      "data": "2026-11-17",
+      "mediana": 1.7204
+     },
+     {
+      "data": "2026-11-18",
+      "mediana": 1.7204
+     },
+     {
+      "data": "2026-11-19",
+      "mediana": 1.7018
      }
     ],
     "2027": [
-     {
-      "data": "2025-11-21",
-      "mediana": 1.88
-     },
      {
       "data": "2025-11-24",
       "mediana": 1.88
@@ -1987,6 +1995,22 @@
      {
       "data": "2026-11-13",
       "mediana": 1.0224
+     },
+     {
+      "data": "2026-11-16",
+      "mediana": 1.0129
+     },
+     {
+      "data": "2026-11-17",
+      "mediana": 1.0129
+     },
+     {
+      "data": "2026-11-18",
+      "mediana": 1.0021
+     },
+     {
+      "data": "2026-11-19",
+      "mediana": 0.9995
      }
     ]
    }
@@ -1994,28 +2018,24 @@
   "IPCA": {
    "anos": {
     "2026": {
-     "mediana": 5.1082,
-     "numeroRespondentes": 146
+     "mediana": 5.1505,
+     "numeroRespondentes": 147
     },
     "2027": {
-     "mediana": 5.0,
+     "mediana": 5.1214,
      "numeroRespondentes": 146
     },
     "2028": {
      "mediana": 4.0,
-     "numeroRespondentes": 133
+     "numeroRespondentes": 134
     },
     "2029": {
      "mediana": 4.0,
-     "numeroRespondentes": 122
+     "numeroRespondentes": 123
     }
    },
    "historico": {
     "2026": [
-     {
-      "data": "2025-11-21",
-      "mediana": 4.1829
-     },
      {
       "data": "2025-11-24",
       "mediana": 4.19
@@ -2991,13 +3011,25 @@
      {
       "data": "2026-11-13",
       "mediana": 5.1082
+     },
+     {
+      "data": "2026-11-16",
+      "mediana": 5.1
+     },
+     {
+      "data": "2026-11-17",
+      "mediana": 5.1
+     },
+     {
+      "data": "2026-11-18",
+      "mediana": 5.1082
+     },
+     {
+      "data": "2026-11-19",
+      "mediana": 5.1505
      }
     ],
     "2027": [
-     {
-      "data": "2025-11-21",
-      "mediana": 3.8
-     },
      {
       "data": "2025-11-24",
       "mediana": 3.8
@@ -3973,6 +4005,22 @@
      {
       "data": "2026-11-13",
       "mediana": 5.0
+     },
+     {
+      "data": "2026-11-16",
+      "mediana": 5.0
+     },
+     {
+      "data": "2026-11-17",
+      "mediana": 5.0
+     },
+     {
+      "data": "2026-11-18",
+      "mediana": 5.0
+     },
+     {
+      "data": "2026-11-19",
+      "mediana": 5.1214
      }
     ]
    }
@@ -3981,10 +4029,10 @@
    "anos": {
     "2026": {
      "mediana": 13.75,
-     "numeroRespondentes": 144
+     "numeroRespondentes": 145
     },
     "2027": {
-     "mediana": 12.75,
+     "mediana": 13.0,
      "numeroRespondentes": 144
     },
     "2028": {
@@ -3993,15 +4041,11 @@
     },
     "2029": {
      "mediana": 10.5,
-     "numeroRespondentes": 116
+     "numeroRespondentes": 117
     }
    },
    "historico": {
     "2026": [
-     {
-      "data": "2025-11-21",
-      "mediana": 12.0
-     },
      {
       "data": "2025-11-24",
       "mediana": 12.0
@@ -4977,13 +5021,25 @@
      {
       "data": "2026-11-13",
       "mediana": 13.75
+     },
+     {
+      "data": "2026-11-16",
+      "mediana": 13.75
+     },
+     {
+      "data": "2026-11-17",
+      "mediana": 13.75
+     },
+     {
+      "data": "2026-11-18",
+      "mediana": 13.75
+     },
+     {
+      "data": "2026-11-19",
+      "mediana": 13.75
      }
     ],
     "2027": [
-     {
-      "data": "2025-11-21",
-      "mediana": 10.5
-     },
      {
       "data": "2025-11-24",
       "mediana": 10.5
@@ -5959,6 +6015,22 @@
      {
       "data": "2026-11-13",
       "mediana": 12.75
+     },
+     {
+      "data": "2026-11-16",
+      "mediana": 12.75
+     },
+     {
+      "data": "2026-11-17",
+      "mediana": 12.75
+     },
+     {
+      "data": "2026-11-18",
+      "mediana": 12.75
+     },
+     {
+      "data": "2026-11-19",
+      "mediana": 13.0
      }
     ]
    }
@@ -5966,28 +6038,24 @@
   "Câmbio": {
    "anos": {
     "2026": {
-     "mediana": 5.4,
+     "mediana": 5.55,
      "numeroRespondentes": 121
     },
     "2027": {
-     "mediana": 5.45,
+     "mediana": 5.5,
      "numeroRespondentes": 120
     },
     "2028": {
-     "mediana": 5.4821,
-     "numeroRespondentes": 93
+     "mediana": 5.5,
+     "numeroRespondentes": 95
     },
     "2029": {
-     "mediana": 5.5,
-     "numeroRespondentes": 90
+     "mediana": 5.5469,
+     "numeroRespondentes": 92
     }
    },
    "historico": {
     "2026": [
-     {
-      "data": "2025-11-21",
-      "mediana": 5.5
-     },
      {
       "data": "2025-11-24",
       "mediana": 5.5
@@ -6963,13 +7031,25 @@
      {
       "data": "2026-11-13",
       "mediana": 5.4
+     },
+     {
+      "data": "2026-11-16",
+      "mediana": 5.4
+     },
+     {
+      "data": "2026-11-17",
+      "mediana": 5.4
+     },
+     {
+      "data": "2026-11-18",
+      "mediana": 5.4
+     },
+     {
+      "data": "2026-11-19",
+      "mediana": 5.55
      }
     ],
     "2027": [
-     {
-      "data": "2025-11-21",
-      "mediana": 5.5
-     },
      {
       "data": "2025-11-24",
       "mediana": 5.5
@@ -7945,6 +8025,22 @@
      {
       "data": "2026-11-13",
       "mediana": 5.45
+     },
+     {
+      "data": "2026-11-16",
+      "mediana": 5.4525
+     },
+     {
+      "data": "2026-11-17",
+      "mediana": 5.4525
+     },
+     {
+      "data": "2026-11-18",
+      "mediana": 5.4549
+     },
+     {
+      "data": "2026-11-19",
+      "mediana": 5.5
      }
     ]
    }
