@@ -8312,6 +8312,25 @@
           </div>
         </div>
 
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="pgblIdade65">Você terá 65 anos ou mais no ano do resgate?
+              <button type="button" class="hg-info-btn" data-glossario="pgbl-vgbl-isencao65" aria-label="Por que isso importa?" title="">?</button>
+            </label>
+            <select id="pgblIdade65">
+              <option value="nao" selected>Não</option>
+              <option value="sim">Sim</option>
+            </select>
+          </div>
+          <div class="calc-campo">
+            <label for="pgblPensaoOficial">Dessas "outras rendas", quanto é aposentadoria/pensão do INSS ou RPPS <span style="color:var(--muted); font-weight:400;">(opcional)</span></label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="pgblPensaoOficial" placeholder="0,00" />
+            </div>
+          </div>
+        </div>
+
         <div class="cmp-acoes-linha" style="margin-top:14px;">
           <button type="button" class="hg-btn" id="pgblBtnCalcular">Simular</button>
           <button type="button" class="cmp-btn-secundario" id="pgblBtnLimpar">Limpar</button>
@@ -8367,6 +8386,16 @@
                 renda mais baixa no ano do resgate; como suas regras de cálculo dependem de outras deduções (INSS,
                 dependentes), não entram aqui — o valor mostrado tende a ser, no máximo, uma estimativa um pouco
                 CONSERVADORA (igual ou maior que o imposto real) para esse cenário.
+              </p>
+            </div>
+            <div class="calc-educativo-item">
+              <strong>Isenção extra pra quem tem 65 anos ou mais</strong>
+              <p>
+                A Lei 9.250/1995 isenta de IR uma parcela adicional (R$ 1.903,98/mês, até R$ 24.751,74/ano) só sobre
+                aposentadoria/pensão paga por INSS, RPPS ou fundo de pensão — não sobre salário de quem continua
+                trabalhando, nem sobre o resgate do PGBL/VGBL em si. Se você preencheu os campos de idade e pensão
+                oficial acima, descontamos esse valor (até o teto) das "outras rendas" antes de calcular o IR
+                progressivo do resgate — ela não afeta a alíquota regressiva.
               </p>
             </div>
             <div class="calc-educativo-item">
@@ -16598,6 +16627,8 @@
       const selDeclaracao = document.getElementById('pgblDeclaracao');
       const selInss = document.getElementById('pgblInss');
       const inOutrasRendas = document.getElementById('pgblOutrasRendas');
+      const selIdade65 = document.getElementById('pgblIdade65');
+      const inPensaoOficial = document.getElementById('pgblPensaoOficial');
       const btnCalcular = document.getElementById('pgblBtnCalcular');
       const btnLimpar = document.getElementById('pgblBtnLimpar');
       const resultadoEl = document.getElementById('pgblResultado');
@@ -16612,6 +16643,7 @@
       hgAplicarMascaraMoeda(inAporte);
       hgAplicarMascaraMoeda(inRendaAnual);
       hgAplicarMascaraMoeda(inOutrasRendas);
+      hgAplicarMascaraMoeda(inPensaoOficial);
 
       function abrirModal() {
         overlay.hidden = false;
@@ -16645,6 +16677,15 @@
         return faixaAnual(Math.max(renda, 0)).aliquota;
       }
 
+      // Isenção adicional de IR pra quem tem 65+ anos (Lei 9.250/1995, art.
+      // 6º): R$1.903,98/mês, até R$24.751,74/ano somando o 13º — só sobre
+      // aposentadoria/pensão paga por INSS, RPPS ou fundo de pensão. NÃO
+      // vale pra salário de quem continua trabalhando, nem pro resgate do
+      // PGBL/VGBL em si (que tem tributação própria, regressiva/progressiva)
+      // — só reduz a base de "outras rendas" usada pra empilhar o IR
+      // progressivo do resgate.
+      const TETO_ANUAL_ISENCAO_65 = 24751.74;
+
       // Tabela regressiva específica de previdência privada (PGBL/VGBL),
       // Lei 11.053/2004 — 35% a 10%, bem mais ampla que a do CDB/Tesouro.
       function aliquotaRegressivaPrevidencia(anos) {
@@ -16672,6 +16713,8 @@
         const outrasRendas = outrasRendasInput > 0 ? outrasRendasInput : rendaAnual;
         const declaracaoCompleta = selDeclaracao.value === 'sim';
         const contribuiInss = selInss.value === 'sim';
+        const idade65Mais = selIdade65.value === 'sim';
+        const pensaoOficialInput = hgValorMascarado(inPensaoOficial) || 0;
 
         if (!(aporteMensal > 0) || !(anos > 0) || !(rentabilidade >= 0) || !(rendaAnual > 0)) {
           erro('Preencha o aporte mensal, o prazo, a rentabilidade esperada e sua renda tributável anual pra simular.');
@@ -16703,8 +16746,18 @@
         const aliqRegressiva = aliquotaRegressivaPrevidencia(anos);
         const impostoPgblRegressiva = saldo * aliqRegressiva;
         const impostoVgblRegressiva = rendimento * aliqRegressiva;
-        const impostoPgblProgressiva = Math.max(0, impostoAnualTradicional(outrasRendas + saldo) - impostoAnualTradicional(outrasRendas));
-        const impostoVgblProgressiva = Math.max(0, impostoAnualTradicional(outrasRendas + rendimento) - impostoAnualTradicional(outrasRendas));
+
+        // Isenção adicional 65+ (ver TETO_ANUAL_ISENCAO_65 acima): reduz só
+        // a base de "outras rendas" usada pra empilhar o IR progressivo do
+        // resgate — nunca negativa, nunca maior que a própria pensão
+        // informada nem que o teto anual da lei.
+        const pensaoOficialConsiderada = idade65Mais
+          ? Math.min(pensaoOficialInput, outrasRendas, TETO_ANUAL_ISENCAO_65)
+          : 0;
+        const outrasRendasAjustada = Math.max(0, outrasRendas - pensaoOficialConsiderada);
+
+        const impostoPgblProgressiva = Math.max(0, impostoAnualTradicional(outrasRendasAjustada + saldo) - impostoAnualTradicional(outrasRendasAjustada));
+        const impostoVgblProgressiva = Math.max(0, impostoAnualTradicional(outrasRendasAjustada + rendimento) - impostoAnualTradicional(outrasRendasAjustada));
 
         const cenarios = [
           { chave: 'pgbl-reg', titulo: 'PGBL — Regressiva', imposto: impostoPgblRegressiva, pgbl: true },
@@ -16742,6 +16795,16 @@
             </div>`;
         }
 
+        let avisoIsencao65 = '';
+        if (idade65Mais && pensaoOficialConsiderada > 0) {
+          const foiLimitada = pensaoOficialInput > pensaoOficialConsiderada;
+          avisoIsencao65 = `
+            <div class="hg-status atencao-fixa" style="margin-top:12px;">
+              <span>ℹ️</span>
+              <span>Por ter 65 anos ou mais, descontamos ${moeda(pensaoOficialConsiderada)} de isenção adicional (Lei 9.250/1995) da sua aposentadoria/pensão oficial antes de calcular o IR progressivo do resgate${foiLimitada ? ` (limitado ao teto anual de ${moeda(TETO_ANUAL_ISENCAO_65)})` : ''} — isso não muda a alíquota regressiva nem o IR sobre o PGBL/VGBL em si.</span>
+            </div>`;
+        }
+
         resultadoEl.innerHTML = `
           <div class="carteira-resumo-cards">
             <div class="carteira-resumo-card">
@@ -16768,6 +16831,7 @@
           <p class="calc-ajuda" style="margin-top:14px; margin-bottom:0;">
             <strong>No resgate</strong> (saldo bruto de ${moeda(saldo)}, após ${anos} ano${anos > 1 ? 's' : ''} — alíquota regressiva de ${pct(aliqRegressiva * 100)}):
           </p>
+          ${avisoIsencao65}
           <div class="pgbl-cenarios-grid">${cardsHtml}</div>
           <p class="calc-ajuda" style="margin-top:10px;">
             O valor em destaque de cada cenário já soma a economia de IR da contribuição (quando for PGBL), pra comparar os quatro de forma justa. 🏆 marca o de maior valor final, com os dados que você informou.
@@ -16776,6 +16840,7 @@
         ultimoCalculoPgbl = {
           aporteMensal, anos, rentabilidade, rendaAnual, outrasRendas,
           declaracaoCompleta, contribuiInss, elegivelDeducao, aporteExcedeLimite,
+          idade65Mais, pensaoOficialInput, pensaoOficialConsiderada, outrasRendasAjustada,
           totalAportado, saldo, rendimento,
           dedutivelAnual, aliquotaMarginalHoje, economiaAnual, economiaTotal,
           aliqRegressiva, cenarios, melhor,
@@ -16794,6 +16859,9 @@
         inOutrasRendas.dataset.centavos = '0';
         selDeclaracao.value = 'sim';
         selInss.value = 'sim';
+        selIdade65.value = 'nao';
+        inPensaoOficial.value = '';
+        inPensaoOficial.dataset.centavos = '0';
         resultadoEl.innerHTML = '';
         ultimoCalculoPgbl = null;
         acoesEl.hidden = true;
@@ -16852,6 +16920,10 @@
             ['Declaração de IR', c.declaracaoCompleta ? 'Completa' : 'Simplificada (ou não declara)'],
             ['Contribui para INSS/RPPS', c.contribuiInss ? 'Sim' : 'Não'],
             ['Outras rendas tributáveis no ano do resgate', moeda(c.outrasRendas)],
+            ...(c.idade65Mais ? [
+              ['65 anos ou mais no ano do resgate', 'Sim'],
+              ['Isenção adicional considerada (Lei 9.250/1995)', moeda(c.pensaoOficialConsiderada)],
+            ] : []),
           ],
           theme: 'grid',
           styles: { fontSize: 9, cellPadding: 6 },
@@ -24326,6 +24398,7 @@
         'pgbl-vgbl-regressiva': 'Alíquota de IR que cai conforme o tempo no plano, criada pela Lei 11.053/2004: até 2 anos 35%; 2 a 4 anos 30%; 4 a 6 anos 25%; 6 a 8 anos 20%; 8 a 10 anos 15%; acima de 10 anos 10%.\n\nÉ definitiva (não entra na declaração anual). Incide sobre o valor TOTAL no PGBL, só sobre o RENDIMENTO no VGBL.\n\nNão confundir com a tabela regressiva de CDB/Tesouro Direto (22,5% a 15%, outra escala, outros prazos).',
         'pgbl-vgbl-progressiva': 'No resgate, 15% de IR é retido na fonte como antecipação; na declaração anual, esse valor entra na soma com os outros rendimentos tributáveis do ano e o imposto é recalculado pela tabela progressiva normal (a mesma dos salários, até 27,5%).\n\nCostuma compensar mais pra prazos curtos ou renda baixa/moderada no ano do resgate. Desde a Lei 14.803/2024, dá pra escolher entre progressiva e regressiva no momento do resgate, não só na adesão ao plano.',
         'pgbl-vgbl-declaracao': 'Simplificada: troca todas as deduções (saúde, educação, dependentes, PGBL...) por um desconto único de 20% da renda tributável, até um teto.\n\nCompleta: deduz item por item, com comprovante — inclusive os 12% de renda tributável anual que podem ir pro PGBL. A dedução do PGBL só existe pra quem usa a declaração completa.',
+        'pgbl-vgbl-isencao65': 'A Lei 9.250/1995 dá a quem tem 65 anos ou mais uma parcela extra isenta de IR sobre APOSENTADORIA OU PENSÃO paga pelo INSS, por RPPS ou por fundo de pensão (R$ 1.903,98/mês, até R$ 24.751,74/ano somando o 13º) — mas essa isenção é só sobre esse tipo específico de renda. Ela NÃO vale pra salário de quem continua trabalhando, nem pro próprio resgate do PGBL/VGBL (que tem sua tributação própria, regressiva ou progressiva).\n\nSe parte das "outras rendas" que você informou é aposentadoria/pensão oficial e você já tem (ou terá) 65+, informe o valor pra essa isenção reduzir a base de cálculo do IR progressivo do resgate — ela não muda a alíquota regressiva nem o IR sobre o PGBL/VGBL em si.',
 
         // --- Consórcio x Financiamento ---
         'cxf-taxa-administracao': 'O que a administradora do consórcio cobra pra organizar o grupo — é o "lucro" dela, já que o consórcio em si não cobra juros. Normalmente expressa como um percentual TOTAL sobre o valor do bem (ex: 18%), diluído em todas as parcelas do grupo.\n\nDiferente de juros: não cresce com o tempo que falta pagar, é sempre a mesma fatia do valor do bem.',
