@@ -8628,12 +8628,21 @@
           </div>
         </div>
 
-        <div class="calc-campo">
-          <label for="cxfSistemaFinanc">Sistema de amortização do financiamento</label>
-          <select id="cxfSistemaFinanc">
-            <option value="sac" selected>SAC — parcelas decrescentes</option>
-            <option value="price">Price — parcelas fixas</option>
-          </select>
+        <div class="calc-grid-2">
+          <div class="calc-campo">
+            <label for="cxfSistemaFinanc">Sistema de amortização do financiamento</label>
+            <select id="cxfSistemaFinanc">
+              <option value="sac" selected>SAC — parcelas decrescentes</option>
+              <option value="price">Price — parcelas fixas</option>
+            </select>
+          </div>
+          <div class="calc-campo">
+            <label for="cxfEntradaFinanc">Entrada do financiamento <span style="color:var(--muted); font-weight:400;">(opcional)</span></label>
+            <div class="calc-input-prefixado">
+              <span class="calc-prefixo">R$</span>
+              <input type="text" inputmode="numeric" id="cxfEntradaFinanc" placeholder="0,00" />
+            </div>
+          </div>
         </div>
 
         <details class="calc-educativo">
@@ -8679,7 +8688,14 @@
               <p>
                 Consórcio: a parcela inicial é o valor do bem × (1 + taxa de administração + fundo de reserva) ÷
                 prazo do grupo, reajustada uma vez por ano pela correção informada — sem juros, diferente do
-                financiamento. Financiamento: parcelas fixas em Price, com a taxa de juros informada.
+                financiamento. Financiamento: parcelas pelo sistema escolhido (SAC ou Price), com a taxa de juros
+                informada, sobre o valor financiado.
+              </p>
+              <p>
+                Se você informar uma entrada do financiamento, ela é descontada do valor do bem antes de calcular as
+                parcelas (valor financiado = valor do bem − entrada) e soma ao custo total do financiamento. O
+                consórcio normalmente não exige entrada — por isso esse campo aparece só do lado do financiamento, e
+                é opcional: deixe em branco pra simular um financiamento sem entrada.
               </p>
             </div>
             <div class="calc-educativo-item">
@@ -17331,6 +17347,7 @@
       const inPrazoFinanc = document.getElementById('cxfPrazoFinanc');
       const inTaxaJurosFinanc = document.getElementById('cxfTaxaJurosFinanc');
       const selSistemaFinanc = document.getElementById('cxfSistemaFinanc');
+      const inEntradaFinanc = document.getElementById('cxfEntradaFinanc');
       const inFundoReserva = document.getElementById('cxfFundoReserva');
       const btnCalcular = document.getElementById('cxfBtnCalcular');
       const btnLimpar = document.getElementById('cxfBtnLimpar');
@@ -17341,6 +17358,7 @@
       if (!overlay || !btnAbrirMenu) return;
 
       hgAplicarMascaraMoeda(inValorBem);
+      hgAplicarMascaraMoeda(inEntradaFinanc);
 
       let ultimoCalculoCxf = null;
 
@@ -17391,11 +17409,16 @@
         const prazoFinancAnos = parseInt(inPrazoFinanc.value, 10);
         const taxaJurosFinancAnual = parseFloat((inTaxaJurosFinanc.value || '').replace(',', '.'));
         const sistemaFinanc = selSistemaFinanc.value;
+        const entradaFinanc = hgValorMascarado(inEntradaFinanc) || 0;
         const fundoReservaPct = parseFloat((inFundoReserva.value || '0').replace(',', '.')) || 0;
 
         if (!(valorBem > 0) || !(prazoConsorcioMeses > 0) || !(taxaAdmPct >= 0) || !(correcaoAnual >= 0)
           || !(prazoFinancAnos > 0) || !(taxaJurosFinancAnual >= 0)) {
           erro('Preencha o valor do bem, o prazo do consórcio, a taxa de administração, a correção esperada e os dados do financiamento pra comparar.');
+          return;
+        }
+        if (!(entradaFinanc >= 0) || entradaFinanc >= valorBem) {
+          erro('A entrada do financiamento precisa ser menor que o valor do bem.');
           return;
         }
 
@@ -17404,21 +17427,24 @@
         const custoTotalConsorcio = somaParcelasConsorcio(parcelaConsorcioInicial, correcaoAnual, prazoConsorcioMeses);
 
         // ---- Financiamento: SAC (amortização fixa, parcela decrescente)
-        // ou Price (parcela fixa) ----
+        // ou Price (parcela fixa) — sobre o valor do bem MENOS a entrada,
+        // já que, diferente do consórcio, financiamento costuma exigir
+        // entrada ----
+        const financiamentoValor = valorBem - entradaFinanc;
         const nFinanc = prazoFinancAnos * 12;
         const iMensalFinanc = Math.pow(1 + taxaJurosFinancAnual / 100, 1 / 12) - 1;
-        const amortizacaoMensalSac = valorBem / nFinanc;
+        const amortizacaoMensalSac = financiamentoValor / nFinanc;
         const parcelaFinancPrice = iMensalFinanc > 0
-          ? valorBem * iMensalFinanc / (1 - Math.pow(1 + iMensalFinanc, -nFinanc))
-          : valorBem / nFinanc;
+          ? financiamentoValor * iMensalFinanc / (1 - Math.pow(1 + iMensalFinanc, -nFinanc))
+          : financiamentoValor / nFinanc;
         function parcelaFinancMes(m) {
           if (sistemaFinanc === 'price') return parcelaFinancPrice;
-          const saldoDevedorAntes = valorBem - amortizacaoMensalSac * (m - 1);
+          const saldoDevedorAntes = financiamentoValor - amortizacaoMensalSac * (m - 1);
           return amortizacaoMensalSac + saldoDevedorAntes * iMensalFinanc;
         }
         const parcelaFinancInicial = parcelaFinancMes(1);
         const parcelaFinancFinal = parcelaFinancMes(nFinanc);
-        let custoTotalFinanc = 0;
+        let custoTotalFinanc = entradaFinanc;
         for (let m = 1; m <= nFinanc; m++) custoTotalFinanc += parcelaFinancMes(m);
 
         const consorcioMaisBarato = custoTotalConsorcio < custoTotalFinanc;
@@ -17456,6 +17482,11 @@
               <span>${sistemaFinanc === 'sac' ? 'Parcela do financiamento (inicial → final, SAC)' : 'Parcela do financiamento (Price, fixa)'}</span>
               <strong>${sistemaFinanc === 'sac' ? `${moeda(parcelaFinancInicial)} → ${moeda(parcelaFinancFinal)}` : moeda(parcelaFinancInicial)}</strong>
             </div>
+            ${entradaFinanc > 0 ? `
+            <div class="carteira-resumo-card">
+              <span>Entrada do financiamento</span>
+              <strong>${moeda(entradaFinanc)}</strong>
+            </div>` : ''}
           </div>
 
           <div class="cxf-cenarios-grid" style="margin-top:14px;">
@@ -17489,7 +17520,7 @@
 
         ultimoCalculoCxf = {
           valorBem, prazoConsorcioMeses, taxaAdmPct, correcaoAnual, fundoReservaPct,
-          prazoFinancAnos, taxaJurosFinancAnual, sistemaFinanc,
+          prazoFinancAnos, taxaJurosFinancAnual, sistemaFinanc, entradaFinanc,
           parcelaConsorcioInicial, custoTotalConsorcio, parcelaFinancInicial, parcelaFinancFinal, custoTotalFinanc,
           consorcioMaisBarato, diferencaCustoTotal, cenarios,
         };
@@ -17506,6 +17537,8 @@
         inPrazoFinanc.value = '';
         inTaxaJurosFinanc.value = '';
         selSistemaFinanc.value = 'sac';
+        inEntradaFinanc.value = '';
+        inEntradaFinanc.dataset.centavos = '0';
         inFundoReserva.value = '';
         resultadoEl.innerHTML = '';
         ultimoCalculoCxf = null;
@@ -17567,6 +17600,10 @@
             ['Prazo do financiamento', `${c.prazoFinancAnos} ano${c.prazoFinancAnos > 1 ? 's' : ''}`],
             ['Sistema de amortização do financiamento', nomeSistemaFinanc],
             ['Taxa de juros do financiamento', pct(c.taxaJurosFinancAnual)],
+            ...(c.entradaFinanc > 0 ? [
+              ['Entrada do financiamento', moeda(c.entradaFinanc)],
+              ['Valor financiado (bem − entrada)', moeda(c.valorBem - c.entradaFinanc)],
+            ] : []),
           ],
           theme: 'grid',
           styles: { fontSize: 9, cellPadding: 6 },
