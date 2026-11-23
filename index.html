@@ -17459,15 +17459,21 @@
           </div>
 
           <div class="cxf-cenarios-grid" style="margin-top:14px;">
-            <div class="cxf-cenario-card${consorcioMaisBarato ? ' cxf-cenario-destaque' : ''}">
+            <div class="cxf-cenario-card${consorcioMaisBarato ? ' cxf-cenario-destaque' : ''}" style="${consorcioMaisBarato ? '' : 'opacity:0.7;'}">
               <div class="cxf-cenario-titulo">${consorcioMaisBarato ? '🏆 ' : ''}Custo total — Consórcio</div>
               <div class="cxf-cenario-linha"><span>Soma de todas as parcelas, prazo completo</span><strong>${moeda(custoTotalConsorcio)}</strong></div>
               <div class="cxf-cenario-liquido">${moeda(custoTotalConsorcio)}</div>
+              ${consorcioMaisBarato
+                ? `<div style="margin-top:8px; font-weight:700; font-size:0.82rem; color:var(--primary);">✅ Mais barato no total · ${moeda(diferencaCustoTotal)} a menos</div>`
+                : `<div style="margin-top:8px; font-weight:700; font-size:0.82rem; color:var(--muted);">${moeda(diferencaCustoTotal)} a mais que a outra opção</div>`}
             </div>
-            <div class="cxf-cenario-card${!consorcioMaisBarato ? ' cxf-cenario-destaque' : ''}">
+            <div class="cxf-cenario-card${!consorcioMaisBarato ? ' cxf-cenario-destaque' : ''}" style="${!consorcioMaisBarato ? '' : 'opacity:0.7;'}">
               <div class="cxf-cenario-titulo">${!consorcioMaisBarato ? '🏆 ' : ''}Custo total — Financiamento</div>
               <div class="cxf-cenario-linha"><span>Soma de todas as parcelas, prazo completo</span><strong>${moeda(custoTotalFinanc)}</strong></div>
               <div class="cxf-cenario-liquido">${moeda(custoTotalFinanc)}</div>
+              ${!consorcioMaisBarato
+                ? `<div style="margin-top:8px; font-weight:700; font-size:0.82rem; color:var(--primary);">✅ Mais barato no total · ${moeda(diferencaCustoTotal)} a menos</div>`
+                : `<div style="margin-top:8px; font-weight:700; font-size:0.82rem; color:var(--muted);">${moeda(diferencaCustoTotal)} a mais que a outra opção</div>`}
             </div>
           </div>
           <p class="calc-ajuda" style="margin-top:10px;">
