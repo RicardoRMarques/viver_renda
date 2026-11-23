@@ -30682,17 +30682,21 @@
               : simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0, amort });
           }
 
-          const amortBase = montarAmortParaSimulacao(parcelas);
-          const linhasBase = rodar(amortBase);
+          // A base precisa excluir este MESMO ponto mesmo se ele já estiver
+          // no histórico (ex: a pessoa já clicou "+ Adicionar à lista" e
+          // volta aqui pra reconferir aquela mesma amortização) — senão a
+          // base e o cenário "com a nova" ficariam idênticos (a amortização
+          // já estaria nos dois lados) e a comparação sempre daria zero.
+          const listaSemEsta = (montarAmortParaSimulacao(parcelas)?.lista ?? []).filter(a => a.ponto !== ponto);
+          const linhasBase = rodar(listaSemEsta.length > 0 ? { lista: listaSemEsta } : null);
           const prazoBase = linhasBase.length - 1;
 
           if (ponto >= prazoBase) {
-            erroComparacao(`Esse financiamento (com as amortizações já cadastradas) termina na parcela ${prazoBase} — escolha um ponto antes disso.`);
+            erroComparacao(`Esse financiamento (sem contar esta amortização) termina na parcela ${prazoBase} — escolha um ponto antes disso.`);
             return;
           }
 
-          const listaComNova = (amortBase?.lista ?? []).filter(a => a.ponto !== ponto);
-          listaComNova.push({ ponto, valor: valorNovo, modo });
+          const listaComNova = [...listaSemEsta, { ponto, valor: valorNovo, modo }];
           const linhasComNova = rodar({ lista: listaComNova });
           const novoFim = linhasComNova.length - 1;
 
