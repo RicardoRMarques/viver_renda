@@ -30730,16 +30730,22 @@
           const amortizarGanha = patrimonioAmortizar >= patrimonioInvestir;
           const diferenca = Math.abs(patrimonioAmortizar - patrimonioInvestir);
 
+          function cardComparacao(titulo, valor, venceu) {
+            const selo = venceu
+              ? `<div style="font-weight:700; font-size:0.82rem; color:var(--primary);">✅ Vale mais a pena · ${hgFormatMoeda(diferenca)} a mais</div>`
+              : `<div style="font-weight:700; font-size:0.82rem; color:var(--muted);">${hgFormatMoeda(diferenca)} a menos que a outra opção</div>`;
+            return `
+              <div class="carteira-resumo-card${venceu ? ' carteira-resumo-destaque' : ''}" style="${venceu ? '' : 'opacity:0.7;'}">
+                <span>${venceu ? '🏆 ' : ''}${titulo}</span>
+                <strong>${hgFormatMoeda(valor)}</strong>
+                ${selo}
+              </div>`;
+          }
+
           amortComparacaoResultado.innerHTML = `
             <div class="carteira-resumo-cards" style="margin-top:10px;">
-              <div class="carteira-resumo-card${amortizarGanha ? ' carteira-resumo-destaque' : ''}">
-                <span>${amortizarGanha ? '🏆 ' : ''}Amortizando (economia reinvestida)</span>
-                <strong>${hgFormatMoeda(patrimonioAmortizar)}</strong>
-              </div>
-              <div class="carteira-resumo-card${!amortizarGanha ? ' carteira-resumo-destaque' : ''}">
-                <span>${!amortizarGanha ? '🏆 ' : ''}Investindo o valor todo</span>
-                <strong>${hgFormatMoeda(patrimonioInvestir)}</strong>
-              </div>
+              ${cardComparacao('Amortizando (economia reinvestida)', patrimonioAmortizar, amortizarGanha)}
+              ${cardComparacao('Investindo o valor todo', patrimonioInvestir, !amortizarGanha)}
             </div>
             <p class="calc-ajuda" style="margin-top:10px;">
               Projetando até o mês ${prazoBase} (quando o financiamento, sem essa amortização, terminaria),
