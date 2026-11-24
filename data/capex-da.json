@@ -1,7 +1,7 @@
 {
   "_leia_me": "CAPEX e Depreciação/Amortização (D&A) de ações, direto dos dados abertos da CVM (ITR/DFP) — não da HG Brasil, que não tem esses campos. Valores em R$, ACUMULADOS NO ANO até 'dt_refer' de cada empresa (convenção do fluxo de caixa brasileiro — nunca isolado por trimestre). Ver coletar_cvm_capex.py.",
   "fonte": "CVM - Dados Abertos (dados.cvm.gov.br), ITR/DFP",
-  "atualizado_em": "2026-11-17T00:11:22.336582+00:00",
+  "atualizado_em": "2026-11-24T02:52:24.268891+00:00",
   "ativos": {
     "AALR3": {
       "dt_refer": "2025-12-31",
@@ -134,14 +134,14 @@
       "depreciacao_amortizacao": 3794423000.0
     },
     "AZEV3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 12827000.0
+      "depreciacao_amortizacao": 19534000.0
     },
     "AZEV4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 12827000.0
+      "depreciacao_amortizacao": 19534000.0
     },
     "AZUL54": {
       "dt_refer": "2026-09-30",
@@ -159,13 +159,13 @@
       "depreciacao_amortizacao": 286244000.0
     },
     "BALM3": {
-      "dt_refer": "2026-06-30",
-      "capex": 3612000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 7269000.0,
       "depreciacao_amortizacao": null
     },
     "BALM4": {
-      "dt_refer": "2026-06-30",
-      "capex": 3612000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 7269000.0,
       "depreciacao_amortizacao": null
     },
     "BAUH4": {
@@ -174,8 +174,8 @@
       "depreciacao_amortizacao": 5234000.0
     },
     "BAZA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 62172000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 0.0,
       "depreciacao_amortizacao": null
     },
     "BBAS3": {
@@ -399,8 +399,8 @@
       "depreciacao_amortizacao": null
     },
     "CEGR3": {
-      "dt_refer": "2026-06-30",
-      "capex": 121540000.0,
+      "dt_refer": "2026-09-30",
+      "capex": 190571000.0,
       "depreciacao_amortizacao": null
     },
     "CLSC3": {
@@ -519,14 +519,14 @@
       "depreciacao_amortizacao": 40807000.0
     },
     "DOHL3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 11065000.0
+      "depreciacao_amortizacao": 16749000.0
     },
     "DOHL4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 11065000.0
+      "depreciacao_amortizacao": 16749000.0
     },
     "DOTZ3": {
       "dt_refer": "2026-09-30",
@@ -769,14 +769,14 @@
       "depreciacao_amortizacao": 111402000.0
     },
     "INEP3": {
-      "dt_refer": "2026-06-30",
-      "capex": null,
-      "depreciacao_amortizacao": 3525000.0
+      "dt_refer": "2026-09-30",
+      "capex": 530000.0,
+      "depreciacao_amortizacao": 3590000.0
     },
     "INEP4": {
-      "dt_refer": "2026-06-30",
-      "capex": null,
-      "depreciacao_amortizacao": 3525000.0
+      "dt_refer": "2026-09-30",
+      "capex": 530000.0,
+      "depreciacao_amortizacao": 3590000.0
     },
     "IRBR3": {
       "dt_refer": "2026-09-30",
@@ -894,9 +894,9 @@
       "depreciacao_amortizacao": null
     },
     "LUPA3": {
-      "dt_refer": "2026-06-30",
-      "capex": 188000.0,
-      "depreciacao_amortizacao": 1036000.0
+      "dt_refer": "2026-09-30",
+      "capex": 737000.0,
+      "depreciacao_amortizacao": 1514000.0
     },
     "LWSA3": {
       "dt_refer": "2026-09-30",
@@ -974,14 +974,19 @@
       "depreciacao_amortizacao": 180680000.0
     },
     "MSPA3": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 12086000.0
+      "depreciacao_amortizacao": 18264000.0
     },
     "MSPA4": {
-      "dt_refer": "2026-06-30",
+      "dt_refer": "2026-09-30",
       "capex": null,
-      "depreciacao_amortizacao": 12086000.0
+      "depreciacao_amortizacao": 18264000.0
+    },
+    "MTRE3": {
+      "dt_refer": "2026-09-30",
+      "capex": 2945000.0,
+      "depreciacao_amortizacao": 6951000.0
     },
     "MTSA3": {
       "dt_refer": "2026-09-30",
