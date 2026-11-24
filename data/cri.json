@@ -2,23 +2,23 @@
  "_leia_me": "Cadastro de EMISSÃO de CRIs (Certificados de Recebíveis Imobiliários) negociados na B3, só os que ainda não venceram. 'rotulo_remuneracao' é a remuneração CONTRATADA no lançamento do papel — a B3 não publica uma taxa de mercado secundário atualizada todo dia para CRI (diferente da tela de Debêntures, que usa a ANBIMA). Para papel pós-fixado (DI/IPCA/IGP-M + spread) isso ainda descreve o que o título paga hoje, porque só o indexador-base flutua; para PREFIXADO não há garantia nenhuma de que siga valendo. CRI é isento de Imposto de Renda para pessoa física por lei (diferente de debênture incentivada, que depende de cada papel) — mas não tem FGC, e a maioria exige um investimento mínimo alto (na casa de R$ 10 a 20 mil), que este arquivo não informa.",
  "fonte": "B3 — Consulta Pública de CRIs",
  "fonte_url": "https://sistemaswebb3-balcao.b3.com.br/featuresCRIPage/",
- "atualizado_em": "2026-11-20T20:47:29+00:00",
- "total": 4445,
+ "atualizado_em": "2026-11-24T00:25:34+00:00",
+ "total": 4441,
  "total_no_arquivo_b3": 4702,
  "por_indexador": {
-  "di": 1261,
-  "igp_m": 206,
+  "di": 1260,
+  "igp_m": 205,
   "tr": 59,
   "outro": 349,
-  "ipca": 2494,
+  "ipca": 2493,
   "prefixado": 13,
-  "incc_di": 42,
+  "incc_di": 41,
   "inpc": 8,
   "igp_di": 6,
   "incc_m": 5,
   "ipc_fipe": 2
  },
- "volume_total_emissao": 304841973685.48,
+ "volume_total_emissao": 304745155170.59,
  "cris": [
   {
    "codigo": "27I0000801",
@@ -41654,23 +41654,6 @@
    "data_final_distribuicao": "2024-06-05"
   },
   {
-   "codigo": "23L1349378",
-   "isin": "BRRBRACRIL41",
-   "emissor": "OPEA SECURITIZADORA S/A",
-   "agente_fiduciario": "OLIVEIRA TRUST DTVM S/A",
-   "numero_emissao": "185",
-   "numero_serie": "1",
-   "quantidade_emitida": 30000.0,
-   "volume_emissao": 30000000.0,
-   "indexador": "di",
-   "pct_indexador": 100.0,
-   "spread": 7.5,
-   "rotulo_remuneracao": "100% do DI + 7,50%",
-   "data_emissao": "2023-12-04",
-   "data_vencimento": "2026-11-23",
-   "data_final_distribuicao": "2026-11-22"
-  },
-  {
    "codigo": "23L0016646",
    "isin": "BRAPCSCRILL4",
    "emissor": "TRUE SECURITIZADORA S/A",
@@ -44525,23 +44508,6 @@
    "data_emissao": "2023-09-01",
    "data_vencimento": "2043-09-17",
    "data_final_distribuicao": "2024-03-25"
-  },
-  {
-   "codigo": "23H2511402",
-   "isin": "BRASPRCRI0X8",
-   "emissor": "CASA DE PEDRA SECURITIZADORA DE CREDITO S.A",
-   "agente_fiduciario": "OLIVEIRA TRUST DTVM S/A",
-   "numero_emissao": "10",
-   "numero_serie": "1",
-   "quantidade_emitida": 25800.0,
-   "volume_emissao": 25800000.0,
-   "indexador": "incc_di",
-   "pct_indexador": null,
-   "spread": 12.68,
-   "rotulo_remuneracao": "INCC-DI + 12,68%",
-   "data_emissao": "2023-08-31",
-   "data_vencimento": "2026-11-23",
-   "data_final_distribuicao": "2024-03-06"
   },
   {
    "codigo": "23H1578104",
@@ -58210,23 +58176,6 @@
    "data_emissao": "2021-12-16",
    "data_vencimento": "2036-12-24",
    "data_final_distribuicao": "2022-06-10"
-  },
-  {
-   "codigo": "21L0285556",
-   "isin": "BRAPCSCRIBL5",
-   "emissor": "OPEA SECURITIZADORA S/A",
-   "agente_fiduciario": "VORTX DTVM S.A.",
-   "numero_emissao": "1",
-   "numero_serie": "472",
-   "quantidade_emitida": 37000.0,
-   "volume_emissao": 37000000.0,
-   "indexador": "ipca",
-   "pct_indexador": null,
-   "spread": 8.75,
-   "rotulo_remuneracao": "IPCA + 8,75%",
-   "data_emissao": "2021-12-15",
-   "data_vencimento": "2026-11-24",
-   "data_final_distribuicao": "2023-12-16"
   },
   {
    "codigo": "21L0666509",
@@ -73663,23 +73612,6 @@
    "data_emissao": "2014-11-05",
    "data_vencimento": "2050-12-31",
    "data_final_distribuicao": "2015-05-04"
-  },
-  {
-   "codigo": "14J0105984",
-   "isin": "",
-   "emissor": "POLO CAPITAL SECURITIZADORA S/A",
-   "agente_fiduciario": "PENTAGONO SA DTVM",
-   "numero_emissao": "1",
-   "numero_serie": "25",
-   "quantidade_emitida": 13.0,
-   "volume_emissao": 4018514.89,
-   "indexador": "igp_m",
-   "pct_indexador": null,
-   "spread": 14.0,
-   "rotulo_remuneracao": "IGP-M + 14,00%",
-   "data_emissao": "2014-10-20",
-   "data_vencimento": "2026-11-24",
-   "data_final_distribuicao": "2015-04-18"
   },
   {
    "codigo": "14J0045626",
