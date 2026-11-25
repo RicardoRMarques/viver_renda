@@ -2,7 +2,7 @@
  "_leia_me": "Vacância e inadimplência de FIIs de tijolo, por imóvel e agregado por fundo (média ponderada pela participação de cada imóvel na receita do fundo), direto do Informe Trimestral de FIIs da CVM (dados abertos, não scraping) — ver coletar_cvm_fii_imoveis.py. 'resumo_ia' é um texto curto gerado pelo mesmo Worker de IA que atende o Assistente do site, descrevendo os números em linguagem simples; null quando a chamada falhou ou ainda não rodou pra esse fundo. Só fundos com propriedades 'Imóveis para renda acabados' aparecem aqui — fundos de papel/recebíveis (sem imóvel físico) não têm esse dado na CVM, por isso não entram neste arquivo. Consulte 'fatos relevantes' e 'relatórios gerenciais' direto no Fundos.NET (fnet.bmfbovespa.com.br) — não automatizado aqui (Cloudflare + CAPTCHA na fonte).",
  "fonte": "CVM — Dados Abertos, Informe Trimestral de FIIs (inf_trimestral_fii_imovel)",
  "fonte_url": "https://dados.cvm.gov.br/dados/FII/DOC/INF_TRIMESTRAL/DADOS/",
- "atualizado_em": "2026-11-21T01:35:17+00:00",
+ "atualizado_em": "2026-11-25T00:55:13+00:00",
  "fundos": {
   "FVPQ11": {
    "data_referencia": "2026-09-30",
@@ -198,14 +198,6 @@
      "participacao_receita_pct": 0.31
     },
     {
-     "nome": "URUGUAIANA, 78",
-     "endereco": "Rua Uruguaiana nº 78, centro, Rio de Janeiro",
-     "area_m2": 645.79,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.3
-    },
-    {
      "nome": "TRAVESSA DO OUVIDOR, 9",
      "endereco": "Travessa do Ouvidor nº9, centro, Rio de Janeiro",
      "area_m2": 749.88,
@@ -214,18 +206,26 @@
      "participacao_receita_pct": 0.3
     },
     {
-     "nome": "TOUCH OFFICES",
-     "endereco": "Rua Jardim Botânico, nº 568, conjunto 301, Jardim Botânico, Rio de Janeiro/RJ",
-     "area_m2": 627.49,
-     "vacancia_pct": 69.23,
+     "nome": "URUGUAIANA, 78",
+     "endereco": "Rua Uruguaiana nº 78, centro, Rio de Janeiro",
+     "area_m2": 645.79,
+     "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.27
+     "participacao_receita_pct": 0.3
     },
     {
      "nome": "CONDE DE BONFIM, 149",
      "endereco": "Rua Conde de Bonfim nº149, centro, Rio de Janeiro",
      "area_m2": 638.64,
      "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.27
+    },
+    {
+     "nome": "TOUCH OFFICES",
+     "endereco": "Rua Jardim Botânico, nº 568, conjunto 301, Jardim Botânico, Rio de Janeiro/RJ",
+     "area_m2": 627.49,
+     "vacancia_pct": 69.23,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.27
     },
@@ -318,6 +318,14 @@
      "participacao_receita_pct": 0.13
     },
     {
+     "nome": "CARIOCA 21",
+     "endereco": "Rua da Carioca, centro, Rio de Janeiro",
+     "area_m2": 259.72,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.08
+    },
+    {
      "nome": "CARIOCA 19",
      "endereco": "Rua da Carioca, centro, Rio de Janeiro",
      "area_m2": 284.28,
@@ -334,22 +342,6 @@
      "participacao_receita_pct": 0.08
     },
     {
-     "nome": "CARIOCA 21",
-     "endereco": "Rua da Carioca, centro, Rio de Janeiro",
-     "area_m2": 259.72,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.08
-    },
-    {
-     "nome": "CARIOCA 15",
-     "endereco": "Rua da Carioca, centro, Rio de Janeiro",
-     "area_m2": 216.24,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.07
-    },
-    {
      "nome": "CARIOCA 17",
      "endereco": "Rua da Carioca, centro, Rio de Janeiro",
      "area_m2": 216.24,
@@ -362,6 +354,14 @@
      "endereco": "Rua da Carioca, centro, Rio de Janeiro",
      "area_m2": 315.6,
      "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.07
+    },
+    {
+     "nome": "CARIOCA 15",
+     "endereco": "Rua da Carioca, centro, Rio de Janeiro",
+     "area_m2": 216.24,
+     "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.07
     },
@@ -761,7 +761,7 @@
    "resumo_ia": "O Fundo Imobiliário EURO11 (FII Europar) apresenta uma vacância baixa, o que significa que a maioria dos imóveis está ocupada e gerando receita. No entanto, a inadimplência também é baixa, o que é um bom sinal, pois indica que os inquilinos estão pagando seus aluguéis. Isso sugere que o fundo está gerenciando bem seus imóveis e tem um perfil de risco moderado."
   },
   "FAMB11": {
-   "data_referencia": "2026-06-30",
+   "data_referencia": "2026-09-30",
    "n_imoveis": 1,
    "vacancia_pct": 98.01,
    "inadimplencia_pct": 11.82,
@@ -775,7 +775,7 @@
      "participacao_receita_pct": 57.79
     }
    ],
-   "resumo_ia": "O Fundo Imobiliário FAMB11 (FII Almirant) tem uma vacância alta, o que significa que uma grande parte dos imóveis do fundo está desocupada e não está gerando aluguel. Isso pode afetar a rentabilidade do fundo.\n\nAlém disso, a inadimplência também é alta, o que significa que muitos inquilinos estão atrasados ou não pagando os aluguéis que devem. Isso pode ser um problema para o fundo, pois pode afetar a capacidade de pagar os investidores."
+   "resumo_ia": "O Fundo Imobiliário FAMB11 (FII Almirant) está enfrentando uma situação de vacância alta, o que significa que uma grande parte da área dos imóveis está desocupada e não está gerando receita. Isso pode afetar negativamente a rentabilidade do fundo. Além disso, a inadimplência também está alta, o que indica que muitos inquilinos estão atrasando ou não pagando os aluguéis, o que pode levar a problemas de liquidez para o fundo."
   },
   "EDFO11": {
    "data_referencia": "2026-09-30",
@@ -809,6 +809,14 @@
     },
     {
      "nome": "Edifício Ourinvest",
+     "endereco": "Avenida Paulista, 1728, São Paulo/SP (12º ANDAR)",
+     "area_m2": 292.1,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Edifício Ourinvest",
      "endereco": "Avenida Paulista, 1728, São Paulo/SP (10º ANDAR)",
      "area_m2": 350.17,
      "vacancia_pct": 100.0,
@@ -826,14 +834,6 @@
     {
      "nome": "Edifício Ourinvest",
      "endereco": "Avenida Paulista, 1728, São Paulo/SP (13º ANDAR)",
-     "area_m2": 292.1,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Edifício Ourinvest",
-     "endereco": "Avenida Paulista, 1728, São Paulo/SP (12º ANDAR)",
      "area_m2": 292.1,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
@@ -1861,7 +1861,7 @@
    "resumo_ia": "O Fundo Imobiliário CXCE11 (FII Cx Cedae) tem uma vacância baixa, o que significa que a maior parte dos imóveis está ocupada e gerando aluguel. Isso é bom para os investidores, pois significa que o fundo está gerando receita.\n\nJá a inadimplência também é baixa, o que significa que os inquilinos estão pagando os aluguéis de forma regular. Isso é importante, pois evita que o fundo perca receita devido a pagamentos atrasados."
   },
   "STRX11": {
-   "data_referencia": "2026-06-30",
+   "data_referencia": "2026-09-30",
    "n_imoveis": 1,
    "vacancia_pct": 4.01,
    "inadimplencia_pct": 1.0,
@@ -1875,7 +1875,7 @@
      "participacao_receita_pct": 100.0
     }
    ],
-   "resumo_ia": "O Fundo Imobiliário STRX11 (FII Starx) tem uma vacância baixa, o que significa que a parte desocupada dos imóveis é relativamente pequena. Isso pode ser um sinal positivo, pois significa que há pouca área não gerando receita.\n\nAlém disso, a inadimplência do fundo também é baixa, o que significa que os inquilinos estão pagando os aluguéis de forma regular. Isso é um indicador de que o fundo está gerenciando bem os imóveis e os aluguéis estão sendo pagos nos prazos estabelecidos."
+   "resumo_ia": "A vacância do Fundo Imobiliário STRX11 é considerada baixa, o que significa que a parte dos imóveis que está desocupada é relativamente pequena em comparação com a área total. Isso pode indicar que o fundo está gerenciando bem os imóveis e encontrando inquilinos para os espaços vagos.\n\nJá a inadimplência do fundo também é baixa, o que significa que os inquilinos que estão ocupando os imóveis estão pagando os aluguéis de forma regular. Isso é um sinal positivo para o investidor, pois indica que o fundo está gerenciando bem as relações com os inquilinos e não está tendo problemas com pagamentos atrasados."
   },
   "FAED11": {
    "data_referencia": "2026-09-30",
@@ -3053,18 +3053,18 @@
      "participacao_receita_pct": 2.65
     },
     {
-     "nome": "PCOMAGUA",
-     "endereco": "Rua Inácio Pereira da Rocha, 597 - Pinheiros, São Paulo - SP",
-     "area_m2": 685.0,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "AGRAPOSO",
      "endereco": "Av. Eng. Heitor Antônio Eiras Garcia, 3963,/3967 São Paulo-SP",
      "area_m2": 806.0,
      "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "PCOMAGUA",
+     "endereco": "Rua Inácio Pereira da Rocha, 597 - Pinheiros, São Paulo - SP",
+     "area_m2": 685.0,
+     "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     }
@@ -3511,17 +3511,17 @@
      "participacao_receita_pct": 1.23
     },
     {
-     "nome": "UBERLAND",
-     "endereco": "AV. AFONSO PENA, 745, ESQUINA R. QUINTINO BOCAIUVA",
-     "area_m2": 6241.0,
+     "nome": "C_ELISEO",
+     "endereco": "AV.RIO BRANCO,1437",
+     "area_m2": 5991.07,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 1.21
     },
     {
-     "nome": "C_ELISEO",
-     "endereco": "AV.RIO BRANCO,1437",
-     "area_m2": 5991.07,
+     "nome": "UBERLAND",
+     "endereco": "AV. AFONSO PENA, 745, ESQUINA R. QUINTINO BOCAIUVA",
+     "area_m2": 6241.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 1.21
@@ -3958,14 +3958,6 @@
      "participacao_receita_pct": 4.18
     },
     {
-     "nome": "LOJA 30",
-     "endereco": "Praça Manoel Inácio Peixoto, 96 - Centro, Cataguases - MG.",
-     "area_m2": 13182.9,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 3.92
-    },
-    {
      "nome": "LOJA 48",
      "endereco": "Rua Álvaro José Rodrigues, 1200 - loja 1 Bairro Santos Dumont - São Pedro, Juiz de Fora - MG",
      "area_m2": 10273.1,
@@ -3982,17 +3974,25 @@
      "participacao_receita_pct": 3.92
     },
     {
-     "nome": "LOJA 35",
-     "endereco": "R. Maria do Carmo Sáles, 333 - Meia Laranja, Leopoldina - MG.",
-     "area_m2": 14000.0,
+     "nome": "LOJA 30",
+     "endereco": "Praça Manoel Inácio Peixoto, 96 - Centro, Cataguases - MG.",
+     "area_m2": 13182.9,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 3.4
+     "participacao_receita_pct": 3.92
     },
     {
      "nome": "LOJA 46",
      "endereco": "R. Francisco de Souza Fortes, 629 - Vale do Sol, Viçosa - MG.",
      "area_m2": 15626.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 3.4
+    },
+    {
+     "nome": "LOJA 35",
+     "endereco": "R. Maria do Carmo Sáles, 333 - Meia Laranja, Leopoldina - MG.",
+     "area_m2": 14000.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 3.4
@@ -4020,6 +4020,30 @@
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 3.14
+    },
+    {
+     "nome": "LOJA 14",
+     "endereco": "Av. Veríssimo Mendonça, 255 - Beira Rio, Cataguases - MG.",
+     "area_m2": 2758.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 2.61
+    },
+    {
+     "nome": "LOJA 65",
+     "endereco": "Av. José Ananias de Águiar, 6770 - Araxá - MG.",
+     "area_m2": 14556.4,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 2.61
+    },
+    {
+     "nome": "LOJA 50",
+     "endereco": "Av. Faria Pereira, 3225 - São Cristovao, Patrocínio - MG.",
+     "area_m2": 12817.6,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 2.61
     },
     {
      "nome": "LOJA 64",
@@ -4062,44 +4086,12 @@
      "participacao_receita_pct": 2.61
     },
     {
-     "nome": "LOJA 50",
-     "endereco": "Av. Faria Pereira, 3225 - São Cristovao, Patrocínio - MG.",
-     "area_m2": 12817.6,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 2.61
-    },
-    {
-     "nome": "LOJA 65",
-     "endereco": "Av. José Ananias de Águiar, 6770 - Araxá - MG.",
-     "area_m2": 14556.4,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 2.61
-    },
-    {
-     "nome": "LOJA 14",
-     "endereco": "Av. Veríssimo Mendonça, 255 - Beira Rio, Cataguases - MG.",
-     "area_m2": 2758.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 2.61
-    },
-    {
      "nome": "LOJA 49",
      "endereco": "Av. Dep. José Marcus Cherem, 2300 - Vila Sao Cristovao, Uberaba - MG.",
      "area_m2": 10638.4,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 2.61
-    },
-    {
-     "nome": "LOJA 36",
-     "endereco": "Av. Rondon Pacheco, 4800 - Tibery, Uberlândia - MG.",
-     "area_m2": 5712.6,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 1.83
     },
     {
      "nome": "LOJA 58",
@@ -4118,9 +4110,9 @@
      "participacao_receita_pct": 1.83
     },
     {
-     "nome": "LOJA 38",
-     "endereco": "Av. Angelino Favato, 461 - Granada, Uberlândia - MG.",
-     "area_m2": 5119.6,
+     "nome": "LOJA 36",
+     "endereco": "Av. Rondon Pacheco, 4800 - Tibery, Uberlândia - MG.",
+     "area_m2": 5712.6,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 1.83
@@ -4129,6 +4121,14 @@
      "nome": "LOJA 33",
      "endereco": "Av. Cleanto Vieira Gonçalves, 600 - Jardim America II, Uberlândia - MG.",
      "area_m2": 6039.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 1.83
+    },
+    {
+     "nome": "LOJA 38",
+     "endereco": "Av. Angelino Favato, 461 - Granada, Uberlândia - MG.",
+     "area_m2": 5119.6,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 1.83
@@ -4158,14 +4158,6 @@
      "participacao_receita_pct": 1.31
     },
     {
-     "nome": "LOJA 79",
-     "endereco": "Avenida do contorno, 770 Area 3, R. Cel. José Furtado de Mendonça - dos Reis, Rio Pomba - MG.",
-     "area_m2": 4956.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.78
-    },
-    {
      "nome": "LOJA 17",
      "endereco": "Av. dos Ex-Combatentes, 658 - San Raphael II, Ubá - MG.",
      "area_m2": 4774.5,
@@ -4177,6 +4169,14 @@
      "nome": "LOJA 75",
      "endereco": "R. Ver. Jose Soares Ferreira, 190, Visc. do Rio Branco - MG.",
      "area_m2": 8566.9,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.78
+    },
+    {
+     "nome": "LOJA 79",
+     "endereco": "Avenida do contorno, 770 Area 3, R. Cel. José Furtado de Mendonça - dos Reis, Rio Pomba - MG.",
+     "area_m2": 4956.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.78
@@ -4401,17 +4401,17 @@
      "participacao_receita_pct": 5.08
     },
     {
-     "nome": "Cogna - São Bernardo do Campo - São Bernardo do Campo/SP",
-     "endereco": "Avenida Doutor Rudge Ramos, 1501, Rudge Ramos",
-     "area_m2": 24270.27,
+     "nome": "Estácio - Santa Cruz - Rio de Janeiro/RJ",
+     "endereco": "Rua General Olímpio, 100, Santa Cruz, Rio de Janeiro",
+     "area_m2": 16207.63,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 4.94
     },
     {
-     "nome": "Estácio - Santa Cruz - Rio de Janeiro/RJ",
-     "endereco": "Rua General Olímpio, 100, Santa Cruz, Rio de Janeiro",
-     "area_m2": 16207.63,
+     "nome": "Cogna - São Bernardo do Campo - São Bernardo do Campo/SP",
+     "endereco": "Avenida Doutor Rudge Ramos, 1501, Rudge Ramos",
+     "area_m2": 24270.27,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 4.94
@@ -4825,14 +4825,6 @@
      "participacao_receita_pct": 0.15
     },
     {
-     "nome": "Caixa - Cipo Guaçu - Embu Guaçu/SP",
-     "endereco": "Rua Sesefredo Klein Doll, 12",
-     "area_m2": 548.68,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.07
-    },
-    {
      "nome": "Loja Monsenhor Celso - Curitiba/PR",
      "endereco": "Rua Marechal Deodoro, 195",
      "area_m2": 780.095,
@@ -4841,57 +4833,25 @@
      "participacao_receita_pct": 0.07
     },
     {
-     "nome": "- Paulista  - São Paulo/SP",
-     "endereco": "Av. Paulista, 436",
-     "area_m2": 2857.24,
+     "nome": "Caixa - Cipo Guaçu - Embu Guaçu/SP",
+     "endereco": "Rua Sesefredo Klein Doll, 12",
+     "area_m2": 548.68,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "M3Storage - Italianos - São Paulo/SP",
-     "endereco": "Rua dos Italianos, 609",
-     "area_m2": 521.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "- Ed. Olivetti Paulista - São Paulo/SP",
-     "endereco": "Av Paulista 447 Loja",
-     "area_m2": 701.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 16000000.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Pedro I - Centro - Fortaleza/CE",
-     "endereco": "Rua Pedro I, 373",
-     "area_m2": 2582.15,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Centro - Jundiaí/SP",
-     "endereco": "R. Barao de Jundiai, 884",
-     "area_m2": 2770.46,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "- Ouvidor - Rio de Janeiro/RJ",
-     "endereco": "Av. Rio Branco, 115",
-     "area_m2": 1343.2,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
+     "participacao_receita_pct": 0.07
     },
     {
      "nome": "- Centro Histórico - Porto Alegre/RS",
      "endereco": "Rua 7 de Setembro, 1100",
      "area_m2": 2223.93,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "- Santo Antônio - Recife/PE",
+     "endereco": "Rua Imperador Dom Pedro II, 255",
+     "area_m2": 2343.25,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -4913,9 +4873,49 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "- Santo Antônio - Recife/PE",
-     "endereco": "Rua Imperador Dom Pedro II, 255",
-     "area_m2": 2343.25,
+     "nome": "Centro - Jundiaí/SP",
+     "endereco": "R. Barao de Jundiai, 884",
+     "area_m2": 2770.46,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "- Ouvidor - Rio de Janeiro/RJ",
+     "endereco": "Av. Rio Branco, 115",
+     "area_m2": 1343.2,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "M3Storage - Italianos - São Paulo/SP",
+     "endereco": "Rua dos Italianos, 609",
+     "area_m2": 521.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "- Paulista  - São Paulo/SP",
+     "endereco": "Av. Paulista, 436",
+     "area_m2": 2857.24,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "- Ed. Olivetti Paulista - São Paulo/SP",
+     "endereco": "Av Paulista 447 Loja",
+     "area_m2": 701.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 16000000.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Pedro I - Centro - Fortaleza/CE",
+     "endereco": "Rua Pedro I, 373",
+     "area_m2": 2582.15,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -4945,11 +4945,11 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Goodbe - Monções - São Paulo/SP",
-     "endereco": "Av. Sto. Amaro, 3332",
-     "area_m2": 617.95,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 9300000.0,
+     "nome": "- Presidente Wilson - Rio de Janeiro/RJ",
+     "endereco": "Av. Rio Branco, 311-B",
+     "area_m2": 742.59,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
@@ -4961,11 +4961,11 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "- Presidente Wilson - Rio de Janeiro/RJ",
-     "endereco": "Av. Rio Branco, 311-B",
-     "area_m2": 742.59,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
+     "nome": "Goodbe - Monções - São Paulo/SP",
+     "endereco": "Av. Sto. Amaro, 3332",
+     "area_m2": 617.95,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 9300000.0,
      "participacao_receita_pct": 0.0
     },
     {
@@ -5304,17 +5304,17 @@
      "participacao_receita_pct": 0.52
     },
     {
-     "nome": "Ed.Berlioz",
-     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
-     "area_m2": 367.96,
+     "nome": "Ed. Concórdia",
+     "endereco": "Alameda Oscar Niemeyer, nº 132, Vale Sereno, Nova Lima - MG",
+     "area_m2": 180.54,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.51
     },
     {
-     "nome": "Ed. Concórdia",
-     "endereco": "Alameda Oscar Niemeyer, nº 132, Vale Sereno, Nova Lima - MG",
-     "area_m2": 180.54,
+     "nome": "Ed.Berlioz",
+     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
+     "area_m2": 367.96,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.51
@@ -5346,7 +5346,7 @@
     {
      "nome": "Ed.Berlioz",
      "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
-     "area_m2": 367.96,
+     "area_m2": 362.23,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.42
@@ -5354,7 +5354,7 @@
     {
      "nome": "Ed.Berlioz",
      "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
-     "area_m2": 362.23,
+     "area_m2": 367.96,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.42
@@ -5464,6 +5464,30 @@
      "participacao_receita_pct": 0.03
     },
     {
+     "nome": "Ed.Berlioz",
+     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
+     "area_m2": 27.59,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Ed.Berlioz",
+     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
+     "area_m2": 546.26,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Ed.Berlioz",
+     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
+     "area_m2": 796.84,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "Ed. Concórdia",
      "endereco": "Alameda Oscar Niemeyer, nº 132, Vale Sereno, Nova Lima - MG",
      "area_m2": 8.91,
@@ -5480,38 +5504,6 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Ed.Berlioz",
-     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
-     "area_m2": 546.26,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Ed.Berlioz",
-     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
-     "area_m2": 27.59,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Ed.Berlioz",
-     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
-     "area_m2": 796.84,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Ed.Berlioz",
-     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
-     "area_m2": 1722.54,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "Ed.Renaissance",
      "endereco": "Rua Paraiba, 550 23º and. Belo Horizonte MG",
      "area_m2": 533.7,
@@ -5524,6 +5516,14 @@
      "endereco": "Alameda Oscar Niemeyer, nº 132, Vale Sereno, Nova Lima - MG",
      "area_m2": 10.98,
      "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Ed.Berlioz",
+     "endereco": "Rua Levindo Lopes, 258 Belo Horizonte  MG",
+     "area_m2": 1722.54,
+     "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     }
@@ -6202,17 +6202,17 @@
      "participacao_receita_pct": 0.46
     },
     {
-     "nome": "13",
-     "endereco": "Rua Candido Mendes, 1.280 - Bairro Central",
-     "area_m2": 3605.0,
+     "nome": "19",
+     "endereco": "Rua Voluntários da Pátria, 167 - Centro",
+     "area_m2": 1600.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.45
     },
     {
-     "nome": "19",
-     "endereco": "Rua Voluntários da Pátria, 167 - Centro",
-     "area_m2": 1600.0,
+     "nome": "13",
+     "endereco": "Rua Candido Mendes, 1.280 - Bairro Central",
+     "area_m2": 3605.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.45
@@ -6266,17 +6266,17 @@
      "participacao_receita_pct": 0.23
     },
     {
-     "nome": "3",
-     "endereco": "Av. Portugal, 221 - Centro",
-     "area_m2": 1099.0,
+     "nome": "18",
+     "endereco": "Rua da Azenha, 795, 807 e 811",
+     "area_m2": 755.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.19
     },
     {
-     "nome": "18",
-     "endereco": "Rua da Azenha, 795, 807 e 811",
-     "area_m2": 755.0,
+     "nome": "3",
+     "endereco": "Av. Portugal, 221 - Centro",
+     "area_m2": 1099.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.19
@@ -6322,14 +6322,6 @@
      "participacao_receita_pct": 0.02
     },
     {
-     "nome": "9",
-     "endereco": "Rua Antonio João, 59 - Lj 12 e 13 - Centro",
-     "area_m2": 27.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.02
-    },
-    {
      "nome": "2",
      "endereco": "Av. 13 de Maio, 53 - Altos - Centro",
      "area_m2": 4198.0,
@@ -6338,12 +6330,12 @@
      "participacao_receita_pct": 0.02
     },
     {
-     "nome": "32",
-     "endereco": "Pça Ramos de Azevedo, 229",
-     "area_m2": 600.0,
-     "vacancia_pct": 100.0,
+     "nome": "9",
+     "endereco": "Rua Antonio João, 59 - Lj 12 e 13 - Centro",
+     "area_m2": 27.0,
+     "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
+     "participacao_receita_pct": 0.02
     },
     {
      "nome": "31",
@@ -6370,6 +6362,14 @@
      "participacao_receita_pct": 0.0
     },
     {
+     "nome": "32",
+     "endereco": "Pça Ramos de Azevedo, 229",
+     "area_m2": 600.0,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "21",
      "endereco": "Rua dos Andradas, 1307/1315 - Centro",
      "area_m2": 2558.0,
@@ -6386,17 +6386,17 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "27",
-     "endereco": "Rua João de Barros, 1812  - Encruzilhada",
-     "area_m2": 1625.0,
+     "nome": "17",
+     "endereco": "Av. Rio Branco, 637 - Cidade Alta",
+     "area_m2": 5430.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "17",
-     "endereco": "Av. Rio Branco, 637 - Cidade Alta",
-     "area_m2": 5430.0,
+     "nome": "27",
+     "endereco": "Rua João de Barros, 1812  - Encruzilhada",
+     "area_m2": 1625.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -6410,14 +6410,6 @@
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
    "imoveis": [
-    {
-     "nome": "Edíficio River One",
-     "endereco": "Rua Gerivatiba, esquina com a Rua Pirajussara, nºs 71,87 e 95, com frente também para a Rua Desembargador Armando Fairbanks, nº 32,Pinheiros, São Paulo - SP.",
-     "area_m2": 23625.14,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
     {
      "nome": "Edíficio Mario Garneiro Torre Sul",
      "endereco": "Av. Brigadeiro Faria Lima nº 1.461,  Pinheiros, São Paulo/SP",
@@ -6435,6 +6427,14 @@
      "participacao_receita_pct": 0.0
     },
     {
+     "nome": "Edíficio River One",
+     "endereco": "Rua Gerivatiba, esquina com a Rua Pirajussara, nºs 71,87 e 95, com frente também para a Rua Desembargador Armando Fairbanks, nº 32,Pinheiros, São Paulo - SP.",
+     "area_m2": 23625.14,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "Edíficio Celebration",
      "endereco": "Rua Casa do Ator, 1.155 - Vila Olímpia - São Paulo - SP",
      "area_m2": 6458.29,
@@ -6443,17 +6443,17 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Edifício Delta Plaza",
-     "endereco": "Rua Cincinato Braga, 340 - Bela Vista - São Paulo - SP",
-     "area_m2": 4058.7,
+     "nome": "Ed. Castello Branco",
+     "endereco": "Av. República do Chile, 230 - Centro, Rio de Janeiro - RJ",
+     "area_m2": 1065.15,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Ed. Castello Branco",
-     "endereco": "Av. República do Chile, 230 - Centro, Rio de Janeiro - RJ",
-     "area_m2": 1065.15,
+     "nome": "Edifício Delta Plaza",
+     "endereco": "Rua Cincinato Braga, 340 - Bela Vista - São Paulo - SP",
+     "area_m2": 4058.7,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -6502,14 +6502,6 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
-     "nome": "Edificio de Escritório - Torre III (Norte)",
-     "endereco": "Setor de Autarquias Norte - Quadra 5 - Lote B - Brasilia / DF",
-     "area_m2": 55145.89,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "Edificio de Escritório - Torre II (Central)",
      "endereco": "Setor de Autarquias Norte - Quadra 5 - Lote B - Brasilia / DF",
      "area_m2": 57717.61,
@@ -6521,6 +6513,14 @@
      "nome": "Edificio de Escritório - Torre I (Sul)",
      "endereco": "Setor de Autarquias Norte - Quadra 5 - Lote B - Brasilia / DF",
      "area_m2": 50215.36,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Edificio de Escritório - Torre III (Norte)",
+     "endereco": "Setor de Autarquias Norte - Quadra 5 - Lote B - Brasilia / DF",
+     "area_m2": 55145.89,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -6867,10 +6867,58 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
-     "nome": "CD GAIA AR JARINU",
-     "endereco": "Est. Alberto Tofanin, km 5,5",
-     "area_m2": 17253.8,
-     "vacancia_pct": 100.0,
+     "nome": "24929_26502 (Galpão Extrema II)",
+     "endereco": "Estrada M. Luiz Lopes Neto",
+     "area_m2": 77106.29,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "88913_26502 (Galpão Hortolândia I)",
+     "endereco": "Rod. Jornalista F. A. Proença, Km 09",
+     "area_m2": 15349.29,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "2260_49076 (Piracicaba)",
+     "endereco": "Avenida Comendador Leopoldo Dedini, nº 2.260 - Piracicaba, SP",
+     "area_m2": 67988.0,
+     "vacancia_pct": 16.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "95140_26502 (Galpão WT RBR Log)",
+     "endereco": "Rod. P. Tancredo Neves, Km 45",
+     "area_m2": 33615.9,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "SBP",
+     "endereco": "Estrada Tenente Marques, 1818 - Santana de Parnaiba - SP",
+     "area_m2": 50181.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "SEROPEDICA",
+     "endereco": "Estrada Miguel Pereira nº 34, Bairro São Miguel, CEP: 23.890-000",
+     "area_m2": 82048.99,
+     "vacancia_pct": 37.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "DIA AMERICA",
+     "endereco": "Rua Joao de Padula, 245 - Americana - SP",
+     "area_m2": 30345.13,
+     "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
@@ -6883,9 +6931,25 @@
      "participacao_receita_pct": 0.0
     },
     {
+     "nome": "CD GAIA AR JARINU",
+     "endereco": "Est. Alberto Tofanin, km 5,5",
+     "area_m2": 17253.8,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "CD - GAIA TF JARINU",
      "endereco": "Est. Alberto Tofanin, km 5,5",
      "area_m2": 12742.54,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "CD BARÃO DE MAUÁ ATIBAIA",
+     "endereco": "Rod. Dom Pedro I, km 87,5",
+     "area_m2": 14387.89,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -6895,14 +6959,6 @@
      "endereco": "Rua Lennie Queiroz, 333 - Cachoeirinha - RS",
      "area_m2": 38410.0,
      "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "CD BARÃO DE MAUÁ ATIBAIA",
-     "endereco": "Rod. Dom Pedro I, km 87,5",
-     "area_m2": 14387.89,
-     "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
@@ -6927,62 +6983,6 @@
      "endereco": "Avenida OL-1 -Duque de Caxias, RJ",
      "area_m2": 29087.0,
      "vacancia_pct": 13.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "88913_26502 (Galpão Hortolândia I)",
-     "endereco": "Rod. Jornalista F. A. Proença, Km 09",
-     "area_m2": 15349.29,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "24929_26502 (Galpão Extrema II)",
-     "endereco": "Estrada M. Luiz Lopes Neto",
-     "area_m2": 77106.29,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "95140_26502 (Galpão WT RBR Log)",
-     "endereco": "Rod. P. Tancredo Neves, Km 45",
-     "area_m2": 33615.9,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "2260_49076 (Piracicaba)",
-     "endereco": "Avenida Comendador Leopoldo Dedini, nº 2.260 - Piracicaba, SP",
-     "area_m2": 67988.0,
-     "vacancia_pct": 16.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "SBP",
-     "endereco": "Estrada Tenente Marques, 1818 - Santana de Parnaiba - SP",
-     "area_m2": 50181.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "DIA AMERICA",
-     "endereco": "Rua Joao de Padula, 245 - Americana - SP",
-     "area_m2": 30345.13,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "SEROPEDICA",
-     "endereco": "Estrada Miguel Pereira nº 34, Bairro São Miguel, CEP: 23.890-000",
-     "area_m2": 82048.99,
-     "vacancia_pct": 37.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
@@ -7035,6 +7035,14 @@
      "participacao_receita_pct": 0.0
     },
     {
+     "nome": "1702_26502 (Guarulhos)",
+     "endereco": "Av. Francisco Xavier, 62",
+     "area_m2": 111197.53,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "110307_26502 (Galpão Hortolândia II)",
      "endereco": "Rod. SP 101, Km 9,5",
      "area_m2": 43123.34,
@@ -7046,6 +7054,14 @@
      "nome": "SYSLOG SP",
      "endereco": "km 26 + 175,35m e o km 25 + 759,35m da Rodovia Anhanguera",
      "area_m2": 66378.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "12769_26502 (Galpão Extrema I)",
+     "endereco": "Estrada M. Vargem João Pinto",
+     "area_m2": 37600.24,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -7067,25 +7083,9 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "1702_26502 (Guarulhos)",
-     "endereco": "Av. Francisco Xavier, 62",
-     "area_m2": 111197.53,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "DUQUECX_RJ",
      "endereco": "Av. SN 1, 280 - Parque Duque. Rio de Janeiro - RJ",
      "area_m2": 23541.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "12769_26502 (Galpão Extrema I)",
-     "endereco": "Estrada M. Vargem João Pinto",
-     "area_m2": 37600.24,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -7107,6 +7107,134 @@
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
    "imoveis": [
+    {
+     "nome": "TODIMO",
+     "endereco": "Rodovia Palmiro Paes de Barros, 290, Vista Alegre - Cuiabá - MT",
+     "area_m2": 52187.33,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "CEPALGO",
+     "endereco": "Fazenda Santo Antonio, Aparecida de Goiania/SP",
+     "area_m2": 31395.3,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "SANTA CRUZ",
+     "endereco": "BR 153,KM 2, 3621, ANAPOLIS - GO",
+     "area_m2": 19000.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "BRASPARK A",
+     "endereco": "Rodovia SC 417, nº 11.915 - Mina Velha - Garuva-SC",
+     "area_m2": 259763.94,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "BENTELER",
+     "endereco": "Area 1-1, Via principial 2, Polo Empresarial VTO Iguarassu 1, Iguarassu/PE",
+     "area_m2": 33582.25,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "CONTAGEM1",
+     "endereco": "Av Wilson Tavares Ribeiro, 800, Contagem/MG",
+     "area_m2": 31671.08,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "QUEI 13639",
+     "endereco": "Rua Irmãos Guinle, nº 1000, Galpão 07 Queimados/RJ",
+     "area_m2": 2172.93,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "EAGLEBURGM",
+     "endereco": "Quadra A, Loteamento Macuco, Valinhos/SP",
+     "area_m2": 12375.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "EXTREMA2",
+     "endereco": "Rua Josepha Gomes de Souza, Galpão 02 N° 306B - Extrema/MG",
+     "area_m2": 18804.17,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "EXTREMA1",
+     "endereco": "Rua Josepha Gomes de Souza, Galpão 01 N° 306A - Extrema/MG",
+     "area_m2": 16926.06,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "MARTINBROWER",
+     "endereco": "Rua Paul Garfunkel,300 - Curitiba/PR",
+     "area_m2": 12845.08,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "APTIV1",
+     "endereco": "Rua Mary Aparecida de Carvalhinho Valente Passarelli, Espirito Santo do Pinhal/SP",
+     "area_m2": 68947.53,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "VOLKSWAGEM",
+     "endereco": "RESENDE/RJ",
+     "area_m2": 151209.23,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "AMBEV PELOT",
+     "endereco": "AV Presidente João Belchior Marques Goulart, 9500, Pelotas/RS",
+     "area_m2": 23500.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "AIRLIQUIDE",
+     "endereco": "Rua Ronald Cladstone Negri, nº 557,, Campinas/SP",
+     "area_m2": 26176.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "GREENHOUSE",
+     "endereco": "GREEN HOUSE SAO PAULO/SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
     {
      "nome": "DIADEMA",
      "endereco": "Avenida Casa Grande, 1.864 e 1.960, bairro Piraporinha, Diadema - São Paulo, CEP 09961-350",
@@ -7132,14 +7260,6 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "GREENHOUSE",
-     "endereco": "GREEN HOUSE SAO PAULO/SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "UBERLANDIA",
      "endereco": "LASA Avenida CTR Empresarial, KM 1.480 BR 497, Uberlândia-MG",
      "area_m2": 204537.0,
@@ -7148,17 +7268,17 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "QUEI 13633",
-     "endereco": "Rua Irmãos Guinle, nº 1000, Galpão 01A Queimados/RJ",
-     "area_m2": 1632.0,
+     "nome": "MOINHO SMI",
+     "endereco": "Rodovia Federal BR 277, S/N KM 600+400, São Miguel do Iguaçu - PR",
+     "area_m2": 7164.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "MOINHO SMI",
-     "endereco": "Rodovia Federal BR 277, S/N KM 600+400, São Miguel do Iguaçu - PR",
-     "area_m2": 7164.0,
+     "nome": "QUEI 13633",
+     "endereco": "Rua Irmãos Guinle, nº 1000, Galpão 01A Queimados/RJ",
+     "area_m2": 1632.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -7220,121 +7340,17 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "CONTAGEM1",
-     "endereco": "Av Wilson Tavares Ribeiro, 800, Contagem/MG",
-     "area_m2": 31671.08,
+     "nome": "QUEI 13638",
+     "endereco": "Rua Irmãos Guinle, nº 1000, Galpão 06 Queimados/RJ",
+     "area_m2": 2172.96,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "BRASPARK A",
-     "endereco": "Rodovia SC 417, nº 11.915 - Mina Velha - Garuva-SC",
-     "area_m2": 259763.94,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "EXTREMA2",
-     "endereco": "Rua Josepha Gomes de Souza, Galpão 02 N° 306B - Extrema/MG",
-     "area_m2": 18804.17,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "BENTELER",
-     "endereco": "Area 1-1, Via principial 2, Polo Empresarial VTO Iguarassu 1, Iguarassu/PE",
-     "area_m2": 33582.25,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "QUEI 13639",
-     "endereco": "Rua Irmãos Guinle, nº 1000, Galpão 07 Queimados/RJ",
-     "area_m2": 2172.93,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "EAGLEBURGM",
-     "endereco": "Quadra A, Loteamento Macuco, Valinhos/SP",
-     "area_m2": 12375.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "TODIMO",
-     "endereco": "Rodovia Palmiro Paes de Barros, 290, Vista Alegre - Cuiabá - MT",
-     "area_m2": 52187.33,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "EXTREMA1",
-     "endereco": "Rua Josepha Gomes de Souza, Galpão 01 N° 306A - Extrema/MG",
-     "area_m2": 16926.06,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "SANTA CRUZ",
-     "endereco": "BR 153,KM 2, 3621, ANAPOLIS - GO",
-     "area_m2": 19000.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "CEPALGO",
-     "endereco": "Fazenda Santo Antonio, Aparecida de Goiania/SP",
-     "area_m2": 31395.3,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "MARTINBROWER",
-     "endereco": "Rua Paul Garfunkel,300 - Curitiba/PR",
-     "area_m2": 12845.08,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "AMBEV PELOT",
-     "endereco": "AV Presidente João Belchior Marques Goulart, 9500, Pelotas/RS",
-     "area_m2": 23500.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "VOLKSWAGEM",
-     "endereco": "RESENDE/RJ",
-     "area_m2": 151209.23,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "APTIV1",
-     "endereco": "Rua Mary Aparecida de Carvalhinho Valente Passarelli, Espirito Santo do Pinhal/SP",
-     "area_m2": 68947.53,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "AIRLIQUIDE",
-     "endereco": "Rua Ronald Cladstone Negri, nº 557,, Campinas/SP",
-     "area_m2": 26176.0,
+     "nome": "COTIA",
+     "endereco": "Avenida dos Bandeirantes, n° 988 - São Paulo SP",
+     "area_m2": 20000.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -7356,49 +7372,9 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "QUEI 13638",
-     "endereco": "Rua Irmãos Guinle, nº 1000, Galpão 06 Queimados/RJ",
-     "area_m2": 2172.96,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "COTIA",
-     "endereco": "Avenida dos Bandeirantes, n° 988 - São Paulo SP",
-     "area_m2": 20000.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "MILLS",
      "endereco": "CAMACARI/BA",
      "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "QUEI 13640",
-     "endereco": "Rua Irmãos Guinle, nº 1000, Galpão 08 Queimados/RJ",
-     "area_m2": 2412.42,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "MOINHO CASC",
-     "endereco": "Rodovia Federal BR 467, 0, Canadá, Cascavel PR",
-     "area_m2": 5680.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "SUPERMARKET",
-     "endereco": "RIO DE JANEIRO/RJ",
-     "area_m2": 33840.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -7412,9 +7388,25 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "AMBEV STALUZ",
-     "endereco": "Sitio Boa Vista - Santa Luzia - MG",
-     "area_m2": 102423.0,
+     "nome": "SUPERMARKET",
+     "endereco": "RIO DE JANEIRO/RJ",
+     "area_m2": 33840.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "MOINHO CASC",
+     "endereco": "Rodovia Federal BR 467, 0, Canadá, Cascavel PR",
+     "area_m2": 5680.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "AETHRA",
+     "endereco": "LOTE C123",
+     "area_m2": 130860.37,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -7428,9 +7420,9 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "AETHRA",
-     "endereco": "LOTE C123",
-     "area_m2": 130860.37,
+     "nome": "AMBEV STALUZ",
+     "endereco": "Sitio Boa Vista - Santa Luzia - MG",
+     "area_m2": 102423.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -7455,6 +7447,14 @@
      "nome": "QUEI 13634",
      "endereco": "Rua Irmãos Guinle, nº 1000, Galpão 02A Queimados/RJ",
      "area_m2": 2172.93,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "QUEI 13640",
+     "endereco": "Rua Irmãos Guinle, nº 1000, Galpão 08 Queimados/RJ",
+     "area_m2": 2412.42,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -7795,46 +7795,6 @@
      "participacao_receita_pct": 2.03
     },
     {
-     "nome": "TERRA-02-10",
-     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
-     "area_m2": 2865.91,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 1.38
-    },
-    {
-     "nome": "TERRA-02-11",
-     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
-     "area_m2": 2865.91,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 1.38
-    },
-    {
-     "nome": "TERRA-02-06",
-     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
-     "area_m2": 2895.08,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 1.38
-    },
-    {
-     "nome": "TERRA-02-03",
-     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
-     "area_m2": 2865.91,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 1.38
-    },
-    {
-     "nome": "TERRA-02-07",
-     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
-     "area_m2": 2895.08,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 1.38
-    },
-    {
      "nome": "TERRA-02-04",
      "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
      "area_m2": 2865.91,
@@ -7851,9 +7811,41 @@
      "participacao_receita_pct": 1.38
     },
     {
-     "nome": "TERRA-02-05",
+     "nome": "TERRA-02-10",
      "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
      "area_m2": 2865.91,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 1.38
+    },
+    {
+     "nome": "TERRA-02-11",
+     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
+     "area_m2": 2865.91,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 1.38
+    },
+    {
+     "nome": "TERRA-02-07",
+     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
+     "area_m2": 2895.08,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 1.38
+    },
+    {
+     "nome": "TERRA-02-03",
+     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
+     "area_m2": 2865.91,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 1.38
+    },
+    {
+     "nome": "TERRA-02-06",
+     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
+     "area_m2": 2895.08,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 1.38
@@ -7870,6 +7862,14 @@
      "nome": "TERRA-02-01",
      "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
      "area_m2": 2895.08,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 1.38
+    },
+    {
+     "nome": "TERRA-02-05",
+     "endereco": "Estrada Municipal Alberto Tofanin, km 5,5, Bairro do Pinhal",
+     "area_m2": 2865.91,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 1.38
@@ -7923,6 +7923,14 @@
      "participacao_receita_pct": 1.21
     },
     {
+     "nome": "GAIAAR-01-09",
+     "endereco": "Rodovia Dom Pedro I, km 90",
+     "area_m2": 2895.08,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 1.12
+    },
+    {
      "nome": "GAIAAR-01-08",
      "endereco": "Rodovia Dom Pedro I, km 90",
      "area_m2": 2865.91,
@@ -7947,15 +7955,15 @@
      "participacao_receita_pct": 1.12
     },
     {
-     "nome": "GAIAAR-01-09",
+     "nome": "GAIAAR-01-05",
      "endereco": "Rodovia Dom Pedro I, km 90",
-     "area_m2": 2895.08,
+     "area_m2": 2865.91,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 1.12
     },
     {
-     "nome": "GAIAAR-01-05",
+     "nome": "GAIAAR-01-06",
      "endereco": "Rodovia Dom Pedro I, km 90",
      "area_m2": 2865.91,
      "vacancia_pct": 0.0,
@@ -7971,28 +7979,12 @@
      "participacao_receita_pct": 1.12
     },
     {
-     "nome": "GAIAAR-01-06",
-     "endereco": "Rodovia Dom Pedro I, km 90",
-     "area_m2": 2865.91,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 1.12
-    },
-    {
      "nome": "BM-01-03",
      "endereco": "Rod Dom Pedro I, km 87,5, Ponte Alta, 12954-273",
      "area_m2": 3141.14,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 1.05
-    },
-    {
-     "nome": "BM-01-09",
-     "endereco": "Rod Dom Pedro I, km 87,5, Ponte Alta, 12954-275",
-     "area_m2": 2895.08,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.94
     },
     {
      "nome": "BM-01-36",
@@ -8006,6 +7998,14 @@
      "nome": "BM-01-38",
      "endereco": "Rod Dom Pedro I, km 87,5, Ponte Alta, 12954-261",
      "area_m2": 2084.69,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.94
+    },
+    {
+     "nome": "BM-01-09",
+     "endereco": "Rod Dom Pedro I, km 87,5, Ponte Alta, 12954-275",
+     "area_m2": 2895.08,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.94
@@ -8091,9 +8091,17 @@
      "participacao_receita_pct": 0.69
     },
     {
-     "nome": "JNDI-01-11C",
-     "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
+     "nome": "JNDI-01-10C",
+     "endereco": "Rod Dom Pedro I, km 87,5, Ponte Alta, 12954-261",
      "area_m2": 1856.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.67
+    },
+    {
+     "nome": "JNDI-01-6C",
+     "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
+     "area_m2": 1860.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.67
@@ -8102,6 +8110,14 @@
      "nome": "JNDI-01-12C",
      "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
      "area_m2": 1860.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.67
+    },
+    {
+     "nome": "JNDI-01-11C",
+     "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
+     "area_m2": 1856.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.67
@@ -8124,22 +8140,6 @@
     },
     {
      "nome": "JNDI-01-5C",
-     "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
-     "area_m2": 1860.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.67
-    },
-    {
-     "nome": "JNDI-01-10C",
-     "endereco": "Rod Dom Pedro I, km 87,5, Ponte Alta, 12954-261",
-     "area_m2": 1856.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.67
-    },
-    {
-     "nome": "JNDI-01-6C",
      "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
      "area_m2": 1860.0,
      "vacancia_pct": 0.0,
@@ -8267,17 +8267,17 @@
      "participacao_receita_pct": 0.32
     },
     {
-     "nome": "JNDI-01-3A",
+     "nome": "JNDI-01-4A",
      "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
-     "area_m2": 1108.63,
+     "area_m2": 1148.39,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.32
     },
     {
-     "nome": "JNDI-01-4A",
+     "nome": "JNDI-01-3A",
      "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
-     "area_m2": 1148.39,
+     "area_m2": 1108.63,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.32
@@ -8289,22 +8289,6 @@
      "vacancia_pct": 85.99,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.26
-    },
-    {
-     "nome": "BM-01-04",
-     "endereco": "Rod Dom Pedro I, km 87,5, Ponte Alta, 12954-273",
-     "area_m2": 3109.11,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "JNDI-01-8A",
-     "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
-     "area_m2": 1740.35,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 70.42,
-     "participacao_receita_pct": 0.0
     },
     {
      "nome": "CEA-01-12",
@@ -8320,6 +8304,22 @@
      "area_m2": 1108.63,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "BM-01-04",
+     "endereco": "Rod Dom Pedro I, km 87,5, Ponte Alta, 12954-273",
+     "area_m2": 3109.11,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "JNDI-01-8A",
+     "endereco": "Rua Kanebo, 175, bairro Distrito Federal",
+     "area_m2": 1740.35,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 70.42,
      "participacao_receita_pct": 0.0
     },
     {
@@ -8348,33 +8348,209 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
-     "nome": "Pão De Açúcar  Scs",
-     "endereco": "Rua Maranhão, 975 - Santa Paula",
-     "area_m2": 7530.0,
+     "nome": "MATEUS - ESTRADA DO ARROZ IMPERATRIZ/MA",
+     "endereco": "Av. Newton Bello, 22",
+     "area_m2": 29776.6,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "DRS_MARITUBA- GRUPO MATHEUS",
-     "endereco": "Rodovia BR-316, KM 25, S/N, Bairro Parque Verde, Marituba -PA",
-     "area_m2": 10291.95,
+     "nome": "SHOPPING MARANHÃO",
+     "endereco": "Av. Prof. Carlos Cunha, 100",
+     "area_m2": 55312.91,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "CÂNDIDO BENÍCIO - LOJA B",
-     "endereco": "MAT. 126.225",
-     "area_m2": 4920.0,
+     "nome": "ÂNIMA CANOAS",
+     "endereco": "Rua Santos Dumont, 88",
+     "area_m2": 11664.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "ASSAI DIADEMA PIRAPORINHA",
-     "endereco": "Av. Piraporinha, 1144 - Vila Nogueira",
-     "area_m2": 19620.71,
+     "nome": "ASSAÍ SÃO BERNADO",
+     "endereco": "Av. Piraporinha, 680,Planalto, São Bernardo do Campo",
+     "area_m2": 43950.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "IGUATEMI SÃO JOSÉ DO RIO PRETO",
+     "endereco": "Av. Pres. Juscelino K. de Oliveira, 5000 - Iguatemi, São José do Rio Preto - SP, 15093-340",
+     "area_m2": 4370.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ITAPEVA - MG",
+     "endereco": "6QQM+F6 - Itapeva, MG, 37655-000",
+     "area_m2": 59348.88,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Extra  Praia Grande",
+     "endereco": "Avenida Guadalajara, s/nº - Jardim Glória",
+     "area_m2": 5436.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "IGUATEMI PRAIA DE BELAS",
+     "endereco": "Av. Praia de Belas, 1181 - Praia de Belas, Porto Alegre - RS, 90110-001",
+     "area_m2": 16420.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "DRS_CARUARU - GRUPO MATHEUS",
+     "endereco": "Av. Portugal - Bairro Universitário - Caruaru/PE",
+     "area_m2": 32604.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "DRS_LEAO DOURADO - GRUPO MATHE",
+     "endereco": "Av. Leão Dourado - Bairro Kennedy - Caruaru/PE",
+     "area_m2": 32391.18,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "LEROY MERLIN JUNDIAI",
+     "endereco": "Av. Antônio Frederico Ozanan, 4490 - Jardim Liberdade",
+     "area_m2": 27750.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "MATEUS - SALVADOR IGUATEMI/BA",
+     "endereco": "Av. Antônio Carlos Magalhães, 3650",
+     "area_m2": 70050.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Pão De Açúcar  Valinhos",
+     "endereco": "Rua Dr. Ademar de Barros, 50 - Jardim Europa",
+     "area_m2": 3760.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "GPA GRANJA VIANA",
+     "endereco": "Av. São Camilo, 700 - Granja Viana, Cotia",
+     "area_m2": 4492.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ATACADÃO - ARAPIRACA",
+     "endereco": "AL-220, 359 - Itapoá",
+     "area_m2": 34842.89,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ÂNIMA POA",
+     "endereco": "Rua Orfanotrófio, 555, Alto - Teresópolis",
+     "area_m2": 29592.24,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "VILA MADALENA - CEF",
+     "endereco": "R. Fradique Coutinho, 1339",
+     "area_m2": 800.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ATACADÃO - MOSSORÓ",
+     "endereco": "Av. João da Escóssia, 1724",
+     "area_m2": 87176.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "DECHATLON CAMPINAS",
+     "endereco": "Trevo da Rodovia D. Pedro I, Km 129, Jardim das Palmeiras, Campians/SP",
+     "area_m2": 50391.4,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Pão De Açúcar  SP",
+     "endereco": "Rua Dr Altino Arantes, 268 - Vila Clementino",
+     "area_m2": 3469.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "DRS_PATOS - GRUPO MATHEUS",
+     "endereco": "Rua Lima Campos, 156 - São Sebastião - Patos/PB",
+     "area_m2": 36000.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "IGUATEMI RIBEIRÃO PRETO",
+     "endereco": "Av. Luiz Eduardo Toledo Prado, 900 - Vila do Golfe, Ribeirão Preto - SP, 14027-250",
+     "area_m2": 4370000.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "CARIACICA - ES",
+     "endereco": "Rodovia BR-101",
+     "area_m2": 266398.17,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Pão De Açúcar  Sp",
+     "endereco": "Rua Carneiro da Cunha, S/N - Vila da Saúde",
+     "area_m2": 3872.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "SÃO JOÃO DO MERITI - CEF",
+     "endereco": "Av. Getúlio de Moura, 60",
+     "area_m2": 602.23,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "GPA SANTANA - SÃO PAULO",
+     "endereco": "Rua Augusto Tolle, 470 - Santana",
+     "area_m2": 2877.15,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -8396,6 +8572,46 @@
      "participacao_receita_pct": 0.0
     },
     {
+     "nome": "ATACADÃO - CAMARAGIBE",
+     "endereco": "Av. Dr. Belmínio Correia, 4817",
+     "area_m2": 40216.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ASSAI DIADEMA PIRAPORINHA",
+     "endereco": "Av. Piraporinha, 1144 - Vila Nogueira",
+     "area_m2": 19620.71,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "CÂNDIDO BENÍCIO - LOJA B",
+     "endereco": "MAT. 126.225",
+     "area_m2": 4920.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Pão De Açúcar  Scs",
+     "endereco": "Rua Maranhão, 975 - Santa Paula",
+     "area_m2": 7530.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "DRS_MARITUBA- GRUPO MATHEUS",
+     "endereco": "Rodovia BR-316, KM 25, S/N, Bairro Parque Verde, Marituba -PA",
+     "area_m2": 10291.95,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "Assaí  Paulínia",
      "endereco": "Avenida José Paulino, nº 2.600",
      "area_m2": 11475.0,
@@ -8412,22 +8628,6 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "ATACADÃO - CAMARAGIBE",
-     "endereco": "Av. Dr. Belmínio Correia, 4817",
-     "area_m2": 40216.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "SHOPPING BARIGUI",
-     "endereco": "R. Prof. Pedro Viriato Parigot de Souza, 600 - Mossunguê, Curitiba - PR, 81200-100",
-     "area_m2": 6187.19,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "EXTRA ATIBAIA",
      "endereco": "Av. Prof. Carlos Alberto de Carvalho Pinto, 210",
      "area_m2": 8025.0,
@@ -8439,6 +8639,14 @@
      "nome": "ASSAÍ APARECIDA DE GOIÂNIA",
      "endereco": "BR-153, s/n - Jardim Monte Serrat",
      "area_m2": 21920.57,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "SHOPPING BARIGUI",
+     "endereco": "R. Prof. Pedro Viriato Parigot de Souza, 600 - Mossunguê, Curitiba - PR, 81200-100",
+     "area_m2": 6187.19,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -8492,22 +8700,6 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "DRS_ANANINDEUA- GRUPO MATHEUS",
-     "endereco": "Av. Cláudio Saunders, Coqueiro, Ananindeua/PA",
-     "area_m2": 7601.92,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "EXTRA DIADEMA PIRAPORINHA",
-     "endereco": "Praça Bom Jesus de Piraporinha, 435",
-     "area_m2": 9286.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "ESCOLA ELEVA - RJ",
      "endereco": "Av. José Silva de Azevedo Neto, 309 - Barra da Tijuca",
      "area_m2": 17961.67,
@@ -8532,9 +8724,17 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "GPA SERAFIM ORLANDI",
-     "endereco": "R. Prof. Serafim Orlandi, 299 - Vila Mariana, São Paulo",
-     "area_m2": 13260.0,
+     "nome": "DRS_ANANINDEUA- GRUPO MATHEUS",
+     "endereco": "Av. Cláudio Saunders, Coqueiro, Ananindeua/PA",
+     "area_m2": 7601.92,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "EXTRA DIADEMA PIRAPORINHA",
+     "endereco": "Praça Bom Jesus de Piraporinha, 435",
+     "area_m2": 9286.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -8548,17 +8748,9 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "RUA DAS FLORES - CEF",
-     "endereco": "Praça Gen. Osório, 319",
-     "area_m2": 1789.05,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "DHL EXTREMA",
-     "endereco": "Av. Luís Alves Cardoso Sobrinho - Extrema",
-     "area_m2": 91751.0,
+     "nome": "GPA SERAFIM ORLANDI",
+     "endereco": "R. Prof. Serafim Orlandi, 299 - Vila Mariana, São Paulo",
+     "area_m2": 13260.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -8572,385 +8764,9 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "MATEUS - CARPINA/PE",
-     "endereco": "Av. Conselheiro João Alfredo, 262",
-     "area_m2": 18242.09,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Pão De Açúcar  Sp",
-     "endereco": "Rua Maria Amalia Lopes de Azevedo, 852 - Vila Albertina",
-     "area_m2": 8489.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Extra  Sbc",
-     "endereco": "Avenida Maria Servidei Demarchi, 1897 - Demarchi",
-     "area_m2": 6144.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ANHANGUERA",
-     "endereco": "R. Luiz Otávio, 1313 - Parque Taquara",
-     "area_m2": 22787.79,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ALCÂNTARA - CEF",
-     "endereco": "Dr. Alfredo Backer, 5",
-     "area_m2": 1688.88,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ATACADÃO - DUQUE DE CAXIAS",
-     "endereco": "Rod. Washington Luiz, 121",
-     "area_m2": 31600.21,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "IBMEC PINHEIROS",
-     "endereco": "R. Sumidouro, 89 - Pinheiros, São Paulo - SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ASSAI COTIA",
-     "endereco": "R. Prof. José Barreto, 1635 - Vila Santo Antonio do Portao",
-     "area_m2": 19518.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "STRIP MALL BARRA - RJ",
-     "endereco": "Av. José Silva de Azevedo Neto, 309 - Barra da Tijuca",
-     "area_m2": 2333.33,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Extra  Peruíbe",
-     "endereco": "Avenida Padre Anchieta, 4.580 - Vila Vermelha",
-     "area_m2": 6198.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "IGUATEMI OUTLET",
-     "endereco": "BR-116, km 236 - Operário, Novo Hamburgo - RS, 93310-460",
-     "area_m2": 7380.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "IGUATEMI SÃO JOSÉ DO RIO PRETO",
-     "endereco": "Av. Pres. Juscelino K. de Oliveira, 5000 - Iguatemi, São José do Rio Preto - SP, 15093-340",
-     "area_m2": 4370.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "MATEUS - ESTRADA DO ARROZ IMPERATRIZ/MA",
-     "endereco": "Av. Newton Bello, 22",
-     "area_m2": 29776.6,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "IGUATEMI RIBEIRÃO PRETO",
-     "endereco": "Av. Luiz Eduardo Toledo Prado, 900 - Vila do Golfe, Ribeirão Preto - SP, 14027-250",
-     "area_m2": 4370000.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "DRS_PATOS - GRUPO MATHEUS",
-     "endereco": "Rua Lima Campos, 156 - São Sebastião - Patos/PB",
-     "area_m2": 36000.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "SHOPPING MARANHÃO",
-     "endereco": "Av. Prof. Carlos Cunha, 100",
-     "area_m2": 55312.91,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ASSAÍ SÃO BERNADO",
-     "endereco": "Av. Piraporinha, 680,Planalto, São Bernardo do Campo",
-     "area_m2": 43950.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ITAPEVA - MG",
-     "endereco": "6QQM+F6 - Itapeva, MG, 37655-000",
-     "area_m2": 59348.88,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ÂNIMA CANOAS",
-     "endereco": "Rua Santos Dumont, 88",
-     "area_m2": 11664.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Extra  Praia Grande",
-     "endereco": "Avenida Guadalajara, s/nº - Jardim Glória",
-     "area_m2": 5436.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "DECHATLON CAMPINAS",
-     "endereco": "Trevo da Rodovia D. Pedro I, Km 129, Jardim das Palmeiras, Campians/SP",
-     "area_m2": 50391.4,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Pão De Açúcar  SP",
-     "endereco": "Rua Dr Altino Arantes, 268 - Vila Clementino",
-     "area_m2": 3469.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ÂNIMA POA",
-     "endereco": "Rua Orfanotrófio, 555, Alto - Teresópolis",
-     "area_m2": 29592.24,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "DRS_LEAO DOURADO - GRUPO MATHE",
-     "endereco": "Av. Leão Dourado - Bairro Kennedy - Caruaru/PE",
-     "area_m2": 32391.18,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "IGUATEMI PRAIA DE BELAS",
-     "endereco": "Av. Praia de Belas, 1181 - Praia de Belas, Porto Alegre - RS, 90110-001",
-     "area_m2": 16420.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "DRS_CARUARU - GRUPO MATHEUS",
-     "endereco": "Av. Portugal - Bairro Universitário - Caruaru/PE",
-     "area_m2": 32604.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "MATEUS - SALVADOR IGUATEMI/BA",
-     "endereco": "Av. Antônio Carlos Magalhães, 3650",
-     "area_m2": 70050.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "GPA GRANJA VIANA",
-     "endereco": "Av. São Camilo, 700 - Granja Viana, Cotia",
-     "area_m2": 4492.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ATACADÃO - ARAPIRACA",
-     "endereco": "AL-220, 359 - Itapoá",
-     "area_m2": 34842.89,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ATACADÃO - MOSSORÓ",
-     "endereco": "Av. João da Escóssia, 1724",
-     "area_m2": 87176.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "VILA MADALENA - CEF",
-     "endereco": "R. Fradique Coutinho, 1339",
-     "area_m2": 800.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Pão De Açúcar  Valinhos",
-     "endereco": "Rua Dr. Ademar de Barros, 50 - Jardim Europa",
-     "area_m2": 3760.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "BARRA DA TIJUCA - CEF",
-     "endereco": "Av. das Américas, 3959",
-     "area_m2": 1174.08,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "SHOPPING BARRA - CEF",
-     "endereco": "R. Augusto Frederico Schmith, 139",
-     "area_m2": 829.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "SÃO JOÃO DO MERITI - CEF",
-     "endereco": "Av. Getúlio de Moura, 60",
-     "area_m2": 602.23,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "GPA SANTANA - SÃO PAULO",
-     "endereco": "Rua Augusto Tolle, 470 - Santana",
-     "area_m2": 2877.15,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "LEROY MERLIN JUNDIAI",
-     "endereco": "Av. Antônio Frederico Ozanan, 4490 - Jardim Liberdade",
-     "area_m2": 27750.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "CARIACICA - ES",
-     "endereco": "Rodovia BR-101",
-     "area_m2": 266398.17,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Pão De Açúcar  Sp",
-     "endereco": "Rua Carneiro da Cunha, S/N - Vila da Saúde",
-     "area_m2": 3872.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "RIACHUELO - CEF",
-     "endereco": "R. Riachuelo, 61",
-     "area_m2": 1150.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "MATEUS - CAMETÁ/PA",
-     "endereco": "Rodovia BR 422, KM 01, Cametá - PA",
-     "area_m2": 28000.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Assaí  Campinas",
-     "endereco": "Avenida Senador Saraiva, 835",
-     "area_m2": 6552.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "DECATLON GOIANIA",
-     "endereco": "Avenida I, número 208, Quadra B-37, Lote 02, bairro Jardim, Goiânia/GO",
-     "area_m2": 10548.5,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "SÃO BENTO - CEF",
-     "endereco": "R. São Bento, 397",
-     "area_m2": 1539.8,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "HOSPITAL SIRIO LIBANES",
-     "endereco": "Av. Roque Petroni Júnior, 630",
-     "area_m2": 10051.27,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "EXTRA DOMINGO DE MORAES",
-     "endereco": "R. Domingos de Morais, 316 - Vila Mariana, São Paulo",
-     "area_m2": 3313.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ATACADÃO - TANGARÁ DA SERRA",
-     "endereco": "Av. Domingos Parente de Sá Barreto, 303",
-     "area_m2": 51443.56,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "DELBONI RICARDO JAFET",
-     "endereco": "R. Rodrigo Vieira, 67 - Jardim Vila Mariana, São Paulo",
-     "area_m2": 6290.0,
+     "nome": "DHL EXTREMA",
+     "endereco": "Av. Luís Alves Cardoso Sobrinho - Extrema",
+     "area_m2": 91751.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -8972,9 +8788,113 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "FRANCISO MATARAZO - CEF",
-     "endereco": "Av. Francisco Matarazzo, 342",
-     "area_m2": 674.4,
+     "nome": "RUA DAS FLORES - CEF",
+     "endereco": "Praça Gen. Osório, 319",
+     "area_m2": 1789.05,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ALCÂNTARA - CEF",
+     "endereco": "Dr. Alfredo Backer, 5",
+     "area_m2": 1688.88,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ANHANGUERA",
+     "endereco": "R. Luiz Otávio, 1313 - Parque Taquara",
+     "area_m2": 22787.79,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Pão De Açúcar  Sp",
+     "endereco": "Rua Maria Amalia Lopes de Azevedo, 852 - Vila Albertina",
+     "area_m2": 8489.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Extra  Sbc",
+     "endereco": "Avenida Maria Servidei Demarchi, 1897 - Demarchi",
+     "area_m2": 6144.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "MATEUS - CARPINA/PE",
+     "endereco": "Av. Conselheiro João Alfredo, 262",
+     "area_m2": 18242.09,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ATACADÃO - DUQUE DE CAXIAS",
+     "endereco": "Rod. Washington Luiz, 121",
+     "area_m2": 31600.21,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ASSAI COTIA",
+     "endereco": "R. Prof. José Barreto, 1635 - Vila Santo Antonio do Portao",
+     "area_m2": 19518.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "IBMEC PINHEIROS",
+     "endereco": "R. Sumidouro, 89 - Pinheiros, São Paulo - SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "IGUATEMI OUTLET",
+     "endereco": "BR-116, km 236 - Operário, Novo Hamburgo - RS, 93310-460",
+     "area_m2": 7380.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "STRIP MALL BARRA - RJ",
+     "endereco": "Av. José Silva de Azevedo Neto, 309 - Barra da Tijuca",
+     "area_m2": 2333.33,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Extra  Peruíbe",
+     "endereco": "Avenida Padre Anchieta, 4.580 - Vila Vermelha",
+     "area_m2": 6198.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ATACADÃO - SOBRAL",
+     "endereco": "Av. Sen. Fernandes Távora, 605",
+     "area_m2": 33460.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Pão De Açúcar  Sjrp",
+     "endereco": "Avenida Miguel Dahma, 1.805",
+     "area_m2": 5736.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -8983,6 +8903,14 @@
      "nome": "Pão De Açúcar  Sjrp",
      "endereco": "Avenida Bady Bassitt, 5.300",
      "area_m2": 6127.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "FRANCISO MATARAZO - CEF",
+     "endereco": "Av. Francisco Matarazzo, 342",
+     "area_m2": 674.4,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -9012,9 +8940,49 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Pão De Açúcar  Sjrp",
-     "endereco": "Avenida Miguel Dahma, 1.805",
-     "area_m2": 5736.0,
+     "nome": "DELBONI RICARDO JAFET",
+     "endereco": "R. Rodrigo Vieira, 67 - Jardim Vila Mariana, São Paulo",
+     "area_m2": 6290.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "EXTRA DOMINGO DE MORAES",
+     "endereco": "R. Domingos de Morais, 316 - Vila Mariana, São Paulo",
+     "area_m2": 3313.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "MATEUS - CAMETÁ/PA",
+     "endereco": "Rodovia BR 422, KM 01, Cametá - PA",
+     "area_m2": 28000.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Assaí  Campinas",
+     "endereco": "Avenida Senador Saraiva, 835",
+     "area_m2": 6552.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "RIACHUELO - CEF",
+     "endereco": "R. Riachuelo, 61",
+     "area_m2": 1150.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ATACADÃO - TANGARÁ DA SERRA",
+     "endereco": "Av. Domingos Parente de Sá Barreto, 303",
+     "area_m2": 51443.56,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -9028,65 +8996,33 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "ATACADÃO - SOBRAL",
-     "endereco": "Av. Sen. Fernandes Távora, 605",
-     "area_m2": 33460.0,
+     "nome": "DECATLON GOIANIA",
+     "endereco": "Avenida I, número 208, Quadra B-37, Lote 02, bairro Jardim, Goiânia/GO",
+     "area_m2": 10548.5,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "CLGV VIANA",
-     "endereco": "Av. Alcacibas Furtado, 800 - Canaã, Viana - ES, 29135-008",
-     "area_m2": 810534.0,
+     "nome": "HOSPITAL SIRIO LIBANES",
+     "endereco": "Av. Roque Petroni Júnior, 630",
+     "area_m2": 10051.27,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "DRS_MARANHAO- GRUPO MATHEUS",
-     "endereco": "BR-135, km-190, s/n, São Mateus do Maranhão/MA",
-     "area_m2": 3734.0,
+     "nome": "SÃO BENTO - CEF",
+     "endereco": "R. São Bento, 397",
+     "area_m2": 1539.8,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Pão De Açúcar  Sp",
-     "endereco": "Avenida Dr. José Ramon Urtiza, 1000 - Panamby",
-     "area_m2": 2429.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Pão De Açúcar  Sant. P",
-     "endereco": "Avenida Marte, 624 - Alphaville",
-     "area_m2": 6597.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "JUNDIAÍ - CEF",
-     "endereco": "Rua Rangel Pestana, 278",
-     "area_m2": 1150.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "CÂNDIDO BENÍCIO - LOJA A",
-     "endereco": "R. Cândido Benício, 1671",
-     "area_m2": 4920.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "EXTRA VIERA DE MORAES",
-     "endereco": "R. Vieira de Morais, 1597 - Campo Belo",
-     "area_m2": 1629.0,
+     "nome": "CIDADELA - CEF",
+     "endereco": "Av. Antônio Carlos Magalhães,",
+     "area_m2": 1219.44,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -9108,25 +9044,9 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "CIDADELA - CEF",
-     "endereco": "Av. Antônio Carlos Magalhães,",
-     "area_m2": 1219.44,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "DECATLON JOINVILLE",
-     "endereco": "Rua XV de novembro, 2805 -Glória, Joinville/SC",
-     "area_m2": 37301.68,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Assaí Cidade Alta",
-     "endereco": "Rua Aricambú, 65 - Cordovil - Rio de Janeiro - RJ",
-     "area_m2": 14038.18,
+     "nome": "CÂNDIDO BENÍCIO - LOJA A",
+     "endereco": "R. Cândido Benício, 1671",
+     "area_m2": 4920.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -9156,9 +9076,89 @@
      "participacao_receita_pct": 0.0
     },
     {
+     "nome": "DECATLON JOINVILLE",
+     "endereco": "Rua XV de novembro, 2805 -Glória, Joinville/SC",
+     "area_m2": 37301.68,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Assaí Cidade Alta",
+     "endereco": "Rua Aricambú, 65 - Cordovil - Rio de Janeiro - RJ",
+     "area_m2": 14038.18,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "FONSECA - CEF",
      "endereco": "Alameda São Boaventura, 904",
      "area_m2": 935.55,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "BARRA DA TIJUCA - CEF",
+     "endereco": "Av. das Américas, 3959",
+     "area_m2": 1174.08,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "SHOPPING BARRA - CEF",
+     "endereco": "R. Augusto Frederico Schmith, 139",
+     "area_m2": 829.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "EXTRA VIERA DE MORAES",
+     "endereco": "R. Vieira de Morais, 1597 - Campo Belo",
+     "area_m2": 1629.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "DRS_MARANHAO- GRUPO MATHEUS",
+     "endereco": "BR-135, km-190, s/n, São Mateus do Maranhão/MA",
+     "area_m2": 3734.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "CLGV VIANA",
+     "endereco": "Av. Alcacibas Furtado, 800 - Canaã, Viana - ES, 29135-008",
+     "area_m2": 810534.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Pão De Açúcar  Sp",
+     "endereco": "Avenida Dr. José Ramon Urtiza, 1000 - Panamby",
+     "area_m2": 2429.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "JUNDIAÍ - CEF",
+     "endereco": "Rua Rangel Pestana, 278",
+     "area_m2": 1150.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Pão De Açúcar  Sant. P",
+     "endereco": "Avenida Marte, 624 - Alphaville",
+     "area_m2": 6597.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -9522,7 +9522,7 @@
    "resumo_ia": "O Fundo Imobiliário XP Malls (FII XPML11) está apresentando uma vacância alta, o que significa que uma grande parte da área dos imóveis que o fundo administra está desocupada e sem aluguel sendo pago. Isso pode ser um sinal de que o mercado imobiliário está enfrentando dificuldades, mas é importante considerar que a vacância pode variar ao longo do tempo.\n\nJá a inadimplência é baixa, o que é positivo, pois indica que os inquilinos que ocupam os imóveis estão pagando os aluguéis de forma regular. No entanto, é importante monitorar a situação de forma contínua, pois a inadimplência pode mudar rapidamente."
   },
   "HUSC11": {
-   "data_referencia": "2026-06-30",
+   "data_referencia": "2026-09-30",
    "n_imoveis": 1,
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
@@ -9533,10 +9533,10 @@
      "area_m2": 73270.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 97.12
+     "participacao_receita_pct": 99.02
     }
    ],
-   "resumo_ia": "A vacância do Fundo Imobiliário HUSC11 é considerada baixa, o que significa que a maioria dos imóveis está ocupada e gerando receita. Isso é positivo para os investidores, pois indica que os imóveis estão sendo utilizados de forma eficaz.\n\nA inadimplência do fundo também é baixa, o que significa que os inquilinos estão pagando os aluguéis de forma regular. Isso é um sinal de que a gestão do fundo está lidando bem com os riscos associados à inadimplência."
+   "resumo_ia": "A vacância do FII H Unimed é baixa, o que significa que a maioria dos imóveis está ocupada e gerando receita. Isso é positivo, pois reduz os riscos de não ter aluguel a receber. A inadimplência também é baixa, o que significa que os inquilinos estão pagando seus aluguéis na maioria dos casos. Isso é um sinal de que o fundo está gerenciando bem seus imóveis e os inquilinos estão satisfeitos."
   },
   "HGRU11": {
    "data_referencia": "2026-09-30",
@@ -9881,17 +9881,17 @@
      "participacao_receita_pct": 0.44
     },
     {
-     "nome": "Colégio POP",
-     "endereco": "Praça Padre Aleixo Monteiro Mafra, 18",
-     "area_m2": 4225.76,
+     "nome": "Pernambucanas Carapicuíba",
+     "endereco": "Av. Rui Barbosa, 447, Carapicuíba, SP",
+     "area_m2": 1564.16,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.41
     },
     {
-     "nome": "Pernambucanas Carapicuíba",
-     "endereco": "Av. Rui Barbosa, 447, Carapicuíba, SP",
-     "area_m2": 1564.16,
+     "nome": "Colégio POP",
+     "endereco": "Praça Padre Aleixo Monteiro Mafra, 18",
+     "area_m2": 4225.76,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.41
@@ -9961,17 +9961,17 @@
      "participacao_receita_pct": 0.3
     },
     {
-     "nome": "Pernambucanas Paranaguá",
-     "endereco": "R. Xv De Novembro, 0352, Paranaguá, PR",
-     "area_m2": 2409.94,
+     "nome": "Pernambucanas Jundiaí",
+     "endereco": "R. Barão De Jundiai, 736, 740 e 744, Jundiaí, SP",
+     "area_m2": 1505.08,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.28
     },
     {
-     "nome": "Pernambucanas Jundiaí",
-     "endereco": "R. Barão De Jundiai, 736, 740 e 744, Jundiaí, SP",
-     "area_m2": 1505.08,
+     "nome": "Pernambucanas Paranaguá",
+     "endereco": "R. Xv De Novembro, 0352, Paranaguá, PR",
+     "area_m2": 2409.94,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.28
@@ -10009,17 +10009,17 @@
      "participacao_receita_pct": 0.23
     },
     {
-     "nome": "Pernambucanas Itú",
-     "endereco": "R. Floriano Peixoto, 963, 967, 971 e 975, Itu, SP",
-     "area_m2": 1552.11,
+     "nome": "Pernambucanas Foz do Iguaçu",
+     "endereco": "Av. Brasil, 1.015 - Centro",
+     "area_m2": 3524.82,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.23
     },
     {
-     "nome": "Pernambucanas Foz do Iguaçu",
-     "endereco": "Av. Brasil, 1.015 - Centro",
-     "area_m2": 3524.82,
+     "nome": "Pernambucanas Itú",
+     "endereco": "R. Floriano Peixoto, 963, 967, 971 e 975, Itu, SP",
+     "area_m2": 1552.11,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.23
@@ -10049,17 +10049,17 @@
      "participacao_receita_pct": 0.21
     },
     {
-     "nome": "Pernambucanas Itararé",
-     "endereco": "Rua Amazonas Ribas, 402 e R. São Pedro, 1213, Itararé, SP",
-     "area_m2": 1161.17,
+     "nome": "Pernambucanas Itapecerica Da Serra",
+     "endereco": "Ladeira Capitão Moraes, 49, Itapecerica da Serra, SP",
+     "area_m2": 1450.2,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.2
     },
     {
-     "nome": "Pernambucanas Itapecerica Da Serra",
-     "endereco": "Ladeira Capitão Moraes, 49, Itapecerica da Serra, SP",
-     "area_m2": 1450.2,
+     "nome": "Pernambucanas Mauá",
+     "endereco": "Av. Barão De Mauá, 74, Mauá, SP",
+     "area_m2": 1354.6,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.2
@@ -10073,9 +10073,9 @@
      "participacao_receita_pct": 0.2
     },
     {
-     "nome": "Pernambucanas Mauá",
-     "endereco": "Av. Barão De Mauá, 74, Mauá, SP",
-     "area_m2": 1354.6,
+     "nome": "Pernambucanas Itararé",
+     "endereco": "Rua Amazonas Ribas, 402 e R. São Pedro, 1213, Itararé, SP",
+     "area_m2": 1161.17,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.2
@@ -10121,6 +10121,14 @@
      "participacao_receita_pct": 0.17
     },
     {
+     "nome": "Pernambucanas Marília",
+     "endereco": "R. São Luiz, 693, Marília, SP",
+     "area_m2": 760.5,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.16
+    },
+    {
      "nome": "Pernambucanas Apiaí",
      "endereco": "R. Dr. Gabriel Rib. Dos Santos, 40, Apiaí, SP",
      "area_m2": 790.98,
@@ -10132,14 +10140,6 @@
      "nome": "Pernambucanas Itapira",
      "endereco": "R. José Bonifácio, 48, Itapira, SP",
      "area_m2": 992.09,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.16
-    },
-    {
-     "nome": "Pernambucanas Marília",
-     "endereco": "R. São Luiz, 693, Marília, SP",
-     "area_m2": 760.5,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.16
@@ -10241,22 +10241,6 @@
      "participacao_receita_pct": 0.12
     },
     {
-     "nome": "Pernambucanas Sete Quedas",
-     "endereco": "Av. Mate Laranjeiras, 496, Guaíra - PR, PR",
-     "area_m2": 1335.17,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.11
-    },
-    {
-     "nome": "Pernambucanas Capão Bonito",
-     "endereco": "R. Floriano Peixoto, 575, Capão Bonito, SP",
-     "area_m2": 718.94,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.11
-    },
-    {
      "nome": "Pernambucanas Palmas",
      "endereco": "Praça Bom Jesus, 154, Palmas, PR",
      "area_m2": 892.62,
@@ -10281,20 +10265,28 @@
      "participacao_receita_pct": 0.11
     },
     {
+     "nome": "Pernambucanas Sete Quedas",
+     "endereco": "Av. Mate Laranjeiras, 496, Guaíra - PR, PR",
+     "area_m2": 1335.17,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.11
+    },
+    {
+     "nome": "Pernambucanas Capão Bonito",
+     "endereco": "R. Floriano Peixoto, 575, Capão Bonito, SP",
+     "area_m2": 718.94,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.11
+    },
+    {
      "nome": "Pernambucanas Ituiutaba",
      "endereco": "Rua Vinte e Dois, 798 - Centro",
      "area_m2": 806.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.1
-    },
-    {
-     "nome": "Pernambucanas Bandeirantes",
-     "endereco": "Av. Bandeirantes, 892, Bandeirantes, PR",
-     "area_m2": 1068.2,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.09
     },
     {
      "nome": "Pernambucanas Taquarituba",
@@ -10308,6 +10300,14 @@
      "nome": "Pernambucanas Jacarezinho",
      "endereco": "R. Paraná, 889 - Centro",
      "area_m2": 1218.24,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.09
+    },
+    {
+     "nome": "Pernambucanas Bandeirantes",
+     "endereco": "Av. Bandeirantes, 892, Bandeirantes, PR",
+     "area_m2": 1068.2,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.09
@@ -10338,6 +10338,14 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
+     "nome": "Edifício Cetenco Plaza",
+     "endereco": "Avenida Paulista, 1.842 - São Paulo",
+     "area_m2": 1152.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "Edifício Sky Corporate",
      "endereco": "R. Gomes de Carvalho, 1996, Vila Olímpia, São Paulo - SP",
      "area_m2": 2689.52,
@@ -10349,14 +10357,6 @@
      "nome": "Edifício RM Square",
      "endereco": "Rua Pascoal Pais, 525 - São Paulo",
      "area_m2": 2615.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Edifício Cetenco Plaza",
-     "endereco": "Avenida Paulista, 1.842 - São Paulo",
-     "area_m2": 1152.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -10548,17 +10548,17 @@
      "participacao_receita_pct": 0.94
     },
     {
-     "nome": "Atrium VIII",
-     "endereco": "Rua Fidêncio Ramos, 213",
-     "area_m2": 582.92,
+     "nome": "Edifício Tangram",
+     "endereco": "Rua Ibirajá, 244",
+     "area_m2": 1186.37,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.92
     },
     {
-     "nome": "Edifício Tangram",
-     "endereco": "Rua Ibirajá, 244",
-     "area_m2": 1186.37,
+     "nome": "Atrium VIII",
+     "endereco": "Rua Fidêncio Ramos, 213",
+     "area_m2": 582.92,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.92
@@ -10620,17 +10620,17 @@
      "participacao_receita_pct": 0.8
     },
     {
-     "nome": "Atrium Jardins",
-     "endereco": "Rua Cristiano Viana, 401",
-     "area_m2": 321.4,
+     "nome": "Monumento",
+     "endereco": "Av. Brigadeiro Faria Lima, nº 1478",
+     "area_m2": 312.88,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.75
     },
     {
-     "nome": "Monumento",
-     "endereco": "Av. Brigadeiro Faria Lima, nº 1478",
-     "area_m2": 312.88,
+     "nome": "Atrium Jardins",
+     "endereco": "Rua Cristiano Viana, 401",
+     "area_m2": 321.4,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.75
@@ -10732,17 +10732,17 @@
      "participacao_receita_pct": 0.57
     },
     {
-     "nome": "Veranda Berrini",
-     "endereco": "Rua Ribeiro do Vale, 152",
-     "area_m2": 184.19,
+     "nome": "Brasílio Machado",
+     "endereco": "Av. Dr. Cardoso De Melo, 1855",
+     "area_m2": 307.848,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.56
     },
     {
-     "nome": "Brasílio Machado",
-     "endereco": "Av. Dr. Cardoso De Melo, 1855",
-     "area_m2": 307.848,
+     "nome": "Veranda Berrini",
+     "endereco": "Rua Ribeiro do Vale, 152",
+     "area_m2": 184.19,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.56
@@ -10756,17 +10756,17 @@
      "participacao_receita_pct": 0.54
     },
     {
-     "nome": "Edifício Brasif",
-     "endereco": "Rua Luigi Galvani, 146",
-     "area_m2": 319.1,
+     "nome": "Atrium I",
+     "endereco": "Rua do Rócio, 220",
+     "area_m2": 260.2,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.53
     },
     {
-     "nome": "Atrium I",
-     "endereco": "Rua do Rócio, 220",
-     "area_m2": 260.2,
+     "nome": "Edifício Brasif",
+     "endereco": "Rua Luigi Galvani, 146",
+     "area_m2": 319.1,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.53
@@ -10844,17 +10844,17 @@
      "participacao_receita_pct": 0.48
     },
     {
-     "nome": "Brasílio Machado",
-     "endereco": "Av. Dr. Cardoso De Melo, 1855",
-     "area_m2": 384.81,
+     "nome": "Banco Mercantil",
+     "endereco": "Av. Paulista, 925",
+     "area_m2": 215.72,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.47
     },
     {
-     "nome": "Banco Mercantil",
-     "endereco": "Av. Paulista, 925",
-     "area_m2": 215.72,
+     "nome": "Brasílio Machado",
+     "endereco": "Av. Dr. Cardoso De Melo, 1855",
+     "area_m2": 384.81,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.47
@@ -10874,14 +10874,6 @@
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.46
-    },
-    {
-     "nome": "MONTREAL",
-     "endereco": "Rua Funchal, 129",
-     "area_m2": 214.1,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.45
     },
     {
      "nome": "Brasilinterpart",
@@ -10908,28 +10900,20 @@
      "participacao_receita_pct": 0.45
     },
     {
+     "nome": "MONTREAL",
+     "endereco": "Rua Funchal, 129",
+     "area_m2": 214.1,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.45
+    },
+    {
      "nome": "GC SQUARE CORPORATE",
      "endereco": "Rua Gomes de Carvalho, 1108",
      "area_m2": 204.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.45
-    },
-    {
-     "nome": "Atrium I",
-     "endereco": "Rua do Rócio, 220",
-     "area_m2": 260.2,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.44
-    },
-    {
-     "nome": "EDIFÍCIO IRACEMA",
-     "endereco": "Rua Doutor Renato Paes de Barros, 717",
-     "area_m2": 200.78,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.44
     },
     {
      "nome": "Spazio Centrale",
@@ -10948,44 +10932,28 @@
      "participacao_receita_pct": 0.44
     },
     {
+     "nome": "Atrium I",
+     "endereco": "Rua do Rócio, 220",
+     "area_m2": 260.2,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.44
+    },
+    {
+     "nome": "EDIFÍCIO IRACEMA",
+     "endereco": "Rua Doutor Renato Paes de Barros, 717",
+     "area_m2": 200.78,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.44
+    },
+    {
      "nome": "Santa Filippa",
      "endereco": "Avenida Paulista,  668",
      "area_m2": 187.12,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.44
-    },
-    {
-     "nome": "Concorde",
-     "endereco": "Rua Funchal, 203",
-     "area_m2": 231.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.42
-    },
-    {
-     "nome": "Érika",
-     "endereco": "Rua do Rócio, 351",
-     "area_m2": 251.03,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.42
-    },
-    {
-     "nome": "Edifício Fortaleza",
-     "endereco": "Av. Luiz Carlos Berrini, 1461",
-     "area_m2": 278.92,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.42
-    },
-    {
-     "nome": "Arandu",
-     "endereco": "Rua Arizona, 1366",
-     "area_m2": 253.65,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.42
     },
     {
      "nome": "THERA OFFICE",
@@ -11015,6 +10983,38 @@
      "nome": "Flórida",
      "endereco": "Rua Florida, 1738",
      "area_m2": 350.06,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.42
+    },
+    {
+     "nome": "Concorde",
+     "endereco": "Rua Funchal, 203",
+     "area_m2": 231.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.42
+    },
+    {
+     "nome": "Érika",
+     "endereco": "Rua do Rócio, 351",
+     "area_m2": 251.03,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.42
+    },
+    {
+     "nome": "Edifício Fortaleza",
+     "endereco": "Av. Luiz Carlos Berrini, 1461",
+     "area_m2": 278.92,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.42
+    },
+    {
+     "nome": "Arandu",
+     "endereco": "Rua Arizona, 1366",
+     "area_m2": 253.65,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.42
@@ -11052,25 +11052,9 @@
      "participacao_receita_pct": 0.41
     },
     {
-     "nome": "Brasílio Machado",
-     "endereco": "Av. Dr. Cardoso De Melo, 1855",
-     "area_m2": 163.47,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.4
-    },
-    {
      "nome": "Setin Tower",
      "endereco": "Rua Fidêncio Ramos, 100",
      "area_m2": 287.98,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.4
-    },
-    {
-     "nome": "Gold Center",
-     "endereco": "Rua Arizona, 1426",
-     "area_m2": 158.49,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.4
@@ -11084,9 +11068,17 @@
      "participacao_receita_pct": 0.4
     },
     {
+     "nome": "Gold Center",
+     "endereco": "Rua Arizona, 1426",
+     "area_m2": 158.49,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.4
+    },
+    {
      "nome": "Brasílio Machado",
      "endereco": "Av. Dr. Cardoso De Melo, 1855",
-     "area_m2": 191.019684,
+     "area_m2": 163.47,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.4
@@ -11100,9 +11092,17 @@
      "participacao_receita_pct": 0.4
     },
     {
-     "nome": "Edifício Columbus",
-     "endereco": "AL. Campinas, 457",
-     "area_m2": 203.3,
+     "nome": "Brasílio Machado",
+     "endereco": "Av. Dr. Cardoso De Melo, 1855",
+     "area_m2": 191.019684,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.4
+    },
+    {
+     "nome": "Brasílio Machado",
+     "endereco": "Av. Dr. Cardoso De Melo, 1855",
+     "area_m2": 198.061707,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.39
@@ -11118,15 +11118,15 @@
     {
      "nome": "Brasílio Machado",
      "endereco": "Av. Dr. Cardoso De Melo, 1855",
-     "area_m2": 198.061707,
+     "area_m2": 186.63285,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.39
     },
     {
-     "nome": "Brasílio Machado",
-     "endereco": "Av. Dr. Cardoso De Melo, 1855",
-     "area_m2": 186.63285,
+     "nome": "Edifício Columbus",
+     "endereco": "AL. Campinas, 457",
+     "area_m2": 203.3,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.39
@@ -11172,17 +11172,17 @@
      "participacao_receita_pct": 0.36
     },
     {
-     "nome": "Avenida Paulista",
-     "endereco": "Av. Paulista, 2022",
-     "area_m2": 227.89755,
+     "nome": "Brasílio Machado",
+     "endereco": "Av. Dr. Cardoso De Melo, 1855",
+     "area_m2": 163.467288,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.35
     },
     {
-     "nome": "Brasílio Machado",
-     "endereco": "Av. Dr. Cardoso De Melo, 1855",
-     "area_m2": 163.467288,
+     "nome": "Avenida Paulista",
+     "endereco": "Av. Paulista, 2022",
+     "area_m2": 227.89755,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.35
@@ -11194,14 +11194,6 @@
      "vacancia_pct": 93.33,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.35
-    },
-    {
-     "nome": "Brasílio Machado",
-     "endereco": "Av. Dr. Cardoso De Melo, 1855",
-     "area_m2": 384.81,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.34
     },
     {
      "nome": "Gold Center",
@@ -11220,9 +11212,9 @@
      "participacao_receita_pct": 0.34
     },
     {
-     "nome": "Gold Center",
-     "endereco": "Rua Arizona, 1426",
-     "area_m2": 161.55,
+     "nome": "Brasílio Machado",
+     "endereco": "Av. Dr. Cardoso De Melo, 1855",
+     "area_m2": 384.81,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.34
@@ -11236,17 +11228,25 @@
      "participacao_receita_pct": 0.34
     },
     {
-     "nome": "Dr. Naur Martins",
-     "endereco": "Rua Professor Artur Ramos, 96",
-     "area_m2": 199.06,
+     "nome": "Gold Center",
+     "endereco": "Rua Arizona, 1426",
+     "area_m2": 161.55,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.33
+     "participacao_receita_pct": 0.34
     },
     {
      "nome": "GAUDÍ",
      "endereco": "Rua Princesa Isabel, 86 e 94",
      "area_m2": 159.969,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.33
+    },
+    {
+     "nome": "Dr. Naur Martins",
+     "endereco": "Rua Professor Artur Ramos, 96",
+     "area_m2": 199.06,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.33
@@ -11276,6 +11276,14 @@
      "participacao_receita_pct": 0.32
     },
     {
+     "nome": "Luxor Center",
+     "endereco": "Rua Arizona, nº 1349",
+     "area_m2": 143.28,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.31
+    },
+    {
      "nome": "Aeroporto II",
      "endereco": "Rua Funchal, 513",
      "area_m2": 171.81,
@@ -11284,25 +11292,9 @@
      "participacao_receita_pct": 0.31
     },
     {
-     "nome": "Luxor Center",
-     "endereco": "Rua Arizona, nº 1349",
-     "area_m2": 143.28,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.31
-    },
-    {
-     "nome": "THERA OFFICE",
-     "endereco": "Avenida Engenheiro Luís Carlos Berrini, 105",
-     "area_m2": 149.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.3
-    },
-    {
-     "nome": "Luxor Center",
-     "endereco": "Rua Arizona, nº 1349",
-     "area_m2": 143.28,
+     "nome": "Edifício Lafayette",
+     "endereco": "Rua Tabapuã, 500",
+     "area_m2": 152.08,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.3
@@ -11311,14 +11303,6 @@
      "nome": "Concorde",
      "endereco": "Rua Funchal, 203",
      "area_m2": 163.8,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.3
-    },
-    {
-     "nome": "Edifício Lafayette",
-     "endereco": "Rua Tabapuã, 500",
-     "area_m2": 152.08,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.3
@@ -11340,12 +11324,20 @@
      "participacao_receita_pct": 0.3
     },
     {
-     "nome": "GBC",
-     "endereco": "Av. Dr. Cardoso de Melo, 1667",
-     "area_m2": 133.0,
+     "nome": "THERA OFFICE",
+     "endereco": "Avenida Engenheiro Luís Carlos Berrini, 105",
+     "area_m2": 149.0,
      "vacancia_pct": 0.0,
-     "inadimplencia_pct": 100.0,
-     "participacao_receita_pct": 0.29
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.3
+    },
+    {
+     "nome": "Luxor Center",
+     "endereco": "Rua Arizona, nº 1349",
+     "area_m2": 143.28,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.3
     },
     {
      "nome": "Palladio",
@@ -11357,8 +11349,24 @@
     },
     {
      "nome": "GBC",
+     "endereco": "Av. Dr. Cardoso de Melo, 1667",
+     "area_m2": 133.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 100.0,
+     "participacao_receita_pct": 0.29
+    },
+    {
+     "nome": "GBC",
      "endereco": "Av. Dr. Cardoso de Melo, 1666",
      "area_m2": 133.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.28
+    },
+    {
+     "nome": "Brasílio Machado",
+     "endereco": "Av. Dr. Cardoso De Melo, 1855",
+     "area_m2": 198.17715,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.28
@@ -11380,26 +11388,18 @@
      "participacao_receita_pct": 0.28
     },
     {
-     "nome": "Brasílio Machado",
-     "endereco": "Av. Dr. Cardoso De Melo, 1855",
-     "area_m2": 198.17715,
+     "nome": "Edifício Lafayette",
+     "endereco": "Rua Tabapuã, 500",
+     "area_m2": 151.2,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.28
+     "participacao_receita_pct": 0.27
     },
     {
      "nome": "Santa Filippa",
      "endereco": "Avenida Paulista,  668",
      "area_m2": 280.68,
      "vacancia_pct": 65.56,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.27
-    },
-    {
-     "nome": "Edifício Lafayette",
-     "endereco": "Rua Tabapuã, 500",
-     "area_m2": 151.2,
-     "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.27
     },
@@ -11484,14 +11484,6 @@
      "participacao_receita_pct": 0.08
     },
     {
-     "nome": "Brasílio Machado",
-     "endereco": "Av. Dr. Cardoso De Melo, 1856",
-     "area_m2": 57.7215,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.07
-    },
-    {
      "nome": "Monterey OfficeTower",
      "endereco": "Rua Álvaro Rodrigues, 182",
      "area_m2": 136.72,
@@ -11503,6 +11495,14 @@
      "nome": "Arco do Triunfo",
      "endereco": "Av. Angélica, 745",
      "area_m2": 110.318432,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.07
+    },
+    {
+     "nome": "Brasílio Machado",
+     "endereco": "Av. Dr. Cardoso De Melo, 1856",
+     "area_m2": 57.7215,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.07
@@ -11522,86 +11522,6 @@
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.01
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 654.76,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 268.48,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 268.48,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 134.24,
-     "vacancia_pct": 54.44,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 268.48,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 180.311168,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 88.168832,
-     "vacancia_pct": 40.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 268.48,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 134.24,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 268.48,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
     },
     {
      "nome": "Arco do Triunfo",
@@ -11638,15 +11558,95 @@
     {
      "nome": "Arco do Triunfo",
      "endereco": "Av. Angélica, 745",
+     "area_m2": 654.76,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 268.48,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 268.48,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 134.24,
+     "vacancia_pct": 54.44,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 180.311168,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 88.168832,
+     "vacancia_pct": 40.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 268.48,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 268.48,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
      "area_m2": 134.24,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Business Center",
-     "endereco": "Rua Gomes de Carvalho, 1306",
-     "area_m2": 470.0,
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 268.48,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 158.161568,
+     "vacancia_pct": 100.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "Arco do Triunfo",
+     "endereco": "Av. Angélica, 745",
+     "area_m2": 134.24,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -11660,9 +11660,9 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Arco do Triunfo",
-     "endereco": "Av. Angélica, 745",
-     "area_m2": 158.161568,
+     "nome": "Business Center",
+     "endereco": "Rua Gomes de Carvalho, 1306",
+     "area_m2": 470.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -11774,6 +11774,14 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
+     "nome": "Barra Private",
+     "endereco": "Avenida Armando Lombardi, 400 Rio de Janeiro - RJ",
+     "area_m2": 6706.0,
+     "vacancia_pct": 14.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "One Eleven",
      "endereco": "Rua Pequetita, 111,  Cidade de São Paulo/SP",
      "area_m2": 4112.11,
@@ -11794,14 +11802,6 @@
      "endereco": "Av. Domingos Odália Filho, 301,  Cidade de Osasco/SP",
      "area_m2": 5679.9,
      "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Barra Private",
-     "endereco": "Avenida Armando Lombardi, 400 Rio de Janeiro - RJ",
-     "area_m2": 6706.0,
-     "vacancia_pct": 14.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     }
@@ -12244,7 +12244,7 @@
    "resumo_ia": "O Fundo Imobiliário BLMG11 (FII Blue Log) está com vacância baixa, o que significa que a maioria dos imóveis está ocupada e gerando aluguel. Isso é bom, pois significa que o fundo está gerando receita.\n\nJá a inadimplência é baixa, o que indica que os inquilinos estão pagando os aluguéis de forma regular. Isso é uma boa notícia, pois evita problemas financeiros para o fundo."
   },
   "INLG11": {
-   "data_referencia": "2026-06-30",
+   "data_referencia": "2026-09-30",
    "n_imoveis": 4,
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
@@ -12275,14 +12275,14 @@
     },
     {
      "nome": "LOG Rio Campo Grande",
-     "endereco": "RODOVIA BR 262, nº 222  VILA BETANIA CEP: 29.136-930VIANA/ES",
+     "endereco": "RODOVIA BR 262, nº 222 VILA BETANIA CEP: 29.136-930VIANA/ES",
      "area_m2": 11157.66,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 8.92
     }
    ],
-   "resumo_ia": "O Fundo Imobiliário INLG11 (FII Inter Lg) tem uma vacância baixa, o que significa que a maioria dos imóveis está ocupada e gerando aluguel. Isso é positivo, pois indica que o fundo está gerando receita de forma consistente. No entanto, é importante lembrar que a vacância baixa também pode indicar que o fundo está subutilizando seus imóveis, o que pode afetar a sua rentabilidade a longo prazo."
+   "resumo_ia": "A vacância do Fundo Imobiliário INLG11 é considerada baixa, o que significa que a porcentagem de área dos imóveis desocupada é pequena em relação ao total. Isso pode ser uma boa notícia para os investidores, pois indica que a maioria dos imóveis está ocupada e gerando receita.\n\nJá a inadimplência do fundo também é baixa, o que significa que a porcentagem de aluguéis não pagos pelos inquilinos é pequena em relação ao total. Isso pode indicar que os inquilinos estão pagando seus aluguéis de forma regular e que o fundo está gerando receita estável."
   },
   "CPUR11": {
    "data_referencia": "2026-09-30",
@@ -12406,53 +12406,53 @@
    "resumo_ia": "O fundo imobiliário CPUR11 (FII Cphbc Ur) tem uma vacância baixa, o que significa que uma pequena parte dos imóveis do fundo está desocupada e não está gerando aluguel. Isso pode ser uma boa notícia para os investidores, pois significa que o fundo está aproveitando ao máximo a capacidade de seus imóveis.\n\nJá a inadimplência é baixa, o que indica que os inquilinos estão pagando os aluguéis de forma regular. Isso é um sinal positivo, pois sugere que o fundo está gerando receita estável e previsível."
   },
   "INRD11": {
-   "data_referencia": "2026-06-30",
+   "data_referencia": "2026-09-30",
    "n_imoveis": 5,
-   "vacancia_pct": 2.0,
-   "inadimplencia_pct": 1.51,
+   "vacancia_pct": 1.32,
+   "inadimplencia_pct": 1.54,
    "imoveis": [
     {
      "nome": "Luggo Cenarium",
      "endereco": "Rua Santa Maria Rosselo, 180, Mansões Santo Antonio - Campinas - SP",
      "area_m2": 6062.7,
-     "vacancia_pct": 0.6,
-     "inadimplencia_pct": 0.6,
-     "participacao_receita_pct": 27.28
+     "vacancia_pct": 1.55,
+     "inadimplencia_pct": 0.64,
+     "participacao_receita_pct": 27.22
     },
     {
      "nome": "Luggo Lindoia",
      "endereco": "Rua Capitão João Zaleski, 842, Lindoia - Curitiba - PR",
      "area_m2": 5896.0,
-     "vacancia_pct": 1.68,
-     "inadimplencia_pct": 2.05,
-     "participacao_receita_pct": 26.33
+     "vacancia_pct": 0.76,
+     "inadimplencia_pct": 2.02,
+     "participacao_receita_pct": 26.46
     },
     {
      "nome": "Luggo Cipreste",
      "endereco": "Rua das Espatodias 610, Marajó - Belo Horizonte - MG",
      "area_m2": 5349.06,
-     "vacancia_pct": 2.64,
-     "inadimplencia_pct": 0.77,
-     "participacao_receita_pct": 17.81
+     "vacancia_pct": 1.35,
+     "inadimplencia_pct": 0.92,
+     "participacao_receita_pct": 19.03
     },
     {
      "nome": "Luggo Ecoville",
      "endereco": "Rua Casemiro Augusto Rodacki, 289, Cidade Industrial - Curitiba - PR",
      "area_m2": 4569.49,
-     "vacancia_pct": 1.75,
-     "inadimplencia_pct": 2.41,
-     "participacao_receita_pct": 17.33
+     "vacancia_pct": 1.04,
+     "inadimplencia_pct": 2.42,
+     "participacao_receita_pct": 17.68
     },
     {
      "nome": "Inter Residence Barbacena",
      "endereco": "Rua Tenente Brito Melo, 472, Barro Preto - Belo Horizonte - MG",
      "area_m2": 3722.74,
-     "vacancia_pct": 5.47,
-     "inadimplencia_pct": 2.24,
-     "participacao_receita_pct": 11.25
+     "vacancia_pct": 2.65,
+     "inadimplencia_pct": 2.38,
+     "participacao_receita_pct": 9.61
     }
    ],
-   "resumo_ia": "A vacância do Fundo Imobiliário INRD11 é baixa, o que significa que a grande maioria dos imóveis está ocupada e gerando receita. Isso é um sinal positivo para o investidor, pois indica que os imóveis estão sendo bem aproveitados.\n\nA inadimplência também é baixa, o que significa que os inquilinos estão pagando seus aluguéis de forma regular. Isso é importante, pois evita que os imóveis fiquem sem receita e permita que o fundo continue a gerar retornos para os investidores."
+   "resumo_ia": "A vacância do Fundo Imobiliário INRD11 é baixa, o que significa que a maioria dos imóveis está ocupada e gerando receita. Por outro lado, a inadimplência é também baixa, indicando que os inquilinos estão pagando seus aluguéis de forma regular.\n\nEssa combinação de baixa vacância e baixa inadimplência é positiva para os investidores, pois sugere que o fundo está gerando receita estável e confiável."
   },
   "TSER11": {
    "data_referencia": "2026-09-30",
@@ -12740,17 +12740,17 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
-     "nome": "Standard Building",
-     "endereco": "Avenida Presidente Wilson, 118 - Centro - Rio de Janeiro - RJ",
-     "area_m2": 8341.0,
+     "nome": "Rochavera - Torre D",
+     "endereco": "Avenida das Nações Unidas, 14.171 - Chucri Zaidan - São Paulo - SP",
+     "area_m2": 14648.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Rochavera - Torre D",
-     "endereco": "Avenida das Nações Unidas, 14.171 - Chucri Zaidan - São Paulo - SP",
-     "area_m2": 14648.0,
+     "nome": "Standard Building",
+     "endereco": "Avenida Presidente Wilson, 118 - Centro - Rio de Janeiro - RJ",
+     "area_m2": 8341.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -12759,7 +12759,7 @@
    "resumo_ia": "A vacância do Fundo Imobiliário AIEC11 é considerada baixa, o que significa que a maioria dos imóveis está ocupada e gerando receita. Em contrapartida, a inadimplência também é baixa, indicando que os inquilinos estão pagando seus aluguéis de forma regular. Isso é um bom sinal para os investidores, pois sugere que o fundo está gerenciando seus imóveis de forma eficaz."
   },
   "BTSG11": {
-   "data_referencia": "2026-06-30",
+   "data_referencia": "2026-09-30",
    "n_imoveis": 1,
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
@@ -12773,7 +12773,7 @@
      "participacao_receita_pct": 100.0
     }
    ],
-   "resumo_ia": "O Fundo Imobiliário BTSG11 (FII Btsp I) tem uma vacância baixa, o que significa que a maioria dos imóveis está ocupada e gerando aluguel. Isso é uma boa notícia para os investidores. Por outro lado, a inadimplência também é baixa, o que indica que os inquilinos estão pagando seus aluguéis de forma regular."
+   "resumo_ia": "O fundo imobiliário BTSG11 tem uma vacância baixa, o que significa que a maioria dos imóveis está ocupada e gerando aluguel. Isso é positivo para os investidores, pois significa que há menos espaço vazio e mais receita a ser gerada. No entanto, é importante notar que a inadimplência também é baixa, o que pode indicar que os inquilinos estão pagando os aluguéis em dia."
   },
   "TRXB11": {
    "data_referencia": "2026-09-30",
@@ -12781,38 +12781,6 @@
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
    "imoveis": [
-    {
-     "nome": "ASSAÍ - CAMPINA GRANDE",
-     "endereco": "Avenida Assis Chateaubriand, 1110, Liberdade - Campina Grande/PB",
-     "area_m2": 34833.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ASSAÍ - PAULO AFONSO",
-     "endereco": "Avenida do Aeroporto, 13, Jardim Bahia - Paulo Afonso/BA",
-     "area_m2": 24377.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "EXTRA -  RECIFE",
-     "endereco": "ua Benfica, 715, Madalena - Recife/PE",
-     "area_m2": 30542.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "EXTRA ARARUAMA",
-     "endereco": "Rua México, 160, Centro - Araruama/RJ",
-     "area_m2": 4826.36,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
     {
      "nome": "ASSAÍ - JEQUIÉ",
      "endereco": "Avenida Cesar Borges, s/nº, São Judas Tadeu - Jequié/BA",
@@ -12830,17 +12798,49 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "PÃO DE AÇUCAR - ARACAJU",
-     "endereco": "Rua José Seabra Batista, 30, Jardins - Aracaju/SE",
-     "area_m2": 5706.24,
+     "nome": "ASSAÍ - GOIANIA INDEPENDENCIA",
+     "endereco": "Avenida Independência, s/nº, Setor Central - Goiânia/GO",
+     "area_m2": 21647.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "ASSAÍ - GOIANIA INDEPENDENCIA",
-     "endereco": "Avenida Independência, s/nº, Setor Central - Goiânia/GO",
-     "area_m2": 21647.0,
+     "nome": "ASSAÍ - CAMPINA GRANDE",
+     "endereco": "Avenida Assis Chateaubriand, 1110, Liberdade - Campina Grande/PB",
+     "area_m2": 34833.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "EXTRA ARARUAMA",
+     "endereco": "Rua México, 160, Centro - Araruama/RJ",
+     "area_m2": 4826.36,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "EXTRA -  RECIFE",
+     "endereco": "ua Benfica, 715, Madalena - Recife/PE",
+     "area_m2": 30542.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ASSAÍ - PAULO AFONSO",
+     "endereco": "Avenida do Aeroporto, 13, Jardim Bahia - Paulo Afonso/BA",
+     "area_m2": 24377.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "PÃO DE AÇUCAR - GOIANIA",
+     "endereco": "Avenida República do Líbano, Quadra 56 - Setor 56, Setor Oeste - Goiânia/GO",
+     "area_m2": 4307.2,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -12862,9 +12862,9 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "PÃO DE AÇUCAR - GOIANIA",
-     "endereco": "Avenida República do Líbano, Quadra 56 - Setor 56, Setor Oeste - Goiânia/GO",
-     "area_m2": 4307.2,
+     "nome": "PÃO DE AÇUCAR - ARACAJU",
+     "endereco": "Rua José Seabra Batista, 30, Jardins - Aracaju/SE",
+     "area_m2": 5706.24,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -13025,14 +13025,6 @@
      "participacao_receita_pct": 3.01
     },
     {
-     "nome": "FAZ. SÃO TOMAZ CACHOEIRINHA - GO",
-     "endereco": "Zona rural de Rio Verde/GO",
-     "area_m2": 7750000.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 2.09
-    },
-    {
      "nome": "FAZ. NOSSA SENHORA DA APARECIDA - MA",
      "endereco": "Zona rural de Sambaíba /MA",
      "area_m2": 14939127.0,
@@ -13105,6 +13097,22 @@
      "participacao_receita_pct": 0.52
     },
     {
+     "nome": "FAZ. SAN FRANCISCO - GLEBA RECREIO DO NORTE",
+     "endereco": "Canarana - MT",
+     "area_m2": 53463248.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "FAZ. FRANCISCO DUMONT",
+     "endereco": "Serra do Cabral/MG",
+     "area_m2": 29290000.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "FAZENDA MIRAI - MA",
      "endereco": "Alto Parnaíba - MA",
      "area_m2": 544883.3,
@@ -13116,14 +13124,6 @@
      "nome": "FAZ. ROMA",
      "endereco": "Tupiratins - TO",
      "area_m2": 76760970.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "FAZ. SAN FRANCISCO - GLEBA RECREIO DO NORTE",
-     "endereco": "Canarana - MT",
-     "area_m2": 53463248.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -13274,7 +13274,7 @@
    "resumo_ia": "O Fundo Imobiliário MCRE11 (FII Maua Re) apresenta uma vacância moderada, o que significa que cerca de 15% da área dos imóveis não está ocupada por inquilinos pagando aluguel. Isso pode afetar a receita do fundo. Por outro lado, a inadimplência é baixa, o que é positivo, pois indica que os inquilinos que estão ocupando os imóveis estão pagando os aluguéis."
   },
   "BTSI11": {
-   "data_referencia": "2026-06-30",
+   "data_referencia": "2026-09-30",
    "n_imoveis": 5,
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
@@ -13285,7 +13285,7 @@
      "area_m2": 63101.01,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 28.88
+     "participacao_receita_pct": 29.05
     },
     {
      "nome": "Condomínio Logístico Sumaré 01",
@@ -13293,7 +13293,7 @@
      "area_m2": 73256.74,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 27.5
+     "participacao_receita_pct": 28.9
     },
     {
      "nome": "Condomínio Logístico Cariacica 01",
@@ -13301,7 +13301,7 @@
      "area_m2": 113559.76,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 23.26
+     "participacao_receita_pct": 21.08
     },
     {
      "nome": "Condomínio Logístico Itapeva 01",
@@ -13309,7 +13309,7 @@
      "area_m2": 59348.88,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 10.74
+     "participacao_receita_pct": 11.31
     },
     {
      "nome": "Condomínio Logístico Cravinhos 01",
@@ -13317,13 +13317,13 @@
      "area_m2": 25818.28,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 9.61
+     "participacao_receita_pct": 9.66
     }
    ],
-   "resumo_ia": "A vacância do FII Btsp II é baixa, o que significa que a maioria dos imóveis está ocupada e gerando aluguel. Por outro lado, a inadimplência também é baixa, indicando que os inquilinos estão pagando os aluguéis de forma regular.\n\nEssa combinação de baixa vacância e baixa inadimplência é um sinal positivo para o fundo, pois sugere que os imóveis estão sendo gerenciados de forma eficaz e que os inquilinos estão satisfeitos com os serviços oferecidos."
+   "resumo_ia": "O FII Btsp II apresentou uma vacância baixa, o que significa que a parte desocupada dos imóveis é relativamente pequena. Isso é uma boa notícia, pois indica que a maioria dos imóveis está ocupada e gerando receita.\n\nJá a inadimplência do fundo é também baixa, o que significa que a parte dos aluguéis que não foram pagos é pequena em relação ao total. Isso é um indicador positivo de que os inquilinos estão pagando os aluguéis em dia."
   },
   "GARE11": {
-   "data_referencia": "2026-06-30",
+   "data_referencia": "2026-09-30",
    "n_imoveis": 3,
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
@@ -13353,7 +13353,7 @@
      "participacao_receita_pct": 0.6
     }
    ],
-   "resumo_ia": "O Fundo Imobiliário GARE11 (FII Guardian) tem uma vacância baixa, o que significa que a maioria dos imóveis está ocupada e gerando aluguel. Isso é positivo para os investidores, pois indica que o fundo está gerando receita consistente. Por outro lado, a inadimplência também é baixa, o que sugere que os inquilinos estão pagando seus aluguéis de forma regular."
+   "resumo_ia": "A vacância do Fundo Imobiliário GARE11 é considerada baixa, o que significa que a parte dos imóveis que está desocupada é relativamente pequena em comparação com a área total dos imóveis. Isso pode indicar que o fundo está gerenciando bem a ocupação dos imóveis.\n\nA inadimplência do fundo também é baixa, o que significa que a parte dos aluguéis que não foram pagos pelos inquilinos é relativamente pequena em comparação com a receita total do fundo. Isso pode indicar que o fundo está gerenciando bem os inquilinos e cobrando os aluguéis de forma eficaz."
   },
   "DAYM11": {
    "data_referencia": "2026-09-30",
@@ -13361,30 +13361,6 @@
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
    "imoveis": [
-    {
-     "nome": "ED PEDRA GRL",
-     "endereco": "Av. Brigadeiro Faria Lima, 2197",
-     "area_m2": 976.56,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 100.0
-    },
-    {
-     "nome": "ED SA II",
-     "endereco": "Avenida Alfredo Egidio De Souza Aranha, 145, Edifício Souza Aranha Ii, Vila Cruzeiro, Sao Paulo/SP, Brasil, 04726-170",
-     "area_m2": 4078.62,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 100.0
-    },
-    {
-     "nome": "ED SA I",
-     "endereco": "Avenida Alfredo Egidio De Souza Aranha, 145, Edifício Souza Aranha I, Vila Cruzeiro, Sao Paulo/SP, Brasil, 04726-170",
-     "area_m2": 2231.27,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 100.0
-    },
     {
      "nome": "ED PEDRA GR",
      "endereco": "Av. Brigadeiro Faria Lima, 2161",
@@ -13408,6 +13384,30 @@
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 100.0
+    },
+    {
+     "nome": "ED PEDRA GRL",
+     "endereco": "Av. Brigadeiro Faria Lima, 2197",
+     "area_m2": 976.56,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 100.0
+    },
+    {
+     "nome": "ED SA II",
+     "endereco": "Avenida Alfredo Egidio De Souza Aranha, 145, Edifício Souza Aranha Ii, Vila Cruzeiro, Sao Paulo/SP, Brasil, 04726-170",
+     "area_m2": 4078.62,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 100.0
+    },
+    {
+     "nome": "ED SA I",
+     "endereco": "Avenida Alfredo Egidio De Souza Aranha, 145, Edifício Souza Aranha I, Vila Cruzeiro, Sao Paulo/SP, Brasil, 04726-170",
+     "area_m2": 2231.27,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 100.0
     }
    ],
    "resumo_ia": "A vacância do FII Dayc Rem é considerada baixa, o que significa que a parte desocupada dos imóveis é relativamente pequena. Isso é um bom sinal, pois indica que os imóveis estão sendo ocupados de forma eficiente.\n\nJá a inadimplência é também baixa, o que significa que a parte dos aluguéis cobrados que não foram pagos pelos inquilinos é relativamente pequena. Isso é um bom indicador de que os inquilinos estão pagando seus aluguéis de forma regular."
@@ -13419,17 +13419,17 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
-     "nome": "ED SEDE MT",
-     "endereco": "Rua Barão de Melgaço, nº 3465, CEP 78005-300, Cuiabá, MT",
-     "area_m2": 5570.0,
+     "nome": "ED SEDE CONT",
+     "endereco": "Av do contorno, nº8256, CEP 30170-050, Belo Horizonte, MG",
+     "area_m2": 7572.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 100.0
     },
     {
-     "nome": "ED NOVO HAMB",
-     "endereco": "Rua Bento Gonçalves, nº2463, CEP 93510-365, Novo Hamburgo, RS",
-     "area_m2": 4782.02,
+     "nome": "ED SEDE MT",
+     "endereco": "Rua Barão de Melgaço, nº 3465, CEP 78005-300, Cuiabá, MT",
+     "area_m2": 5570.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 100.0
@@ -13443,9 +13443,9 @@
      "participacao_receita_pct": 100.0
     },
     {
-     "nome": "ED CARLOS GO",
-     "endereco": "Rua José Loureiro, nº195, CEP 80010-000, Curitiba, PR",
-     "area_m2": 15778.68,
+     "nome": "ED NOVO HAMB",
+     "endereco": "Rua Bento Gonçalves, nº2463, CEP 93510-365, Novo Hamburgo, RS",
+     "area_m2": 4782.02,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 100.0
@@ -13459,9 +13459,9 @@
      "participacao_receita_pct": 100.0
     },
     {
-     "nome": "ED SEDE CONT",
-     "endereco": "Av do contorno, nº8256, CEP 30170-050, Belo Horizonte, MG",
-     "area_m2": 7572.0,
+     "nome": "ED CARLOS GO",
+     "endereco": "Rua José Loureiro, nº195, CEP 80010-000, Curitiba, PR",
+     "area_m2": 15778.68,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 100.0
@@ -14028,7 +14028,7 @@
     {
      "nome": "Eusebio",
      "endereco": "Rodovia Ce-040, S/n, Sem Complemento, Coaçu, Eusébio/CE, Brasil, 61760-908",
-     "area_m2": 7803.73,
+     "area_m2": 7873.0,
      "vacancia_pct": 94.01,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 12.3
@@ -14036,7 +14036,7 @@
     {
      "nome": "Paulista",
      "endereco": "Avenida Antonio Cabral De Souza, 1660, Sem Complemento, Maranguape I, Paulista/PE, Brasil, 53444-360",
-     "area_m2": 9456.61,
+     "area_m2": 9497.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 11.0
@@ -14044,7 +14044,7 @@
     {
      "nome": "Sargento Herminio",
      "endereco": "Avenida Sargento Herminio Sampaio, 2411, Sem Complemento, São Gerardo, Fortaleza/CE, Brasil, 60320-105",
-     "area_m2": 25000.0,
+     "area_m2": 11175.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 10.5
@@ -14052,7 +14052,7 @@
     {
      "nome": "Strip Mall P4",
      "endereco": "Rua Quinze De Novembro, 202, Sem Complemento, Itaoca, Fortaleza/CE, Brasil, 60421-076",
-     "area_m2": 935794.2,
+     "area_m2": 9017.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 10.2
@@ -14060,7 +14060,7 @@
     {
      "nome": "Caxanga",
      "endereco": "Avenida Caxanga, 3942, Sem Complemento, Iputinga, Recife/PE, Brasil, 50731-005",
-     "area_m2": 7750.67,
+     "area_m2": 7703.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 8.5
@@ -14068,7 +14068,7 @@
     {
      "nome": "Maraponga",
      "endereco": "Avenida Godofredo Maciel, 2540, Sem Complemento, Maraponga, Fortaleza/CE, Brasil, 60710-684",
-     "area_m2": 6084.25,
+     "area_m2": 6039.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 6.9
@@ -14076,7 +14076,7 @@
     {
      "nome": "Lagoa",
      "endereco": "Avenida Bernardo Manuel, 11000, Sem Complemento, Mondubim, Fortaleza/CE, Brasil, 60761-740",
-     "area_m2": 13950.0,
+     "area_m2": 14150.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 6.6
@@ -14084,7 +14084,7 @@
     {
      "nome": "Sargento Herminio 2",
      "endereco": "Avenida Cearenses, 2851, Sem Complemento, Presidente Kennedy, Fortaleza/CE, Brasil, 60355-504",
-     "area_m2": 11497.77,
+     "area_m2": 4523.0,
      "vacancia_pct": 100.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 6.5
@@ -14238,6 +14238,14 @@
      "participacao_receita_pct": 0.0
     },
     {
+     "nome": "Edição Jardins",
+     "endereco": "Alameda Fernão Cardim, 70 e 72 - Jardim Paulista - Estadode São Paulo",
+     "area_m2": 124.618,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "Imóvel Clarion",
      "endereco": "Rua Jerônimo da Veiga nº 248, no 28º Subdistrito Jardim Paulista, São Paulo - SP",
      "area_m2": 77.42,
@@ -14249,14 +14257,6 @@
      "nome": "Imovel Dialogo",
      "endereco": "Alameda Fernão Cardim, 70 - Jardim Paulista - Estadode São Paulo",
      "area_m2": 821.61,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "Edição Jardins",
-     "endereco": "Alameda Fernão Cardim, 70 e 72 - Jardim Paulista - Estadode São Paulo",
-     "area_m2": 124.618,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -14323,7 +14323,7 @@
    "resumo_ia": "A vacância do FII BIPD11 é baixa, o que significa que a maioria dos imóveis está ocupada e gerando receita. A inadimplência também é baixa, o que é positivo pois indica que os inquilinos estão pagando os aluguéis de forma regular. Isso sugere que o fundo está gerenciando bem os imóveis e os inquilinos estão satisfeitos."
   },
   "DPRO11": {
-   "data_referencia": "2026-06-30",
+   "data_referencia": "2026-09-30",
    "n_imoveis": 1,
    "vacancia_pct": 0.0,
    "inadimplencia_pct": 0.0,
@@ -14337,7 +14337,7 @@
      "participacao_receita_pct": 100.0
     }
    ],
-   "resumo_ia": "O Fundo Imobiliário DPRO11 (FII Deva Pro) tem uma vacância baixa, o que significa que a maioria dos imóveis está ocupada e gerando aluguel. Isso é positivo, pois indica que os imóveis estão sendo bem aproveitados. Por outro lado, a inadimplência também é baixa, o que sugere que os inquilinos estão pagando seus aluguéis de forma regular."
+   "resumo_ia": "O Fundo Imobiliário DPRO11 (FII Deva Pro) tem uma vacância baixa, o que significa que a parte desocupada dos imóveis é relativamente pequena. Isso é bom porque significa que o fundo está aproveitando ao máximo a área disponível para gerar receita.\n\nA inadimplência também é baixa, o que significa que os inquilinos que ocupam os imóveis estão pagando os aluguéis de forma regular. Isso é positivo porque evita problemas com pagamentos atrasados e mantém a estabilidade financeira do fundo."
   },
   "APXM11": {
    "data_referencia": "2026-09-30",
@@ -14380,6 +14380,14 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
+     "nome": "MARACANAU",
+     "endereco": "Rodovia Doutor Mendel Steinbruch,S/N-Maracanaú-CE",
+     "area_m2": 24359.64,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "MARANGUAPE",
      "endereco": "Avenida Comandante Aviador Childerico Mora,S/N-Maranguape-CE",
      "area_m2": 21945.75,
@@ -14391,14 +14399,6 @@
      "nome": "ARACATI",
      "endereco": "Rua Dragão do Mar,S/N-Aracati-CE",
      "area_m2": 20000.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "MARACANAU",
-     "endereco": "Rodovia Doutor Mendel Steinbruch,S/N-Maracanaú-CE",
-     "area_m2": 24359.64,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -14972,6 +14972,78 @@
      "participacao_receita_pct": 0.2
     },
     {
+     "nome": "CEA-01-10",
+     "endereco": "Avenida Tégula,888,Ponte Alta,Atibaia-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "BM-01-20",
+     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "TERRA-02-11",
+     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "TERRA-02-01",
+     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "CEA-01-04",
+     "endereco": "Avenida Tégula,888,Ponte Alta,Atibaia-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "BM-01-36",
+     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "TERRA-02-12",
+     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "CEA-01-05",
+     "endereco": "Avenida Tégula,888,Ponte Alta,Atibaia-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "CEA-01-02",
+     "endereco": "Avenida Tégula,888,Ponte Alta,Atibaia-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "EXTR-ACQUA",
      "endereco": "Estr. Municipal Antônio Agostinho Barbosa,1300,Bairro dos Pires,Extrema-MG",
      "area_m2": 0.0,
@@ -15084,16 +15156,16 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "BM-01-38",
-     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
+     "nome": "GAIAAR-01-31",
+     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
      "area_m2": 0.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "GAIAAR-01-31",
-     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
+     "nome": "BM-01-38",
+     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
      "area_m2": 0.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -15124,102 +15196,6 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "BM-01-20",
-     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "ED-EXTR-ACQU",
-     "endereco": "Estr. Municipal Antônio Agostinho Barbosa,1300,Bairro dos Pires,Extrema-MG",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "BM-01-03",
-     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "BM-01-37",
-     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "CEA-01-10",
-     "endereco": "Avenida Tégula,888,Ponte Alta,Atibaia-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "TERRA-02-11",
-     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "TERRA-02-12",
-     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "BM-01-36",
-     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "CEA-01-04",
-     "endereco": "Avenida Tégula,888,Ponte Alta,Atibaia-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "TERRA-02-01",
-     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "CEA-01-02",
-     "endereco": "Avenida Tégula,888,Ponte Alta,Atibaia-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "CEA-01-05",
-     "endereco": "Avenida Tégula,888,Ponte Alta,Atibaia-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "BM-01-26",
      "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
      "area_m2": 0.0,
@@ -15236,14 +15212,6 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "GAIAAR-01-28",
-     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
-     "area_m2": 0.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "28000-1_5",
      "endereco": "Extrema, estado de Minas Gerais - Unidade Autônoma nº 01 do Edifício D",
      "area_m2": 1.0,
@@ -15252,8 +15220,40 @@
      "participacao_receita_pct": 0.0
     },
     {
+     "nome": "GAIAAR-01-28",
+     "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "TERRA-02-02",
      "endereco": "Rodovia Dom Pedro I,km 90,Zona rural,Jarinu-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "BM-01-03",
+     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "ED-EXTR-ACQU",
+     "endereco": "Estr. Municipal Antônio Agostinho Barbosa,1300,Bairro dos Pires,Extrema-MG",
+     "area_m2": 0.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "BM-01-37",
+     "endereco": "Rodovia Dom Pedro I,km 87,Ponte Alta,Atibaia-SP",
      "area_m2": 0.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -15344,6 +15344,14 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
+     "nome": "VOLKSWAGEN",
+     "endereco": "Rua Volkswagens, 291, São Paulo - SP",
+     "area_m2": 12560.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "BURITY",
      "endereco": "Av. Indianópolis, 3096, São Paulo - SP",
      "area_m2": 10550.0,
@@ -15352,9 +15360,9 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "VOLKSWAGEN",
-     "endereco": "Rua Volkswagens, 291, São Paulo - SP",
-     "area_m2": 12560.0,
+     "nome": "TRANSATLANT",
+     "endereco": "Rua Verbo Divino, 1488, São Paulo - SP",
+     "area_m2": 4241.11,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -15364,14 +15372,6 @@
      "endereco": "Av. Paulista, 1374",
      "area_m2": 10879.0,
      "vacancia_pct": 14.7,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "TRANSATLANT",
-     "endereco": "Rua Verbo Divino, 1488, São Paulo - SP",
-     "area_m2": 4241.11,
-     "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     }
@@ -15490,19 +15490,19 @@
   "PDBM11": {
    "data_referencia": "2026-09-30",
    "n_imoveis": 1,
-   "vacancia_pct": 100.0,
-   "inadimplencia_pct": 0.0,
+   "vacancia_pct": 0.0,
+   "inadimplencia_pct": 0.38,
    "imoveis": [
     {
      "nome": "EMPREENDIMENTO PORTO DA BARRA",
      "endereco": "Avenida José Bento Ribeiro Dantas, Manguinhos - Armação de Búzios",
      "area_m2": 11286.0,
-     "vacancia_pct": 100.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.38,
+     "participacao_receita_pct": 99.01
     }
    ],
-   "resumo_ia": "O Fundo Imobiliário PDBM11 (FII PDBM) está com uma vacância alta, o que significa que uma grande parte da área dos imóveis não está ocupada por inquilinos e, portanto, não está gerando aluguel. Isso pode ser um problema para o fundo, pois pode afetar a rentabilidade.\n\nPor outro lado, a inadimplência do fundo é baixa, o que significa que os inquilinos que estão ocupando os imóveis estão pagando os aluguéis de forma regular. Isso é uma boa notícia, pois indica que o fundo está gerenciando bem os imóveis e os inquilinos estão satisfeitos com os serviços."
+   "resumo_ia": "O Fundo Imobiliário PDBM11 (FII PDBM) tem uma vacância baixa, o que significa que a maior parte dos imóveis está ocupada por inquilinos pagando aluguel. Isso é positivo para os investidores, pois gera mais receita para o fundo. Por outro lado, a inadimplência também é baixa, o que indica que os inquilinos estão pagando os aluguéis de forma regular."
   },
   "SPG211": {
    "data_referencia": "2026-09-30",
@@ -15728,6 +15728,110 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
+     "nome": "15844_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 91, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15771_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 155, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "16174_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 46, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "61556_63806",
+     "endereco": "Av Rio branco, quadra 14, Marília/SP",
+     "area_m2": 972.4,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "16168_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 63, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "16446_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 64, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15956_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 105, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15751_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 161, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15762_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 142, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15959_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 102, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "17611_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 96, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15764_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 144, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "4134_63806",
+     "endereco": "Gleba ML, 07303-000, Cabreúva/SP",
+     "area_m2": 8000.0,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
      "nome": "97279_63806",
      "endereco": "AV. JOÃO PAULO I, nº 5.297, Guarulhos/SP",
      "area_m2": 27238.83,
@@ -15736,16 +15840,16 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15760_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 136, Pinheiros, São Paulo/SP",
+     "nome": "15954_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 73, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15954_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 73, Pinheiros, São Paulo/SP",
+     "nome": "15760_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 136, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -15800,8 +15904,8 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15953_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 74, Pinheiros, São Paulo/SP",
+     "nome": "15773_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 162, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -15816,8 +15920,8 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15773_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 162, Pinheiros, São Paulo/SP",
+     "nome": "15953_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 74, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -15832,128 +15936,8 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15844_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 91, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15771_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 155, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "16174_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 46, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15956_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 105, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15751_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 161, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "61556_63806",
-     "endereco": "Av Rio branco, quadra 14, Marília/SP",
-     "area_m2": 972.4,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "16168_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 63, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "16446_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 64, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15762_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 142, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15848_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 61, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15959_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 102, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "17611_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 96, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15764_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 144, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "4134_63806",
-     "endereco": "Gleba ML, 07303-000, Cabreúva/SP",
-     "area_m2": 8000.0,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
      "nome": "15955_63806",
      "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 104, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15772_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 156, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -15978,6 +15962,14 @@
     {
      "nome": "15761_63806",
      "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 141, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15772_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 156, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -16016,16 +16008,16 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15846_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 92, Pinheiros, São Paulo/SP",
+     "nome": "15759_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 93, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15759_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 93, Pinheiros, São Paulo/SP",
+     "nome": "15842_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 62, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -16040,16 +16032,16 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15767_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 151, Pinheiros, São Paulo/SP",
+     "nome": "15846_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 92, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15842_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 62, Pinheiros, São Paulo/SP",
+     "nome": "15848_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 61, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -16072,24 +16064,8 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15774_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 163, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15763_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 143, Pinheiros, São Paulo/SP",
-     "area_m2": 140.52,
-     "vacancia_pct": 0.0,
-     "inadimplencia_pct": 0.0,
-     "participacao_receita_pct": 0.0
-    },
-    {
-     "nome": "15766_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 146, Pinheiros, São Paulo/SP",
+     "nome": "15753_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 165, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -16104,8 +16080,32 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "15753_63806",
-     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 165, Pinheiros, São Paulo/SP",
+     "nome": "15766_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 146, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15774_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 163, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15767_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 151, Pinheiros, São Paulo/SP",
+     "area_m2": 140.52,
+     "vacancia_pct": 0.0,
+     "inadimplencia_pct": 0.0,
+     "participacao_receita_pct": 0.0
+    },
+    {
+     "nome": "15763_63806",
+     "endereco": "Rua Paes Leme, 524, Ed. Passarelli, Conjunto 143, Pinheiros, São Paulo/SP",
      "area_m2": 140.52,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
@@ -16290,17 +16290,17 @@
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Condominio Edificio Batatais",
-     "endereco": "Rua Batataes, 483, Sem Complemento, Jardim Paulista, São Paulo/SP, Brasil, 01423-010",
-     "area_m2": 211.0,
+     "nome": "Condominio Edificio Ana Luiza",
+     "endereco": "Rua Doutor Tomas Carvalhal, 880, Sem Complemento, Paraíso, São Paulo/SP, Brasil, 04006-003",
+     "area_m2": 463177.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Condominio Edificio Ana Luiza",
-     "endereco": "Rua Doutor Tomas Carvalhal, 880, Sem Complemento, Paraíso, São Paulo/SP, Brasil, 04006-003",
-     "area_m2": 463177.0,
+     "nome": "Condominio Edificio Batatais",
+     "endereco": "Rua Batataes, 483, Sem Complemento, Jardim Paulista, São Paulo/SP, Brasil, 01423-010",
+     "area_m2": 211.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
@@ -16602,17 +16602,17 @@
    "inadimplencia_pct": 0.0,
    "imoveis": [
     {
-     "nome": "Plaza JK",
-     "endereco": "Rua Minas de Prata, 30",
-     "area_m2": 1438.05,
+     "nome": "Casa Av Europa, 310",
+     "endereco": "Avenida Europa, 310",
+     "area_m2": 1315.0,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
     },
     {
-     "nome": "Casa Av Europa, 310",
-     "endereco": "Avenida Europa, 310",
-     "area_m2": 1315.0,
+     "nome": "Plaza JK",
+     "endereco": "Rua Minas de Prata, 30",
+     "area_m2": 1438.05,
      "vacancia_pct": 0.0,
      "inadimplencia_pct": 0.0,
      "participacao_receita_pct": 0.0
