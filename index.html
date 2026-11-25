@@ -10291,6 +10291,17 @@
                 <button type="button" class="lista-mercado-fechar" id="hgBtnFecharResultado" title="Fechar" aria-label="Fechar resultado da consulta">✕</button>
               </div>
             </div>
+            ${chaveIndiceEuaExibido ? `
+            <div class="hg-status atencao-fixa" style="margin-bottom:14px;">
+              <span>⚠️</span>
+              <span>
+                Este preço é o da cota do ETF <strong>${a.symbol}</strong> (em dólares), não o valor do índice
+                ${nomeExibido} em pontos — por isso é um número bem menor do que você vê em gráficos/notícias
+                (ex: Dow Jones ~50 mil pontos, ETF DIA ~US$ 500). A variação % costuma ser parecida, mas também pode
+                divergir um pouco porque este dado é um retrato atualizado a cada ~15 minutos, não ao vivo.
+              </span>
+            </div>
+            ` : ''}
             <div class="hg-grid-dados">
               <div class="hg-grupo-titulo">Cotação</div>
               <div>
