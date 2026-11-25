@@ -29942,6 +29942,7 @@
             rotuloData: formatMesAno(anoLinha, mesLinha0),
             divida: dividaAntes,
             juros, amortizacao,
+            correcao: saldoCorrigido - dividaAntes,
             parcela: amortizacao + juros + seguro + tca,
             saldoDevedor: saldo,
             indice: indiceMensal,
@@ -30094,6 +30095,7 @@
           : simularFinanciamento({ valor, taxaMensal, parcelas, sistema, anoInicio, mesInicio0, amort: montarAmortParaSimulacao(parcelas) });
 
         const totalJuros = linhas.reduce((acc, l) => acc + l.juros, 0);
+        const totalCorrecao = usarCorrecao ? linhas.reduce((acc, l) => acc + (l.correcao || 0), 0) : 0;
         const totalPago = linhas.reduce((acc, l) => acc + l.parcela, 0);
         const primeiraParcela = linhas[1]?.parcela ?? 0;
         const ultimaParcela = linhas[linhas.length - 1]?.parcela ?? 0;
@@ -30124,6 +30126,7 @@
             <div class="financ-resumo-card"><span>${sistema === 'price' ? 'Parcela fixa' : '1ª parcela'}</span><strong>${hgFormatMoeda(primeiraParcela)}</strong></div>
             ${sistema === 'sac' ? `<div class="financ-resumo-card"><span>Última parcela</span><strong>${hgFormatMoeda(ultimaParcela)}</strong></div>` : `<div class="financ-resumo-card"><span>Total pago</span><strong>${hgFormatMoeda(totalPago)}</strong></div>`}
             <div class="financ-resumo-card"><span>Total de juros</span><strong>${hgFormatMoeda(totalJuros)}</strong></div>
+            ${usarCorrecao ? `<div class="financ-resumo-card"><span>Total de correção monetária</span><strong>${hgFormatMoeda(totalCorrecao)}</strong></div>` : ''}
           </div>
 
           <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
@@ -30198,7 +30201,7 @@
         // Guarda os dados da última simulação para o PDF e o compartilhamento.
         ultimaSimulacao = {
           valor, sistema, taxaPct, periodo, parcelas,
-          anoInicio, mesInicio0, totalPago, totalJuros,
+          anoInicio, mesInicio0, totalPago, totalJuros, totalCorrecao,
           primeiraParcela, ultimaParcela,
           usarCorrecao, taxaCorrecaoMensal, taxaSeguroMensal, tcaMensal,
           dataUltimaParcela: linhas[linhas.length - 1]?.rotuloData ?? '—',
@@ -30289,6 +30292,7 @@
           ['Total de juros', hgFormatMoeda(s.totalJuros)],
           ['Total de seguros (MIP+DFI) + TCA', s.usarCorrecao ? hgFormatMoeda(totalSeguroTca) : 'não incluído nesta simulação'],
           ['Correção monetária (TR, média)', s.usarCorrecao ? `${hgFormatNumero(s.taxaCorrecaoMensal * 100, 2)}% a.m.` : 'não incluída nesta simulação'],
+          ['Total de correção monetária (acumulada)', s.usarCorrecao ? hgFormatMoeda(s.totalCorrecao) : 'não incluída nesta simulação'],
           ['Taxa de juros', `${hgFormatNumero(s.taxaPct)}% (${s.periodo === 'anual' ? 'a.a' : 'a.m'})`],
           ['Quantidade de parcelas', (s.linhas.length - 1) !== s.parcelas
             ? `${s.linhas.length - 1} de ${s.parcelas} (reduzida pela amortização)`
@@ -30441,6 +30445,7 @@
           ['Total de juros', s.totalJuros],
           ...(s.usarCorrecao ? [
             ['Correção monetária (TR, média)', `${hgFormatNumero(s.taxaCorrecaoMensal * 100, 2)}% a.m.`],
+            ['Total de correção monetária (acumulada)', s.totalCorrecao],
             ['Seguro MIP+DFI (média)', `${hgFormatNumero(s.taxaSeguroMensal * 100, 2)}% do saldo devedor`],
             ['TCA mensal', s.tcaMensal],
           ] : []),
