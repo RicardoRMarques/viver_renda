@@ -1,6 +1,6 @@
 {
   "_leia_me": "Índice de Basileia dos bancos, usado na tabela do site. Os bancos vêm em dois grupos: 'listado' (tem ação na B3 — o site busca também valor de mercado, P/L, P/VP, ROE e DY) e 'emissor' (não tem ação, mas emite CDB/LCI/LCA — só a coluna de Basileia é preenchida). Enquanto não houver coleta automática, este arquivo é atualizado à mão a cada divulgação trimestral. O site monta o seletor a partir de 'periodos': basta acrescentar um período novo no TOPO da lista que ele aparece sozinho, sem mexer no index.html.",
-  "atualizado_em": "2026-11-18",
+  "atualizado_em": "2026-11-25",
   "fonte": "IF.data — Banco Central do Brasil",
   "bancos": [
     {
@@ -182,6 +182,11 @@
       "ticker": "BBCDIGITAL",
       "nome": "Banco BBC Digital",
       "grupo": "emissor"
+    },
+    {
+      "ticker": "SICOOB",
+      "nome": "Sicoob",
+      "grupo": "emissor"
     }
   ],
   "periodos": [
@@ -223,7 +228,8 @@
         "PAGBANK": 15.04,
         "C6": 12.57,
         "NEON": 12.62,
-        "PICPAY": 15.93
+        "PICPAY": 15.93,
+        "SICOOB": 20.29
       },
       "notas": {
         "BPAN4": "Sem conglomerado prudencial próprio",
