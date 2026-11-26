@@ -5351,6 +5351,20 @@
       </div>
 
       <button type="button" class="hg-btn" id="jurosFiisVerIfix">📈 Ver o histórico completo do IFIX</button>
+
+      <h3 style="margin:18px 0 8px;">Juros x Ibovespa ao longo do tempo</h3>
+      <p class="calc-ajuda" style="margin-top:0;">
+        O mesmo efeito também aparece no mercado de ações, por um motivo um pouco diferente do dos FIIs: juros mais
+        altos encarecem o custo de capital e tornam a renda fixa mais competitiva com a renda variável de um modo
+        geral — pressionando o preço das ações, não só dos fundos imobiliários. Aqui embaixo, a mesma taxa do
+        vértice de 1 ano ao lado do Ibovespa no mesmo período.
+      </p>
+      <div id="jurosIbovStatus" class="hg-status">Carregando comparação...</div>
+      <div id="jurosIbovGraficoWrap" style="position:relative; height:280px; margin-bottom:8px;" hidden>
+        <canvas id="jurosIbovChart"></canvas>
+      </div>
+
+      <button type="button" class="hg-btn" id="jurosFiisVerIbov">📈 Ver o histórico completo do Ibovespa</button>
     </section>
 
     <!-- O QUE O MERCADO ESPERA (BOLETIM FOCUS) — mediana das expectativas
@@ -20814,6 +20828,9 @@
     document.getElementById('jurosFiisVerIfix')?.addEventListener('click', () => {
       window.hgConsultarAtivo?.('IFIX');
     });
+    document.getElementById('jurosFiisVerIbov')?.addEventListener('click', () => {
+      window.hgConsultarAtivo?.('IBOVESPA');
+    });
 
     // Curva de juros futuros (ETTJ prefixada) — data/curva-juros.json,
     // coletado 1x por dia útil pelo coletar_curva_juros.py (ANBIMA). Os
@@ -21139,6 +21156,133 @@
         statusEl.className = 'hg-status';
         statusEl.textContent = 'Comparação indisponível no momento — tente novamente mais tarde.';
         jurosIfixCarregada = false;
+      }
+    }
+
+    // Mesma comparação acima, só que com o Ibovespa — o efeito de juros
+    // mais altos pesando sobre ativos de risco também vale pra ações em
+    // geral, não só FIIs. Função praticamente idêntica a
+    // carregarComparacaoJurosIfix (mesmo motivo de outras duplicações
+    // deste arquivo: mais simples manter duas funções pequenas e
+    // independentes do que uma genérica parametrizada).
+    let jurosIbovChart = null;
+    let jurosIbovCarregada = false;
+    async function carregarComparacaoJurosIbov() {
+      if (jurosIbovCarregada) return;
+      jurosIbovCarregada = true;
+
+      const statusEl = document.getElementById('jurosIbovStatus');
+      const wrapEl = document.getElementById('jurosIbovGraficoWrap');
+      if (!statusEl) return;
+
+      try {
+        const resp = await fetch('data/curva-juros-historico.json', { cache: 'no-store' });
+        if (!resp.ok) throw new Error('arquivo não encontrado');
+        const dados = await resp.json();
+        const pontosJuros = Array.isArray(dados?.pontos) ? dados.pontos : [];
+
+        if (pontosJuros.length < 2) {
+          statusEl.textContent = pontosJuros.length === 0
+            ? 'Ainda não há histórico acumulado pra essa comparação — volte em alguns dias úteis.'
+            : 'Só 1 dia de histórico acumulado até agora — volte em alguns dias úteis pra essa comparação ficar visível.';
+          jurosIbovCarregada = false;
+          return;
+        }
+
+        const hojeISO = new Date().toISOString().slice(0, 10);
+        const diasDesdeInicio = Math.round(
+          (new Date(`${hojeISO}T00:00:00`) - new Date(`${pontosJuros[0].data}T00:00:00`)) / 86400000
+        );
+        const periodo = diasDesdeInicio <= 7 ? '7D' : diasDesdeInicio <= 30 ? '30D' : diasDesdeInicio <= 182 ? '6M' : '1A';
+
+        await hgCarregarChartJs();
+        const amostrasIbov = await window.hgBuscarHistoricoPrecos('INDEXB3:BVSP', periodo);
+
+        const primeiraDataJuros = pontosJuros[0].data;
+        const ultimaDataJuros = pontosJuros[pontosJuros.length - 1].data;
+        const mapaJuros = new Map(pontosJuros.map(p => [p.data, p.taxa]));
+        const mapaIbov = new Map(
+          (amostrasIbov || [])
+            .map(a => [String(a.date).slice(0, 10), a.close])
+            .filter(([data]) => data >= primeiraDataJuros && data <= ultimaDataJuros)
+        );
+        const todasDatas = Array.from(new Set([...mapaJuros.keys(), ...mapaIbov.keys()])).sort();
+
+        const taxasJuros = pontosJuros.map(p => p.taxa);
+        const amplitudeJuros = Math.max(...taxasJuros) - Math.min(...taxasJuros);
+        const casasDecimaisJuros = amplitudeJuros < 0.05 ? 3 : amplitudeJuros < 0.5 ? 2 : 1;
+
+        if (jurosIbovChart) jurosIbovChart.destroy();
+        jurosIbovChart = new Chart(document.getElementById('jurosIbovChart'), {
+          type: 'line',
+          data: {
+            labels: todasDatas,
+            datasets: [
+              {
+                label: 'Juros (vértice de 1 ano, % a.a.)',
+                data: todasDatas.map(d => mapaJuros.has(d) ? mapaJuros.get(d) : null),
+                spanGaps: true,
+                borderColor: HG_COR_PRIMARIA(), backgroundColor: 'transparent',
+                borderWidth: 2, pointRadius: 2, pointHoverRadius: 5, tension: 0.2, yAxisID: 'y',
+              },
+              {
+                label: 'Ibovespa',
+                data: todasDatas.map(d => mapaIbov.has(d) ? mapaIbov.get(d) : null),
+                spanGaps: true,
+                borderColor: HG_COR_GOLD(), backgroundColor: 'transparent',
+                borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, tension: 0.2, yAxisID: 'y1',
+              },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { display: true, labels: { color: HG_COR_MUTED(), boxWidth: 12 } },
+            },
+            scales: {
+              x: {
+                type: 'category',
+                title: { display: true, text: 'Data', color: HG_COR_MUTED() },
+                ticks: {
+                  color: HG_COR_MUTED(),
+                  autoSkip: false,
+                  maxRotation: 0,
+                  callback: function (valor, indice) {
+                    const total = todasDatas.length;
+                    const passo = Math.max(1, Math.ceil(total / 8));
+                    if (indice === 0 || indice === total - 1 || indice % passo === 0) {
+                      return todasDatas[indice];
+                    }
+                    return '';
+                  },
+                },
+                grid: { display: false },
+              },
+              y: {
+                position: 'left',
+                title: { display: true, text: 'Juros (% a.a.)', color: HG_COR_PRIMARIA() },
+                ticks: { color: HG_COR_MUTED(), callback: (v) => `${Number(v).toFixed(casasDecimaisJuros)}%` },
+                grid: { color: HG_COR_GRID() },
+              },
+              y1: {
+                position: 'right',
+                title: { display: true, text: 'Ibovespa (pts)', color: HG_COR_GOLD() },
+                ticks: { color: HG_COR_MUTED() },
+                grid: { display: false },
+              },
+            },
+          },
+        });
+
+        statusEl.hidden = true;
+        if (wrapEl) wrapEl.hidden = false;
+      } catch (e) {
+        console.error('Erro ao carregar a comparação Juros x Ibovespa:', e);
+        statusEl.hidden = false;
+        statusEl.className = 'hg-status';
+        statusEl.textContent = 'Comparação indisponível no momento — tente novamente mais tarde.';
+        jurosIbovCarregada = false;
       }
     }
 
@@ -27462,7 +27606,7 @@
       // aqui dentro, e não num listener separado, garante que roda DEPOIS
       // do hidden=false de cima, sem depender da ordem de registro entre
       // handlers do mesmo clique.
-      if (secaoId === 'juros-x-fiis') { carregarCurvaJuros(); carregarComparacaoJurosIfix(); }
+      if (secaoId === 'juros-x-fiis') { carregarCurvaJuros(); carregarComparacaoJurosIfix(); carregarComparacaoJurosIbov(); }
       if (secaoId === 'boletim-focus') { carregarBoletimFocus(); }
       if (secaoId === 'mapa-de-calor') { carregarMapaDeCalor(); }
       atualizarCabecalhoFixoListaMercado(secao);
