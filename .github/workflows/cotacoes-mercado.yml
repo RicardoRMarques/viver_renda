@@ -1,0 +1,82 @@
+name: Coletar Cotações do Mercado (preço + variação do dia)
+
+on:
+  schedule:
+    # A cada 30 min durante o pregão (10h-18h em Brasília, cobrindo um
+    # pouco antes da abertura e depois do fechamento) — só preço e
+    # variação do dia, via HG Brasil /v2/finance/quotes, SEM repetir o
+    # scraping pesado de fundamentos (B3/Fundamentus/CVM) que o
+    # mercado.yml já faz 1x por dia de madrugada. Minutos quebrados de
+    # propósito (mesmo motivo do boletim.yml: evita a fila pesada em
+    # horários redondos do GitHub Actions).
+    #
+    # Criado porque o Mapa de Calor usava a variação do dia do
+    # mercado.yml (1x/dia), mostrando a variação de ONTEM o pregão
+    # inteiro de hoje (reportado em 27/11/2026 com o TRXF11).
+    - cron: '7,37 10-18 * * 1-5'
+      timezone: 'America/Sao_Paulo'
+  workflow_dispatch: {} # permite rodar manualmente pelo botão "Run workflow" no GitHub
+
+concurrency:
+  group: coletar-cotacoes-mercado
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  coletar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v5
+
+      - name: Sincronizar com o topo do main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependências
+        run: pip install requests
+
+      - name: Rodar robô de cotações
+        env:
+          HGBRASIL_TOKEN: ${{ secrets.HGBRASIL_TOKEN }}
+        run: python coletar_cotacoes_mercado.py
+
+      - name: Commitar resultado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/mercado-cotacoes.json
+          if git diff --staged --quiet; then
+            echo "Sem cotações novas, nada para commitar."
+            exit 0
+          fi
+          git commit -m "Atualiza cotações do mercado (preço + variação do dia)"
+
+          # Mesma lógica de retry do mercado.yml: outro robô pode commitar
+          # na main entre o checkout e este push — cada execução é só a
+          # leitura mais recente da API, sem edição manual, então o lado
+          # de cá sempre pode vencer sem perder nada de real.
+          tentativas=5
+          ok=0
+          for i in $(seq 1 $tentativas); do
+            if git pull --rebase -X theirs origin main && git push; then
+              ok=1
+              break
+            fi
+            echo "Tentativa $i/$tentativas falhou (provável corrida com outro robô), tentando de novo..."
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 3))
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "::error::Não foi possível commitar data/mercado-cotacoes.json após $tentativas tentativas."
+            exit 1
+          fi
