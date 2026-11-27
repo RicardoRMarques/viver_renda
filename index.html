@@ -25547,11 +25547,26 @@
       { nome: 'BITCOIN', aliases: ['BTC'] },
       { nome: 'SELIC' },
     ];
+    // Quando a pessoa já favoritou o mesmo ativo (★, ao vivo), o item
+    // equivalente daqui (indices.json, atualizado só a cada ~15min pelo
+    // robô) é redundante — e pior, pode mostrar um valor/variação
+    // DIFERENTE do favorito ao vivo pro MESMO índice, só por causa da
+    // defasagem entre as duas fontes (reportado em 27/11/2026: BVSP
+    // favoritado ao vivo com +2,18%, e "Ibovespa" do robô ao lado
+    // mostrando +6,07% no mesmo instante). Lista os símbolos que o
+    // favoritar pode gravar pra cada nome daqui, pra pular o item do
+    // robô sempre que já tiver a versão ao vivo equivalente no carrossel.
+    const SIMBOLOS_FAVORITO_DO_TICKER = {
+      IBOVESPA: ['BVSP', 'IBOV', 'IBOVESPA', '^BVSP'],
+      IFIX: ['IFIX'],
+      BITCOIN: ['BTC/USD', 'BTC', 'BITCOIN'],
+    };
     function renderizarTickerCarrossel(indices) {
       const track = document.getElementById('tickerTrack');
       if (!track) return;
 
       const lista = Array.isArray(indices) ? indices : [];
+      const simbolosFavoritados = new Set(tickerFavoritosCache.map(f => (f.symbol || '').toUpperCase()));
 
       // Faz correspondência por prefixo (case-insensitive), pois o robô
       // costuma gravar rótulos com sufixo entre parênteses, como
@@ -25565,6 +25580,10 @@
       }
 
       const itens = TICKER_ATIVOS
+        .filter(({ nome }) => {
+          const possiveis = SIMBOLOS_FAVORITO_DO_TICKER[nome];
+          return !possiveis || !possiveis.some(s => simbolosFavoritados.has(s));
+        })
         .map(({ nome, aliases }) => ({ nome, item: encontrarItem(nome, aliases) }))
         .filter(({ item }) => item);
 
