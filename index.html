@@ -27463,14 +27463,45 @@
       btn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.7-9.5-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.5 12c-2 4.3-9.5 9-9.5 9z"/></svg>Meus Favoritos${totalFavoritos ? ` <span class="lm-fav-contador">${totalFavoritos}</span>` : ''}`;
     }
 
+    // Preço + variação do dia frescos (robô coletar_cotacoes_mercado.py,
+    // a cada ~30min durante o pregão) pra mesclar por cima dos fundamentos
+    // de mercado-acoes.json/mercado-fiis.json (coletar_mercado.py, só 1x
+    // por dia de madrugada) — sem isso, o Mapa de Calor ficava preso na
+    // variação de ONTEM o pregão inteiro de hoje (reportado 27/11/2026
+    // com o TRXF11). Cache numa promise só, reaproveitada pelas duas
+    // abas (Ações/FIIs), já que é o mesmo arquivo pros dois casos.
+    let mcCotacoesPromise = null;
+    function mcBuscarCotacoesFrescas() {
+      if (!mcCotacoesPromise) {
+        mcCotacoesPromise = fetch(`data/mercado-cotacoes.json?v=${Date.now()}`, { cache: 'no-store' })
+          .then(r => r.ok ? r.json() : null)
+          .catch(() => null);
+      }
+      return mcCotacoesPromise;
+    }
+
     function mcCarregarDataset(tipo) {
       if (mcEstado.dados[tipo] || mcEstado.carregando[tipo]) return;
       mcEstado.carregando[tipo] = true;
       const url = tipo === 'acoes' ? 'mercado-acoes.json' : 'mercado-fiis.json';
-      fetch(`${url}?v=${Date.now()}`, { cache: 'no-store' })
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(json => {
-          mcEstado.dados[tipo] = (json.ativos || []).filter(a => typeof a.variacao_dia_pct === 'number' && !isNaN(a.variacao_dia_pct));
+      Promise.all([
+        fetch(`${url}?v=${Date.now()}`, { cache: 'no-store' })
+          .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }),
+        mcBuscarCotacoesFrescas(),
+      ])
+        .then(([json, cotacoesJson]) => {
+          // Mescla best-effort: se o arquivo de cotações frescas não
+          // carregar (ou ainda não tiver rodado pela 1ª vez), cada ativo
+          // simplesmente mantém a variação do dia já vinda do arquivo
+          // diário — nunca quebra o Mapa de Calor por causa disso.
+          const mapaCotacoes = cotacoesJson?.cotacoes || {};
+          const ativos = (json.ativos || []).map(a => {
+            const fresco = mapaCotacoes[a.ticker];
+            return (fresco && typeof fresco.variacao_dia_pct === 'number')
+              ? { ...a, preco: fresco.preco ?? a.preco, variacao_dia_pct: fresco.variacao_dia_pct }
+              : a;
+          });
+          mcEstado.dados[tipo] = ativos.filter(a => typeof a.variacao_dia_pct === 'number' && !isNaN(a.variacao_dia_pct));
           mcEstado.carregando[tipo] = false;
           if (mcEstado.aba === tipo) mcRenderizar();
         })
