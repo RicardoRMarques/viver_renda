@@ -3558,6 +3558,12 @@
       border-radius: 50%; border: 1px solid var(--muted); background: transparent;
       color: var(--muted); font-size: 0.62rem; font-weight: 700; line-height: 1;
       cursor: pointer; font-family: inherit; padding: 0;
+      /* Sem isso, o :hover (linha debaixo) + o mouseenter que abre o balão
+         (JS) competem com a simulação de hover que o Chrome/Safari fazem no
+         1º toque em touchscreen — o toque "morre" ali e o clique real nunca
+         chega a disparar. Rolar a tela até o botão (comum em listas/tabelas
+         longas) piora a chance de pegar esse estado. */
+      touch-action: manipulation;
     }
     .cmp-info-btn:hover, .hg-info-btn:hover { border-color: var(--primary); color: var(--primary); }
     .hg-info-vermelho { border-color: #e05555 !important; color: #e05555 !important; }
@@ -3733,6 +3739,14 @@
        sem isso ficava no padrão estreito (480px) e os campos lado a lado
        (valor do imóvel/aluguel, despesas/DY) ficavam apertados. */
     .calc-modal.cr-modal { max-width: 960px; }
+    /* Calculadora de Imposto de Renda: alargado além do .fire-modal padrão
+       (720px), a pedido do usuário — a tabela de regras de IR (15 linhas)
+       exigia rolagem vertical longa; mais largura deixa menos texto
+       quebrando linha por linha, encurtando a altura total da tabela. */
+    .calc-modal.ir-modal { max-width: 860px; }
+    @media (min-width: 900px) {
+      .calc-modal.ir-modal { max-width: 920px; }
+    }
     @media (min-width: 1024px) {
       .calc-modal.cr-modal { max-width: 1040px; }
     }
@@ -7174,7 +7188,7 @@
 
     <!-- Modal: Calculadora de Imposto de Renda sobre Investimentos -->
     <div id="irOverlay" class="calc-overlay" role="dialog" aria-modal="true" aria-labelledby="irTitulo" hidden>
-      <div class="calc-modal fire-modal">
+      <div class="calc-modal fire-modal ir-modal">
         <div class="calc-modal-topo">
           <h3 id="irTitulo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px; vertical-align:-3px; margin-right:6px;"><path d="M6 2h9l3 3v17H6z"></path><path d="M15 2v3h3"></path><line x1="9" y1="10" x2="15" y2="10"></line><line x1="9" y1="14" x2="15" y2="14"></line><line x1="9" y1="18" x2="12" y2="18"></line></svg>Calculadora de Imposto de Renda
@@ -7279,7 +7293,7 @@
                   <tr><td>Fundo DI / Renda Fixa (curto prazo)</td><td>22,5% ou 20% (tabela regressiva de curto prazo, só 2 faixas) + come-cotas de 20% a cada maio/novembro, abatido no resgate</td></tr>
                   <tr><td>Ações (comum)</td><td>15% sobre o lucro (isento até R$ 20 mil vendidos/mês)</td></tr>
                   <tr><td>Ações (day-trade)</td><td>20% sobre o lucro, sem isenção</td></tr>
-                  <tr><td>Units (ex: TAEE11, SANB11, KLBN11) <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="ir-units-sem-isencao" aria-label="O que é isso?" title="">?</button></td><td>15% sobre o lucro (day-trade: 20%) <strong>sem</strong> a isenção de R$ 20 mil/mês das ações — tributado desde o 1º real</td></tr>
+                  <tr><td>Units <button type="button" class="hg-info-btn hg-info-vermelho" data-glossario="ir-units-sem-isencao" aria-label="O que é isso?" title="">?</button></td><td>15% (day-trade: 20%) — <strong>sem</strong> isenção de R$ 20 mil</td></tr>
                   <tr><td>FIIs (rendimentos mensais)</td><td>Isento*</td></tr>
                   <tr><td>FIIs (venda de cotas c/ lucro)</td><td>20%, sem faixa de isenção</td></tr>
                   <tr><td>FI-Infra (rendimentos e venda de cotas)</td><td>Isento**</td></tr>
@@ -24470,6 +24484,12 @@
         glossarioTooltipEl.className = 'cmp-info-balao';
         document.body.appendChild(glossarioTooltipEl);
       }
+      // Marcado por "pointerup" em touch (ver ligarBotaoGlossario) pra
+      // ignorar o "click" fantasma que o navegador sintetiza logo depois do
+      // toque — sem isso, esse click (que não necessariamente mira o botão
+      // certo) chega no listener de documento abaixo e fecha o balão que o
+      // pointerup acabou de abrir.
+      let suprimirProximoCliqueDeToque = false;
       function fechar() {
         glossarioTooltipEl.classList.remove('cmp-info-aberto');
         glossarioTooltipEl.style.display = 'none';
@@ -24522,14 +24542,33 @@
         const texto = GLOSSARIO[botao.getAttribute('data-glossario')];
         if (!texto) return;
         botao.dataset.glossarioLigado = '1';
-        botao.addEventListener('click', (e) => {
-          e.stopPropagation();
+        const alternar = () => {
           const meuIndice = botao.getAttribute('data-glossario');
           const jaAbertoAqui = glossarioTooltipEl.classList.contains('cmp-info-aberto') && glossarioTooltipEl.dataset.origem === meuIndice;
           if (jaAbertoAqui) { fechar(); return; }
           abrir(botao, texto);
           glossarioTooltipEl.classList.add('cmp-info-aberto');
           glossarioTooltipEl.dataset.origem = meuIndice;
+        };
+        // Em touch, dentro de um modal com rolagem própria (.calc-modal,
+        // overflow-y:auto), o "click" sintético que o navegador gera depois
+        // do toque às vezes chega com o target errado (ex: body), e o botão
+        // nunca abre — reproduzido ao rolar até um "?" perto do fim de uma
+        // tabela comprida (ex: tabela de IR) e tocar nele. "pointerup" não
+        // sofre disso: confirmado que chega sempre com o alvo certo. Resolve
+        // por toque ali mesmo e cancela o "click" fantasma que viria depois.
+        botao.addEventListener('pointerup', (e) => {
+          if (e.pointerType !== 'touch') return;
+          e.preventDefault();
+          e.stopPropagation();
+          suprimirProximoCliqueDeToque = true;
+          setTimeout(() => { suprimirProximoCliqueDeToque = false; }, 500);
+          alternar();
+        });
+        botao.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (suprimirProximoCliqueDeToque) { suprimirProximoCliqueDeToque = false; return; }
+          alternar();
         });
         botao.addEventListener('mouseenter', () => {
           if (glossarioTooltipEl.classList.contains('cmp-info-aberto')) return;
@@ -24542,7 +24581,10 @@
 
       window.ligarGlossario();
 
-      document.addEventListener('click', fechar);
+      document.addEventListener('click', () => {
+        if (suprimirProximoCliqueDeToque) { suprimirProximoCliqueDeToque = false; return; }
+        fechar();
+      });
       window.addEventListener('scroll', fechar, { passive: true });
       // O evento scroll não sobe na árvore: sem a fase de captura, rolar
       // DENTRO de um modal (que é quem rola, não a janela) deixava o balão
