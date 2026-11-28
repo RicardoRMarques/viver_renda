@@ -2,403 +2,403 @@
  "_leia_me": "Três curvas da Estrutura a Termo da Taxa de Juros (ETTJ), publicadas diariamente pela ANBIMA. 'taxa' é a curva PREFIXADA — o mercado se refere a ela como \"curva de juros\", \"curva do DI futuro\" ou \"curva pré\" (nos contratos futuros negociados na B3, cada vencimento tem um código DI1 + letra do mês + ano, ex: DI1F27 = janeiro/2027 — a ETTJ da ANBIMA é a versão dessa mesma curva já ajustada por modelo, suave, a partir desses títulos). 'taxa_ipca' é a curva REAL (acima da inflação) — a mesma lógica, mas a partir dos títulos indexados ao IPCA (as NTN-B/Tesouro IPCA+); só existe a partir dos vértices mais longos (grosso modo, 2 anos em diante), por isso vem None nos vértices curtos. 'inflacao_implicita' é a inflação que o mercado está precificando para cada prazo, calculada pela própria ANBIMA (não por este robô) pela equação de Fisher: (1+prefixada)/(1+real) − 1 — por isso só existe onde as outras duas também existem. Cada ponto em 'pontos' é um vértice (prazo em dias úteis — 252 é aproximadamente 1 ano), ajustado pelo modelo da própria ANBIMA (Svensson/Nelson-Siegel) a partir dos títulos públicos negociados no dia. Quando a curva prefixada sobe (sobretudo nos vértices mais longos), FIIs tendem a cair — a renda fixa fica mais atraente na comparação; quando recua, o movimento costuma ser o oposto. Ver seção 'Juros Futuros x Fundos Imobiliários' em viverderenda.dev.br.",
  "fonte": "ANBIMA — Estrutura a Termo da Taxa de Juros (ETTJ): prefixada, IPCA e inflação implícita",
  "fonte_url": "https://www.anbima.com.br/informacoes/est-termo/",
- "data_referencia": "2026-11-25",
- "atualizado_em": "2026-11-26T05:06:02+00:00",
+ "data_referencia": "2026-11-26",
+ "atualizado_em": "2026-11-27T05:04:06+00:00",
  "pontos": [
   {
    "dias": 126,
-   "taxa": 13.8202,
-   "taxa_ipca": 3.8368,
-   "inflacao_implicita": 9.6145
+   "taxa": 13.8039,
+   "taxa_ipca": 3.8177,
+   "inflacao_implicita": 9.6189
   },
   {
    "dias": 252,
-   "taxa": 14.1571,
-   "taxa_ipca": 5.8433,
-   "inflacao_implicita": 7.8548
+   "taxa": 14.0646,
+   "taxa_ipca": 5.8179,
+   "inflacao_implicita": 7.7932
   },
   {
    "dias": 378,
-   "taxa": 14.4619,
-   "taxa_ipca": 6.8376,
-   "inflacao_implicita": 7.1363
+   "taxa": 14.294,
+   "taxa_ipca": 6.792,
+   "inflacao_implicita": 7.0248
   },
   {
    "dias": 504,
-   "taxa": 14.7033,
-   "taxa_ipca": 7.3386,
-   "inflacao_implicita": 6.8611
+   "taxa": 14.4756,
+   "taxa_ipca": 7.2658,
+   "inflacao_implicita": 6.7214
   },
   {
    "dias": 630,
-   "taxa": 14.8837,
-   "taxa_ipca": 7.596,
-   "inflacao_implicita": 6.7732
+   "taxa": 14.613,
+   "taxa_ipca": 7.4953,
+   "inflacao_implicita": 6.6214
   },
   {
    "dias": 756,
-   "taxa": 15.0147,
-   "taxa_ipca": 7.7307,
-   "inflacao_implicita": 6.7613
+   "taxa": 14.7148,
+   "taxa_ipca": 7.6049,
+   "inflacao_implicita": 6.6074
   },
   {
    "dias": 882,
-   "taxa": 15.108,
-   "taxa_ipca": 7.8018,
-   "inflacao_implicita": 6.7774
+   "taxa": 14.7894,
+   "taxa_ipca": 7.6553,
+   "inflacao_implicita": 6.6267
   },
   {
    "dias": 1008,
-   "taxa": 15.1733,
-   "taxa_ipca": 7.8386,
-   "inflacao_implicita": 6.8015
+   "taxa": 14.8438,
+   "taxa_ipca": 7.6761,
+   "inflacao_implicita": 6.6567
   },
   {
    "dias": 1134,
-   "taxa": 15.2181,
-   "taxa_ipca": 7.856,
-   "inflacao_implicita": 6.8258
+   "taxa": 14.8833,
+   "taxa_ipca": 7.6819,
+   "inflacao_implicita": 6.6876
   },
   {
    "dias": 1260,
-   "taxa": 15.2479,
-   "taxa_ipca": 7.8618,
-   "inflacao_implicita": 6.8477
+   "taxa": 14.912,
+   "taxa_ipca": 7.6798,
+   "inflacao_implicita": 6.7163
   },
   {
    "dias": 1386,
-   "taxa": 15.2667,
-   "taxa_ipca": 7.8604,
-   "inflacao_implicita": 6.8665
+   "taxa": 14.9325,
+   "taxa_ipca": 7.6735,
+   "inflacao_implicita": 6.7416
   },
   {
    "dias": 1512,
-   "taxa": 15.2776,
-   "taxa_ipca": 7.8542,
-   "inflacao_implicita": 6.8828
+   "taxa": 14.9471,
+   "taxa_ipca": 7.6649,
+   "inflacao_implicita": 6.7637
   },
   {
    "dias": 1638,
-   "taxa": 15.2826,
-   "taxa_ipca": 7.8448,
-   "inflacao_implicita": 6.8967
+   "taxa": 14.9573,
+   "taxa_ipca": 7.6549,
+   "inflacao_implicita": 6.7831
   },
   {
    "dias": 1764,
-   "taxa": 15.2835,
-   "taxa_ipca": 7.8334,
-   "inflacao_implicita": 6.9088
+   "taxa": 14.9643,
+   "taxa_ipca": 7.6442,
+   "inflacao_implicita": 6.8002
   },
   {
    "dias": 1890,
-   "taxa": 15.2814,
-   "taxa_ipca": 7.8205,
-   "inflacao_implicita": 6.9197
+   "taxa": 14.9688,
+   "taxa_ipca": 7.6331,
+   "inflacao_implicita": 6.8154
   },
   {
    "dias": 2016,
-   "taxa": 15.2772,
-   "taxa_ipca": 7.8068,
-   "inflacao_implicita": 6.9294
+   "taxa": 14.9716,
+   "taxa_ipca": 7.6218,
+   "inflacao_implicita": 6.8292
   },
   {
    "dias": 2142,
-   "taxa": 15.2716,
-   "taxa_ipca": 7.7925,
-   "inflacao_implicita": 6.9384
+   "taxa": 14.973,
+   "taxa_ipca": 7.6105,
+   "inflacao_implicita": 6.8418
   },
   {
    "dias": 2268,
-   "taxa": 15.2651,
-   "taxa_ipca": 7.7781,
-   "inflacao_implicita": 6.9466
+   "taxa": 14.9735,
+   "taxa_ipca": 7.5993,
+   "inflacao_implicita": 6.8533
   },
   {
    "dias": 2394,
-   "taxa": 15.258,
-   "taxa_ipca": 7.7636,
-   "inflacao_implicita": 6.9544
+   "taxa": 14.9733,
+   "taxa_ipca": 7.5883,
+   "inflacao_implicita": 6.8641
   },
   {
    "dias": 2520,
-   "taxa": 15.2506,
-   "taxa_ipca": 7.7493,
-   "inflacao_implicita": 6.9618
+   "taxa": 14.9726,
+   "taxa_ipca": 7.5775,
+   "inflacao_implicita": 6.8742
   },
   {
    "dias": 2646,
    "taxa": null,
-   "taxa_ipca": 7.7353,
+   "taxa_ipca": 7.567,
    "inflacao_implicita": null
   },
   {
    "dias": 2772,
    "taxa": null,
-   "taxa_ipca": 7.7216,
+   "taxa_ipca": 7.5569,
    "inflacao_implicita": null
   },
   {
    "dias": 2898,
    "taxa": null,
-   "taxa_ipca": 7.7084,
+   "taxa_ipca": 7.5471,
    "inflacao_implicita": null
   },
   {
    "dias": 3024,
    "taxa": null,
-   "taxa_ipca": 7.6956,
+   "taxa_ipca": 7.5377,
    "inflacao_implicita": null
   },
   {
    "dias": 3150,
    "taxa": null,
-   "taxa_ipca": 7.6833,
+   "taxa_ipca": 7.5286,
    "inflacao_implicita": null
   },
   {
    "dias": 3276,
    "taxa": null,
-   "taxa_ipca": 7.6715,
+   "taxa_ipca": 7.5199,
    "inflacao_implicita": null
   },
   {
    "dias": 3402,
    "taxa": null,
-   "taxa_ipca": 7.6602,
+   "taxa_ipca": 7.5115,
    "inflacao_implicita": null
   },
   {
    "dias": 3528,
    "taxa": null,
-   "taxa_ipca": 7.6494,
+   "taxa_ipca": 7.5035,
    "inflacao_implicita": null
   },
   {
    "dias": 3654,
    "taxa": null,
-   "taxa_ipca": 7.6391,
+   "taxa_ipca": 7.4959,
    "inflacao_implicita": null
   },
   {
    "dias": 3780,
    "taxa": null,
-   "taxa_ipca": 7.6292,
+   "taxa_ipca": 7.4886,
    "inflacao_implicita": null
   },
   {
    "dias": 3906,
    "taxa": null,
-   "taxa_ipca": 7.6198,
+   "taxa_ipca": 7.4816,
    "inflacao_implicita": null
   },
   {
    "dias": 4032,
    "taxa": null,
-   "taxa_ipca": 7.6108,
+   "taxa_ipca": 7.4749,
    "inflacao_implicita": null
   },
   {
    "dias": 4158,
    "taxa": null,
-   "taxa_ipca": 7.6023,
+   "taxa_ipca": 7.4686,
    "inflacao_implicita": null
   },
   {
    "dias": 4284,
    "taxa": null,
-   "taxa_ipca": 7.5941,
+   "taxa_ipca": 7.4625,
    "inflacao_implicita": null
   },
   {
    "dias": 4410,
    "taxa": null,
-   "taxa_ipca": 7.5864,
+   "taxa_ipca": 7.4567,
    "inflacao_implicita": null
   },
   {
    "dias": 4536,
    "taxa": null,
-   "taxa_ipca": 7.579,
+   "taxa_ipca": 7.4511,
    "inflacao_implicita": null
   },
   {
    "dias": 4662,
    "taxa": null,
-   "taxa_ipca": 7.5719,
+   "taxa_ipca": 7.4458,
    "inflacao_implicita": null
   },
   {
    "dias": 4788,
    "taxa": null,
-   "taxa_ipca": 7.5651,
+   "taxa_ipca": 7.4408,
    "inflacao_implicita": null
   },
   {
    "dias": 4914,
    "taxa": null,
-   "taxa_ipca": 7.5587,
+   "taxa_ipca": 7.4359,
    "inflacao_implicita": null
   },
   {
    "dias": 5040,
    "taxa": null,
-   "taxa_ipca": 7.5525,
+   "taxa_ipca": 7.4313,
    "inflacao_implicita": null
   },
   {
    "dias": 5166,
    "taxa": null,
-   "taxa_ipca": 7.5467,
+   "taxa_ipca": 7.4268,
    "inflacao_implicita": null
   },
   {
    "dias": 5292,
    "taxa": null,
-   "taxa_ipca": 7.541,
+   "taxa_ipca": 7.4226,
    "inflacao_implicita": null
   },
   {
    "dias": 5418,
    "taxa": null,
-   "taxa_ipca": 7.5356,
+   "taxa_ipca": 7.4185,
    "inflacao_implicita": null
   },
   {
    "dias": 5544,
    "taxa": null,
-   "taxa_ipca": 7.5305,
+   "taxa_ipca": 7.4146,
    "inflacao_implicita": null
   },
   {
    "dias": 5670,
    "taxa": null,
-   "taxa_ipca": 7.5255,
+   "taxa_ipca": 7.4108,
    "inflacao_implicita": null
   },
   {
    "dias": 5796,
    "taxa": null,
-   "taxa_ipca": 7.5208,
+   "taxa_ipca": 7.4073,
    "inflacao_implicita": null
   },
   {
    "dias": 5922,
    "taxa": null,
-   "taxa_ipca": 7.5163,
+   "taxa_ipca": 7.4038,
    "inflacao_implicita": null
   },
   {
    "dias": 6048,
    "taxa": null,
-   "taxa_ipca": 7.5119,
+   "taxa_ipca": 7.4005,
    "inflacao_implicita": null
   },
   {
    "dias": 6174,
    "taxa": null,
-   "taxa_ipca": 7.5077,
+   "taxa_ipca": 7.3973,
    "inflacao_implicita": null
   },
   {
    "dias": 6300,
    "taxa": null,
-   "taxa_ipca": 7.5037,
+   "taxa_ipca": 7.3942,
    "inflacao_implicita": null
   },
   {
    "dias": 6426,
    "taxa": null,
-   "taxa_ipca": 7.4998,
+   "taxa_ipca": 7.3913,
    "inflacao_implicita": null
   },
   {
    "dias": 6552,
    "taxa": null,
-   "taxa_ipca": 7.4961,
+   "taxa_ipca": 7.3884,
    "inflacao_implicita": null
   },
   {
    "dias": 6678,
    "taxa": null,
-   "taxa_ipca": 7.4925,
+   "taxa_ipca": 7.3857,
    "inflacao_implicita": null
   },
   {
    "dias": 6804,
    "taxa": null,
-   "taxa_ipca": 7.489,
+   "taxa_ipca": 7.3831,
    "inflacao_implicita": null
   },
   {
    "dias": 6930,
    "taxa": null,
-   "taxa_ipca": 7.4857,
+   "taxa_ipca": 7.3805,
    "inflacao_implicita": null
   },
   {
    "dias": 7056,
    "taxa": null,
-   "taxa_ipca": 7.4825,
+   "taxa_ipca": 7.3781,
    "inflacao_implicita": null
   },
   {
    "dias": 7182,
    "taxa": null,
-   "taxa_ipca": 7.4793,
+   "taxa_ipca": 7.3757,
    "inflacao_implicita": null
   },
   {
    "dias": 7308,
    "taxa": null,
-   "taxa_ipca": 7.4763,
+   "taxa_ipca": 7.3734,
    "inflacao_implicita": null
   },
   {
    "dias": 7434,
    "taxa": null,
-   "taxa_ipca": 7.4734,
+   "taxa_ipca": 7.3712,
    "inflacao_implicita": null
   },
   {
    "dias": 7560,
    "taxa": null,
-   "taxa_ipca": 7.4706,
+   "taxa_ipca": 7.369,
    "inflacao_implicita": null
   },
   {
    "dias": 7686,
    "taxa": null,
-   "taxa_ipca": 7.4679,
+   "taxa_ipca": 7.367,
    "inflacao_implicita": null
   },
   {
    "dias": 7812,
    "taxa": null,
-   "taxa_ipca": 7.4653,
+   "taxa_ipca": 7.365,
    "inflacao_implicita": null
   },
   {
    "dias": 7938,
    "taxa": null,
-   "taxa_ipca": 7.4628,
+   "taxa_ipca": 7.363,
    "inflacao_implicita": null
   },
   {
    "dias": 8064,
    "taxa": null,
-   "taxa_ipca": 7.4603,
+   "taxa_ipca": 7.3611,
    "inflacao_implicita": null
   },
   {
    "dias": 8190,
    "taxa": null,
-   "taxa_ipca": 7.4579,
+   "taxa_ipca": 7.3593,
    "inflacao_implicita": null
   },
   {
    "dias": 8316,
    "taxa": null,
-   "taxa_ipca": 7.4556,
+   "taxa_ipca": 7.3575,
    "inflacao_implicita": null
   }
  ]
